@@ -16,11 +16,6 @@
     "type": "image/png",
     "density": "1.5"
   }, {
-    "src": "images/touch/google-touch-icon-76x76.png",
-    "sizes": "76x76",
-    "type": "image/png",
-    "density": "1.583"
-  }, {
     "src": "images/touch/google-touch-icon-96x96.png",
     "sizes": "96x96",
     "type": "image/png",
