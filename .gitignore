@@ -1,5 +1,8 @@
+bower_components
+components
 node_modules
+dist
 .sass-cache
 .tmp
-dist
 .DS_Store
+app/sass/*.css
