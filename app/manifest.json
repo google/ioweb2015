@@ -8,6 +8,6 @@
       "density": "4.0"
     }
   ],
-  "start_url": "index.html",
+  "start_url": "index.html?utm_source=web_app_manifest",
   "display": "standalone"
 }
