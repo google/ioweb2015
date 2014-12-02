@@ -28,8 +28,37 @@
     <meta name="msapplication-tap-highlight" content="no">
 
     <meta property="og:title" content="Google I/O 2015">
+    <meta property="og:type" content="website">
     <meta property="og:description" content="Google I/O 2015 brings developers together for an immersive, two-day experience focused on exploring the next generation of technology.">
-    <meta property="og:image" content="/images/io.png">
+    <meta property="og:image" content="images/io.png">
+
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "Event",
+        "name": "Google I/O 2015",
+        "url": ".",
+        "image": "images/io.png",
+        "location": {
+          "@type": "Place",
+          "name": "Todovenue",
+          "address": {
+            "@type" : "PostalAddress",
+            "streetAddress" : "34 Todo St.",
+            "addressLocality" : "Todoville",
+            "addressRegion" : "TO",
+            "postalCode" : "34343",
+            "addressCountry" : "US"
+          }
+        },
+        "startDate": "2015-01-01T00:00Z",
+        "endDate": "2015-01-02T00:00Z",
+        "offers" : {
+          "@type" : "Offer",
+          "url" : "tickets"
+        }
+      }
+    </script>
 
     <!-- Page styles -->
     <link rel="stylesheet" href="styles/main.css">
