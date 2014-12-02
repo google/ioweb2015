@@ -1,0 +1,14 @@
+{
+  "name": "Google I/O 2015",
+  "icons": [
+    {
+      "src": "images/touch/chrome-touch-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "density": "4.0"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait"
+}
