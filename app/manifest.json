@@ -2,10 +2,10 @@
   "name": "Google I/O 2015",
   "icons": [
     {
-      "src": "images/touch/chrome-touch-icon-192x192.png",
-      "sizes": "192x192",
+      "src": "images/touch/chrome-touch-icon-152x152.png",
+      "sizes": "152x152",
       "type": "image/png",
-      "density": "4.0"
+      "density": "3.1667"
     }
   ],
   "start_url": "index.html?utm_source=web_app_manifest",
