@@ -41,7 +41,6 @@
     "through2": "0.6.3",
     "vinyl-map": "1.0.1",
     "sprintf-js": "1.0.2",
-    "yargs": "1.3.3",
-    "merge-stream": "^0.1.6"
+    "yargs": "1.3.3"
   }
 }
