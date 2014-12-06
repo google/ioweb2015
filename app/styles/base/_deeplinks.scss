@@ -1,0 +1,32 @@
+body.deeplink-schedule:after,
+body.deeplink-sessions:after,
+body.deeplink-attendee-information:after,
+body.deeplink-get-involved:after
+body.deeplink-about-chrome-dev-summit:after {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+body.deeplink-schedule:after {
+  background: $color-primary;
+}
+
+body.deeplink-sessions:after {
+  background: $color-accent;
+}
+
+body.deeplink-attendee-information:after {
+  background: $color-hotpink;
+}
+
+body.deeplink-get-involved:after {
+  background: $color-yellow;
+}
+
+body.deeplink-about-chrome-dev-summit:after {
+  background: $color-action;
+}

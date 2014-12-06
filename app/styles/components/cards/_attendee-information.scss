@@ -1,0 +1,122 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.attendee-information.card {
+  height: 240px;
+  margin-bottom: 4px;
+}
+
+.attendee-information__join-wait-list {
+  @include typo-button();
+  @include button();
+  color: $color-accent;
+  background: #FFF;
+  margin-top: 24px;
+}
+
+.attendee-information .ripple {
+  background: $color-hotpink;
+}
+
+.attendee-information .card__container {
+  background: $color-hotpink;
+
+  &:after {
+    background: $color-hotpink;
+  }
+
+  &:before {
+    background: $color-hotpink;
+  }
+}
+
+.attendee-information__address {
+  margin: 16px 0;
+}
+
+.attendee-information div[itemprop="name"] {
+  font-weight: bold;
+}
+
+.attendee-information .card__content-wrapper {
+  padding: 0 16px 30px 16px;
+  border-top: 136px solid $color-hotpink;
+
+  h1 {
+    @include typo-base();
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 32px;
+    color: $color-hotpink;
+    margin-bottom: 16px;
+    padding-top: 20px;
+  }
+
+  a {
+    color: $color-hotpink;
+  }
+}
+
+.attendee-information .card__logo {
+  width: 191px;
+  height: 191px;
+  left: calc(50% - 96px);
+  top: calc(50% - 85px);
+  background: url(../images/icon-quad.png) top left no-repeat;
+  background-size: contain;
+}
+
+.attendee-information.card--expanded {
+  .card__logo {
+    left: calc(50% - 61px);
+    top: 66px;
+
+    width: 120px;
+    height: 120px;
+  }
+
+  .card__content-wrapper {
+    top: 60px;
+  }
+}
+
+@media (min-width: 600px) {
+  .attendee-information.card {
+    float: left;
+    width: calc(50% - 2px);
+  }
+}
+
+@media (min-width: 800px) {
+  .attendee-information.card {
+    float: left;
+    width: calc(25% - 2px);
+  }
+}
+
+@media (min-width: 900px) {
+
+  .attendee-information .card__content-wrapper {
+    border-top: 136px solid darken($color-hotpink, 16%);
+  }
+}
+
+@media (min-width: 960px) {
+  .attendee-information.card {
+    width: calc(25% - 6px);
+    margin-left: 4px;
+  }
+}

@@ -1,0 +1,361 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@mixin g-contain() {
+  overflow: hidden;
+}
+
+@mixin g-w25() {
+  width: 25%;
+}
+
+@mixin g-w50() {
+  width: 50%;
+}
+
+@mixin g-w75() {
+  width: 75%;
+}
+
+@mixin g-w100() {
+  width: 100%;
+}
+
+@mixin g-h25() {
+  height: 25%;
+}
+
+@mixin g-h50() {
+  height: 50%;
+}
+
+@mixin g-h75() {
+  height: 75%;
+}
+
+@mixin g-h100() {
+  height: 100%;
+}
+
+@mixin g-left() {
+  float: left;
+}
+
+@mixin g-right() {
+  float: right;
+}
+
+.summit-home-content {
+  position: relative;
+}
+
+.summit-intro-content {
+  width: 100%;
+  height: 100%;
+  background: #FFF;
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+.summit-intro-text-container {
+  width: 100%;
+  height: 100%;
+  background: #FFF;
+  padding: 32px 32px 16px 16px;
+  position: relative;
+}
+
+.summit-intro-text-container p {
+  line-height: 1.7;
+}
+
+.summit-intro-text-container p:first-of-type {
+  font-family: Roboto;
+  font-weight: 400;
+  font-size: 16px;
+  opacity: 0.54;
+  line-height: 1.5;
+  letter-spacing: 0px;
+}
+
+.summit-register-button {
+  @include typo-button();
+  @include button();
+  background: $color-action;
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+}
+
+.summit-home-grid {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  height: 600px;
+}
+
+.summit-pic {
+  @include g-contain();
+  width: 100%;
+  height: 100%;
+  display: block;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  background-origin: border-box;
+  background-size: cover;
+}
+
+.summit-intro {
+  @include g-w100();
+  height: 68%;
+  padding: 0 0 2px 0;
+}
+
+.summit-pic-3-1 {
+  @include g-w50();
+  @include g-h25();
+  @include g-left();
+  padding: 2px 2px 2px 0;
+}
+
+.summit-pic-3-1 .summit-pic {
+  background-image: url(../images/pic-3-1.jpg);
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.summit-pic-3-2 {
+  @include g-w50();
+  @include g-h25();
+  @include g-left();
+  padding: 2px 2px 2px 0;
+}
+
+.summit-pic-3-2 .summit-pic {
+  background-image: url(../images/pic-3-2.jpg);
+  background-position: right center;
+  background-repeat: no-repeat;
+}
+
+.summit-pic-4-2 {
+  @include g-w50();
+  @include g-h50();
+  @include g-right();
+  padding: 2px 0 2px 2px;
+}
+
+.summit-pic-4-2 .summit-pic {
+  background-image: url(../images/pic-4-2.jpg);
+  background-position: right top;
+  background-repeat: no-repeat;
+}
+
+.summit-pic-2-3 {
+  @include g-w100();
+  @include g-h50();
+  @include g-right();
+  padding: 2px 0 2px 0;
+}
+
+.summit-pic-2-3 .summit-pic {
+  background-image: url(../images/pic-2-3.jpg);
+  background-position: left top;
+  background-repeat: no-repeat;
+}
+
+.summit-pic-1-3 {
+  display: none;
+}
+
+.summit-pic-1-3 .summit-pic {
+  background-image: url(../images/pic-1-3.jpg);
+  background-position: left top;
+  background-repeat: no-repeat;
+}
+
+.summit-pic-4-4 {
+  @include g-w100();
+  @include g-h50();
+  @include g-right();
+  padding: 2px 0 0 0;
+}
+
+.summit-pic-4-4 .summit-pic {
+  background: $color-primary;
+  color: #FFF;
+  line-height: 2;
+  padding: 16px;
+}
+
+.summit-pic-4-4 .format-list {
+  margin: 0;
+  padding: 4px 0 4px 16px;
+}
+
+.summit-format-title {
+  @include typo-title();
+  color: #FFF;
+  line-height: 2;
+}
+
+@media (min-width: 600px) {
+
+  .summit-home-grid {
+    height: 800px;
+  }
+
+  .summit-intro {
+    @include g-w50();
+    @include g-h50();
+    @include g-left();
+    padding: 0 2px 2px 0;
+  }
+
+  .summit-intro-text-container p {
+    line-height: 1.5;
+  }
+
+  .summit-pic-3-1 {
+    @include g-h25();
+    padding: 0 0 2px 2px;
+  }
+
+  .summit-pic-3-2 {
+    @include g-w25();
+    @include g-h25();
+    padding: 2px;
+  }
+
+  .summit-pic-4-2 {
+    @include g-w25();
+    @include g-h25();
+  }
+
+  .summit-pic-2-3 {
+    @include g-w50();
+    @include g-h25();
+    @include g-right();
+    padding: 2px 0 2px 2px;
+  }
+
+  .summit-pic-1-3 {
+    @include g-w50();
+    @include g-h50();
+    @include g-left();
+    display: block;
+    padding: 2px 2px 0 0;
+  }
+
+  .summit-pic-4-4 {
+    @include g-w50();
+    @include g-h25();
+    padding: 2px 0 0 2px;
+  }
+
+  .summit-pic-4-4 .summit-pic {
+    line-height: 1.6;
+  }
+
+  .summit-format-title {
+    line-height: 1;
+  }
+}
+
+@media (min-width: 650px) {
+
+  .summit-intro-text-container p {
+    line-height: 1.7;
+  }
+}
+
+@media (min-width: 960px) {
+  .summit-home-grid {
+    height: 960px;
+    margin-top: 432px;
+  }
+
+  .summit-intro-text-container {
+    padding: 32px 64px 32px 32px;
+  }
+
+  .summit-intro-text-container p {
+    line-height: 1.8;
+  }
+
+  .summit-intro-text-container p:first-of-type {
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.5;
+    letter-spacing: 0px;
+    padding-bottom: 16px;
+  }
+
+  .summit-pic-4-2 {
+    @include g-h50();
+    @include g-right();
+  }
+
+  .summit-pic-2-3 {
+    @include g-w50();
+    @include g-h50();
+    @include g-left();
+    padding: 2px 2px 0 2px;
+  }
+
+  .summit-pic-1-3 {
+    @include g-w25();
+    @include g-h50();
+    @include g-left();
+  }
+
+  .summit-pic-4-4 {
+    @include g-w25();
+    @include g-h25();
+    @include g-right();
+  }
+
+  .summit-pic {
+    background-size: auto;
+  }
+
+  .summit-pic-4-4 .summit-pic {
+    line-height: 1.8;
+  }
+}
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2) {
+  .summit-pic-3-1 .summit-pic {
+    background-image: url(../images/pic-3-1@2x.jpg);
+    background-size: cover;
+  }
+
+  .summit-pic-3-2 .summit-pic {
+    background-image: url(../images/pic-3-2@2x.jpg);
+    background-size: cover;
+  }
+
+  .summit-pic-4-2 .summit-pic {
+    background-image: url(../images/pic-4-2@2x.jpg);
+    background-size: cover;
+  }
+
+  .summit-pic-2-3 .summit-pic {
+    background-image: url(../images/pic-2-3@2x.jpg);
+    background-size: cover;
+  }
+}
