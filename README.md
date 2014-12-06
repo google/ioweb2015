@@ -10,3 +10,7 @@
 ### Running
 
 Start a web server in `app/` or server via App Engine dev server.
+
+### Building
+
+Run `gulp`. Then hit `http://localhost:<PORT>/dist/app/`.
