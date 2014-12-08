@@ -3,7 +3,7 @@ Copyright 2014 Google Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,87 +12,1001 @@ limitations under the License.
 -->
 <!doctype html>
 <html lang="en" itemscope itemtype="http://schema.org/Event">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Google I/O 2015 brings developers together for an immersive, two-day experience focused on exploring the next generation of technology.">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Google I/O 2015</title>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Google I/O 2015 brings developers together for an immersive, two-day experience focused on exploring the next generation of technology.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Google I/O 2015</title>
 
-    <!-- See http://updates.html5rocks.com/2014/11/Support-for-installable-web-apps-with-webapp-manifest-in-chrome-38-for-Android -->
-    <link rel="manifest" href="manifest.json">
-    <!-- See http://updates.html5rocks.com/2014/11/Support-for-theme-color-in-Chrome-39-for-Android -->
-    <meta name="theme-color" content="#eceff1">
+  <!-- See http://updates.html5rocks.com/2014/11/Support-for-installable-web-apps-with-webapp-manifest-in-chrome-38-for-Android -->
+  <link rel="manifest" href="manifest.json">
+  <!-- See http://updates.html5rocks.com/2014/11/Support-for-theme-color-in-Chrome-39-for-Android -->
+  <meta name="theme-color" content="#eceff1">
 
-    <!-- Add to homescreen for Chrome on Android -->
-    <meta name="mobile-web-app-capable" content="yes"> <!-- fallback for manifest.json -->
-    <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes"> <!-- fallback for manifest.json -->
+  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
 
-    <!-- Add to homescreen for Safari on iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Google I/O 2015">
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Google I/O 2015">
 
-    <!-- Homescreen icons. -->
-    <link rel="shortcut icon" href="favicon.ico">
-    <link rel="apple-touch-icon" href="images/touch/google-touch-icon-48x48.png">
-    <link rel="apple-touch-icon" sizes="57x57" href="images/touch/google-touch-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/touch/google-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="images/touch/google-touch-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/touch/google-touch-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="images/touch/google-touch-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="images/touch/google-touch-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="images/touch/google-touch-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="images/touch/google-touch-icon-192x192.png">
+  <!-- Homescreen icons. -->
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/touch/google-touch-icon-48x48.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="images/touch/google-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="images/touch/google-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="images/touch/google-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="images/touch/google-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="images/touch/google-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="images/touch/google-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="images/touch/google-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="images/touch/google-touch-icon-192x192.png">
 
-    <!-- Tile icon for Win8 (144x144 + tile color) -->
-    <meta name="msapplication-TileImage" content="images/touch/google-touch-icon-144x144.png">
-    <meta name="msapplication-TileColor" content="#eceff1">
-    <meta name="msapplication-tap-highlight" content="no">
+  <!-- Tile icon for Win8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/touch/google-touch-icon-144x144.png">
+  <meta name="msapplication-TileColor" content="#eceff1">
+  <meta name="msapplication-tap-highlight" content="no">
 
-    <meta property="og:title" content="Google I/O 2015">
-    <meta property="og:description" content="Google I/O 2015 brings developers together for an immersive, two-day experience focused on exploring the next generation of technology.">
-    <meta property="og:image" content="/images/io.png">
+  <meta property="og:title" content="Google I/O 2015">
+  <meta property="og:description" content="Google I/O 2015 brings developers together for an immersive, two-day experience focused on exploring the next generation of technology.">
+  <meta property="og:image" content="/images/io.png">
 
-    <!-- Page styles -->
-    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="styles/main.css">
+  <!-- Page styles -->
+  <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="styles/main.css">
 
-    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
-    <link rel="imports" href="elements/elements.html">
-  </head>
-  <body>
-    <header class="app-bar promote-layer">
-      <div class="app-bar-container">
-        <h1 class="logo">Web <strong>Starter Kit</strong></h1>
+  <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="imports" href="elements/elements.html">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead__color-block"></div>
+  <div class="masthead__container">
+    <h1 class="masthead__title">Google I/O</h1>
+    <h2 class="masthead__subtitle">2015</h2>
+    <h3 class="masthead__date-and-location">Smarch, 2015. San Francisco CA and live stream.</h3>
+  </div>
+</header>
+
+<section class="app-sections">
+
+  <div class="app__group app__group--schedule">
+    <section class="schedule card card--left-half">
+      <div class="card__container">
+        <a href="/devsummit/schedule/" class="card__see-more">See more</a>
+        <a href="/devsummit/" class="card__collapse-button">Back</a>
+        <div class="card__title">Schedule</div>
+        <div class="card__logo"></div>
+        <div class="card__content-wrapper">
+          <section class="schedule__day">
+
+            <h1>Day 1</h1>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Breakfast
+              </div>
+              <div class="schedule__block-time">
+                8am - 9am
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Keynote
+              </div>
+              <div class="schedule__block-time">
+                9am - 9.30am
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Sessions
+              </div>
+              <div class="schedule__block-time">
+                9.30am - 11am
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Break
+              </div>
+              <div class="schedule__block-time">
+                11am - 11.30am
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Sessions
+              </div>
+              <div class="schedule__block-time">
+                11.30am - 1pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Lunch
+              </div>
+              <div class="schedule__block-time">
+                1pm - 2.30pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Sessions
+              </div>
+              <div class="schedule__block-time">
+                2.30pm - 4pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Break
+              </div>
+              <div class="schedule__block-time">
+                4pm - 4.30pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Sessions
+              </div>
+              <div class="schedule__block-time">
+                4.30pm - 5pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Closing Keynote
+              </div>
+              <div class="schedule__block-time">
+                5pm - 5.15pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                After Party
+              </div>
+              <div class="schedule__block-time">
+                5.15pm - Late
+              </div>
+            </div>
+
+          </section>
+
+          <section class="schedule__day">
+
+            <h1>Day 2</h1>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Breakfast
+              </div>
+              <div class="schedule__block-time">
+                8am - 9.30am
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Sessions
+              </div>
+              <div class="schedule__block-time">
+                9.30am - 11.30am
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Break
+              </div>
+              <div class="schedule__block-time">
+                11.30am - 12pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Sessions
+              </div>
+              <div class="schedule__block-time">
+                12pm - 1pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Lunch
+              </div>
+              <div class="schedule__block-time">
+                1pm - 2.15pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Sessions
+              </div>
+              <div class="schedule__block-time">
+                2.15pm - 4pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Break
+              </div>
+              <div class="schedule__block-time">
+                4pm - 4.30pm
+              </div>
+            </div>
+
+            <div class="schedule__block">
+              <div class="schedule__block-title">
+                Breakout discussion with Engineers
+              </div>
+              <div class="schedule__block-time">
+                4.30pm - 6pm
+              </div>
+            </div>
+
+          </section>
+
+        </div>
       </div>
-    </header>
 
-    <nav class="navdrawer-container promote-layer">
-      <h4>Navigation</h4>
-      <ul>
-        <li><a href="#hello">Hello</a></li>
-        <li><a href="#get-started">Get Started</a></li>
-        <li><a href="styleguide.html">Style Guide</a></li>
-      </ul>
-    </nav>
+      <div class="schedule__overview-container">
+        <canvas></canvas>
+        <button class="schedule__day-1">Day 1</button>
+        <button class="schedule__day-2">Day 2</button>
+      </div>
+    </section>
+  </div>
 
-    <main>
-      <h1 id="hello">Hello!</h1>
-      <p>Welcome to Web Starter Kit.</p>
+  <div class="app__group app__group--bottom">
+    <section class="sessions card card--right-half">
+      <div class="card__container">
+        <a href="/devsummit/sessions/" class="card__see-more">See more</a>
+        <a href="/devsummit/" class="card__collapse-button">Back</a>
 
-      <h2 id="get-started">Get Started.</h2>
-      <p>Read how to <a href="http://developers.google.com/web/starter-kit">Get Started</a> or check out the <a href="styleguide.html">Style Guide</a>.</p>
-    </main>
+        <div class="card__title">Sessions</div>
+        <div class="card__logo"></div>
+        <div class="card__content-wrapper">
+          <section class="sessions__day">
+            <h1>Day 1</h1>
 
-    <script src="scripts/main.js" async></script>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      ga('create', 'UA-XXXXX-X', 'auto');
-      ga('send', 'pageview');
-    </script>
-  </body>
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/keynote/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Keynote <span class="card__subtitle">09:00 - 09:30</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image keynote"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Keynote</h1>
+                    <h2 class="session__header-time-and-location">09:00 - 09:30, Main Room</h2>
+                  </div>
+                  <button data-embed="//www.youtube.com/embed/lboyR-A1woU" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Darin Fisher</h3>
+                    <p>
+                      Darin Fisher introduces the Chrome Developer Summit.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/wicked-fast/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Wicked Fast (Performance investments) <span class="card__subtitle">09:30 - 09:50</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image wicked-fast"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Wicked Fast (Performance investments)</h1>
+                    <h2 class="session__header-time-and-location">09:30 - 09:50, Main Room</h2>
+                  </div>
+                  <button data-embed="//www.youtube.com/embed/v0xRTEf-ytE" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Ryan Schoen, Product Manager</h3>
+                    <p>
+                      Ryan gives an overview of some of the architectural improvements we've been making to Chrome to ensure that it's easy to make 60fps web applications across any device, as well as some features that help your apps perform silky-smooth.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/making-web-apps-appy/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Making Web Apps Appy <span class="card__subtitle">09:50 - 10:40</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image making-web-apps-appy"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Making Web Apps Appy</h1>
+                    <h2 class="session__header-time-and-location">09:50 - 10:40, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/QbuLq4f6DGQ" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Alex Russell, Software Engineer</h3>
+                    <p>
+                      Alex gives an overview of why web apps don’t feel “appy” today, and shows how Service Worker is enabling a whole new world of appiness - beyond the simple goal of making web apps work offline, to building truly engaging web applications.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/asking-for-super-powers-chromes-permission-model/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Asking for superpowers: Chrome's permission model <span class="card__subtitle">10:40 - 11:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image asking-for-super-powers-chromes-permission-model"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Asking for superpowers: Chrome's permission model</h1>
+                    <h2 class="session__header-time-and-location">10:40 - 11:00, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/3dAwZVsS8wo" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Adrienne Porter Felt, Software Engineer</h3>
+                    <p>
+                      Adrienne explains how we can enable more powerful web applications while keeping a user focus on security and privacy, and how you should structure your own apps to take best advantage.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/material-design-deconstructed/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Material Design Deconstructed <span class="card__subtitle">11:30 - 12:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image material-design-deconstructed"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Material Design Deconstructed</h1>
+                    <h2 class="session__header-time-and-location">11:30 - 12:00, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/tfSiXRy1vEw" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Roma Shah, UI Designer</h3>
+                    <p>
+                      Roma explores the philosophy of Material Design, and provides practical guidance for building apps according to Material Design principles.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/the-applied-science-of-runtime-performance/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">The Applied Science of Runtime Performance <span class="card__subtitle">12:00 - 12:30</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image the-applied-science-of-runtime-performance"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">The Applied Science of Runtime Performance</h1>
+                    <h2 class="session__header-time-and-location">12:00 - 12:30, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/RCFQu0hK6bU" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Paul Lewis, Developer Advocate</h3>
+                    <p>
+                      Building a 60fps, cross-browser website can be tricky. It requires knowledge, experience and judgment calls on trade-offs and what to prioritize.
+                    </p>
+                    <p>
+                      In this session Paul will take you through his recent experience of building the Chrome Dev Summit site, and in particular the challenges of achieving good runtime performance, performance tooling, and a couple of new and useful APIs.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/tls-all-the-things-security-with-performance/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">TLS All the Things! - Security with Performance <span class="card__subtitle">12:30 - 13:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image tls-all-the-things-security-with-performance"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">TLS All the Things! - Security with Performance</h1>
+                    <h2 class="session__header-time-and-location">12:30 - 13:00, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/ayD0LiZkWLQ" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Chris Palmer, Software Engineer</h3>
+                    <p>
+                      TLS underlies all security and privacy on the web. Chris explains how to do TLS right: not only to deploy TLS and remain performant at scale, but also demonstrating how TLS is the basis of new performance improvements.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/easy-composition-and-reuse/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Easy Composition and Reuse with Web Components <span class="card__subtitle">14:30 - 15:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image easy-composition-and-reuse"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Easy Composition and Reuse with Web Components</h1>
+                    <h2 class="session__header-time-and-location">14:30 - 15:00, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/6vcQlD-jadk" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Dmitri Glazkov, Uber Compositor</h3>
+                    <p>
+                      Dimitri explores the set of enabling technologies that make up Web Components, and describes how these pieces make it easy and fast to build composable components, and make HTML finally earn its keep.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/polymer-state-of-the-union/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Polymer: State of the Union <span class="card__subtitle">15:00 - 15:30</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image polymer-state-of-the-union"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Polymer: State of the Union</h1>
+                    <h2 class="session__header-time-and-location">15:00 - 15:30, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/0LT6W5QVCJI" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Matt McNulty, Software Engineer</h3>
+                    <p>
+                      Polymer started as an experiment in pushing the web platform. In the two and a half years since, we’ve helped ship a lot of standards, a developer preview of Polymer, and learned a lot and heard a lot of feedback from developers. Matt will share what we’ve learned, the state of the art of Polymer today, and most importantly what’s next.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/lets-build-some-apps-with-polymer/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Let's build some apps with Polymer! <span class="card__subtitle">15:30 - 16:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image lets-build-some-apps-with-polymer"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Let's build some apps with Polymer!</h1>
+                    <h2 class="session__header-time-and-location">15:30 - 16:00, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/kV0hgdMpH28" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Rob Dodson, Developer Advocate</h3>
+                    <p>
+                      This talk will cover what it takes to build a single page app in Polymer.  Rob will demonstrate how to quickly scaffold the structure of an application by leveraging Material Design elements, explore best practices around lazy loading elements to keep our app speedy, and also touch upon the tools we can use to debug and test our app.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/fundamentals-of-mobile-web-development/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Fundamentals of Mobile Web Development <span class="card__subtitle">16:30 - 17:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image fundamentals-of-mobile-web-development"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Fundamentals of Mobile Web Development</h1>
+                    <h2 class="session__header-time-and-location">16:30 - 17:00, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/z6dg_V22wV0" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <h3 class="session__speaker">Matt Gaunt, Developer Advocate</h3>
+                    <p>
+                      Matt gives a whirlwind tour of getting started on Web, from our Web Fundamentals guide to jump-starting with the Web Starter Kit, and also cover some of the stunning advancements in DevTools.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/closing-keynote/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Closing Keynote <span class="card__subtitle">17:00 - 17:15</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image closing-keynote"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Closing Keynote</h1>
+                    <h2 class="session__header-time-and-location">17:00 - 17:15, Main Room</h2>
+                  </div>
+
+                  <button data-embed="//www.youtube.com/embed/BVWAk661NL8" class="paper-button session__fab">
+                    <div class="session__fab-inner">
+                      <div class="button__ripple"></div>Watch session
+                    </div>
+                  </button>
+
+                  <div class="session__abstract">
+                    <p>
+                      Closing remarks on Day 1 from Sundar Pichai.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </section>
+
+          <section class="sessions__day">
+            <h1>Day 2</h1>
+
+            <div class="sessions__session-detail sessions__session-detail--panel card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/web-components-and-polymer-panel/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Web Components and Polymer Panel <span class="card__subtitle">09:30 - 10:30</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image web-components-and-polymer-panel"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Web Components and Polymer Panel</h1>
+                    <h2 class="session__header-time-and-location">09:30 - 10:30, Main Room</h2>
+                  </div>
+                  <div class="session__abstract">
+
+                    <p>
+                      The Web Components and Polymer Panel gives you the chance to talk directly to the Web Components and Polymer engineering teams to get answers for the questions: What is the future of Web Components? How should we start building using Web Components and Polymer? Are there performance issues with Polymer?
+                    </p>
+
+                    <!-- <button data-url="https://www.google.com/moderator/#15/e=216720&t=216720.42" class="session__ask-a-question paper-button shadow-z2">Ask A Question<div class="button__ripple"></div></button> -->
+
+                    <h3 class="session__speaker">Moderator: Rob Dodson</h3>
+                    <p>Panelists:</p>
+                    <ul>
+                      <li>Alex Komoroske</li>
+                      <li>Taylor Savage</li>
+                      <li>Alice Boxhall</li>
+                      <li>Matthew McNulty</li>
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail sessions__session-detail--panel card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/future-of-web-apps-panel/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Future of Web Apps Panel <span class="card__subtitle">10:30 - 11:30</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image future-of-web-apps-panel"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Future of Web Apps Panel</h1>
+                    <h2 class="session__header-time-and-location">10:30 - 11:30, Main Room</h2>
+                  </div>
+                  <div class="session__abstract">
+
+                    <p>
+                      The Future of Apps Panel gives you the chance to get answers for the hard questions about the direction Google are taking with Web Apps: What is the future of apps on the web? What platform should we build for? When should we build a Chrome App or a Web App? Are we going to get all of the Chrome Apps APIs on the web?
+                    </p>
+
+                    <!-- <button data-url="https://www.google.com/moderator/#15/e=216720&t=216720.43" class="session__ask-a-question paper-button shadow-z2">Ask A Question<div class="button__ripple"></div></button> -->
+
+                    <h3 class="session__speaker">Moderator: Jake Archibald</h3>
+                    <p>Panelists:</p>
+                    <ul>
+                      <li>Alex Russell</li>
+                      <li>Alex Komoroske</li>
+                      <li>Adrienne Porter Felt</li>
+                      <li>Mike Tsao</li>
+                      <li>Greg Simon</li>
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail sessions__session-detail--panel card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/performance-panel/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Performance Panel <span class="card__subtitle">12:00 - 13:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image performance-panel"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Performance Panel</h1>
+                    <h2 class="session__header-time-and-location">12:00 - 13:00, Main Room</h2>
+                  </div>
+                  <div class="session__abstract">
+
+                    <p>
+                      The Performance panel gives you direct access to the engineers who are leading the performance in Chrome and on the web and gives you the chance to ask the hard questions about performance: Where should I focus my efforts: Network or Rendering? Where are the next set of performance improvements coming from? Why is it so difficult to get 60fps on sites and apps?
+                    </p>
+
+                    <!-- <button data-url="https://www.google.com/moderator/#15/e=216720&t=216720.44" class="session__ask-a-question paper-button shadow-z2">Ask A Question<div class="button__ripple"></div></button> -->
+
+                    <h3 class="session__speaker">Moderator: Paul Lewis</h3>
+                    <p>Panelists:</p>
+                    <ul>
+                      <li>Paul Irish</li>
+                      <li>Pat Meenan</li>
+                      <li>Tony Gentilcore</li>
+                      <li>Nat Duca</li>
+                      <li>Elliot Sprehn</li>
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail sessions__session-detail--panel card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/material-design-panel/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Material Design Panel <span class="card__subtitle">14:15 - 15:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image material-design-panel"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Material Design Panel</h1>
+                    <h2 class="session__header-time-and-location">14:15 - 15:00, Main Room</h2>
+                  </div>
+                  <div class="session__abstract">
+
+                    <p>
+                      The Material Design Panel lets you talk directly to teams building and implementing Material Design and get answers directly from them on: How do I use Material Design in a content site? Should I adhere to it fully, can I bend the rules and, if so, when and how?
+                    </p>
+
+                    <!-- <button data-url="https://www.google.com/moderator/#15/e=216720&t=216720.46" class="session__ask-a-question paper-button shadow-z2">Ask A Question<div class="button__ripple"></div></button> -->
+
+                    <h3 class="session__speaker">Moderator: Matt Gaunt</h3>
+                    <p>Panelists:</p>
+                    <ul>
+                      <li>Zachary Gibson</li>
+                      <li>Matthew McNulty</li>
+                      <li>Josh Estelle</li>
+                      <li>Paul Lewis</li>
+                      <li>Roma Shah</li>
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="sessions__session-detail sessions__session-detail--panel card card--no-title-scale card--no-title-opacity-during-scroll">
+
+              <div class="card__container">
+                <a href="/devsummit/sessions/chrome-leadership-panel/" class="card__see-more">See more</a>
+                <a href="/devsummit/sessions/" class="card__collapse-button">Back</a>
+
+                <div class="card__title">Chrome Leadership Panel <span class="card__subtitle">15:00 - 16:00</span></div>
+                <div class="card__logo"></div>
+                <div class="card__content-wrapper">
+
+                  <div class="session__header-image chrome-leadership-panel"></div>
+                  <div class="session__header-headline">
+                    <h1 class="session__header-name">Chrome Leadership Panel</h1>
+                    <h2 class="session__header-time-and-location">15:00 - 16:00, Main Room</h2>
+                  </div>
+                  <div class="session__abstract">
+
+                    <p>
+                      The Chrome Leadership Panel is your chance to help direct the platform.  Let the Leadership team know where your issues are and how you would like them to be solved. Ask tough questions and get your voice heard.
+                    </p>
+
+                    <!-- <button data-url="https://www.google.com/moderator/#15/e=216720&t=216720.45" class="session__ask-a-question paper-button shadow-z2">Ask A Question<div class="button__ripple"></div></button> -->
+
+                    <h3 class="session__speaker">Moderator: Jake Archibald</h3>
+                    <p>Panelists:</p>
+                    <ul>
+                      <li>Darin Fisher</li>
+                      <li>Greg Simon</li>
+                      <li>Rahul Roy-Chowdhury</li>
+                      <li>Avni Shah</li>
+                      <li>Grace Kloba</li>
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <div class="app-sections__card-breaker"></div>
+
+    <section class="pic-1" aria-role="img" alt="Attendees listening to a Chrome Summit presentation."></section>
+
+    <section class="attendee-information card">
+      <div class="card__container">
+        <a href="/devsummit/attendee-information/" class="card__see-more">See more</a>
+        <a href="/devsummit/" class="card__collapse-button">Back</a>
+        <div class="card__title">Attendee Information</div>
+        <div class="card__logo"></div>
+        <div class="card__content-wrapper">
+          <section class="card__content-block">
+            <h1>Getting to Chrome Dev Summit</h1>
+            <p>Chrome Dev Summit will be taking place on Google's campus:</p>
+            <div class="attendee-information__address" itemscope itemtype="http://schema.org/ContactPoint">
+              <div itemscope itemtype="http://schema.org/PostalAddress">
+                <div itemprop="name">Google Building QD3</div>
+                <div itemprop="streetAddress">468 Ellis Street</div>
+                <div itemprop="addressLocality">Mountain View</div>
+                <div>
+                  <span itemprop="addressRegion">CA</span>
+                  <span itemprop="postalCode">94043</span>
+                </div>
+              </div>
+            </div>
+
+            <p>Attendees can park at the venue using the numerous lots in and around the building. If you're coming by train, the closest VTA train is <a href="http://goo.gl/maps/igKWw">Middlefield Station</a>, which is about a block away.</p>
+
+            <p>If you're coming from further afield, the closest airport is SJC. SFO is also an option, though it is farther away.</p>
+          </section>
+
+          <section class="card__content-block">
+            <h1>Registration</h1>
+
+            <p>Chrome Dev Summit has sold out. Please join us on November 19 for the live stream.</p>
+
+          </section>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="pic-2" aria-role="img" alt="Attendees listening to a Chrome Summit presentation."></section>
+
+    <section class="get-involved card card--left-half">
+      <div class="card__container">
+        <a href="/devsummit/get-involved/" class="card__see-more"></a>
+        <a href="/devsummit/" class="card__collapse-button">Back</a>
+        <div class="card__title">Get Involved</div>
+        <div class="card__logo"></div>
+        <div class="card__content-wrapper">
+          <section class="card__content-block">
+            <h1>Ask the questions that matter to you.</h1>
+            <p>Chrome Dev Summit is a fantastic opportunity to ask Chrome Engineers the questions you want answered. It's also your chance to tell us exactly what you think about anything from performance to tooling, design to Service Worker.</p>
+
+            <p>So if you have a question, please put it into <a href="https://www.google.com/moderator/#15/e=216720&t=216720.41">our dedicated moderator page</a>.</p>
+          </section>
+          <section class="card__content-block">
+            <h1>Join the conversation</h1>
+            <p>There are a few places you can say hi and follow along:</p>
+            <ul>
+              <li><a href="https://plus.google.com/+GoogleChromeDevelopers/posts">Follow Google Chrome Developers</a> on Google+.</li>
+              <li><a href="https://plus.sandbox.google.com/communities/113388322868091932405">Join the Chrome Dev Summit Community</a> on Google+.</li>
+              <li><a href="https://twitter.com/chromiumdev">Follow Chrome Developers</a> on Twitter.</li>
+            </ul>
+          </section>
+
+        </div>
+      </div>
+    </section>
+
+    <div class="app-sections__card-breaker"></div>
+
+    <section class="pic-3" aria-role="img" alt="Panel discussion with Chrome leadership."></section>
+
+
+    <section class="about-chrome-dev-summit card">
+      <div class="card__container">
+        <a href="/devsummit/about-chrome-dev-summit/" class="card__see-more">See more</a>
+        <a href="/devsummit/" class="card__collapse-button">Back</a>
+        <div class="card__title">About Chrome Dev Summit</div>
+        <div class="card__logo">
+          Connect with Chrome engineers and other leading developers for a two-day exploration of building beautiful and performant mobile experiences.
+        </div>
+        <div class="card__content-wrapper">
+
+          <p>This year the Summit presentations will mainly focus on performance, Polymer, Material Design, and building mobile web apps that work like apps with Service Worker and other technologies, but will also have breakouts and panels to discuss what you want to discuss.</p>
+
+          <p class="strong">Join us in Mountain View or via the live video streams.</p>
+
+          <ul>
+            <li>Master the art of web performance.</li>
+            <li>Collaborate with Chrome engineers and other attendees.</li>
+            <li>Learn how to build for a multi-device world.</li>
+            <li>Explore web APIs and their implementations in Chrome.</li>
+            <li>Enhance your productivity with tested workflows.</li>
+            <li>Guide the evolution of the web.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</section>
+
+<footer class="footer">
+  <div class="footer__content">
+    <span class="footer__copyright">Google &copy;</span>
+    <span class="footer__privacy-and-terms">
+      <a href="http://www.google.com/intl/en/policies/privacy/">Privacy</a> &amp; <a href="http://www.google.com/intl/en/policies/terms/">Terms</a>
+    </span>
+    <span class="footer__code-of-conduct">
+      <a href="https://www.google.com/events/policy/anti-harassmentpolicy.html">Code of Conduct</a>
+    </span>
+  </div>
+</footer>
+
+<script src="scripts/main.js" async></script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-XXXXX-X', 'auto');
+  ga('send', 'pageview');
+</script>
+
+</body>
 </html>

@@ -14,8 +14,30 @@
  * limitations under the License.
  */
 
-(function () {
-  'use strict';
+(function(exports) {
 
+'use strict';
 
-})();
+// @codekit-prepend 'third_party/signals.min.js'
+// @codekit-prepend 'third_party/requestAnimationFrame.js'
+
+exports.CDS = {};
+
+// @codekit-append 'helper/event-publisher.js'
+// @codekit-append 'helper/util.js'
+// @codekit-append 'helper/history.js'
+// @codekit-append 'helper/analytics.js'
+// @codekit-append 'helper/theme.js'
+// @codekit-append 'helper/video-embedder.js'
+
+// @codekit-append 'components/button.js'
+// @codekit-append 'components/card.js'
+// @codekit-append 'components/cards.js'
+// @codekit-append 'components/toast.js'
+
+// @codekit-append 'components/masthead.js'
+// @codekit-append 'components/schedule.js'
+
+// @codekit-append 'bootstrap.js'
+
+})(window);

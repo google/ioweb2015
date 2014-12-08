@@ -1,0 +1,127 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.masthead {
+  min-height: 56px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+}
+
+.masthead__color-block {
+  background: $color-primary;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 56px;
+  width: 100%;
+  min-height: 64px;
+  opacity: 0;
+  @include shadow-z2();
+}
+
+.masthead__container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.masthead__title {
+  @include keyline-16l();
+  @include typo-headline();
+  font-size: 20px;
+  color: #FFF;
+  line-height: 64px;
+}
+
+.masthead__subtitle {
+  display: none;
+  @include typo-base();
+  font-size: 19px;
+  color: #FFF;
+  line-height: 23px;
+}
+
+.masthead__date-and-location {
+  display: none;
+  @include typo-base();
+  font-size: 16px;
+  color: #FFF;
+  line-height: 1;
+}
+
+@media (min-width: 960px) {
+  .masthead {
+    height: 396px;
+    position: relative;
+    background: #493B8A;
+    margin-bottom: -135px;
+  }
+
+  .masthead__color-block {
+    opacity: 1 !important;
+    box-shadow: none;
+  }
+
+  .masthead__title {
+    position: relative;
+    letter-spacing: -0.03em;
+    top: 112px;
+    left: 146px;
+    font-size: 48px;
+    line-height: 1;
+    width: 550px;
+  }
+
+  .masthead__subtitle {
+    display: block;
+    position: relative;
+    top: 110px;
+    left: 164px;
+    font-weight: 300;
+    opacity: 0.8;
+    width: 550px;
+  }
+
+  .masthead__date-and-location {
+    display: block;
+    position: relative;
+    top: 126px;
+    left: 164px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    width: 550px;
+  }
+
+  .masthead__container:after {
+    content: '';
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    display: block;
+    left: 32px;
+    top: 102px;
+    background: url('../images/chrome-icon.jpg') center center no-repeat;
+    background-size: 100px 100px;
+  }
+}
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: 960px) {
+  .masthead__container:after {
+    background-image: url('../images/chrome-icon@2x.jpg');
+  }
+}
