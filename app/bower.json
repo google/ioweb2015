@@ -24,6 +24,8 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^0.5.1",
+    "paper-tabs": "Polymer/paper-tabs#^0.5.1",
+    "paper-fab": "Polymer/paper-fab#^0.5.1",
     "core-a11y-keys": "Polymer/core-a11y-keys#^0.5.1",
     "google-apis": "GoogleWebComponents/google-apis#^0.4.3",
     "google-youtube": "GoogleWebComponents/google-youtube#^1.0.1",

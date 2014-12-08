@@ -1,178 +1,183 @@
-/**
- *
- *  Web Starter Kit
- *  Copyright 2014 Google Inc. All rights reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License
- *
- */
+/* jshint node: true */
 
 'use strict';
 
-// Include Gulp & Tools We'll Use
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
-var del = require('del');
-var runSequence = require('run-sequence');
-var browserSync = require('browser-sync');
 var pagespeed = require('psi');
+var path = require('path');
+var del = require('del');
+var i18n_replace = require('./gulp_scripts/i18n_replace');
+var runSequence = require('run-sequence');
+var argv = require('yargs').argv;
+var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 
-var AUTOPREFIXER_BROWSERS = [
-  'ie >= 10',
-  'ie_mob >= 10',
-  'ff >= 30',
-  'chrome >= 34',
-  'safari >= 7',
-  'opera >= 23',
-  'ios >= 7',
-  'android >= 4.4',
-  'bb >= 10'
-];
+var APP_DIR = 'app';
+
+var STATIC_VERSION = 1; // Cache busting static assets.
+var VERSION = argv.build || STATIC_VERSION;
+
+// TODO(ericbidelman|bckenny): fill in with default static asset base URL
+// var STATIC_BASE_URL = argv.baseurl ? argv.baseurl : '';
+// var STATIC_URL = argv.pretty ? '' : (STATIC_BASE_URL + VERSION + '/');
+
+var DIST_STATIC_DIR = 'dist';
+// var PROD_DIR = APP_DIR + '/dist_prod';
+// var STATIC_DIR = APP_DIR + '/dist_static';
+// var PRETTY_DIR = APP_DIR + '/dist_pretty';
+
+// path for files (mostly index_*.html) with short cache periods
+// var DIST_PROD_DIR = argv.pretty ? PRETTY_DIR : PROD_DIR;
+
+// path for static resources
+// var DIST_STATIC_DIR = argv.pretty ? PRETTY_DIR : (STATIC_DIR + '/' + VERSION);
+
+// TODO(ericbidelman): also remove generated .css files.
+gulp.task('clean', function(cleanCallback) {
+  del([DIST_STATIC_DIR], cleanCallback);
+});
+
+gulp.task('compass', function() {
+  return gulp.src([
+      APP_DIR + '/{styles,elements}/**/*.scss'
+    ])
+    .pipe($.compass({
+      project: path.join(__dirname, '/' + APP_DIR),
+      css: '',
+      sass: '',
+      environment: 'production',
+    }))
+    .pipe($.changed(APP_DIR + '/{styles,elements}', {extension: '.scss'}))
+    .pipe($.autoprefixer([
+      'ie >= 10',
+      'ie_mob >= 10',
+      'ff >= 33',
+      'chrome >= 38',
+      'safari >= 7',
+      'opera >= 26',
+      'ios >= 7'
+    ]))
+    // .pipe(gulp.dest('.'))
+    .pipe($.size({title: 'styles'}));
+});
+
+// Copy Web Fonts To Dist
+gulp.task('fonts', function () {
+  return gulp.src([APP_DIR + '/fonts/**'])
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/fonts'))
+    .pipe($.size({title: 'fonts'}));
+});
+
+// gulp.task('vulcanize-scenes', ['clean', 'compass', 'compile-scenes'], function() {
+//   return gulp.src([
+//       'scenes/*/*-scene*.html'
+//     ], {base: './'})
+//     // gulp-vulcanize doesn't currently handle multiple files in multiple
+//     // directories well right now, so vulcanize them one at a time
+//     .pipe($.foreach(function(stream, file) {
+//       var dest = path.dirname(path.relative(__dirname, file.path));
+//       return stream.pipe($.vulcanize({
+//         excludes: {
+//           // these are inlined in elements.html
+//           imports: [
+//             'jquery.html$',
+//             'modernizr.html$',
+//             'polymer.html$',
+//             'base-scene.html$',
+//             'i18n-msg.html$',
+//             'core-a11y-keys.html$',
+//             'core-shared-lib.html$',
+//             'google-maps-api.html$',
+//           ]
+//         },
+//         strip: !argv.pretty,
+//         csp: true,
+//         inline: true,
+//         dest: dest
+//       }))
+//       .pipe(i18n_replace({
+//         strict: !!argv.strict,
+//         path: '_messages',
+//       }))
+//       .pipe(gulp.dest(path.join(DIST_STATIC_DIR, dest)));
+//     }));
+// });
+
+// vulcanize main site elements separately.
+gulp.task('vulcanize-elements', ['clean', 'compass'], function() {
+  return gulp.src([
+      APP_DIR + '/elements/elements.html'
+    ], {base: './'})
+    .pipe($.vulcanize({
+      strip: !argv.pretty,
+      csp: true,
+      inline: true,
+      dest: 'elements/'
+    }))
+    // .pipe(i18n_replace({
+    //   strict: !!argv.strict,
+    //   path: '_messages',
+    // }))
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR+ '/elements/'));
+});
+
+// gulp.task('i18n_index', function() {
+//   return gulp.src(['index.html', 'error.html', 'upgrade.html'])
+//     .pipe(argv.pretty ? $.gutil.noop() : $.replace(/window\.DEV ?= ?true.*/, ''))
+//     .pipe($.replace('<base href="">',
+//         '<base href="' + STATIC_URL + '">'))
+//     .pipe(i18n_replace({
+//       strict: !!argv.strict,
+//       path: '_messages',
+//     }))
+//     .pipe(gulp.dest(DIST_PROD_DIR));
+// });
+
+// copy needed assets (images, polymer elements, etc) to /dist directory
+// gulp.task('copy-assets', ['clean', 'vulcanize', 'i18n_index'], function() {
+  gulp.task('copy-assets', function() {
+  return gulp.src([
+    APP_DIR + '/*.{html,txt,ico}',
+    APP_DIR + '/app.yaml',
+    APP_DIR + '/manifest.json',
+    APP_DIR + '/styles/**.css',
+    APP_DIR + 'elements/**/images/*',
+    APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js'
+  ], {base: './'})
+  .pipe(gulp.dest(DIST_STATIC_DIR))
+  .pipe($.size({title: 'copy-assets'}));
+});
 
 // Lint JavaScript
-gulp.task('jshint', function () {
-  return gulp.src('app/scripts/**/*.js')
+gulp.task('jshint', function() {
+  return gulp.src(APP_DIR + '/scripts/**/*.js')
     .pipe(reload({stream: true, once: true}))
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
 });
 
+// Crush JS
+gulp.task('uglify', function() {
+  return gulp.src(APP_DIR + '/scripts/**/*.js')
+    .pipe(reload({stream: true, once: true}))
+    .pipe($.uglify({preserveComments: 'some'}))
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/scripts'))
+    .pipe($.size({title: 'uglify'}));
+});
+
 // Optimize Images
-gulp.task('images', function () {
-  return gulp.src('app/images/**/*')
+gulp.task('images', function() {
+  return gulp.src([
+      APP_DIR + '/images/**/*'
+    ])
     .pipe($.cache($.imagemin({
       progressive: true,
       interlaced: true
     })))
-    .pipe(gulp.dest('dist/images'))
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/images'))
     .pipe($.size({title: 'images'}));
-});
-
-// Copy All Files At The Root Level (app)
-gulp.task('copy', function () {
-  return gulp.src([
-    'app/*',
-    '!app/*.html',
-    'node_modules/apache-server-configs/dist/.htaccess'
-  ], {
-    dot: true
-  }).pipe(gulp.dest('dist'))
-    .pipe($.size({title: 'copy'}));
-});
-
-// Copy Web Fonts To Dist
-gulp.task('fonts', function () {
-  return gulp.src(['app/fonts/**'])
-    .pipe(gulp.dest('dist/fonts'))
-    .pipe($.size({title: 'fonts'}));
-});
-
-// Compile and Automatically Prefix Stylesheets
-gulp.task('styles', function () {
-  // For best performance, don't add Sass partials to `gulp.src`
-  return gulp.src([
-      'app/styles/*.scss',
-      'app/styles/**/*.css',
-      'app/styles/components/components.scss'
-    ])
-    .pipe($.changed('styles', {extension: '.scss'}))
-    .pipe($.rubySass({
-        style: 'expanded',
-        precision: 10
-      })
-      .on('error', console.error.bind(console))
-    )
-    .pipe($.autoprefixer(AUTOPREFIXER_BROWSERS))
-    .pipe(gulp.dest('.tmp/styles'))
-    // Concatenate And Minify Styles
-    .pipe($.if('*.css', $.csso()))
-    .pipe(gulp.dest('dist/styles'))
-    .pipe($.size({title: 'styles'}));
-});
-
-// Scan Your HTML For Assets & Optimize Them
-gulp.task('html', function () {
-  var assets = $.useref.assets({searchPath: '{.tmp,app}'});
-
-  return gulp.src('app/**/*.html')
-    .pipe(assets)
-    // Concatenate And Minify JavaScript
-    .pipe($.if('*.js', $.uglify({preserveComments: 'some'})))
-    // Remove Any Unused CSS
-    // Note: If not using the Style Guide, you can delete it from
-    // the next line to only include styles your project uses.
-    .pipe($.if('*.css', $.uncss({
-      html: [
-        'app/index.html',
-        'app/styleguide.html'
-      ],
-      // CSS Selectors for UnCSS to ignore
-      ignore: [
-        /.navdrawer-container.open/,
-        /.app-bar.open/
-      ]
-    })))
-    // Concatenate And Minify Styles
-    // In case you are still using useref build blocks
-    .pipe($.if('*.css', $.csso()))
-    .pipe(assets.restore())
-    .pipe($.useref())
-    // Update Production Style Guide Paths
-    .pipe($.replace('components/components.css', 'components/main.min.css'))
-    // Minify Any HTML
-    .pipe($.if('*.html', $.minifyHtml()))
-    // Output Files
-    .pipe(gulp.dest('dist'))
-    .pipe($.size({title: 'html'}));
-});
-
-// Clean Output Directory
-gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
-
-// Watch Files For Changes & Reload
-gulp.task('serve', ['styles'], function () {
-  browserSync({
-    notify: false,
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: ['.tmp', 'app']
-  });
-
-  gulp.watch(['app/**/*.html'], reload);
-  gulp.watch(['app/styles/**/*.{scss,css}'], ['styles', reload]);
-  gulp.watch(['app/scripts/**/*.js'], ['jshint']);
-  gulp.watch(['app/images/**/*'], reload);
-});
-
-// Build and serve the output from the dist build
-gulp.task('serve:dist', ['default'], function () {
-  browserSync({
-    notify: false,
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: 'dist'
-  });
-});
-
-// Build Production Files, the Default Task
-gulp.task('default', ['clean'], function (cb) {
-  runSequence('styles', ['jshint', 'html', 'images', 'fonts', 'copy'], cb);
 });
 
 // Run PageSpeed Insights
@@ -185,6 +190,31 @@ gulp.task('pagespeed', pagespeed.bind(null, {
   url: 'https://example.com',
   strategy: 'mobile'
 }));
+
+// Watch Files For Changes & Reload
+gulp.task('serve', ['compass'], function () {
+  browserSync({
+    notify: false,
+    // Run as an https by uncommenting 'https: true'
+    // Note: this uses an unsigned certificate which on first access
+    //       will present a certificate warning in the browser.
+    // https: true,
+    server: [APP_DIR]
+  });
+
+  gulp.watch([APP_DIR + '/**/*.html'], reload);
+  gulp.watch([APP_DIR + '/styles/**/*.{scss,css}'], ['styles', reload]);
+  gulp.watch([APP_DIR + '/scripts/**/*.js'], ['jshint']);
+  gulp.watch([APP_DIR + '/images/**/*'], reload);
+});
+
+gulp.task('vulcanize', ['vulcanize-elements']);
+
+gulp.task('js', ['jshint', 'uglify']);
+
+gulp.task('default', ['clean'], function(cb) {
+  runSequence('compass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets'], cb);
+});
 
 // Load custom tasks from the `tasks` directory
 try { require('require-dir')('tasks'); } catch (err) {}
