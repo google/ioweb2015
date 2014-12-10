@@ -17,6 +17,7 @@
 $color-text: #212121;
 $color-heading: #000;
 $color-body: #F9F9F9;
+
 $color-primary: #362A6C;
 $color-accent: #4A90E2;
 $color-action: #4CBB47;
@@ -25,3 +26,27 @@ $color-yellow: #FFD200;
 $color-brown: #AB7317;
 $color-orange: #C67008;
 $color-darkgray: #3C4C5D;
+
+// ---
+
+$color-body: #F5F5F5; // grey 100
+
+// Nav colors
+$color-cyan-900: #006064;
+$color-bluegrey-600: #546E7A;
+$color-bluegrey-200: #B0BEC5;
+
+// Background
+$color-cyan-500: #00BCD4;
+$color-cyan-400: #26C6DA;
+$color-bluegrey-100: #CFD8DC;
+$color-bluegrey-800: #37474F;
+
+// Links
+$color-lime-A100: #F4FF41;
+$color-cyan-A800: #029EBB;
+$color-cyan-A400: #00EF55;
+$color-grey-500: #9E9E9E;
+$color-cyan-A700: #00B8D4;
+
+$color-card: $color-body;

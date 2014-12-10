@@ -55,21 +55,60 @@ limitations under the License.
   <meta property="og:image" content="/images/io.png">
 
   <!-- Page styles -->
-  <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/main_sd.css" shim-shadowdom>
 
   <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
-  <link rel="imports" href="elements/elements.html">
+  <link rel="import" href="elements/elements.html">
 </head>
-<body>
+<body unresolved>
+
+<core-drawer-panel forceNarrow>
+  <div drawer>Drawer panel todo...</div>
+  <div main>
+
+    <core-toolbar id="navbar">
+      <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
+      <div flex></div>
+      <paper-tabs class="white" link>
+        <paper-tab>
+          <a href="#about" layout horizontal center>
+            <i18n-msg msgid="about">About</i18n-msg>
+          </a>
+        </paper-tab>
+        <paper-tab>
+          <a href="#schedule" layout horizontal center>
+            <i18n-msg msgid="schedule">Schedule</i18n-msg>
+          </a>
+        </paper-tab>
+        <paper-tab>
+          <a href="#onsite" layout horizontal center>
+            <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
+          </a>
+        </paper-tab>
+        <paper-tab>
+          <a href="#offsite" layout horizontal center>
+            <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
+          </a>
+        </paper-tab>
+        <paper-tab>
+          <a href="#registration" layout horizontal center>
+            <i18n-msg msgid="registration">Registration</i18n-msg>
+          </a>
+        </paper-tab>
+      </paper-tabs>
+    </core-toolbar>
 
 <header class="masthead">
-  <div class="masthead__color-block"></div>
-  <div class="masthead__container">
-    <h1 class="masthead__title">Google I/O</h1>
-    <h2 class="masthead__subtitle">2015</h2>
-    <h3 class="masthead__date-and-location">Smarch, 2015. San Francisco CA and live stream.</h3>
+  <!-- <div class="masthead__color-block"></div> -->
+  <div class="masthead__container" layout horizontal>
+    <div layout vertical end-justified end flex>
+      <h1 class="masthead__title">Smarch xx - xx</h1>
+      <h2 class="masthead__subtitle">Monscone Center West,<br>San Francisco CA</h2>
+    </div>
   </div>
+  <paper-fab icon="add"></paper-fab>
 </header>
 
 <section class="app-sections">
@@ -997,6 +1036,10 @@ limitations under the License.
     </span>
   </div>
 </footer>
+
+
+  </div>
+</core-drawer-panel>
 
 <script src="scripts/main.js" async></script>
 <script>
