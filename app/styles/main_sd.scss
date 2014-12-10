@@ -7,8 +7,13 @@ core-drawer-panel::shadow #drawer {
     &::shadow #selectionBar {
       background-color: #fff;
     }
-    & paper-tab::shadow #ink {
-      color: rgba(255,255,255,0.5);
+    & paper-tab::shadow {
+      .tab-content {
+        opacity: 1 !important;
+      }
+      #ink {
+        color: rgba(255,255,255,0.5);
+      }
     }
   }
 }
