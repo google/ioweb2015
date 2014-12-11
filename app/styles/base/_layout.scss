@@ -30,6 +30,10 @@
 	padding: 0 72px 0 72px;
 }
 
+@mixin keyline-32() {
+  padding: 0 32px 0 32px;
+}
+
 @mixin keyline-24() {
 	padding: 0 24px 0 24px;
 }

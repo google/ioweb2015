@@ -1,0 +1,24 @@
+core-drawer-panel::shadow {
+  #drawer {
+    z-index: 100; // TODO: stick in _zindex.scss
+  }
+  #scrim {
+    z-index: 5;// TODO: stick in _zindex.scss
+  }
+}
+
+#navbar {
+  paper-tabs.white {
+    &::shadow #selectionBar {
+      background-color: #fff;
+    }
+    & paper-tab::shadow {
+      .tab-content {
+        opacity: 1 !important;
+      }
+      #ink {
+        color: rgba(255,255,255,0.5);
+      }
+    }
+  }
+}

@@ -14,6 +14,55 @@
  * limitations under the License.
  */
 
+@mixin typo-base() {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+@mixin typo-display-4() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 48px;
+  font-weight: 300;
+  opacity: 0.54;
+  line-height: 56px;
+  letter-spacing: -0.04em;
+}
+
+@mixin typo-display-3() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 32px;
+  font-weight: 300;
+  opacity: 0.54;
+  line-height: 48px;
+  letter-spacing: -0.02em;
+}
+
+@mixin typo-display-2() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  opacity: 0.87;
+  line-height: 32px;
+}
+
+@mixin typo-display-1() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  opacity: 0.87;
+  line-height: 24px;
+}
+
+@mixin typo-button() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
 html, body {
   font-family: 'Helvetica', 'Arial', 'sans-serif';
   font-size: 14px;
@@ -34,8 +83,9 @@ p {
 }
 
 a {
-  color: $color-accent;
+  color: $color-bluegrey-700;
   font-weight: bold;
+  text-decoration: none;
 }
 
 .strong {
@@ -46,119 +96,120 @@ li {
   line-height: 1.7;
 }
 
-@mixin typo-base() {
-  font-family: 'Roboto', sans-serif;
-  line-height: 1;
-  letter-spacing: -0.01em;
+h1 {
+  @include typo-display-3();
 }
 
-@mixin typo-display-4() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 112px;
-  font-weight: 300;
-  opacity: 0.54;
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-@mixin typo-display-3() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 56px;
-  font-weight: 400;
-  opacity: 0.54;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-@mixin typo-display-2() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 45px;
-  font-weight: 400;
-  opacity: 0.54;
-  line-height: 48px;
-}
-
-@mixin typo-display-1() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 34px;
-  font-weight: 400;
-  opacity: 0.54;
-  line-height: 40px;
-}
-
-@mixin typo-headline() {
-  font-family: 'Roboto', sans-serif;
+h2 {
+  @include typo-display-2();
   font-size: 24px;
-  font-weight: 400;
-  opacity: 0.87;
-  line-height: 32px;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-@mixin typo-title() {
-  font-family: 'Roboto', sans-serif;
+h3 {
+  @include typo-display-1();
   font-size: 20px;
-  font-weight: 500;
-  opacity: 0.87;
-  line-height: 1;
-  letter-spacing: 0.02em;
+  line-height: 32px;
 }
 
-@mixin typo-subhead() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  opacity: 0.87;
-  line-height: 24px;
-  letter-spacing: 0.04em;
+h4 {
+  @include typo-display-1();
 }
 
-@mixin typo-subhead-2() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  opacity: 0.87;
-  line-height: 24px;
-  letter-spacing: 0.04em;
+h5 {
+  @include typo-button();
 }
 
-@mixin typo-subhead-2() {
-  font-family: 'Roboto', sans-serif;
-  line-height: 28px;
+@media (min-width: $desktop-breakpoint) {
+  h1 {
+    @include typo-display-4();
+  }
+
+  h2 {
+    @include typo-display-3();
+  }
+
+  h3 {
+    @include typo-display-2();
+  }
+
+  h4 {
+    @include typo-display-1();
+  }
 }
 
-@mixin typo-body-2() {
-  font-size: 14px;
-  font-weight: 500;
-  opacity: 0.87;
-  line-height: 24px;
-  letter-spacing: 0.04em;
-}
+// @mixin typo-headline() {
+//   font-family: 'Roboto', sans-serif;
+//   font-size: 24px;
+//   font-weight: 400;
+//   opacity: 0.87;
+//   line-height: 32px;
+//   -moz-osx-font-smoothing: grayscale;
+// }
 
-@mixin typo-caption() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  opacity: 0.54;
-  line-height: 1;
-  letter-spacing: 0.08em;
-}
+// @mixin typo-title() {
+//   font-family: 'Roboto', sans-serif;
+//   font-size: 20px;
+//   font-weight: 500;
+//   opacity: 0.87;
+//   line-height: 1;
+//   letter-spacing: 0.02em;
+// }
 
-@mixin typo-menu() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  opacity: 0.87;
-  line-height: 1;
-  letter-spacing: 0.04em;
-}
+// @mixin typo-subhead() {
+//   font-family: 'Roboto', sans-serif;
+//   font-size: 16px;
+//   font-weight: 400;
+//   opacity: 0.87;
+//   line-height: 24px;
+//   letter-spacing: 0.04em;
+// }
 
-@mixin typo-button() {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  text-transform: uppercase;
-  opacity: 0.87;
-  line-height: 1;
-  letter-spacing: 0.04em;
-}
+// @mixin typo-subhead-2() {
+//   font-family: 'Roboto', sans-serif;
+//   font-size: 16px;
+//   font-weight: 400;
+//   opacity: 0.87;
+//   line-height: 24px;
+//   letter-spacing: 0.04em;
+// }
+
+// @mixin typo-subhead-2() {
+//   font-family: 'Roboto', sans-serif;
+//   line-height: 28px;
+// }
+
+// @mixin typo-body-2() {
+//   font-size: 14px;
+//   font-weight: 500;
+//   opacity: 0.87;
+//   line-height: 24px;
+//   letter-spacing: 0.04em;
+// }
+
+// @mixin typo-caption() {
+//   font-family: 'Roboto', sans-serif;
+//   font-size: 12px;
+//   font-weight: 400;
+//   opacity: 0.54;
+//   line-height: 1;
+//   letter-spacing: 0.08em;
+// }
+
+// @mixin typo-menu() {
+//   font-family: 'Roboto', sans-serif;
+//   font-size: 14px;
+//   font-weight: 500;
+//   opacity: 0.87;
+//   line-height: 1;
+//   letter-spacing: 0.04em;
+// }
+
+// @mixin typo-button() {
+//   font-family: 'Roboto', sans-serif;
+//   font-size: 14px;
+//   font-weight: 500;
+//   text-transform: uppercase;
+//   opacity: 0.87;
+//   line-height: 1;
+//   letter-spacing: 0.04em;
+// }

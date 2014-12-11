@@ -16,12 +16,36 @@
 
 $color-text: #212121;
 $color-heading: #000;
-$color-body: #F9F9F9;
-$color-primary: #362A6C;
-$color-accent: #4A90E2;
-$color-action: #4CBB47;
-$color-hotpink: #EA006F;
-$color-yellow: #FFD200;
-$color-brown: #AB7317;
-$color-orange: #C67008;
-$color-darkgray: #3C4C5D;
+// $color-body: #F9F9F9;
+
+// $color-primary: #362A6C;
+// $color-accent: #4A90E2;
+// $color-action: #4CBB47;
+// $color-hotpink: #EA006F;
+// $color-yellow: #FFD200;
+// $color-brown: #AB7317;
+// $color-orange: #C67008;
+// $color-darkgray: #3C4C5D;
+
+// ---
+
+$color-body: #F5F5F5; // grey 100
+$color-card: $color-body;
+
+// Nav colors
+$color-cyan-900: #006064;
+$color-bluegrey-600: #546E7A;
+$color-bluegrey-200: #B0BEC5;
+
+// Background
+$color-cyan-500: #00BCD4;
+$color-cyan-400: #26C6DA;
+$color-bluegrey-100: #CFD8DC;
+$color-bluegrey-700: #455A64;
+
+// Links
+$color-cyan-900: #004446;
+$color-cyan-A700: #008094;
+$color-cyan-A400: #00E5FF;
+
+ $color-gray: #9e9e9e;

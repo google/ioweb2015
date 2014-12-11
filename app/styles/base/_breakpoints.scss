@@ -14,37 +14,6 @@
  * limitations under the License.
  */
 
-footer {
-  min-height: 200px;
-  background: #fff;
-  padding-bottom: 40px;
-  @include keyline-16();
-  padding-bottom: 40px !important;
-  padding-top: 40px !important;
-  color: $color-gray;
-
-  a {
-    color: inherit;
-  }
-
-  .footer-backtotop {
-    color: $color-cyan-A700;
-  }
-}
-
-.footer-content {
-  nav {
-    width: 450px;
-  }
-}
-
-@media (min-width: $tablet-breakpoint) {
-  footer {
-    @include keyline-32();
-  }
-}
-
-@media (min-width: $desktop-breakpoint) {
-
-}
-
+$desktop-breakpoint: 1136px;
+$tablet-breakpoint: 960px;
+$phone-breakpoint: 460px;
