@@ -14,65 +14,66 @@
  * limitations under the License.
  */
 
-html.locked,
-html.locked body {
-  overflow: hidden;
-  height: 100%;
-}
 
-.app.locked {
-  overflow: hidden;
-}
+// html.locked,
+// html.locked body {
+//   overflow: hidden;
+//   height: 100%;
+// }
 
-.app-sections {
-  background: #FFF;
-}
+// .app.locked {
+//   overflow: hidden;
+// }
 
-.app-sections__card-breaker {
-  clear: both;
-  display: block;
+// .app-sections {
+//   background: #FFF;
+// }
 
-  &:after {
-    content: '';
-    clear: both;
-    display: table;
-  }
-}
+// .app-sections__card-breaker {
+//   clear: both;
+//   display: block;
 
-@media (min-width: 600px) {
-  .app-sections__card-breaker {
-    clear: none;
-    display: none;
-  }
-}
+//   &:after {
+//     content: '';
+//     clear: both;
+//     display: table;
+//   }
+// }
 
-@media (min-width: 960px) {
+// @media (min-width: 600px) {
+//   .app-sections__card-breaker {
+//     clear: none;
+//     display: none;
+//   }
+// }
 
-  .app-sections {
-    background: none;
-  }
+// @media (min-width: 960px) {
 
-  .app__group {
-    background: #FFF;
-    max-width: 960px;
-    margin: 0 auto 20px auto;
-    border-radius: 3px;
-    @include shadow-z2();
+//   .app-sections {
+//     background: none;
+//   }
 
-    &:after {
-      content: '';
-      clear: both;
-      display: table;
-    }
-  }
+//   .app__group {
+//     background: #FFF;
+//     max-width: 960px;
+//     margin: 0 auto 20px auto;
+//     border-radius: 3px;
+//     @include shadow-z2();
 
-  .app__group--bottom {
-    padding-top: 4px;
-    margin-bottom: 155px;
-  }
+//     &:after {
+//       content: '';
+//       clear: both;
+//       display: table;
+//     }
+//   }
 
-  .app__group--livestream {
-    border-radius: 3px;
-    overflow: hidden;
-  }
-}
+//   .app__group--bottom {
+//     padding-top: 4px;
+//     margin-bottom: 155px;
+//   }
+
+//   .app__group--livestream {
+//     border-radius: 3px;
+//     overflow: hidden;
+//   }
+// }

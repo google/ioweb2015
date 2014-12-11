@@ -15,11 +15,25 @@
  */
 
 .masthead {
-  min-height: 56px;
+  // min-height: 56px;
   position: fixed;
   width: 100%;
   top: 0;
-  background: $color-bluegrey-100;
+
+  &.cyan {
+    background-color: $color-cyan-500;
+    color: $color-cyan-900;
+  }
+
+  &.lightgrey {
+    background-color: $color-bluegrey-100;
+    color: $color-bluegrey-700;
+  }
+
+  &.darkgrey {
+    background-color: $color-bluegrey-700;
+    color: $color-bluegrey-100;
+  }
 }
 
 core-drawer-panel {
@@ -32,113 +46,105 @@ core-drawer-panel {
 }
 
 #navbar {
+  background-color: inherit;
+
+  paper-tabs {
+    display: none;
+  }
+
   paper-tab {
     flex: none !important;
+
     a {
       font-size: 12px;
       text-decoration: none;
       text-transform: uppercase;
-      color: $color-bluegrey-600;
+      color: inherit;
     }
   }
+
   paper-icon-button {
     color: #fff;
   }
 }
 
-.masthead__container {
+#io-logo {
+  // TODO(ericbidelman): this should be a 1x asset.
+  background: url('../images/home/io_white.png') no-repeat;
+  height: 32px;
+  background-size: contain;
+}
+
+.masthead-container {
   width: 100%;
-  max-width: 960px;
+  max-width: $tablet-breakpoint;
   margin: 0 auto;
   position: relative;
 }
 
-.masthead__title {
-  // @include keyline-16l();
-  @include typo-headline();
-  // font-size: 20px;
-  color: $color-cyan-500;
-  // line-height: 64px;
-}
-
-.masthead__subtitle {
-  // display: none;
-  @include typo-base();
-  // font-size: 19px;
-  color: $color-bluegrey-600;
-  // line-height: 23px;
-}
-
-.masthead__date-and-location {
+#masthead-io-meta {
   display: none;
-  @include typo-base();
-  font-size: 16px;
-  color: #FFF;
-  line-height: 1;
+}
+
+.masthead-title {
+  @include typo-display-3();
+  color: #fff;
+  font-weight: 400;
+  opacity: 1;
+}
+
+.masthead-subtitle {
+  @include typo-display-2();
+  color: $color-bluegrey-600;
 }
 
 paper-fab {
   color: inherit;
   background: $color-card;
   position: absolute;
-  bottom: -28px; // paper-fab height / 2
+  bottom: -28px; // paper-fab's height / 2
   right: 32px;
 }
 
-@media (min-width: 960px) {
+@media (min-width: $tablet-breakpoint) {
   .masthead {
     height: 396px;
     position: relative;
-    margin-bottom: -135px;
+    margin-bottom: -100px;
   }
 
-  .masthead__title {
-    // position: relative;
-    // letter-spacing: -0.03em;
-    // top: 112px;
-    // left: 146px;
-    // font-size: 48px;
-    // line-height: 1;
-    // width: 550px;
-  }
-
-  .masthead__subtitle {
-    // display: block;
-    // position: relative;
-    // top: 110px;
-    // left: 164px;
-    // font-weight: 300;
-    // opacity: 0.8;
-    // width: 550px;
+  .masthead-subtitle {
     text-align: right;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
 
-  .masthead__date-and-location {
-    // display: block;
-    // position: relative;
-    // top: 126px;
-    // left: 164px;
-    // font-weight: 500;
-    // letter-spacing: 0.01em;
-    // width: 550px;
+  #masthead-io-meta {
+    display: inherit;
   }
 
-  .masthead__container::before {
+  .masthead-container::before {
     content: '';
     width: 256px;
     height: 184px;
-    // position: absolute;
     display: block;
-    // left: 32px;
-    // top: 102px;
+    // TODO(ericbidelman): this should be a 1x asset.
     background: url('../images/home/io_white.png') center center no-repeat;
     background-size: contain;
   }
-}
 
-@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: 960px) {
-  .masthead__container::before {
-    background-image: url('../images/home/io_white.png');
+  #navbar paper-tabs {
+    display: inherit;
   }
 }
+
+@media (min-width: $phone-breakpoint) {
+  paper-icon-button {
+    display: none;
+  }
+}
+
+// @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint) {
+//   .masthead-container::before {
+//     background-image: url('../images/home/io_white.png');
+//   }
+// }
