@@ -12,6 +12,7 @@ var runSequence = require('run-sequence');
 var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
+var bower = require('gulp-bower');
 
 var APP_DIR = 'app';
 
@@ -105,7 +106,7 @@ gulp.task('fonts', function () {
 // });
 
 // vulcanize main site elements separately.
-gulp.task('vulcanize-elements', ['clean', 'compass'], function() {
+gulp.task('vulcanize-elements', ['clean', 'bower', 'compass'], function() {
   return gulp.src([
       APP_DIR + '/elements/elements.html'
     ], {base: './'})
@@ -119,7 +120,7 @@ gulp.task('vulcanize-elements', ['clean', 'compass'], function() {
     //   strict: !!argv.strict,
     //   path: '_messages',
     // }))
-    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR+ '/elements/'));
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
 });
 
 // gulp.task('i18n_index', function() {
@@ -192,7 +193,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 }));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['compass'], function () {
+gulp.task('serve', ['bower', 'compass'], function() {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
@@ -214,6 +215,10 @@ gulp.task('js', ['jshint', 'uglify']);
 
 gulp.task('default', ['clean'], function(cb) {
   runSequence('compass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets'], cb);
+});
+
+gulp.task('bower', function() {
+  return bower({cwd: APP_DIR});
 });
 
 // Load custom tasks from the `tasks` directory
