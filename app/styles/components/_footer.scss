@@ -38,13 +38,8 @@ footer {
   }
 }
 
-@media (min-width: $tablet-breakpoint) {
+@media (min-width: $tablet-breakpoint-min) {
   footer {
     @include keyline-32();
   }
 }
-
-@media (min-width: $desktop-breakpoint) {
-
-}
-

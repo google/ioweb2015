@@ -41,7 +41,8 @@
 @mixin typo-display-2() {
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
-  font-weight: 400;
+  // font-weight: 400;
+  font-weight: 300;
   opacity: 0.87;
   line-height: 32px;
 }
@@ -119,7 +120,7 @@ h5 {
   @include typo-button();
 }
 
-@media (min-width: $desktop-breakpoint) {
+@media (min-width: $desktop-breakpoint-mid) {
   h1 {
     @include typo-display-4();
   }
