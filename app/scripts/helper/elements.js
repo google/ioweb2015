@@ -20,17 +20,7 @@ IOW.Elements = (function() {
 
   var toast = document.getElementById('toast');
 
-  function configureToast() {
-    // TODO: Just an example for listening to schedule changes. Temporary.
-    var schedule = document.querySelector('sw-schedule');
-    toast.listen(schedule, 'message', 'message');
-  }
-
-  if (toast.listen) {
-    configureToast();
-  } else {
-    window.addEventListener('polymer-ready', configureToast);
-  }
+  // TODO: Add element's configuration and listeners here.
 
   return {
     Toast: toast

@@ -128,6 +128,8 @@ limitations under the License.
 
   <section class="home-photo"></section>
 
+  <io-toast id="toast"></io-toast>
+
 </main>
 
 <footer layout horizontal>
@@ -147,7 +149,11 @@ limitations under the License.
   </div>
 </core-drawer-panel>
 
+<!-- TODO: Move to automatic concatenation via codekit-gulp -->
 <script src="scripts/main.js" async></script>
+<script src="scripts/helper/elements.js"></script>
+<script src="scripts/bootstrap.js"></script>
+
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

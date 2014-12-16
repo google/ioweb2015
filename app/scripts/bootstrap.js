@@ -13,25 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-CDS.EventPublisher.add('load', function() {
-
-  // Remove the color-blocks
-  document.body.classList.remove('deeplink-schedule');
-  document.body.classList.remove('deeplink-sessions');
-  document.body.classList.remove('deeplink-attendee-information');
-  document.body.classList.remove('deeplink-get-involved');
-  document.body.classList.remove('deeplink-about-chrome-dev-summit');
-
-  document.body.classList.add('loaded');
-
-});
-
-CDS.History.init();
 
 if ('serviceWorker' in navigator) {
 
-  navigator.serviceWorker.register('/devsummit/sw.js', {
-    scope: '/devsummit/'
+  navigator.serviceWorker.register('/service-worker.js', {
+    scope: '/'
   }).then(function(registration) {
 
     var newServiceWorkerAvailableMessage =
@@ -40,21 +26,22 @@ if ('serviceWorker' in navigator) {
     // If this fires we should check if there's a new Service Worker
     // waiting to be activated. If so, ask the user to force refresh.
     if (registration.waiting) {
-      CDS.Toaster.create(newServiceWorkerAvailableMessage);
+      IOW.Elements.Toast.showMessage(newServiceWorkerAvailableMessage);
       return;
     }
 
     // We should also start tracking for any updates to the Service Worker.
     registration.onupdatefound = function(event) {
 
-      console.log("A new version has been found... Installing...");
+      IOW.Elements.Toast.showMessage(
+          'A new version has been found... Installing...');
 
       // If an update is found the spec says that there is a new Service Worker
       // installing, so we should wait for that to complete then show a
       // notification to the user.
       registration.installing.onstatechange = function(event) {
         if (this.state === 'installed')
-          CDS.Toaster.create(newServiceWorkerAvailableMessage);
+          IOW.Elements.Toast.showMessage(newServiceWorkerAvailableMessage);
         else
           console.log("New Service Worker state: ", this.state);
       };
