@@ -15,11 +15,11 @@
  */
 
 html, body {
-	background: $color-body;
-	margin: 0;
-	padding: 0;
+  background: $color-body;
+  margin: 0;
+  padding: 0;
   height: 100%;
-	-webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -29,7 +29,7 @@ body {
 }
 
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 /**
