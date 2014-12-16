@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-IOW.Elements = (function() {
+IOWA.Elements = (function() {
 
   "use strict";
 

@@ -6,12 +6,46 @@
   </template>
   <script>
   Polymer({
-    listen: function(el, eventType, messageFieldName) {
-      el.addEventListener(eventType, function(e) {
-        this.text= e.detail[messageFieldName];
-        this.show();
-      }.bind(this));
+
+    listeners_: null,
+
+    created: function() {
+      this.listeners_ = [];
     },
+
+    detached: function() {
+      this.listeners_.forEach(function(listener) {
+        listener.target.removeEventListener(
+            listener.eventType, listener.handler);
+      });
+    },
+
+    /**
+     * Makes toast to listen to notifications from another element.
+     * @method listen
+     * @param {Element} el Target sending the notification.
+     * @param {string} eventType Notification (event) type.
+     * @param {string} messageFieldName Name of the field in event.details
+     *    containing the message for the user.
+     */
+    listen: function(el, eventType, messageFieldName) {
+      var handler = function(e) {
+        this.text = e.detail[messageFieldName];
+        this.show();
+      }.bind(this);
+      el.addEventListener(eventType, handler);
+      this.listeners_.push({
+        target: el,
+        eventType: eventType,
+        handler: handler
+      });
+    },
+
+    /**
+     * Shows the message in the toast.
+     * @method showMessage
+     * @param {string} message Message to show.Notification (event) type.
+     */
     showMessage: function(message) {
       this.text = message;
       this.show();

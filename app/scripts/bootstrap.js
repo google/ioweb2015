@@ -16,6 +16,7 @@
 
 if ('serviceWorker' in navigator) {
 
+  // TODO: change scope accordingly to the production address.
   navigator.serviceWorker.register('/sw.js', {
     scope: '/'
   }).then(function(registration) {
@@ -26,14 +27,14 @@ if ('serviceWorker' in navigator) {
     // If this fires we should check if there's a new Service Worker
     // waiting to be activated. If so, ask the user to force refresh.
     if (registration.waiting) {
-      IOW.Elements.Toast.showMessage(newServiceWorkerAvailableMessage);
+      IOWA.Elements.Toast.showMessage(newServiceWorkerAvailableMessage);
       return;
     }
 
     // We should also start tracking for any updates to the Service Worker.
     registration.onupdatefound = function(event) {
 
-      IOW.Elements.Toast.showMessage(
+      IOWA.Elements.Toast.showMessage(
           'A new version has been found... Installing...');
 
       // If an update is found the spec says that there is a new Service Worker
@@ -41,7 +42,7 @@ if ('serviceWorker' in navigator) {
       // notification to the user.
       registration.installing.onstatechange = function(event) {
         if (this.state === 'installed')
-          IOW.Elements.Toast.showMessage(newServiceWorkerAvailableMessage);
+          IOWA.Elements.Toast.showMessage(newServiceWorkerAvailableMessage);
         else
           console.log("New Service Worker state: ", this.state);
       };
