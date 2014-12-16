@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <polymer-element name="countdown-timer"
-    attributes="date dateadjustment easeintime waittime easeouttime">
+    attributes="date dateAdjustment easeInTime waitTime easeOutTime">
 
   <template>
     <style>
@@ -12,13 +12,13 @@
       }
 
       .countdown-timer,
-      .countdown-timer__surface {
+      #surface {
         width: 100%;
         height: 100%;
       }
     </style>
     <div class="countdown-timer">
-      <canvas class="countdown-timer__surface" id="surface"></canvas>
+      <canvas id="surface"></canvas>
     </div>
   </template>
   <script>
@@ -26,10 +26,10 @@
   Polymer({
 
     date: 'Mon, 02 Mar 2015 09:00:00 GMT-0700',
-    dateadjustment: 3,
-    easeintime: 500,
-    waittime: 300,
-    easeouttime: 400,
+    dateAdjustment: 3,
+    easeInTime: 500,
+    waitTime: 300,
+    easeOutTime: 400,
 
     ready: function() {
 
@@ -43,10 +43,10 @@
       var timer = new IO.CountdownTimer(this.$.surface);
       timer.animate({
         targetDate: targetDate,
-        adjustmentInDays: this.dateadjustment,
-        easeInTime: this.easeintime,
-        waitTime: this.waittime,
-        easeOutTime: this.easeouttime
+        adjustmentInDays: this.dateAdjustment,
+        easeInTime: this.easeInTime,
+        waitTime: this.waitTime,
+        easeOutTime: this.easeOutTime
       });
     }
 
