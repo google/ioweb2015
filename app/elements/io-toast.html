@@ -1,0 +1,21 @@
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+
+<polymer-element name="io-toast" extends="paper-toast">
+  <template>
+    <shadow></shadow>
+  </template>
+  <script>
+  Polymer({
+    listen: function(el, eventType, messageFieldName) {
+      el.addEventListener(eventType, function(e) {
+        this.text= e.detail[messageFieldName];
+        this.show();
+      }.bind(this));
+    },
+    showMessage: function(message) {
+      this.text = message;
+      this.show();
+    }
+  });
+  </script>
+</polymer-element>
