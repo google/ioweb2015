@@ -1,0 +1,26 @@
+{
+  "requireCurlyBraces": ["for", "while", "do", "try", "catch"],
+  "requireSpaceAfterKeywords": ["if", "else", "for", "while", "do", "switch", "return", "try", "catch"],
+  "requireSpacesInFunctionExpression": {
+    "beforeOpeningCurlyBrace": true
+  },
+  "disallowMultipleVarDecl": "exceptUndefined",
+  "requireSpacesInsideObjectBrackets": "allButNested",
+  "disallowSpacesInsideArrayBrackets": true,
+  "disallowSpacesInsideParentheses": true,
+  "disallowSpaceAfterObjectKeys": true,
+  "disallowQuotedKeysInObjects": true,
+  "requireSpaceBeforeBinaryOperators": ["?", "+", "/", "*", "=", "==", "===", "!=", "!==", ">", ">=", "<", "<="],
+  "disallowSpaceAfterBinaryOperators": ["!"],
+  "requireSpaceAfterBinaryOperators": ["?", ",", "+", "/", "*", ":", "=", "==", "===", "!=", "!==", ">", ">=", "<", "<="],
+  "disallowSpaceBeforeBinaryOperators": [","],
+  "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~", "!"],
+  "disallowSpaceBeforePostfixUnaryOperators": ["++", "--"],
+  "requireSpaceBeforeBinaryOperators": ["+", "-", "/", "*", "=", "==", "===", "!=", "!=="],
+  "requireSpaceAfterBinaryOperators": ["+", "-", "/", "*", "=", "==", "===", "!=", "!=="],
+  "disallowImplicitTypeConversion": ["numeric", "binary", "string"],
+  "disallowKeywords": ["with", "eval"],
+  "disallowMultipleLineBreaks": true,
+  "requireLineFeedAtFileEnd": true,
+  "validateIndentation": 2
+}
