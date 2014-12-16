@@ -26,7 +26,8 @@
     "polymer": "Polymer/polymer#^0.5.2",
     "paper-tabs": "Polymer/paper-tabs#^0.5.2",
     "paper-fab": "Polymer/paper-fab#^0.5.2",
-    "core-item": "Polymer/core-item#^0.5.2",
+    "paper-item": "Polymer/paper-item#^0.5.2",
+    "paper-button": "Polymer/paper-button#552f5bbc1796207ebff82171316d639c0d5b7afd",
     "paper-toast": "Polymer/paper-toast#^0.5.2",
     "core-a11y-keys": "Polymer/core-a11y-keys#^0.5.2",
     "core-drawer-panel": "Polymer/core-drawer-panel#^0.5.2",
@@ -35,5 +36,20 @@
     "google-youtube": "GoogleWebComponents/google-youtube#^1.0.1",
     "i18n-msg": "ebidel/i18n-msg#^0.0.1",
     "closure-compiler": "https://dl.google.com/closure-compiler/compiler-latest.zip"
+  },
+  "resolutions": {
+    "polymer": "^0.5.2",
+    "core-icon": "^0.5.2",
+    "paper-ripple": "^0.5.2",
+    "paper-button": "552f5bbc1796207ebff82171316d639c0d5b7afd",
+    "paper-shadow": "^0.5.2",
+    "core-icons": "^0.5.2",
+    "core-focusable": "^0.5.2",
+    "font-roboto": "^0.5.2",
+    "webcomponentsjs": "^0.5.2",
+    "core-component-page": "^0.5.2",
+    "core-iconset": "^0.5.2",
+    "core-iconset-svg": "^0.5.2",
+    "core-meta": "^0.5.2"
   }
 }
