@@ -1,5 +1,23 @@
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
+<!--
+`io-toast` extends `paper-toast` and adds listening capability.
+
+Example:
+
+    <paper-button id="myButton">Example button</paper-button>
+    <io-toast text="Your draft has been discarded."></io-toast>
+    <script>
+
+      document.querySelector('io-toast').listen(
+          document.querySelector('#myButton'),
+          'click',
+          'message'));
+    </script>
+
+@element io-toast
+@extends paper-toast
+-->
 <polymer-element name="io-toast" extends="paper-toast">
   <template>
     <shadow></shadow>
