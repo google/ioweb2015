@@ -214,6 +214,7 @@ gulp.task('serve', ['compass'], function() {
   gulp.watch([APP_DIR + '/styles/**/*.{scss,css}'], ['styles', reload]);
   gulp.watch([APP_DIR + '/scripts/**/*.js'], ['jshint']);
   gulp.watch([APP_DIR + '/images/**/*'], reload);
+  gulp.watch([APP_DIR + '/bower.json'], ['bower']);
 });
 
 gulp.task('vulcanize', ['vulcanize-elements']);
@@ -225,7 +226,7 @@ gulp.task('default', ['clean'], function(cb) {
 });
 
 gulp.task('bower', function() {
-  return bower({cwd: APP_DIR});
+  return bower({ cwd: APP_DIR });
 });
 
 gulp.task('setup', function(cb) {
