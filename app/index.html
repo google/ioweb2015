@@ -64,90 +64,134 @@ limitations under the License.
 </head>
 <body unresolved>
 
+<template is="auto-binding" id="t">
+
+<core-media-query query="(min-width:320px) and (max-width:768px)" queryMatches="{{isPhoneSize}}"></core-media-query>
+<core-media-query query="(min-width:769px) and (max-width:944px)" queryMatches="{{isTabletSize}}"></core-media-query>
+<core-media-query query="(min-width:945px)" queryMatches="{{isDesktopSize}}"></core-media-query>
+
 <core-drawer-panel forceNarrow>
   <div drawer>
-    TODO: put in nav
+    <core-toolbar class="tall cyan-bg">
+      <div class="top io-logo" flex></div>
+      <div class="bottom">
+        <p class="typo-white">Smarch xx - xx</p>
+        <p>San Francisco</p>
+      </div>
+    </core-toolbar>
+    <div class="drawer-panel-content">
+      <core-menu>
+        <paper-item>
+          <a href="#home">
+            <i18n-msg msgid="home">Home</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item>
+          <a href="#about">
+            <i18n-msg msgid="about">About</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item>
+          <a href="#schedule">
+            <i18n-msg msgid="schedule">Schedule</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item>
+          <a href="#onsite">
+            <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item>
+          <a href="#offsite">
+            <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item>
+          <a href="#registration">
+            <i18n-msg msgid="registration">Registration</i18n-msg>
+          </a>
+        </paper-item>
+      </core-menu>
+    </div>
   </div>
   <div main>
 
-<header class="masthead lightgrey">
+    <header class="masthead lightgrey-bg" layout vertical>
+      <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
+        <paper-icon-button icon="menu" class="typo-white" core-drawer-toggle></paper-icon-button>
+        <div flex></div>
+        <paper-tabs class="white" link>
+          <paper-tab>
+            <a href="#about" layout horizontal center>
+              <i18n-msg msgid="about">About</i18n-msg>
+            </a>
+          </paper-tab>
+          <paper-tab>
+            <a href="#schedule" layout horizontal center>
+              <i18n-msg msgid="schedule">Schedule</i18n-msg>
+            </a>
+          </paper-tab>
+          <paper-tab>
+            <a href="#onsite" layout horizontal center>
+              <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
+            </a>
+          </paper-tab>
+          <paper-tab>
+            <a href="#offsite" layout horizontal center>
+              <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
+            </a>
+          </paper-tab>
+          <paper-tab>
+            <a href="#registration" layout horizontal center>
+              <i18n-msg msgid="registration">Registration</i18n-msg>
+            </a>
+          </paper-tab>
+        </paper-tabs>
+      </core-toolbar>
+      <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+        <div id="masthead-io-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
+          <h1 class="masthead-title typo-white">Smarch xx - xx</h1>
+          <h2 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h2>
+        </div>
+      </div>
+      <paper-fab icon="add" mini?="{{isPhoneSize}}"></paper-fab>
+    </header>
 
-  <core-toolbar id="navbar">
-    <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-    <div flex></div>
-    <paper-tabs class="white" link>
-      <paper-tab>
-        <a href="#about" layout horizontal center>
-          <i18n-msg msgid="about">About</i18n-msg>
-        </a>
-      </paper-tab>
-      <paper-tab>
-        <a href="#schedule" layout horizontal center>
-          <i18n-msg msgid="schedule">Schedule</i18n-msg>
-        </a>
-      </paper-tab>
-      <paper-tab>
-        <a href="#onsite" layout horizontal center>
-          <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
-        </a>
-      </paper-tab>
-      <paper-tab>
-        <a href="#offsite" layout horizontal center>
-          <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
-        </a>
-      </paper-tab>
-      <paper-tab>
-        <a href="#registration" layout horizontal center>
-          <i18n-msg msgid="registration">Registration</i18n-msg>
-        </a>
-      </paper-tab>
-    </paper-tabs>
-  </core-toolbar>
+    <main>
 
-  <div class="masthead-container" layout horizontal>
-    <div id="masthead-io-meta" layout vertical end-justified end flex>
-      <h1 class="masthead-title">Smarch xx - xx</h1>
-      <h2 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h2>
-    </div>
-  </div>
-  <paper-fab icon="add"></paper-fab>
-</header>
+      <section class="card">
+        <div class="card-content">
+          <h2>
+            Google I/O brings together best-in-class developers to meet on a global stage. Join us to explore emerging technology for mobile and beyond.
+          </h2>
+        </div>
+        <div class="card-content">
+          <a href="#">Learn more about I/O</a>
+        </div>
+      </section>
 
-<main>
+      <section class="home-photo"></section>
+      <io-toast id="toast"></io-toast>
 
-  <section class="card">
-    <div class="card-content">
-      <h2>
-        Google I/O brings together best-in-class developers to meet on a global stage. Join us to explore emerging technology for mobile and beyond.
-      </h2>
-    </div>
-    <div class="card-content">
-      <a href="#">Learn more about I/O</a>
-    </div>
-  </section>
+    </main>
 
-  <section class="home-photo"></section>
-
-  <io-toast id="toast"></io-toast>
-
-</main>
-
-<footer layout horizontal>
-  <img src="images/google-logo.svg" self-end>
-  <div class="footer-content" flex layout vertical end>
-    <a href="#navbar" class="footer-backtotop">Back to the top <core-icon icon="hardware:keyboard-arrow-up"></core-icon></a>
-    <nav flex horizontal layout end justified>
-      <span><a href="#">FAQ</a></span>
-      <span><a href="#">Google Developers</a></span>
-      <span><a href="#">I/O Community</a></span>
-      <span><a href="http://www.google.com/intl/en/policies/terms/">Privacy</a> &amp; <a href="http://www.google.com/intl/en/policies/terms/">Terms</a></span>
-    </nav>
-  </div>
-</footer>
-
+    <footer layout horizontal>
+      <img src="images/google-logo.svg" self-end>
+      <div class="footer-content" flex layout vertical end>
+        <a href="#navbar" class="footer-backtotop">Back to the top <core-icon icon="hardware:keyboard-arrow-up"></core-icon></a>
+        <nav flex horizontal layout end justified>
+          <span><a href="#">FAQ</a></span>
+          <span><a href="#">Google Developers</a></span>
+          <span><a href="#">I/O Community</a></span>
+          <span><a href="https://www.google.com/intl/en/policies/terms/">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/">Terms</a></span>
+        </nav>
+      </div>
+    </footer>
 
   </div>
 </core-drawer-panel>
+
+</template>
 
 <!-- TODO: Move to automatic concatenation via codekit-gulp -->
 <script src="scripts/main.js"></script>

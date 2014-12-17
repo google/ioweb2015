@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
+$mobileKeyline: 16px;
+$tabletKeyline: 24px;
+$desktopKeyline: 32px;
+
 @mixin keyline-72l() {
 	padding-left: 72px;
 }
 
 @mixin keyline-24l() {
-	padding-left: 24px;
+	padding-left: $tabletKeyline;
 }
 
 @mixin keyline-16l() {
-	padding-left: 16px;
+	padding-left: $mobileKeyline;
 }
 
 @mixin keyline-72() {
@@ -31,13 +35,13 @@
 }
 
 @mixin keyline-32() {
-  padding: 0 32px 0 32px;
+  padding: 0 $desktopKeyline 0 $desktopKeyline;
 }
 
 @mixin keyline-24() {
-	padding: 0 24px 0 24px;
+	padding: 0 $tabletKeyline 0 $tabletKeyline;
 }
 
 @mixin keyline-16() {
-	padding: 0 16px 0 16px;
+	padding: 0 $mobileKeyline 0 $mobileKeyline;
 }

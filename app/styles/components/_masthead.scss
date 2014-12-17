@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
+.io-logo {
+  // TODO(ericbidelman): this should be a 1x asset.
+  background: url('../images/home/io_white.png') no-repeat;
+  height: 40px;
+  background-size: contain;
+
+  &.medium {
+    height: 136px;
+  }
+  &.large {
+    height: 192px;
+  }
+  &.huge {
+    height: 272px;
+  }
+}
+
 .masthead {
-  // min-height: 56px;
-  position: fixed;
-  width: 100%;
-  top: 0;
-
-  &.cyan {
-    background-color: $color-cyan-500;
-    color: $color-cyan-900;
-  }
-
-  &.lightgrey {
-    background-color: $color-bluegrey-100;
-    color: $color-bluegrey-700;
-  }
-
-  &.darkgrey {
-    background-color: $color-bluegrey-700;
-    color: $color-bluegrey-100;
-  }
+  position: relative;
+  min-height: 400px;
+  height: 60vh; // ~2/3 viewport height
+  max-height: 550px;
 }
 
 core-drawer-panel {
@@ -42,6 +44,15 @@ core-drawer-panel {
   }
   [main] {
     overflow: auto;
+  }
+  .drawer-panel-content {
+    core-menu {
+      margin-left: 0;
+      margin-right: 0;
+    }
+    a {
+      font-weight: inherit;
+    }
   }
 }
 
@@ -62,33 +73,28 @@ core-drawer-panel {
       color: inherit;
     }
   }
-
-  paper-icon-button {
-    color: #fff;
-  }
-}
-
-#io-logo {
-  // TODO(ericbidelman): this should be a 1x asset.
-  background: url('../images/home/io_white.png') no-repeat;
-  height: 32px;
-  background-size: contain;
 }
 
 .masthead-container {
   width: 100%;
-  max-width: $tablet-breakpoint;
+  max-width: $tablet-breakpoint-max;
   margin: 0 auto;
   position: relative;
-}
+  padding: 32px 0;
 
-#masthead-io-meta {
-  display: none;
+  &::before {
+    content: '';
+    width: 177px;
+    height: 128px;
+    display: block;
+    // TODO(ericbidelman): this should be a 1x asset.
+    background: url('../images/home/io_white.png') center center no-repeat;
+    background-size: contain;
+  }
 }
 
 .masthead-title {
   @include typo-display-3();
-  color: #fff;
   font-weight: 400;
   opacity: 1;
 }
@@ -102,34 +108,47 @@ paper-fab {
   color: inherit;
   background: $color-card;
   position: absolute;
-  bottom: -28px; // paper-fab's height / 2
-  right: 32px;
+  bottom: -20px; // paper-fab's height / 2
+  right: $mobileKeyline;
 }
 
-@media (min-width: $tablet-breakpoint) {
-  .masthead {
-    height: 396px;
-    position: relative;
-    margin-bottom: -100px;
+@media (max-width: $phone-breakpoint-max) {
+  .masthead-container {
+    @include keyline-72l();
   }
+}
 
-  .masthead-subtitle {
-    text-align: right;
-    margin-bottom: 15px;
+@media (min-width: $tablet-breakpoint-min) {
+  .masthead {
+    position: relative;
+    margin-bottom: -115px;
   }
 
   #masthead-io-meta {
-    display: inherit;
+    text-align: right;
   }
 
-  .masthead-container::before {
-    content: '';
-    width: 256px;
-    height: 184px;
-    display: block;
-    // TODO(ericbidelman): this should be a 1x asset.
-    background: url('../images/home/io_white.png') center center no-repeat;
-    background-size: contain;
+  .masthead-container {
+    max-width: 704px;
+    padding: 0 0 170px 0;
+
+    &::before {
+      width: 256px;
+      height: 184px;
+    }
+  }
+
+  .masthead-subtitle {
+    margin-bottom: 15px;
+  }
+
+  paper-fab {
+    bottom: -28px; // paper-fab's height / 2
+    right: $desktopKeyline;
+  }
+
+  paper-icon-button {
+    display: none;
   }
 
   #navbar paper-tabs {
@@ -137,11 +156,18 @@ paper-fab {
   }
 }
 
-@media (min-width: $phone-breakpoint) {
-  paper-icon-button {
-    display: none;
+@media (min-width: $desktop-breakpoint-mid) {
+  .masthead-container {
+    max-width: 896px;
   }
 }
+
+@media (min-width: $desktop-breakpoint-max) {
+  .masthead-container {
+    max-width: 1024px;
+  }
+}
+
 
 // @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint) {
 //   .masthead-container::before {

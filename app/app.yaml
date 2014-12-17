@@ -28,6 +28,11 @@ handlers:
   http_headers:
     Access-Control-Allow-Origin: "*"
 
+- url: /temporary_api
+  static_dir: temporary_api
+  http_headers:
+    Access-Control-Allow-Origin: "*"
+
 - url: /$
   static_files: index.html
   upload: index\.html
