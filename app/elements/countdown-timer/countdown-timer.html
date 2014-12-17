@@ -42,9 +42,9 @@ Creates a countdown timer to a specific date.
   <script>
   (function() {
 
-    var timer;
-
     Polymer({
+
+      timer: null,
 
       /**
        * The target date for the countdown. Should be specified in ISO 8601
@@ -109,7 +109,7 @@ Creates a countdown timer to a specific date.
        * @method stop
        */
       stop: function() {
-        timer.stop();
+        this.timer.stop();
       },
 
       /**
@@ -118,7 +118,7 @@ Creates a countdown timer to a specific date.
        * @method start
        */
       start: function() {
-        timer.start();
+        this.timer.start();
       },
 
       /**
@@ -128,32 +128,32 @@ Creates a countdown timer to a specific date.
        */
       reset: function() {
         this.configureTimer_();
-        timer.drawIfAnimationIsNotRunning();
+        this.timer.drawIfAnimationIsNotRunning();
       },
 
       dateChanged: function() {
         this.configureTimer_();
-        timer.drawIfAnimationIsNotRunning();
+        this.timer.drawIfAnimationIsNotRunning();
       },
 
       dateAdjustmentChanged: function() {
         this.configureTimer_();
-        timer.drawIfAnimationIsNotRunning();
+        this.timer.drawIfAnimationIsNotRunning();
       },
 
       easeInTimeChanged: function() {
         this.configureTimer_();
-        timer.drawIfAnimationIsNotRunning();
+        this.timer.drawIfAnimationIsNotRunning();
       },
 
       easeOutTimeChanged: function() {
         this.configureTimer_();
-        timer.drawIfAnimationIsNotRunning();
+        this.timer.drawIfAnimationIsNotRunning();
       },
 
       waitTimeChanged: function() {
         this.configureTimer_();
-        timer.drawIfAnimationIsNotRunning();
+        this.timer.drawIfAnimationIsNotRunning();
       },
 
       /**
@@ -167,11 +167,11 @@ Creates a countdown timer to a specific date.
         // Create the timer and set it with whatever the current
         // values are. If the user updates any values then the
         // timer will get reconfigured.
-        timer = new IOWA.CountdownTimer.Element(this.$.surface);
+        this.timer = new IOWA.CountdownTimer.Element(this.$.surface);
         this.configureTimer_();
 
         if (!this.autoStart) {
-          timer.drawIfAnimationIsNotRunning();
+          this.timer.drawIfAnimationIsNotRunning();
           return;
         }
 
@@ -193,14 +193,14 @@ Creates a countdown timer to a specific date.
 
         targetDate = new Date(targetDate);
 
-        timer.configure({
+        this.timer.configure({
           targetDate: targetDate,
           adjustmentInDays: this.dateAdjustment,
           easeInTime: this.easeInTime,
           waitTime: this.waitTime,
           easeOutTime: this.easeOutTime
         });
-      },
+      }
 
     });
 
