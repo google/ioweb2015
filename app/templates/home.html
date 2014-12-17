@@ -9,7 +9,7 @@
 
 {% define "content" %}
   <div class="card__container">
-    <div class="card">
+    <div class="card js-experiment-visualizer">
       <div class="card-content">
         <h2>Google I/O is for developers—the creative coders who are building what's next. Together we'll explore the latest in tech, mobile &amp; beyond.</h2>
       </div>
@@ -20,9 +20,9 @@
     </div>
   </div>
 
-  <section class="home-photo page__section"></section>
+  <section class="home-photo page__section js-experiment-instrument"></section>
 
-  <section id="registration" class="page__section bg-cyan">
+  <section id="registration" class="page__section js-experiment-instrument bg-cyan">
     <h2>Registration opens<br>March 10 at 9AM PST</h2>
     <paper-button class="registration__setreminder" hidden?="{{isPhoneSize}}">
       <core-icon icon="social:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg>
@@ -39,13 +39,13 @@
 
   <div class="registration__card card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
     <template if="{{isPhoneSize}}">
-      <div class="card" auto-vertical flex>
+      <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
           <a href="#"><core-icon icon="social:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg></a>
         </div>
       </div>
     </template>
-    <div class="card" auto-vertical flex>
+    <div class="card js-experiment-visualizer" auto-vertical flex>
       <div class="card-content hide-on-mobile">
         <h3>I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between.</h3>
       </div>
@@ -53,7 +53,7 @@
         <a href="schedule" data-ajax-link><core-icon icon="event"></core-icon> Check the agenda</a>
       </div>
     </div>
-    <div class="card" layout vertical auto-vertical flex>
+    <div class="card js-experiment-visualizer" layout vertical auto-vertical flex>
       <div flex class="card__photo card__photo--recap hide-on-mobile"></div>
       <div class="card-content">
         <a href="#"><core-icon icon="av:play-circle-fill"></core-icon> Watch the 2014 I/O Recap Video</a>
@@ -61,7 +61,7 @@
     </div>
   </div>
 
-  <section class="page__section page__section--attend bg-dark-grey">
+  <section class="page__section js-experiment-instrument page__section js-experiment-instrument--attend bg-dark-grey">
     <h2><i18n-msg msgid="attend-from">Attend I/O from</i18n-msg>
       <div class="attend__cityname">
         <name-cycler items="['Kyoto', 'Chiang Mai', 'Calgary', 'Detroit', 'Porto','Nice', 'Melbourne', 'Kano', 'Durban', 'Porto Alegre']"></name-cycler>
@@ -73,7 +73,7 @@
   </section>
 
   <div class="card__container">
-    <div class="card">
+    <div class="card js-experiment-visualizer">
       <div class="card-content">
         <h2>If you aren't able to join us for I/O in person this year, you can still make an event out of it. Watch the live stream with other developers near you.</h2>
       </div>
@@ -83,7 +83,7 @@
     </div>
   </div>
 
-  <section id="join" class="page__section bg-light-grey">
+  <section id="join" class="page__section js-experiment-instrument bg-light-grey">
     <h2>Join the conversation<br>now at #io15</h2>
     <div class="join__social" layout vertical end hidden?="{{isPhoneSize}}">
       <a href="https://plus.google.com/+GoogleDevelopers">

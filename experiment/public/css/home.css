@@ -1,0 +1,302 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+a {
+    text-decoration: none;
+    display: block;
+}
+
+/**
+Custom Home
+ */
+
+ html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+ }
+
+ img {
+    max-width: 100%;
+ }
+
+.roboto {
+    font-family: 'Roboto', sans-serif;
+}
+
+nav{ 
+    position:absolute;
+    right: 0;
+    margin: 46px 37px 0 0;
+    z-index: 100;
+}
+    nav ul li {
+        display: inline-block;
+        margin-left: 20px;
+    }
+        nav ul li a {
+            font-weight: 500;
+            font-size: 14px;
+            color: #8198A3;
+        }
+        nav ul li a:hover {
+            color: #fff;
+        }
+
+footer {
+    position: relative;
+    background-color: #fff;
+    min-height: 187px;
+    min-width: 752px;
+    color: #9B9B9B;
+}
+    footer #footer-logo {
+        float: left;
+        margin: 93px 0 0 65px;
+    }
+
+    footer #fab3 {
+        position: absolute;
+        top: -30px;
+        right: 30px;
+        z-index: 100;
+    }
+
+    footer nav { 
+        float: right;
+        margin-top: 100px;
+    }
+    footer nav ul li a {
+        color: #9B9B9B;
+    }
+    footer nav ul li a:hover { color: #9B9B9B; }
+
+.mobile {
+    display: none;
+}
+
+.row {
+    position: relative;
+    text-align: center;
+    /*min-height: 450px;*/
+}
+
+.content {
+    position: relative;
+    /*border: 1px solid red;*/
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.card {
+    position: relative;
+    margin-left: 10px;
+}
+
+.fab {
+    position: absolute;
+    left: 0;
+    bottom: -32px;
+}
+
+#row-1 {
+    background-color: #CFD8DC;
+    z-index: 1;
+}
+    #row-1 .card {
+        margin-top: -100px;
+        bottom: -150px;
+    }
+
+#row-2 {
+    background: url("/images/homeproto/io7-3.png") no-repeat;
+    background-size: cover;
+    height: 600px;
+    width: 100%;
+}
+
+    #io-photos-btn {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+    }
+
+#row-3 {
+    background-color: #4ED0E1;
+    padding: 65px;
+    height: 925px;
+    z-index: 5;
+}
+    #row-3 .cards {
+        width: 100%;
+        position: absolute;
+        left: 0px;
+        bottom: -50px;
+        margin-left: -10px;
+    }
+
+#row-4 {
+    background-color: #37474F;
+    z-index: 4;
+}
+    #row-4 .card {
+        margin-top: -307px;
+        bottom: -69px;
+        z-index: 1000;
+    }
+
+#row-5 {
+    background-color: #4ED0E1;
+    padding: 144px;
+}
+
+
+@media only screen and (max-width : 1166px) {
+/* Styles */
+
+    .content {
+        max-width: 960px;
+    }
+
+    .card {
+        width: 75%;
+    }
+
+    .fab {
+        position: absolute;
+        left: 0;
+        bottom: -32px;
+    }
+
+}
+
+/* Smartphones (portrait) ----------- */
+@media only screen and (max-width : 400px) {
+/* Styles */
+    .mobile {
+        display: block;
+    }
+
+    .desktop {
+        display: none;
+    }
+
+    .fab {
+        position: absolute;
+        left: 10px;
+        bottom: 65px;
+        z-index: 3;
+        width: 40px;
+        height: 40px;
+    }
+
+    #row-1 {
+        padding-top: 50px;
+    }
+    #row-1 .card {
+        width: 100%; 
+        background: #fff;
+        padding: 50px 0;
+        margin-left: 0;
+    }
+
+    #row-2 {
+        height: 450px;
+    }
+
+    #row-3 {
+        height: auto;
+    }
+
+    #io-photos-btn {
+        position: absolute;
+        bottom: 40px;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+
+    #row-5 {
+        padding: 50px;
+    }
+
+
+    footer #footer-logo {
+        position: absolute;
+        float: left;
+        /*margin: 93px 0 0 0px;*/
+        margin: 0;
+        bottom: 25px;
+        left: 25px;
+    }
+
+    footer  nav {
+        margin: 0;
+    }
+    footer nav ul li {
+        display: inline;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

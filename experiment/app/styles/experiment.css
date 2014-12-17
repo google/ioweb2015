@@ -1,0 +1,96 @@
+.experiment-viewport {
+  position:absolute;
+  margin: 0;
+  padding: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 100000;
+  user-select: none;
+}
+
+  .experiment-is-masked {
+    -webkit-mask: -webkit-canvas(wipe);
+    -webkit-mask-repeat: no-repeat;
+  }
+
+.experiment-logo {
+  background-size: 84px 60px;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 170px;
+  height: 132px;
+  z-index: 100003;
+  opacity: 1;
+  visibility: visible;
+  transition: 300ms all ease-out;
+}
+
+  .experiment-logo.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+.logo-dialog {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+  font-family: 'Roboto', sans-serif;
+  height: 100px;
+  padding: 20px;
+  position: absolute;
+  left: 150px;
+  top: 40px;
+  transition: transform 300ms ease-in-out;
+  transform: scale(0,0);
+  transform-origin: 0 0;
+  width: 220px;
+  z-index: 100003;
+}
+
+.logo-dialog.active {
+  transform: scale(1,1);
+}
+
+.logo-dialog h4 {
+  color: #424242;
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+  @media screen and (max-width: 767px) {
+    .experiment-logo {
+      background-size: 42px 30px;
+      height: 60px;
+      width: 88px;
+    }
+    .logo-dialog {
+      left: 80px;
+      top: 18px;
+    }
+  }
+
+.experiment-instrument {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.experiment-visualizer {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+}

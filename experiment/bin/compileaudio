@@ -1,0 +1,9 @@
+#!/bin/bash
+
+audiosprite --output normalaudiosprite --export=mp3 public/sounds/normal/*.mp3
+mv normalaudiosprite.mp3 public/normalaudiosprite.mp3
+mv normalaudiosprite.json app/data/normalaudiosprite.json
+
+audiosprite --output cataudiosprite --export=mp3 public/sounds/cat/*.mp3
+mv cataudiosprite.mp3 public/cataudiosprite.mp3
+mv cataudiosprite.json app/data/cataudiosprite.json

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+npm install && webpack-dev-server -d --progress --colors --content-base public

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+npm install
+STATIC_BASE=$1 webpack -p

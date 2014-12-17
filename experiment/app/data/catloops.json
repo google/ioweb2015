@@ -1,0 +1,38 @@
+[
+  {
+    "name": "arp1",
+    "beats": {
+      "0": [ { "sound": "arp_synth_C" } ],
+      "1": [ { "sound": "arp_synth_E" } ],
+      "2": [ { "sound": "arp_synth_G" } ],
+      "3": [ { "sound": "arp_synth_E" } ]
+    }
+  },
+  {
+    "name": "arp2",
+    "beats": {
+      "0": [ { "sound": "arp_synth_A" } ],
+      "1": [ { "sound": "arp_synth_C" } ],
+      "2": [ { "sound": "arp_synth_E" } ],
+      "3": [ { "sound": "arp_synth_C" } ]
+    }
+  },
+  {
+    "name": "arp3",
+    "beats": {
+      "0": [ { "sound": "arp_synth_G" } ],
+      "1": [ { "sound": "arp_synth_B" } ],
+      "2": [ { "sound": "arp_synth_D" } ],
+      "3": [ { "sound": "arp_synth_B" } ]
+    }
+  },
+  {
+    "name": "arp4",
+    "beats": {
+      "0": [ { "sound": "arp_synth_F" } ],
+      "1": [ { "sound": "arp_synth_A" } ],
+      "2": [ { "sound": "arp_synth_C" } ],
+      "3": [ { "sound": "arp_synth_A" } ]
+    }
+  }
+]

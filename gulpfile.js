@@ -23,6 +23,7 @@ var glob = require('glob');
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
 var BACKEND_APP_YAML = BACKEND_DIR + '/app.yaml';
+var EXPERIMENT_DIR = 'experiment';
 
 var STATIC_VERSION = 1; // Cache busting static assets.
 var VERSION = argv.build || STATIC_VERSION;
@@ -31,7 +32,10 @@ var VERSION = argv.build || STATIC_VERSION;
 // var STATIC_BASE_URL = argv.baseurl ? argv.baseurl : '';
 // var STATIC_URL = argv.pretty ? '' : (STATIC_BASE_URL + VERSION + '/');
 
+var EXPERIMENT_STATIC_URL = '/experiment/';
+
 var DIST_STATIC_DIR = 'dist';
+var DIST_EXPERIMENT_DIR = 'app/experiment';
 // var PROD_DIR = APP_DIR + '/dist_prod';
 // var STATIC_DIR = APP_DIR + '/dist_static';
 // var PRETTY_DIR = APP_DIR + '/dist_pretty';
@@ -204,7 +208,7 @@ gulp.task('jscs', function() {
 gulp.task('uglify', function() {
   return gulp.src([APP_DIR + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
-    .pipe($.uglify({preserveComments: 'some'}))
+    .pipe($.uglify({preserveComments: 'some'}).on('error', function(){}))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/scripts'))
     .pipe($.size({title: 'uglify'}));
 });
@@ -317,6 +321,20 @@ gulp.task('vulcanize', ['vulcanize-elements']);
 
 gulp.task('js', ['jshint', 'jscs', 'uglify']);
 
+// Build experiment and place inside app.
+gulp.task('build-experiment', buildExperiment);
+
+// Copy experiment files.
+gulp.task('copy-experiment', function(cb) {
+  gulp.src([
+    EXPERIMENT_DIR + '/public/js/*.*',
+    EXPERIMENT_DIR + '/public/cataudiosprite.mp3',
+    EXPERIMENT_DIR + '/public/normalaudiosprite.mp3',
+  ], {base: EXPERIMENT_DIR + '/public/' })
+  .pipe(gulp.dest(DIST_EXPERIMENT_DIR))
+  .on('end', cb);
+});
+
 // Build self-sufficient backend server binary w/o GAE support.
 gulp.task('backend', buildBackend);
 
@@ -334,7 +352,7 @@ gulp.task('backend:test', function(cb) {
 });
 
 gulp.task('default', ['clean'], function(cb) {
-  runSequence('sass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'],
+  runSequence('build-experiment', 'copy-experiment', 'sass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'],
     'generate-service-worker-dist', cb);
 });
 
@@ -361,6 +379,13 @@ function watch() {
   gulp.watch([APP_DIR + '/scripts/**/*.js'], ['jshint']);
   gulp.watch([APP_DIR + '/images/**/*'], reload);
   gulp.watch([APP_DIR + '/bower.json'], ['bower']);
+}
+
+// Build experiment
+function buildExperiment(cb) {
+  var args = [EXPERIMENT_STATIC_URL];
+  var build = spawn('./bin/build', args, {cwd: EXPERIMENT_DIR, stdio: 'inherit' });
+  build.on('close', cb);
 }
 
 // Build standalone backend server

@@ -1,0 +1,40 @@
+{
+  "selectedTheme": "theme1",
+  "centerRadius": 180,
+  "safeZone": 0.2,
+
+  "theme1": {
+    "center": [
+      "FF8A65",
+      "FF7043",
+      "F3511E",
+      "E64A18"
+    ],
+    "quadrants": [
+      [
+        "FFEE58",
+        "FDD834",
+        "FBC02D",
+        "F9A825"
+      ],
+      [
+        "FFB74D",
+        "FFA726",
+        "FB8C00",
+        "F57C00"
+      ],
+      [
+        "E57373",
+        "EF5350",
+        "E53935",
+        "D32F2F"
+      ],
+      [
+        "F06292",
+        "EC407A",
+        "D81B60",
+        "C2185B"
+      ]
+    ]
+  }
+}

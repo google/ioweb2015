@@ -1,0 +1,131 @@
+module.exports = (function() {
+  'use strict';
+
+  /**
+   * Creates a Metronome class which controls a dynamically
+   * created webworker.
+   * @constructor
+   */
+  return function Metronome() {
+    var url = getWorkerURL();
+    var worker = new Worker(url);
+
+    /**
+     * Convert the worker function to a string.
+     * @return {string}
+     */
+    function getWorkerScript() {
+      return '(' + workerInit + ')(this);';
+    }
+
+    /**
+     * The body of the worker definition.
+     * @param {window} global - The global scope.
+     */
+    function workerInit(global) {
+      /* jshint worker: true, validthis: true  */
+      var timerID = null;
+      var interval = 100;
+
+      function ticker() {
+        postMessage('tick');
+      }
+
+      global.onmessage = (function(e) {
+        /* jshint sub: true */
+        if (e.data === 'start') {
+          // lastTick = performance.now();
+          timerID = this['setInterval'](ticker, interval);
+        } else if (e.data.interval) {
+          interval = e.data.interval;
+          if (timerID) {
+            this['clearInterval'](timerID);
+            timerID = this['setInterval'](ticker, interval);
+          }
+        } else if (e.data === 'stop') {
+          this['clearInterval'](timerID);
+          timerID = null;
+        }
+      }).bind(this);
+    }
+
+    /**
+     * Get a BLOB representation of the inline worker script.
+     * @return {URL}
+     */
+    function getWorkerURL() {
+      var blob = new Blob([getWorkerScript()], { type: 'text/javascript' });
+      return URL.createObjectURL(blob);
+    }
+
+    /**
+     * Kill the web worker.
+     */
+    function kill() {
+      if (worker) {
+        worker.terminate();
+        worker = null;
+      }
+
+      if (url) {
+        URL.revokeObjectURL(url);
+        url = null;
+      }
+    }
+
+    /**
+     * Send a message to the worker.
+     * @param {string|object} msg - The message to pass.
+     */
+    function post(msg) {
+      if (worker) {
+        worker.postMessage(msg);
+      } else {
+        throw 'This worker is dead.';
+      }
+    }
+
+    /**
+     * Start the metronome.
+     */
+    function start() {
+      post('start');
+    }
+
+    /**
+     * Stop the metronome.
+     */
+    function stop() {
+      post('stop');
+    }
+
+    /**
+     * Start the metronome speed.
+     */
+    function setInterval(interval) {
+      post({ interval: interval });
+    }
+
+    /**
+     * Subscribe to tick events.
+     * @param {function} handler - The callback.
+     */
+    function onTick(handler) {
+      if (worker) {
+        worker.addEventListener('message', function(e) {
+          handler(e.data);
+        });
+      } else {
+        throw 'This worker is dead.';
+      }
+    }
+
+    return {
+      onTick: onTick,
+      setInterval: setInterval,
+      start: start,
+      stop: stop,
+      kill: kill
+    };
+  };
+})();

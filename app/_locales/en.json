@@ -100,6 +100,74 @@
     "description": "The experiment's loading message explaining it will use a particular API.",
     "message": "Web Audio API experiment ahead"
   },
+  "loading": {
+    "description": "Indicates that the experiment is loading.",
+    "message": "Loading..."
+  },
+  "make-some-noise": {
+    "description": "Entry point to the experiment once experiment has loaded completely.",
+    "message": "Make Some Noise"
+  },
+  "cancel": {
+    "description": "Generic cancel button message",
+    "message": "Cancel"
+  },
+  "experiment-unsupported": {
+    "description": "Message to be displayed if experiment tech supported.",
+    "message": "Unsupported"
+  },
+  "experiment-failed": {
+    "description": "If experiment fails to load, display this message.",
+    "message": "The experiment failed to load"
+  },
+  "close-dialog": {
+    "description": "Close message for the dialog box.",
+    "message": "Close"
+  },
+  "exit-experiment": {
+    "description": "Headline for experiment exit dialog.",
+    "message": "Exit the Experiment?"
+  },
+  "exit-confirmation": {
+    "description": "Confirmation copy for experiment exit dialog",
+    "message": "Are you sure you want to exit the experiment and go back to the I/O website?"
+  },
+  "reset-song": {
+    "description": "Headline for experiment reset dialog.",
+    "message": "Reset the song?"
+  },
+  "reset-confirm": {
+    "description": "Confirmation copy for experiment reset dialog.",
+    "message": "Are you sure you want to reset the song back to the default?"
+  },
+  "share-your-song": {
+    "description": "Headline for share dialog",
+    "message": "Share Your Song"
+  },
+  "gplus-share": {
+    "description": "Google plus share text",
+    "message": "Google+"
+  },
+  "twitter-share": {
+    "description": "Twitter share text",
+    "message": "Twitter"
+  },
+  "facebook-share": {
+    "description": "Facebook share text",
+    "message": "Facebook"
+  },
+  "copy-link": {
+    "description": "Copy link text",
+    "message": "Copy Link"
+  },
+  "yes": {
+    "description": "Generic yes",
+    "message": "Yes"
+  },
+  "no": {
+    "description": "Generic no",
+    "message": "No"
+  },
   "day": {
     "description": "Link text. Please keep short. Used on the schedule page.",
     "message": "Day"
