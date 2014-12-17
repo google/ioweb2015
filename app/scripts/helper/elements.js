@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-(function(exports) {
+IOWA.Elements = (function() {
 
-'use strict';
+  "use strict";
 
-// @codekit-prepend 'third_party/signals.min.js'
-// @codekit-prepend 'third_party/requestAnimationFrame.js'
+  var toast = document.getElementById('toast');
 
-exports.IOWA = {};
+  // TODO: Add element's configuration and listeners here.
 
-// TODO: Make the codekit syntax work with gulp.
-// @codekit-append 'bootstrap.js'
+  return {
+    Toast: toast
+  };
 
-
-})(window);
+})();
