@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-.home-photo {
-  background: url(../images/home/io7.jpg) top center no-repeat;
-  background-size: cover;
-  height: 745px;
-  margin-top: -180px;
-}
+IOWA.Elements = (function() {
+
+  "use strict";
+
+  var toast = document.getElementById('toast');
+
+  // TODO: Add element's configuration and listeners here.
+
+  return {
+    Toast: toast
+  };
+
+})();

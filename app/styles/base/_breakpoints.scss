@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
-$desktop-breakpoint: 1136px;
-$tablet-breakpoint: 960px;
-$phone-breakpoint: 460px;
+$phone-breakpoint-min: 320px;
+$phone-breakpoint-max: 768px;
+
+$tablet-breakpoint-min: $phone-breakpoint-max + 1;
+$tablet-breakpoint-max: 944px;
+
+$desktop-breakpoint-min: $tablet-breakpoint-max + 1;
+$desktop-breakpoint-mid: 1136px;
+$desktop-breakpoint-max: 1264px;

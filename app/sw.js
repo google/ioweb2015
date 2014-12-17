@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-.home-photo {
-  background: url(../images/home/io7.jpg) top center no-repeat;
-  background-size: cover;
-  height: 745px;
-  margin-top: -180px;
-}
+importScripts('scripts/third_party/shed.js');
+
+shed.precache(['/temporary_api/precache/test.html']);
+
+shed.router.get('/temporary_api/precache/:resource', shed.cacheOnly);
+shed.router.get('/temporary_api/networkOnly/:resource', shed.networkOnly);
+shed.router.get('/temporary_api/cacheFirst/:resource', shed.cacheFirst);

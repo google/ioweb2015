@@ -1,0 +1,26 @@
+{
+  "sessions": [
+    {
+      "id": "79edef8b-96d4-e311-b297-00155d5066d7",
+      "description": "foo bar qux.",
+      "title": "Web Components in Action",
+      "url": "https://google.com/events/io/schedule/session/79edef8b-96d4-e311-b297-00155d5066d7",
+      "tags": [
+        "TYPE_SESSION",
+        "PRODUCT_ANDROID",
+        "PRODUCT_CHROME",
+        "THEME_DEVELOP",
+        "THEME_DESIGN"],
+      "startTimestamp": 1.3687335E9,
+      "youtubeUrl": "FDEMA6OhvGo",
+      "speakers": [
+        "104905409446591990813",
+        "101770524855203737699"
+      ],
+      "endTimestamp": 1.3687359E9,
+      "room": "1234135487",
+      "isLivestream": true,
+      "captionsUrl": "http://......"
+    }
+  ]
+}
