@@ -106,7 +106,7 @@ gulp.task('fonts', function () {
 // });
 
 // vulcanize main site elements separately.
-gulp.task('vulcanize-elements', ['clean', 'bower', 'compass'], function() {
+gulp.task('vulcanize-elements', ['clean', 'compass'], function() {
   return gulp.src([
       APP_DIR + '/elements/elements.html'
     ], {base: './'})
@@ -200,7 +200,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 }));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['bower', 'compass'], function() {
+gulp.task('serve', ['compass'], function() {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
@@ -226,6 +226,10 @@ gulp.task('default', ['clean'], function(cb) {
 
 gulp.task('bower', function() {
   return bower({cwd: APP_DIR});
+});
+
+gulp.task('setup', function(cb) {
+  runSequence('bower', 'default', cb);
 });
 
 // Load custom tasks from the `tasks` directory
