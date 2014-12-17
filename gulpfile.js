@@ -151,11 +151,18 @@ gulp.task('vulcanize-elements', ['clean', 'compass'], function() {
 
 // Lint JavaScript
 gulp.task('jshint', function() {
-  return gulp.src(APP_DIR + '/scripts/**/*.js')
+  return gulp.src([APP_DIR + '/scripts/**/*.js', '!**/third_party/**'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
+});
+
+// Check JS style
+gulp.task('jscs', function() {
+  return gulp.src([APP_DIR + '/scripts/**/*.js', '!**/third_party/**'])
+    .pipe(reload({stream: true, once: true}))
+    .pipe($.jscs());
 });
 
 // Crush JS
@@ -210,7 +217,7 @@ gulp.task('serve', ['compass'], function () {
 
 gulp.task('vulcanize', ['vulcanize-elements']);
 
-gulp.task('js', ['jshint', 'uglify']);
+gulp.task('js', ['jshint', 'jscs', 'uglify']);
 
 gulp.task('default', ['clean'], function(cb) {
   runSequence('compass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets'], cb);
