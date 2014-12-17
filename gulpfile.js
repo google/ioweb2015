@@ -13,6 +13,7 @@ var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var bower = require('gulp-bower');
+var chmod = require('gulp-chmod');
 
 var APP_DIR = 'app';
 
@@ -137,7 +138,7 @@ gulp.task('vulcanize-elements', ['clean', 'compass'], function() {
 
 // copy needed assets (images, polymer elements, etc) to /dist directory
 // gulp.task('copy-assets', ['clean', 'vulcanize', 'i18n_index'], function() {
-  gulp.task('copy-assets', function() {
+gulp.task('copy-assets', function() {
   return gulp.src([
     APP_DIR + '/*.{html,txt,ico}',
     APP_DIR + '/app.yaml',
@@ -229,8 +230,14 @@ gulp.task('bower', function() {
   return bower({ cwd: APP_DIR });
 });
 
+gulp.task('addgithooks', function() {
+  return gulp.src('.git-hooks/*')
+    .pipe(chmod(755))
+    .pipe(gulp.dest('.git/hooks'));
+});
+
 gulp.task('setup', function(cb) {
-  runSequence('bower', 'default', cb);
+  runSequence('bower', 'addgithooks', 'default', cb);
 });
 
 // Load custom tasks from the `tasks` directory
