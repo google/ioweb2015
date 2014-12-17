@@ -17,6 +17,8 @@ IOWA.CountdownTimer.Element = function(el) {
   this.animationEaseOutStartTime_ = 0;
   this.animationEaseOutEndTime_ = 0;
 
+  this.drawIfAnimationIsNotRunning =
+      this.drawIfAnimationIsNotRunning.bind(this);
   this.update_ = this.update_.bind(this);
 
   this.addEventListeners_();
@@ -25,48 +27,14 @@ IOWA.CountdownTimer.Element = function(el) {
 
 IOWA.CountdownTimer.Element.prototype = {
 
-  get currentDayValue_() {
-    return this.currentDayCountValue_;
-  },
-
-  set currentDayValue_(value) {
-    if (value < this.targetDayValue_ || isNaN(value))
-      value = this.targetDayValue_;
-
-    this.currentDayCountValue_ = value;
-  },
-
-  get targetDayValue_() {
-    return this.targetDayCountValue_;
-  },
-
-  set targetDayValue_(value) {
-
-    if (isNaN(value))
-      return;
-
-    if (value < 0)
-      value = 0;
-
-    this.targetDayCountValue_ = value;
-  },
-
   addEventListeners_: function() {
-    window.addEventListener('resize', this.drawIfNeeded_.bind(this));
-  },
-
-  drawIfNeeded_: function() {
-
-    if (this.animationRunning_)
-      return;
-
-    this.renderer_.clear();
-    this.renderer_.draw(this.currentDayValue_, 1,
-        IOWA.CountdownTimer.Animation.In);
-
+    window.addEventListener('resize', this.drawIfAnimationIsNotRunning);
   },
 
   update_: function() {
+
+    if (!this.animationRunning_)
+      return;
 
     // Figure out where we are in the animation cycle and map it to a value
     // between 0 and 1, where 0 is the start and end state, and 1 is the
@@ -85,8 +53,8 @@ IOWA.CountdownTimer.Element.prototype = {
     if (now > this.animationEaseOutStartTime_) {
 
       // We may choose to end here if this is the last value.
-      if (this.currentDayValue_ === this.targetDayValue_) {
-        this.stop_();
+      if (this.currentDayValue === this.targetDayValue) {
+        this.stop();
         return;
       }
 
@@ -105,7 +73,7 @@ IOWA.CountdownTimer.Element.prototype = {
     animationValue = IOWA.CountdownTimer.Easing(animationValue);
 
     this.renderer_.clear();
-    this.renderer_.draw(this.currentDayValue_, animationValue,
+    this.renderer_.draw(this.currentDayValue, animationValue,
         animationDirection);
 
     if (animationValue === 0) {
@@ -118,8 +86,8 @@ IOWA.CountdownTimer.Element.prototype = {
   freezeRendererForUnchangingDigits_: function() {
 
     var freezeCount = 0;
-    var currentDayValueAsString = Number(this.currentDayValue_).toString();
-    var nextDayValueAsString = Number(this.currentDayValue_ - 1).toString();
+    var currentDayValueAsString = Number(this.currentDayValue).toString();
+    var nextDayValueAsString = Number(this.currentDayValue - 1).toString();
 
     for (var i = 0; i < nextDayValueAsString.length; i++) {
       if (nextDayValueAsString[i] !== currentDayValueAsString[i])
@@ -129,18 +97,6 @@ IOWA.CountdownTimer.Element.prototype = {
     }
 
     this.renderer_.freeze(freezeCount);
-  },
-
-  start_: function() {
-    if (this.animationRunning_)
-      return;
-
-    this.animationRunning_ = true;
-    requestAnimationFrame(this.update_);
-  },
-
-  stop_: function() {
-    this.animationRunning_ = false;
   },
 
   updateAnimationTimingValues_: function() {
@@ -156,33 +112,85 @@ IOWA.CountdownTimer.Element.prototype = {
 
   continueAnimationIfNotAtFinalValue_: function() {
 
-    this.currentDayValue_--;
-    this.stop_();
+    this.currentDayValue--;
+    this.stop();
 
-    if (this.currentDayValue_ < this.targetDayValue_) {
+    if (this.currentDayValue < this.targetDayValue) {
       return;
     }
 
     this.updateAnimationTimingValues_();
-    this.start_();
+    this.start();
 
   },
 
-  animate: function(options) {
+  start: function() {
+    if (this.animationRunning_)
+      return;
+
+    this.animationRunning_ = true;
+    requestAnimationFrame(this.update_);
+  },
+
+  stop: function() {
+    this.animationRunning_ = false;
+  },
+
+  drawIfAnimationIsNotRunning: function() {
+
+    if (this.animationRunning_)
+      return;
+
+    this.renderer_.clear();
+    this.renderer_.draw(this.currentDayValue, 1,
+        IOWA.CountdownTimer.Animation.In);
+
+  },
+
+  configure: function(options) {
 
     var millisecondsToDays = 1 / (24 * 60 * 60 * 1000);
     var millisecondsToTarget = options.targetDate.getTime() - Date.now();
 
-    this.targetDayValue_ = Math.round(millisecondsToTarget *
+    this.targetDayValue = Math.round(millisecondsToTarget *
         millisecondsToDays);
-    this.currentDayValue_ = this.targetDayValue_ + options.adjustmentInDays;
+    this.currentDayValue = this.targetDayValue + options.adjustmentInDays;
 
     this.easeInTime_ = options.easeInTime;
     this.waitTime_ = options.waitTime;
     this.easeOutTime_ = options.easeOutTime;
 
     this.updateAnimationTimingValues_();
-    this.start_();
-  }
+  },
+
+  get configured() {
+    return this.configured_;
+  },
+
+  get currentDayValue() {
+    return this.currentDayCountValue_;
+  },
+
+  set currentDayValue(value) {
+    if (value < this.targetDayValue || isNaN(value))
+      value = this.targetDayValue;
+
+    this.currentDayCountValue_ = value;
+  },
+
+  get targetDayValue() {
+    return this.targetDayCountValue_;
+  },
+
+  set targetDayValue(value) {
+
+    if (isNaN(value))
+      return;
+
+    if (value < 0)
+      value = 0;
+
+    this.targetDayCountValue_ = value;
+  },
 
 };

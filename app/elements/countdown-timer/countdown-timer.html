@@ -1,7 +1,24 @@
+<!--
+  @license
+  TBC
+-->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<script src="countdown-timer-namespace.js"></script>
+<script src="countdown-timer-enumerations.js"></script>
+<script src="countdown-timer-renderer.js"></script>
+<script src="countdown-timer.js"></script>
+
+<!--
+Creates a countdown timer to a specific date.
+##### Example
+    <countdown-timer date=""></countdown-timer>
+@element countdown-timer
+@blurb Creates a countdown timer to a specific date.
+@status alpha
+-->
 <polymer-element name="countdown-timer"
-    attributes="date dateAdjustment easeInTime waitTime easeOutTime">
+    attributes="date dateAdjustment easeInTime waitTime easeOutTime autoStart">
 
   <template>
     <style>
@@ -22,41 +39,202 @@
     </div>
   </template>
 
-  <script src="countdown-timer-namespace.js"></script>
-  <script src="countdown-timer-enumerations.js"></script>
-  <script src="countdown-timer-renderer.js"></script>
-  <script src="countdown-timer.js"></script>
-
   <script>
+  (function() {
 
-  Polymer({
+    var timer;
 
-    date: 'Mon, 02 Mar 2015 09:00:00 GMT-0700',
-    dateAdjustment: 3,
-    easeInTime: 500,
-    waitTime: 300,
-    easeOutTime: 400,
+    Polymer({
 
-    ready: function() {
+      /**
+       * The target date for the countdown. Should be specified in ISO 8601
+       * format, e.g. `Thu, 18 Dec 2014 09:00:00 GMT`.
+       *
+       * @property date
+       * @type string
+       * @default 'Mon, 02 Mar 2015 09:00:00 GMT-0700'
+       */
+      date: 'Mon, 02 Mar 2015 09:00:00 GMT-0700',
 
-      var targetDate = Date.parse(this.date);
+      /**
+       * `dateAdjustment` adds the specified number of days to count down before
+       * displaying the final count. So, for example, if it is 75 days to the
+       * target date, a `dateAdjustment` of 3 will start the countdown at 78.
+       *
+       * @property dateAdjustment
+       * @type number
+       * @default 3
+       */
+      dateAdjustment: 3,
 
-      if (isNaN(targetDate))
-        targetDate = Date.now();
+      /**
+       * The time, in milliseconds, that it takes for a number to transition in.
+       *
+       * @property dateAdjustment
+       * @type number
+       * @default 500
+       */
+      easeInTime: 500,
 
-      targetDate = new Date(targetDate);
+      /**
+       * The time, in milliseconds, that a number stays on screen.
+       *
+       * @property dateAdjustment
+       * @type number
+       * @default 500
+       */
+      waitTime: 300,
 
-      var timer = new IOWA.CountdownTimer.Element(this.$.surface);
-      timer.animate({
-        targetDate: targetDate,
-        adjustmentInDays: this.dateAdjustment,
-        easeInTime: this.easeInTime,
-        waitTime: this.waitTime,
-        easeOutTime: this.easeOutTime
-      });
-    }
+      /**
+       * The time, in milliseconds, that a number takes to transition out.
+       *
+       * @property dateAdjustment
+       * @type number
+       * @default 500
+       */
+      easeOutTime: 400,
 
-  });
+      /**
+       * Whether or not the countdown should begin immediately.
+       *
+       * @property autoStart
+       * @type boolean
+       * @default false
+       */
+      autoStart: false,
+
+      /**
+       * Stops the timer.
+       *
+       * @method stop
+       */
+      stop: function() {
+        timer.stop();
+      },
+
+      /**
+       * Starts the timer.
+       *
+       * @method start
+       */
+      start: function() {
+        timer.start();
+      },
+
+      /**
+       * Resets the timer.
+       *
+       * @method reset
+       */
+      reset: function() {
+        this.configureTimer_();
+        timer.drawIfAnimationIsNotRunning();
+      },
+
+      /**
+       * Handles changes to the target date.
+       *
+       * @method dateChanged
+       * @private
+       */
+      dateChanged: function() {
+        this.configureTimer_();
+        timer.drawIfAnimationIsNotRunning();
+      },
+
+      /**
+       * Handles changes to the date adjustment.
+       *
+       * @method dateAdjustmentChanged
+       * @private
+       */
+      dateAdjustmentChanged: function() {
+        this.configureTimer_();
+        timer.drawIfAnimationIsNotRunning();
+      },
+
+      /**
+       * Handles changes to the ease in time.
+       *
+       * @method easeInTimeChanged
+       * @private
+       */
+      easeInTimeChanged: function() {
+        this.configureTimer_();
+        timer.drawIfAnimationIsNotRunning();
+      },
+
+      /**
+       * Handles changes to the ease out time.
+       *
+       * @method easeOutTimeChanged
+       * @private
+       */
+      easeOutTimeChanged: function() {
+        this.configureTimer_();
+        timer.drawIfAnimationIsNotRunning();
+      },
+
+      /**
+       * Handles changes to the wait time.
+       *
+       * @method waitTimeChanged
+       * @private
+       */
+      waitTimeChanged: function() {
+        this.configureTimer_();
+        timer.drawIfAnimationIsNotRunning();
+      },
+
+      /**
+       * Lifecycle event that creates the timer, configures it, and either
+       * starts it (if `autoStart` === true) or draws the start value if not.
+       *
+       * @private
+       */
+      ready: function() {
+
+        // Create the timer and set it with whatever the current
+        // values are. If the user updates any values then the
+        // timer will get reconfigured.
+        timer = new IOWA.CountdownTimer.Element(this.$.surface);
+        this.configureTimer_();
+
+        if (!this.autoStart) {
+          timer.drawIfAnimationIsNotRunning();
+          return;
+        }
+
+        this.start();
+      },
+
+      /**
+       * Used to take the current values from the element's prototype to set
+       * the corresponding values on the timer.
+       *
+       * @private
+       */
+      configureTimer_: function() {
+
+        var targetDate = Date.parse(this.date);
+
+        if (isNaN(targetDate))
+          targetDate = Date.now();
+
+        targetDate = new Date(targetDate);
+
+        timer.configure({
+          targetDate: targetDate,
+          adjustmentInDays: this.dateAdjustment,
+          easeInTime: this.easeInTime,
+          waitTime: this.waitTime,
+          easeOutTime: this.easeOutTime
+        });
+      },
+
+    });
+
+  })();
   </script>
 
 </polymer-element>
