@@ -48,7 +48,7 @@ gulp.task('compass', function() {
       project: path.join(__dirname, '/' + APP_DIR),
       css: '',
       sass: '',
-      environment: 'production',
+      environment: 'production'
     }))
     .pipe($.changed(APP_DIR + '/{styles,elements}', {extension: '.scss'}))
     .pipe($.autoprefixer([
@@ -227,7 +227,7 @@ gulp.task('default', ['clean'], function(cb) {
 });
 
 gulp.task('bower', function() {
-  return bower({ cwd: APP_DIR });
+  return bower({cwd: APP_DIR});
 });
 
 gulp.task('addgithooks', function() {
