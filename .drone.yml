@@ -1,0 +1,11 @@
+image: bradrydzewski/node:0.10
+git:
+  depth: 1
+script:
+  - npm -q install
+  - npm -q -g install gulp
+  - gem install compass --no-ri --no-doc
+  - rbenv rehash
+  - gulp bower
+  - gulp
+
