@@ -4,8 +4,6 @@ git:
 script:
   - npm -q install
   - npm -q -g install gulp
-  - gem install compass --no-ri --no-doc
-  - rbenv rehash
   - gulp bower
   - gulp
 
