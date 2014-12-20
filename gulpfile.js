@@ -40,16 +40,11 @@ gulp.task('clean', function(cleanCallback) {
   del([DIST_STATIC_DIR], cleanCallback);
 });
 
-gulp.task('compass', function() {
+gulp.task('sass', function() {
   return gulp.src([
       APP_DIR + '/{styles,elements}/**/*.scss'
     ])
-    .pipe($.compass({
-      project: path.join(__dirname, '/' + APP_DIR),
-      css: '',
-      sass: '',
-      environment: 'production'
-    }))
+    .pipe($.sass({outputStyle: 'compressed'}))
     .pipe($.changed(APP_DIR + '/{styles,elements}', {extension: '.scss'}))
     .pipe($.autoprefixer([
       'ie >= 10',
@@ -60,7 +55,7 @@ gulp.task('compass', function() {
       'opera >= 26',
       'ios >= 7'
     ]))
-    // .pipe(gulp.dest('.'))
+    .pipe(gulp.dest(APP_DIR))
     .pipe($.size({title: 'styles'}));
 });
 
@@ -71,7 +66,7 @@ gulp.task('fonts', function () {
     .pipe($.size({title: 'fonts'}));
 });
 
-// gulp.task('vulcanize-scenes', ['clean', 'compass', 'compile-scenes'], function() {
+// gulp.task('vulcanize-scenes', ['clean', 'sass', 'compile-scenes'], function() {
 //   return gulp.src([
 //       'scenes/*/*-scene*.html'
 //     ], {base: './'})
@@ -107,7 +102,7 @@ gulp.task('fonts', function () {
 // });
 
 // vulcanize main site elements separately.
-gulp.task('vulcanize-elements', ['clean', 'compass'], function() {
+gulp.task('vulcanize-elements', ['clean', 'sass'], function() {
   return gulp.src([
       APP_DIR + '/elements/elements.html'
     ], {base: './'})
@@ -201,7 +196,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 }));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['compass'], function() {
+gulp.task('serve', ['sass'], function() {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
@@ -223,7 +218,7 @@ gulp.task('vulcanize', ['vulcanize-elements']);
 gulp.task('js', ['jshint', 'jscs', 'uglify']);
 
 gulp.task('default', ['clean'], function(cb) {
-  runSequence('compass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets'], cb);
+  runSequence('sass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets'], cb);
 });
 
 gulp.task('bower', function() {
