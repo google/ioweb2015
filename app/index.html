@@ -72,7 +72,7 @@ limitations under the License.
 
 <core-drawer-panel forceNarrow>
   <div drawer>
-    <core-toolbar class="tall cyan-bg">
+    <core-toolbar class="tall bg-cyan">
       <div class="top io-logo" flex></div>
       <div class="bottom">
         <p class="typo-white">Smarch xx - xx</p>
@@ -116,9 +116,9 @@ limitations under the License.
   </div>
   <div main>
 
-    <header class="masthead lightgrey-bg" layout vertical>
+    <header class="masthead bg-medium-grey" layout vertical>
       <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
-        <paper-icon-button icon="menu" class="typo-white" core-drawer-toggle></paper-icon-button>
+        <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
         <div flex></div>
         <paper-tabs class="white" link>
           <paper-tab>
@@ -149,9 +149,9 @@ limitations under the License.
         </paper-tabs>
       </core-toolbar>
       <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
-        <div id="masthead-io-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
-          <h1 class="masthead-title typo-white">Smarch xx - xx</h1>
-          <h2 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h2>
+        <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
+          <h2 class="masthead-title">Smarch xx - xx</h2>
+          <h5 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h5>
         </div>
       </div>
       <paper-fab icon="add" mini?="{{isPhoneSize}}"></paper-fab>

@@ -22,12 +22,11 @@
   display: block;
 
   .card-content {
-    // @include typo-display-3();
     padding: 0 $mobileKeyline;
   }
 
   a {
-    color: $color-cyan-A700;
+    // color: $color-cyan-A700;
     @include typo-button();
   }
 }
@@ -36,10 +35,6 @@
 @media (max-width: $phone-breakpoint-max) {
   .card {
     padding-top: 32px;
-
-    h2 {
-      @include typo-display-2();
-    }
 
     .card-content {
       padding: 0 16px 32px 16px;

@@ -36,6 +36,16 @@
   min-height: 400px;
   height: 60vh; // ~2/3 viewport height
   max-height: 550px;
+
+  &.bg-medium-grey {
+    color: $color-bluegrey-700;
+  }
+  &.bg-cyan {
+    color: $color-cyan-900;
+  }
+  &.bg-dark-grey {
+    color: $color-bluegrey-100;
+  }
 }
 
 core-drawer-panel {
@@ -44,6 +54,9 @@ core-drawer-panel {
   }
   [main] {
     overflow: auto;
+  }
+  core-toolbar .bottom {
+    padding-bottom: $mobileKeyline;
   }
   .drawer-panel-content {
     core-menu {
@@ -94,19 +107,18 @@ core-drawer-panel {
 }
 
 .masthead-title {
-  @include typo-display-3();
-  font-weight: 400;
-  opacity: 1;
+  font-size: 32px;
+  font-weight: 300;
+  color: $color-cyan-A700 !important;
 }
 
 .masthead-subtitle {
-  @include typo-display-2();
-  color: $color-bluegrey-600;
+  color: $color-bluegrey-700;
 }
 
 paper-fab {
   color: inherit;
-  background: $color-card;
+  background: #fff;
   position: absolute;
   bottom: -20px; // paper-fab's height / 2
   right: $mobileKeyline;
@@ -124,7 +136,7 @@ paper-fab {
     margin-bottom: -115px;
   }
 
-  #masthead-io-meta {
+  .masthead-meta {
     text-align: right;
   }
 
