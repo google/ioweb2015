@@ -15,6 +15,7 @@
  */
 
 importScripts('scripts/third_party/shed.js');
+importScripts('scripts/shed-offline-analytics.js');
 
 shed.precache(['/temporary_api/precache/test.html']);
 
