@@ -140,7 +140,6 @@ gulp.task('copy-assets', ['copy-bower-dependencies'], function() {
     APP_DIR + '/manifest.json',
     APP_DIR + '/styles/**.css',
     APP_DIR + '/elements/**/images/*',
-    APP_DIR + '/scripts/third_party/*',
     // The service worker script needs to be at the top-level of the site.
     APP_DIR + '/sw.js'
   ], {base: './'})
@@ -168,7 +167,7 @@ gulp.task('copy-bower-dependencies', function() {
 
 // Lint JavaScript
 gulp.task('jshint', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js', '!**/third_party/**'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
@@ -177,14 +176,16 @@ gulp.task('jshint', function() {
 
 // Check JS style
 gulp.task('jscs', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js', '!**/third_party/**'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jscs());
 });
 
 // Crush JS
+// TODO: /sw.js isn't being uglified. It needs to be copied into the top-level
+// directory of the site, which is currently being done in the copy-assets task.
 gulp.task('uglify', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', '!**/third_party/**'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.uglify({preserveComments: 'some'}))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/scripts'))
