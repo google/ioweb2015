@@ -29,7 +29,7 @@ CDS.Toast = function(message) {
   this.element_.appendChild(this.elementInner_);
   document.body.appendChild(this.element_);
 
-  requestAnimFrame(this.hide);
+  window.requestAnimationFrame(this.hide);
 
   return this;
 };

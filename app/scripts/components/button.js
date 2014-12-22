@@ -64,14 +64,14 @@ CDS.Button = (function() {
     ripple.style.opacity = '0.4';
     ripple.classList.remove('button__ripple--animate');
 
-    requestAnimFrame(reset);
+    window.requestAnimationFrame(reset);
 
   }
 
   function reset() {
 
     if (frameCount-- > 0) {
-      requestAnimFrame(reset);
+      window.requestAnimationFrame(reset);
     } else {
 
       transformString = 'translate(-50%, -50%) ' +
