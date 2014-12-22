@@ -19,7 +19,6 @@
   'use strict';
 
   // @codekit-prepend '../bower_components/js-signals/dist/signals.min.js'
-  // @codekit-prepend '../bower_components/requestAnimationFrame/requestAnimationFrame.min.js'
 
   exports.IOWA = {};
 

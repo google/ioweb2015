@@ -153,7 +153,6 @@ gulp.task('copy-assets', ['copy-bower-dependencies'], function() {
 gulp.task('copy-bower-dependencies', function() {
   var bowerPackagesToCopy = [
     'js-signals',
-    'requestAnimationFrame',
     'shed',
     'webcomponentsjs'
   ];
