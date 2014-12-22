@@ -18,8 +18,8 @@
 
   'use strict';
 
-  // @codekit-prepend 'third_party/signals.min.js'
-  // @codekit-prepend 'third_party/requestAnimationFrame.js'
+  // @codekit-prepend '../bower_components/js-signals/dist/signals.min.js'
+  // @codekit-prepend '../bower_components/requestAnimationFrame/requestAnimationFrame.min.js'
 
   exports.IOWA = {};
 
