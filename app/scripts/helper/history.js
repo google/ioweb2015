@@ -76,17 +76,17 @@ CDS.History = (function() {
 
   function onPopState(evt) {
     evt.preventDefault();
-    requestAnimFrame(manageCards);
+    window.requestAnimationFrame(manageCards);
   }
 
   function onTransitionEnd() {
     transitioningCard = null;
-    requestAnimFrame(manageCards);
+    window.requestAnimationFrame(manageCards);
   }
 
   function forth(path) {
     window.history.pushState(null, "", path);
-    requestAnimFrame(manageCards);
+    window.requestAnimationFrame(manageCards);
   }
 
   function back() {

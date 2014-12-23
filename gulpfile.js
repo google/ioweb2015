@@ -133,22 +133,40 @@ gulp.task('vulcanize-elements', ['clean', 'sass'], function() {
 
 // copy needed assets (images, polymer elements, etc) to /dist directory
 // gulp.task('copy-assets', ['clean', 'vulcanize', 'i18n_index'], function() {
-gulp.task('copy-assets', function() {
+gulp.task('copy-assets', ['copy-bower-dependencies'], function() {
   return gulp.src([
     APP_DIR + '/*.{html,txt,ico}',
     APP_DIR + '/app.yaml',
     APP_DIR + '/manifest.json',
     APP_DIR + '/styles/**.css',
-    APP_DIR + 'elements/**/images/*',
-    APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js'
+    APP_DIR + '/elements/**/images/*',
+    // The service worker script needs to be at the top-level of the site.
+    APP_DIR + '/sw.js'
   ], {base: './'})
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .pipe($.size({title: 'copy-assets'}));
 });
 
+// Copy over third-party bower dependencies that we need to DIST_STATIC_DIR.
+// This will include some bower metadata-cruft, but since we won't actually
+// reference that cruft from anywhere, it presumably shouldn't incur overhead.
+gulp.task('copy-bower-dependencies', function() {
+  var bowerPackagesToCopy = [
+    'js-signals',
+    'shed',
+    'webcomponentsjs'
+  ];
+  var directoryPaths = bowerPackagesToCopy.map(function(bowerPackageToCopy) {
+    return APP_DIR + '/bower_components/' + bowerPackageToCopy + '/**';
+  });
+
+  return gulp.src(directoryPaths, {base: './'})
+    .pipe(gulp.dest(DIST_STATIC_DIR));
+});
+
 // Lint JavaScript
 gulp.task('jshint', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', '!**/third_party/**'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
@@ -157,14 +175,16 @@ gulp.task('jshint', function() {
 
 // Check JS style
 gulp.task('jscs', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', '!**/third_party/**'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jscs());
 });
 
 // Crush JS
+// TODO: /sw.js isn't being uglified. It needs to be copied into the top-level
+// directory of the site, which is currently being done in the copy-assets task.
 gulp.task('uglify', function() {
-  return gulp.src(APP_DIR + '/scripts/**/*.js')
+  return gulp.src([APP_DIR + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.uglify({preserveComments: 'some'}))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/scripts'))
