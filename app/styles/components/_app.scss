@@ -14,66 +14,80 @@
  * limitations under the License.
  */
 
+a {
+  color: $color-cyan-A700;
+}
 
-// html.locked,
-// html.locked body {
-//   overflow: hidden;
-//   height: 100%;
-// }
+h1, h2 {
+  color: $color-heading;
+}
 
-// .app.locked {
-//   overflow: hidden;
-// }
+h3, h4, h5, h6 {
+  color: $color-text;
+}
 
-// .app-sections {
-//   background: #FFF;
-// }
+.typo-white {
+  color: #fff;
+}
 
-// .app-sections__card-breaker {
-//   clear: both;
-//   display: block;
+.bg-cyan {
+  background-color: $color-cyan-500;
+  color: #07434D;
 
-//   &:after {
-//     content: '';
-//     clear: both;
-//     display: table;
-//   }
-// }
+  h1, h2, h3, h4 {
+    color: inherit;
+  }
 
-// @media (min-width: 600px) {
-//   .app-sections__card-breaker {
-//     clear: none;
-//     display: none;
-//   }
-// }
+  // a {
+  //   @extend .typo-white;
+  // }
+}
 
-// @media (min-width: 960px) {
+.bg-light-grey {
+  background-color: $color-body;
+  color: $color-text;
 
-//   .app-sections {
-//     background: none;
-//   }
+  h1, h2, h3, h4 {
+    // color: $color-heading;
+    color: inherit;
+  }
 
-//   .app__group {
-//     background: #FFF;
-//     max-width: 960px;
-//     margin: 0 auto 20px auto;
-//     border-radius: 3px;
-//     @include shadow-z2();
+  a {
+    color: $color-cyan-A700;
+  }
+}
 
-//     &:after {
-//       content: '';
-//       clear: both;
-//       display: table;
-//     }
-//   }
+.bg-medium-grey {
+  background-color: $color-bluegrey-100;
+  color: #373839;
 
-//   .app__group--bottom {
-//     padding-top: 4px;
-//     margin-bottom: 155px;
-//   }
+  h1, h2, h3, h4 {
+    // color: #4A4D4F;
+    color: inherit;
+  }
 
-//   .app__group--livestream {
-//     border-radius: 3px;
-//     overflow: hidden;
-//   }
-// }
+  a {
+    color: $color-cyan-A700;
+  }
+}
+
+.bg-dark-grey {
+  background-color: $color-bluegrey-700;
+  color: $color-section-dark-grey-text;
+
+  h1, h2, h3, h4 {
+    color: inherit;
+  }
+
+  a {
+    color: $color-cyan-A400;
+  }
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  .page__section {
+    @include keyline-32();
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+}

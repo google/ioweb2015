@@ -14,9 +14,49 @@
  * limitations under the License.
  */
 
+@import '../base/_layout';
+@import '../base/_color';
+@import '../base/_breakpoints';
+
 .home-photo {
   background: url(../images/home/io7.jpg) top center no-repeat;
   background-size: cover;
   height: 745px;
-  margin-top: -183px;
+  margin-top: -232px;
+}
+
+.io__countdown {
+  width: 100%;
+  height: 400px;
+  max-width: 700px;
+  margin: 100px auto;
+}
+
+.card__photo--recap {
+  // TODO(ebidel): replace with 1x/2x handling
+  background-image: url(../images/home/recap-poster-1200.jpg);
+}
+
+#attend {
+  color: #fff;
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  #registration {
+    margin-bottom: -48px;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid + 1) {
+
+}
+
+
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .home-photo {
+    .card__photo--recap  {
+      background-image: url(../images/home/recap-poster-1200@2x.jpg);
+    }
+  }
 }

@@ -14,20 +14,40 @@
  * limitations under the License.
  */
 
+@import '../base/_color';
+@import '../base/_layout';
 
 .card {
   min-height: 168px;
   position: relative;
   background: #fff;
   display: block;
+  color: $color-text;
 
   .card-content {
     padding: 0 $mobileKeyline;
   }
 
+  img {
+    max-width: 100%;
+  }
+
   a {
-    // color: $color-cyan-A700;
     @include typo-button();
+  }
+
+  h2 {
+    color: $color-heading;
+  }
+
+  .card__title {
+    padding-bottom: $tabletKeyline;
+  }
+
+  .card__photo {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50% 50%;
   }
 }
 
@@ -38,15 +58,25 @@
 
     .card-content {
       padding: 0 16px 32px 16px;
-      @include keyline-72l();
     }
   }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  .card {
+  .card__container {
     max-width: 704px;
     margin: 0 auto;
+  }
+
+  .sidebyside {
+    .card {
+      &:first-child {
+        margin-right: $desktopKeyline;
+      }
+    }
+  }
+
+  .card {
     border-radius: 3px;
     @include shadow-z2();
 
@@ -66,13 +96,13 @@
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
-  .card {
+  .card__container {
     max-width: 896px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
-  .card {
+  .card__container {
     max-width: 1024px;
   }
 }
