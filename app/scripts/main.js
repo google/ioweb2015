@@ -20,7 +20,7 @@
 
   // @codekit-prepend '../bower_components/js-signals/dist/signals.min.js'
 
-  exports.IOWA = {};
+  exports.IOWA = exports.IOWA || {};
 
   // TODO: Make the codekit syntax work with gulp.
   // @codekit-append 'bootstrap.js'
