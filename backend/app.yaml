@@ -34,11 +34,18 @@ handlers:
   http_headers:
     Access-Control-Allow-Origin: "*"
 
-- url: /(.*\.html)$
+- url: /(.+\.html)$
   static_files: app/\1
-  upload: app/.*\.html$
+  upload: app/.+\.html$
   # need access to app/templates
   application_readable: true
+  http_headers:
+    access-control-allow-origin: "*"
+# all other static assets in app/ root dir,
+# including service worker
+- url: /(.+\.(json|ico|txt|js))$
+  static_files: app/\1
+  upload: app/(.+\.(json|ico|txt|js))$
   http_headers:
     access-control-allow-origin: "*"
 
