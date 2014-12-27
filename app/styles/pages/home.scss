@@ -19,31 +19,57 @@
 @import '../base/_breakpoints';
 
 .home-photo {
-  background: url(../images/home/io7.jpg) top center no-repeat;
+  background: url(../images/home/io7.jpg) no-repeat 0 50%;
   background-size: cover;
   height: 745px;
   margin-top: -232px;
 }
 
-.io__countdown {
+.io-countdown {
+  // display: block;
   width: 100%;
   height: 400px;
   max-width: 700px;
-  margin: 100px auto;
+  margin: 0 auto;
 }
 
 .card__photo--recap {
-  // TODO(ebidel): replace with 1x/2x handling
   background-image: url(../images/home/recap-poster-1200.jpg);
+  background-position: 50% 0 !important;
+  // background-size: 130%;
 }
 
 #attend {
+  position: relative;
   color: #fff;
+  background-image: url(../images/home/earth-1200.png);
+  background-repeat: no-repeat;
+  background-position: 50% 120px;
+  background-size: 140%;
+
+  .attend__cityname {
+    color: $color-cyan-A400;
+  }
+
+  // .attend__globe {
+  //   min-height: 200px;
+  //   max-height: 500px;
+  //   background: url(../images/home/earth-1200.png) no-repeat 50% 0;
+  //   background-size: 170%;
+  // }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
   #registration {
-    margin-bottom: -48px;
+    margin-bottom: -325px;
+  }
+  #attend {
+    padding-top: 100px;
+    margin-top: -50px;
+    margin-bottom: -255px;
+  }
+  .attend-globe {
+    height: 500px;
   }
 }
 
@@ -54,9 +80,7 @@
 
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-  .home-photo {
-    .card__photo--recap  {
-      background-image: url(../images/home/recap-poster-1200@2x.jpg);
-    }
+  .card__photo--recap  {
+    background-image: url(../images/home/recap-poster-1200@2x.jpg);
   }
 }
