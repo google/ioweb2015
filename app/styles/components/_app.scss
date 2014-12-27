@@ -30,6 +30,15 @@ h3, h4, h5, h6 {
   color: #fff;
 }
 
+.bg-light-grey, .bg-medium-grey, .bg-dark-grey, .bg-cyan {
+  a {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+}
+
 .bg-cyan {
   background-color: $color-cyan-500;
   color: #07434D;
@@ -45,7 +54,8 @@ h3, h4, h5, h6 {
 
 .bg-light-grey {
   background-color: $color-body;
-  color: $color-text;
+  // color: $color-text;
+  color: $color-heading;
 
   h1, h2, h3, h4 {
     // color: $color-heading;

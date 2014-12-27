@@ -39,6 +39,15 @@
   // background-size: 130%;
 }
 
+.join-social {
+  a {
+    margin-bottom: 10px;
+  }
+  core-icon {
+    margin-left: 5px;
+  }
+}
+
 #attend {
   position: relative;
   color: #fff;
@@ -57,6 +66,15 @@
   //   background: url(../images/home/earth-1200.png) no-repeat 50% 0;
   //   background-size: 170%;
   // }
+}
+
+#join {
+  .social-post {
+    header {
+      color: $color-gray;
+      margin-bottom: $tabletKeyline;
+    }
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
