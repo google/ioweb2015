@@ -73,10 +73,8 @@
   // }
 
   .sidebyside {
-    .card {
-      &:first-child {
-        margin-right: $desktopKeyline;
-      }
+    > :not(:last-child) {
+      margin-right: $desktopKeyline;
     }
   }
 

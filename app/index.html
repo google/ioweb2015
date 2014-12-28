@@ -221,14 +221,17 @@ limitations under the License.
       <section id="join" class="page__section bg-light-grey">
         <h3>Join the conversation<br>now at #io15</h3>
         <div class="join-social" layout vertical end>
-          <a href="https://plus.google.com/+googledevelopers">
-            +GoogleDevelopers <core-icon icon="social:post-gplus"></core-icon>
+          <a href="https://plus.google.com/+GoogleDevelopers">
+            +googledevelopers <core-icon icon="social:post-gplus"></core-icon>
           </a>
           <a href="https://twitter.com/googledevs">
             @googledevs <core-icon icon="social:post-twitter"></core-icon>
           </a>
         </div>
-        <div layout horizontal vertical?="{{isPhoneSize}}">
+        <div class="join-hash">
+          TODO
+        </div>
+        <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
           <div class="social-post">
             <header>
               <a href="https://twitter.com/googledevs">@googledevs</a>
@@ -259,11 +262,15 @@ limitations under the License.
       <img src="images/google-logo.svg" self-end>
       <div class="footer-content" flex layout vertical end>
         <a href="#navbar" class="footer-backtotop">Back to the top <core-icon icon="hardware:keyboard-arrow-up"></core-icon></a>
-        <nav flex horizontal layout end justified>
+        <nav layout horizontal vertical?="{{isPhoneSize}}" end justified flex?="{{isDesktopSize || isTabletSize}}">
           <span><a href="#">FAQ</a></span>
           <span><a href="#">Google Developers</a></span>
           <span><a href="#">I/O Community</a></span>
           <span><a href="https://www.google.com/intl/en/policies/terms/">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/">Terms</a></span>
+          <span>
+            <a href="https://plus.google.com/+GoogleDevelopers"><core-icon icon="social:post-gplus"></core-icon></a>
+            <a href="https://twitter.com/googledevs"><core-icon icon="social:post-twitter"></core-icon></a>
+          </span>
         </nav>
       </div>
     </footer>

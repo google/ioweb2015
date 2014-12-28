@@ -69,6 +69,9 @@
 }
 
 #join {
+  .join-social {
+    display: none;
+  }
   .social-post {
     header {
       color: $color-gray;
@@ -88,6 +91,20 @@
   }
   .attend-globe {
     height: 500px;
+  }
+  #join {
+    position: relative;
+    .join-social {
+      display: -webkit-flex;
+      display: -ms-flex;
+      display: flex;
+      position: absolute;
+      top: 40px;
+      right: 32px;
+    }
+    .join-hash {
+      margin: 100px auto;
+    }
   }
 }
 
