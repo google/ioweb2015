@@ -19,10 +19,9 @@
 @import '../base/_breakpoints';
 
 .home-photo {
-  background: url(../images/home/io7.jpg) no-repeat 0 50%;
+  background: url(../images/home/io7.jpg) no-repeat 50% 0;
   background-size: cover;
-  height: 745px;
-  margin-top: -232px;
+  height: 310px;
 }
 
 .io-countdown {
@@ -36,12 +35,11 @@
 .card__photo--recap {
   background-image: url(../images/home/recap-poster-1200.jpg);
   background-position: 50% 0 !important;
-  // background-size: 130%;
 }
 
 .join-social {
   a {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
   }
   core-icon {
     margin-left: 5px;
@@ -53,24 +51,30 @@
   color: #fff;
   background-image: url(../images/home/earth-1200.png);
   background-repeat: no-repeat;
-  background-position: 50% 120px;
+  background-position: 50% 150px;
   background-size: 140%;
 
   .attend__cityname {
     color: $color-cyan-A400;
   }
 
-  // .attend__globe {
-  //   min-height: 200px;
-  //   max-height: 500px;
-  //   background: url(../images/home/earth-1200.png) no-repeat 50% 0;
-  //   background-size: 170%;
-  // }
+  .attend__globe {
+    min-height: 150px;
+  }
+}
+
+.registration__card {
+  core-icon {
+    margin-right: 15px;
+  }
 }
 
 #join {
-  .join-social {
+  .join__social {
     display: none;
+  }
+  .join__hash {
+    margin: 40px auto;
   }
   .social-post {
     header {
@@ -80,21 +84,38 @@
   }
 }
 
+@media (max-width: $phone-breakpoint-max) {
+  .registration__card {
+    .card {
+      border-bottom: 1px solid $color-light-grey-border;
+    }
+  }
+}
+
 @media (min-width: $tablet-breakpoint-min) {
+  .home-photo {
+    height: 745px;
+    margin-top: -232px;
+  }
   #registration {
     margin-bottom: -325px;
+  }
+  .registration__card {
+    core-icon {
+      display: none;
+    }
   }
   #attend {
     padding-top: 100px;
     margin-top: -50px;
     margin-bottom: -255px;
   }
-  .attend-globe {
+  .attend__globe {
     height: 500px;
   }
   #join {
     position: relative;
-    .join-social {
+    .join__social {
       display: -webkit-flex;
       display: -ms-flex;
       display: flex;
@@ -102,7 +123,7 @@
       top: 40px;
       right: 32px;
     }
-    .join-hash {
+    .join__hash {
       margin: 100px auto;
     }
   }
@@ -111,7 +132,6 @@
 @media (min-width: $desktop-breakpoint-mid + 1) {
 
 }
-
 
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {

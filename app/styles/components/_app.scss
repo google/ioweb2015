@@ -30,6 +30,10 @@ h3, h4, h5, h6 {
   color: #fff;
 }
 
+.hide-on-mobile {
+  display: none;
+}
+
 .bg-light-grey, .bg-medium-grey, .bg-dark-grey, .bg-cyan {
   a {
     font-size: 14px;
@@ -93,10 +97,19 @@ h3, h4, h5, h6 {
   }
 }
 
+.page__section {
+  @include keyline-16();
+  padding-top: $desktopKeyline;
+  padding-bottom: $desktopKeyline;
+}
+
 @media (min-width: $tablet-breakpoint-min) {
   .page__section {
     @include keyline-32();
     padding-top: 40px;
     padding-bottom: 40px;
+  }
+  .hide-on-mobile {
+    display: block;
   }
 }
