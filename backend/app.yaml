@@ -41,6 +41,7 @@ handlers:
   application_readable: true
   http_headers:
     access-control-allow-origin: "*"
+
 # all other static assets in app/ root dir,
 # including service worker
 - url: /(.+\.(json|ico|txt|js))$
@@ -54,11 +55,13 @@ handlers:
   static_dir: app/bower_components
   http_headers:
     Access-Control-Allow-Origin: "*"
+
 - url: /elements
   static_dir: app/elements
   http_headers:
     Access-Control-Allow-Origin: "*"
 
+# All other requests are routed to the backend
 - url: /.*
   script: _go_app
   secure: always

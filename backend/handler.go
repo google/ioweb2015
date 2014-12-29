@@ -10,7 +10,8 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	if name[len(name)-1] == '/' {
 		name += "index"
 	}
-	err := render(w, name)
+	w.Header().Set("Content-Type", "text/html;charset=utf-8")
+	err := renderTemplate(w, name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

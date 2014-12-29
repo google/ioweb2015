@@ -40,7 +40,9 @@ Run `gulp`. Then hit `http://localhost:<PORT>/dist/app/`. The unbuilt version is
 
 `gulp backend` will build a self-sufficient backend server and place the binary in `backend/bin/server`.
 
-`gulp backend:test` will run backend server tests.
+`gulp backend:test` will run backend server tests. If, while working on the backend, you feel tired
+of running the command again and again, use `gulp backend:test --watch` to watch for file changes
+and re-run tests automatically.
 
 To deploy complete application on App Engine:
 

@@ -11,6 +11,5 @@ import "net/http"
 var rootDir = "app"
 
 func init() {
-	//rootDir = filepath.Dir(os.Args[0])
 	http.HandleFunc("/", serveTemplate)
 }

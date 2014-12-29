@@ -2,6 +2,7 @@
 
 'use strict';
 
+var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawn;
 
@@ -18,7 +19,7 @@ var bower = require('gulp-bower');
 var chmod = require('gulp-chmod');
 
 var APP_DIR = 'app';
-var BACKEND_DIR = 'backend'
+var BACKEND_DIR = 'backend';
 
 var STATIC_VERSION = 1; // Cache busting static assets.
 var VERSION = argv.build || STATIC_VERSION;
@@ -176,7 +177,7 @@ gulp.task('copy-backend', function(cb) {
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .on('end', function() {
     var destLink = [DIST_STATIC_DIR, BACKEND_DIR, APP_DIR].join('/');
-    require('fs').symlink('../' + APP_DIR, destLink, cb);
+    fs.symlink('../' + APP_DIR, destLink, cb);
   });
 });
 
@@ -297,6 +298,7 @@ gulp.task('backend:test', function(cb) {
   var t = testBackend();
   if (watchOpt) {
     gulp.watch([BACKEND_DIR + '/**/*.go'], testBackend);
+    gulp.watch([APP_DIR + '/templates/*'], testBackend);
     cb();
   } else {
     t.on('close', cb);
