@@ -33,7 +33,7 @@
 }
 
 .card__photo--recap {
-  background-image: url(../images/home/recap-poster-1200.jpg);
+  background-image: url(../images/home/recap-poster-600.jpg);
   background-position: 50% 0 !important;
 }
 
@@ -136,6 +136,6 @@
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .card__photo--recap  {
-    background-image: url(../images/home/recap-poster-1200@2x.jpg);
+    background-image: url(../images/home/recap-poster-1200.jpg);
   }
 }
