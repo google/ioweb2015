@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-window.DEV = true; // Remove for prod.
-
 (function(exports) {
   'use strict';
 
