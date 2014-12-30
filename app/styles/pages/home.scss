@@ -37,15 +37,6 @@
   background-position: 50% 0 !important;
 }
 
-.join__social {
-  a {
-    margin-bottom: 15px;
-  }
-  core-icon {
-    margin-left: 5px;
-  }
-}
-
 #attend {
   position: relative;
   color: #fff;
@@ -71,7 +62,13 @@
 
 #join {
   .join__social {
-    display: none;
+    a {
+      margin-bottom: 15px;
+    }
+
+    core-icon {
+      margin-left: 5px;
+    }
   }
   .join__hash {
     margin: 40px auto;
@@ -116,9 +113,6 @@
   #join {
     position: relative;
     .join__social {
-      display: -webkit-flex;
-      display: -ms-flex;
-      display: flex;
       position: absolute;
       top: 40px;
       right: 32px;
