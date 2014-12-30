@@ -45,9 +45,7 @@ gulp.task('clean', function(cleanCallback) {
 });
 
 gulp.task('sass', function() {
-  return gulp.src([
-      APP_DIR + '/{styles,elements}/**/*.scss'
-    ])
+  return gulp.src([APP_DIR + '/{styles,elements}/**/*.scss'])
     .pipe($.sass({outputStyle: 'compressed'}))
     .pipe($.changed(APP_DIR + '/{styles,elements}', {extension: '.scss'}))
     .pipe($.autoprefixer([
@@ -333,7 +331,7 @@ gulp.task('setup', function(cb) {
 // or rebuid stuff.
 function watch() {
   gulp.watch([APP_DIR + '/**/*.html'], reload);
-  gulp.watch([APP_DIR + '/styles/**/*.{scss,css}'], ['styles', reload]);
+  gulp.watch([APP_DIR + '/styles/**/*.{scss,css}'], ['sass', reload]);
   gulp.watch([APP_DIR + '/scripts/**/*.js'], ['jshint']);
   gulp.watch([APP_DIR + '/images/**/*'], reload);
   gulp.watch([APP_DIR + '/bower.json'], ['bower']);
