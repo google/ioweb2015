@@ -17,11 +17,11 @@
 footer {
   min-height: 200px;
   background: #fff;
-  padding-bottom: 40px;
   @include keyline-16();
-  padding-bottom: 40px !important;
-  padding-top: 40px !important;
+  padding-top: $mobileKeyline;
+  padding-bottom: $mobileKeyline;
   color: $color-gray;
+  font-size: 14px;
 
   a {
     color: inherit;
@@ -32,14 +32,28 @@ footer {
   }
 }
 
-.footer-content {
-  nav {
-    width: 450px;
+@media (max-width: $phone-breakpoint-max) {
+  footer {
+    nav {
+      > * {
+        margin-top: $mobileKeyline;
+      }
+    }
+  }
+  .masthead-container {
+    @include keyline-72l();
   }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
   footer {
     @include keyline-32();
+    padding-top: $desktopKeyline;
+    padding-bottom: $desktopKeyline;
+  }
+  .footer-content {
+    nav {
+      width: 550px;
+    }
   }
 }

@@ -14,66 +14,102 @@
  * limitations under the License.
  */
 
+a {
+  color: $color-cyan-A700;
+}
 
-// html.locked,
-// html.locked body {
-//   overflow: hidden;
-//   height: 100%;
-// }
+h1, h2 {
+  color: $color-heading;
+}
 
-// .app.locked {
-//   overflow: hidden;
-// }
+h3, h4, h5, h6 {
+  color: $color-text;
+}
 
-// .app-sections {
-//   background: #FFF;
-// }
+.typo-white {
+  color: #fff;
+}
 
-// .app-sections__card-breaker {
-//   clear: both;
-//   display: block;
+.hide-on-mobile {
+  display: none;
+}
 
-//   &:after {
-//     content: '';
-//     clear: both;
-//     display: table;
-//   }
-// }
+.bg-light-grey, .bg-medium-grey, .bg-dark-grey, .bg-cyan {
+  a {
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+}
 
-// @media (min-width: 600px) {
-//   .app-sections__card-breaker {
-//     clear: none;
-//     display: none;
-//   }
-// }
+.bg-cyan {
+  background-color: $color-cyan-500;
+  color: #07434D;
 
-// @media (min-width: 960px) {
+  h1, h2, h3, h4 {
+    color: inherit;
+  }
 
-//   .app-sections {
-//     background: none;
-//   }
+  // a {
+  //   @extend .typo-white;
+  // }
+}
 
-//   .app__group {
-//     background: #FFF;
-//     max-width: 960px;
-//     margin: 0 auto 20px auto;
-//     border-radius: 3px;
-//     @include shadow-z2();
+.bg-light-grey {
+  background-color: $color-body;
+  // color: $color-text;
+  color: $color-heading;
 
-//     &:after {
-//       content: '';
-//       clear: both;
-//       display: table;
-//     }
-//   }
+  h1, h2, h3, h4 {
+    // color: $color-heading;
+    color: inherit;
+  }
 
-//   .app__group--bottom {
-//     padding-top: 4px;
-//     margin-bottom: 155px;
-//   }
+  a {
+    color: $color-cyan-A700;
+  }
+}
 
-//   .app__group--livestream {
-//     border-radius: 3px;
-//     overflow: hidden;
-//   }
-// }
+.bg-medium-grey {
+  background-color: $color-bluegrey-100;
+  color: #373839;
+
+  h1, h2, h3, h4 {
+    // color: #4A4D4F;
+    color: inherit;
+  }
+
+  a {
+    color: $color-cyan-A700;
+  }
+}
+
+.bg-dark-grey {
+  background-color: $color-bluegrey-700;
+  color: $color-section-dark-grey-text;
+
+  h1, h2, h3, h4 {
+    color: inherit;
+  }
+
+  a {
+    color: $color-cyan-A400;
+  }
+}
+
+.page__section {
+  @include keyline-16();
+  padding-top: $desktopKeyline;
+  padding-bottom: $desktopKeyline;
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  .page__section {
+    @include keyline-32();
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  .hide-on-mobile {
+    display: block;
+  }
+}

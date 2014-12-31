@@ -14,9 +14,122 @@
  * limitations under the License.
  */
 
+@import '../base/_layout';
+@import '../base/_color';
+@import '../base/_breakpoints';
+
 .home-photo {
-  background: url(../images/home/io7.jpg) top center no-repeat;
+  background: url(../images/home/io7.jpg) no-repeat 50% 0;
   background-size: cover;
-  height: 745px;
-  margin-top: -180px;
+  height: 310px;
+}
+
+.io-countdown {
+  // display: block;
+  width: 100%;
+  height: 400px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.card__photo--recap {
+  background-image: url(../images/home/recap-poster-600.jpg);
+  background-position: 50% 0 !important;
+}
+
+#attend {
+  position: relative;
+  color: #fff;
+  background-image: url(../images/home/earth-1200.png);
+  background-repeat: no-repeat;
+  background-position: 50% 150px;
+  background-size: 140%;
+
+  .attend__cityname {
+    color: $color-cyan-A400;
+  }
+
+  .attend__globe {
+    min-height: 150px;
+  }
+}
+
+.registration__card {
+  core-icon {
+    margin-right: 15px;
+  }
+}
+
+#join {
+  .join__social {
+    a {
+      margin-bottom: 15px;
+    }
+
+    core-icon {
+      margin-left: 5px;
+    }
+  }
+  .join__hash {
+    margin: 40px auto;
+  }
+  .social-post {
+    header {
+      color: $color-gray;
+      margin-bottom: $tabletKeyline;
+    }
+  }
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  .registration__card {
+    .card {
+      border-bottom: 1px solid $color-light-grey-border;
+    }
+  }
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  .home-photo {
+    height: 745px;
+    margin-top: -232px;
+  }
+  #registration {
+    margin-bottom: -325px;
+  }
+  .registration__card {
+    core-icon {
+      display: none;
+    }
+  }
+  #attend {
+    padding-top: 100px;
+    margin-top: -50px;
+    margin-bottom: -255px;
+  }
+  .attend__globe {
+    height: 500px;
+  }
+  #join {
+    position: relative;
+    .join__social {
+      position: absolute;
+      top: 40px;
+      right: 32px;
+    }
+    .join__hash {
+      margin: 100px auto;
+    }
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid + 1) {
+
+}
+
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .card__photo--recap  {
+    background-image: url(../images/home/recap-poster-1200.jpg);
+  }
 }

@@ -15,14 +15,52 @@
  */
 
 (function(exports) {
-
   'use strict';
 
-  // @codekit-prepend '../bower_components/js-signals/dist/signals.min.js'
+  exports.IOWA = exports.IOWA || {};
 
-  exports.IOWA = {};
+  var POLYMER_ANALYTICS_TIMEOUT_ = 60 * 1000;
 
-  // TODO: Make the codekit syntax work with gulp.
-  // @codekit-append 'bootstrap.js'
+  // log some polymer startup performance numbers
+  function trackPerfAnalyticsEvent(eventName, categoryName) {
+    // performance.now() is sadly disabled even in some very recent browsers
+    // TODO(bckenny): for now, only do polymer perf analytics in browsers with it.
+    if (window.performance && window.performance.now) {
+      document.addEventListener(eventName, function() {
+        var now = window.performance.now();
+
+        if (exports.DEV) {
+          console.info(eventName, '@', now);
+        }
+
+        var variable = eventName;
+        if (now > POLYMER_ANALYTICS_TIMEOUT_) {
+          variable += ' - outliers';
+        }
+
+        exports.ga('send', {
+          'hitType': 'timing',
+          'timingCategory': categoryName,
+          'timingVar': variable,
+          'timingValue': now,
+          //'timingLabel': 'Polymer',
+          'page': location.pathname
+        });
+      });
+    }
+  }
+
+  trackPerfAnalyticsEvent('template-bound', 'Polymer');
+  trackPerfAnalyticsEvent('HTMLImportsLoaded', 'Polymer');
+  trackPerfAnalyticsEvent('polymer-ready', 'Polymer');
+
+  // TODO(ericbidelman): add i18n support.
+  // if (exports.DEV) {
+  //   // Polyfill needs I18nMsg to exist before setting the lang. Timing is fine for native.
+  //   // Set locale for entire site (e.g. i18n-msg elements).
+  //   document.addEventListener('HTMLImportsLoaded', function() {
+  //     I18nMsg.lang = document.documentElement.lang || 'en';
+  //   });
+  // }
 
 })(window);

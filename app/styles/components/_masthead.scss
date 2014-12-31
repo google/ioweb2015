@@ -34,7 +34,7 @@
 .masthead {
   position: relative;
   min-height: 400px;
-  height: 60vh; // ~2/3 viewport height
+  height: 66vh; // ~2/3 viewport height
   max-height: 550px;
 
   &.bg-medium-grey {
@@ -107,8 +107,6 @@ core-drawer-panel {
 }
 
 .masthead-title {
-  font-size: 32px;
-  font-weight: 300;
   color: $color-cyan-A700 !important;
 }
 
