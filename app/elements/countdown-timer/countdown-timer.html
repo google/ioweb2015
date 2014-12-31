@@ -11,8 +11,11 @@
 
 <!--
 Creates a countdown timer to a specific date.
+
 ##### Example
-    <countdown-timer date=""></countdown-timer>
+
+    <countdown-timer date="Mon, 02 Mar 2015 09:00:00 GMT-0700"></countdown-timer>
+
 @element countdown-timer
 @blurb Creates a countdown timer to a specific date.
 @status alpha
@@ -162,7 +165,7 @@ Creates a countdown timer to a specific date.
        *
        * @private
        */
-      ready: function() {
+      attached: function() {
 
         // Create the timer and set it with whatever the current
         // values are. If the user updates any values then the
