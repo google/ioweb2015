@@ -18,7 +18,7 @@ IOWA.Analytics = (function(exports) {
 
   "use strict";
 
-  var GA_TRACKING_CODE = 'UA-XXXXX-X';  // TODO: set the GA string
+  var GA_TRACKING_CODE = exports.DEV ? 'UA-58124138-2' : 'UA-58124138-1';
 
   /**
    * Analytics for Santa Tracker
