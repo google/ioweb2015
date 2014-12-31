@@ -22,3 +22,9 @@ core-drawer-panel::shadow {
     }
   }
 }
+
+footer {
+  paper-dropdown-menu::shadow #label {
+    color: inherit;
+  }
+}
