@@ -7,18 +7,16 @@ core-drawer-panel::shadow {
   }
 }
 
-#navbar {
-  paper-tabs.white {
-    &::shadow #selectionBar {
-      background-color: #fff;
+paper-tabs.white {
+  &::shadow #selectionBar {
+    background-color: #fff;
+  }
+  & paper-tab::shadow {
+    .tab-content {
+      opacity: 1 !important;
     }
-    & paper-tab::shadow {
-      .tab-content {
-        opacity: 1 !important;
-      }
-      #ink {
-        color: rgba(255,255,255,0.5);
-      }
+    #ink {
+      color: rgba(255,255,255,0.5);
     }
   }
 }
