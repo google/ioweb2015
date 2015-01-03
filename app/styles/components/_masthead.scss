@@ -107,7 +107,7 @@ core-drawer-panel {
 }
 
 paper-fab {
-  color: inherit;
+  color: $color-text;
   background: #fff;
   position: absolute;
   bottom: -20px; // paper-fab's height / 2

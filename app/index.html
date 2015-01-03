@@ -105,32 +105,32 @@ limitations under the License.
     <div class="drawer-panel-content">
       <core-menu>
         <paper-item>
-          <a href="#home">
+          <a href="home.html">
             <i18n-msg msgid="home">Home</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#about">
+          <a href="about.html">
             <i18n-msg msgid="about">About</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#schedule">
+          <a href="schedule.html">
             <i18n-msg msgid="schedule">Schedule</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#onsite">
+          <a href="onsite.html">
             <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#offsite">
+          <a href="offsite.html">
             <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#registration">
+          <a href="registration.html">
             <i18n-msg msgid="registration">Registration</i18n-msg>
           </a>
         </paper-item>
@@ -149,30 +149,30 @@ limitations under the License.
       <header class="masthead bg-medium-grey" layout vertical>
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-          <div flex></div>
+          <div flex><a href="./"><div class="io-logo"></div></a></div>
           <paper-tabs class="white" link>
             <paper-tab>
-              <a href="#about" layout horizontal center>
+              <a href="about.html" layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab>
-              <a href="#schedule" layout horizontal center>
+              <a href="schedule.html" layout horizontal center>
                 <i18n-msg msgid="schedule">Schedule</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab>
-              <a href="#onsite" layout horizontal center>
+              <a href="onsite.html" layout horizontal center>
                 <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab>
-              <a href="#offsite" layout horizontal center>
+              <a href="offsite.html" layout horizontal center>
                 <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab>
-              <a href="#registration" layout horizontal center>
+              <a href="registration.html" layout horizontal center>
                 <i18n-msg msgid="registration">Registration</i18n-msg>
               </a>
             </paper-tab>
@@ -184,7 +184,7 @@ limitations under the License.
             <h5 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h5>
           </div>
         </div>
-        <paper-fab icon="add" mini?="{{isPhoneSize}}"></paper-fab>
+        <paper-fab icon="assessment" mini?="{{isPhoneSize}}"></paper-fab>
       </header>
 
       <main>
@@ -233,11 +233,27 @@ limitations under the License.
               <a href="#"><core-icon icon="event"></core-icon> Check the agenda</a>
             </div>
           </div>
+<<<<<<< HEAD
           <div class="card" layout vertical auto-vertical flex>
             <div flex class="card__photo card__photo--recap hide-on-mobile"></div>
             <div class="card-content">
               <a href="#"><core-icon icon="av:play-circle-fill"></core-icon> Watch the 2014 Recap Video</a>
             </div>
+=======
+        </template>
+        <div class="card" auto-vertical flex>
+          <div class="card-content hide-on-mobile">
+            <h3>I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between</h3>
+          </div>
+          <div class="card-content">
+            <a href="#"><core-icon icon="event"></core-icon> Check the agenda</a>
+          </div>
+        </div>
+        <div class="card" layout vertical auto-vertical flex>
+          <div flex class="card__photo card__photo--recap hide-on-mobile"></div>
+          <div class="card-content">
+            <a href="#"><core-icon icon="av:play-circle-fill"></core-icon> Watch the 2014 Recap Video</a>
+>>>>>>> About page
           </div>
         </div>
 
@@ -259,6 +275,7 @@ limitations under the License.
           </div>
         </div>
 
+<<<<<<< HEAD
         <section id="join" class="page__section bg-light-grey">
           <h3>Join the conversation<br>now at #io15</h3>
           <div class="join__social" layout vertical end hidden?="{{isPhoneSize}}">
@@ -268,6 +285,28 @@ limitations under the License.
             <a href="https://twitter.com/googledevs">
               @googledevs<core-icon icon="social:post-twitter"></core-icon>
             </a>
+=======
+      <section id="join" class="page__section bg-light-grey">
+        <h3>Join the conversation<br>now at #io15</h3>
+        <div class="join__social" layout vertical end hidden?="{{isPhoneSize}}">
+          <a href="https://plus.google.com/+GoogleDevelopers">
+            +googledevelopers<core-icon icon="social:post-gplus"></core-icon>
+          </a>
+          <a href="https://twitter.com/googledevs">
+            @googledevs<core-icon icon="social:post-twitter"></core-icon>
+          </a>
+        </div>
+        <div class="io__hash">
+          TODO
+        </div>
+        <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+          <div class="social-post">
+            <header>
+              <a href="https://twitter.com/googledevs">@googledevs</a>
+              <div>3hrs ago</div>
+            </header>
+            <div>Find relief for your bloated game woes in the recent Game On! DevByte on WebP from @duhroach http://goo.gl/0Paa9V</div>
+>>>>>>> About page
           </div>
           <div class="join__hash">
             TODO

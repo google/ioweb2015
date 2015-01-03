@@ -103,6 +103,10 @@ h3, h4, h5, h6 {
   padding-bottom: $desktopKeyline;
 }
 
+.io__hash {
+  margin: 40px auto;
+}
+
 @media (min-width: $tablet-breakpoint-min) {
   .page__section {
     @include keyline-32();
@@ -111,5 +115,8 @@ h3, h4, h5, h6 {
   }
   .hide-on-mobile {
     display: block;
+  }
+  .io__hash {
+    margin: 100px auto;
   }
 }
