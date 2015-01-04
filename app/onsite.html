@@ -62,7 +62,7 @@ limitations under the License.
   <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="elements/elements.html">
 </head>
-<body id="page-about" unresolved>
+<body id="page-onsite" unresolved>
 
 <core-drawer-panel forceNarrow>
   <div drawer>
@@ -151,7 +151,7 @@ limitations under the License.
       </core-toolbar>
       <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
         <div layout vertical end-justified?="{{isPhoneSize}}" flex>
-          <h1>About I/O</h1>
+          <h1>Attend Onsite</h1>
         </div>
       </div>
       <paper-fab icon="assessment" mini?="{{isPhoneSize}}"></paper-fab>
@@ -162,42 +162,73 @@ limitations under the License.
       <div class="card__container">
         <div class="card">
           <div class="card-content">
-            <h2>Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</h2>
-          </div>
-          <div class="card-content">
-            <a href="#">I/O in Photos</a>
+            <h2>Google I/O is Innovation in the Open. Connect face-to-face with developers and designers from around the world, check the latest product releases first hand, and chat directly with Googlers.</h2>
           </div>
         </div>
       </div>
 
-      <section class="page__section pics__section" layout horizontal>
-        <div class="photo__about" flex two></div>
-        <div layout vertical flex>
-          <div class="photo__about" layout vertical flex></div>
-          <div class="photo__about" layout vertical flex></div>
-        </div>
-      </section>
+      <section class="page__section onsite-pic"></section>
 
-      <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-        <div class="card" auto-vertical flex>
-          <div class="card-content">
-            <h3>Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President for Android, Chrome &amp; App, Sundar Pichai.</h3>
+      <section id="traveldetails" class="page__section bg-light-grey">
+        <h3>Travel details</h3>
+        <div class="sidebyside" layout horizontal wrap>
+          <div flex?="{{!isPhoneSize}}">
+            <h4><core-icon icon="maps:directions"></core-icon> Getting to San Francisco</h4>
+            <p>Here are the three major airports in the Bay Area with international airline service. SFO is about 13 miles south of downtown; OAK is 5 miles south of downtown; and SJC is in the city of San Jose about 45 miles southwest of downtown San Francisco.</p>
+            <ul>
+              <li><a href="#">San Francisco International Airport (SFO)</a><br>
+              14 miles, 25-40 minute drive</li>
+              <li><a href="#">Oakland International Airport (OAK)</a><br>
+              19 miles, 25-40 minute drive</li>
+              <li><a href="#">San Jose International Airport (SJC)</a><br>
+              47 miles, 60-75 minute drive</li>
+            </ul>
+            <h5>From the Airport</h5>
+            <p>Super Shuttle International is offering a discount to all Google I/O attendees. Reservations must be booked in advance either online or by calling 1-800-BLUE-VAN (1-800-258-3826). The discount code for Google I/O is G66Z7.</p>
           </div>
-          <div class="card-content">
-            <a href="#">See the 2014 Keynote and sessions</a>
+          <div flex?="{{!isPhoneSize}}">
+            <h4><core-icon icon="maps:hotel"></core-icon> Hotels</h4>
+            <p>We have room blocks at the following hotels:</p>
+            <ul>
+              <li><a href="#">InterContinental</a><br>
+              Group Code: 1406GOOGLE
+              </li>
+              <li><a href="#">Parc 55 Wyndham San Francisco</a><br>
+              Group Code: 1406GOOGLE
+              </li>
+              <li><a href="#">The Hotel Rex</a><br>
+              Group Code: 1406GOOGLE
+              </li>
+              <li><a href="#">Hotel Adagio</a><br>
+              Group Code: 1406GOOGLE
+              </li>
+              <li><a href="#">Holiday Inn Civic Center</a><br>
+              Group Code: GLE or Google I/O 2014
+              </li>
+              <li><a href="#">Marriott Marquis San Francisco</a><br>
+              Group Code: GIOGIOA (Single/Dbl), GIOGIOB (Triple), GIOGIOC (Quad)
+              </li>
+              <li><a href="#">Westin Market Street</a><br>
+              Group Code: 1406GOOGLE
+              </li>
+              <li><a href="#">Palomar San Francisco</a><br>
+              Group Code: GOIO
+              </li>
+            </ul>
           </div>
-        </div>
-        <div class="card" layout vertical auto-vertical flex>
-          <div flex class="card__photo card__photo--recap"></div>
-          <div class="card-content">
-            <a href="#"><core-icon icon="av:play-circle-fill"></core-icon> Watch the 2014 Recap Video</a>
+          <div flex?="{{!isPhoneSize}}">
+            <h4><core-icon icon="maps:place"></core-icon> Moscone Center West</h4>
+            <p>The Moscone Center is located at the corner of Fourth &amp; Howard streets, at 800 Howard St. San Francisco, CA 94103</p>
+            <p>Public transportation to the Moscone Center is accessible via:</p>
+            <ul>
+              <li><a href="#">BART</a><br>
+              Subway linking San Francisco to Oakland and Berkeley</li>
+              <li><a href="#">MUNI Metro</a><br>
+              Citywide buses, trollies and cable cars</li>
+              <li><a href="#">Caltrain</a><br>
+              Regional rail system</li>
+            </ul>
           </div>
-        </div>
-      </div>
-
-      <section id="hashtag" class="page__section bg-cyan">
-        <div class="io__hash">
-          TODO
         </div>
       </section>
 

@@ -25,6 +25,13 @@ $name: 'page-home';
 
 ##{$name} {
 
+// Homepage doesn't include top-left io logo.
+.masthead {
+  .io-logo {
+    display: none;
+  }
+}
+
 .masthead-container {
   &::before {
     content: '';

@@ -19,6 +19,7 @@
   background: url('../images/home/io_white.png') no-repeat;
   height: 40px;
   background-size: contain;
+  margin-left: $mobileKeyline / 2;
 
   &.medium {
     height: 136px;
@@ -45,6 +46,12 @@
   }
   &.bg-dark-grey {
     color: $color-bluegrey-100;
+  }
+
+  .io-logo {
+    height: 40px;
+    width: 60px;
+    display: none;
   }
 }
 
@@ -124,6 +131,11 @@ paper-fab {
   .masthead {
     position: relative;
     margin-bottom: -115px;
+
+    .io-logo {
+      display: inline-block;
+    }
+
   }
 
   .masthead-meta {
