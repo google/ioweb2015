@@ -1,5 +1,5 @@
 IOWA.CountdownTimer.Colors = {
-  Background: '#26C6DA',
+  Background: '#00BCD4',
   LightBlue: '#E0F7FA',
   MediumBlue: '#80DEEA',
   DarkBlue: '#00ACC1',
