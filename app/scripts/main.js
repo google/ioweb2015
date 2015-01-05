@@ -28,4 +28,12 @@
   //   });
   // }
 
+  exports.onerror = function(message, file, lineNumber) {
+    // We don't want to trigger any errors inside window.onerror, so wrap in a try/catch.
+    try {
+      IOWA.Analytics.trackError(file + ':' + lineNumber, message);
+    } catch (e) {
+    }
+  };
+
 })(window);

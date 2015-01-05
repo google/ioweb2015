@@ -21,7 +21,7 @@ IOWA.Analytics = (function(exports) {
   var GA_TRACKING_CODE = exports.DEV ? 'UA-58124138-2' : 'UA-58124138-1';
 
   /**
-   * Analytics for Santa Tracker
+   * Analytics for the I/O Web App.
    *
    * @constructor
    * @param {string} trackingCode GA tracking code.
@@ -29,10 +29,12 @@ IOWA.Analytics = (function(exports) {
   function Analytics(trackingCode) {
     this.loadTrackingCode();
 
-    ga('create', trackingCode, {
-      'cookiePath': '/events/io2015',
-      'siteSpeedSampleRate': 50 // 50% of users.
-    });
+    var opts = {siteSpeedSampleRate: 50}; // 50% of users.
+    if (!exports.DEV) {
+      opts.cookiePath = '/events/io2015';
+    }
+
+    ga('create', trackingCode, opts);
 
     this.trackPageView(); // Track initial pageview.
 
@@ -57,7 +59,7 @@ IOWA.Analytics = (function(exports) {
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  },
+  };
   // jscs: enable
   /* jshint ignore:end */
 
@@ -107,6 +109,16 @@ IOWA.Analytics = (function(exports) {
    */
   Analytics.prototype.trackEvent = function(category, action, opt_label, opt_value) {
     ga('send', 'event', category, action, opt_label, opt_value, {useBeacon: true});
+  };
+
+  /**
+   * Tracks an error event.
+   *
+   * @param {string} location
+   * @param {string} message
+   */
+  Analytics.prototype.trackError = function(location, message) {
+    ga('send', 'event', 'error', location, String(message));
   };
 
   /**
