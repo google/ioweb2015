@@ -28,7 +28,7 @@ $name: 'page-onsite';
   }
 }
 
-.onsite-pic {
+.onsite__pic {
   background: url(../images/home/io7.jpg) no-repeat 50% 0;
   background-size: cover;
   height: 310px;
@@ -51,7 +51,7 @@ $name: 'page-onsite';
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  .onsite-pic {
+  .onsite__pic {
     height: 745px;
     margin-top: -232px;
   }
