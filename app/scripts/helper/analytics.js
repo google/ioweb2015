@@ -66,10 +66,10 @@ IOWA.Analytics = (function(exports) {
   Analytics.prototype.trackPageView = function(opt_path, opt_callback) {
     var obj = {};
     if (opt_path) {
-      obj.page = opt_path
+      obj.page = opt_path;
     }
     if (typeof opt_callback === 'function') {
-      obj.hitCallback = opt_callback
+      obj.hitCallback = opt_callback;
     }
 
     ga('send', 'pageview', obj);
