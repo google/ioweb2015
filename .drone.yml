@@ -1,0 +1,9 @@
+image: bradrydzewski/node:0.10
+git:
+  depth: 1
+script:
+  - npm -q install
+  - npm -q -g install gulp
+  - gulp bower
+  - gulp
+

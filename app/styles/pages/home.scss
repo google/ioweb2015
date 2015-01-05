@@ -1,0 +1,181 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+$name: 'page-home';
+
+@import '../base/_layout';
+@import '../base/_color';
+@import '../base/_breakpoints';
+@import '../base/_typography';
+
+
+##{$name} {
+
+.masthead-container {
+  &::before {
+    content: '';
+    width: 177px;
+    height: 128px;
+    display: block;
+    // TODO(ericbidelman): this should be a 1x asset.
+    background: url('../images/home/io_white.png') center center no-repeat;
+    background-size: contain;
+  }
+}
+
+.home-photo {
+  background: url(../images/home/io7.jpg) no-repeat 50% 0;
+  background-size: cover;
+  height: 310px;
+}
+
+.io-countdown {
+  margin: 60px 0 365px 0;
+
+  countdown-timer {
+    width: 400px;
+    height: 180px;
+    max-width: 100%;
+  }
+
+  h4 {
+    @include typo-button();
+    margin-right: 180px;
+  }
+}
+
+.card__photo--recap {
+  background-image: url(../images/home/recap-poster-600.jpg);
+  background-position: 50% 0 !important;
+}
+
+#attend {
+  position: relative;
+  color: #fff;
+  background-image: url(../images/home/earth-1200.png);
+  background-repeat: no-repeat;
+  background-position: 50% 150px;
+  background-size: 140%;
+
+  .attend__cityname {
+    color: $color-cyan-A400;
+  }
+
+  .attend__globe {
+    min-height: 150px;
+  }
+}
+
+.registration__card {
+  core-icon {
+    margin-right: 15px;
+  }
+}
+
+#join {
+  .join__social {
+    a {
+      margin-bottom: 15px;
+    }
+
+    core-icon {
+      margin-left: 5px;
+    }
+  }
+  .join__hash {
+    margin: 40px auto;
+  }
+  .social-post {
+    header {
+      color: $color-gray;
+      margin-bottom: $tabletKeyline;
+    }
+  }
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  .registration__card {
+    .card {
+      border-bottom: 1px solid $color-light-grey-border;
+    }
+  }
+  .io-countdown {
+    margin: $desktopKeyline auto;
+  }
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  .masthead-container {
+    &::before {
+      width: 256px;
+      height: 184px;
+    }
+  }
+
+  .home-photo {
+    height: 745px;
+    margin-top: -232px;
+  }
+  #registration {
+    position: relative;
+    margin-bottom: -325px;
+    .registration__setreminder {
+      background: #fff;
+      color: $color-cyan-A700;
+      position: absolute;
+      top: 40px;
+      right: $desktopKeyline;
+    }
+  }
+  .registration__card {
+    core-icon {
+      display: none;
+    }
+  }
+  #attend {
+    padding-top: 100px;
+    margin-top: -50px;
+    margin-bottom: -255px;
+  }
+  .attend__globe {
+    height: 500px;
+  }
+  #join {
+    position: relative;
+    .join__social {
+      position: absolute;
+      top: 40px;
+      right: $desktopKeyline;
+    }
+    .join__hash {
+      margin: 100px auto;
+    }
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid + 1) {
+
+}
+
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .card__photo--recap  {
+    background-image: url(../images/home/recap-poster-1200.jpg);
+  }
+}
+
+}

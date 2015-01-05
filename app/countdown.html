@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="author" content="" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title></title>
+
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="elements/countdown-timer/countdown-timer.html">
+
+    <style>
+      .io-countdown-timer {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .container {
+        width: 100%;
+        height: 400px;
+        max-width: 700px;
+        margin: 100px auto;
+      }
+    </style>
+  </head>
+
+  <body fullbleed>
+
+    <div class="container">
+      <countdown-timer
+        class="io-countdown-timer"
+        autostart
+        date="Mon, 02 Mar 2015 09:00:00 GMT-0700"
+        dateadjustment="3"
+        easeintime="500"
+        waittime="300"
+        easeouttime="400"></countdown-timer>
+    </div>
+
+  </body>
+
+</html>

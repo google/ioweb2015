@@ -1,0 +1,213 @@
+<!--
+  @license
+  TBC
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<script src="countdown-timer-namespace.js"></script>
+<script src="countdown-timer-enumerations.js"></script>
+<script src="countdown-timer-renderer.js"></script>
+<script src="countdown-timer.js"></script>
+
+<!--
+Creates a countdown timer to a specific date.
+
+##### Example
+
+    <countdown-timer date="Mon, 02 Mar 2015 09:00:00 GMT-0700"></countdown-timer>
+
+@element countdown-timer
+@blurb Creates a countdown timer to a specific date.
+@status alpha
+-->
+<polymer-element name="countdown-timer"
+    attributes="date dateAdjustment easeInTime waitTime easeOutTime autoStart">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+        width: 300px;
+        height: 200px;
+      }
+
+      .countdown-timer,
+      #surface {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <div class="countdown-timer">
+      <canvas id="surface"></canvas>
+    </div>
+  </template>
+
+  <script>
+  (function() {
+
+    Polymer({
+
+      timer: null,
+
+      /**
+       * The target date for the countdown. Should be specified in ISO 8601
+       * format, e.g. `Thu, 18 Dec 2014 09:00:00 GMT`.
+       *
+       * @attribute date
+       * @type string
+       * @default 'Mon, 02 Mar 2015 09:00:00 GMT-0700'
+       */
+      date: 'Mon, 02 Mar 2015 09:00:00 GMT-0700',
+
+      /**
+       * `dateAdjustment` adds the specified number of days to count down before
+       * displaying the final count. So, for example, if it is 75 days to the
+       * target date, a `dateAdjustment` of 3 will start the countdown at 78.
+       *
+       * @attribute dateAdjustment
+       * @type number
+       * @default 3
+       */
+      dateAdjustment: 3,
+
+      /**
+       * The time, in milliseconds, that it takes for a number to transition in.
+       *
+       * @attribute dateAdjustment
+       * @type number
+       * @default 500
+       */
+      easeInTime: 500,
+
+      /**
+       * The time, in milliseconds, that a number stays on screen.
+       *
+       * @attribute dateAdjustment
+       * @type number
+       * @default 500
+       */
+      waitTime: 300,
+
+      /**
+       * The time, in milliseconds, that a number takes to transition out.
+       *
+       * @attribute dateAdjustment
+       * @type number
+       * @default 500
+       */
+      easeOutTime: 400,
+
+      /**
+       * Whether or not the countdown should begin immediately.
+       *
+       * @attribute autoStart
+       * @type boolean
+       * @default false
+       */
+      autoStart: false,
+
+      /**
+       * Stops the timer.
+       *
+       * @method stop
+       */
+      stop: function() {
+        this.timer.stop();
+      },
+
+      /**
+       * Starts the timer.
+       *
+       * @method start
+       */
+      start: function() {
+        this.timer.start();
+      },
+
+      /**
+       * Resets the timer.
+       *
+       * @method reset
+       */
+      reset: function() {
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      dateChanged: function() {
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      dateAdjustmentChanged: function() {
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      easeInTimeChanged: function() {
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      easeOutTimeChanged: function() {
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      waitTimeChanged: function() {
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      /**
+       * Lifecycle event that creates the timer, configures it, and either
+       * starts it (if `autoStart` === true) or draws the start value if not.
+       *
+       * @private
+       */
+      attached: function() {
+
+        // Create the timer and set it with whatever the current
+        // values are. If the user updates any values then the
+        // timer will get reconfigured.
+        this.timer = new IOWA.CountdownTimer.Element(this.$.surface);
+        this.configureTimer_();
+
+        if (!this.autoStart) {
+          this.timer.drawIfAnimationIsNotRunning();
+          return;
+        }
+
+        this.start();
+      },
+
+      /**
+       * Used to take the current values from the element's prototype to set
+       * the corresponding values on the timer.
+       *
+       * @private
+       */
+      configureTimer_: function() {
+
+        var targetDate = Date.parse(this.date);
+
+        if (isNaN(targetDate))
+          targetDate = Date.now();
+
+        targetDate = new Date(targetDate);
+
+        this.timer.configure({
+          targetDate: targetDate,
+          adjustmentInDays: this.dateAdjustment,
+          easeInTime: this.easeInTime,
+          waitTime: this.waitTime,
+          easeOutTime: this.easeOutTime
+        });
+      }
+
+    });
+
+  })();
+  </script>
+
+</polymer-element>

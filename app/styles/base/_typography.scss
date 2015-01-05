@@ -1,0 +1,159 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@mixin typo-base() {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+@mixin typo-heading-1() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 34px;
+  line-height: 48px;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+}
+
+@mixin typo-heading-2() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 36px;
+  letter-spacing: -0.02em;
+}
+
+@mixin typo-heading-3() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 32px;
+}
+
+@mixin typo-heading-4() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+@mixin typo-heading-5() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+@mixin typo-body() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+}
+
+@mixin typo-button() {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+html, body {
+  font-family: 'Helvetica', 'Arial', 'sans-serif';
+  @include typo-body();
+}
+
+p {
+  margin: 0 0 8px 0;
+}
+
+a {
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.strong {
+  font-weight: bold;
+}
+
+li {
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  @include typo-heading-1();
+}
+h2 {
+  @include typo-heading-2();
+}
+h3 {
+  @include typo-heading-3();
+}
+h4 {
+  @include typo-heading-4();
+}
+h5 {
+  @include typo-heading-5();
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  h1 {
+    @include typo-heading-1();
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 56px;
+  }
+  // Rest of heading are same as mobile.
+}
+
+@media (min-width: $desktop-breakpoint-mid + 1) {
+  // h1 same as tablet.
+  h2 {
+    @include typo-heading-2();
+    font-size: 32px;
+    line-height: 48px;
+    font-weight: 300;
+  }
+
+  h3 {
+    @include typo-heading-3();
+    font-size: 24px;
+    line-height: 36px;
+    font-weight: 400;
+  }
+
+  h4 {
+    @include typo-heading-4();
+    font-size: 20px;
+    line-height: 32px;
+    font-weight: 400;
+  }
+
+  h5 {
+    @include typo-heading-5();
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
+  }
+}

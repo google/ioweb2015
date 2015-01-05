@@ -1,0 +1,48 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<polymer-element name="io-logo" attributes="height">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        width: 400px;
+      }
+      .letter {
+        background: #fff;
+      }
+      #slash {
+        width: 10px;
+        height: 135%;
+        -webkit-transform: rotateZ(12deg);
+        transform: rotateZ(12deg);
+        margin: -35px 0 0 40px;
+      }
+      #i {
+        max-width: 80px;
+        -webkit-align-self: center;
+        align-self: center;
+        height: 96%;
+      }
+      #o {
+        border-radius: 50%;
+        margin-left: 15px;
+      }
+    </style>
+    <div layout horizontal style="height:100%">
+      <div id="i" class="letter" flex></div>
+      <div id="slash" class="letter"></div>
+      <div id="o" class="letter" flex style="max-width:{{height}}"></div>
+    </div>
+  </template>
+  <script>
+  Polymer({
+    height: '165px',
+    ready: function() {
+      this.heightChanged();
+    },
+    heightChanged: function() {
+      this.style.height = this.height;
+    }
+  });
+  </script>
+</polymer-element>

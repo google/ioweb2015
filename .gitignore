@@ -1,8 +1,19 @@
+# Ignore NPM and Bower folders.
 bower_components
-components
 node_modules
+npm-debug.log
+
+# Ignore prod/dist folders
 dist
+
+# Ignore generated CSS.
 .sass-cache
+app/styles/**/*.css
+
+# Standalone backend server
+backend/bin
+
+# Other generated/common stuff.
 .tmp
 .DS_Store
-app/sass/*.css
+*.pyc
