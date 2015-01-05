@@ -1,0 +1,75 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+$name: 'page-onsite';
+
+@import '../base/_layout';
+@import '../base/_breakpoints';
+
+
+##{$name} {
+
+.masthead {
+  h1 {
+    color: #fff;
+  }
+}
+
+.onsite__pic {
+  background: url(../images/home/io7.jpg) no-repeat 50% 0;
+  background-size: cover;
+  height: 310px;
+}
+
+#traveldetails {
+  h3 {
+    margin-bottom: $tabletKeyline;
+  }
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+  h4 {
+    margin-bottom: $mobileKeyline;
+  }
+  .sidebyside > * {
+    margin-bottom: $tabletKeyline;
+  }
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  .onsite__pic {
+    height: 745px;
+    margin-top: -232px;
+  }
+  #traveldetails {
+    h3 {
+      margin-bottom: $desktopKeyline;
+    }
+  }
+}
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .photo__about {
+    background-image: url(../images/home/recap-poster-1200.jpg);
+  }
+  .card__photo--recap  {
+    background-image: url(../images/home/recap-poster-1200.jpg);
+  }
+}
+
+
+}

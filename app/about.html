@@ -62,7 +62,7 @@ limitations under the License.
   <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="elements/elements.html">
 </head>
-<body id="page-schedule" unresolved>
+<body id="page-about" unresolved>
 
 <core-drawer-panel forceNarrow>
   <div drawer>
@@ -117,7 +117,7 @@ limitations under the License.
     <core-media-query query="(min-width:769px) and (max-width:944px)" queryMatches="{{isTabletSize}}"></core-media-query>
     <core-media-query query="(min-width:945px)" queryMatches="{{isDesktopSize}}"></core-media-query>
 
-    <header class="masthead bg-cyan" layout vertical>
+    <header class="masthead bg-dark-grey" layout vertical>
       <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
         <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
         <div flex><a href="./"><div class="io-logo"></div></a></div>
@@ -151,95 +151,53 @@ limitations under the License.
       </core-toolbar>
       <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
         <div layout vertical end-justified?="{{isPhoneSize}}" flex>
-          <h1>Schedule</h1>
-          <paper-tabs class="white" selected="0">
-            <paper-tab><i18n-msg msgid="agenda">Agenda</i18n-msg></paper-tab>
-            <paper-tab disabled><i18n-msg msgid="day">Day</i18n-msg> 1</paper-tab>
-            <paper-tab disabled><i18n-msg msgid="day">Day</i18n-msg> 2</paper-tab>
-          </paper-tabs>
+          <h1>About I/O</h1>
         </div>
       </div>
-      <paper-fab icon="add" mini?="{{isPhoneSize}}"></paper-fab>
+      <paper-fab icon="assessment" mini?="{{isPhoneSize}}"></paper-fab>
     </header>
 
     <main>
 
-      <section class="page__section">
-        <div class="card__container">
-          <div class="card">
-            <div class="card-content">
-              <h2>Smarch xx, 2015</h2>
-            </div>
-            <div class="card-content">
-              <div layout horizontal>
-                <core-icon icon="schedule"></core-icon>
-                <div class="schedule-rows">
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>4:00 PM - 6:00 PM</span>
-                    <span auto-vertical flex>Badge pick-up</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div class="card__container">
+        <div class="card">
+          <div class="card-content">
+            <h2>Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</h2>
           </div>
+          <div class="card-content">
+            <a href="#">I/O in Photos</a>
+          </div>
+        </div>
+      </div>
+
+      <section class="page__section pics__section" layout horizontal>
+        <div class="photo__about" flex two></div>
+        <div layout vertical flex>
+          <div class="photo__about" layout vertical flex></div>
+          <div class="photo__about" layout vertical flex></div>
         </div>
       </section>
 
-      <section class="page__section">
-        <div class="card__container">
-          <div class="card">
-            <div class="card-content">
-              <h2>Smarch xx, 2015</h2>
-            </div>
-            <div class="card-content">
-              <div layout horizontal>
-                <core-icon icon="schedule"></core-icon>
-                <div class="schedule-rows">
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>8:00 AM - 10:00 AM</span>
-                    <span auto-vertical flex>Breakfast</span>
-                  </div>
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>9:00 AM - 11:30 AM</span>
-                    <span auto-vertical flex>Keynote</span>
-                  </div>
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>11:30 AM - 1:30 PM</span>
-                    <span auto-vertical flex>Lunch</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+        <div class="card" auto-vertical flex>
+          <div class="card-content">
+            <h3>Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President for Android, Chrome &amp; App, Sundar Pichai.</h3>
+          </div>
+          <div class="card-content">
+            <a href="#">See the 2014 Keynote and sessions</a>
           </div>
         </div>
-      </section>
-
-      <section class="page__section">
-        <div class="card__container">
-          <div class="card">
-            <div class="card-content">
-              <h2>Smarch xx, 2015</h2>
-            </div>
-            <div class="card-content">
-              <div layout horizontal>
-                <core-icon icon="schedule"></core-icon>
-                <div class="schedule-rows">
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>8:00 AM - 10:00 AM</span>
-                    <span auto-vertical flex>Breakfast</span>
-                  </div>
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>9:00 AM - 11:30 AM</span>
-                    <span auto-vertical flex>Sessions</span>
-                  </div>
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>9:00 AM - 5:00 PM</span>
-                    <span auto-vertical flex>Codelabs</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div class="card" layout vertical auto-vertical flex>
+          <div flex class="card__photo card__photo--recap"></div>
+          <div class="card-content">
+            <a href="#"><core-icon icon="av:play-circle-fill"></core-icon> Watch the 2014 Recap Video</a>
           </div>
+        </div>
+      </div>
+
+      <section id="hashtag" class="page__section bg-cyan">
+        <div class="io__hash">
+          TODO
         </div>
       </section>
 

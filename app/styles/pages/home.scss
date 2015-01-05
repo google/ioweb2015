@@ -25,6 +25,13 @@ $name: 'page-home';
 
 ##{$name} {
 
+// Homepage doesn't include top-left io logo.
+.masthead {
+  .io-logo {
+    display: none;
+  }
+}
+
 .masthead-container {
   &::before {
     content: '';
@@ -96,9 +103,6 @@ $name: 'page-home';
       margin-left: 5px;
     }
   }
-  .join__hash {
-    margin: 40px auto;
-  }
   .social-post {
     header {
       color: $color-gray;
@@ -160,9 +164,6 @@ $name: 'page-home';
       position: absolute;
       top: 40px;
       right: $desktopKeyline;
-    }
-    .join__hash {
-      margin: 100px auto;
     }
   }
 }

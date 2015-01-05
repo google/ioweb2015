@@ -105,32 +105,32 @@ limitations under the License.
     <div class="drawer-panel-content">
       <core-menu>
         <paper-item>
-          <a href="#home">
+          <a href="./">
             <i18n-msg msgid="home">Home</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#about">
+          <a href="about.html">
             <i18n-msg msgid="about">About</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#schedule">
+          <a href="schedule.html">
             <i18n-msg msgid="schedule">Schedule</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#onsite">
+          <a href="onsite.html">
             <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#offsite">
+          <a href="offsite.html">
             <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="#registration">
+          <a href="registration.html">
             <i18n-msg msgid="registration">Registration</i18n-msg>
           </a>
         </paper-item>
@@ -149,30 +149,30 @@ limitations under the License.
       <header class="masthead bg-medium-grey" layout vertical>
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-          <div flex></div>
+          <div flex><a href="./"><div class="io-logo"></div></a></div>
           <paper-tabs class="white" link>
             <paper-tab>
-              <a href="#about" layout horizontal center>
+              <a href="about.html" layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab>
-              <a href="#schedule" layout horizontal center>
+              <a href="schedule.html" layout horizontal center>
                 <i18n-msg msgid="schedule">Schedule</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab>
-              <a href="#onsite" layout horizontal center>
+              <a href="onsite.html" layout horizontal center>
                 <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab>
-              <a href="#offsite" layout horizontal center>
+              <a href="offsite.html" layout horizontal center>
                 <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab>
-              <a href="#registration" layout horizontal center>
+              <a href="registration.html" layout horizontal center>
                 <i18n-msg msgid="registration">Registration</i18n-msg>
               </a>
             </paper-tab>
@@ -184,7 +184,7 @@ limitations under the License.
             <h5 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h5>
           </div>
         </div>
-        <paper-fab icon="add" mini?="{{isPhoneSize}}"></paper-fab>
+        <paper-fab icon="assessment" mini?="{{isPhoneSize}}"></paper-fab>
       </header>
 
       <main>
@@ -226,7 +226,6 @@ limitations under the License.
           </template>
           <div class="card" auto-vertical flex>
             <div class="card-content hide-on-mobile">
-              <h2 class="card__title">Registration opens</h2>
               <h3>I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between</h3>
             </div>
             <div class="card-content">
@@ -269,7 +268,7 @@ limitations under the License.
               @googledevs<core-icon icon="social:post-twitter"></core-icon>
             </a>
           </div>
-          <div class="join__hash">
+          <div class="io__hash">
             TODO
           </div>
           <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
