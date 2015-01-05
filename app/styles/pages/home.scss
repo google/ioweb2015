@@ -14,10 +14,28 @@
  * limitations under the License.
  */
 
+
+$name: 'page-home';
+
 @import '../base/_layout';
 @import '../base/_color';
 @import '../base/_breakpoints';
 @import '../base/_typography';
+
+
+##{$name} {
+
+.masthead-container {
+  &::before {
+    content: '';
+    width: 177px;
+    height: 128px;
+    display: block;
+    // TODO(ericbidelman): this should be a 1x asset.
+    background: url('../images/home/io_white.png') center center no-repeat;
+    background-size: contain;
+  }
+}
 
 .home-photo {
   background: url(../images/home/io7.jpg) no-repeat 50% 0;
@@ -101,6 +119,13 @@
 }
 
 @media (min-width: $tablet-breakpoint-min) {
+  .masthead-container {
+    &::before {
+      width: 256px;
+      height: 184px;
+    }
+  }
+
   .home-photo {
     height: 745px;
     margin-top: -232px;
@@ -151,4 +176,6 @@
   .card__photo--recap  {
     background-image: url(../images/home/recap-poster-1200.jpg);
   }
+}
+
 }

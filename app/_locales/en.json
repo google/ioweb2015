@@ -87,5 +87,13 @@
   "experiment-ahead": {
     "description": "The experiment's loading message explaining it will use a particular API.",
     "message": "Web Audio API experiment ahead"
+  },
+  "day": {
+    "description": "Link text. Please keep short. Used on the schedule page.",
+    "message": "Day"
+  },
+  "agenda": {
+    "description": "Link text. Please keep short. Used on the schedule page.",
+    "message": "Agenda"
   }
 }

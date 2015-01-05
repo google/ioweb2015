@@ -65,6 +65,7 @@ core-drawer-panel {
     }
     a {
       font-weight: inherit;
+      color: inherit;
     }
   }
 }
@@ -74,6 +75,7 @@ core-drawer-panel {
 
   paper-tabs {
     display: none;
+    text-transform: uppercase;
   }
 
   paper-tab {
@@ -81,8 +83,6 @@ core-drawer-panel {
 
     a {
       font-size: 12px;
-      text-decoration: none;
-      text-transform: uppercase;
       color: inherit;
     }
   }
@@ -94,16 +94,6 @@ core-drawer-panel {
   margin: 0 auto;
   position: relative;
   padding: 32px 0;
-
-  &::before {
-    content: '';
-    width: 177px;
-    height: 128px;
-    display: block;
-    // TODO(ericbidelman): this should be a 1x asset.
-    background: url('../images/home/io_white.png') center center no-repeat;
-    background-size: contain;
-  }
 }
 
 .masthead-title {
@@ -141,11 +131,6 @@ paper-fab {
   .masthead-container {
     max-width: 704px;
     padding: 0 0 170px 0;
-
-    &::before {
-      width: 256px;
-      height: 184px;
-    }
   }
 
   .masthead-subtitle {
