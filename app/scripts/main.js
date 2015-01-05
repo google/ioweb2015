@@ -33,6 +33,7 @@
     try {
       IOWA.Analytics.trackError(file + ':' + lineNumber, message);
     } catch (e) {
+      // no-op
     }
   };
 

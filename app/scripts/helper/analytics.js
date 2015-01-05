@@ -30,7 +30,10 @@ IOWA.Analytics = (function(exports) {
     this.loadTrackingCode();
 
     var opts = {siteSpeedSampleRate: 50}; // 50% of users.
-    if (!exports.DEV) {
+    if (exports.DEV) {
+      // See https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#localhost
+      opts.cookieDomain = 'none';
+    } else {
       opts.cookiePath = '/events/io2015';
     }
 
