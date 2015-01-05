@@ -276,7 +276,15 @@ limitations under the License.
         <a href="#navbar" class="footer-backtotop">Back to the top <core-icon icon="hardware:keyboard-arrow-up"></core-icon></a>
         <nav layout horizontal vertical?="{{isPhoneSize}}" end justified flex?="{{isDesktopSize || isTabletSize}}">
           <span><a href="#">FAQ</a></span>
-          <span><a href="#">Google Developers</a></span>
+          <span><a href="https://www.google.com/events/io">I/O 2014</a></span>
+          <paper-dropdown-menu label="Google Developers">
+            <paper-dropdown valign="bottom" class="dropdown">
+                <paper-item><a href="https://developers.google.com">developers.google.com</a></paper-item>
+                <paper-item><a href="https://plus.google.com/+GoogleDevelopers">+googledevelopers</a></paper-item>
+                <paper-item><a href="http://googledevelopers.blogspot.com/">Blog</a></paper-item>
+            </paper-dropdown>
+          </paper-dropdown-menu>
+
           <span><a href="#">I/O Community</a></span>
           <span><a href="https://www.google.com/intl/en/policies/terms/">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/">Terms</a></span>
           <span>
