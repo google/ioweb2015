@@ -41,6 +41,8 @@ IOWA.Router = (function() {
           e.stopPropagation();
           renderPage(el.href);
           history.pushState(null, '', el.href);
+          // TODO: Add GA pageview.
+          // TODO: Update meta.
         }
         return; // found first anchor, quit here.
       }
@@ -83,7 +85,7 @@ IOWA.Router = (function() {
   }
 
   /**
-   * Injects new page content into existinf layout.
+   * Injects new page content into existing layout.
    * @param {string} pageName New page identifier.
    * @param {DocumentFragment} importContent HTML containing templates to be
    *    injected.
