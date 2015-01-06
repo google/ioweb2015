@@ -20,10 +20,14 @@ IOWA.Elements = (function() {
 
   var toast = document.getElementById('toast');
 
-  // TODO: Add element's configuration and listeners here.
+  var drawer = document.querySelector('core-drawer-panel');
+  drawer.addEventListener('core-activate', function(e) {
+    this.closeDrawer();
+  });
 
   return {
-    Toast: toast
+    Toast: toast,
+    Drawer: drawer
   };
 
 })();
