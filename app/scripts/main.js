@@ -117,5 +117,4 @@
     injectPage(location.href);
   });
 
-
 })(window);
