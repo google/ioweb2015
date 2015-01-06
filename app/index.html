@@ -105,32 +105,32 @@ limitations under the License.
     <div class="drawer-panel-content">
       <core-menu>
         <paper-item>
-          <a href="./">
+          <a href="./" data-ajax-link>
             <i18n-msg msgid="home">Home</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="about.html">
+          <a href="about.html" data-ajax-link>
             <i18n-msg msgid="about">About</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="schedule.html">
+          <a href="schedule.html" data-ajax-link>
             <i18n-msg msgid="schedule">Schedule</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="onsite.html">
+          <a href="onsite.html" data-ajax-link>
             <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="offsite.html">
+          <a href="offsite.html" data-ajax-link>
             <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="registration.html">
+          <a href="registration.html" data-ajax-link>
             <i18n-msg msgid="registration">Registration</i18n-msg>
           </a>
         </paper-item>
@@ -149,7 +149,7 @@ limitations under the License.
       <header class="masthead {{pages[selectedPage].mastheadBgClass}}" layout vertical>
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-          <div flex><a href="./"><div class="io-logo"></div></a></div>
+          <div flex><a href="./" data-ajax-link><div class="io-logo"></div></a></div>
           <paper-tabs class="white" link
             valueattr="label" selected="{{selectedPage}}">
             <paper-tab label="about">
@@ -168,12 +168,12 @@ limitations under the License.
               </a>
             </paper-tab>
             <paper-tab label="offsite">
-              <a href="offsite.html" layout horizontal center>
+              <a href="offsite.html" data-ajax-link layout horizontal center>
                 <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="registration">
-              <a href="registration.html" layout horizontal center>
+              <a href="registration.html" data-ajax-link layout horizontal center>
                 <i18n-msg msgid="registration">Registration</i18n-msg>
               </a>
             </paper-tab>
