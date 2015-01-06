@@ -37,11 +37,5 @@
     }
   };
 
-  console.log(IOWA.Router)
   IOWA.Router.init();
-
-
-
-
-
 })(window);

@@ -25,15 +25,14 @@ IOWA.Elements = (function() {
     this.closeDrawer();
   });
 
-   var template = document.getElementById('t');
-    template.pages = {};
-    template.selectedPage = 'home';
-
+  var template = document.getElementById('t');
+  template.pages = {};
+  template.selectedPage = 'home';
 
   return {
-    Toast: toast,
     Drawer: drawer,
-    Template: template
+    Template: template,
+    Toast: toast
   };
 
 })();

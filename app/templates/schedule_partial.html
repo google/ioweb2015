@@ -1,4 +1,6 @@
-<template id="template-schedule-masthead">
+<template id="template-schedule-masthead"
+    class="js-ajax-template js-ajax-schedule"
+    data-ajax-target-template="template-masthead-container">
   <h1>Schedule</h1>
   <paper-tabs class="white" selected="0">
     <paper-tab><i18n-msg msgid="agenda">Agenda</i18n-msg></paper-tab>
@@ -7,7 +9,8 @@
   </paper-tabs>
 </template>
 
-<template id="template-schedule">
+<template id="template-schedule-content" class="js-ajax-template js-ajax-schedule"
+    data-ajax-target-template="template-content-container">
   <section class="page__section">
     <div class="card__container">
       <div class="card">
@@ -91,7 +94,6 @@
 <script>
 IOWA.Elements.Template.pages['schedule'] = {
   title: 'Schedule',
-  mastheadBgClass: 'bg-cyan',
-  mastheadHTML: document._currentScript.ownerDocument.getElementById('template-masthead').innerHTML
+  mastheadBgClass: 'bg-cyan'
 };
 </script>

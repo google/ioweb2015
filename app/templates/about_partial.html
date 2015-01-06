@@ -1,8 +1,12 @@
-<template id="template-masthead">
+<template id="template-about-masthead"
+    class="js-ajax-template js-ajax-about"
+    data-ajax-target-template="template-masthead-container">
   <h1>About</h1>
 </template>
 
-<template id="template-about">
+<template id="template-about-content"
+    class="js-ajax-template js-ajax-about"
+    data-ajax-target-template="template-content-container">
   <div class="card__container">
     <div class="card">
       <div class="card-content">
@@ -49,7 +53,6 @@
 <script>
 IOWA.Elements.Template.pages['about'] = {
   title: 'About I/O',
-  mastheadBgClass: 'bg-dark-grey',
-  mastheadHTML: document._currentScript.ownerDocument.getElementById('template-masthead').innerHTML
+  mastheadBgClass: 'bg-dark-grey'
 };
 </script>

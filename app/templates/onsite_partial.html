@@ -1,8 +1,12 @@
-<template id="template-masthead">
+<template id="template-onsite-masthead"
+    class="js-ajax-template js-ajax-onsite"
+    data-ajax-target-template="template-masthead-container">
   <h1>Attend Onsite</h1>
 </template>
 
-<template id="template-onsite">
+<template id="template-onsite-content"
+    class="js-ajax-template js-ajax-onsite"
+    data-ajax-target-template="template-content-container">
   <div class="card__container">
     <div class="card">
       <div class="card-content">
@@ -80,7 +84,6 @@
 <script>
 IOWA.Elements.Template.pages['onsite'] = {
   title: 'Attend Onsite',
-  mastheadBgClass: 'bg-dark-grey',
-  mastheadHTML: document._currentScript.ownerDocument.getElementById('template-masthead').innerHTML
+  mastheadBgClass: 'bg-dark-grey'
 };
 </script>

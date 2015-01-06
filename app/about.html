@@ -121,28 +121,29 @@ limitations under the License.
       <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
         <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
         <div flex><a href="./"><div class="io-logo"></div></a></div>
-        <paper-tabs class="white" link>
-          <paper-tab>
-            <a href="about.html" layout horizontal center>
+        <paper-tabs class="white" link
+            valueattr="label" selected="{{selectedPage}}">
+          <paper-tab label="about">
+            <a href="about.html" data-ajax-link layout horizontal center>
               <i18n-msg msgid="about">About</i18n-msg>
             </a>
           </paper-tab>
-          <paper-tab>
-            <a href="schedule.html" layout horizontal center>
+          <paper-tab label="schedule">
+            <a href="schedule.html" data-ajax-link layout horizontal center>
               <i18n-msg msgid="schedule">Schedule</i18n-msg>
             </a>
           </paper-tab>
-          <paper-tab>
-            <a href="onsite.html" layout horizontal center>
+          <paper-tab label="onsite">
+            <a href="onsite.html" data-ajax-link layout horizontal center>
               <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
             </a>
           </paper-tab>
-          <paper-tab>
+          <paper-tab label="offsite">
             <a href="offsite.html" layout horizontal center>
               <i18n-msg msgid="attend-offsite">Attend off-site</i18n-msg>
             </a>
           </paper-tab>
-          <paper-tab>
+          <paper-tab label="registration">
             <a href="registration.html" layout horizontal center>
               <i18n-msg msgid="registration">Registration</i18n-msg>
             </a>
@@ -151,9 +152,7 @@ limitations under the License.
       </core-toolbar>
       <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
         <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
-
-          <div id="masthead-title-container"></div>
-
+          <template id="template-masthead-container" ref="" bind></template>
         </div>
       </div>
       <paper-fab icon="assessment" mini?="{{isPhoneSize}}"></paper-fab>
