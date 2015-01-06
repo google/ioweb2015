@@ -39,8 +39,7 @@ IOWA.Router = (function() {
         if (el.hasAttribute('data-ajax-link')) {
           e.preventDefault();
           e.stopPropagation();
-          renderPage(el.href);
-          history.pushState(null, '', el.href);
+          IOWA.History.pushState(null, '', el.href);
           // TODO: Add GA pageview.
           // TODO: Update meta.
         }
