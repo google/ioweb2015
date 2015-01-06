@@ -72,7 +72,7 @@ IOWA.Router = (function() {
       document.body.id = 'page-' + pageName;
       IOWA.Elements.Template.selectedPage = pageName;
       var pageMeta = IOWA.Elements.Template.pages[pageName];
-      document.title = 'Google I/O 2015 ' + pageMeta.title;
+      document.title = pageMeta.title || 'Google I/O 2015';
     });
   }
 
