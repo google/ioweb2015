@@ -15,7 +15,6 @@ var runSequence = require('run-sequence');
 var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
-var bower = require('gulp-bower');
 var chmod = require('gulp-chmod');
 
 var APP_DIR = 'app';
@@ -313,8 +312,9 @@ gulp.task('serve:dist', ['default'], function(cb) {
   proc.on('close', cb);
 });
 
-gulp.task('bower', function() {
-  return bower({cwd: APP_DIR});
+gulp.task('bower', function(cb) {
+  var proc = spawn('../node_modules/bower/bin/bower', ['install'], {cwd: APP_DIR, stdio: 'inherit'});
+  proc.on('close', cb);
 });
 
 gulp.task('addgithooks', function() {
