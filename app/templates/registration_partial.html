@@ -1,0 +1,42 @@
+<template id="template-registration-masthead"
+    class="js-ajax-template js-ajax-registration"
+    data-ajax-target-template="template-masthead-container">
+  <h1>Registration</h1>
+</template>
+
+<template id="template-registration-content"
+    class="js-ajax-template js-ajax-registration"
+    data-ajax-target-template="template-content-container">
+
+  <div class="card__container">
+    <div class="card">
+      <div class="card-content">
+        <h2>Registration opens Smarch xx at 9:00PM PST</h2>
+        <a href="#"><core-icon icon="social:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg></a>
+      </div>
+      <div class="card-content">
+        <h3>How it works</h3>
+        <p>Donec mi arcu, vestibulum eu mollis ac, tristique non lorem. Sed vitae accumsan quam. Pellentesque vitae lacinia ipsum. Suspendisse venenatis, dolor gravida accumsan eleifend, nisl tellus mattis nibh, ac condimentum mauris ante ut nisi.</p>
+      </div>
+    </div>
+  </div>
+
+<section class="page__section bg-light-grey ">
+<div class="io-countdown" layout vertical center>
+  <countdown-timer autostart
+                   bgcolor="#F5F5F5"
+                   date="Mon, 02 Mar 2015 09:00:00 GMT-0700"
+                   dateadjustment="5" easeintime="500" waittime="300"
+                   easeouttime="400"></countdown-timer>
+  <h4><i18n-msg msgid="daysuntilreg">Days until registration opens</i18n-msg></h4>
+</div>
+</section>
+
+</template>
+
+<script>
+IOWA.Elements.Template.pages['registration'] = {
+  title: 'Registration',
+  mastheadBgClass: 'bg-cyan'
+};
+</script>

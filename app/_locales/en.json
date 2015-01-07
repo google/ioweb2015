@@ -92,6 +92,14 @@
     "description": "Link text. Please keep short. Used on the schedule page.",
     "message": "Day"
   },
+  "days": {
+    "description": "Short label",
+    "message": "Days"
+  },
+  "daysuntilreg": {
+    "description": "Short label used on the registration page. By the countdown timer",
+    "message": "Days until registration opens"
+  },
   "agenda": {
     "description": "Link text. Please keep short. Used on the schedule page.",
     "message": "Agenda"
