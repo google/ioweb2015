@@ -107,6 +107,27 @@ h3, h4, h5, h6 {
   margin: 40px auto;
 }
 
+.io-countdown {
+  margin: 60px 0 365px 0;
+
+  countdown-timer {
+    width: 400px;
+    height: 180px;
+    max-width: 100%;
+  }
+
+  h4 {
+    @include typo-button();
+    margin-right: 180px;
+  }
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  .io-countdown {
+    margin: $desktopKeyline auto;
+  }
+}
+
 @media (min-width: $tablet-breakpoint-min) {
   .page__section {
     @include keyline-32();
