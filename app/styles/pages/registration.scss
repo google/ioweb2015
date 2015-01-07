@@ -35,10 +35,6 @@ $name: 'page-registration';
   padding-bottom: $tabletKeyline;
 }
 
-@media (max-width: $phone-breakpoint-max) {
-
-}
-
 @media (min-width: $tablet-breakpoint-min) {
   .io-countdown {
     margin: 100px 0;
