@@ -50,21 +50,6 @@ $name: 'page-home';
   height: 310px;
 }
 
-.io-countdown {
-  margin: 60px 0 365px 0;
-
-  countdown-timer {
-    width: 400px;
-    height: 180px;
-    max-width: 100%;
-  }
-
-  h4 {
-    @include typo-button();
-    margin-right: 180px;
-  }
-}
-
 .card__photo--recap {
   background-image: url(../images/home/recap-poster-600.jpg);
   background-position: 50% 0 !important;
@@ -116,9 +101,6 @@ $name: 'page-home';
     .card {
       border-bottom: 1px solid $color-light-grey-border;
     }
-  }
-  .io-countdown {
-    margin: $desktopKeyline auto;
   }
 }
 

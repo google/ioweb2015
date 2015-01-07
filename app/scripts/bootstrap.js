@@ -17,8 +17,8 @@
 if ('serviceWorker' in navigator) {
 
   // TODO: change scope accordingly to the production address.
-  navigator.serviceWorker.register('/sw.js', {
-    scope: '/'
+  navigator.serviceWorker.register('sw.js', {
+    scope: './'
   }).then(function(registration) {
 
     var newServiceWorkerAvailableMessage =

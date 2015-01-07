@@ -14,24 +14,31 @@
  * limitations under the License.
  */
 
-$card-anim-time: 0;
 
-@import 'base/_breakpoints';
-@import 'base/_color';
-@import 'base/_shadow';
-@import 'base/_typography';
+$name: 'page-registration';
 
-@import 'base/_reset';
-@import 'base/_layout';
-@import 'base/_zindex';
+@import '../base/_layout';
+@import '../base/_color';
+@import '../base/_breakpoints';
 
-@import 'components/_app';
-@import 'components/_masthead';
-@import 'components/_card';
-@import 'components/_footer';
 
-@import 'pages/home';
-@import 'pages/schedule';
-@import 'pages/about';
-@import 'pages/onsite';
-@import 'pages/registration';
+##{$name} {
+
+.io-countdown {
+  h4 {
+    color: $color-cyan-A700;
+    margin-right: 0;
+  }
+}
+
+.card-content h2 {
+  padding-bottom: $tabletKeyline;
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  .io-countdown {
+    margin: 100px 0;
+  }
+}
+
+}

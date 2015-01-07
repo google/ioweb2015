@@ -21,7 +21,7 @@ Creates a countdown timer to a specific date.
 @status alpha
 -->
 <polymer-element name="countdown-timer"
-    attributes="date dateAdjustment easeInTime waitTime easeOutTime autoStart">
+    attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart">
 
   <template>
     <style>
@@ -132,6 +132,10 @@ Creates a countdown timer to a specific date.
       reset: function() {
         this.configureTimer_();
         this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      bgColorChanged: function() {
+        IOWA.CountdownTimer.Colors.Background = this.bgColor;
       },
 
       dateChanged: function() {
