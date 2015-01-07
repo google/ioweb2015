@@ -1,0 +1,98 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+$name: 'page-offsite';
+
+@import '../base/_layout';
+@import '../base/_color';
+@import '../base/_breakpoints';
+
+##{$name} {
+
+$icon-margin: 10px;
+
+.card__photo--stage {
+  height: 310px;
+  background-image: url(../images/offsite/stage-750.jpg);
+  background-position: 0% 50%;
+  background-size: 120%;
+  background-repeat: no-repeat;
+}
+
+.page__section--attend {
+  position: relative;
+  background-image: url(../images/home/earth-1200.png);
+  background-repeat: no-repeat;
+  background-position: 50% 200px;
+  background-size: 140%;
+
+  .action__links {
+    align-items: flex-start;
+
+    paper-button {
+      color: $color-cyan-A400;
+    }
+
+    core-icon {
+      margin-right: $icon-margin;
+    }
+  }
+  .attend__globe {
+    min-height: 150px;
+  }
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  .card__photo--stage {
+    height: 700px;
+    position: relative;
+    margin-top: -100px;
+    margin-bottom: -285px;
+  }
+  .page__section--attend {
+    background-position: 50% 280px;
+
+    h2 {
+      max-width: 58%;
+    }
+
+    .action__links {
+      position: absolute;
+      top: 0px;
+      right: 32px;
+      padding-top: 100px;
+      align-items: flex-end;
+
+      core-icon {
+        order: 1;
+        margin-left: $icon-margin;
+      }
+    }
+    .attend__globe {
+      height: 500px;
+    }
+  }
+}
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .card__photo--stage  {
+    background-image: url(../images/offsite/stage-750@2x.jpg);
+  }
+}
+
+
+}

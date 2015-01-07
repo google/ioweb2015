@@ -1,0 +1,62 @@
+<template id="template-offsite-masthead"
+    class="js-ajax-template js-ajax-offsite"
+    data-ajax-target-template="template-masthead-container">
+  <h1><i18n-msg msgid="attend-offsite">Attend Off-site</i18n-msg></h1>
+</template>
+
+<template id="template-offsite-content"
+    class="js-ajax-template js-ajax-offsite"
+    data-ajax-target-template="template-content-container">
+
+  <div class="card__container">
+    <div class="card">
+      <div class="card-content">
+        <h2 class="card__title"><i18n-msg msgid="livestream">Live Stream</i18n-msg></h2>
+        <p>Watch the keynote and selected sessions in real-time, from your laptop or mobile device.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="card__photo--stage page__section"></section>
+
+  <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+    <div class="card" auto-vertical flex>
+      <div class="card-content">
+        <h3 class="card__title"><i18n-msg msgid="ioextendevents">I/O Extended events</i18n-msg></h3>
+        <h4>I/O Extended includes anything from live streaming sessions, to local developer demos, to hackathons. These events are brought to you by our Google Developer Groups, Student Ambassadors, and local developers.</h4>
+      </div>
+    </div>
+    <div class="card" auto-vertical flex>
+      <div class="card-content">
+        <h3 class="card__title"><i18n-msg msgid="hostioextend">Host an I/O Extended event</i18n-msg></h3>
+        <h4>We've got you covered with all the information you need to bring I/O to your neighborhood.</h4>
+      </div>
+      <div class="card-content">
+        <a href="#">Download Organizer's Guide</a> <a href="#">Submit your event</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="page__section page__section--attend bg-dark-grey">
+    <h2>We're compiling a map of I/O Extended events in your area. Check back to find one that's closest to you.</h2>
+    <div class="action__links" layout vertical>
+      <paper-button>
+        <core-icon icon="social:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about events near me</i18n-msg>
+      </paper-button>
+      <paper-button>
+        <core-icon icon="maps:place"></core-icon><i18n-msg msgid="viewlastyear">View last year's events</i18n-msg>
+      </paper-button>
+    </div>
+    <div class="attend__globe">
+
+    </div>
+  </section>
+
+</template>
+
+<script>
+IOWA.Elements.Template.pages['offsite'] = {
+  title: 'Attend Offsite',
+  mastheadBgClass: 'bg-cyan'
+};
+</script>
