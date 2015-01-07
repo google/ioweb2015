@@ -24,11 +24,10 @@ func renderTemplate(w io.Writer, name string, partial bool) error {
 	} else {
 		layout = "layout_full.html"
 	}
-	tplpath := name + ".html"
 
 	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
 		filepath.Join(rootDir, "templates", layout),
-		filepath.Join(rootDir, "templates", tplpath),
+		filepath.Join(rootDir, "templates", name+".html"),
 	)
 	if err != nil {
 		return err
