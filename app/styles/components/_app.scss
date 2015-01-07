@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+$hashWidth: 90px;
+
 a {
   color: $color-cyan-A700;
 }
@@ -105,6 +107,11 @@ h3, h4, h5, h6 {
 
 .io__hash {
   margin: 40px auto;
+  margin-left: -$hashWidth / 2;
+  height: 120px;
+
+  background: url(../images/io15hash.png) no-repeat 50% 50%;
+  background-size: contain;
 }
 
 .io-countdown {
@@ -138,6 +145,8 @@ h3, h4, h5, h6 {
     display: block;
   }
   .io__hash {
-    margin: 100px auto;
+    margin: 80px auto;
+    margin-left: -$hashWidth;
+    height: 160px;
   }
 }
