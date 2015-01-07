@@ -15,24 +15,28 @@ var tmplFunc = template.FuncMap{
 	"safeHTML": func(v string) template.HTML { return template.HTML(v) },
 }
 
-// renderTemplate executes a template found in 'name' file
-// using layout.html as the root template.
-// If name does not end with an extension, '.html' is appended.
-func renderTemplate(w io.Writer, name string) error {
-	if filepath.Ext(name) == "" {
-		name += ".html"
+// renderTemplate executes a template found in name.html file
+// using either layout_full.html or layout_partial.html as the root template.
+func renderTemplate(w io.Writer, name string, partial bool) error {
+	var layout string
+	if partial {
+		layout = "layout_partial.html"
+	} else {
+		layout = "layout_full.html"
 	}
+	tplpath := name + ".html"
 
-	t, err := template.New("layout.html").Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(rootDir, "templates", "layout.html"),
-		filepath.Join(rootDir, "templates", name),
+	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
+		filepath.Join(rootDir, "templates", layout),
+		filepath.Join(rootDir, "templates", tplpath),
 	)
 	if err != nil {
 		return err
 	}
 
-	data := struct{ Title string }{
+	data := struct{ Title, Slug string }{
 		Title: pageTitle(t),
+		Slug:  name,
 	}
 	return t.Execute(w, data)
 }

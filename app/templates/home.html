@@ -1,13 +1,9 @@
-<template id="template-home-masthead"
-    class="js-ajax-template js-ajax-home"
-    data-ajax-target-template="template-masthead-container">
+{% define "masthead" %}
   <h2 class="masthead-title">Smarch xx - xx</h2>
   <h5 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h5>
-</template>
+{% end %}
 
-<template id="template-home-content"
-    class="js-ajax-template js-ajax-home"
-    data-ajax-target-template="template-content-container">
+{% define "content" %}
   <div class="card__container">
     <div class="card">
       <div class="card-content">
@@ -113,10 +109,13 @@
       </div>
     </div>
   </section>
-</template>
+{% end %}
 
+{% define "bottom" %}
 <script>
-IOWA.Elements.Template.pages['home'] = {
+IOWA.Elements.Template.pages['{% .Slug %}'] = {
   mastheadBgClass: 'bg-medium-grey'
 };
 </script>
+{% end %}
+

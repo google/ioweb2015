@@ -10,10 +10,17 @@ func init() {
 	rootDir = "app"
 }
 
-func TestRenderIndex(t *testing.T) {
+func TestRenderFull(t *testing.T) {
 	var b bytes.Buffer
-	if err := renderTemplate(&b, "index"); err != nil {
-		t.Fatalf("render(index): %v", err)
+	if err := renderTemplate(&b, "about", false); err != nil {
+		t.Fatalf("render(about): %v", err)
+	}
+}
+
+func TestRenderPartial(t *testing.T) {
+	var b bytes.Buffer
+	if err := renderTemplate(&b, "about", true); err != nil {
+		t.Fatalf("render(about): %v", err)
 	}
 }
 

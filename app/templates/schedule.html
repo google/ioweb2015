@@ -1,16 +1,15 @@
-<template id="template-schedule-masthead"
-    class="js-ajax-template js-ajax-schedule"
-    data-ajax-target-template="template-masthead-container">
+{% define "title" %}Schedule{% end %}
+
+{% define "masthead" %}
   <h1>Schedule</h1>
   <paper-tabs class="white" selected="0">
     <paper-tab><i18n-msg msgid="agenda">Agenda</i18n-msg></paper-tab>
     <paper-tab disabled><i18n-msg msgid="day">Day</i18n-msg> 1</paper-tab>
     <paper-tab disabled><i18n-msg msgid="day">Day</i18n-msg> 2</paper-tab>
   </paper-tabs>
-</template>
+{% end %}
 
-<template id="template-schedule-content" class="js-ajax-template js-ajax-schedule"
-    data-ajax-target-template="template-content-container">
+{% define "content" %}
   <section class="page__section">
     <div class="card__container">
       <div class="card">
@@ -89,11 +88,14 @@
       </div>
     </div>
   </section>
-</template>
+{% end %}
 
+{% define "bottom" %}
 <script>
-IOWA.Elements.Template.pages['schedule'] = {
-  title: 'Schedule',
+IOWA.Elements.Template.pages[{% .Slug %}] = {
+  title: {% .Title %},
   mastheadBgClass: 'bg-cyan'
 };
 </script>
+{% end %}
+
