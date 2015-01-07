@@ -103,5 +103,29 @@
   "agenda": {
     "description": "Link text. Please keep short. Used on the schedule page.",
     "message": "Agenda"
+  },
+  "howitworks": {
+    "description": "Heading text for the top card on the registration page.",
+    "message": "How it works"
+  },
+  "livestream": {
+    "description": "Heading text for the top card on the attend offsite page",
+    "message": "Live Stream"
+  },
+  "notifyme": {
+    "description": "Offsite page. Button text have users receive a notification when new events around near them.",
+    "message": "Notify me about events near me"
+  },
+  "viewlastyear": {
+    "description": "Offsite page. Button text to view last year's event locations",
+    "message": "View last year's events"
+  },
+  "ioextendevents": {
+    "description": "Offsite page. Card title description",
+    "message": "I/O Extended events"
+  },
+  "hostioextend": {
+    "description": "Offsite page. Card title description for developers to submit their own event details",
+    "message": "Host an I/O Extended event"
   }
 }

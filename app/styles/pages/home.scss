@@ -55,7 +55,7 @@ $name: 'page-home';
   background-position: 50% 0 !important;
 }
 
-#attend {
+.page__section--attend {
   position: relative;
   color: #fff;
   background-image: url(../images/home/earth-1200.png);
@@ -132,9 +132,7 @@ $name: 'page-home';
       display: none;
     }
   }
-  #attend {
-    padding-top: 100px;
-    margin-top: -50px;
+  .page__section--attend {
     margin-bottom: -255px;
   }
   .attend__globe {
