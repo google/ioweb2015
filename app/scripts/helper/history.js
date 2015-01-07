@@ -19,11 +19,11 @@
  *
  * Triggers 'popstate' event on pushstate method call.
  */
-IOWA.History = (function(history){
+IOWA.History = (function(history) {
   var pushState = history.pushState;
   history.pushState = function(state) {
     if (typeof history.onpushstate == "function") {
-        history.onpushstate({state: state} );
+      history.onpushstate({state: state} );
     }
     pushState.apply(history, arguments);
     window.dispatchEvent(new Event('popstate'));
