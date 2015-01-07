@@ -81,7 +81,9 @@
 
     .card-content {
       padding: 32px;
-      border-bottom: 1px solid #eee;
+      &:not(:last-child) {
+        border-bottom: 1px solid #eee;
+      }
     }
   }
 }
