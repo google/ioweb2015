@@ -14,109 +14,19 @@
  * limitations under the License.
  */
 
-CDS.History = (function() {
-
-  "use strict";
-
-  var activePath;
-  var transitioningCard = null;
-
-  function manageCards(opt_disableAnimation) {
-
-    var currentPath = document.location.pathname;
-    var compositePath = '/';
-
-    if (typeof opt_disableAnimation !== 'boolean')
-      opt_disableAnimation = false;
-
-    if (activePath === currentPath)
-      return;
-
-    if (transitioningCard)
-      return;
-
-    // If the new card is not a child of the current section collapse it
-    // before opening the new card.
-    if (currentPath.indexOf(activePath) === -1 &&
-      typeof CDS.Cards[activePath] !== 'undefined') {
-
-      transitioningCard = CDS.Cards[activePath];
-      transitioningCard.collapse();
-
-    } else if (typeof CDS.Cards[currentPath] !== 'undefined') {
-
-      // Step up through the path making sure any other cards are enabled
-      currentPath.split('/').forEach(function(part) {
-
-        if (part === '')
-          return;
-
-        compositePath += part + '/';
-
-        if (compositePath !== currentPath &&
-            typeof CDS.Cards[compositePath] !== 'undefined') {
-
-          CDS.Cards[compositePath].expand(true);
-
-        } else if (compositePath === currentPath) {
-
-          transitioningCard = CDS.Cards[currentPath];
-          transitioningCard.expand(opt_disableAnimation);
-        }
-      });
+/**
+ * @fileOverview History management for IOWA project.
+ *
+ * Triggers 'popstate' event on pushstate method call.
+ */
+IOWA.History = (function(history) {
+  var pushState = history.pushState;
+  history.pushState = function(state) {
+    if (typeof history.onpushstate == "function") {
+      history.onpushstate({state: state});
     }
-
-    if (transitioningCard !== null) {
-      transitioningCard.addEventListener('transitionend',
-          onTransitionEnd.bind(transitioningCard), true);
-    }
-
-    activePath = currentPath;
-  }
-
-  function onPopState(evt) {
-    evt.preventDefault();
-    window.requestAnimationFrame(manageCards);
-  }
-
-  function onTransitionEnd() {
-    transitioningCard = null;
-    window.requestAnimationFrame(manageCards);
-  }
-
-  function forth(path) {
-    window.history.pushState(null, "", path);
-    window.requestAnimationFrame(manageCards);
-  }
-
-  function back() {
-    window.history.back();
-  }
-
-  function init() {
-    manageCards(true);
-    transitioningCard = null;
-  }
-
-  function onKeyUp(evt) {
-
-    // We only care about the user hitting escape
-    // to collapse the card down.
-    if (evt.keyCode !== 27)
-      return;
-
-    if (typeof CDS.Cards[activePath] !== 'undefined')
-      forth('../');
-
-  }
-
-  window.addEventListener('keyup', onKeyUp);
-  window.addEventListener('popstate', onPopState);
-
-  return {
-    back: back,
-    forth: forth,
-    init: init
+    pushState.apply(history, arguments);
+    window.dispatchEvent(new Event('popstate'));
   };
-
-})();
+  return history;
+})(window.history);
