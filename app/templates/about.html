@@ -1,4 +1,7 @@
-{% define "title" %}About I/O{% end %}
+{% define "meta" %}
+  "title": "About I/O",
+  "mastheadBgClass": "bg-dark-grey"
+{% end %}
 
 {% define "masthead" %}
   <h1>About</h1>
@@ -44,14 +47,5 @@
   <section id="hashtag" class="page__section bg-cyan">
     <div class="io__hash"></div>
   </section>
-{% end %}
-
-{% define "bottom" %}
-<script>
-IOWA.Elements.Template.pages[{% .Slug %}] = {
-  title: {% .Title %},
-  mastheadBgClass: 'bg-dark-grey'
-};
-</script>
 {% end %}
 

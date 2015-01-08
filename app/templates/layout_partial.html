@@ -10,4 +10,7 @@
   {% template "content" .%}
 </template>
 
-{% template "bottom" .%}
+<script>
+  IOWA.Elements.Template.pages[{% .Slug %}] = {% .Meta %};
+</script>
+

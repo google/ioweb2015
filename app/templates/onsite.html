@@ -1,4 +1,7 @@
-{% define "title" %}Attend Onsite{% end %}
+{% define "meta" %}
+  "title": "Attend Onsite",
+  "mastheadBgClass": "bg-dark-grey"
+{% end %}
 
 {% define "masthead" %}
   <h1><i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg></h1>
@@ -77,14 +80,5 @@
       </div>
     </div>
   </section>
-{% end %}
-
-{% define "bottom" %}
-<script>
-IOWA.Elements.Template.pages[{% .Slug %}] = {
-  title: {% .Title %},
-  mastheadBgClass: 'bg-dark-grey'
-};
-</script>
 {% end %}
 

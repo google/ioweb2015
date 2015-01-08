@@ -1,3 +1,7 @@
+{% define "meta" %}
+  "mastheadBgClass": "bg-medium-grey"
+{% end %}
+
 {% define "masthead" %}
   <h2 class="masthead-title">Smarch xx - xx</h2>
   <h5 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h5>
@@ -109,13 +113,5 @@
       </div>
     </div>
   </section>
-{% end %}
-
-{% define "bottom" %}
-<script>
-IOWA.Elements.Template.pages[{% .Slug %}] = {
-  mastheadBgClass: 'bg-medium-grey'
-};
-</script>
 {% end %}
 

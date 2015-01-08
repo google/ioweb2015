@@ -1,4 +1,7 @@
-{% define "title" %}Schedule{% end %}
+{% define "meta" %}
+  "title": "Schedule",
+  "mastheadBgClass": "bg-cyan"
+{% end %}
 
 {% define "masthead" %}
   <h1>Schedule</h1>
@@ -88,14 +91,5 @@
       </div>
     </div>
   </section>
-{% end %}
-
-{% define "bottom" %}
-<script>
-IOWA.Elements.Template.pages[{% .Slug %}] = {
-  title: {% .Title %},
-  mastheadBgClass: 'bg-cyan'
-};
-</script>
 {% end %}
 
