@@ -17,3 +17,5 @@ backend/bin
 .tmp
 .DS_Store
 *.pyc
+
+service-worker.js

@@ -16,6 +16,7 @@ var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var chmod = require('gulp-chmod');
+var swPrecache = require('sw-precache');
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -353,3 +354,30 @@ function testBackend() {
 // Load custom tasks from the `tasks` directory
 try { require('require-dir')('tasks'); } catch (err) {}
 
+function generateServiceWorkerFileContents(rootDir, handleFetch) {
+  return swPrecache({
+    dynamicUrlToDependencies: {
+      //'dynamic/page1': [rootDir + '/views/layout.jade', rootDir + '/views/page1.jade'],
+      //'dynamic/page2': [rootDir + '/views/layout.jade', rootDir + '/views/page2.jade']
+    },
+    handleFetch: handleFetch,
+    staticFileGlobs: [
+      rootDir + '/**'
+    ],
+    stripPrefix: rootDir + '/'
+  });
+}
+
+gulp.task('generate-service-worker-dev', function() {
+  var serviceWorkerFileContents = generateServiceWorkerFileContents(APP_DIR, false);
+
+  return $.file('service-worker.js', serviceWorkerFileContents)
+    .pipe(gulp.dest(APP_DIR));
+});
+
+gulp.task('generate-service-worker-dist', function() {
+  var serviceWorkerFileContents = generateServiceWorkerFileContents(DIST_DIR, true);
+
+  return $.file('service-worker.js', serviceWorkerFileContents)
+    .pipe(gulp.dest(DIST_DIR));
+});
