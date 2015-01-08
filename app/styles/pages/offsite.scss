@@ -35,10 +35,8 @@ $icon-margin: 10px;
 
 .page__section--attend {
   position: relative;
-  background-image: url(../images/home/earth-1200.png);
-  background-repeat: no-repeat;
-  background-position: 50% 200px;
-  background-size: 140%;
+  color: #fff;
+  @extend .bg-globe;
 
   .action__links {
     align-items: flex-start;
@@ -64,7 +62,7 @@ $icon-margin: 10px;
     margin-bottom: -285px;
   }
   .page__section--attend {
-    background-position: 50% 280px;
+    background-position: 50% 0;
 
     h2 {
       max-width: 58%;

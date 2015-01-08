@@ -29,13 +29,13 @@ $name: 'page-onsite';
 }
 
 .onsite__pic {
-  background: url(../images/home/io7.jpg) no-repeat 50% 0;
+  background: url(../images/onsite/Image-01.jpg) no-repeat 50% 0;
   background-size: cover;
   height: 310px;
 }
 
 #traveldetails {
-  h3 {
+  h2, h3 {
     margin-bottom: $tabletKeyline;
   }
   ul {
@@ -56,7 +56,7 @@ $name: 'page-onsite';
     margin-top: -232px;
   }
   #traveldetails {
-    h3 {
+    h2, h3 {
       margin-bottom: $desktopKeyline;
     }
   }
@@ -64,10 +64,7 @@ $name: 'page-onsite';
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .photo__about {
-    background-image: url(../images/home/recap-poster-1200.jpg);
-  }
-  .card__photo--recap  {
-    background-image: url(../images/home/recap-poster-1200.jpg);
+    background-image: url(../images/onsite/Image-01@2x.jpg)
   }
 }
 
