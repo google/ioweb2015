@@ -357,12 +357,21 @@ try { require('require-dir')('tasks'); } catch (err) {}
 function generateServiceWorkerFileContents(rootDir, handleFetch) {
   return swPrecache({
     dynamicUrlToDependencies: {
+      // TODO: Fill in URLs for server-generated pages, along with each URL's component templates.
       //'dynamic/page1': [rootDir + '/views/layout.jade', rootDir + '/views/page1.jade'],
       //'dynamic/page2': [rootDir + '/views/layout.jade', rootDir + '/views/page2.jade']
     },
     handleFetch: handleFetch,
+    importScripts: ['bower_components/shed/dist/shed.js', 'scripts/shed-offline-analytics.js'],
     staticFileGlobs: [
-      rootDir + '/**'
+      rootDir + '/bower_components/**/*.{html,js,css}',
+      rootDir + '/elements/**',
+      rootDir + '/fonts/**',
+      rootDir + '/images/**',
+      rootDir + '/scripts/**',
+      rootDir + '/styles/**/*.css',
+      rootDir + '/templates/**/*_partial.html',
+      rootDir + '/*.{html,ico,json}'
     ],
     stripPrefix: rootDir + '/'
   });
@@ -376,8 +385,8 @@ gulp.task('generate-service-worker-dev', function() {
 });
 
 gulp.task('generate-service-worker-dist', function() {
-  var serviceWorkerFileContents = generateServiceWorkerFileContents(DIST_DIR, true);
+  var serviceWorkerFileContents = generateServiceWorkerFileContents(DIST_STATIC_DIR + '/' + APP_DIR, true);
 
   return $.file('service-worker.js', serviceWorkerFileContents)
-    .pipe(gulp.dest(DIST_DIR));
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR));
 });

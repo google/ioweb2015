@@ -18,4 +18,5 @@ backend/bin
 .DS_Store
 *.pyc
 
-service-worker.js
+# This should be generated as part of the gulp build process.
+app/service-worker.js
