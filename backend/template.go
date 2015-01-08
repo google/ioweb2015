@@ -62,7 +62,8 @@ func pageTitle(m meta) string {
 }
 
 // pageMeta extracts page meta info by executing "meta" template.
-// It returns empty meta if template execution fails.
+// The template is assumed to be a JSON object body (w/o {}).
+// Returns empty meta if template execution fails.
 func pageMeta(t *template.Template) (m meta) {
 	m = make(meta)
 
