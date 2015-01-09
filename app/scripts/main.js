@@ -36,6 +36,4 @@
       // no-op
     }
   };
-
-  IOWA.Router.init();
 })(window);

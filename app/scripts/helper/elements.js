@@ -18,50 +18,73 @@ IOWA.Elements = (function() {
 
   "use strict";
 
-  var toast = document.getElementById('toast');
+  var updateElements = function() {
+    var toast = document.getElementById('toast');
 
-  var drawer = document.querySelector('core-drawer-panel');
-  drawer.addEventListener('core-activate', function(e) {
-    this.closeDrawer();
-  });
+    var drawer = document.querySelector('core-drawer-panel');
+    drawer.addEventListener('core-activate', function(e) {
+      this.closeDrawer();
+    });
 
-  var template = document.getElementById('t');
-  template.pages = {};
-  template.selectedPage = 'home';
+    var ripple = document.querySelector('.masthead__ripple__content');
+    var main = document.querySelector('main');
+    var masthead = document.querySelector('.masthead');
+    var header = document.querySelector('.masthead-container');
 
-  var cyan = '#00BCD4';
-  var mediumGrey = '#CFD8DC';
-  var darkGrey = '#455A64';
-
-  template.pages = {
-    'schedule': {
-      mastheadBgClass: cyan
-    },
-    'home': {
-      mastheadBgClass: mediumGrey
-    },
-    'about': {
-      mastheadBgClass: darkGrey
-    },
-    'onsite': {
-      mastheadBgClass: darkGrey
-    },
-    'offsite': {
-      mastheadBgClass: cyan
-    },
-    'registration': {
-      mastheadBgClass: cyan
-    }
+    IOWA.Elements.Drawer = drawer;
+    IOWA.Elements.Header = header;
+    IOWA.Elements.Main = main;
+    IOWA.Elements.Masthead = masthead;
+    IOWA.Elements.Ripple = ripple;
+    IOWA.Elements.Toast = toast;
   };
 
-  var ripple = document.querySelector('.masthead__ripple__content');
+  var init = function() {
+
+    var template = document.getElementById('t');
+    template.pages = {};
+    template.selectedPage = 'home';
+
+    var cyan = '#00BCD4';
+    var mediumGrey = '#CFD8DC';
+    var darkGrey = '#455A64';
+
+    template.pages = {
+      'schedule': {
+        bgColor: cyan,
+        mastheadBgClass: 'bg-cyan'
+      },
+      'home': {
+        bgColor: mediumGrey,
+        mastheadBgClass: 'bg-medium-grey'
+      },
+      'about': {
+        bgColor: darkGrey,
+        mastheadBgClass: 'bg-dark-grey'
+      },
+      'onsite': {
+        bgColor: darkGrey,
+        mastheadBgClass: 'bg-dark-grey'
+      },
+      'offsite': {
+        bgColor: cyan,
+        mastheadBgClass: 'bg-cyan'
+      },
+      'registration': {
+        bgColor: cyan,
+        mastheadBgClass: 'bg-cyan'
+      }
+    };
+
+    t.addEventListener('template-bound', function() {
+      updateElements();
+    });
+
+    updateElements();
+    IOWA.Elements.Template = template;
+  };
 
   return {
-    Drawer: drawer,
-    Template: template,
-    Toast: toast,
-    Ripple: ripple
+    init: init
   };
-
 })();
-

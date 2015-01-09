@@ -136,6 +136,19 @@ h3, h4, h5, h6 {
   }
 }
 
+.io-main {
+  -webkit-transition: -webkit-transform $page-anim-time,
+      opacity $page-anim-time;
+  transition: transform $page-anim-time, opacity $page-anim-time;
+  transform: translateY(300px);
+  opacity: 0;
+
+  &.active {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: $phone-breakpoint-max) {
   .io-countdown {
     margin: $desktopKeyline auto;

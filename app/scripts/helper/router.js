@@ -22,13 +22,28 @@ IOWA.Router = (function() {
 
   "use strict";
 
+  var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
+
+  function playMastheadRipple(x, y, color) {
+    IOWA.Elements.Ripple.style.backgroundColor = color;
+    IOWA.Elements.Ripple.style.transition = '';
+    IOWA.Elements.Ripple.style.transform = [
+        'translate(', x, 'px,', y, 'px) scale(0.0)'
+    ].join('');
+    // Force recalculate style.
+    /*jshint -W030 */
+    IOWA.Elements.Ripple.offsetTop;
+    /*jshint +W030 */
+    IOWA.Elements.Ripple.style.transition = 'transform 1s';
+    IOWA.Elements.Ripple.style.transform = 'scale(1)';
+  }
+
   /**
    * Navigates to a new page. Uses ajax for data-ajax-link links.
    * @param {Event} e Event that triggered navigation.
    * @private
    */
   function navigate(e) {
-    console.log(e)
     // Allow user to open new tabs.
     if (e.metaKey || e.ctrlKey) {
       return;
@@ -40,64 +55,14 @@ IOWA.Router = (function() {
         if (el.hasAttribute('data-ajax-link')) {
           e.preventDefault();
           e.stopPropagation();
-          //IOWA.History.pushState(null, '', el.href);
-          // TODO: Add GA pageview.
-          // TODO: Update meta.
-
           var parts = el.href.split('/');
           var pageName = parts[parts.length - 1].split('.html')[0] || 'home';
-
-          var ripple = document.querySelector('.masthead__ripple__content');
-          console.log(ripple);
-          console.log(IOWA.Elements.Ripple);
-          //śripple = IOWA.Elements.Ripple;
-
-
-          console.log(pageName)
-
-          ripple.style.backgroundColor = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
-          ripple.style.transition = '';
-          ripple.style.transform = 'scale(0.05)';
-
-
-         // debugger;
-
-          ripple.style.transform = [
-          'translate(',
-            e.x,
-          'px,',
-          e.y,
-          'px) scale(0.0)'
-
-
-          ].join('');
-          var x = ripple.offsetTop;
-          ripple.style.transition = 'transform 1s';
-
-
-
-          //TODO: only once
-          var onTransitionEnd = function(e) {
-            console.log('onwebkittransitionend');
-            console.log(e);
-            if (e.target == ripple) {
-              document.querySelector('.masthead').style.backgroundColor = ripple.style.backgroundColor;
-            }
-          };
-
-          window.onwebkittransitionend = onTransitionEnd;
-          ripple.style.transform = 'scale(1)';
-
-
-
-
-
-
-
-          return;
-
-
-
+          var rippleColor = IOWA.Elements.Template.pages[pageName].bgColor;
+          // TODO: Update the nav color faster.
+          playMastheadRipple(e.x, e.y, rippleColor);
+          IOWA.History.pushState(null, '', el.href);
+          // TODO: Add GA pageview.
+          // TODO: Update meta.
         }
         return; // found first anchor, quit here.
       }
@@ -123,23 +88,14 @@ IOWA.Router = (function() {
       }
       // Update content of the page.
       injectPageContent(pageName, htmlImport.import);
-      // Update additional data on the page.
-      document.body.id = 'page-' + pageName;
-      IOWA.Elements.Template.selectedPage = pageName;
-      var pageMeta = IOWA.Elements.Template.pages[pageName];
-      document.title = pageMeta.title || 'Google I/O 2015';
     });
   }
 
   /**
-   * Renders a new page for the current location.
+   * Replaces templated content and fades the page in.
    * @private
    */
-  function animatePageIn(pageName) {
-    console.log('animatein')
-    // Replace containers with the relevant content.
-    var currentPageTemplates = document.querySelectorAll(
-        '.js-ajax-' + pageName);
+  function replaceAndFadeIn(currentPageTemplates) {
     for (var j = 0; j < currentPageTemplates.length; j++) {
       var template = currentPageTemplates[j];
       var templateToReplace = document.getElementById(
@@ -148,6 +104,38 @@ IOWA.Router = (function() {
         templateToReplace.setAttribute('ref', template.id);
       }
     }
+    IOWA.Elements.Main.classList.add('active');
+    IOWA.Elements.Header.classList.add('active');
+  }
+
+  /**
+   * Runs animated page transition.
+   * @param {string} pageName New page identifier.
+   * @private
+   */
+  function animatePageIn(pageName) {
+    // Prequery for content templates.
+    var currentPageTemplates = document.querySelectorAll(
+        '.js-ajax-' + pageName);
+
+    // Fade page out.
+    IOWA.Elements.Main.classList.remove('active');
+    IOWA.Elements.Header.classList.remove('active');
+
+    // Replace content and fade in.
+    setTimeout(function() {
+      requestAnimationFrame(function() {
+        replaceAndFadeIn(currentPageTemplates);
+        // Fade in post-processing.
+        document.body.id = 'page-' + pageName;
+        IOWA.Elements.Template.selectedPage = pageName;
+        var pageMeta = IOWA.Elements.Template.pages[pageName];
+        document.title = pageMeta.title || 'Google I/O 2015';
+        var masthead = IOWA.Elements.Masthead;
+        masthead.className = masthead.className.replace(
+            MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
+      });
+    }, 600);
   }
 
   /**
@@ -175,7 +163,6 @@ IOWA.Router = (function() {
         document.body.appendChild(newTemplate);
       }
     }
-
     animatePageIn(pageName);
   }
 
@@ -185,7 +172,7 @@ IOWA.Router = (function() {
   function init() {
     window.addEventListener('popstate', renderCurrentPage);
     // Load current page content when layout ready.
-    // TODO: do we really need 2 requests instead of 1?
+    // TODO: Remove ajax and change animation on first page load.
     document.addEventListener('template-bound', renderCurrentPage);
     document.addEventListener('click', navigate);
   }

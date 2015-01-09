@@ -146,7 +146,7 @@ limitations under the License.
       <core-media-query query="(min-width:769px) and (max-width:944px)" queryMatches="{{isTabletSize}}"></core-media-query>
       <core-media-query query="(min-width:945px)" queryMatches="{{isDesktopSize}}"></core-media-query>
 
-      <header class="masthead" layout vertical>
+      <header class="masthead {% template "mastheadBgClass" .%}" layout vertical>
         <div class="masthead__ripple" >
 
             <div class="masthead__ripple__content" id="masthead-ripple"></div>
@@ -185,7 +185,7 @@ limitations under the License.
             </paper-tab>
           </paper-tabs>
         </core-toolbar>
-        <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+        <div class="masthead-container active" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
@@ -193,7 +193,7 @@ limitations under the License.
         <paper-fab icon="assessment" mini?="{{isPhoneSize}}"></paper-fab>
       </header>
 
-      <main>
+      <main class="io-main active">
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
       </main>
 
@@ -233,15 +233,21 @@ limitations under the License.
 <script>
   window.DEV = true; // Remove for prod.
 </script>
+<script src="scripts/main.js"></script>
+<script src="scripts/helper/elements.js"></script>
+
 <script src="scripts/helper/history.js"></script>
 <script src="scripts/helper/router.js"></script>
-<script src="scripts/main.js"></script>
+
 <script src="scripts/helper/analytics.js"></script>
-<script src="scripts/helper/elements.js"></script>
 <script src="scripts/bootstrap.js"></script>
 <script>
-  IOWA.Elements.Template.pages[{% .Slug %}] = {% .Meta %};
+  if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
+    IOWA.Elements.Template.pages[{% .Slug %}] = {};
+  }
+  IOWA.Elements.Template.pages[{% .Slug %}].title = {% template "title" .%};
 </script>
+
 
 </body>
 </html>
