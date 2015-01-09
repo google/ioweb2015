@@ -29,7 +29,6 @@
     "gulp-load-plugins": "^0.5.3",
     "gulp-minify-html": "^0.1.4",
     "gulp-replace": "^0.5.0",
-    "gulp-ruby-sass": "^0.7.1",
     "gulp-sass": "^1.2.4",
     "gulp-size": "^1.0.0",
     "gulp-uglify": "^0.3.1",
