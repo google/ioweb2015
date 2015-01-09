@@ -1,12 +1,13 @@
-<template id="template-onsite-masthead"
-    class="js-ajax-template js-ajax-onsite"
-    data-ajax-target-template="template-masthead-container">
-  <h1><i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg></h1>
-</template>
+{% define "meta" %}
+  "title": "Attend Onsite",
+  "mastheadBgClass": "bg-dark-grey"
+{% end %}
 
-<template id="template-onsite-content"
-    class="js-ajax-template js-ajax-onsite"
-    data-ajax-target-template="template-content-container">
+{% define "masthead" %}
+  <h1><i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg></h1>
+{% end %}
+
+{% define "content" %}
   <div class="card__container">
     <div class="card">
       <div class="card-content">
@@ -79,11 +80,5 @@
       </div>
     </div>
   </section>
-</template>
+{% end %}
 
-<script>
-IOWA.Elements.Template.pages['onsite'] = {
-  title: 'Attend Onsite',
-  mastheadBgClass: 'bg-dark-grey'
-};
-</script>

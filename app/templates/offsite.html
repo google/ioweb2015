@@ -1,13 +1,13 @@
-<template id="template-offsite-masthead"
-    class="js-ajax-template js-ajax-offsite"
-    data-ajax-target-template="template-masthead-container">
+{% define "meta" %}
+  "title": "Attend Off-site",
+  "mastheadBgClass": "bg-cyan"
+{% end %}
+
+{% define "masthead" %}
   <h1><i18n-msg msgid="attend-offsite">Attend Off-site</i18n-msg></h1>
-</template>
+{% end %}
 
-<template id="template-offsite-content"
-    class="js-ajax-template js-ajax-offsite"
-    data-ajax-target-template="template-content-container">
-
+{% define "content" %}
   <div class="card__container">
     <div class="card">
       <div class="card-content">
@@ -51,12 +51,5 @@
 
     </div>
   </section>
+{% end %}
 
-</template>
-
-<script>
-IOWA.Elements.Template.pages['offsite'] = {
-  title: 'Attend Offsite',
-  mastheadBgClass: 'bg-cyan'
-};
-</script>

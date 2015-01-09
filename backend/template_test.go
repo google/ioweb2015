@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"html/template"
+	"reflect"
 	"testing"
 )
 
@@ -10,27 +11,42 @@ func init() {
 	rootDir = "app"
 }
 
-func TestRenderIndex(t *testing.T) {
+func TestRenderFull(t *testing.T) {
 	var b bytes.Buffer
-	if err := renderTemplate(&b, "index"); err != nil {
-		t.Fatalf("render(index): %v", err)
+	if err := renderTemplate(&b, "about", false); err != nil {
+		t.Fatalf("render(about): %v", err)
+	}
+}
+
+func TestRenderPartial(t *testing.T) {
+	var b bytes.Buffer
+	if err := renderTemplate(&b, "about", true); err != nil {
+		t.Fatalf("render(about): %v", err)
 	}
 }
 
 func TestPageTitle(t *testing.T) {
-	table := []struct{ template, out string }{
-		{``, defaultTitle},
-		{`{{define "title"}}my-title{{end}}`, "my-title - " + defaultTitle},
+	table := []struct {
+		meta  meta
+		title string
+	}{
+		{meta{}, defaultTitle},
+		{meta{"title": "my-title"}, "my-title - " + defaultTitle},
 	}
 	for i, test := range table {
-		tmpl, err := template.New("").Parse(test.template)
-		if err != nil {
-			t.Errorf("%d: template.Parse(%q): %v", i, test.template, err)
-			continue
+		title := pageTitle(test.meta)
+		if title != test.title {
+			t.Errorf("%d: pageTitle(%v) = %q; want %q", i, test.meta, title, test.title)
 		}
-		title := pageTitle(tmpl)
-		if title != test.out {
-			t.Errorf("%d: pageTitle(%q) = %q; want %q", i, test.template, title, test.out)
-		}
+	}
+}
+
+func TestPageMeta(t *testing.T) {
+	const smeta = `{{define "meta"}}"title": "my title", "foo": "bar"{{end}}`
+	want := meta{"title": "my title", "foo": "bar"}
+	tmpl := template.Must(template.New("").Parse(smeta))
+	m := pageMeta(tmpl)
+	if !reflect.DeepEqual(m, want) {
+		t.Errorf("pageMeta(%s) = %#v; want %#v", smeta, m, want)
 	}
 }
