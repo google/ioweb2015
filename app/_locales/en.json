@@ -19,6 +19,14 @@
     "description": "Top navbar sink text. Please keep this short. Links to the site's page for offsite participants.",
     "message": "Attend off-site"
   },
+  "attend-from": {
+    "description": "Beginning of 'Attend I/O from x or wherever you are heading",
+    "message": "Attend I/O from"
+  },
+  "attend-wherever": {
+    "description": "Ending to 'Attend I/O from x or wherever you are heading",
+    "message": "or wherever you may be"
+  },
   "registration": {
     "description": "Top navbar sink text. Please keep this short. Links to the site's registration page.",
     "message": "Registration"
