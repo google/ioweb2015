@@ -33,13 +33,28 @@ $name: 'page-about';
 }
 
 .photo__about {
-  background-image: url(../images/home/recap-poster-600.jpg);
+  background-image: url(../images/about/Image-01.jpg);
   background-position: 50% 0;
   background-size: cover;
+  border: 0 solid white;
+  border-right-width: 3px;
+}
+
+.photo__about--top {
+  @extend .photo__about;
+  background-image: url(../images/about/Image-02.jpg);
+  border-right: 0;
+  border-bottom-width: 3px;
+}
+
+.photo__about--bottom {
+  @extend .photo__about;
+  background-image: url(../images/about/Image-03.jpg);
+  border-right: 0;
 }
 
 .card__photo--recap {
-  background-image: url(../images/home/recap-poster-600.jpg);
+  background-image: url(../images/home/recap-500.jpg);
   background-position: 50% 0;
   min-height: 200px;
 }
@@ -48,20 +63,26 @@ $name: 'page-about';
   .pics__section {
     height: 745px;
     margin-top: -183px;
-    margin-bottom: -80px;
+    margin-bottom: -50px;
   }
   #hashtag {
-    margin-top: -290px;
+    margin-top: -320px;
     padding-top: 340px;
   }
 }
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .photo__about {
-    background-image: url(../images/home/recap-poster-1200.jpg);
+    background-image: url(../images/about/Image-01@2x.jpg);
+  }
+  .photo__about--top {
+    background-image: url(../images/about/Image-02@2x.jpg);
+  }
+  .photo__about--bottom {
+    background-image: url(../images/about/Image-03@2x.jpg);
   }
   .card__photo--recap  {
-    background-image: url(../images/home/recap-poster-1200.jpg);
+    background-image: url(../images/home/recap-500@2x.jpg);
   }
 }
 

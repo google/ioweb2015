@@ -1,13 +1,13 @@
-<template id="template-home-masthead"
-    class="js-ajax-template js-ajax-home"
-    data-ajax-target-template="template-masthead-container">
+{% define "meta" %}
+  "mastheadBgClass": "bg-medium-grey"
+{% end %}
+
+{% define "masthead" %}
   <h2 class="masthead-title">Smarch xx - xx</h2>
   <h5 class="masthead-subtitle">Moscone Center West,<br>San Francisco</h5>
-</template>
+{% end %}
 
-<template id="template-home-content"
-    class="js-ajax-template js-ajax-home"
-    data-ajax-target-template="template-content-container">
+{% define "content" %}
   <div class="card__container">
     <div class="card">
       <div class="card-content">
@@ -22,7 +22,7 @@
   <section class="home-photo page__section"></section>
 
   <section id="registration" class="page__section bg-cyan">
-    <h3>Registration opens<br>Smarch 1 at 9AM PST</h3>
+    <h2>Registration opens<br>Smarch 1 at 9AM PST</h2>
     <paper-button class="registration__setreminder" hidden?="{{isPhoneSize}}">
       <core-icon icon="social:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg>
     </paper-button>
@@ -61,7 +61,7 @@
   </div>
 
   <section class="page__section page__section--attend bg-dark-grey">
-    <h3>Attend I/O from <div class="attend__cityname">Mumbai</div> or wherever you may be</h3>
+    <h2>Attend I/O from <div class="attend__cityname">Mumbai</div> or wherever you may be</h2>
     <div class="attend__globe">
 
     </div>
@@ -79,7 +79,7 @@
   </div>
 
   <section id="join" class="page__section bg-light-grey">
-    <h3>Join the conversation<br>now at #io15</h3>
+    <h2>Join the conversation<br>now at #io15</h2>
     <div class="join__social" layout vertical end hidden?="{{isPhoneSize}}">
       <a href="https://plus.google.com/+GoogleDevelopers">
         +googledevelopers<core-icon icon="social:post-gplus"></core-icon>
@@ -113,10 +113,5 @@
       </div>
     </div>
   </section>
-</template>
+{% end %}
 
-<script>
-IOWA.Elements.Template.pages['home'] = {
-  mastheadBgClass: 'bg-medium-grey'
-};
-</script>

@@ -1,12 +1,13 @@
-<template id="template-onsite-masthead"
-    class="js-ajax-template js-ajax-onsite"
-    data-ajax-target-template="template-masthead-container">
-  <h1><i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg></h1>
-</template>
+{% define "meta" %}
+  "title": "Attend Onsite",
+  "mastheadBgClass": "bg-dark-grey"
+{% end %}
 
-<template id="template-onsite-content"
-    class="js-ajax-template js-ajax-onsite"
-    data-ajax-target-template="template-content-container">
+{% define "masthead" %}
+  <h1><i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg></h1>
+{% end %}
+
+{% define "content" %}
   <div class="card__container">
     <div class="card">
       <div class="card-content">
@@ -18,7 +19,7 @@
   <section class="page__section onsite__pic"></section>
 
   <section id="traveldetails" class="page__section bg-light-grey">
-    <h3>Travel details</h3>
+    <h2>Travel details</h2>
     <div class="sidebyside" layout horizontal wrap>
       <div flex?="{{!isPhoneSize}}">
         <h4><core-icon icon="maps:directions"></core-icon> Getting to San Francisco</h4>
@@ -79,11 +80,5 @@
       </div>
     </div>
   </section>
-</template>
+{% end %}
 
-<script>
-IOWA.Elements.Template.pages['onsite'] = {
-  title: 'Attend Onsite',
-  mastheadBgClass: 'bg-dark-grey'
-};
-</script>

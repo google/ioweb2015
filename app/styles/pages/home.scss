@@ -51,17 +51,14 @@ $name: 'page-home';
 }
 
 .card__photo--recap {
-  background-image: url(../images/home/recap-poster-600.jpg);
+  background-image: url(../images/home/recap-500.jpg);
   background-position: 50% 0 !important;
 }
 
 .page__section--attend {
   position: relative;
   color: #fff;
-  background-image: url(../images/home/earth-1200.png);
-  background-repeat: no-repeat;
-  background-position: 50% 150px;
-  background-size: 140%;
+  @extend .bg-globe;
 
   .attend__cityname {
     color: $color-cyan-A400;
@@ -148,14 +145,9 @@ $name: 'page-home';
   }
 }
 
-@media (min-width: $desktop-breakpoint-mid + 1) {
-
-}
-
-
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .card__photo--recap  {
-    background-image: url(../images/home/recap-poster-1200.jpg);
+    background-image: url(../images/home/recap-500@2x.jpg);
   }
 }
 

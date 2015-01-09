@@ -56,7 +56,7 @@ IOWA.Router = (function() {
   function renderPage(url) {
     var parts = url.split('/');
     var pageName = parts[parts.length - 1].split('.html')[0] || 'home';
-    var importURL = 'templates/' + pageName + '_partial.html';
+    var importURL = url + '?partial';
 
     Polymer.import([importURL], function() {
       // Don't proceed if import didn't load correctly.

@@ -1,0 +1,16 @@
+<template id="template-{% .Slug %}-masthead"
+    class="js-ajax-template js-ajax-{% .Slug %}"
+    data-ajax-target-template="template-masthead-container">
+  {% template "masthead" .%}
+</template>
+
+<template id="template-{% .Slug %}-content"
+    class="js-ajax-template js-ajax-{% .Slug %}"
+    data-ajax-target-template="template-content-container">
+  {% template "content" .%}
+</template>
+
+<script>
+  IOWA.Elements.Template.pages[{% .Slug %}] = {% .Meta %};
+</script>
+
