@@ -11,7 +11,8 @@ import (
 // found under request base path.
 // 'home' template is assumed if request path ends with '/'.
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html;charset=utf-8")
+	r.ParseForm()
+	_, wantsPartial := r.Form["partial"]
 
 	tplname := path.Base(r.URL.Path)
 	switch {
@@ -21,7 +22,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		tplname = tplname[:len(tplname)-5]
 	}
 
-	wantsPartial := len(r.FormValue("partial")) > 0
+	w.Header().Set("Content-Type", "text/html;charset=utf-8")
 	err := renderTemplate(w, tplname, wantsPartial)
 
 	if err != nil {
