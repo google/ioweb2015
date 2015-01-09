@@ -30,6 +30,9 @@ You can also use GAE dev appserver by running `gulp serve:gae`. This is closer t
 we're using in our webapp environment but a bit slower on startup.
 You'll need `gcloud` tool and `app` component to do this.
 
+Both gulp tasks accept optional `--no-watch` argument in case you need to disable
+file watchers and live reload.
+
 ### Building
 
 Run `gulp`. This will create `dist` directory with both front-end and backend parts, ready for deploy.

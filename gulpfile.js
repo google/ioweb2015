@@ -15,6 +15,7 @@ var runSequence = require('run-sequence');
 var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
+var opn = require('opn');
 var chmod = require('gulp-chmod');
 var swPrecache = require('sw-precache');
 var glob = require('glob');
@@ -233,10 +234,24 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 
 // Start a standalone server (no GAE SDK needed) serving both front-end and backend,
 // watch for file changes and live-reload when needed.
-gulp.task('serve', ['sass', 'backend'], function() {
+// If you don't want file watchers and live-reload, use '--no-watch' option.
+gulp.task('serve', ['sass', 'backend'], function(cb) {
+  var noWatch = argv.watch === false;
+  var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
+  var startArgs = ['-d', APP_DIR, '-listen', serverAddr];
+  var start = spawn.bind(null, BACKEND_DIR + '/bin/server', startArgs, {stdio: 'inherit'});
+
+  if (noWatch) {
+    start().on('close', cb);
+    serverAddr = 'http://' + serverAddr;
+    console.log('The site should now be available at: ' + serverAddr);
+    opn(serverAddr);
+    return;
+  }
+
   var backend;
   var run = function() {
-    backend = spawn(BACKEND_DIR + '/bin/server', ['-d', APP_DIR], {stdio: 'inherit'});
+    backend = start();
     backend.on('close', run);
   };
   var restart = function() {
@@ -256,12 +271,26 @@ gulp.task('serve', ['sass', 'backend'], function() {
     console.log('Building backend');
     buildBackend(restart);
   });
+
+  cb();
 });
 
 // The same as 'serve' task but using GAE dev appserver.
-gulp.task('serve:gae', ['sass'], function() {
-  var args = ['preview', 'app', 'run', BACKEND_DIR];
+// If you don't want file watchers and live-reload, use '--no-watch' option.
+gulp.task('serve:gae', ['sass'], function(cb) {
+  var noWatch = argv.watch === false;
+  var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
+  var args = ['preview', 'app', 'run', BACKEND_DIR, '--host', serverAddr];
+
   var backend = spawn('gcloud', args, {stdio: 'inherit'});
+  if (noWatch) {
+    backend.on('close', cb);
+    serverAddr = 'http://' + serverAddr;
+    console.log('The site should now be available at: ' + serverAddr);
+    opn(serverAddr);
+    return;
+  }
+
   browserSync.emitter.on('service:exit', backend.kill.bind(backend, 'SIGTERM'));
 
   // give GAE serve some time to start
@@ -269,6 +298,7 @@ gulp.task('serve:gae', ['sass'], function() {
   setTimeout(bs, 2000);
 
   watch();
+  cb();
 });
 
 // Serve build with GAE dev appserver. This is how it would look in production.
