@@ -28,6 +28,7 @@ IOWA.Router = (function() {
    * @private
    */
   function navigate(e) {
+    console.log(e)
     // Allow user to open new tabs.
     if (e.metaKey || e.ctrlKey) {
       return;
@@ -39,9 +40,64 @@ IOWA.Router = (function() {
         if (el.hasAttribute('data-ajax-link')) {
           e.preventDefault();
           e.stopPropagation();
-          IOWA.History.pushState(null, '', el.href);
+          //IOWA.History.pushState(null, '', el.href);
           // TODO: Add GA pageview.
           // TODO: Update meta.
+
+          var parts = el.href.split('/');
+          var pageName = parts[parts.length - 1].split('.html')[0] || 'home';
+
+          var ripple = document.querySelector('.masthead__ripple__content');
+          console.log(ripple);
+          console.log(IOWA.Elements.Ripple);
+          //śripple = IOWA.Elements.Ripple;
+
+
+          console.log(pageName)
+
+          ripple.style.backgroundColor = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+          ripple.style.transition = '';
+          ripple.style.transform = 'scale(0.05)';
+
+
+         // debugger;
+
+          ripple.style.transform = [
+          'translate(',
+            e.x,
+          'px,',
+          e.y,
+          'px) scale(0.0)'
+
+
+          ].join('');
+          var x = ripple.offsetTop;
+          ripple.style.transition = 'transform 1s';
+
+
+
+          //TODO: only once
+          var onTransitionEnd = function(e) {
+            console.log('onwebkittransitionend');
+            console.log(e);
+            if (e.target == ripple) {
+              document.querySelector('.masthead').style.backgroundColor = ripple.style.backgroundColor;
+            }
+          };
+
+          window.onwebkittransitionend = onTransitionEnd;
+          ripple.style.transform = 'scale(1)';
+
+
+
+
+
+
+
+          return;
+
+
+
         }
         return; // found first anchor, quit here.
       }
@@ -79,6 +135,25 @@ IOWA.Router = (function() {
    * Renders a new page for the current location.
    * @private
    */
+  function animatePageIn(pageName) {
+    console.log('animatein')
+    // Replace containers with the relevant content.
+    var currentPageTemplates = document.querySelectorAll(
+        '.js-ajax-' + pageName);
+    for (var j = 0; j < currentPageTemplates.length; j++) {
+      var template = currentPageTemplates[j];
+      var templateToReplace = document.getElementById(
+          template.getAttribute('data-ajax-target-template'));
+      if (templateToReplace) {
+        templateToReplace.setAttribute('ref', template.id);
+      }
+    }
+  }
+
+  /**
+   * Renders a new page for the current location.
+   * @private
+   */
   function renderCurrentPage() {
     renderPage(location.href);
   }
@@ -101,17 +176,7 @@ IOWA.Router = (function() {
       }
     }
 
-    // Replace containers with the relevant content.
-    var currentPageTemplates = document.querySelectorAll(
-        '.js-ajax-' + pageName);
-    for (var j = 0; j < currentPageTemplates.length; j++) {
-      var template = currentPageTemplates[j];
-      var templateToReplace = document.getElementById(
-          template.getAttribute('data-ajax-target-template'));
-      if (templateToReplace) {
-        templateToReplace.setAttribute('ref', template.id);
-      }
-    }
+    animatePageIn(pageName);
   }
 
   /**

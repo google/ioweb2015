@@ -29,10 +29,39 @@ IOWA.Elements = (function() {
   template.pages = {};
   template.selectedPage = 'home';
 
+  var cyan = '#00BCD4';
+  var mediumGrey = '#CFD8DC';
+  var darkGrey = '#455A64';
+
+  template.pages = {
+    'schedule': {
+      mastheadBgClass: cyan
+    },
+    'home': {
+      mastheadBgClass: mediumGrey
+    },
+    'about': {
+      mastheadBgClass: darkGrey
+    },
+    'onsite': {
+      mastheadBgClass: darkGrey
+    },
+    'offsite': {
+      mastheadBgClass: cyan
+    },
+    'registration': {
+      mastheadBgClass: cyan
+    }
+  };
+
+  var ripple = document.querySelector('.masthead__ripple__content');
+
   return {
     Drawer: drawer,
     Template: template,
-    Toast: toast
+    Toast: toast,
+    Ripple: ripple
   };
 
 })();
+

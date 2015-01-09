@@ -55,6 +55,30 @@
   }
 }
 
+.masthead__ripple {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+
+.masthead__ripple__content {
+  width: 6000px;
+  height: 6000px;
+  border-radius: 50%;
+  position: absolute;
+  left: -3000px;
+  top: -3000px;
+  will-change: transform;
+  //transition: transform 0.8s;
+  transform: scale(0.02);
+  //transform-origin: 0 0;
+
+}
+
 core-drawer-panel {
   [drawer] {
     background-color: $color-body;
@@ -78,7 +102,7 @@ core-drawer-panel {
 }
 
 #navbar {
-  background-color: inherit;
+  background-color: transparent;
 
   paper-tabs {
     display: none;
