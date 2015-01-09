@@ -52,7 +52,7 @@ func renderTemplate(w io.Writer, name string, partial bool) error {
 }
 
 // pageTitle extracts "title" property of the page meta and appends defaultTitle to it.
-// It returns defaultTitle if meta does not contain "title" or it is zero.
+// It returns defaultTitle if meta does not contain "title" or it is of zero value.
 func pageTitle(m meta) string {
 	title, ok := m["title"].(string)
 	if !ok || title == "" {
