@@ -21,6 +21,11 @@ To run a backend server you'll need:
    and [app](https://cloud.google.com/sdk/gcloud-app#Installation) component
    to run and deploy GAE-based backend (hint: `gcloud components update app`).
 
+   Once `gcloud` and `app` component are installed, you'll need to do a one-off
+   configuration by executing the following command: `gcloud config set project <project-id>`.
+
+   Project ID can be any non-empty string if you just want to run the app locally.
+
 ### Running
 
 Run `gulp serve` to start a standalone backend, while still enjoying live-reload.
