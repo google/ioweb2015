@@ -15,12 +15,11 @@
  */
 
 if ('serviceWorker' in navigator) {
-
-  // TODO: change scope accordingly to the production address.
-  navigator.serviceWorker.register('sw.js', {
+  navigator.serviceWorker.register('service-worker.js', {
     scope: './'
   }).then(function(registration) {
-
+    // TODO (jeffposnick): This logic needs to change. Take into account whether the page is
+    // currently controlled when showing a message, for instance.
     var newServiceWorkerAvailableMessage =
         'A new version of this page is available. Please force-refresh.';
 
@@ -47,7 +46,8 @@ if ('serviceWorker' in navigator) {
           console.log("New Service Worker state: ", this.state);
       };
     };
-  }, function(err) {
-    console.log(err);
+  }, function(e) {
+    IOWA.Analytics.trackError('navigator.serviceWorker.register() rejection', e);
+    console.error('Service worker registration failed:', e);
   });
 }

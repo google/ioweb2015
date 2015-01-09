@@ -16,6 +16,8 @@ var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var chmod = require('gulp-chmod');
+var swPrecache = require('sw-precache');
+var glob = require('glob');
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -169,7 +171,7 @@ gulp.task('copy-bower-dependencies', function() {
 gulp.task('copy-backend', function(cb) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
-    BACKEND_DIR + '/app.yaml',
+    BACKEND_DIR + '/app.yaml'
   ], {base: './'})
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .on('end', function() {
@@ -353,3 +355,64 @@ function testBackend() {
 // Load custom tasks from the `tasks` directory
 try { require('require-dir')('tasks'); } catch (err) {}
 
+// TODO (jeffposnick): Refactor this out of the main gulpfile.
+function generateServiceWorkerFileContents(rootDir, handleFetch) {
+  var regex = /([^\/]+)\.html$/;
+  var templateDir = rootDir + '/templates/';
+  var dynamicUrlToDependencies = {
+    './': [templateDir + 'layout_full.html', templateDir + 'home.html'],
+    './?partial': [templateDir + 'layout_partial.html', templateDir + 'home.html']
+  };
+
+  // This isn't pretty, but it works for our dynamic URL mapping.
+  glob.sync(templateDir + '!(layout_*).html').forEach(function(template) {
+    var matches = template.match(regex);
+    if (matches) {
+      var path = matches[1];
+      var partialPath = path + '?partial';
+      dynamicUrlToDependencies[path] = [templateDir + 'layout_full.html', template];
+      dynamicUrlToDependencies[partialPath] = [templateDir + 'layout_partial.html', template];
+    }
+  });
+
+  return swPrecache({
+    dynamicUrlToDependencies: dynamicUrlToDependencies,
+    handleFetch: handleFetch,
+    importScripts: ['bower_components/shed/dist/shed.js', 'scripts/shed-offline-analytics.js'],
+    staticFileGlobs: [
+      rootDir + '/bower_components/**/*.{html,js,css}',
+      rootDir + '/elements/**',
+      rootDir + '/fonts/**',
+      rootDir + '/images/**',
+      rootDir + '/scripts/**',
+      rootDir + '/styles/**/*.css',
+      rootDir + '/templates/**/*_partial.html',
+      rootDir + '/*.{html,ico,json}'
+    ],
+    stripPrefix: rootDir + '/'
+  });
+}
+
+// TODO (jeffposnick): Figure out how to make these tasks play nicely when defined in sequence with
+// other tasks.
+gulp.task('generate-service-worker-dev', function() {
+  del([APP_DIR + '/service-worker.js']);
+
+  // Passing in false will cause the service worker to precache the resources (to confirm it works),
+  // but not actually serve files from the cache (so that live reloading still works in dev).
+  // TODO (jeffposnick): Use a flag to toggle this behavior.
+  var serviceWorkerFileContents = generateServiceWorkerFileContents(APP_DIR, false);
+
+  return $.file('service-worker.js', serviceWorkerFileContents)
+    .pipe(gulp.dest(APP_DIR));
+});
+
+gulp.task('generate-service-worker-dist', function() {
+  var distDir = DIST_STATIC_DIR + '/' + APP_DIR;
+  del([distDir + '/service-worker.js']);
+
+  var serviceWorkerFileContents = generateServiceWorkerFileContents(distDir, true);
+
+  return $.file('service-worker.js', serviceWorkerFileContents)
+    .pipe(gulp.dest(distDir));
+});
