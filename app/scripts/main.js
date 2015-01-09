@@ -37,5 +37,4 @@
     }
   };
 
-  IOWA.Router.init();
 })(window);
