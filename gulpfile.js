@@ -231,35 +231,9 @@ gulp.task('pagespeed', pagespeed.bind(null, {
   strategy: 'mobile'
 }));
 
-// Watch Files For Changes & Reload
-gulp.task('serve', ['sass'], function() {
-  browserSync({
-    notify: false,
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: [APP_DIR]
-  });
-
-  watch();
-});
-
-// Start GAE-based server, serving both front-end and backend.
-gulp.task('serve:gae', ['sass'], function() {
-  var args = ['preview', 'app', 'run', BACKEND_DIR];
-  var backend = spawn('gcloud', args, {stdio: 'inherit'});
-  browserSync.emitter.on('service:exit', backend.kill.bind(backend, 'SIGTERM'));
-
-  // give GAE serve some time to start
-  var bs = browserSync.bind(null, {notify: false, proxy: '127.0.0.1:8080'});
-  setTimeout(bs, 2000);
-
-  watch();
-});
-
-// Start standalone server (no GAE SDK needed), serving both front-end and backend.
-gulp.task('serve:backend', ['sass', 'backend'], function() {
+// Start a standalone server (no GAE SDK needed) serving both front-end and backend,
+// watch for file changes and live-reload when needed.
+gulp.task('serve', ['sass', 'backend'], function() {
   var backend;
   var run = function() {
     backend = spawn(BACKEND_DIR + '/bin/server', ['-d', APP_DIR], {stdio: 'inherit'});
@@ -284,6 +258,27 @@ gulp.task('serve:backend', ['sass', 'backend'], function() {
   });
 });
 
+// The same as 'serve' task but using GAE dev appserver.
+gulp.task('serve:gae', ['sass'], function() {
+  var args = ['preview', 'app', 'run', BACKEND_DIR];
+  var backend = spawn('gcloud', args, {stdio: 'inherit'});
+  browserSync.emitter.on('service:exit', backend.kill.bind(backend, 'SIGTERM'));
+
+  // give GAE serve some time to start
+  var bs = browserSync.bind(null, {notify: false, proxy: '127.0.0.1:8080'});
+  setTimeout(bs, 2000);
+
+  watch();
+});
+
+// Serve build with GAE dev appserver. This is how it would look in production.
+// There are no file watchers.
+gulp.task('serve:dist', ['default'], function(cb) {
+  var args = ['preview', 'app', 'run', DIST_STATIC_DIR + '/' + BACKEND_DIR];
+  var proc = spawn('gcloud', args, {stdio: 'inherit'});
+  proc.on('close', cb);
+});
+
 gulp.task('vulcanize', ['vulcanize-elements']);
 
 gulp.task('js', ['jshint', 'jscs', 'uglify']);
@@ -306,12 +301,6 @@ gulp.task('backend:test', function(cb) {
 
 gulp.task('default', ['clean'], function(cb) {
   runSequence('sass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'], cb);
-});
-
-gulp.task('serve:dist', ['default'], function(cb) {
-  var args = ['preview', 'app', 'run', DIST_STATIC_DIR + '/' + BACKEND_DIR];
-  var proc = spawn('gcloud', args, {stdio: 'inherit'});
-  proc.on('close', cb);
 });
 
 gulp.task('bower', function(cb) {
