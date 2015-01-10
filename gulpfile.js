@@ -379,6 +379,7 @@ function generateServiceWorkerFileContents(rootDir, handleFetch) {
     dynamicUrlToDependencies: dynamicUrlToDependencies,
     handleFetch: handleFetch,
     importScripts: ['bower_components/shed/dist/shed.js', 'scripts/shed-offline-analytics.js'],
+    logger: $.util.log,
     staticFileGlobs: [
       rootDir + '/bower_components/**/*.{html,js,css}',
       rootDir + '/elements/**',

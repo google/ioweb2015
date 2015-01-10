@@ -20,35 +20,28 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js', {
     scope: './'
   }).then(function(registration) {
-    // TODO (jeffposnick): This logic needs to change. Take into account whether the page is
-    // currently controlled when showing a message, for instance.
-    var newServiceWorkerAvailableMessage =
-        'A new version of this page is available. Please force-refresh.';
-
-    // If this fires we should check if there's a new Service Worker
-    // waiting to be activated. If so, ask the user to force refresh.
-    if (registration.waiting) {
-      IOWA.Elements.Toast.showMessage(newServiceWorkerAvailableMessage);
-      return;
-    }
-
-    // We should also start tracking for any updates to the Service Worker.
     registration.onupdatefound = function(event) {
+      // updatefound is also fired the very first time the SW is installed, and there's no need to
+      // prompt for a reload at that point. So check here to see if the page is already controlled
+      // and only display the "Site updates are available..." toast if there is.
+      if (navigator.serviceWorker.controller) {
+        // TODO: How do we handle i18n of this string?
+        var message = 'Site updates are available. ';
 
-      IOWA.Elements.Toast.showMessage(
-          'A new version has been found... Installing...');
+        // The SW code calls skipWaiting(), which should bypass the waiting state and allow a
+        // refresh (rather than a force-refresh) to pull in the latest content.
+        // However, skipWaiting() was added in Chrome 41, so we need to account for the fact that
+        // in Chrome 40 a force-refresh will still be required.
+        if (registration.installing || registration.waiting) {
+          message += 'Please force-refresh.';
+        } else {
+          message += 'Please refresh.';
+        }
 
-      // If an update is found the spec says that there is a new Service Worker
-      // installing, so we should wait for that to complete then show a
-      // notification to the user.
-      registration.installing.onstatechange = function(event) {
-        if (this.state === 'installed')
-          IOWA.Elements.Toast.showMessage(newServiceWorkerAvailableMessage);
-        else
-          console.log("New Service Worker state: ", this.state);
-      };
+        IOWA.Elements.Toast.showMessage(message);
+      }
     };
-  }, function(e) {
+  }).catch(function(e) {
     IOWA.Analytics.trackError('navigator.serviceWorker.register() rejection', e);
     console.error('Service worker registration failed:', e);
   });
