@@ -15,16 +15,20 @@ import (
 	"path/filepath"
 )
 
-var rootDir string
+var (
+	rootDir    string
+	listenAddr string
+)
 
 // main is the entry point of the standalone server.
 func main() {
 	flag.StringVar(&rootDir, "d", "app", "app root dir")
+	flag.StringVar(&listenAddr, "listen", "127.0.0.1:8080", "address to listen on")
 	flag.Parse()
 
 	http.HandleFunc("/", catchAllHandler)
 
-	log.Fatal(http.ListenAndServe("127.0.0.1:8080", nil))
+	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
 
 // catchAllHandler serves either static content from rootDir

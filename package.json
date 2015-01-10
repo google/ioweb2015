@@ -46,6 +46,7 @@
     "sw-precache": "git://github.com/jeffposnick/sw-precache#d844dd36ead823bec53d8e468dd044d84d629625",
     "through2": "0.6.3",
     "vinyl-map": "1.0.1",
-    "yargs": "1.3.3"
+    "yargs": "1.3.3",
+    "opn": "^1.0.1"
   }
 }
