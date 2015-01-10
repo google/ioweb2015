@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 	"reflect"
+	"regexp"
 	"testing"
 )
 
@@ -13,15 +14,27 @@ func init() {
 
 func TestRenderFull(t *testing.T) {
 	var b bytes.Buffer
-	if err := renderTemplate(&b, "about", false); err != nil {
-		t.Fatalf("render(about): %v", err)
+	if err := renderTemplate(&b, "dev", "about", false); err != nil {
+		t.Fatalf("renderTemplate(dev, about, false): %v", err)
 	}
 }
 
 func TestRenderPartial(t *testing.T) {
 	var b bytes.Buffer
-	if err := renderTemplate(&b, "about", true); err != nil {
-		t.Fatalf("render(about): %v", err)
+	if err := renderTemplate(&b, "dev", "about", true); err != nil {
+		t.Fatalf("renderTemplate(dev, about, true): %v", err)
+	}
+}
+
+func TestRenderEnv(t *testing.T) {
+	var b bytes.Buffer
+	if err := renderTemplate(&b, "prod", "home", false); err != nil {
+		t.Fatalf("renderTemplate(prod, home, false): %v", err)
+	}
+
+	r := `window\.ENV\s+=\s+"prod";`
+	if matched, err := regexp.Match(r, b.Bytes()); !matched || err != nil {
+		t.Errorf("didn't match %s to: %s (%v)", r, b.String(), err)
 	}
 }
 

@@ -23,7 +23,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	err := renderTemplate(w, tplname, wantsPartial)
+	err := renderTemplate(w, env(r), tplname, wantsPartial)
 
 	if err != nil {
 		log.Printf("renderTemplate: %v", err)

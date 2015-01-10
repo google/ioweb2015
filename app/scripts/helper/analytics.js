@@ -18,7 +18,7 @@ IOWA.Analytics = (function(exports) {
 
   "use strict";
 
-  var GA_TRACKING_CODE = exports.DEV ? 'UA-58124138-2' : 'UA-58124138-1';
+  var GA_TRACKING_CODE = exports.ENV == 'dev' ? 'UA-58124138-2' : 'UA-58124138-1';
 
   /**
    * Analytics for the I/O Web App.
@@ -30,7 +30,7 @@ IOWA.Analytics = (function(exports) {
     this.loadTrackingCode();
 
     var opts = {siteSpeedSampleRate: 50}; // 50% of users.
-    if (exports.DEV) {
+    if (exports.ENV == 'dev') {
       // See https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#localhost
       opts.cookieDomain = 'none';
     } else {
@@ -148,7 +148,7 @@ IOWA.Analytics = (function(exports) {
     document.addEventListener(eventName, function() {
       var now = exports.performance.now();
 
-      if (exports.DEV) {
+      if (exports.ENV == 'dev') {
         console.info(eventName, '@', now);
       }
 
