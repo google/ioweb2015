@@ -76,9 +76,7 @@ IOWA.Elements = (function() {
       }
     };
 
-    t.addEventListener('template-bound', function() {
-      updateElements();
-    });
+    t.addEventListener('template-bound', updateElements);
 
     updateElements();
     IOWA.Elements.Template = template;

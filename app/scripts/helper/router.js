@@ -56,7 +56,7 @@ IOWA.Router = (function() {
           e.preventDefault();
           e.stopPropagation();
           var parts = el.href.split('/');
-          var pageName = parts[parts.length - 1].split('.html')[0] || 'home';
+          var pageName = parts[parts.length - 1] || 'home';
           var rippleColor = IOWA.Elements.Template.pages[pageName].bgColor;
           // TODO: Update the nav color faster.
           playMastheadRipple(e.x, e.y, rippleColor);
@@ -76,7 +76,7 @@ IOWA.Router = (function() {
    */
   function renderPage(url) {
     var parts = url.split('/');
-    var pageName = parts[parts.length - 1].split('.html')[0] || 'home';
+    var pageName = parts[parts.length - 1] || 'home';
     var importURL = url + '?partial';
 
     Polymer.import([importURL], function() {
