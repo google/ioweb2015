@@ -25,7 +25,7 @@ func init() {
 //   "-prod" suffix results into "prod" env
 //   "-stage" suffix results into "stage"
 //   default is "dev"
-// App version is speicified in app.yaml.
+// App version is specified in app.yaml.
 func env(r *http.Request) string {
 	c := appengine.NewContext(r)
 	v := appengine.VersionID(c)

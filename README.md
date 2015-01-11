@@ -34,7 +34,16 @@ You'll need Go for that.
 Normally the app is running in "dev" environment but you can change that by
 modifying `APP_ENV` environment variable:
 
-  `APP_ENV=prod gulp serve`
+  ```
+  # set app environment to production:
+  APP_ENV=prod gulp serve
+  # or run as if we were in staging:
+  APP_ENV=stage gulp serve
+  ```
+
+Not that this does not change the way the backend code is compiled
+or the front-end is built. It merely changes a variable values,
+which the app takes into account when rendering a page or responding to a request.
 
 You can also use GAE dev appserver by running `gulp serve:gae`. This is closer to what
 we're using in our webapp environment but a bit slower on startup.
@@ -64,6 +73,11 @@ To deploy complete application on App Engine:
 
 The version also determines the app environment: dev, stage or prod.
 It is matched against "-stage" and "-prod" suffixes. Defaults to dev if none matched.
+For instance, to deploy a production version:
+
+  ```
+  gcloud preview app deploy --version v1-prod dist/backend
+  ```
 
 ## Backend
 
@@ -75,5 +89,4 @@ binary program.
 `gulp backend:test` will run backend server tests. If, while working on the backend, you feel tired
 of running the command again and again, use `gulp backend:test --watch` to watch for file changes
 and re-run tests automatically.
-
 
