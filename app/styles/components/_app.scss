@@ -163,10 +163,17 @@ h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   background-color: $color-bluegrey-100;
+  will-change: clip, opacity;
 
-  // height: 100%;
-  // transition: height 300ms ease-in-out;
-  will-change: height;
+  transition: opacity 300ms ease-in-out;
+
+  &.fadeout {
+    opacity: 0;
+  }
+
+  io-logo {
+    will-change: transform;
+  }
 }
 
 @media (max-width: $phone-breakpoint-max) {

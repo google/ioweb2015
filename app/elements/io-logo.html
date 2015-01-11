@@ -6,9 +6,9 @@
     <div layout horizontal style="height:100%">
       <div id="i" class="letter" flex></div>
       <div id="slash" class="letter"></div>
-      <div id="o" class="o letter" style="max-width:{{height}}px" flex layout vertical center-center>
-        <div id="o2" class="o {{ {animating: animating} | tokenList }}" style="height:{{height - 20}}px;width:{{height - 20}}px" layout vertical center-center>
-          <h2 id="year">{{year}}</h2>
+      <div id="o" class="o letter" style="max-width:[[height]]px" flex layout vertical center-center>
+        <div id="o2" class="o" style="height:{{height - 20}}px;width:{{height - 20}}px" layout vertical center-center>
+          <h2 id="year">[[year]]</h2>
         </div>
       </div>
     </div>
@@ -17,14 +17,13 @@
   Polymer({
     year: (new Date()).getYear() - 100,
 
-    height: '165',
+    height: 165,
+    width: 312,
 
-    width: '312',
+    // animating: false,
+    // done: false,
 
-    animating: false,
-    done: false,
-
-    SHOW_FOR: 1000,
+    SHOW_FOR: 600,
     START_DELAY: 300,
 
     eventDelegates: {
@@ -39,7 +38,7 @@
     attached: function() {
       // this.async(function() {
         this.start();
-      // }, null, 300);
+      // }, null, this.START_DELAY);
     },
 
     heightChanged: function() {
@@ -53,48 +52,17 @@
     start: function() {
       var GROW_DURATION = 400;
 
-      // this.animating = !this.animating;
-      // var player1 = this.$.o2.animate([
-      //   {transform: 'scale(0)'},
-      //   {transform: 'scale(1)'}
-      // ], {
-      //   delay: this.START_DELAY,
-      //   // direction: 'alternate',
-      //   duration: GROW_DURATION,
-      //   iterations: 1,
-      //   easing: 'cubic-bezier(.72,0,.28,1)',
-      //   fill: 'forwards'
-      // });
-      // var player2 = this.$.year.animate([
-      //   {opacity: '0'},
-      //   {opacity: '1'}
-      // ], {
-      //   delay: this.START_DELAY + GROW_DURATION,
-      //   // direction: 'alternate',
-      //   duration: 300,
-      //   iterations: 1,
-      //   easing: 'ease-in-out',
-      //   fill: 'forwards'
-      // });
-
       var sequence = new AnimationSequence([
-        new Animation(this.$.o2, [{transform: 'scale(0)'}, {transform: 'scale(1)'}], {
+        new Animation(this.$.o2, [
+          {transform: 'scale(0)'},
+          {transform: 'scale(1)'}
+        ], {
           delay: this.START_DELAY,
           // direction: 'alternate',
           duration: GROW_DURATION,
           // iterations: 1,
-          easing: 'cubic-bezier(.72,0,.28,1)',
+          easing: 'cubic-bezier(.72,0,.28,1)', //cubic-bezier(0,0,0.21,1)
           fill: 'forwards'
-        }),
-        new Animation(this.$.year, [{opacity: 0}, {opacity: 1}], {
-          // delay: this.START_DELAY + GROW_DURATION,
-          // direction: 'alternate',
-          duration: 300,
-          // iterations: 1,
-          easing: 'ease-in-out',
-          // fill: 'both'
-          fill: 'forwards'
-
         })
       ]);
 
@@ -102,6 +70,9 @@
 
       var player = document.timeline.play(sequence);
 
+      // TODO(ericbidelman): this should be possible with creating the sequence
+      // direction: alternate and introducing a delay between reversing the
+      // animation. Inquire with WA folks.
       player.onfinish = function(e) {
         iteration++;
         if (iteration >= 2) {
@@ -118,44 +89,77 @@
     },
 
     animationDone: function(e, detail, sender) {
-      // if (this.done) {
-      //   return;
-      // }
+      var logoContainerCurrent = this.getBoundingClientRect();
+      var logoContainerFinal = document.querySelector('.masthead-container .io-logo').getBoundingClientRect();
+      var mastHead = document.querySelector('.masthead').getBoundingClientRect();
 
-      var player = this.parentElement.animate([
-        {background: 'inherit', height: '100%'},
-        {background: 'transparent', height: '66vh'}
-      ], {
-        duration: 300,
-        iterations: 1,
-        fill: 'forwards'
-      });
+      var finalX = parseInt(Math.abs(logoContainerCurrent.left - logoContainerFinal.left));
+      var finalY = parseInt(Math.abs(logoContainerCurrent.top - logoContainerFinal.top));
+
+      if (logoContainerFinal.left < logoContainerCurrent.left) {
+        finalX *= -1;
+        finalY = -(finalY - 9);
+        scale = 0.83;
+      } else {
+        // mobile
+        finalY = -(finalY + 19);
+        scale = 0.58;
+      }
+
+      var containerWidth = document.documentElement.clientWidth;
+      var containerHeight = document.documentElement.clientHeight;
+
+
+this.parentElement.style.zIndex = 1;
+// this.parentElement.style.background = 'none';
+
+// this.style.transform = 'translate3d(' + finalX + 'px,' + finalY + 'px,0) scale(' + scale + ')';
+
+      var group = new AnimationGroup([
+        new Animation(this.parentElement, [
+            {clip: 'rect(0, ' + containerWidth + 'px, ' + containerHeight + 'px, 0)'},
+            {clip: 'rect(0, ' + mastHead.width + 'px, ' + mastHead.height + 'px, 0)'},
+          ], {
+            duration: 300,
+            iterations: 1,
+            fill: 'forwards',
+            easing: 'cubic-bezier(0,0,0.21,1)'
+          }
+        ),
+        // new Animation(this.parentElement, [
+        //     {background: 'inherit', height: '100%'},
+        //     {background: 'transparent', height: '66vh'}
+        //   ], {
+        //     duration: 300,
+        //     iterations: 1,
+        //     fill: 'forwards'
+        //   }
+        // ),
+        new Animation(this, [
+            {transform: 'none'},
+            {transform: 'translate3d(' + finalX + 'px,' + finalY + 'px,0) scale(' + scale + ')'}
+          ], {
+            duration: 300,
+            iterations: 1,
+            fill: 'forwards',
+            easing: 'cubic-bezier(0,0,0.21,1)'
+          }
+        )
+      ]);
+
+      var player = document.timeline.play(group);
 
       player.onfinish = function(e) {
-        console.log(e);
-      };
+        var el = this.parentElement;
+        var callback = function(e) {
+          el.removeEventListener('transitionend', callback);
+          el.parentElement.removeChild(el);
+        };
 
+        el.addEventListener('transitionend', callback);
 
-      // if (e.propertyName === 'opacity') {
-      //   this.async(function() {
-      //     this.toggle();
-      //   }, null, this.SHOW_FOR);
-      // } else if (!this.animating) {
-      //   console.log('here')
-      //   // this.parentElement.style.height = '66vh';
-      //   // this.parentElement.style.background = 'transparent';
-      //   var player = this.parentElement.animate([
-      //     {background: 'inherit', height: '100%'},
-      //     {background: 'transparent', height: '66vh'}
-      //   ], {
-      //     // direction: 'alternate',
-      //     duration: 300,
-      //     iterations: 1
-      //   });
-      //   player.onfinish = function(e) {
-      //     console.log(e)
-      //   };
-      // }
+        el.classList.add('fadeout');
+      }.bind(this);
     }
   });
   </script>

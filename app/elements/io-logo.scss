@@ -20,6 +20,7 @@
   display: inline-block;
   -webkit-user-select: none;
   user-select: none;
+  transform-origin: 0 50%;
 }
 
 .letter {
@@ -28,17 +29,15 @@
 
 #slash {
   width: 10px;
-  height: 135%;
-  -webkit-transform: rotateZ(12deg);
-  transform: rotateZ(12deg);
-  margin: -35px 0 0 40px;
+  height: 137%;
+  transform: rotateZ(13deg);
+  margin: -31px 0 0 35px;
 }
 
 #i {
-  max-width: 80px;
-  -webkit-align-self: center;
+  max-width: 77px;
   align-self: center;
-  height: 96%;
+  height: 94%;
 }
 
 .o  {
@@ -46,28 +45,16 @@
 }
 
 #o {
-  margin-left: 15px;
+  margin-left: 19px;
 }
 
 #o2 {
   background: #CFD8DC;
   transform: scale(0);
-  // transition: transform 400ms cubic-bezier(.72,0,.28,1);
   will-change: transform;
-
-  // &.animating {
-  //   // transform: scale(1);
-
-  //   h2 {
-  //     // opacity: 1;
-  //   }
-  // }
 
   h2 {
     font-weight: 500;
     color: #fff;
-    // transition: opacity 300ms ease-in-out 400ms;
-    will-change: opacity;
-    opacity: 0;
   }
 }
