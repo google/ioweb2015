@@ -69,14 +69,14 @@ and navigating to http://localhost:8080.
 To deploy complete application on App Engine:
 
 1. Run `gulp` which will build both frontend and backend in `dist` directory.
-2. Run `gcloud preview app deploy [--version <v>] dist/backend`.
+2. Run `gcloud preview app deploy dist/backend [--version <v>]`.
 
 The version also determines the app environment: dev, stage or prod.
 It is matched against "-stage" and "-prod" suffixes. Defaults to dev if none matched.
 For instance, to deploy a production version:
 
   ```
-  gcloud preview app deploy --version v1-prod dist/backend
+  gcloud preview app deploy dist/backend --version v1-prod
   ```
 
 ## Backend
