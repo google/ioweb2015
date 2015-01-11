@@ -31,9 +31,17 @@ To run a backend server you'll need:
 Run `gulp serve` to start a standalone backend, while still enjoying live-reload.
 You'll need Go for that.
 
+Normally the app is running in "dev" environment but you can change that by
+modifying `APP_ENV` environment variable:
+
+  `APP_ENV=prod gulp serve`
+
 You can also use GAE dev appserver by running `gulp serve:gae`. This is closer to what
 we're using in our webapp environment but a bit slower on startup.
 You'll need `gcloud` tool and `app` component to do this.
+
+To change the app environment when using GAE SDK, modify the app version
+to end either with "-stage" or "-prod" in `app.yaml`.
 
 Both gulp tasks accept optional `--no-watch` argument in case you need to disable
 file watchers and live reload.
@@ -53,6 +61,9 @@ To deploy complete application on App Engine:
 
 1. Run `gulp` which will build both frontend and backend in `dist` directory.
 2. Run `gcloud preview app deploy [--version <v>] dist/backend`.
+
+The version also determines the app environment: dev, stage or prod.
+It is matched against "-stage" and "-prod" suffixes. Defaults to dev if none matched.
 
 ## Backend
 

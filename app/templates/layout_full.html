@@ -224,7 +224,7 @@ limitations under the License.
 
 <!-- TODO: Move to automatic concatenation via codekit-gulp -->
 <script>
-  window.DEV = true; // Remove for prod.
+  window.ENV = {% .Env %};
 </script>
 <script src="scripts/main.js"></script>
 <script src="scripts/helper/history.js"></script>
