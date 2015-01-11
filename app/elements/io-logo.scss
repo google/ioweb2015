@@ -1,0 +1,73 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import '_elements';
+
+:host {
+  display: inline-block;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.letter {
+  background: #fff;
+}
+
+#slash {
+  width: 10px;
+  height: 135%;
+  -webkit-transform: rotateZ(12deg);
+  transform: rotateZ(12deg);
+  margin: -35px 0 0 40px;
+}
+
+#i {
+  max-width: 80px;
+  -webkit-align-self: center;
+  align-self: center;
+  height: 96%;
+}
+
+.o  {
+  border-radius: 50%;
+}
+
+#o {
+  margin-left: 15px;
+}
+
+#o2 {
+  background: #CFD8DC;
+  transform: scale(0);
+  // transition: transform 400ms cubic-bezier(.72,0,.28,1);
+  will-change: transform;
+
+  // &.animating {
+  //   // transform: scale(1);
+
+  //   h2 {
+  //     // opacity: 1;
+  //   }
+  // }
+
+  h2 {
+    font-weight: 500;
+    color: #fff;
+    // transition: opacity 300ms ease-in-out 400ms;
+    will-change: opacity;
+    opacity: 0;
+  }
+}
