@@ -166,8 +166,6 @@ IOWA.Router = (function() {
    */
   function init() {
     window.addEventListener('popstate', renderCurrentPage);
-    // Load current page content when layout ready.
-    IOWA.Elements.Template.addEventListener('template-bound', renderCurrentPage);
     document.addEventListener('click', navigate);
   }
 
