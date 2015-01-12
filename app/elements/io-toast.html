@@ -76,9 +76,9 @@ Example:
      * @param {string} message Message to show.Notification (event) type.
      * @param {function} tapHandler Optional handler to execute when the toast is tapped.
      */
-    showMessage: function(message, tapHandler) {
+    showMessage: function(message, opt_tapHandler) {
       this.text = message;
-      this.tapHandler_ = tapHandler;
+      this.tapHandler_ = opt_tapHandler;
       this.show();
     },
 
