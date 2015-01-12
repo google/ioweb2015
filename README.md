@@ -19,33 +19,74 @@ To run a backend server you'll need:
 1. [Go 1.4](https://golang.org/dl/).
 2. Optional: [gcloud tool](https://cloud.google.com/sdk/#Quick_Start)
    and [app](https://cloud.google.com/sdk/gcloud-app#Installation) component
-   to run and deploy GAE-based backend.
+   to run and deploy GAE-based backend (hint: `gcloud components update app`).
+
+   Once `gcloud` and `app` component are installed, you'll need to do a one-off
+   configuration by executing the following command: `gcloud config set project <project-id>`.
+
+   Project ID can be any non-empty string if you just want to run the app locally.
 
 ### Running
 
-Start any static web server in `app/` or `gulp serve` to leverage live-reload,
-serve with a standalone backend via `gulp serve:backend`
-or using App Engine dev server: `gulp serve:gae`.
+Run `gulp serve` to start a standalone backend, while still enjoying live-reload.
+You'll need Go for that.
 
-**Note**: If you're using a static server, you'll have to run `gulp` or `gulp sass` at least once
-to generate CSS from the .scss files.
+Normally the app is running in "dev" environment but you can change that by
+modifying `APP_ENV` environment variable:
+
+  ```
+  # set app environment to production:
+  APP_ENV=prod gulp serve
+  # or run as if we were in staging:
+  APP_ENV=stage gulp serve
+  ```
+
+Not that this does not change the way the backend code is compiled
+or the front-end is built. It merely changes a variable values,
+which the app takes into account when rendering a page or responding to a request.
+
+You can also use GAE dev appserver by running `gulp serve:gae`. This is closer to what
+we're using in our webapp environment but a bit slower on startup.
+You'll need `gcloud` tool and `app` component to do this.
+
+To change the app environment when using GAE SDK, modify the app version
+to end either with "-stage" or "-prod" in `app.yaml`.
+
+Both gulp tasks accept optional `--no-watch` argument in case you need to disable
+file watchers and live reload.
 
 ### Building
 
-Run `gulp`. Then hit `http://localhost:<PORT>/dist/app/`. The unbuilt version is still viewable at `http://localhost:<PORT>/app/` but will not contain minfied JS or vulcanized HTML Imports.
+Run `gulp`. This will create `dist` directory with both front-end and backend parts, ready for deploy.
+
+You can also serve the build from `dist` by running `gulp serve:dist`,
+and navigating to http://localhost:8080.
 
 **Note**: Build won't succeed if either `gulp jshint` or `gulp jscs` reports errors.
 
+### Deploying
+
+To deploy complete application on App Engine:
+
+1. Run `gulp` which will build both frontend and backend in `dist` directory.
+2. Run `gcloud preview app deploy dist/backend [--version <v>]`.
+
+The version also determines the app environment: dev, stage or prod.
+It is matched against "-stage" and "-prod" suffixes. Defaults to dev if none matched.
+For instance, to deploy a production version:
+
+  ```
+  gcloud preview app deploy dist/backend --version v1-prod
+  ```
+
 ## Backend
+
+Backend is written in Go. It can run on either Google App Engine or any other platform as a standalone
+binary program.
 
 `gulp backend` will build a self-sufficient backend server and place the binary in `backend/bin/server`.
 
 `gulp backend:test` will run backend server tests. If, while working on the backend, you feel tired
 of running the command again and again, use `gulp backend:test --watch` to watch for file changes
 and re-run tests automatically.
-
-To deploy complete application on App Engine:
-
-1. Run `gulp` which will build both frontend and backend in `dist` directory.
-2. Run `gcloud preview app deploy [--version <v>] dist/backend`.
 
