@@ -27,6 +27,7 @@
   //     I18nMsg.lang = document.documentElement.lang || 'en';
   //   });
   // }
+  window.I18nMsg.lang = 'en';
 
   exports.onerror = function(message, file, lineNumber) {
     // We don't want to trigger any errors inside window.onerror, so wrap in a try/catch.

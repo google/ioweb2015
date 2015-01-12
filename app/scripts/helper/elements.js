@@ -29,8 +29,11 @@ IOWA.Elements = (function() {
   template.pages = {};
   template.selectedPage = 'home';
 
+  var i18n = document.querySelector('io-i18n');
+
   return {
     Drawer: drawer,
+    I18n: i18n,
     Template: template,
     Toast: toast
   };
