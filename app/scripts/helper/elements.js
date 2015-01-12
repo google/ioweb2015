@@ -42,33 +42,23 @@ IOWA.Elements = (function() {
     template.selectedPage = 'home';
     template.pageTransitioning = false;
 
-    var cyan = '#00BCD4';
-    var mediumGrey = '#CFD8DC';
-    var darkGrey = '#455A64';
-
     template.pages = {
       'schedule': {
-        bgColor: cyan,
         mastheadBgClass: 'bg-cyan'
       },
       'home': {
-        bgColor: mediumGrey,
         mastheadBgClass: 'bg-medium-grey'
       },
       'about': {
-        bgColor: darkGrey,
         mastheadBgClass: 'bg-dark-grey'
       },
       'onsite': {
-        bgColor: darkGrey,
         mastheadBgClass: 'bg-dark-grey'
       },
       'offsite': {
-        bgColor: cyan,
         mastheadBgClass: 'bg-cyan'
       },
       'registration': {
-        bgColor: cyan,
         mastheadBgClass: 'bg-cyan'
       }
     };

@@ -129,7 +129,7 @@ IOWA.Router = (function() {
         masthead.className = masthead.className.replace(
             MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
       });
-    }, 600); // Wait for ripple to play before transitionting.
+    }, 600); // Wait for the ripple to play before transitioning.
   }
 
   /**
