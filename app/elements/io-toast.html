@@ -20,22 +20,23 @@ Example:
 -->
 <polymer-element name="io-toast"
                  extends="paper-toast"
-                 on-tap="{{handleTap}}"
                  on-core-overlay-close-completed="{{handleOverlayClosed}}">
   <template>
     <style>
-      :host {
+      .clickable {
         cursor: pointer;
       }
     </style>
 
-    <shadow></shadow>
+    <div id="wrapper"
+         class="{{ {clickable: tapHandler_} | tokenList }}"
+         on-tap="{{handleTap}}">
+      <shadow></shadow>
+    </div>
   </template>
   <script>
   Polymer({
-    publish: {
-      tapHandler: null
-    },
+    tapHandler_: null,
 
     listeners_: null,
 
@@ -75,15 +76,17 @@ Example:
      * Shows the message in the toast.
      * @method showMessage
      * @param {string} message Message to show.Notification (event) type.
+     * @param {function} tapHandler Optional handler to execute when the toast is tapped.
      */
-    showMessage: function(message) {
+    showMessage: function(message, tapHandler) {
       this.text = message;
+      this.tapHandler_ = tapHandler;
       this.show();
     },
 
     handleTap: function() {
-      if (typeof this.tapHandler == 'function') {
-        this.tapHandler();
+      if (typeof this.tapHandler_ == 'function') {
+        this.tapHandler_();
       }
     },
 
@@ -91,7 +94,7 @@ Example:
     // if a tapHandler was associated with a specific occurrence of the toast's display, it gets
     // removed once the toast closes.
     handleOverlayClosed: function() {
-      this.tapHandler = null;
+      this.tapHandler_ = null;
     }
   });
   </script>

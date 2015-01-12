@@ -51,13 +51,8 @@ if ('serviceWorker' in navigator) {
           // TODO: How do we handle i18n of these strings?
           switch (installingWorker.state) {
             case 'installed':
-              IOWA.Elements.Toast.tapHandler = tapHandler;
-              IOWA.Elements.Toast.showMessage('Please tap or force-refresh for the latest content.');
-            break;
-
-            case 'activated':
-              IOWA.Elements.Toast.tapHandler = tapHandler;
-              IOWA.Elements.Toast.showMessage('Please tap or refresh for the latest content.');
+              IOWA.Elements.Toast.showMessage(
+                'Please tap or refresh the page for the latest content.', tapHandler);
             break;
 
             case 'redundant':
