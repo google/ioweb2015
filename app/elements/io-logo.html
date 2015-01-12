@@ -17,7 +17,7 @@ can be applied before Polymer is ready and the element is upgraded.
 
 @element io-logo
 -->
-<polymer-element name="io-logo" attributes="height width year">
+<polymer-element name="io-logo" attributes="height width year page">
   <template>
     <link rel="stylesheet" href="io-logo.css">
     <div layout horizontal style="height:100%">
@@ -58,6 +58,15 @@ can be applied before Polymer is ready and the element is upgraded.
      * @default 213
      */
     width: 312,
+
+    /**
+     * The page that was loaded at pageload time.
+     *
+     * @attribute page
+     * @type string
+     * @default null
+     */
+    page: null,
 
     /**
      * The number of milliseconds the center of the "O" shows after it has grown.
@@ -177,32 +186,55 @@ can be applied before Polymer is ready and the element is upgraded.
         scale = 0.58;
       }
 
-      this.parentElement.style.zIndex = 1; // card/nav should overlay.
+      // TODO(ericbidelman): coordinate with Ewa on delaying <main> transition up.
+      // this.parentElement.style.zIndex = 1;
 
-// this.style.transform = 'translate3d(' + diffX + 'px,' + diffY + 'px,0) scale(' + scale + ')';
+      // Masthead clipping.
+      var mastheadClipAnimation = new Animation(this.parentElement, [
+        {clip: 'rect(0, ' + containerWidth + 'px, ' + containerHeight + 'px, 0)'},
+        {clip: 'rect(0, ' + masthead.width + 'px, ' + masthead.height + 'px, 0)'}
+      ], {
+        duration: 500,
+        iterations: 1,
+        fill: 'forwards',
+        easing: 'cubic-bezier(0,0,0.21,1)'
+      });
 
-      var group = new AnimationGroup([
-        new Animation(this.parentElement, [
-          {clip: 'rect(0, ' + containerWidth + 'px, ' + containerHeight + 'px, 0)'},
-          {clip: 'rect(0, ' + masthead.width + 'px, ' + masthead.height + 'px, 0)'},
-        ], {
-          duration: 300,
-          iterations: 1,
-          fill: 'forwards',
-          easing: 'cubic-bezier(0,0,0.21,1)'
-        }),
-        new Animation(this, [
-          {transform: 'none'},
-          {transform: 'translate3d(' + diffX + 'px,' + diffY + 'px,0) scale(' + scale + ')'}
-        ], {
-          duration: 300,
-          iterations: 1,
-          fill: 'forwards',
-          easing: 'cubic-bezier(0,0,0.21,1)'
-        })
-      ]);
+      if (this.page == 'home') {
+        // At the same time, clip masthead background and move I/O logo.
+        var animations = new AnimationGroup([
+          mastheadClipAnimation,
+          // I/O logo movement.
+          new Animation(this, [
+            {transform: 'none'},
+            {transform: 'translate3d(' + diffX + 'px,' + diffY + 'px,0) scale(' + scale + ')'}
+          ], {
+            duration: 500,
+            iterations: 1,
+            fill: 'forwards',
+            easing: 'cubic-bezier(0,0,0.21,1)'
+          })
+        ]);
+      } else {
+        // Fade out I/O logo then clip masthead background.
+        var animations = new AnimationSequence([
+          // I/O logo fade out.
+          new Animation(this, [
+            {opacity: 1},
+            {opacity: 0}
+          ], {
+            duration: 300,
+            iterations: 1,
+            fill: 'forwards',
+            easing: 'cubic-bezier(0,0,0.21,1)'
+          }),
+          mastheadClipAnimation
+        ]);
 
-      var player = document.timeline.play(group);
+        this.style.transformOrigin = '50% 50%'; // shrink logo from center oge page.
+      }
+
+      var player = document.timeline.play(animations);
 
       player.onfinish = function(e) {
         var el = this.parentElement;

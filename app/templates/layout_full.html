@@ -93,10 +93,8 @@ limitations under the License.
 </head>
 <body id="page-{% .Slug %}">
 
-<!-- TODO: update bg color class based on page. This needs to chrome from server.
-     or devnoo's new inline data. -->
 <div class="io-logo-container {% template "mastheadBgClass" .%}">
-  <io-logo width="312" height="165"></io-logo>
+  <io-logo width="312" height="165" page="{% .Slug %}"></io-logo>
 </div>
 
 <core-drawer-panel forceNarrow>
