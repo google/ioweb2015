@@ -68,8 +68,8 @@ IOWA.Elements = (function() {
 
     template.addEventListener('template-bound', function() {
       updateElements();
-      ioLogo.masthead = document.querySelector('.masthead');
-      ioLogo.destination = document.querySelector('.masthead-container .io-logo');
+      IOWA.Elements.IOLogo.masthead = IOWA.Elements.Masthead;
+      IOWA.Elements.IOLogo.destination = document.querySelector('.masthead-container .io-logo');
     });
 
     updateElements();
