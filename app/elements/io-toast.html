@@ -18,12 +18,25 @@ Example:
 @element io-toast
 @extends paper-toast
 -->
-<polymer-element name="io-toast" extends="paper-toast">
+<polymer-element name="io-toast"
+                 extends="paper-toast"
+                 on-tap="{{handleTap}}"
+                 on-core-overlay-close-completed="{{handleOverlayClosed}}">
   <template>
+    <style>
+      :host {
+        cursor: pointer;
+      }
+    </style>
+
     <shadow></shadow>
   </template>
+
   <script>
   Polymer({
+    publish: {
+      tapHandler: null
+    },
 
     listeners_: null,
 
@@ -67,6 +80,19 @@ Example:
     showMessage: function(message) {
       this.text = message;
       this.show();
+    },
+
+    handleTap: function() {
+      if (typeof this.tapHandler == 'function') {
+        this.tapHandler();
+      }
+    },
+
+    // Since there's a single <io-toast> element that's reused throughout the site, make sure that
+    // if a tapHandler was associated with a specific occurrence of the toast's display, it gets
+    // removed once the toast closes.
+    handleOverlayClosed: function() {
+      this.tapHandler = null;
     }
   });
   </script>
