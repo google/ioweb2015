@@ -28,29 +28,20 @@ if ('serviceWorker' in navigator) {
         // The updatefound event implies that registration.installing is set; see
         // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-container-updatefound-event
         var installingWorker = registration.installing;
-
-        // The SW code calls skipWaiting(), which should bypass the waiting state and allow a
-        // refresh (rather than a force-refresh) to pull in the latest content.
-        // However, skipWaiting() was added in Chrome 41, so we need to account for the fact that
-        // in Chrome 40 a force-refresh will still be required.
-        // To do this, we detect the state change from installing:
-        //   -> installed (a force refresh is required)
-        //   -> activated (a normal refresh/navigation is required)
-        //   -> redundant (something went wrong; log an error)
         installingWorker.onstatechange = function() {
-          // Define a handler that will be used for the next io-toast tap, at which point it will
-          // be automatically removed.
-          var tapHandler = function() {
-            navigator.serviceWorker.getRegistration().then(function(registration) {
-              return registration.unregister();
-            }).then(function() {
-              window.location.reload(true);
-            });
-          };
-
           // TODO: How do we handle i18n of these strings?
           switch (installingWorker.state) {
             case 'installed':
+              // Define a handler that will be used for the next io-toast tap, at which point it
+              // be automatically removed.
+              var tapHandler = function() {
+                navigator.serviceWorker.getRegistration().then(function(registration) {
+                  return registration.unregister();
+                }).then(function() {
+                  window.location.reload(true);
+                });
+              };
+
               IOWA.Elements.Toast.showMessage(
                 'Please tap or refresh the page for the latest content.', tapHandler);
             break;
