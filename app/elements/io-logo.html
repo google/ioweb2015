@@ -208,7 +208,7 @@ can be applied before Polymer is ready and the element is upgraded.
         var el = this.parentElement;
         var callback = function(e) {
           el.removeEventListener('transitionend', callback);
-          el.parentElement.removdeChild(el);
+          el.parentElement.removeChild(el);
         };
 
         el.addEventListener('transitionend', callback);
