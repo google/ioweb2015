@@ -27,13 +27,9 @@ IOWA.Elements = (function() {
     });
 
     var ripple = document.querySelector('.masthead__ripple__content');
-    var main = document.querySelector('main');
     var masthead = document.querySelector('.masthead');
-    var header = document.querySelector('.masthead-container');
 
     IOWA.Elements.Drawer = drawer;
-    IOWA.Elements.Header = header;
-    IOWA.Elements.Main = main;
     IOWA.Elements.Masthead = masthead;
     IOWA.Elements.Ripple = ripple;
     IOWA.Elements.Toast = toast;
@@ -44,6 +40,7 @@ IOWA.Elements = (function() {
     var template = document.getElementById('t');
     template.pages = {};
     template.selectedPage = 'home';
+    template.pageTransitioning = false;
 
     var cyan = '#00BCD4';
     var mediumGrey = '#CFD8DC';

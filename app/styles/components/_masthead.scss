@@ -56,7 +56,7 @@
 }
 
 .masthead-container {
-  transition: opacity $page-anim-time;
+  transition: opacity 0.6s;
   opacity: 0;
 
   &.active {
@@ -73,7 +73,6 @@
   overflow: hidden;
 }
 
-
 .masthead__ripple__content {
   width: 6000px;
   height: 6000px;
@@ -82,10 +81,7 @@
   left: -3000px;
   top: -3000px;
   will-change: transform;
-  //transition: transform 0.8s;
   transform: scale(0.02);
-  //transform-origin: 0 0;
-
 }
 
 core-drawer-panel {
@@ -116,6 +112,17 @@ core-drawer-panel {
   paper-tabs {
     display: none;
     text-transform: uppercase;
+    background-color: inherit;
+
+    &.bg-medium-grey {
+      color: $color-bluegrey-700;
+    }
+    &.bg-cyan {
+      color: $color-cyan-900;
+    }
+    &.bg-dark-grey {
+      color: $color-bluegrey-100;
+    }
   }
 
   paper-tab {

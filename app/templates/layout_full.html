@@ -147,16 +147,14 @@ limitations under the License.
       <core-media-query query="(min-width:945px)" queryMatches="{{isDesktopSize}}"></core-media-query>
 
       <header class="masthead {% template "mastheadBgClass" .%}" layout vertical>
-        <div class="masthead__ripple" >
-
-            <div class="masthead__ripple__content" id="masthead-ripple"></div>
-
+        <div class="masthead__ripple">
+          <div class="masthead__ripple__content {{ pages[nextPage].mastheadBgClass }}" id="masthead-ripple"></div>
         </div>
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
 
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
           <div flex><a href="./" data-ajax-link><div class="io-logo"></div></a></div>
-          <paper-tabs class="white" link noink
+          <paper-tabs class="white {{ pages[nextPage].mastheadBgClass }}" link noink
             valueattr="label" selected="{{selectedPage}}">
             <paper-tab label="about">
               <a href="about" data-ajax-link layout horizontal center>
@@ -185,7 +183,7 @@ limitations under the License.
             </paper-tab>
           </paper-tabs>
         </core-toolbar>
-        <div class="masthead-container active" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+        <div class="masthead-container {{ {active: !pageTransitioning} | tokenList }}" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
@@ -193,7 +191,7 @@ limitations under the License.
         <paper-fab icon="assessment" mini?="{{isPhoneSize}}"></paper-fab>
       </header>
 
-      <main class="io-main active">
+      <main class="io-main {{ {active: !pageTransitioning} | tokenList }}" >
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
       </main>
 

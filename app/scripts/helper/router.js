@@ -24,8 +24,7 @@ IOWA.Router = (function() {
 
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
-  function playMastheadRipple(x, y, color) {
-    IOWA.Elements.Ripple.style.backgroundColor = color;
+  function playMastheadRipple(x, y) {
     IOWA.Elements.Ripple.style.transition = '';
     IOWA.Elements.Ripple.style.transform = [
         'translate(', x, 'px,', y, 'px) scale(0.0)'
@@ -57,9 +56,9 @@ IOWA.Router = (function() {
           e.stopPropagation();
           var parts = el.href.split('/');
           var pageName = parts[parts.length - 1] || 'home';
-          var rippleColor = IOWA.Elements.Template.pages[pageName].bgColor;
-          // TODO: Update the nav color faster.
-          playMastheadRipple(e.x, e.y, rippleColor);
+          var pageMeta = IOWA.Elements.Template.pages[pageName];
+          IOWA.Elements.Template.nextPage = pageName;
+          playMastheadRipple(e.x, e.y);
           IOWA.History.pushState(null, '', el.href);
           // TODO: Add GA pageview.
           // TODO: Update meta.
@@ -92,10 +91,10 @@ IOWA.Router = (function() {
   }
 
   /**
-   * Replaces templated content and fades the page in.
+   * Replaces templated content.
    * @private
    */
-  function replaceAndFadeIn(currentPageTemplates) {
+  function replaceTemplateContent(currentPageTemplates) {
     for (var j = 0; j < currentPageTemplates.length; j++) {
       var template = currentPageTemplates[j];
       var templateToReplace = document.getElementById(
@@ -104,8 +103,6 @@ IOWA.Router = (function() {
         templateToReplace.setAttribute('ref', template.id);
       }
     }
-    IOWA.Elements.Main.classList.add('active');
-    IOWA.Elements.Header.classList.add('active');
   }
 
   /**
@@ -117,16 +114,13 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-
-    // Fade page out.
-    IOWA.Elements.Main.classList.remove('active');
-    IOWA.Elements.Header.classList.remove('active');
-
-    // Replace content and fade in.
+    IOWA.Elements.Template.pageTransitioning = true;
+    // Replace content and end transition.
     setTimeout(function() {
       requestAnimationFrame(function() {
-        replaceAndFadeIn(currentPageTemplates);
-        // Fade in post-processing.
+        replaceTemplateContent(currentPageTemplates);
+        IOWA.Elements.Template.pageTransitioning = false;
+        // Transition in post-processing.
         document.body.id = 'page-' + pageName;
         IOWA.Elements.Template.selectedPage = pageName;
         var pageMeta = IOWA.Elements.Template.pages[pageName];
@@ -135,7 +129,7 @@ IOWA.Router = (function() {
         masthead.className = masthead.className.replace(
             MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
       });
-    }, 600);
+    }, 600); // Wait for ripple to play before transitionting.
   }
 
   /**
@@ -154,7 +148,6 @@ IOWA.Router = (function() {
    * @private
    */
   function injectPageContent(pageName, importContent) {
-
     // Add freshly fetched templates to DOM, if not yet present.
     var newTemplates = importContent.querySelectorAll('.js-ajax-template');
     for (var i = 0; i < newTemplates.length; i++) {
