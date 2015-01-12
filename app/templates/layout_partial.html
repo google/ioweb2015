@@ -11,6 +11,9 @@
 </template>
 
 <script>
-  IOWA.Elements.Template.pages[{% .Slug %}] = {% .Meta %};
+  if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
+    IOWA.Elements.Template.pages[{% .Slug %}] = {};
+  }
+  IOWA.Elements.Template.pages[{% .Slug %}].title = {% template "title" .%};
 </script>
 
