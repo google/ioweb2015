@@ -18,21 +18,58 @@ IOWA.Elements = (function() {
 
   "use strict";
 
-  var toast = document.getElementById('toast');
+  var updateElements = function() {
+    var toast = document.getElementById('toast');
 
-  var drawer = document.querySelector('core-drawer-panel');
-  drawer.addEventListener('core-activate', function(e) {
-    this.closeDrawer();
-  });
+    var drawer = document.querySelector('core-drawer-panel');
+    drawer.addEventListener('core-activate', function(e) {
+      this.closeDrawer();
+    });
 
-  var template = document.getElementById('t');
-  template.pages = {};
-  template.selectedPage = 'home';
+    var ripple = document.querySelector('.masthead__ripple__content');
+    var masthead = document.querySelector('.masthead');
 
-  return {
-    Drawer: drawer,
-    Template: template,
-    Toast: toast
+    IOWA.Elements.Drawer = drawer;
+    IOWA.Elements.Masthead = masthead;
+    IOWA.Elements.Ripple = ripple;
+    IOWA.Elements.Toast = toast;
   };
 
+  var init = function() {
+
+    var template = document.getElementById('t');
+    template.pages = {};
+    template.selectedPage = 'home';
+    template.pageTransitioning = false;
+
+    template.pages = {
+      'schedule': {
+        mastheadBgClass: 'bg-cyan'
+      },
+      'home': {
+        mastheadBgClass: 'bg-medium-grey'
+      },
+      'about': {
+        mastheadBgClass: 'bg-dark-grey'
+      },
+      'onsite': {
+        mastheadBgClass: 'bg-dark-grey'
+      },
+      'offsite': {
+        mastheadBgClass: 'bg-cyan'
+      },
+      'registration': {
+        mastheadBgClass: 'bg-cyan'
+      }
+    };
+
+    t.addEventListener('template-bound', updateElements);
+
+    updateElements();
+    IOWA.Elements.Template = template;
+  };
+
+  return {
+    init: init
+  };
 })();
