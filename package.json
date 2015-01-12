@@ -43,7 +43,7 @@
     "require-dir": "^0.1.0",
     "run-sequence": "^0.3.6",
     "sprintf-js": "1.0.2",
-    "sw-precache": "git://github.com/jeffposnick/sw-precache#0d42e3a51551b59f562ce7fec9d285540ff64863",
+    "sw-precache": "git://github.com/jeffposnick/sw-precache#29e31451795e613ed9732d72c55aaed0b53766d5",
     "through2": "0.6.3",
     "vinyl-map": "1.0.1",
     "yargs": "1.3.3",
