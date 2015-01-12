@@ -37,7 +37,8 @@
 
 .masthead {
   position: relative;
-  height: 55vh; // ~2/3 viewport height
+  min-height: 400px;
+  height: 66vh; // ~2/3 viewport height
   max-height: 550px;
 
   &.bg-medium-grey {
@@ -186,8 +187,6 @@ experiment-fab-container {
   .masthead {
     position: relative;
     margin-bottom: -115px;
-    min-height: 400px;
-    height: 66vh;
 
     core-toolbar {
       .io-logo {

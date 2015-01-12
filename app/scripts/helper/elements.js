@@ -20,6 +20,7 @@ IOWA.Elements = (function() {
 
   var updateElements = function() {
     var toast = document.getElementById('toast');
+    var ioLogo = document.querySelector('io-logo');
 
     var drawer = document.querySelector('core-drawer-panel');
     drawer.addEventListener('core-activate', function(e) {
@@ -33,6 +34,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.Masthead = masthead;
     IOWA.Elements.Ripple = ripple;
     IOWA.Elements.Toast = toast;
+    IOWA.Elements.IOLogo = ioLogo;
   };
 
   var init = function() {
@@ -64,7 +66,11 @@ IOWA.Elements = (function() {
       }
     };
 
-    t.addEventListener('template-bound', updateElements);
+    template.addEventListener('template-bound', function() {
+      updateElements();
+      ioLogo.masthead = document.querySelector('.masthead');
+      ioLogo.destination = document.querySelector('.masthead-container .io-logo');
+    });
 
     updateElements();
     IOWA.Elements.Template = template;

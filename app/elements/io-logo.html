@@ -1,5 +1,22 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
+<!--
+The `<io-logo>` provides a  material design animation loading screen which transitions
+the differently based on the type of page. For the homepage, the logo
+transitions from the center of the screen to its ending position in the masthead.
+For all other pages, the lgoo only fades out after its animation is done. This
+is because there is no destination position to transition to.
+
+A container element is expected to wrap the `<io-logo>` and expand to the full
+viewport width/height. This feature is not baked into the element so styling
+can be applied before Polymer is ready and the element is upgraded.
+
+    <div class="io-logo-container">
+      <io-logo width="312" height="165"></io-logo>
+    </div>
+
+@element io-logo
+-->
 <polymer-element name="io-logo" attributes="height width year">
   <template>
     <link rel="stylesheet" href="io-logo.css">
@@ -20,7 +37,7 @@
      *
      * @attribute width
      * @type number
-     * @default the current year
+     * @default the current year (e.g. 15)
      */
     year: (new Date()).getYear() - 100,
 
@@ -47,9 +64,9 @@
      *
      * @property SHOW_FOR
      * @type number
-     * @default 600
+     * @default 100
      */
-    SHOW_FOR: 600,
+    SHOW_FOR: 100,
 
     /**
      * The number of milliseconds before the "O" starts to grow.
@@ -60,12 +77,31 @@
      */
     START_DELAY: 300,
 
+    /**
+     * The left/top of the destination node will be used to calculate the final
+     * left/top of the logo at the end of its animation.
+     *
+     * @property destination
+     * @type Element
+     * @default null
+     */
+    destination: null,
+
+    /**
+     * The site's container masthead element.
+     *
+     * @property masthead
+     * @type Element
+     * @default null
+     */
+    masthead: null,
+
     ready: function() {
       this.heightChanged();
       this.widthChanged();
     },
 
-    domReady: function() {
+    attached: function() {
       this.start();
     },
 
@@ -82,8 +118,6 @@
      * @method start
      */
     start: function() {
-      var GROW_DURATION = 400;
-
       var sequence = new AnimationSequence([
         new Animation(this.$.o2, [
           {transform: 'scale(0)'},
@@ -91,9 +125,9 @@
         ], {
           delay: this.START_DELAY,
           // direction: 'alternate',
-          duration: GROW_DURATION,
+          duration: 400,
           // iterations: 1,
-          easing: 'cubic-bezier(.72,0,.28,1)', //cubic-bezier(0,0,0.21,1)
+          easing: 'cubic-bezier(0,0,0.21,1)',
           fill: 'forwards'
         })
       ]);
@@ -109,7 +143,7 @@
         iteration++;
         if (iteration >= 2) {
           player.cancel();
-          this.animationDone(e);
+          this.moveLogo();
           return;
         }
 
@@ -119,63 +153,53 @@
       }.bind(this);
     },
 
-    animationDone: function(e, detail, sender) {
-      var logoContainerCurrent = this.getBoundingClientRect();
-      var logoContainerFinal = document.querySelector('.masthead-container .io-logo').getBoundingClientRect();
-      var mastHead = document.querySelector('.masthead').getBoundingClientRect();
-
-      var finalX = parseInt(Math.abs(logoContainerCurrent.left - logoContainerFinal.left));
-      var finalY = parseInt(Math.abs(logoContainerCurrent.top - logoContainerFinal.top));
-
-      if (logoContainerFinal.left < logoContainerCurrent.left) {
-        finalX *= -1;
-        finalY = -(finalY - 9);
-        scale = 0.83;
-      } else {
-        // mobile
-        finalY = -(finalY + 19);
-        scale = 0.58;
-      }
+    moveLogo: function() {
+      var current = this.getBoundingClientRect();
+      var destination = this.destination.getBoundingClientRect();
+      var masthead = this.masthead.getBoundingClientRect();
 
       var containerWidth = document.documentElement.clientWidth;
       var containerHeight = document.documentElement.clientHeight;
 
+      var diffX = parseInt(Math.abs(current.left - destination.left));
+      var diffY = parseInt(Math.abs(current.top - destination.top));
 
-this.parentElement.style.zIndex = 1;
-// this.parentElement.style.background = 'none';
+      // Moving left.
+      if (destination.left < current.left) {
+        diffX = -diffX;
+      }
 
-// this.style.transform = 'translate3d(' + finalX + 'px,' + finalY + 'px,0) scale(' + scale + ')';
+      if (containerWidth > 769) { // Tablet/desktop
+        diffY = -(diffY - 9);
+        scale = 0.83;
+      } else {
+        diffY = -(diffY + 19);
+        scale = 0.58;
+      }
+
+      this.parentElement.style.zIndex = 1; // card/nav should overlay.
+
+// this.style.transform = 'translate3d(' + diffX + 'px,' + diffY + 'px,0) scale(' + scale + ')';
 
       var group = new AnimationGroup([
         new Animation(this.parentElement, [
-            {clip: 'rect(0, ' + containerWidth + 'px, ' + containerHeight + 'px, 0)'},
-            {clip: 'rect(0, ' + mastHead.width + 'px, ' + mastHead.height + 'px, 0)'},
-          ], {
-            duration: 300,
-            iterations: 1,
-            fill: 'forwards',
-            easing: 'cubic-bezier(0,0,0.21,1)'
-          }
-        ),
-        // new Animation(this.parentElement, [
-        //     {background: 'inherit', height: '100%'},
-        //     {background: 'transparent', height: '66vh'}
-        //   ], {
-        //     duration: 300,
-        //     iterations: 1,
-        //     fill: 'forwards'
-        //   }
-        // ),
+          {clip: 'rect(0, ' + containerWidth + 'px, ' + containerHeight + 'px, 0)'},
+          {clip: 'rect(0, ' + masthead.width + 'px, ' + masthead.height + 'px, 0)'},
+        ], {
+          duration: 300,
+          iterations: 1,
+          fill: 'forwards',
+          easing: 'cubic-bezier(0,0,0.21,1)'
+        }),
         new Animation(this, [
-            {transform: 'none'},
-            {transform: 'translate3d(' + finalX + 'px,' + finalY + 'px,0) scale(' + scale + ')'}
-          ], {
-            duration: 300,
-            iterations: 1,
-            fill: 'forwards',
-            easing: 'cubic-bezier(0,0,0.21,1)'
-          }
-        )
+          {transform: 'none'},
+          {transform: 'translate3d(' + diffX + 'px,' + diffY + 'px,0) scale(' + scale + ')'}
+        ], {
+          duration: 300,
+          iterations: 1,
+          fill: 'forwards',
+          easing: 'cubic-bezier(0,0,0.21,1)'
+        })
       ]);
 
       var player = document.timeline.play(group);
@@ -184,7 +208,7 @@ this.parentElement.style.zIndex = 1;
         var el = this.parentElement;
         var callback = function(e) {
           el.removeEventListener('transitionend', callback);
-          el.parentElement.removeChild(el);
+          el.parentElement.removdeChild(el);
         };
 
         el.addEventListener('transitionend', callback);
