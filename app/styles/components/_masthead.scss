@@ -113,16 +113,6 @@ core-drawer-panel {
     display: none;
     text-transform: uppercase;
     background-color: inherit;
-
-    &.bg-medium-grey {
-      color: $color-bluegrey-700;
-    }
-    &.bg-cyan {
-      color: $color-cyan-900;
-    }
-    &.bg-dark-grey {
-      color: $color-bluegrey-100;
-    }
   }
 
   paper-tab {
