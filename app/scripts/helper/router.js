@@ -26,15 +26,14 @@ IOWA.Router = (function() {
 
   function playMastheadRipple(x, y) {
     IOWA.Elements.Ripple.style.transition = '';
-    IOWA.Elements.Ripple.style.transform = [
-        'translate(', x, 'px,', y, 'px) scale(0.0)'
-    ].join('');
+    var translate = ['translate(', x, 'px,', y, 'px)'].join('');
+    IOWA.Elements.Ripple.style.transform = [translate, ' scale(0.0)'].join('');
     // Force recalculate style.
     /*jshint -W030 */
     IOWA.Elements.Ripple.offsetTop;
     /*jshint +W030 */
     IOWA.Elements.Ripple.style.transition = 'transform 1s';
-    IOWA.Elements.Ripple.style.transform = 'scale(1)';
+    IOWA.Elements.Ripple.style.transform = [translate, ' scale(1)'].join('');
   }
 
   /**
