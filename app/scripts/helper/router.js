@@ -78,16 +78,18 @@ IOWA.Router = (function() {
     var pageName = parts[parts.length - 1] || 'home';
     var importURL = url + '?partial';
 
-    Polymer.import([importURL], function() {
-      // Don't proceed if import didn't load correctly.
-      var htmlImport = document.querySelector(
-          'link[rel="import"][href="' + importURL + '"]');
-      if (htmlImport && !htmlImport.import) {
-        return;
-      }
-      // Update content of the page.
-      injectPageContent(pageName, htmlImport.import);
-    });
+    if (pageName !== IOWA.Elements.Template.selectedPage) {
+      Polymer.import([importURL], function() {
+        // Don't proceed if import didn't load correctly.
+        var htmlImport = document.querySelector(
+            'link[rel="import"][href="' + importURL + '"]');
+        if (htmlImport && !htmlImport.import) {
+          return;
+        }
+        // Update content of the page.
+        injectPageContent(pageName, htmlImport.import);
+      });
+    }
   }
 
   /**
@@ -165,8 +167,7 @@ IOWA.Router = (function() {
   function init() {
     window.addEventListener('popstate', renderCurrentPage);
     // Load current page content when layout ready.
-    // TODO: Remove ajax and change animation on first page load.
-    document.addEventListener('template-bound', renderCurrentPage);
+    IOWA.Elements.Template.addEventListener('template-bound', renderCurrentPage);
     document.addEventListener('click', navigate);
   }
 

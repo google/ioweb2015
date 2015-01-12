@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+IOWA.Elements.init();
 IOWA.Router.init();
 
 if ('serviceWorker' in navigator) {
@@ -53,6 +53,3 @@ if ('serviceWorker' in navigator) {
     console.error('Service worker registration failed:', e);
   });
 }
-
-IOWA.Elements.init();
-IOWA.Router.init();
