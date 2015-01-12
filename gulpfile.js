@@ -236,7 +236,8 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // Start a standalone server (no GAE SDK needed) serving both front-end and backend,
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve', ['sass', 'backend'], function() {
+
+gulp.task('serve', ['sass', 'backend', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var startArgs = ['-d', APP_DIR, '-listen', serverAddr];
@@ -276,7 +277,7 @@ gulp.task('serve', ['sass', 'backend'], function() {
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['sass'], function() {
+gulp.task('serve:gae', ['sass', 'generate-service-worker-dev'], function() {
   var appEnv = process.env.APP_ENV || 'dev';
   var restoreAppYaml = changeBackendGaeAppVersion('v-' + appEnv);
 
@@ -333,7 +334,8 @@ gulp.task('backend:test', function(cb) {
 });
 
 gulp.task('default', ['clean'], function(cb) {
-  runSequence('sass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'], cb);
+  runSequence('sass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'],
+    'generate-service-worker-dist', cb);
 });
 
 gulp.task('bower', function(cb) {
@@ -352,7 +354,7 @@ gulp.task('setup', function(cb) {
 });
 
 // Watch file changes and reload running server
-// or rebuid stuff.
+// or rebuild stuff.
 function watch() {
   gulp.watch([APP_DIR + '/**/*.html'], reload);
   gulp.watch([APP_DIR + '/styles/**/*.{scss,css}'], ['sass', reload]);
@@ -411,6 +413,7 @@ function generateServiceWorkerFileContents(rootDir, handleFetch) {
     dynamicUrlToDependencies: dynamicUrlToDependencies,
     handleFetch: handleFetch,
     importScripts: ['bower_components/shed/dist/shed.js', 'scripts/shed-offline-analytics.js'],
+    logger: $.util.log,
     staticFileGlobs: [
       rootDir + '/bower_components/**/*.{html,js,css}',
       rootDir + '/elements/**',
@@ -425,8 +428,6 @@ function generateServiceWorkerFileContents(rootDir, handleFetch) {
   });
 }
 
-// TODO (jeffposnick): Figure out how to make these tasks play nicely when defined in sequence with
-// other tasks.
 gulp.task('generate-service-worker-dev', function() {
   del([APP_DIR + '/service-worker.js']);
 
@@ -435,7 +436,7 @@ gulp.task('generate-service-worker-dev', function() {
   // TODO (jeffposnick): Use a flag to toggle this behavior.
   var serviceWorkerFileContents = generateServiceWorkerFileContents(APP_DIR, false);
 
-  return $.file('service-worker.js', serviceWorkerFileContents)
+  return $.file('service-worker.js', serviceWorkerFileContents, {src: true})
     .pipe(gulp.dest(APP_DIR));
 });
 
@@ -445,6 +446,6 @@ gulp.task('generate-service-worker-dist', function() {
 
   var serviceWorkerFileContents = generateServiceWorkerFileContents(distDir, true);
 
-  return $.file('service-worker.js', serviceWorkerFileContents)
+  return $.file('service-worker.js', serviceWorkerFileContents, {src: true})
     .pipe(gulp.dest(distDir));
 });
