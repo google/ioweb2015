@@ -1,0 +1,9 @@
+{
+  "indent": 2,
+  "node": true,
+  "browser": true,
+  "esnext": true,
+  "bitwise": true,
+  "immed": true,
+  "noarg": true
+}
