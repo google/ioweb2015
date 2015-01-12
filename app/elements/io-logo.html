@@ -15,30 +15,58 @@
   </template>
   <script>
   Polymer({
+    /**
+     * The two-digit year to display inside the "O".
+     *
+     * @attribute width
+     * @type number
+     * @default the current year
+     */
     year: (new Date()).getYear() - 100,
 
+    /**
+     * Height of the logo in pixels.
+     *
+     * @attribute height
+     * @type number
+     * @default 165
+     */
     height: 165,
+
+    /**
+     * Width of the logo in pixels.
+     *
+     * @attribute width
+     * @type number
+     * @default 213
+     */
     width: 312,
 
-    // animating: false,
-    // done: false,
-
+    /**
+     * The number of milliseconds the center of the "O" shows after it has grown.
+     *
+     * @property SHOW_FOR
+     * @type number
+     * @default 600
+     */
     SHOW_FOR: 600,
-    START_DELAY: 300,
 
-    eventDelegates: {
-      'tap': 'toggle'
-    },
+    /**
+     * The number of milliseconds before the "O" starts to grow.
+     *
+     * @property START_DELAY
+     * @type number
+     * @default 300
+     */
+    START_DELAY: 300,
 
     ready: function() {
       this.heightChanged();
       this.widthChanged();
     },
 
-    attached: function() {
-      // this.async(function() {
-        this.start();
-      // }, null, this.START_DELAY);
+    domReady: function() {
+      this.start();
     },
 
     heightChanged: function() {
@@ -49,6 +77,10 @@
       this.style.width = parseInt(this.width) + 'px';
     },
 
+    /**
+     * Starts the loading animation sequence.
+     * @method start
+     */
     start: function() {
       var GROW_DURATION = 400;
 
@@ -83,7 +115,6 @@
 
         this.async(function() {
           player.reverse();
-          // player2.source.timing.delay = 0;
         }, null, this.SHOW_FOR);
       }.bind(this);
     },
