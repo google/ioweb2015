@@ -1,0 +1,123 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-selector/core-selector.html">
+
+<!--
+Vertically cycles through a list of items, fading in the current selection.
+
+    <name-cycler items="['Kyoto', 'Chiang Mai']" interval="1000"></name-cycler>
+
+@element name-cycler
+-->
+<polymer-element name="name-cycler" attributes="interval items auto">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      core-selector {
+        position: relative;
+        display: block;
+      }
+
+      core-selector > * {
+        opacity: 0;
+        position: absolute;
+        -webkit-transform: translateY(-75%);
+        transform: translateY(-75%);
+        transition: all 300ms linear;
+        will-change: transform, opacity;
+      }
+
+      core-selector > .core-selected ~ * {
+        -webkit-transform: translateY(50%);
+        transform: translateY(50%);
+      }
+
+      .core-selected {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+        opacity: 1;
+      }
+    </style>
+    <core-selector id="selector">
+      <template repeat="{{items}}">
+        <div>{{}}</div>
+      </template>
+    </core-selector>
+  </template>
+  <script>
+  Polymer({
+
+    /**
+     * List of items to cycle
+     *
+     * @attribute items
+     * @type array
+     * @default []
+     */
+
+    publish: {
+      /**
+       * True if the items should start cycling automatically.
+       *
+       * @attribute auto
+       * @type bool
+       * @default true
+       */
+      auto: {value: true, reflect: true},
+
+      /**
+       * Time between cycling, in milliseconds.
+       *
+       * @attribute interval
+       * @type number
+       * @default 1000
+       */
+      interval: 1000,
+    },
+
+    created: function() {
+      this.items = [];
+    },
+
+    attached: function() {
+      if (this.auto) {
+        this.start();
+      }
+    },
+
+    detached: function() {
+      this.stop();
+    },
+
+    autoChanged: function() {
+      if (this.auto) {
+        this.start();
+      } else {
+        this.stop();
+      }
+    },
+
+    /**
+     * Starts the cycling animation.
+     *
+     * @method start
+     */
+    start: function() {
+      this.interval_ = setInterval(function() {
+        this.$.selector.selectNext(true);
+      }.bind(this), this.interval);
+    },
+
+    /**
+     * Stops the cycling animation.
+     *
+     * @method start
+     */
+    stop: function() {
+      clearInterval(this.interval_);
+    }
+  });
+  </script>
+</polymer-element>

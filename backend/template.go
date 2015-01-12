@@ -22,7 +22,8 @@ var tmplFunc = template.FuncMap{
 
 // renderTemplate executes a template found in name.html file
 // using either layout_full.html or layout_partial.html as the root template.
-func renderTemplate(w io.Writer, name string, partial bool) error {
+// env is the app current environment: "dev", "stage" or "prod".
+func renderTemplate(w io.Writer, env, name string, partial bool) error {
 	var layout string
 	if partial {
 		layout = "layout_partial.html"
@@ -43,10 +44,12 @@ func renderTemplate(w io.Writer, name string, partial bool) error {
 		Title string
 		Slug  string
 		Meta  meta
+		Env   string
 	}{
 		Title: pageTitle(m),
 		Slug:  name,
 		Meta:  m,
+		Env:   env,
 	}
 	return t.Execute(w, data)
 }

@@ -17,10 +17,22 @@
   },
   "attend-offsite": {
     "description": "Top navbar sink text. Please keep this short. Links to the site's page for offsite participants.",
-    "message": "Attend off-site"
+    "message": "Attend offsite"
+  },
+  "attend-from": {
+    "description": "Beginning of 'Attend I/O from x or wherever you are heading",
+    "message": "Attend I/O from"
+  },
+  "attend-wherever": {
+    "description": "Ending to 'Attend I/O from x or wherever you are heading",
+    "message": "or wherever you may be"
+  },
+  "airport-shuttle": {
+    "description": "Onsite page. Header information on where developers can find a shuttle from the airport.",
+    "message": "Airport Shuttle"
   },
   "registration": {
-    "description": "Top navbar sink text. Please keep this short. Links to the site's registration page.",
+    "description": "Top navbar link text. Please keep this short. Links to the site's registration page.",
     "message": "Registration"
   },
   "sanfrancisco": {
@@ -49,7 +61,7 @@
   },
   "watch-recap-video": {
     "description": "Link text. Please keep this short. Watches the video from the 2014 event.",
-    "message": "Watch the 2014 Recap Video"
+    "message": "Watch the 2014 I/O Recap Video"
   },
   "join-from-offsite": {
     "description": "Link text. Please keep this short. Links to the page for offsite participants.",
@@ -110,7 +122,7 @@
   },
   "livestream": {
     "description": "Heading text for the top card on the attend offsite page",
-    "message": "Live Stream"
+    "message": "Live stream"
   },
   "notifyme": {
     "description": "Offsite page. Button text have users receive a notification when new events around near them.",
@@ -127,5 +139,13 @@
   "hostioextend": {
     "description": "Offsite page. Card title description for developers to submit their own event details",
     "message": "Host an I/O Extended event"
+  },
+  "organizerguide": {
+    "description": "Offsite page. Link to download the organizer's guide",
+    "message": "Organizer's Guide"
+  },
+  "submitevent": {
+    "description": "Offsite page. Link for developers to submit their own event",
+    "message": "Submit your event"
   }
 }

@@ -20,7 +20,7 @@
   exports.IOWA = exports.IOWA || {};
 
   // TODO(ericbidelman): add i18n support.
-  // if (exports.DEV) {
+  // if (exports.ENV == 'dev') {
   //   // Polyfill needs I18nMsg to exist before setting the lang. Timing is fine for native.
   //   // Set locale for entire site (e.g. i18n-msg elements).
   //   document.addEventListener('HTMLImportsLoaded', function() {
@@ -36,4 +36,5 @@
       // no-op
     }
   };
+
 })(window);

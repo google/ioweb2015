@@ -36,6 +36,12 @@ h3, h4, h5, h6 {
   display: none;
 }
 
+.link-spacing {
+  > a {
+    margin-right: $desktopKeyline;
+  }
+}
+
 .bg-light-grey, .bg-medium-grey, .bg-dark-grey, .bg-cyan {
   a {
     font-size: 14px;

@@ -38,14 +38,13 @@ $name: 'page-home';
     width: 177px;
     height: 128px;
     display: block;
-    // TODO(ericbidelman): this should be a 1x asset.
     background: url('../images/home/io_white.png') center center no-repeat;
     background-size: contain;
   }
 }
 
 .home-photo {
-  background: url(../images/home/io7.jpg) no-repeat 50% 0;
+  background: url(../images/home/Image-01.jpg) no-repeat 50% 0;
   background-size: cover;
   height: 310px;
 }
@@ -62,6 +61,7 @@ $name: 'page-home';
 
   .attend__cityname {
     color: $color-cyan-A400;
+    height: 48px; // same as line height.
   }
 
   .attend__globe {
@@ -147,7 +147,7 @@ $name: 'page-home';
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .card__photo--recap  {
-    background-image: url(../images/home/recap-500@2x.jpg);
+    background-image: url(../images/home/Image-01@2x.jpg);
   }
 }
 

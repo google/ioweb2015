@@ -6,4 +6,5 @@ script:
   - npm -q -g install gulp
   - gulp bower
   - gulp
+  - gulp backend:test
 

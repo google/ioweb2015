@@ -60,6 +60,8 @@ footer {
   }
   .footer-content {
     nav {
+      flex-direction: row !important;
+      flex: 1;
       width: 550px;
     }
   }
