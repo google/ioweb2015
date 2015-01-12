@@ -132,13 +132,12 @@ IOWA.Router = (function() {
   }
 
   /**
-   * Parses the page name out absolutePath, ignoring the leading '/'.
-   * Translates '/' into '-' characters, so '/path/to/file' -> 'path-to-file'
-   * Defaults to 'home' if the path is '/' or ''.
+   * Parses the page name out of the last entry in absolutePath, split on '/'.
+   * Defaults to 'home' if absolutePath ends in '/' or is ''.
    * @private
    */
   function parsePageNameFromAbsolutePath(absolutePath) {
-    return absolutePath.slice(1).replace('/', '-') || 'home';
+    return absolutePath.split('/').pop() || 'home';
   }
 
   /**
