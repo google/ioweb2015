@@ -9,8 +9,6 @@ const SECONDS_PER_BEAT = 60.0 / TEMPO_BPM;
 const A_16TH_NOTE_DURATION = 0.25 * SECONDS_PER_BEAT;
 const SCHEDULE_AHEAD_SECONDS = 0.1;
 
-
-
 /**
  * Central controller for the Audio sequencer.
  * @param {AudioManager} audioManager - The main audio manager.

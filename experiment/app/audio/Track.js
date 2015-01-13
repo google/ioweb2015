@@ -47,10 +47,10 @@ module.exports = (function() {
       bpm = bpm || audioManager.getSequencer().noteDuration;
 
       audioManager.willPlayback(
-          sound.play(target, time, duration, bpm, note, tags),
-          time,
-          noteDef,
-          tags
+        sound.play(target, time, duration, bpm, note, tags),
+        time,
+        noteDef,
+        tags
       );
     }
 

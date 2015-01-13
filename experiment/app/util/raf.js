@@ -5,5 +5,4 @@ module.exports = (function() {
   'use strict';
 
   return window.requestAnimationFrame;
-
 })();

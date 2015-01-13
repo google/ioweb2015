@@ -1,6 +1,5 @@
 var { EventEmitter } = require('events');
 
-
 /**
  * Tiny wrapper for a singleton event stream.
  */
