@@ -1,0 +1,152 @@
+{
+  "resources": [
+    "normalaudiosprite.mp3"
+  ],
+  "spritemap": {
+    "arp_synth_A-sharp": {
+      "start": 0,
+      "end": 1.28,
+      "loop": false
+    },
+    "arp_synth_A-sharp2": {
+      "start": 3,
+      "end": 4.253877551020408,
+      "loop": false
+    },
+    "arp_synth_C": {
+      "start": 6,
+      "end": 7.28,
+      "loop": false
+    },
+    "arp_synth_C2": {
+      "start": 9,
+      "end": 10.28,
+      "loop": false
+    },
+    "arp_synth_C3": {
+      "start": 12,
+      "end": 13.28,
+      "loop": false
+    },
+    "arp_synth_D-sharp": {
+      "start": 15,
+      "end": 16.28,
+      "loop": false
+    },
+    "arp_synth_D-sharp2": {
+      "start": 18,
+      "end": 19.28,
+      "loop": false
+    },
+    "arp_synth_D-sharp3": {
+      "start": 21,
+      "end": 22.071020408163264,
+      "loop": false
+    },
+    "arp_synth_F": {
+      "start": 24,
+      "end": 25.227755102040817,
+      "loop": false
+    },
+    "arp_synth_F2": {
+      "start": 27,
+      "end": 28.28,
+      "loop": false
+    },
+    "arp_synth_G": {
+      "start": 30,
+      "end": 31.28,
+      "loop": false
+    },
+    "arp_synth_G2": {
+      "start": 33,
+      "end": 34.25387755102041,
+      "loop": false
+    },
+    "drumClap": {
+      "start": 36,
+      "end": 37.01877551020408,
+      "loop": false
+    },
+    "drumKick": {
+      "start": 39,
+      "end": 39.78367346938776,
+      "loop": false
+    },
+    "drumSnare": {
+      "start": 41,
+      "end": 41.6530612244898,
+      "loop": false
+    },
+    "hexagon1": {
+      "start": 43,
+      "end": 45.97795918367347,
+      "loop": false
+    },
+    "hexagon2": {
+      "start": 47,
+      "end": 50.13469387755102,
+      "loop": false
+    },
+    "hexagon3": {
+      "start": 52,
+      "end": 55.160816326530615,
+      "loop": false
+    },
+    "hexagon4": {
+      "start": 57,
+      "end": 60.2130612244898,
+      "loop": false
+    },
+    "hexagon5": {
+      "start": 62,
+      "end": 65.29142857142857,
+      "loop": false
+    },
+    "parallelogram_A-sharp-major": {
+      "start": 67,
+      "end": 72.48571428571428,
+      "loop": false
+    },
+    "parallelogram_C-minor": {
+      "start": 74,
+      "end": 79.35510204081632,
+      "loop": false
+    },
+    "parallelogram_D-sharp-major": {
+      "start": 81,
+      "end": 86.30285714285714,
+      "loop": false
+    },
+    "parallelogram_G-minor": {
+      "start": 88,
+      "end": 93.51183673469387,
+      "loop": false
+    },
+    "parallelogram_G-sharp-major": {
+      "start": 95,
+      "end": 100.4334693877551,
+      "loop": false
+    },
+    "stringbass_A-sharp": {
+      "start": 102,
+      "end": 103.3061224489796,
+      "loop": false
+    },
+    "stringbass_C2": {
+      "start": 105,
+      "end": 106.14938775510204,
+      "loop": false
+    },
+    "stringbass_F": {
+      "start": 108,
+      "end": 109.12326530612245,
+      "loop": false
+    },
+    "stringbass_G": {
+      "start": 111,
+      "end": 112.01877551020408,
+      "loop": false
+    }
+  }
+}

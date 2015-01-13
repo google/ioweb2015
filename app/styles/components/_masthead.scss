@@ -158,12 +158,11 @@ core-drawer-panel {
   color: $color-bluegrey-700;
 }
 
-paper-fab {
-  color: $color-text;
-  background: #fff;
-  position: absolute;
-  bottom: -20px; // paper-fab's height / 2
+experiment-fab-container {
+  bottom: -20px; // experiment-fab's height / 2
   right: $mobileKeyline;
+  width: 56px;
+  height: 56px;
 }
 
 @media (max-width: $phone-breakpoint-max) {
@@ -197,8 +196,8 @@ paper-fab {
     margin-bottom: 15px;
   }
 
-  paper-fab {
-    bottom: -28px; // paper-fab's height / 2
+  experiment-fab-container {
+    bottom: -28px; // experiment-fab's height / 2
     right: $desktopKeyline;
   }
 

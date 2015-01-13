@@ -146,7 +146,7 @@ limitations under the License.
       <core-media-query query="(min-width:769px) and (max-width:944px)" queryMatches="{{isTabletSize}}"></core-media-query>
       <core-media-query query="(min-width:945px)" queryMatches="{{isDesktopSize}}"></core-media-query>
 
-      <header class="masthead {% template "mastheadBgClass" .%}" layout vertical>
+      <header class="masthead {% template "mastheadBgClass" .%} js-experiment-instrument" layout vertical>
         <div class="masthead__ripple">
           <div class="masthead__ripple__content {{ pages[nextPage].mastheadBgClass }}" id="masthead-ripple"></div>
         </div>
@@ -188,7 +188,7 @@ limitations under the License.
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
-        <paper-fab icon="assessment" mini?="{{isPhoneSize}}"></paper-fab>
+        <experiment-fab-container mode="{{mode}}" playmode="{{playmode}}"></experiment-fab-container>
       </header>
 
       <main class="io-main {{ {active: !pageTransitioning} | tokenList }}" >

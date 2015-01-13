@@ -10,6 +10,9 @@ dist
 .sass-cache
 app/styles/**/*.css
 
+# Built Experiment
+app/experiment
+
 # Standalone backend server
 backend/bin
 

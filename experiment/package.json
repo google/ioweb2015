@@ -1,0 +1,37 @@
+{
+  "name": "google-io-2015-experiment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://github.com/Instrument/google-io-2015-experiment",
+  "devDependencies": {
+    "6to5": "^2.10.1",
+    "6to5-loader": "^2.0.0",
+    "audiosprite": "^0.4.0",
+    "autoprefixer-loader": "^1.0.0",
+    "compression-webpack-plugin": "^0.1.2",
+    "css-loader": "^0.9.1",
+    "es6-promise": "^2.0.1",
+    "es6-set": "^0.1.1",
+    "es6-symbol": "^0.1.1",
+    "exports-loader": "^0.6.2",
+    "file-loader": "^0.8.1",
+    "gsap": "^1.15.0",
+    "imports-loader": "^0.6.3",
+    "jshint": "^2.5.10",
+    "jshint-loader": "^0.8.0",
+    "json-loader": "^0.5.1",
+    "lodash.debounce": "^2.4.1",
+    "lodash.throttle": "^2.4.1",
+    "p2": "^0.6.0",
+    "pixi.js": "^2.2.3",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.8.2",
+    "toxiclibsjs": "^0.2.7",
+    "url-loader": "^0.5.5",
+    "webpack": "^1.4.15"
+  }
+}
