@@ -15,6 +15,11 @@ module.exports = (function() {
 
   const VIEW_NAME = 'ParallelogramView';
 
+  /**
+   * Controls the Parallelogram instrument.
+   * @param {AudioManager} audioManager - The shared audio manager.
+   * @constructor
+   */
   return function ParallelogramView(audioManager) {
     const PARALLELOGRAM_TAG = audioManager.addTag(VIEW_NAME);
     const CHANNEL = audioManager.channels.create();
@@ -40,7 +45,7 @@ module.exports = (function() {
 
     /**
      * Init all of the parallelograms.
-     * @param {number} pid_ - The id of the container.
+     * @param {number} pid_ - The ID of the container.
      * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The PIXI display object.
      */
     function init(_, pid_, displayContainerCenter_) {
@@ -74,6 +79,13 @@ module.exports = (function() {
     var sizeRatio = 280 / 170;
     var skewRatio = 90 / 170;
 
+    /**
+     * Set the parallelogram positions.
+     * @param {number} index - The index of the parallelogram.
+     * @param {Object} parallelogram -The parallelogram object.
+     * @param {number} boundsWidth - The bounding width.
+     * @param {number} boundsHeight - The bounding height.
+     */
     function setPosition(index, parallelogram, boundsWidth, boundsHeight) {
       var parallelogramCount = parallelograms.length;
       var maxWidth = rotated ? boundsHeight : boundsWidth;
@@ -95,6 +107,10 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Load parallelogram data.
+     * @param {Model} d - The parallelogram data.
+     */
     function loadData(d) {
       data = d;
 
@@ -124,6 +140,7 @@ module.exports = (function() {
      * @param {Object} parallelogram - The current parallelogram.
      * @param {number} x - The x position of the parallelogram.
      * @param {number} y - The y position of the parallelogram.
+     * @param {boolean=false} dontPlay - If undefined, defaults to false.
      */
     function onActivate(parallelogram, x, y, dontPlay) {
       var didStartTime = parallelogram.popUp(x, y, dontPlay);
@@ -152,11 +169,17 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Start recording the parallelogram note.
+     */
     function startRecording() {
       isRecording = true;
       data.recorded = [];
     }
 
+    /**
+     * Stop recording the parallelogram note.
+     */
     function stopRecording() {
       isRecording = false;
       currentTrack = audioManager.createRecordedTrack(
@@ -221,6 +244,8 @@ module.exports = (function() {
      * Do things on window resize.
      * @param {number} w - The width of the window.
      * @param {number} h - The height of the window.
+     * @param {number} boundsWidth - The bounding width.
+     * @param {number} boundsHeight - The bounding height.
      */
     function resize(w, h, boundsWidth, boundsHeight) {
       width = w;
@@ -232,6 +257,9 @@ module.exports = (function() {
       updateSpacing();
     }
 
+    /**
+     * Update parallelogram spacing.
+     */
     function updateSpacing() {
       // Flipped because "default" state is vertical.
       rotated = lastBoundsWidth < lastBoundsHeight;

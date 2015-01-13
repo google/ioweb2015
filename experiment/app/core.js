@@ -36,6 +36,8 @@ module.exports = function Experiment() {
 
   /**
    * Load the experiment data and audio files.
+   * @param {Object} audioSprite - The sprited audio file.
+   * @param {array} audioLoops - The array of audio loops.
    */
   function load(audioSprite = audioSpriteDefault, audioLoops = audioLoopsDefault) {
     // Prepare experiment-specific styles.
@@ -100,7 +102,9 @@ module.exports = function Experiment() {
   const SHORTENER_API_URL = 'https://www.googleapis.com/urlshortener/v1/url';
   const SHORTENER_API_KEY = 'AIzaSyBRMm_PwR1cfjT_yLxBiV9PDrwZPRIRLxg';
 
-  // Serialize the entire experiment to URL encoded data.
+  /**
+   * Serialize the entire experiment to URL encoded data.
+   */
   function serialize() {
     var fullURL = window.location.origin + window.location.pathname + '?composition=' + stateManager.toURL();
     var endpoint = `${SHORTENER_API_URL}?key=${SHORTENER_API_KEY}`;
@@ -134,6 +138,7 @@ module.exports = function Experiment() {
 
   /**
    * Shut down the experiment.
+   * @param {array<number>} fromPos - The origin point of the transition in (FAB).
    */
   function tearDown(fromPos = [0,0]) {
     // Stop sound engine.
@@ -146,18 +151,32 @@ module.exports = function Experiment() {
     });
   }
 
+  /**
+   * Pause the experiment audio.
+   */
   function pause() {
     audioManager.stop();
   }
 
+  /**
+   * Play the experiment audio.
+   */
   function play() {
     audioManager.start();
   }
 
+  /**
+   * If entering record mode.
+   * @param {function} cb - The enter callback
+   */
   function didEnterRecordingMode(cb) {
     rootView.didEnterRecordingMode(cb);
   }
 
+  /**
+   * If exiting record mode.
+   * @param {function} cb - The exit callback
+   */
   function didExitRecordingMode(cb) {
     rootView.didExitRecordingMode(cb);
   }

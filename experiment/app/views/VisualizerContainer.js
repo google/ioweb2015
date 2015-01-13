@@ -26,6 +26,11 @@ module.exports = (function() {
 
     var isReady = false;
 
+    /**
+     * Contains a visualizer view.
+     * @param {number} pid_ - The id of the visualizer.
+     * @param {function} SubView - Each unique visualizer view.
+     */
     function init(pid_, SubView) {
       pid = pid_;
 
@@ -38,6 +43,9 @@ module.exports = (function() {
       isReady = true;
     }
 
+    /**
+     * Create the canvas for each visualizer.
+     */
     function createRenderer() {
       wrapperElement = document.createElement('div');
       wrapperElement.style.zIndex = zIndexes.VISUALIZER;
@@ -53,10 +61,18 @@ module.exports = (function() {
       resize();
     }
 
+    /**
+     * Set the position of each visualizer.
+     * @param {number} x - The x position of the visualizer.
+     * @param {number} y - The y position of the visualizer.
+     */
     function setPos(x, y) {
       animate.set(wrapperElement, { x, y });
     }
 
+    /**
+     * On resize, resize each visualizer.
+     */
     function resize() {
       if (!isReady) {
         return;
@@ -83,21 +99,34 @@ module.exports = (function() {
       subView.resize(canvas.width, canvas.height);
     }
 
+    /**
+     * Render
+     * @param {number} delta - The delta.
+     */
     function render(delta) {
       if (isHidden || !isReady || isPaused) { return; }
       subView.render(delta);
     }
 
+    /**
+     * Play the visualizer.
+     */
     function enable() {
       if (!isReady || isPaused) { return; }
       isPaused = false;
     }
 
+    /**
+     * Pause the visualizer.
+     */
     function disable() {
       if (!isReady || !isPaused) { return; }
       isPaused = true;
     }
 
+    /**
+     * Set the hidden position of each visualizer.
+     */
     var buffer = 15;
     function hiddenPosition() {
       if (isHidden === 'top') {
@@ -107,6 +136,10 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Hide each visualizer.
+     * @param {string} direction - The direction in which to animate out.
+     */
     function hide(direction) {
       if (!isReady) {
         return Promise.resolve(true);
@@ -119,6 +152,10 @@ module.exports = (function() {
       });
     }
 
+
+    /**
+     * Show each visualizer.
+     */
     function show() {
       if (!isReady) {
         return Promise.resolve(true);

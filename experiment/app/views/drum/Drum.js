@@ -6,6 +6,14 @@ var {Promise} = require('es6-promise');
 module.exports = (function() {
   'use strict';
 
+  /**
+   * Creates a new drum.
+   * @param {Object} model - The model for this drum.
+   * @param {string} color - The color for this drum.
+   * @param {string} soundName - The soundName for this drum.
+   * @param {Object} physicsWorld - The physics for this drum.
+   * @constructor
+   */
   return function Drum(model, color, soundName, physicsWorld) {
     var pid = model.pid;
     var isDragging = false;
@@ -52,6 +60,9 @@ module.exports = (function() {
 
     var physicsBody = addToPhysics();
 
+    /**
+     * Add event listeners.
+     */
     function addEventListeners() {
       container.interactive = true;
       container.buttonMode = true;
@@ -87,6 +98,9 @@ module.exports = (function() {
       };
     }
 
+    /**
+     * Remove event listeners.
+     */
     function removeEventListeners() {
       container.interactive = false;
       container.buttonMode = false;
@@ -96,18 +110,31 @@ module.exports = (function() {
       container.mousemove = container.touchmove = null;
     }
 
+    /**
+     * On activate callback.
+     * @param {function} cb - The activation callback.
+     */
     var onActivationCallback;
     function onActivate(cb) {
       onActivationCallback = cb;
     }
 
+    /**
+     * Activate drum ball.
+     * @param {Object} ball - The ball object.
+     */
     function activate(ball) {
+      console.log(ball);
       emitCircle(0);
       if (onActivationCallback) {
         onActivationCallback(self, ball);
       }
     }
 
+    /**
+     * Emit a circle.
+     * @param {number} delay - The delay duration.
+     */
     function emitCircle(delay) {
       var hitCircle = new PIXI.Sprite(hitTexture);
       hitCircle.anchor.x = hitCircle.anchor.y = 0.5;
@@ -121,6 +148,9 @@ module.exports = (function() {
       });
     }
 
+    /**
+     * Add drum object to physics.
+     */
     function addToPhysics() {
       var shapeDef = new p2.Circle(model.radius);
       var bodyDef = new p2.Body({
@@ -138,6 +168,11 @@ module.exports = (function() {
 
     var drumPosition = { x: 0, y: 0 };
 
+    /**
+     * Set position of the drum.
+     * @param {number} x - The X position of the drum.
+     * @param {number} y - The Y position of the drum.
+     */
     function setPosition(x, y) {
       drumPosition.x = x;
       drumPosition.y = y;

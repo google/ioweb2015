@@ -36,6 +36,10 @@ module.exports = (function() {
 
   const INSTRUMENT_NAME = 'ArpeggiatorView';
 
+  /**
+   * Make the gradient for each slice of the arpeggiator.
+   * @param {array} colorSet - The set of each colors for the slices.
+   */
   function makeSliceGradient(colorSet) {
     const GRADIENT_A = new ColorGradient();
     GRADIENT_A.addColorAt(RANGE.getAt(0), TColor.newHex(colorSet[0]));
@@ -46,7 +50,8 @@ module.exports = (function() {
   }
 
   /**
-   * Arpeggiator View
+   * Controls the Arpeggiator instrument view.
+   * @param {AudioManager} audioManager - The shared audio manager.
    * @constructor
    */
   return function ArpeggiatorView(audioManager) {
@@ -78,6 +83,12 @@ module.exports = (function() {
     var data;
     var scratchTrack;
 
+    /**
+     * Initialize the view.
+     * @param {Object} _ - Unused variable.
+     * @param {number} pid_ - The ID of the view.
+     * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The center point of the view.
+     */
     function init(_, pid_, displayContainerCenter_) {
       pid = pid_;
       displayContainerCenter = displayContainerCenter_;
@@ -129,6 +140,10 @@ module.exports = (function() {
       });
     }
 
+    /**
+     * Load arpeggiator data.
+     * @param {Model} initialData - The guitar data.
+     */
     function loadData(d) {
       data = d;
 
@@ -141,6 +156,9 @@ module.exports = (function() {
       audioManager.addTrack(currentTrack);
     }
 
+    /**
+     * Attach event listeners.
+     */
     function attachEventListeners() {
       circleGraphic.interactive = true;
       circleGraphic.buttonMode = true;
@@ -170,6 +188,9 @@ module.exports = (function() {
       };
     }
 
+    /**
+     * Remove event listeners.
+     */
     function removeEventListeners() {
       circleGraphic.interactive = false;
       circleGraphic.buttonMode = false;
@@ -179,10 +200,17 @@ module.exports = (function() {
       circleGraphic.mousemove = circleGraphic.touchmove = null;
     }
 
+    /**
+     * Convert degrees to radians
+     * @param {number} degree - Degrees to convert into radians.
+     */
     function toRadians(degree) {
       return degree * (Math.PI / 180);
     }
 
+    /**
+     * Build each arpeggiator slice.
+     */
     function buildSlices() {
       var nextRotation = 0;
       var data = [];
@@ -209,6 +237,11 @@ module.exports = (function() {
     var angleBonus = NUMBER_OF_TRIANGLES * wiggleRoom;
     var maxDepth = (NUMBER_OF_TRIANGLES / 2);
 
+    /**
+     * Build each arpeggatior slice.
+     * @param {number} i - The slice ID.
+     * @param {number} currentRotation - The current rotation point.
+     */
     function buildSlice(i, currentRotation) {
       var depth = Math.abs(maxDepth - i);
       var nextDepth = Math.abs(maxDepth - ((i >= (NUMBER_OF_TRIANGLES - 1)) ? 0 : (i + 1)));
@@ -259,6 +292,10 @@ module.exports = (function() {
       };
     }
 
+    /**
+     * Build each arpeggatior slice.
+     * @param {array} data - data about each arpeggiator slice.
+     */
     function createSliver(data) {
       var container = new PIXI.DisplayObjectContainer();
 
@@ -272,6 +309,11 @@ module.exports = (function() {
       return sliver;
     }
 
+    /**
+     * Make the arpeggiator triangles.
+     * @param {number} radians - Radians.
+     * @param {number} rotation - The current rotation point.
+     */
     function makeTriangle(radians, rotation) {
       var maxLength = Math.max(window.innerHeight, window.innerWidth);
       var bottomVec = vec2.fromValues(0, maxLength);
@@ -287,6 +329,9 @@ module.exports = (function() {
       return new PIXI.Polygon(a, b, c);
     }
 
+    /**
+     * Do things when animation is collapsed.
+     */
     function animationCollapsed() {
       APPLICATION_STATE = 'collapsed';
 
@@ -296,6 +341,9 @@ module.exports = (function() {
       removeEventListeners();
     }
 
+    /**
+     * Do things when animation is expanded.
+     */
     function animationExpanded() {
       APPLICATION_STATE = 'expand';
 
@@ -305,11 +353,17 @@ module.exports = (function() {
       attachEventListeners();
     }
 
+    /**
+     * Start arpeggiator recording.
+     */
     function startRecording() {
       isRecording = true;
       data.recorded = [];
     }
 
+    /**
+     * Stop arpeggiator recording.
+     */
     function stopRecording() {
       isRecording = false;
 
@@ -320,6 +374,9 @@ module.exports = (function() {
           );
     }
 
+    /**
+     * Play the arpeggiator loop and record if in recording state.
+     */
     function playLoop() {
       var mapping = QUAD_MAPPING[currentQuadrant];
 
@@ -336,6 +393,10 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Update the arpeggiator quadrant on move.
+     * @param {number} newQuadrant - The new Quadrant entered.
+     */
     function updateQuadrant(newQuadrant) {
       if (currentQuadrant === newQuadrant) { return; }
 
@@ -347,6 +408,11 @@ module.exports = (function() {
     var targetX = 0;
     var targetY = 0;
 
+    /**
+     * Update the arpeggiator cursor.
+     * @param {number} x - The x position of the cursor.
+     * @param {number} y - The y position of the cursor.
+     */
     function updateCursor(x, y) {
       cursorX = x;
       cursorY = y;
@@ -364,12 +430,21 @@ module.exports = (function() {
       updateQuadrant(q);
     }
 
+    /**
+     * Animate the arpeggiator cursor to a quadrant.
+     * @param {number} q - The quadrant to animate to.
+     */
     function animateCursorToQuadrant(q) {
       var [newX, newY] = positionForQuadrant(q);
       targetX = newX;
       targetY = newY;
     }
 
+    /**
+     * Determines which sound is playing in which quadrant.
+     * @param {number} x - Quadrant x pos.
+     * @param {number} y - Quadrant y pos.
+     */
     function quadrantForPos(x, y) {
       if (x <= 0 && y <= 0) {
         return 0;
@@ -382,6 +457,10 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Determine the quadrant size based on the circle radius.
+     * @param {number} quadrant - Quadrant.
+     */
     function positionForQuadrant(quadrant) {
       var oWidth = optimalWidth - (circleRadius * 2);
       var oHeight = optimalHeight - (circleRadius * 2);
@@ -397,6 +476,13 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * On resize, resize the arpeggiator view.
+     * @param {number} w - View width.
+     * @param {number} h - View height.
+     * @param {number} _optimalWidth - Optimal view width.
+     * @param {number} _optimalHeight - Optimal view height.
+     */
     var myWidth;
     var myHeight;
     function resize(w, h, _optimalWidth, _optimalHeight) {
@@ -413,6 +499,10 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Render on RAF.
+     * @param {number} delta - The delta.
+     */
     function render(delta) {
       if (renderPause) { return; }
 
@@ -423,9 +513,15 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Render the expanded view.
+     */
     function renderExpanded() {
     }
 
+    /**
+     * Render the collapsed view.
+     */
     function renderCollapsed() {
       if ((targetX === cursorX) && (targetY === cursorY)) { return; }
 
@@ -443,10 +539,16 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Pause the arpeggiator.
+     */
     function disable() {
       renderPause = true;
     }
 
+    /**
+     * Resume the arpeggiator.
+     */
     function enable() {
       renderPause = false;
     }

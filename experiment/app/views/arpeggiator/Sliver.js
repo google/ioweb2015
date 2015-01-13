@@ -15,6 +15,17 @@ module.exports = (function() {
 
   var distanceGradients = {};
 
+  /**
+   * Creates a new arpeggiator sliver.
+   * @param {PIXI.DisplayObjectContainer} container - The PIXI container for this sliver.
+   * @param {PIXI.Polygon} polygon - The PIXI polygon for this sliver.
+   * @param {number} depth - The depth of this sliver.
+   * @param {array} colorSets - Array of colors for this sliver.
+   * @param {Boolean} hasLeftShadow - Does this sliver have a left shadow?
+   * @param {Boolean} hasRightShadow - Does this sliver have a right shadow?
+   * @param {number} highlight - The highlight for this sliver.
+   * @constructor
+   */
   return function Sliver(container, polygon, depth, colorSets, hasLeftShadow, hasRightShadow, highlight) {
     const SHADOW_LENGTH = 15 * (1 + (1 - depth / 3));
 
@@ -62,7 +73,14 @@ module.exports = (function() {
     updateCenterPoint(center[0], center[1]);
 
     /**
-     * Zero-allocation vector match to calculate shadows.
+     * Render the shadow for each sliver.
+     * @param {number} movement - Shadow movement.
+     * @param {number} x1 - x pos 1 of the shadow.
+     * @param {number} y1 - y pos 1 of the shadow.
+     * @param {number} x2 - x pos 2 of the shadow.
+     * @param {number} y2 - y pos 2 of the shadow.
+     * @param {Boolean} reverse - Is it reversed?
+     * @param {number} opacity - Opacity of the sliver.
      */
     function renderShadow(movement, x1, y1, x2, y2, reverse, opacity) {
       vec2.set(startVec, x1, y1);
@@ -81,6 +99,11 @@ module.exports = (function() {
       shadow.lineTo(endVec[0], endVec[1]);
     }
 
+    /**
+     * The distance from the center influences the gradient colors.
+     * @param {number} degrees = Gradient degrees.
+     * @param {number} distance = Distance from the view center.
+     */
     function getDistanceGradientColors(degrees, distance) {
       if (distanceGradients[degrees] && distanceGradients[degrees][distance]) {
         return distanceGradients[degrees][distance];
@@ -100,6 +123,11 @@ module.exports = (function() {
       return dColors;
     }
 
+    /**
+     * Update the sliver color.
+     * @param {number} degrees = Gradient degrees.
+     * @param {number} distance = Distance from the view center.
+     */
     function updateColor(degrees, distance) {
       if (distance >= MAX_RADIUS) {
         color = COLORS[degrees].toInt();
@@ -110,6 +138,9 @@ module.exports = (function() {
       color = dColors[MAX_RADIUS-distance].toInt();
     }
 
+    /**
+     * Render sliver on RAF.
+     */
     function render() {
       polygon.points[0] = center[0];
       polygon.points[1] = center[1];
@@ -137,12 +168,25 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Draw the sliver shadow.
+     * @param {number} x1 = x position 1.
+     * @param {number} y1 = y position 1.
+     * @param {number} x2 = x position 2.
+     * @param {number} y2 = y position 2.
+     * @param {Boolean} reverse = reverse or not?
+     */
     function drawShadow(x1, y1, x2, y2, reverse) {
       for (let i = 0; i < SHADOW_LENGTH; i++) {
         renderShadow(i, x1, y1, x2, y2, reverse, SHADOW_RANG.getAt(1 - i / (SHADOW_LENGTH-1)));
       }
     }
 
+    /**
+     * Update the center point of the arpeggiator sliver.
+     * @param {number} x = The x position.
+     * @param {number} y = The y position.
+     */
     function updateCenterPoint(x, y) {
       center[0] = x;
       center[1] = y;
@@ -157,11 +201,18 @@ module.exports = (function() {
       render();
     }
 
+    /**
+     * Update the sliver highlight.
+     * @param {number} h = highlight.
+     */
     function updateHighlight(h) {
       highlight = h;
       render();
     }
 
+    /**
+     * Pulse the highlight color.
+     */
     var tweenInfo = { highlight: 0.2 };
     var tweenTarget = { highlight: 0, onUpdate: onUpdate };
     function pulse() {
@@ -169,6 +220,9 @@ module.exports = (function() {
       animate.to(tweenInfo, 0.5, tweenTarget);
     }
 
+    /**
+     * On update, update the highlight color.
+     */
     function onUpdate() {
       updateHighlight(tweenInfo.highlight);
     }

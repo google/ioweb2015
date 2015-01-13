@@ -57,6 +57,11 @@ module.exports = function(audioManager, stateManager) {
 
   var maskManager = new MaskManager('experiment-is-masked');
 
+  /**
+   * Initialize the view and start the central rAF loop.
+   * @param {string} instrumentSelector - DOM element for instruments
+   * @param {string} visualizerSelector - DOM element for visualizers
+   */
   function init(instrumentSelector, visualizerSelector) {
     // TODO, replace with polymer container?
     viewportElement = document.createElement('div');
@@ -121,6 +126,9 @@ module.exports = function(audioManager, stateManager) {
     dialogClick();
   }
 
+  /**
+   * Pause animations.
+   */
   function stop() {
     continueAnimating = false;
     window.removeEventListener('resize', onWindowResize);
@@ -128,6 +136,10 @@ module.exports = function(audioManager, stateManager) {
     window.removeEventListener('scroll', onWindowScrollStop);
   }
 
+  /**
+   * Animate experiment in from fab.
+   * @param {array} [x, y] - the x and y position to animate from.
+   */
   function animateIn([x, y]) {
     animate();
 
@@ -140,6 +152,10 @@ module.exports = function(audioManager, stateManager) {
     });
   }
 
+  /**
+   * Animate experiment out to fab.
+   * @param {array} [x, y] - the x and y position to animate toward.
+   */
   function animateOut([x, y]) {
     disableScrolling();
 
@@ -149,13 +165,16 @@ module.exports = function(audioManager, stateManager) {
     });
   }
 
+  /**
+   * Remove experiment viewport element.
+   */
   function cleanUp() {
     viewportElement.parentNode.removeChild(viewportElement);
     viewportElement = null;
   }
 
   /**
-   * Figure out which view replaces which DOM element.
+   * Figure out which instrument view replaces which DOM element.
    * @param {Element} elem - The element.
    * @param {number} pid - The unique ID.
    * @return {Object}
@@ -174,6 +193,12 @@ module.exports = function(audioManager, stateManager) {
     }
   }
 
+  /**
+   * Figure out which visualizer view replaces which DOM element.
+   * @param {Element} elem - The element.
+   * @param {number} pid - The unique ID.
+   * @return {Object}
+   */
   function getVisualizerForElem(elem, pid) {
     if (pid === 0) {
       return [WaveVisualizer, instrumentViews[0]];
@@ -206,6 +231,10 @@ module.exports = function(audioManager, stateManager) {
     return views;
   }
 
+  /**
+   * Map visualizers to DOM elements.
+   * @return {array<VisualizerContainer>}
+   */
   function createVisualizerContainers() {
     return visualizerElements.map(function(elem, i) {
       var pixiObject = new VisualizerContainer(audioManager, elem, viewportElement);
@@ -350,7 +379,13 @@ module.exports = function(audioManager, stateManager) {
     });
   }
 
+  /**
+   * Is the visualizer currently on screen?
+   * @param {Object} visualizerView - The visualizer view
+   * @return {boolean}
+   */
   function isVisualizerOnScreen(visualizerView) {
+
     var { top, height } = visualizerView.getElemRect();
 
     var visualizerTop = top;
@@ -365,6 +400,11 @@ module.exports = function(audioManager, stateManager) {
     );
   }
 
+  /**
+   * Hide current on screen visualizer
+   * @param {Object} visualizerView - The visualizer view
+   * @return {function}
+   */
   function hideOnScreenVisualizer(visualizerView) {
     var screenMidPoint = window.scrollY + (window.innerHeight / 2);
 
@@ -374,6 +414,10 @@ module.exports = function(audioManager, stateManager) {
     return visualizerView.hide(viewMidPoint < screenMidPoint ? 'top' : 'bottom');
   }
 
+  /**
+   * Hide on screen visualizers
+   * @return {Promise}
+   */
   function hideOnScreenVisualizers() {
     var animations = visualizerViews
         .filter(isVisualizerOnScreen)
@@ -382,6 +426,10 @@ module.exports = function(audioManager, stateManager) {
     return Promise.all(animations);
   }
 
+  /**
+   * Show on screen visualizers
+   * @return {Promise}
+   */
   function showOnScreenVisualizers() {
     var animations = visualizerViews
         .filter(v => v.isHidden())

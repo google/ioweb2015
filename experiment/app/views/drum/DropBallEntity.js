@@ -20,6 +20,16 @@ module.exports = function DropBallEntity() {
 
   const LIFETIME = 4000;
 
+  /**
+   * Init a drop ball entity.
+   * @param {PIXI.Stage} stage_ - The PIXI stage for this emitter.
+   * @param {number} pid_ - The PID of this drop ball entity.
+   * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The PIXI display container for this entity.
+   * @param {Object} world_ - This emitter world.
+   * @param {number} startX_ - The X start position for this emitter.
+   * @param {number} startY_ - The Y start position for this emitter.
+   * @param {Object} spawnBallObj_ - The ball spawner object.
+   */
   function init(stage_, pid_, displayContainerCenter_, world_, startX_, startY_, spawnBallObj_) {
     stage = stage_;
     pid = pid_;
@@ -34,6 +44,9 @@ module.exports = function DropBallEntity() {
     setTimeout(willDestroy, LIFETIME);
   }
 
+  /**
+   * Create the circle sprite for the ball.
+   */
   function createSprites() {
     ballContainer = new PIXI.DisplayObjectContainer();
     ball = new PIXI.Graphics();
@@ -49,6 +62,15 @@ module.exports = function DropBallEntity() {
     displayContainerCenter.addChild(ballContainer);
   }
 
+  /**
+   * Add a body to the entity.
+   * @param {Object} sprite - The sprite of this body.
+   * @param {number} x - The X position of this body.
+   * @param {number} y - The Y position of this body.
+   * @param {number} width - The width of this body.
+   * @param {number} height - The height of this body.
+   * @param {number} density - The density of this body.
+   */
   function addBody(sprite, x, y, width, height, density) {
     var shapeDef;
 
@@ -76,10 +98,16 @@ module.exports = function DropBallEntity() {
     return body;
   }
 
+  /**
+   * Render on RAF.
+   */
   function render() {
     renderBodies();
   }
 
+  /**
+   * Destroy bodies.
+   */
   function destroy() {
     if (alive) {
       alive = false;
@@ -90,6 +118,9 @@ module.exports = function DropBallEntity() {
     }
   }
 
+  /**
+   * Will destroy.
+   */
   function willDestroy() {
     if (alive) {
       destroy();
@@ -97,6 +128,9 @@ module.exports = function DropBallEntity() {
     }
   }
 
+  /**
+   * Render ball bodies.
+   */
   function renderBodies() {
     if (alive) {
       ballContainer.position.y = ballBody.position[1];
@@ -105,6 +139,9 @@ module.exports = function DropBallEntity() {
     }
   }
 
+  /**
+   * Destroy callback on destroy.
+   */
   function onDestroy(cb) {
     destroyCallback = cb;
   }
