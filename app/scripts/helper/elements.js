@@ -29,7 +29,9 @@ IOWA.Elements = (function() {
 
     var ripple = document.querySelector('.masthead__ripple__content');
     var masthead = document.querySelector('.masthead');
-    var i18n = document.querySelector('io-i18n');
+    var i18n = document.createElement('io-i18n');
+    i18n.setAttribute('msgid', 'home');
+    document.body.appendChild(i18n);
 
     IOWA.Elements.Drawer = drawer;
     IOWA.Elements.I18n = i18n;
