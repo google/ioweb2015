@@ -13,7 +13,7 @@ IOWA.CountdownTimer.Element = function(el) {
   this.easeOutTime_ = 0;
   this.mode_ = IOWA.CountdownTimer.Modes.Days;
   this.onThresholdReachedCallback_ = null;
-  this.lastThreshold_ = 'Days';
+  this.lastThreshold_ = '';
   this.lastDrawnValue_ = Number.MAX_VALUE;
 
   this.animationValue_ = 0;
