@@ -13,7 +13,8 @@ IOWA.CountdownTimer.Element = function(el) {
   this.easeOutTime_ = 0;
   this.mode_ = IOWA.CountdownTimer.Modes.Days;
   this.onThresholdReachedCallback_ = null;
-  this.lastThreshold_ = 'days';
+  this.lastThreshold_ = '';
+  this.lastDrawnValue_ = Number.MAX_VALUE;
 
   this.animationValue_ = 0;
   this.animationRunning_ = false;
@@ -83,9 +84,13 @@ IOWA.CountdownTimer.Element.prototype = {
     // Remap the linear value through the easing equation.
     animationValue = IOWA.CountdownTimer.Easing(animationValue);
 
-    this.renderer_.clear();
-    this.renderer_.draw(this.currentDayValue, animationValue,
-        animationDirection);
+    // Only draw if we need to.
+    if (this.currentDayValue !== this.lastDrawnValue_) {
+
+      this.renderer_.clear();
+      this.renderer_.draw(this.currentDayValue, animationValue,
+          animationDirection);
+    }
 
     if (animationValue === 0)
       this.continueAnimationIfNotAtFinalValue_();
@@ -158,6 +163,14 @@ IOWA.CountdownTimer.Element.prototype = {
     if (this.targetDate_ < Date.now())
       return;
 
+    // If we are over a single day to go, and we're at the final value stop
+    // and stay stopped. Otherwise we'll keep the countdown running.
+    var millisecondsToTarget = this.targetDate_ - Date.now();
+
+    if (millisecondsToTarget > this.millisecondsInADay_ &&
+        this.targetDayValue === this.currentDayValue)
+      return;
+
     this.setValuesAndDispatchThresholdEventsIfNeeded_();
     this.needToFreezeDigits_ = true;
 
@@ -170,7 +183,8 @@ IOWA.CountdownTimer.Element.prototype = {
 
     var millisecondsToTarget = this.targetDate_ - Date.now();
 
-    // TODO(paullewis) Set the label for the hours, minutes, seconds
+    this.lastDrawnValue_ = this.currentDayValue;
+
     if (millisecondsToTarget < this.millisecondsInAMinute_) {
 
       this.mode = IOWA.CountdownTimer.Modes.HoursMinutesSeconds;

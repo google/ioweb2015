@@ -48,10 +48,44 @@ Creates a countdown timer to a specific date.
         width: 100%;
         height: 100%;
       }
+
+      .countdown-label {
+        font-family: 'Roboto',sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        line-height: 1;
+        letter-spacing: 0.04em;
+        margin-left: 90px;
+      }
     </style>
     <div class="countdown-timer">
       <canvas id="surface"></canvas>
     </div>
+
+    <template if="{{ thresholdDays }}">
+      <h4 class="countdown-label">
+        <i18n-msg msgid="days">Days</i18n-msg>
+      </h4>
+    </template>
+
+    <template if="{{ thresholdHours }}">
+      <h4 class="countdown-label">
+        <i18n-msg msgid="hours">Hours</i18n-msg
+      </h4>
+    </template>
+
+    <template if="{{ thresholdMinutes }}">
+      <h4 class="countdown-label">
+        <i18n-msg msgid="minutes">Minutes</i18n-msg>
+      </h4>
+    </template>
+
+    <template if="{{ thresholdSeconds }}">
+      <h4 class="countdown-label">
+        <i18n-msg msgid="seconds">Seconds</i18n-msg>
+      </h4>
+    </template>
   </template>
 
   <script>
@@ -199,6 +233,11 @@ Creates a countdown timer to a specific date.
         this.start();
       },
 
+      thresholdDays: false,
+      thresholdHours: false,
+      thresholdMinutes: false,
+      thresholdSeconds: false,
+
       /**
        * Fires an event from the countdown timer when it has reached a
        * threshold, e.g. changed from hours to minutes, or the timer has
@@ -208,6 +247,30 @@ Creates a countdown timer to a specific date.
        * @private
        */
       onTimerThresholdReached_: function(thresholdInformation) {
+
+        this.thresholdDays = false;
+        this.thresholdHours = false;
+        this.thresholdMinutes = false;
+        this.thresholdSeconds = false;
+
+        switch (thresholdInformation.label) {
+          case "Days":
+            this.thresholdDays = true;
+            break;
+
+          case "Hours":
+            this.thresholdHours = true;
+            break;
+
+          case "Minutes":
+            this.thresholdMinutes = true;
+            break;
+
+          case "Seconds":
+            this.thresholdSeconds = true;
+            break;
+        }
+
         this.fire('timerthreshold', thresholdInformation);
       },
 
