@@ -39,7 +39,7 @@ can be applied before Polymer is ready and the element is upgraded.
      * @type number
      * @default the current year (e.g. 15)
      */
-    year: (new Date()).getYear() - 100,
+    year: (new Date()).getFullYear() % 2000,
 
     /**
      * Height of the logo in pixels.
@@ -133,9 +133,7 @@ can be applied before Polymer is ready and the element is upgraded.
           {transform: 'scale(1)'}
         ], {
           delay: this.START_DELAY,
-          // direction: 'alternate',
           duration: 400,
-          // iterations: 1,
           easing: 'cubic-bezier(0,0,0.21,1)',
           fill: 'forwards'
         })
@@ -148,6 +146,7 @@ can be applied before Polymer is ready and the element is upgraded.
       // TODO(ericbidelman): this should be possible with creating the sequence
       // direction: alternate and introducing a delay between reversing the
       // animation. Inquire with WA folks.
+      // https://github.com/GoogleChrome/ioweb2015/issues/168
       player.onfinish = function(e) {
         iteration++;
         if (iteration >= 2) {
