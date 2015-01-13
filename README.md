@@ -35,6 +35,8 @@ Normally the app is running in "dev" environment but you can change that by
 modifying `APP_ENV` environment variable:
 
   ```
+  # run in dev mode, default:
+  gulp serve
   # set app environment to production:
   APP_ENV=prod gulp serve
   # or run as if we were in staging:
@@ -49,8 +51,16 @@ You can also use GAE dev appserver by running `gulp serve:gae`. This is closer t
 we're using in our webapp environment but a bit slower on startup.
 You'll need `gcloud` tool and `app` component to do this.
 
-To change the app environment when using GAE SDK, modify the app version
-to end either with "-stage" or "-prod" in `app.yaml`.
+To change the app environment when using GAE SDK, modify the same env var:
+
+  ```
+  # run in dev mode, default:
+  gulp serve:gae
+  # set app environment to production:
+  APP_ENV=prod gulp serve:gae
+  # or run as if we were in staging:
+  APP_ENV=stage gulp serve:gae
+  ```
 
 Both gulp tasks accept optional `--no-watch` argument in case you need to disable
 file watchers and live reload.
@@ -59,17 +69,28 @@ file watchers and live reload.
 
 Run `gulp`. This will create `dist` directory with both front-end and backend parts, ready for deploy.
 
+**Note**: Build won't succeed if either `gulp jshint` or `gulp jscs` reports errors.
+
 You can also serve the build from `dist` by running `gulp serve:dist`,
 and navigating to http://localhost:8080.
 
-**Note**: Build won't succeed if either `gulp jshint` or `gulp jscs` reports errors.
+`serve:dist` runs the app in `prod` mode by default. You can change that
+by modifying the same env var as with other `serve` tasks. For instance:
+
+  ```
+  APP_ENV=stage gulp serve:dist
+  ```
 
 ### Deploying
 
 To deploy complete application on App Engine:
 
 1. Run `gulp` which will build both frontend and backend in `dist` directory.
-2. Run `gcloud preview app deploy dist/backend [--version <v>]`.
+2. Run `gcloud preview app deploy dist/backend --version <v>`.
+
+The app will be deployed to the project configured in `gcloud` tool.
+To check which project you're deploying to, run `gcloud config list`
+and look for `project = ...` line.
 
 The version also determines the app environment: dev, stage or prod.
 It is matched against "-stage" and "-prod" suffixes. Defaults to dev if none matched.
