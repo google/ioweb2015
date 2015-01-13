@@ -39,7 +39,7 @@
     "paper-tabs": "Polymer/paper-tabs#^0.5.2",
     "paper-toast": "Polymer/paper-toast#^0.5.2",
     "polymer": "Polymer/polymer#^0.5.2",
-    "shed": "wibblymat/shed"
+    "shed": "wibblymat/shed#af17401a0803c13585f0a33ebc8006562efed6c6"
   },
   "resolutions": {
     "polymer": "^0.5.2",
