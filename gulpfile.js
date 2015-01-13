@@ -161,7 +161,6 @@ gulp.task('copy-assets', ['copy-bower-dependencies'], function() {
 // reference that cruft from anywhere, it presumably shouldn't incur overhead.
 gulp.task('copy-bower-dependencies', function() {
   var bowerPackagesToCopy = [
-    'js-signals',
     'shed',
     'webcomponentsjs'
   ];
