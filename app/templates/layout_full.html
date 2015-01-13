@@ -91,7 +91,11 @@ limitations under the License.
   <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="elements/elements.html">
 </head>
-<body id="page-{% .Slug %}" unresolved>
+<body id="page-{% .Slug %}">
+
+<div class="io-logo-container {% template "mastheadBgClass" .%}">
+  <io-logo width="312" height="165" page="{% .Slug %}"></io-logo>
+</div>
 
 <core-drawer-panel forceNarrow>
   <div drawer>
@@ -184,6 +188,7 @@ limitations under the License.
           </paper-tabs>
         </core-toolbar>
         <div class="masthead-container {{ {active: !pageTransitioning} | tokenList }}" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+          <div class="io-logo large"></div>
           <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>

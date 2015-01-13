@@ -9,6 +9,7 @@ dist
 # Ignore generated CSS.
 .sass-cache
 app/styles/**/*.css
+app/elements/**/*.css
 
 # Built Experiment
 app/experiment

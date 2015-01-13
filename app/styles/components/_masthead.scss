@@ -15,21 +15,24 @@
  */
 
 .io-logo {
-  // TODO(ericbidelman): this should be a 1x asset.
-  background: url('../images/home/io_white.png') no-repeat;
-  height: 40px;
+  background: url('../images/home/io-logo.png') no-repeat;
   background-size: contain;
-  margin-left: $mobileKeyline / 2;
+  height: 40px;
+  width: 60px;
 
   &.medium {
-    height: 136px;
+    // height: 136px;
+    width: 177px;
+    height: 128px;
   }
+
   &.large {
-    height: 192px;
+    height: 184px;
+    width: 256px;
   }
-  &.huge {
-    height: 272px;
-  }
+  // &.huge {
+  //   height: 272px;
+  // }
 }
 
 .masthead {
@@ -48,10 +51,11 @@
     color: $color-bluegrey-100;
   }
 
-  .io-logo {
-    height: 40px;
-    width: 60px;
-    display: none;
+  core-toolbar {
+    .io-logo {
+      margin-left: $mobileKeyline / 2;
+      display: none;
+    }
   }
 }
 
@@ -131,8 +135,6 @@ core-drawer-panel {
   }
 
   paper-tab {
-    -webkit-flex: none !important;
-    -ms-flex: none !important;
     flex: none !important;
 
     a {
@@ -148,6 +150,10 @@ core-drawer-panel {
   margin: 0 auto;
   position: relative;
   padding: 32px 0;
+
+  .io-logo {
+    display: none;
+  }
 }
 
 .masthead-title {
@@ -168,6 +174,11 @@ experiment-fab-container {
 @media (max-width: $phone-breakpoint-max) {
   .masthead-container {
     @include keyline-72l();
+
+    .io-logo.large {
+      width: 177px;
+      height: 128px;
+    }
   }
 }
 
@@ -177,10 +188,11 @@ experiment-fab-container {
     position: relative;
     margin-bottom: -115px;
 
-    .io-logo {
-      display: inline-block;
+    core-toolbar {
+      .io-logo {
+        display: inline-block;
+      }
     }
-
   }
 
   .masthead-title, .masthead-subtitle {
@@ -223,8 +235,8 @@ experiment-fab-container {
   }
 }
 
-// @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint) {
-//   .masthead-container::before {
-//     background-image: url('../images/home/io_white.png');
-//   }
-// }
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .io-logo {
+    background-image: url('../images/home/io-logo@2x.png');
+  }
+}

@@ -1,47 +1,245 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
-<polymer-element name="io-logo" attributes="height">
+<!--
+The `<io-logo>` provides a  material design animation loading screen which transitions
+differently based on the type of page. For the homepage, the logo
+transitions from the center of the screen to its ending position in the masthead.
+For all other pages, the logo only fades out after its animation is done. This
+is because there is no destination position to transition to.
+
+A container element is expected to wrap the `<io-logo>` and expand to the full
+viewport width/height. This feature is not baked into the element so styling
+can be applied before Polymer is ready and the element is upgraded.
+
+    <div class="io-logo-container">
+      <io-logo width="312" height="165"></io-logo>
+    </div>
+
+@element io-logo
+-->
+<polymer-element name="io-logo" attributes="height width year page">
   <template>
-    <style>
-      :host {
-        display: inline-block;
-        width: 400px;
-      }
-      .letter {
-        background: #fff;
-      }
-      #slash {
-        width: 10px;
-        height: 135%;
-        -webkit-transform: rotateZ(12deg);
-        transform: rotateZ(12deg);
-        margin: -35px 0 0 40px;
-      }
-      #i {
-        max-width: 80px;
-        -webkit-align-self: center;
-        align-self: center;
-        height: 96%;
-      }
-      #o {
-        border-radius: 50%;
-        margin-left: 15px;
-      }
-    </style>
+    <link rel="stylesheet" href="io-logo.css">
     <div layout horizontal style="height:100%">
       <div id="i" class="letter" flex></div>
       <div id="slash" class="letter"></div>
-      <div id="o" class="letter" flex style="max-width:{{height}}"></div>
+      <div id="o" class="o letter" style="max-width:[[height]]px" flex layout vertical center-center>
+        <div id="o2" class="o" style="height:{{height - 20}}px;width:{{height - 20}}px" layout vertical center-center>
+          <h2 id="year">[[year]]</h2>
+        </div>
+      </div>
     </div>
   </template>
   <script>
   Polymer({
-    height: '165px',
+    /**
+     * The two-digit year to display inside the "O".
+     *
+     * @attribute width
+     * @type number
+     * @default the current year (e.g. 15)
+     */
+    year: (new Date()).getFullYear() % 2000,
+
+    /**
+     * Height of the logo in pixels.
+     *
+     * @attribute height
+     * @type number|string
+     * @default 165
+     */
+    height: 165,
+
+    /**
+     * Width of the logo in pixels.
+     *
+     * @attribute width
+     * @type number|string
+     * @default 213
+     */
+    width: 312,
+
+    /**
+     * The page that was loaded at pageload time.
+     *
+     * @attribute page
+     * @type string
+     * @default null
+     */
+    page: null,
+
+    /**
+     * The number of milliseconds the center of the "O" shows after it has grown.
+     *
+     * @property SHOW_FOR
+     * @type number
+     * @default 100
+     */
+    SHOW_FOR: 100,
+
+    /**
+     * The number of milliseconds before the "O" starts to grow.
+     *
+     * @property START_DELAY
+     * @type number
+     * @default 300
+     */
+    START_DELAY: 300,
+
+    /**
+     * The left/top of the destination node will be used to calculate the final
+     * left/top of the logo at the end of its animation.
+     *
+     * @property destination
+     * @type Element
+     * @default null
+     */
+    destination: null,
+
+    /**
+     * The site's container masthead element.
+     *
+     * @property masthead
+     * @type Element
+     * @default null
+     */
+    masthead: null,
+
     ready: function() {
       this.heightChanged();
+      this.widthChanged();
     },
+
+    attached: function() {
+      this.start();
+    },
+
     heightChanged: function() {
-      this.style.height = this.height;
+      this.style.height = parseInt(this.height) + 'px';
+    },
+
+    widthChanged: function() {
+      this.style.width = parseInt(this.width) + 'px';
+    },
+
+    /**
+     * Starts the loading animation sequence.
+     * @method start
+     */
+    start: function() {
+      var sequence = new AnimationSequence([
+        new Animation(this.$.o2, [
+          {transform: 'scale(0)'},
+          {transform: 'scale(1)'}
+        ], {
+          delay: this.START_DELAY,
+          duration: 400,
+          easing: 'cubic-bezier(0,0,0.21,1)',
+          fill: 'forwards'
+        })
+      ]);
+
+      var iteration = 0;
+
+      var player = document.timeline.play(sequence);
+
+      // TODO(ericbidelman): this should be possible with creating the sequence
+      // direction: alternate and introducing a delay between reversing the
+      // animation. Inquire with WA folks.
+      // https://github.com/GoogleChrome/ioweb2015/issues/168
+      player.onfinish = function(e) {
+        iteration++;
+        if (iteration >= 2) {
+          player.cancel();
+          this.moveLogo();
+          return;
+        }
+
+        this.async(function() {
+          player.reverse();
+        }, null, this.SHOW_FOR);
+      }.bind(this);
+    },
+
+    moveLogo: function() {
+      var current = this.getBoundingClientRect();
+      var destination = this.destination.getBoundingClientRect();
+      var masthead = this.masthead.getBoundingClientRect();
+
+      var containerWidth = document.documentElement.clientWidth;
+      var containerHeight = document.documentElement.clientHeight;
+
+      var diffX = destination.left - current.left;
+      var diffY = destination.top - current.top;
+
+      // Magic padding/margin offsets to get the I/O logo in its final position.
+      if (containerWidth > 769) { // Tablet/desktop
+        diffY += 9;
+        scale = 0.83;
+      } else {
+        diffY -= 19;
+        scale = 0.58;
+      }
+
+      // TODO(ericbidelman): coordinate with Ewa on delaying <main> transition up.
+      // this.parentElement.style.zIndex = 1;
+
+      // Masthead clipping.
+      var mastheadClipAnimation = new Animation(this.parentElement, [
+        {clip: 'rect(0, ' + containerWidth + 'px, ' + containerHeight + 'px, 0)'},
+        {clip: 'rect(0, ' + masthead.width + 'px, ' + masthead.height + 'px, 0)'}
+      ], {
+        duration: 500,
+        iterations: 1,
+        fill: 'forwards',
+        easing: 'cubic-bezier(0,0,0.21,1)'
+      });
+
+      if (this.page == 'home') {
+        // At the same time, clip masthead background and move I/O logo.
+        var animations = new AnimationGroup([
+          mastheadClipAnimation,
+          // I/O logo movement.
+          new Animation(this, [
+            {transform: 'none'},
+            {transform: 'translate3d(' + diffX + 'px,' + diffY + 'px,0) scale(' + scale + ')'}
+          ], {
+            duration: 500,
+            iterations: 1,
+            fill: 'forwards',
+            easing: 'cubic-bezier(0,0,0.21,1)'
+          })
+        ]);
+      } else {
+        // Fade out I/O logo then clip masthead background.
+        var animations = new AnimationSequence([
+          // I/O logo fade out.
+          new Animation(this, [
+            {opacity: 1},
+            {opacity: 0}
+          ], {
+            duration: 300,
+            iterations: 1,
+            fill: 'forwards',
+            easing: 'cubic-bezier(0,0,0.21,1)'
+          }),
+          mastheadClipAnimation
+        ]);
+      }
+
+      var player = document.timeline.play(animations);
+
+      player.onfinish = function(e) {
+        var el = this.parentElement;
+        var callback = function(e) {
+          el.removeEventListener('transitionend', callback);
+          el.parentElement.removeChild(el);
+        };
+
+        el.addEventListener('transitionend', callback);
+
+        el.classList.add('fadeout');
+      }.bind(this);
     }
   });
   </script>
