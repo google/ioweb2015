@@ -58,7 +58,7 @@ $icon-margin: 10px;
   .card__photo--stage {
     height: 700px;
     position: relative;
-    margin-top: -93px;
+    margin-top: -73px;
     margin-bottom: -285px;
   }
   .page__section--attend {
@@ -84,6 +84,13 @@ $icon-margin: 10px;
       height: 500px;
     }
   }
+}
+
+@media (min-width: $desktop-breakpoint-mid) {
+  .card__photo--stage {
+    margin-top: -93px;
+  }
+
 }
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
