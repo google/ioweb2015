@@ -35,6 +35,11 @@ IOWA.Elements = (function() {
     IOWA.Elements.Ripple = ripple;
     IOWA.Elements.Toast = toast;
     IOWA.Elements.IOLogo = ioLogo;
+
+    ioLogo.addEventListener('finish', function() {
+      IOWA.Elements.Template.pageTransitioningOut = false;
+      IOWA.Elements.Template.pageTransitioningIn = true;
+    });
   };
 
   var init = function() {
@@ -43,7 +48,7 @@ IOWA.Elements = (function() {
     template.pages = {};
     var urlParts = location.href.split('/');
     template.selectedPage = urlParts[urlParts.length - 1] || 'home';
-    template.pageTransitioning = false;
+    template.pageTransitioningOut = true;
 
     template.pages = {
       'schedule': {

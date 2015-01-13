@@ -231,14 +231,8 @@ can be applied before Polymer is ready and the element is upgraded.
 
       player.onfinish = function(e) {
         var el = this.parentElement;
-        var callback = function(e) {
-          el.removeEventListener('transitionend', callback);
-          el.parentElement.removeChild(el);
-        };
-
-        el.addEventListener('transitionend', callback);
-
-        el.classList.add('fadeout');
+        this.fire('finish');
+        el.parentElement.removeChild(el);
       }.bind(this);
     }
   });

@@ -188,13 +188,7 @@ h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  // background-color: $color-bluegrey-100;
-  will-change: clip, opacity;
-  transition: opacity 300ms ease-in-out;
-
-  &.fadeout {
-    opacity: 0;
-  }
+  will-change: clip;
 
   io-logo {
     will-change: transform;

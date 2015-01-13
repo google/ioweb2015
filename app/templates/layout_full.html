@@ -186,9 +186,9 @@ limitations under the License.
             </paper-tab>
           </paper-tabs>
         </core-toolbar>
-        <div class="masthead-container {{ {active: !(pageTransitioningOut)} | tokenList }}" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+        <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="io-logo large"></div>
-          <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
+          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
