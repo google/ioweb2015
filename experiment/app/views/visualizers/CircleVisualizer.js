@@ -33,6 +33,7 @@ module.exports = (function() {
     var iconSizes = [];
     var iconSizesTween = [];
     var lasticonSizesTween = [];
+    var lastYPosTweenObject = [];
 
     var range = 3;
     var rangeOffsetLeft = 10;
@@ -43,6 +44,9 @@ module.exports = (function() {
     var intervalID2;
 
     var analyser = audioManager.analyser;
+    analyser.fftSize = FFT_SIZE;
+    analyser.smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
+
     var canvasContext = canvas.getContext('2d');
     var freqDomain = new Uint8Array(analyser.frequencyBinCount);
 
@@ -52,7 +56,7 @@ module.exports = (function() {
     var length = 25;
 
     var yTween = [];
-    var lastyTween = [];
+    var lastYTween = [];
 
     var amplitude;
 
@@ -70,8 +74,7 @@ module.exports = (function() {
 
     function rebuild() {
       iconSizes = [];
-      for (let i = 0; i < length; i++){
-        // create and store a node for the icon for this image
+      for (let i = 0; i < length; i++) {
         iconSizes[i] = minimumSize;
       }
     }
@@ -99,19 +102,16 @@ module.exports = (function() {
       canvasContext.fillStyle = 'white';
       canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      analyser.fftSize = FFT_SIZE;
       analyser.getByteFrequencyData(freqDomain);
-      analyser.smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
-
 
       var lastWidth = 0;
       var myx = 0;
-      for (var i = 0; i < iconSizes.length; i++) {
-        var radius = iconSizesTween[i];
+      for (let i = 0; i < iconSizes.length; i++) {
+        let radius = iconSizesTween[i];
         canvasContext.beginPath();
         amplitude = freqDomain[i];
 
-        var offset = canvasHeight/2 + yTween[i];
+        let offset = canvasHeight/2 + yTween[i];
         myx = myx + (iconSizesTween[i]) + lastWidth;
         canvasContext.arc(myx, offset, radius, 0, 2 * Math.PI, false);
         canvasContext.fillStyle = '#ffffff';
@@ -131,7 +131,6 @@ module.exports = (function() {
     function circleScale() {
       if (scale < 1) {
         scale = 1;
-       // scale += 0.125;
       } else if (scale >= 1){
         scale = 1;
       }
@@ -139,21 +138,22 @@ module.exports = (function() {
 
     function resizeCircles() {
       var index = 0;
+
       for (let j = 0; j < iconSizes.length; j++) {
         if (j === currentId) {
           index = j;
 
           // obtain the fraction across the icon that the mouseover event occurred
-          var tempX = 0.2;
-          var across = (tempX) / iconSizes[index];
+          let tempX = 0.2;
+          let across = (tempX) / iconSizes[index];
 
           // check a distance across the icon was found (in some cases it will not be)
           if (across) {
             // initialise the current width to 0
-            var currentWidth = 0;
+            let currentWidth = 0;
 
             // loop over the icons
-            for (var i = 0; i < iconSizes.length; i++) {
+            for (let i = 0; i < iconSizes.length; i++) {
 
               // check whether the icon is in the range to be resized
               if (i < index - range || i > index + range) {
@@ -188,7 +188,7 @@ module.exports = (function() {
             }
 
             // update the sizes of the images
-            for (var m = 0; m < iconSizes.length; m++) {
+            for (let m = 0; m < iconSizes.length; m++) {
               tweenById(m);
             }
           }
@@ -198,6 +198,7 @@ module.exports = (function() {
 
     function tweenById(id) {
       var object = {};
+
       if (lasticonSizesTween[id]) {
         object.radius = lasticonSizesTween[id];
       } else {
@@ -208,31 +209,38 @@ module.exports = (function() {
     }
 
     function tweenByIdUpdate(object, id) {
-      iconSizesTween[id ] = object.radius;
+      iconSizesTween[id] = object.radius;
       lasticonSizesTween[id]  = object.radius;
     }
 
     function tweenByIdYpos(id) {
-      var object = {};
       if (freqDomain[id]) {
-        yTween[id] = freqDomain[id]/2;
+        yTween[id] = freqDomain[id] / 2;
       } else {
         yTween[id] = freqDomain[freqDomain.length - 1] / 2;
       }
 
-      if (lasticonSizesTween[id]) {
-        object.y = lastyTween[id];
-        lastyTween[id] = yTween[id];
-      } else {
-        object.y = 0;
+      if (!lastYPosTweenObject[id]) {
+        lastYPosTweenObject[id] = [
+          { y: 0 },
+          { y: 0, onUpdate: tweenByIdUpdateYpos, onUpdateParams: [id] }
+        ];
       }
 
-      animate.to(object, 0.4, {  y: yTween[id],  onUpdate:tweenByIdUpdateYpos , onUpdateParams: [ object, id  ]});
+      if (lasticonSizesTween[id]) {
+        lastYPosTweenObject[id][0].y = lastYTween[id];
+        lastYTween[id] = yTween[id];
+      } else {
+        lastYPosTweenObject[id][0].y = 0;
+      }
+
+      lastYPosTweenObject[id][1].y = yTween[id];
+      animate.to(lastYPosTweenObject[id][0], 0.2, lastYPosTweenObject[id][1]);
     }
 
-    function tweenByIdUpdateYpos(object, id) {
-      yTween[id] = object.y;
-     }
+    function tweenByIdUpdateYpos(id) {
+      yTween[id] = lastYPosTweenObject[id][0].y;
+    }
 
     /**
      * On render, draw circles
@@ -246,7 +254,7 @@ module.exports = (function() {
      * @param {number} w - Width.
      */
     function resize(w) {
-      length = Math.round( w/(10*2.4) );
+      length = Math.round(w / (10 * 2.4));
 
       if (length < 30) {
         rangeOffsetLeft = 4;
