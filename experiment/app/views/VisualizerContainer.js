@@ -54,7 +54,7 @@ module.exports = (function() {
     }
 
     function setPos(x, y) {
-      TweenMax.set(wrapperElement, { x, y });
+      animate.set(wrapperElement, { x, y });
     }
 
     function resize() {

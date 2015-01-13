@@ -53,7 +53,7 @@ module.exports = (function() {
     var mask = new PIXI.Graphics();
     container.addChild(mask);
     container.mask = mask;
-    
+
     var shadow = new PIXI.Graphics();
 
     gfx.addChild(shadow);
@@ -93,7 +93,7 @@ module.exports = (function() {
       }
       distanceGradient.addColorAt(CENTER_RANGE.getAt(1.0), CENTER_COLOR);
 
-      var dColors = distanceGradient.calcGradient(0, MAX_RADIUS+1).colors;
+      var dColors = distanceGradient.calcGradient(0, MAX_RADIUS + 1).colors;
       distanceGradients[degrees] = distanceGradients[degrees] || {};
       distanceGradients[degrees][distance] = dColors;
 
@@ -168,7 +168,7 @@ module.exports = (function() {
       tweenInfo.highlight = 0.2;
       animate.to(tweenInfo, 0.5, tweenTarget);
     }
-    
+
     function onUpdate() {
       updateHighlight(tweenInfo.highlight);
     }

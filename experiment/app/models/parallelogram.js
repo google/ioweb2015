@@ -1,6 +1,5 @@
 var DataModel = require('app/util/DataModel');
 
-
 /**
  * Defines the Guitar data model.
  */

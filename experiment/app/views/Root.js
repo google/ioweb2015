@@ -85,9 +85,9 @@ module.exports = function(audioManager, stateManager) {
     var instrumentData = [];
     for (let i = 0; i < instrumentViews.length; i++) {
       stateManager.registerInstrument(
-          instrumentViews[i].getView().name,
-          instrumentViews[i].getView().dataModel,
-          instrumentViews[i].getView().getData
+        instrumentViews[i].getView().name,
+        instrumentViews[i].getView().dataModel,
+        instrumentViews[i].getView().getData
       );
 
       instrumentData.push(instrumentViews[i].getView().name);

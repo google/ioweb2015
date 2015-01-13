@@ -480,7 +480,7 @@ module.exports = (function() {
      * @param {number} y - The y position.
      */
     function setPos(x, y) {
-      TweenMax.set(wrapperElement, { x, y });
+      animate.set(wrapperElement, { x, y });
     }
 
     /**
