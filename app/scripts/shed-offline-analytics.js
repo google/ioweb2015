@@ -2,6 +2,7 @@ importScripts('scripts/helper/simpledb.js');
 
 var DB_NAME = 'shed-offline-analytics';
 var EXPIRATION_TIME_DELTA = 86400000; // One day, in milliseconds.
+var ORIGIN = /https?:\/\/www\.google-analytics\.com/;
 
 function replayQueuedRequests() {
   simpleDB.open(DB_NAME).then(function(db) {
@@ -56,13 +57,7 @@ function handleAnalyticsCollectionRequest(request) {
   });
 }
 
-// TODO (jeffposnick): Is there any way to use wildcards for the protocols and domains?
-// TODO (jeffposnick): See if there's a way to avoid :ignored. See https://github.com/wibblymat/shed/issues/17
-shed.router.get('http://www.google-analytics.com/collect?:ignored', handleAnalyticsCollectionRequest);
-shed.router.get('https://www.google-analytics.com/collect?:ignored', handleAnalyticsCollectionRequest);
-shed.router.get('https://ssl.google-analytics.com/collect?:ignored', handleAnalyticsCollectionRequest);
-
-shed.router.get('http://www.google-analytics.com/analytics.js', shed.networkFirst);
-shed.router.get('https://www.google-analytics.com/analytics.js', shed.networkFirst);
+shed.router.get('/collect', handleAnalyticsCollectionRequest, {origin: ORIGIN});
+shed.router.get('/analytics.js', shed.networkFirst, {origin: ORIGIN});
 
 replayQueuedRequests();
