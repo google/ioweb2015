@@ -1,0 +1,53 @@
+{
+  "name": "gsap-promise",
+  "version": "1.3.1",
+  "description": "a Promise wrapper around gsap / twenelite",
+  "main": "index.js",
+  "license": "MIT",
+  "author": {
+    "name": "Matt DesLauriers",
+    "email": "dave.des@gmail.com",
+    "url": "https://github.com/mattdesl"
+  },
+  "dependencies": {
+    "bluebird": "^2.3.6",
+    "gsap": "^1.14.1"
+  },
+  "devDependencies": {
+    "tape": "^3.0.0"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mattdesl/gsap-promise.git"
+  },
+  "homepage": "https://github.com/mattdesl/gsap-promise",
+  "bugs": {
+    "url": "https://github.com/mattdesl/gsap-promise/issues"
+  },
+  "gitHead": "64121e61a3dd7d408af67ae90d2125b50ecf1b72",
+  "_id": "gsap-promise@1.3.1",
+  "_shasum": "c3676b8c3216a8645be4ac470195ddc5fe1de9a0",
+  "_from": "gsap-promise@*",
+  "_npmVersion": "2.1.4",
+  "_nodeVersion": "0.10.32",
+  "_npmUser": {
+    "name": "mattdesl",
+    "email": "dave.des@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "mattdesl",
+      "email": "dave.des@gmail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "c3676b8c3216a8645be4ac470195ddc5fe1de9a0",
+    "tarball": "http://registry.npmjs.org/gsap-promise/-/gsap-promise-1.3.1.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/gsap-promise/-/gsap-promise-1.3.1.tgz"
+}

@@ -27,19 +27,16 @@ $name: 'page-home';
 
 // Homepage doesn't include top-left io logo.
 .masthead {
-  .io-logo {
-    display: none;
+  core-toolbar {
+    .io-logo {
+      display: none;
+    }
   }
 }
 
 .masthead-container {
-  &::before {
-    content: '';
-    width: 177px;
-    height: 128px;
-    display: block;
-    background: url('../images/home/io_white.png') center center no-repeat;
-    background-size: contain;
+  .io-logo {
+    display: inline-block;
   }
 }
 
@@ -103,7 +100,7 @@ $name: 'page-home';
 
 @media (min-width: $tablet-breakpoint-min) {
   .masthead-container {
-    &::before {
+    .io-logo {
       width: 256px;
       height: 184px;
     }
@@ -111,7 +108,7 @@ $name: 'page-home';
 
   .home-photo {
     height: 745px;
-    margin-top: -232px;
+    margin-top: -182px;
   }
   #registration {
     position: relative;

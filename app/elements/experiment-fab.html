@@ -1,0 +1,1008 @@
+<script src="../experiment/js/loader.js"></script>
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-icons/social-icons.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/i18n-msg/i18n-msg.html">
+
+<!--
+Main fab for entering/exit the experiment.
+##### Example
+  <experiment-fab></experiment-fab>
+@element experiment-fab
+@blurb Main fab for entering/exit the experiment.
+@extends paper-fab
+-->
+<polymer-element name="experiment-fab" extends="paper-fab">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        background-repeat: no-repeat;
+        color: inherit;
+        display: block;
+        position: absolute;
+        opacity: 1;
+        visibility: visible;
+        z-index: 2;
+        transition: all 300ms ease-out;
+      }
+      :host::shadow core-icon {
+        height: 19px;
+        width: 22px;
+        top: 2px;
+        left: 1px;
+      }
+      :host([playing])::shadow core-icon {
+        height: 17px;
+        width: 12px;
+        left: 5px;
+        top: 3px;
+      }
+      :host([paused])::shadow core-icon {
+        height: 16px;
+        width: 13px;
+        left: 7px;
+        top: 4px;
+      }
+      :host([recording]) {
+        opacity: 0;
+        visibility: hidden;
+      }
+    </style>
+    <shadow></shadow>
+  </template>
+
+  <script>
+    Polymer({
+      publish: {
+        recording: {
+          value: false,
+          reflect: true
+        }
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+This is a rainbow circle border that spins around the experiment-fab while the experiment is loading
+##### Example
+  <experiment-loading-fab></experiment-loading-fab>
+@element experiment-loading-fab
+@blurb This is a rainbow circle border that spins around the experiment-fab while the experiment is loading.
+-->
+<polymer-element name="experiment-loading-circle" noscript>
+  <template>
+    <style>
+      :host {
+        background: transparent url(../../images/loading-circle.png) 0 0 no-repeat;
+        background-size: 100%;
+        color: inherit;
+        display: block;
+        position: absolute;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 150ms ease-out;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+      }
+
+      @-webkit-keyframes rotating {
+        from {
+            -webkit-transform: rotate(0deg);
+        }
+        to {
+            -webkit-transform: rotate(360deg);
+        }
+      }
+
+      @keyframes rotating {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+      }
+
+      :host([loading]) {
+        opacity: 1;
+        visibility: visible;
+        -webkit-animation: rotating 2s linear infinite;
+        animation: rotating 2s linear infinite;
+      }
+
+      :host([exploaded]) {
+        opacity: 0;
+        visibility: hidden;
+        -webkit-animation: none;
+        animation: none;
+      }
+    </style>
+    <shadow></shadow>
+    <content></content>
+  </template>
+</polymer-element>
+
+<!--
+Dialog that animates in when experiment fab is clicked. If experiment is supported, user can cancel out of the dialog or enter into the experiment.
+##### Example
+  <experiment-loading-dialog></experiment-loading-dialog>
+@element experiment-loading-dialog
+@blurb Dialog that animates in when experiment fab is clicked. If experiment is supported, user can cancel out of the dialog or enter into the experiment.
+-->
+<polymer-element name="experiment-loading-dialog">
+  <template>
+    <style>
+      :host {
+        background: #fff url(../../images/headphones-on.png) 60% 60% no-repeat;
+        background-size: 75%;
+        box-sizing: border-box;
+        border-radius: 3px;
+        bottom: 80px;
+        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+        font-family: 'Roboto', sans-serif;
+        height: 480px;
+        padding: 20px;
+        position: absolute;
+        right: 0;
+        -webkit-transition: -webkit-transform 300ms ease-in-out;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 100% 100%;
+        transition: transform 300ms ease-in-out;
+        transform: scale(0,0);
+        transform-origin: 100% 100%;
+        width: 360px;
+        z-index: 2;
+      }
+
+      @media screen and (max-width: 767px) {
+        :host {
+          position: fixed;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+          -webkit-transform-origin: 91% 64%;
+          transform-origin: 91% 64%;
+        }
+      }
+
+      :host([active]) {
+        -webkit-transform: scale(1,1);
+        transform: scale(1,1);
+      }
+
+      h4 {
+        color: #424242;
+        font-size: 24px;
+        font-weight: 400;
+        margin: 0;
+      }
+
+      p {
+        color: #9E9E9E;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .button-container {
+        bottom: 20px;
+        position: absolute;
+        right: 20px;
+      }
+
+      .experiment-button {
+        color: #64B5F6;
+        display: block;
+        float: right;
+        font-size: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .experiment-button[disabled] {
+        background: transparent;
+        color: #ccc;
+      }
+    </style>
+
+    <template if="{{supported}}">
+
+      <h4>
+        <i18n-msg msgid="headphones-on">Headphones on</i18n-msg>
+      </h4>
+      <p>
+        <i18n-msg msgid="experiment-ahead">Web Audio API experiment ahead</i18n-msg>
+      </p>
+      <div class="button-container">
+        <template if="{{!expLoaded}}">
+          <paper-button class="experiment-button" disabled>
+            <i18n-msg msgid="loading">Loading...</i18n-msg>
+          </paper-button>
+        </template>
+        <template if="{{expLoaded}}">
+          <paper-button class="experiment-button" on-tap="{{onExperimentOn}}">
+            <i18n-msg msgid="make-noise">Make Some Noise</i18n-msg>
+          </paper-button>
+        </template>
+        <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
+          <i18n-msg msgid="cancel">Cancel</i18n-msg>
+        </paper-button>
+      </div>
+
+    </template>
+
+    <template if="{{!supported}}">
+
+      <p>
+        <i18n-msg msgid="experiment-unsupported">Unsupported.</i18n-msg>
+      </p>
+      <div class="button-container">
+        <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
+          <i18n-msg msgid="cancel">Cancel</i18n-msg>
+        </paper-button>
+      </div>
+
+    </template>
+
+    <template if="{{experimentFailed}}">
+
+      <p>
+        <i18n-msg msgid="experiment-failed">The experiment failed to load.</i18n-msg>
+      </p>
+      <div class="button-container">
+        <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
+          <i18n-msg msgid="close-dialog">Close</i18n-msg>
+        </paper-button>
+      </div>
+
+    </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      publish: {
+        supported: {
+          value: false,
+          reflect: true
+        },
+        expLoaded: {
+          value: false,
+          reflect: true
+        },
+        experimentFailed: {
+          value: false,
+          reflect: true
+        }
+      },
+
+      onExperimentOff: function() {
+        this.fire('experiment-cancel');
+      },
+
+      onExperimentOn: function() {
+        this.fire('experiment-load');
+      }
+    });
+  </script>
+</polymer-element>
+
+
+<!--
+Semi-opaque overlay that shows when experiment dialog is opened.
+##### Example
+  <experiment-overlay></experiment-overlay>
+@element experiment-overlay
+@blurb Semi-opaque overlay that shows when experiment dialog is opened.
+-->
+<polymer-element name="experiment-overlay" noscript>
+  <template>
+    <style>
+      :host {
+        background: rgba(0,0,0,0.4);
+        background-size: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 300ms ease-out;
+      }
+
+      :host([active]) {
+        opacity: 1;
+        visibility: visible;
+      }
+
+    </style>
+    <content></content>
+  </template>
+</polymer-element>
+
+<!--
+Fab for exiting the experiment.
+##### Example
+  <experiment-exit-fab></experiment-exit-fab>
+@element experiment-exit-fab
+@blurb Fab for exiting the experiment.
+@extends paper-fab
+-->
+<polymer-element name="experiment-exit-fab" extends="paper-fab">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        background-repeat: no-repeat;
+        background-size: 20%;
+        color: inherit;
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        top: -216px;
+        left: 8px;
+        transform: scale(0,0);
+        transform-origin: 50% 100%;
+        transition: all 100ms ease-out 100ms;
+      }
+      :host::shadow core-icon {
+        height: 15px;
+        width: 16px;
+        top: 4px;
+        left: 4px;
+      }
+      :host([open]) {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1,1);
+      }
+    </style>
+    <shadow></shadow>
+  </template>
+
+  <script>
+    Polymer({
+      eventDelegates: {
+        tap: 'onTap'
+      },
+      onTap: function() {
+        this.fire('exit-click');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+Dialog to confirm or cancel experiment exit.
+##### Example
+  <experiment-exit-dialog></experiment-exit-dialog>
+@element experiment-exit-dialog
+@blurb Dialog to confirm or cancel experiment exit.
+-->
+<polymer-element name="experiment-exit-dialog">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        box-sizing: border-box;
+        border-radius: 3px;
+        bottom: 232px;
+        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+        font-family: 'Roboto', sans-serif;
+        height: 190px;
+        padding: 20px;
+        position: absolute;
+        right: 70px;
+        -webkit-transition: -webkit-transform 300ms ease-in-out;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 100% 100%;
+        transition: transform 300ms ease-in-out;
+        transform: scale(0,0);
+        transform-origin: 100% 100%;
+        width: 220px;
+        z-index: 1;
+      }
+
+      :host([active]) {
+        -webkit-transform: scale(1,1);
+        transform: scale(1,1);
+      }
+
+      h4 {
+        color: #424242;
+        font-size: 20px;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      p {
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+
+      paper-button {
+        color: #64B5F6;
+        display: block;
+        float: left;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .button-container {
+        float: right;
+      }
+    </style>
+
+    <h4>
+      <i18n-msg msgid="exit-experiment">Exit the Experiment?</i18n-msg>
+    </h4>
+    <p>
+      <i18n-msg msgid="exit-confirmation">Are you sure you want to exit the experiment and go back to the I/O website?</i18n-msg>
+    </p>
+
+    <div class="button-container">
+      <paper-button on-tap="{{exitYes}}">
+        <i18n-msg msgid="yes">Yes</i18n-msg>
+      </paper-button>
+      <paper-button on-tap="{{exitNo}}">
+        <i18n-msg msgid="no">No</i18n-msg>
+      </paper-button>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      exitYes: function() {
+        this.fire('exit-yes');
+      },
+      exitNo: function() {
+        this.fire('exit-no');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+Fab for resetting the experiment loop to default
+##### Example
+  <experiment-reset-fab></experiment-reset-fab>
+@element experiment-reset-fab
+@blurb Fab for resetting the experiment loop to default.
+@extends paper-fab
+-->
+<polymer-element name="experiment-reset-fab" extends="paper-fab">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        background-repeat: no-repeat;
+        color: inherit;
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        top: -144px;
+        left: 8px;
+        transform: scale(0,0);
+        transform-origin: 50% 100%;
+        transition: all 100ms ease-out 50ms;
+      }
+      :host::shadow core-icon {
+        height: 18px;
+        width: 18px;
+        top: 3px;
+        left: 3px;
+      }
+      :host([open]) {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1,1);
+      }
+    </style>
+    <shadow></shadow>
+  </template>
+
+  <script>
+    Polymer({
+      eventDelegates: {
+        tap: 'onTap'
+      },
+      onTap: function() {
+        this.fire('reset-click');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+Dialog to confirm or cancel experiment reset.
+##### Example
+  <experiment-reset-dialog></experiment-reset-dialog>
+@element experiment-reset-dialog
+@blurb Dialog to confirm or cancel experiment reset.
+-->
+<polymer-element name="experiment-reset-dialog">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        box-sizing: border-box;
+        border-radius: 3px;
+        bottom: 162px;
+        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+        font-family: 'Roboto', sans-serif;
+        height: 190px;
+        padding: 20px;
+        position: absolute;
+        right: 70px;
+        transition: transform 300ms ease-in-out;
+        -webkit-transition: -webkit-transform 300ms ease-in-out;
+        transform: scale(0,0);
+        transform-origin: 100% 100%;
+        width: 220px;
+        z-index: 1;
+      }
+
+      :host([active]) {
+        transform: scale(1,1);
+      }
+
+      h4 {
+        color: #424242;
+        font-size: 20px;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      p {
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+
+      paper-button {
+        color: #64B5F6;
+        display: block;
+        float: left;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .button-container {
+        float: right;
+      }
+    </style>
+
+    <h4>
+      <i18n-msg msgid="reset-song">Reset the song?</i18n-msg>
+    </h4>
+    <p>
+      <i18n-msg msgid="reset-confirm">Are you sure you want to reset the song back to the default?</i18n-msg>
+    </p>
+
+    <div class="button-container">
+      <paper-button on-tap="{{resetYes}}">
+        <i18n-msg msgid="yes">Yes</i18n-msg>
+      </paper-button>
+      <paper-button on-tap="{{resetNo}}">
+        <i18n-msg msgid="no">No</i18n-msg>
+      </paper-button>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      resetYes: function() {
+        this.fire('reset-yes');
+      },
+      resetNo: function() {
+        this.fire('reset-no');
+      }
+    });
+  </script>
+</polymer-element>
+
+
+<!--
+Fab for triggering the share dialog.
+##### Example
+  <experiment-share-fab></experiment-share-fab>
+@element experiment-share-fab
+@blurb Fab for triggering the share dialog.
+@extends paper-fab
+-->
+<polymer-element name="experiment-share-fab" extends="paper-fab">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        background-repeat: no-repeat;
+        background-size: 20%;
+        color: inherit;
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        top: -72px;
+        left: 8px;
+        transform: scale(0,0);
+        transform-origin: 50% 100%;
+        transition: all 100ms ease-out 0;
+      }
+      :host::shadow core-icon {
+        height: 15px;
+        width: 17px;
+        left: 4px;
+        top: 4px;
+      }
+      :host([open]) {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1,1);
+      }
+    </style>
+    <shadow></shadow>
+  </template>
+
+  <script>
+    Polymer({
+      eventDelegates: {
+        tap: 'onTap'
+      },
+      onTap: function() {
+        this.fire('share-click');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+Dialog to share the user's custom experiment/song
+##### Example
+  <experiment-share-dialog></experiment-share-dialog>
+@element experiment-share-dialog
+@blurb Dialog to share the user's custom experiment/song
+-->
+<polymer-element name="experiment-share-dialog" attributes="url plainURL">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        box-sizing: border-box;
+        border-radius: 3px;
+        bottom: 88px;
+        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+        font-family: 'Roboto', sans-serif;
+        height: 300px;
+        padding: 20px 10px 20px 20px;
+        position: absolute;
+        right: 70px;
+        transition: transform 300ms ease-in-out;
+        -webkit-transition: -webkit-transform 300ms ease-in-out;
+        transform: scale(0,0);
+        transform-origin: 100% 100%;
+        width: 220px;
+        z-index: 1;
+      }
+
+      :host([active]) {
+        transform: scale(1,1);
+      }
+
+      .core-selected {
+        background-color: transparent;
+      }
+
+      h4 {
+        color: #424242;
+        font-size: 20px;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      core-menu {
+        margin: 12px 0 0 0;
+      }
+
+      paper-item {
+        color: #424242;
+        font-size: 16px;
+      }
+
+      paper-item::shadow .button-content {
+        padding: 0.7em 1em 0.7em 0.1em;
+      }
+
+      paper-item a {
+        color: #424242;
+        text-decoration: none;
+      }
+
+      core-icon {
+        margin-right: 20px;
+      }
+
+      .share-icon {
+        fill: #bdbdbd;
+      }
+
+      input {
+        border: none;
+        color: #424242;
+        cursor: pointer;
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        overflow: hidden;
+        padding: 0;
+        width: 125px;
+      }
+
+      .cancel {
+        color: #64B5F6;
+        display: block;
+        float: right;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+    </style>
+
+    <h4>
+      <i18n-msg msgid="share-your-song">Share Your Song</i18n-msg>
+    </h4>
+
+    <core-menu>
+      <paper-item>
+        <a href="//plus.google.com/share?url={{url}}" target="_blank" layout horizontal center>
+          <core-icon class="share-icon" icon="social:post-gplus"></core-icon>
+          <i18n-msg msgid="gplus-share">Google+</i18n-msg>
+        </a>
+      </paper-item>
+      <paper-item>
+        <a href="//twitter.com/intent/tweet?text=check+out+my+I/O+song&url={{url}}" target="_blank" layout horizontal center>
+          <core-icon class="share-icon" icon="social:post-twitter"></core-icon>
+          <i18n-msg msgid-"twitter-share">Twitter</i18n-msg>
+        </a>
+      </paper-item>
+      <paper-item>
+        <a href="//www.facebook.com/sharer/sharer.php?u={{url}}" target="_blank" layout horizontal center>
+          <core-icon class="share-icon" icon="social:post-facebook"></core-icon>
+          <i18n-msg msgid="facebook-share">Facebook</i18n-msg>
+        </a>
+      </paper-item>
+      <paper-item class="share-url" noink on-tap="{{linkSelect}}">
+        <core-icon class="share-icon" icon="link"></core-icon>
+        <input id="urlInput" value="{{plainURL}}" readonly>
+      </paper-item>
+    </core-menu>
+
+    <paper-button class="cancel" on-tap="{{shareOff}}">
+      <i18n-msg msgid="cancel">Cancel</i18n-msg>
+    </paper-button>
+
+  </template>
+
+  <script>
+    Polymer({
+      linkSelect: function() {
+        this.$.urlInput.select();
+      },
+
+      shareOff: function() {
+        this.fire('share-cancel');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+Main parent container for all of the fab elements.
+##### Example
+  <experiment-fab-container></experiment-fab-container>
+@element experiment-fab-container
+@blurb Main parent container for all of the fab elements.
+-->
+<polymer-element name="experiment-fab-container" attributes="mini mode playmode fixed">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: absolute;
+        z-index: 100002;
+        transition: all 300ms ease-out;
+      }
+      :host([fixed="fixed"]) {
+        position: fixed;
+        top: 50%;
+        margin-top: -28px;
+      }
+    </style>
+    <template if="{{mode == 'pre'}}">
+
+      <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
+      <experiment-fab src="../images/experiment-fab-animation.gif" on-tap="{{onFabClick}}"></experiment-fab>
+
+      <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}"></experiment-loading-dialog>
+
+      <experiment-overlay active?="{{dialogVisible}}"></experiment-overlay>
+
+    </template>
+
+    <template if="{{mode == 'active'}}">
+
+      <experiment-exit-fab src="../images/exit-experiment.png" mini open?="{{miniFabs}}"></experiment-exit-fab>
+      <experiment-exit-dialog active?="{{exitVisible}}"></experiment-exit-dialog>
+
+      <experiment-reset-fab src="../images/reset-experiment.png" mini open?="{{miniFabs}}"></experiment-reset-fab>
+      <experiment-reset-dialog active?="{{resetVisible}}"></experiment-reset-dialog>
+
+      <experiment-share-fab src="../images/share-experiment.png" mini open?="{{miniFabs}}" on-tap="{{onShareClick}}"></experiment-share-fab>
+      <experiment-share-dialog active?="{{shareVisible}}" url="{{shareURL}}" plainURL="{{unencodedURL}}"></experiment-share-dialog>
+
+      <template if="{{playmode == 'playing'}}">
+        <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="../images/pause-experiment.png" on-tap="{{playingFabClick}}" playing></experiment-fab>
+      </template>
+      <template if="{{playmode == 'paused'}}">
+        <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="../images/play-experiment.png" on-tap="{{pausedFabClick}}" paused></experiment-fab>
+      </template>
+
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      publish: {
+        mode: {
+          value: 'pre',
+          reflect: true
+        },
+        playmode: {
+          reflect: true
+        },
+        fixed: {
+          value: 'unfixed',
+          reflect: true
+        }
+      },
+
+      eventDelegates: {
+        'experiment-cancel': 'experimentOff',
+        'experiment-load': 'experimentOn',
+        'exit-click': 'onExitClick',
+        'exit-yes': 'onExitYes',
+        'exit-no': 'onExitNo',
+        'reset-click': 'onResetClick',
+        'reset-no': 'onResetCancel',
+        'share-cancel': 'onShareCancel'
+      },
+
+      ready: function() {
+        this.boundOnScroll = this.onScroll.bind(this);
+      },
+
+      onFabClick: function(event) {
+        this.dialogVisible = true;
+
+        // get bounds of fab click target
+        this.fabBounds = event.target.getBoundingClientRect();
+
+        if (experiment.canLoad()) {
+          this.experimentSupported = true;
+          experiment.load(15000).then(function(app) {
+            console.log('Experiment Loaded Successfully.');
+            this.app = app;
+            this.experimentLoaded = true;
+          }.bind(this), function() {
+            this.experimentFailed = true;
+            console.log('Experiment failed for some unknown reason');
+          }.bind(this));
+        } else {
+          this.experimentSupported = false;
+        }
+      },
+
+      experimentOff: function(event) {
+        this.dialogVisible = false;
+      },
+
+      experimentOn: function(event) {
+        this.dialogVisible = false;
+        this.playmode = 'playing';
+
+        this.async(function(){
+          this.mode = 'active';
+          var bounds = this.fabBounds;
+          var rect = bounds;
+          var top = rect.top + (rect.height / 2);
+          var left = rect.left + (rect.width / 2);
+          this.app.start('.js-experiment-instrument', '.js-experiment-visualizer', [left, top]);
+        }, null, 50);
+
+        this.app.didEnterRecordingMode(function() {
+          this.recording = true;
+          this.miniFabs = false;
+          this.exitVisible = false;
+          this.resetVisible = false;
+          this.shareVisible = false;
+        }.bind(this));
+
+        this.app.didExitRecordingMode(function() {
+          this.recording = false;
+        }.bind(this));
+
+        window.addEventListener('scroll', this.boundOnScroll);
+      },
+
+      onScroll: function(event) {
+        if (this.fixed == 'unfixed') {
+          this.fixed = 'fixed';
+        }
+      },
+
+      onExitClick: function(event) {
+        this.exitVisible = true;
+      },
+
+      onExitYes: function(event) {
+        this.exitVisible = false;
+
+        this.app.tearDown();
+        this.mode = 'pre';
+        this.playmode = 'playing';
+        this.miniFabs = false;
+
+        this.fixed = 'unfixed';
+        window.removeEventListener('scroll', this.boundOnScroll);
+        this.app.tearDown();
+        this.mode = 'pre';
+      },
+
+      onExitNo: function(event) {
+        this.exitVisible = false;
+      },
+
+      onResetClick: function(event) {
+        this.resetVisible = true;
+      },
+
+      onResetCancel: function(event) {
+        this.resetVisible = false;
+      },
+
+      onShareClick: function(event) {
+        this.shareVisible = true;
+
+        this.app.serialize().then(function(url) {
+          this.unencodedURL = url;
+          this.shareURL = encodeURIComponent(url);
+        }.bind(this));
+      },
+
+      onShareCancel: function(event) {
+        this.shareVisible = false;
+      },
+
+      playingFabClick: function(event) {
+        this.playmode = 'paused';
+        this.miniFabs = true;
+        this.app.pause();
+      },
+
+      pausedFabClick: function(event) {
+        this.playmode = 'playing';
+        this.miniFabs = false;
+        this.app.play();
+      }
+
+    });
+  </script>
+</polymer-element>
