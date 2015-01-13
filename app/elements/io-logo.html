@@ -169,19 +169,15 @@ can be applied before Polymer is ready and the element is upgraded.
       var containerWidth = document.documentElement.clientWidth;
       var containerHeight = document.documentElement.clientHeight;
 
-      var diffX = parseInt(Math.abs(current.left - destination.left));
-      var diffY = parseInt(Math.abs(current.top - destination.top));
+      var diffX = destination.left - current.left;
+      var diffY = destination.top - current.top;
 
-      // Moving left.
-      if (destination.left < current.left) {
-        diffX = -diffX;
-      }
-
+      // Magic padding/margin offsets to get the I/O logo in its final position.
       if (containerWidth > 769) { // Tablet/desktop
-        diffY = -(diffY - 9);
+        diffY += 9;
         scale = 0.83;
       } else {
-        diffY = -(diffY + 19);
+        diffY -= 19;
         scale = 0.58;
       }
 
