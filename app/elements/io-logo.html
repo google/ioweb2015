@@ -4,7 +4,7 @@
 The `<io-logo>` provides a  material design animation loading screen which transitions
 differently based on the type of page. For the homepage, the logo
 transitions from the center of the screen to its ending position in the masthead.
-For all other pages, the lgoo only fades out after its animation is done. This
+For all other pages, the logo only fades out after its animation is done. This
 is because there is no destination position to transition to.
 
 A container element is expected to wrap the `<io-logo>` and expand to the full
@@ -39,13 +39,13 @@ can be applied before Polymer is ready and the element is upgraded.
      * @type number
      * @default the current year (e.g. 15)
      */
-    year: (new Date()).getYear() - 100,
+    year: (new Date()).getFullYear() % 2000,
 
     /**
      * Height of the logo in pixels.
      *
      * @attribute height
-     * @type number
+     * @type number|string
      * @default 165
      */
     height: 165,
@@ -54,7 +54,7 @@ can be applied before Polymer is ready and the element is upgraded.
      * Width of the logo in pixels.
      *
      * @attribute width
-     * @type number
+     * @type number|string
      * @default 213
      */
     width: 312,
@@ -133,9 +133,7 @@ can be applied before Polymer is ready and the element is upgraded.
           {transform: 'scale(1)'}
         ], {
           delay: this.START_DELAY,
-          // direction: 'alternate',
           duration: 400,
-          // iterations: 1,
           easing: 'cubic-bezier(0,0,0.21,1)',
           fill: 'forwards'
         })
@@ -148,6 +146,7 @@ can be applied before Polymer is ready and the element is upgraded.
       // TODO(ericbidelman): this should be possible with creating the sequence
       // direction: alternate and introducing a delay between reversing the
       // animation. Inquire with WA folks.
+      // https://github.com/GoogleChrome/ioweb2015/issues/168
       player.onfinish = function(e) {
         iteration++;
         if (iteration >= 2) {
@@ -170,19 +169,15 @@ can be applied before Polymer is ready and the element is upgraded.
       var containerWidth = document.documentElement.clientWidth;
       var containerHeight = document.documentElement.clientHeight;
 
-      var diffX = parseInt(Math.abs(current.left - destination.left));
-      var diffY = parseInt(Math.abs(current.top - destination.top));
+      var diffX = destination.left - current.left;
+      var diffY = destination.top - current.top;
 
-      // Moving left.
-      if (destination.left < current.left) {
-        diffX = -diffX;
-      }
-
+      // Magic padding/margin offsets to get the I/O logo in its final position.
       if (containerWidth > 769) { // Tablet/desktop
-        diffY = -(diffY - 9);
+        diffY += 9;
         scale = 0.83;
       } else {
-        diffY = -(diffY + 19);
+        diffY -= 19;
         scale = 0.58;
       }
 
@@ -230,8 +225,6 @@ can be applied before Polymer is ready and the element is upgraded.
           }),
           mastheadClipAnimation
         ]);
-
-        this.style.transformOrigin = '50% 50%'; // shrink logo from center oge page.
       }
 
       var player = document.timeline.play(animations);

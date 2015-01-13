@@ -6,6 +6,7 @@
 2. `cd ioweb2015`
 3. `npm install`
 4. `gulp setup`
+5. `npm install -g webpack` (needed for the experiment)
 
 If you plan on modifying source code, be a good citizen and:
 

@@ -72,7 +72,6 @@ IOWA.Elements = (function() {
       IOWA.Elements.IOLogo.destination = document.querySelector('.masthead-container .io-logo');
     });
 
-    updateElements();
     IOWA.Elements.Template = template;
   };
 
