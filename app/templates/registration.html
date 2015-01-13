@@ -7,7 +7,7 @@
 {% end %}
 
 {% define "content" %}
-  <div class="card__container">
+  <div class="card__container transition-fast">
     <div class="card">
       <div class="card-content">
         <h2>Registration opens March 10 at 9AM PST</h2>
@@ -20,15 +20,17 @@
     </div>
   </div>
 
-  <section class="page__section bg-light-grey ">
-    <div class="io-countdown" layout vertical center>
-      <countdown-timer autostart
-                       bgcolor="#F5F5F5"
-                       date="Mar 10 2015 09:00:00 GMT-0700 (PDT)"
-                       dateadjustment="5" easeintime="500" waittime="300"
-                       easeouttime="400"></countdown-timer>
-      <h4><i18n-msg msgid="daysuntilreg">Days until registration opens</i18n-msg></h4>
-    </div>
-  </section>
+  <div class="transition-slow">
+    <section class="page__section bg-light-grey ">
+      <div class="io-countdown" layout vertical center>
+        <countdown-timer autostart
+                         bgcolor="#F5F5F5"
+                         date="Mar 10 2015 09:00:00 GMT-0700 (PDT)"
+                         dateadjustment="5" easeintime="500" waittime="300"
+                         easeouttime="400"></countdown-timer>
+        <h4><i18n-msg msgid="daysuntilreg">Days until registration opens</i18n-msg></h4>
+      </div>
+    </section>
+  </div>
 {% end %}
 

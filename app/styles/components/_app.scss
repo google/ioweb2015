@@ -144,13 +144,13 @@ h3, h4, h5, h6 {
 
 .io-main {
   
-  .page__section {
+  .transition-slow {
     transition: transform 0.6s, opacity 0.6s;
     transform: translateY(0);
     opacity: 1;
   }
 
-  .card__container {
+  .transition-fast {
     transition: transform 0.6s, opacity 0.6s;
     transform: translateY(0);
     opacity: 1;
@@ -158,7 +158,7 @@ h3, h4, h5, h6 {
   }
 
   &.transitionIn {
-    .page__section {
+    .transition-slow {
       transform: translateY(0);
       transition-delay: 0.2s;
     }
@@ -166,12 +166,12 @@ h3, h4, h5, h6 {
 
   &.transitionOut {
 
-    .page__section {
+    .transition-slow {
       transform: translateY(100px);
       opacity: 0;
     }
 
-    .card__container {
+    .transition-fast {
       transform: translateY(100px);
       opacity: 0;
       transition-delay: 0.2s;
