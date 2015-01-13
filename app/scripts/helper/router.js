@@ -26,15 +26,14 @@ IOWA.Router = (function() {
 
   function playMastheadRipple(x, y) {
     IOWA.Elements.Ripple.style.transition = '';
-    IOWA.Elements.Ripple.style.transform = [
-        'translate(', x, 'px,', y, 'px) scale(0.0)'
-    ].join('');
+    var translate = ['translate(', x, 'px,', y, 'px)'].join('');
+    IOWA.Elements.Ripple.style.transform = [translate, ' scale(0.0)'].join('');
     // Force recalculate style.
     /*jshint -W030 */
     IOWA.Elements.Ripple.offsetTop;
     /*jshint +W030 */
     IOWA.Elements.Ripple.style.transition = 'transform 1s';
-    IOWA.Elements.Ripple.style.transform = 'scale(1)';
+    IOWA.Elements.Ripple.style.transform = [translate, ' scale(1)'].join('');
   }
 
   /**
@@ -78,16 +77,18 @@ IOWA.Router = (function() {
     var pageName = parts[parts.length - 1] || 'home';
     var importURL = url + '?partial';
 
-    Polymer.import([importURL], function() {
-      // Don't proceed if import didn't load correctly.
-      var htmlImport = document.querySelector(
-          'link[rel="import"][href="' + importURL + '"]');
-      if (htmlImport && !htmlImport.import) {
-        return;
-      }
-      // Update content of the page.
-      injectPageContent(pageName, htmlImport.import);
-    });
+    if (pageName !== IOWA.Elements.Template.selectedPage) {
+      Polymer.import([importURL], function() {
+        // Don't proceed if import didn't load correctly.
+        var htmlImport = document.querySelector(
+            'link[rel="import"][href="' + importURL + '"]');
+        if (htmlImport && !htmlImport.import) {
+          return;
+        }
+        // Update content of the page.
+        injectPageContent(pageName, htmlImport.import);
+      });
+    }
   }
 
   /**
@@ -164,9 +165,6 @@ IOWA.Router = (function() {
    */
   function init() {
     window.addEventListener('popstate', renderCurrentPage);
-    // Load current page content when layout ready.
-    // TODO: Remove ajax and change animation on first page load.
-    document.addEventListener('template-bound', renderCurrentPage);
     document.addEventListener('click', navigate);
   }
 
