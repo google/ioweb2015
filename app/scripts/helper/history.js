@@ -19,14 +19,25 @@
  *
  * Triggers 'popstate' event on pushstate method call.
  */
-IOWA.History = (function(history) {
-  var pushState = history.pushState;
-  history.pushState = function(state) {
+IOWA.History = (function(exports) {
+  var history = exports.history;
+  var pushState = exports.history.pushState;
+
+  history.pushState = function(state, title, url) {
     if (typeof history.onpushstate == "function") {
       history.onpushstate({state: state});
     }
-    pushState.apply(history, arguments);
-    window.dispatchEvent(new Event('popstate'));
+    pushState.apply(history, [state, title, url]);
+    
+    var evt = new Event('popstate');
+    evt.state = state;
+    exports.dispatchEvent(evt);
   };
+
+  exports.addEventListener('popstate', function(e, state) {
+  	// TODO: Consider adding support for query strings and hashes, if needed.
+    IOWA.Analytics.trackPageView(e.state && e.state.path);
+  });
+
   return history;
-})(window.history);
+})(window);

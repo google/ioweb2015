@@ -87,8 +87,9 @@ IOWA.Router = (function() {
               color = '#fff';
             }
             playMastheadRipple(e.pageX, e.pageY, color);
-            IOWA.History.pushState(null, '', el.href);
+            IOWA.History.pushState({'path': el.pathname}, '', el.href);
           }
+
           // TODO: Add GA pageview.
           // TODO: Update meta.
         }
