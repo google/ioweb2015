@@ -436,7 +436,11 @@ function generateServiceWorkerFileContents(rootDir, handleFetch) {
   return swPrecache({
     dynamicUrlToDependencies: dynamicUrlToDependencies,
     handleFetch: handleFetch,
-    importScripts: ['bower_components/shed/dist/shed.js', 'scripts/shed-offline-analytics.js'],
+    importScripts: [
+      'bower_components/shed/dist/shed.js',
+      'scripts/shed-offline-analytics.js',
+      'scripts/shed-cache-then-network.js'
+    ],
     logger: $.util.log,
     staticFileGlobs: [
       rootDir + '/bower_components/**/*.{html,js,css}',
