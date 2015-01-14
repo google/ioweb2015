@@ -2,7 +2,7 @@ importScripts('scripts/helper/simpledb.js');
 
 var DB_NAME = 'shed-offline-analytics';
 var EXPIRATION_TIME_DELTA = 86400000; // One day, in milliseconds.
-var ORIGIN = /https?:\/\/www\.google-analytics\.com/;
+var ORIGIN = /https?:\/\/((www|ssl)\.)?google-analytics\.com/;
 
 function replayQueuedRequests() {
   simpleDB.open(DB_NAME).then(function(db) {
