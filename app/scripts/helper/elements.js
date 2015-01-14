@@ -29,21 +29,28 @@ IOWA.Elements = (function() {
 
     var ripple = document.querySelector('.masthead__ripple__content');
     var masthead = document.querySelector('.masthead');
+    var i18n = document.createElement('io-i18n');
+    i18n.msgid = 'home';
 
     IOWA.Elements.Drawer = drawer;
+    IOWA.Elements.I18n = i18n;
     IOWA.Elements.Masthead = masthead;
     IOWA.Elements.Ripple = ripple;
     IOWA.Elements.Toast = toast;
     IOWA.Elements.IOLogo = ioLogo;
+
+    ioLogo.addEventListener('finish', function() {
+      IOWA.Elements.Template.pageTransitioningOut = false;
+      IOWA.Elements.Template.pageTransitioningIn = true;
+    });
   };
 
   var init = function() {
 
     var template = document.getElementById('t');
     template.pages = {};
-    var urlParts = location.href.split('/');
-    template.selectedPage = urlParts[urlParts.length - 1] || 'home';
-    template.pageTransitioning = false;
+    template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
+    template.pageTransitioningOut = true;
 
     template.pages = {
       'schedule': {

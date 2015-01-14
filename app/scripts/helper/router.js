@@ -24,15 +24,36 @@ IOWA.Router = (function() {
 
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
-  function playMastheadRipple(x, y) {
+  /**
+   * Animates a ripple effect over the masthead.
+   * @param {Number} x X coordinate of the center of the ripple.
+   * @param {Number} y Y coordinate of the center of the ripple.
+   * @param {string?} color Optional color for the ripple effect.
+   * @private
+   */
+  function playMastheadRipple(x, y, color) {
+    IOWA.Elements.Ripple.style.webkitTransition = '';
     IOWA.Elements.Ripple.style.transition = '';
-    var translate = ['translate(', x, 'px,', y, 'px)'].join('');
+    var translate = ['translate3d(', x, 'px,', y, 'px, 0)',].join('');
+    IOWA.Elements.Ripple.style.webkitTransform = [translate, ' scale(0.0)'].join('');
     IOWA.Elements.Ripple.style.transform = [translate, ' scale(0.0)'].join('');
+    IOWA.Elements.Ripple.style.opacity = 1;
     // Force recalculate style.
     /*jshint -W030 */
     IOWA.Elements.Ripple.offsetTop;
+    IOWA.Elements.Ripple.style.backgroundColor = 'red';
     /*jshint +W030 */
-    IOWA.Elements.Ripple.style.transition = 'transform 1s';
+    if (color) {
+      IOWA.Elements.Ripple.style.webkitTransition = '-webkit-transform 1s, opacity 1s';
+      IOWA.Elements.Ripple.style.transition = 'transform 1s, opacity 1s';
+      IOWA.Elements.Ripple.style.backgroundColor = color;
+      IOWA.Elements.Ripple.style.opacity = 0;
+    } else {
+      IOWA.Elements.Ripple.style.backgroundColor = '';
+      IOWA.Elements.Ripple.style.webkitTransition = '-webkit-transform 1s';
+      IOWA.Elements.Ripple.style.transition = 'transform 1s';
+    }
+    IOWA.Elements.Ripple.style.webkitTransform = [translate, ' scale(1)'].join('');
     IOWA.Elements.Ripple.style.transform = [translate, ' scale(1)'].join('');
   }
 
@@ -58,8 +79,16 @@ IOWA.Router = (function() {
           var pageName = parsePageNameFromAbsolutePath(el.pathname);
           var pageMeta = IOWA.Elements.Template.pages[pageName];
           IOWA.Elements.Template.nextPage = pageName;
-          playMastheadRipple(e.x, e.y);
-          IOWA.History.pushState(null, '', el.href);
+          var color;
+          var currentPage = IOWA.Elements.Template.selectedPage;
+          if (currentPage !== pageName) {
+            if (IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
+                IOWA.Elements.Template.pages[pageName].mastheadBgClass) {
+              color = '#fff';
+            }
+            playMastheadRipple(e.pageX, e.pageY, color);
+            IOWA.History.pushState(null, '', el.href);
+          }
           // TODO: Add GA pageview.
           // TODO: Update meta.
         }
@@ -114,12 +143,19 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-    IOWA.Elements.Template.pageTransitioning = true;
+    IOWA.Elements.Template.pageTransitioningIn = false;
+    IOWA.Elements.Template.pageTransitioningOut = true;
     // Replace content and end transition.
     setTimeout(function() {
       requestAnimationFrame(function() {
         replaceTemplateContent(currentPageTemplates);
-        IOWA.Elements.Template.pageTransitioning = false;
+        // Wait for a new frame before transitioning in.
+        requestAnimationFrame(
+          function() {
+            IOWA.Elements.Template.pageTransitioningOut = false;
+            IOWA.Elements.Template.pageTransitioningIn = true;
+          }
+        );
         // Transition in post-processing.
         document.body.id = 'page-' + pageName;
         IOWA.Elements.Template.selectedPage = pageName;
@@ -177,7 +213,8 @@ IOWA.Router = (function() {
   }
 
   return {
-    init: init
+    init: init,
+    getPageName: parsePageNameFromAbsolutePath
   };
 
 })();

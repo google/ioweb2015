@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-.card {
+.card__container, .card {
   z-index: 1;
 }
 
@@ -26,6 +26,15 @@ paper-fab {
   z-index: 3;
 }
 
+experiment-fab-container {
+  z-index: 4;
+}
+
 .io-logo-container {
-  z-index: 4;  // highest
+  z-index: 5; // highest
+}
+
+experiment-fab-container[playmode="playing"],
+experiment-fab-container[playmode="paused"] {
+  z-index: 100002; // highest when playing
 }
