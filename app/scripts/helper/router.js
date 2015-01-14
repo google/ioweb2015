@@ -32,22 +32,28 @@ IOWA.Router = (function() {
    * @private
    */
   function playMastheadRipple(x, y, color) {
+    IOWA.Elements.Ripple.style.webkitTransition = '';
     IOWA.Elements.Ripple.style.transition = '';
-    var translate = ['translate(', x, 'px,', y, 'px)'].join('');
+    var translate = ['translate3d(', x, 'px,', y, 'px, 0)',].join('');
+    IOWA.Elements.Ripple.style.webkitTransform = [translate, ' scale(0.0)'].join('');
     IOWA.Elements.Ripple.style.transform = [translate, ' scale(0.0)'].join('');
     IOWA.Elements.Ripple.style.opacity = 1;
     // Force recalculate style.
     /*jshint -W030 */
     IOWA.Elements.Ripple.offsetTop;
+    IOWA.Elements.Ripple.style.backgroundColor = 'red';
     /*jshint +W030 */
     if (color) {
+      IOWA.Elements.Ripple.style.webkitTransition = '-webkit-transform 1s, opacity 1s';
       IOWA.Elements.Ripple.style.transition = 'transform 1s, opacity 1s';
       IOWA.Elements.Ripple.style.backgroundColor = color;
       IOWA.Elements.Ripple.style.opacity = 0;
     } else {
       IOWA.Elements.Ripple.style.backgroundColor = '';
+      IOWA.Elements.Ripple.style.webkitTransition = '-webkit-transform 1s';
       IOWA.Elements.Ripple.style.transition = 'transform 1s';
     }
+    IOWA.Elements.Ripple.style.webkitTransform = [translate, ' scale(1)'].join('');
     IOWA.Elements.Ripple.style.transform = [translate, ' scale(1)'].join('');
   }
 
@@ -80,7 +86,7 @@ IOWA.Router = (function() {
                 IOWA.Elements.Template.pages[pageName].mastheadBgClass) {
               color = '#fff';
             }
-            playMastheadRipple(e.x, e.y, color);
+            playMastheadRipple(e.pageX, e.pageY, color);
             IOWA.History.pushState(null, '', el.href);
           }
           // TODO: Add GA pageview.
