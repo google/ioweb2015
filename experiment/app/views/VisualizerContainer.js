@@ -152,7 +152,6 @@ module.exports = (function() {
       });
     }
 
-
     /**
      * Show each visualizer.
      */

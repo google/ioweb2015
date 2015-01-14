@@ -322,10 +322,11 @@ module.exports = function(audioManager, stateManager) {
 
     audioManager.channels.muteAllExcept(view.getChannel());
 
+    logoElement.classList.add('hidden');
+    logoDialog.classList.remove('active');
+
     return Promise.all([
-      logoElement.classList.add('hidden'),
-      logoDialog.classList.remove('active'),
-      hideOnScreenVisualizers(),
+      hideOnScreenVisualizers(view),
       view.expandView()
     ]).then(function() {
       disableAllInstancesExcept(view);
@@ -345,8 +346,9 @@ module.exports = function(audioManager, stateManager) {
       didExitRecordingModeCallback();
     }
 
+    logoElement.classList.remove('hidden');
+
     return Promise.all([
-      logoElement.classList.remove('hidden'),
       showOnScreenVisualizers(),
       view.contractView()
     ]).then(function() {
@@ -396,33 +398,57 @@ module.exports = function(audioManager, stateManager) {
     var scrollBottom = scrollTop + window.innerHeight;
 
     return (
-        (visualizerBottom >= scrollTop) &&
-        (visualizerTop <= scrollBottom)
+      (visualizerBottom >= scrollTop) &&
+      (visualizerTop <= scrollBottom)
     );
   }
 
   /**
    * Hide current on screen visualizer
+   * @param {InstrumentContainer} openingView - The opening view.
    * @param {Object} visualizerView - The visualizer view
    * @return {function}
    */
-  function hideOnScreenVisualizer(visualizerView) {
+  function hideOnScreenVisualizer(openingView, visualizerView) {
+    var screenBottom = window.scrollY + window.innerHeight;
     var screenMidPoint = window.scrollY + (window.innerHeight / 2);
 
-    var { top, height } = visualizerView.getElemRect();
-    var viewMidPoint = top + (height / 2);
+    var openingRect = openingView.getElemRect();
+    var openingViewBottom = openingRect.top + openingRect.height;
 
-    return visualizerView.hide(viewMidPoint < screenMidPoint ? 'top' : 'bottom');
+    var visualizerRect = visualizerView.getElemRect();
+    var visualizerBottom = visualizerRect.top + visualizerRect.height;
+    var viewMidPoint = visualizerRect.top + (visualizerRect.height / 2);
+    var closestDirection = viewMidPoint < screenMidPoint ? 'top' : 'bottom';
+
+    var entirelyInView = (
+      (visualizerRect.top >= window.scrollY) &&
+      (visualizerBottom <= screenBottom)
+    );
+
+    var direction;
+    if (!entirelyInView) {
+      direction = closestDirection;
+    } else if ((openingRect.top <= window.scrollY) && (openingViewBottom <= screenBottom)) {
+      direction = 'bottom';
+    } else if ((openingRect.top > window.scrollY) && (openingViewBottom > screenBottom)) {
+      direction = 'top';
+    } else {
+      direction = closestDirection;
+    }
+
+    return visualizerView.hide(direction);
   }
 
   /**
    * Hide on screen visualizers
+   * @param {InstrumentContainer} view - The opening view.
    * @return {Promise}
    */
-  function hideOnScreenVisualizers() {
+  function hideOnScreenVisualizers(view) {
     var animations = visualizerViews
         .filter(isVisualizerOnScreen)
-        .map(hideOnScreenVisualizer);
+        .map(v => hideOnScreenVisualizer(view, v));
 
     return Promise.all(animations);
   }
