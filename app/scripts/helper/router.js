@@ -213,7 +213,8 @@ IOWA.Router = (function() {
   }
 
   return {
-    init: init
+    init: init,
+    getPageName: parsePageNameFromAbsolutePath
   };
 
 })();

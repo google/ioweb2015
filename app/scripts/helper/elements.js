@@ -49,8 +49,7 @@ IOWA.Elements = (function() {
 
     var template = document.getElementById('t');
     template.pages = {};
-    var urlParts = location.href.split('/');
-    template.selectedPage = urlParts[urlParts.length - 1] || 'home';
+    template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.pageTransitioningOut = true;
 
     template.pages = {
