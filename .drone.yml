@@ -1,10 +1,12 @@
-image: bradrydzewski/node:0.10
+image: crhym3/go1.4-node0.10
 git:
   depth: 1
 script:
   - npm -q install
-  - npm -q -g install gulp
-  - gulp bower
+  - cd app && ../node_modules/bower/bin/bower install -q --allow-root && cd ..
+  # ensure the build works
   - gulp
+  # backend testing
+  - go get -d -v ./backend/...
   - gulp backend:test
 
