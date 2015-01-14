@@ -35,7 +35,7 @@ IOWA.History = (function(exports) {
   };
 
   exports.addEventListener('popstate', function(e, state) {
-  	// TODO: Consider adding support for query strings and hashes, if needed.
+    // TODO: Consider adding support for query strings and hashes, if needed.
     IOWA.Analytics.trackPageView(e.state && e.state.path);
   });
 
