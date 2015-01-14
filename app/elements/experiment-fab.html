@@ -464,6 +464,11 @@ Dialog to confirm or cancel experiment exit.
         font-weight: 600;
         text-transform: uppercase;
       }
+
+      paper-button.cancel {
+        color: #646464;
+      }
+
       .button-container {
         float: right;
       }
@@ -477,11 +482,11 @@ Dialog to confirm or cancel experiment exit.
     </p>
 
     <div class="button-container">
+      <paper-button on-tap="{{exitNo}}" class="cancel">
+        <i18n-msg msgid="cancel">Cancel</i18n-msg>
+      </paper-button>
       <paper-button on-tap="{{exitYes}}">
         <i18n-msg msgid="yes">Yes</i18n-msg>
-      </paper-button>
-      <paper-button on-tap="{{exitNo}}">
-        <i18n-msg msgid="no">No</i18n-msg>
       </paper-button>
     </div>
 
@@ -611,6 +616,10 @@ Dialog to confirm or cancel experiment reset.
         text-transform: uppercase;
       }
 
+      paper-button.cancel {
+        color: #646464;
+      }
+
       .button-container {
         float: right;
       }
@@ -624,11 +633,11 @@ Dialog to confirm or cancel experiment reset.
     </p>
 
     <div class="button-container">
+      <paper-button on-tap="{{resetNo}}" class="cancel">
+        <i18n-msg msgid="cancel">Cancel</i18n-msg>
+      </paper-button>
       <paper-button on-tap="{{resetYes}}">
         <i18n-msg msgid="yes">Yes</i18n-msg>
-      </paper-button>
-      <paper-button on-tap="{{resetNo}}">
-        <i18n-msg msgid="no">No</i18n-msg>
       </paper-button>
     </div>
 
@@ -929,7 +938,7 @@ Main parent container for all of the fab elements.
 
       ready: function() {
         this.boundOnScroll = this.onScroll.bind(this);
-        this.bindEscape = this.onEscKeyUp.bind(this)
+        this.bindEscape = this.onEscKeyUp.bind(this);
       },
 
       onFabClick: function(event) {

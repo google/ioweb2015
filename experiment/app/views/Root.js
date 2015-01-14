@@ -75,7 +75,7 @@ module.exports = function(audioManager, stateManager) {
     logoDialog = document.createElement('div');
     logoDialog.classList.add('logo-dialog');
     logoDialog.insertAdjacentHTML('beforeend',
-      '<h4>Exit the Experiment?</h4><div class="button-container"><button id="yesButton">Yes</button><button id="noButton">No</button></div>');
+      '<h4>Exit the Experiment?</h4><div class="button-container"><button id="noButton">Cancel</button><button id="yesButton">Yes</button></div>');
 
     maskManager.init(viewportElement);
 

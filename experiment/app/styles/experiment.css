@@ -65,8 +65,33 @@
 }
 
 .button-container {
+  float: right;
   margin-top: 20px;
 }
+
+  .button-container button {
+    background: #fff;
+    border: none;
+    color: #64B5F6;
+    cursor: pointer;
+    display: block;
+    float: left;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 20px;
+    text-transform: uppercase;
+  }
+
+  .button-container button:focus {
+    outline: none;
+  }
+
+  #noButton {
+    color: #646464;
+  }
 
   @media screen and (max-width: 767px) {
     .experiment-logo {
