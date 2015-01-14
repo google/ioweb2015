@@ -8,7 +8,7 @@
   },
   "homepage": "https://github.com/Instrument/google-io-2015-experiment",
   "devDependencies": {
-    "6to5": "^2.10.1",
+    "6to5": "^2.12.2",
     "6to5-loader": "^2.0.0",
     "audiosprite": "^0.4.0",
     "autoprefixer-loader": "^1.0.0",
