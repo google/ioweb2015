@@ -21,6 +21,8 @@ module.exports = (function() {
 
     var container = new PIXI.DisplayObjectContainer();
 
+    var velocity = 0;
+
     var shape = new PIXI.Circle(0, 0, model.radius);
     container.alpha = 0.8;
 
@@ -55,7 +57,7 @@ module.exports = (function() {
       removeEventListeners,
       onActivate,
       setPosition,
-      emitCircle
+      showCollision
     };
 
     var physicsBody = addToPhysics();
@@ -124,18 +126,30 @@ module.exports = (function() {
      * @param {Object} ball - The ball object.
      */
     function activate(ball) {
-      console.log(ball);
-      emitCircle(0);
+      showCollision(0);
       if (onActivationCallback) {
         onActivationCallback(self, ball);
       }
+    }
+
+    var tweenData = { y: 0 };
+
+    /**
+     * Update the visual position of the drum during a tween.
+     */
+    function visualUpdate() {
+      container.position.y = tweenData.y;
     }
 
     /**
      * Emit a circle.
      * @param {number} delay - The delay duration.
      */
-    function emitCircle(delay) {
+    function showCollision(delay) {
+      tweenData.y = model.y - 25;
+      TweenMax.killTweensOf(tweenData);
+      TweenMax.to(tweenData, 0.2, { y: model.y, onUpdate: visualUpdate, ease: Expo.easeOut });
+
       var hitCircle = new PIXI.Sprite(hitTexture);
       hitCircle.anchor.x = hitCircle.anchor.y = 0.5;
       container.addChildAt(hitCircle, 0);
@@ -176,13 +190,15 @@ module.exports = (function() {
     function setPosition(x, y) {
       drumPosition.x = x;
       drumPosition.y = y;
+
       animate.to(container.position, 0.1, drumPosition);
 
       model.x = physicsBody.position[0] = x;
-      model.y =  physicsBody.position[1] = y;
+      model.y = physicsBody.position[1] = y;
     }
 
     function render() {
+      // no-op
     }
 
     return self;

@@ -41,7 +41,7 @@ module.exports = function DropBallEntity() {
 
     createSprites();
 
-    setTimeout(willDestroy, LIFETIME);
+    setTimeout(destroy, LIFETIME);
   }
 
   /**
@@ -115,16 +115,8 @@ module.exports = function DropBallEntity() {
       world.removeBody(ballBody);
 
       destroyCallback();
-    }
-  }
 
-  /**
-   * Will destroy.
-   */
-  function willDestroy() {
-    if (alive) {
-      destroy();
-      delete spawnBallObj[pid ];
+      delete spawnBallObj[pid];
     }
   }
 

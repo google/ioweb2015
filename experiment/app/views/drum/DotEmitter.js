@@ -45,9 +45,20 @@ module.exports = function DotEmitter() {
   function dropBall() {
     var dropBallEntity = new DropBallEntity();
     var pid = getNextPIDFunc();
-    dropBallEntity.init(stage, pid, displayContainerCenter, world, startX, startY, dotEmitterObj );
+    dropBallEntity.init(stage, pid, displayContainerCenter, world, startX, startY, dotEmitterObj);
     dotEmitterObj[pid] = dropBallEntity;
     return dropBallEntity;
+  }
+
+  /**
+   * Kill all living dots.
+   */
+  function killAllDots() {
+    for (var key in dotEmitterObj) {
+      if (dotEmitterObj.hasOwnProperty(key)) {
+        dotEmitterObj[key].destroy();
+      }
+    }
   }
 
   /**
@@ -84,7 +95,8 @@ module.exports = function DotEmitter() {
   }
 
   return {
-    init: init,
-    onBeat: onBeat
+    init,
+    onBeat,
+    killAllDots
   };
 };

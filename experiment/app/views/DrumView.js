@@ -99,13 +99,12 @@ module.exports = (function() {
             var d = drumLookup[note.pid];
 
             if (d) {
-              d.emitCircle();
+              d.showCollision();
             }
           }
         }
       });
 
-      //renderBodies( null )
       isReady = true;
     }
 
@@ -273,6 +272,8 @@ module.exports = (function() {
     function animationCollapsed() {
       APPLICATION_STATE = 'collapsed';
 
+      cleanupDots();
+
       audioManager.addTrack(currentTrack);
       removeEventListeners();
     }
@@ -285,6 +286,15 @@ module.exports = (function() {
 
       audioManager.removeTrack(currentTrack);
       addEventListeners();
+    }
+
+    /**
+     * Kill all living dots.
+     */
+    function cleanupDots() {
+      for (let i = 0; i < emitters.length; i++) {
+        emitters[i].killAllDots();
+      }
     }
 
     /**
