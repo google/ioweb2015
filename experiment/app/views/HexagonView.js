@@ -259,7 +259,7 @@ module.exports = (function() {
 
       isListening = true;
       hexagons.forEach(h => h.addEventListeners());
-      // document.addEventListener('keydown', onHexagonKeyDown);
+      document.addEventListener('keyup', onHexagonKeyUp);
     }
 
     /**
@@ -270,24 +270,22 @@ module.exports = (function() {
 
       isListening = false;
       hexagons.forEach(h => h.removeEventListeners());
-      // document.removeEventListener('keydown', onHexagonKeyDown);
+      document.removeEventListener('keyup', onHexagonKeyUp);
     }
 
-    // const NUMBER_KEY_RANGE = [49, 53];
+    const NUMBER_KEY_RANGE = [49, 53];
 
-    // /**
-    //  * Keydown handler for hexagons.
-    //  * @param {event} evt - The keydown event.
-    //  */
-    // function onHexagonKeyDown(evt) {
-    //   if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
-    //     // activateHexagon(evt.keyCode - NUMBER_KEY_RANGE[0]);
-    //     debugger;
-    //     var cubePosition = Cube.getCube(0,0,0);
-    //     activateHexagon(cubePosition);
-    //     console.log(evt.keyCode);
-    //   }
-    // }
+    /**
+     * Keyup handler for hexagons.
+     * @param {event} evt - The keyup event.
+     */
+    function onHexagonKeyUp(evt) {
+      if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
+        var keyPos = (evt.keyCode-2) - NUMBER_KEY_RANGE[0];
+        var cubePosition = Cube.evenQToCube(0,keyPos,0);
+        activateHexagon(cubePosition);
+      }
+    }
 
     var lastBoundsWidth;
 
