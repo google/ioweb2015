@@ -126,7 +126,7 @@ IOWA.Router = (function() {
             IOWA.Elements.Template.pageTransitioningOut = false;
             IOWA.Elements.Template.pageTransitioningIn = true;
           }
-        )
+        );
         // Transition in post-processing.
         document.body.id = 'page-' + pageName;
         IOWA.Elements.Template.selectedPage = pageName;
