@@ -96,7 +96,9 @@ module.exports = function Experiment() {
     rootView.start();
 
     // Animate transition in.
-    rootView.animateIn(fromPos);
+    setTimeout(function() {
+      rootView.animateIn(fromPos);
+    }, 50);
   }
 
   const SHORTENER_API_URL = 'https://www.googleapis.com/urlshortener/v1/url';
