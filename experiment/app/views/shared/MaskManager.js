@@ -127,6 +127,7 @@ module.exports = (function() {
       var lastDuration = 53 / 30;
       var lastStart = 27 / 30;
 
+      draw();
       addMask();
 
       return Promise.all([
@@ -162,6 +163,7 @@ module.exports = (function() {
         ctx.restore();
       }
 
+      draw();
       addMask();
 
       return animate
@@ -210,6 +212,7 @@ module.exports = (function() {
         ctx = document.getCSSCanvasContext('2d', 'wipe', window.innerWidth, window.innerHeight);
         ctx.fillStyle = 'black';
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        addMask();
       } else {
         viewportElement.style.opacity = 0;
       }

@@ -17,7 +17,7 @@ module.exports = (function() {
   const CONTENT_VERTICAL_BUFFER_MOBILE = 32;
   const MOBILE_MAX = 767;
 
-  var isRetina = window.devicePixelRatio > 1.5;
+  var isRetina = false;//window.devicePixelRatio > 1.5;
 
   /**
    * A container that wraps a sub instruments.
