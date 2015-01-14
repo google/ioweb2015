@@ -24,7 +24,6 @@ IOWA.Router = (function() {
 
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
-
   /**
    * Animates a ripple effect over the masthead.
    * @param {Number} x X coordinate of the center of the ripple.
