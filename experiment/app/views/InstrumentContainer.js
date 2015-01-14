@@ -46,7 +46,7 @@ module.exports = (function() {
     var isPaused = false;
 
     var instrumentView;
-    var controlsBG, backIcon, recordButton, debugFrame;
+    var controlsBG, backIcon, backIconContainer, recordButton, debugFrame;
 
     var onActivateCallback_;
     var onBackCallback_;
@@ -131,6 +131,10 @@ module.exports = (function() {
       backIcon.position.x = 20;
       backIcon.position.y = 20;
 
+      backIconContainer = new PIXI.DisplayObjectContainer();
+      backIconContainer.hitArea = new PIXI.Rectangle(0, 0, 56, 56);
+      backIconContainer.addChild(backIcon);
+
       recordButton = new RecordButton(audioManager, 10, 4);
       recordButton.container.position.x = window.innerWidth - 150;
       recordButton.container.position.y = 28;
@@ -139,7 +143,7 @@ module.exports = (function() {
 
       var controlContainer = new PIXI.DisplayObjectContainer();
       controlContainer.addChild(controlsBG);
-      controlContainer.addChild(backIcon);
+      controlContainer.addChild(backIconContainer);
       controlContainer.addChild(recordButton.container);
 
       controlContainer.alpha = 0;
@@ -172,8 +176,8 @@ module.exports = (function() {
     function showControls(delay) {
       stage.addChild(controls);
 
-      backIcon.interactive = true;
-      backIcon.buttonMode = true;
+      backIconContainer.interactive = true;
+      backIconContainer.buttonMode = true;
 
       return animate.to(controls, 0.6, { alpha: 1, delay: delay });
     }
@@ -184,9 +188,9 @@ module.exports = (function() {
      * @return {Promise}
      */
     function hideControls(delay) {
-      backIcon.interactive = false;
-      backIcon.buttonMode = false;
-      backIcon.click = null;
+      backIconContainer.interactive = false;
+      backIconContainer.buttonMode = false;
+      backIconContainer.click = null;
 
       return animate.to(controls, 0.6, {
         alpha: 0,
@@ -327,7 +331,7 @@ module.exports = (function() {
      * Add listeners for when the view is expanded.
      */
     function addExpandedEventListeners() {
-      backIcon.click = backIcon.tap = function() {
+      backIconContainer.click = backIconContainer.tap = function() {
         onBackCallback_(self);
       };
 
@@ -345,7 +349,7 @@ module.exports = (function() {
      * Remove listeners for when the view is expanded.
      */
     function removeExpandedEventListeners() {
-      backIcon.click = backIcon.tap = null;
+      backIconContainer.click = backIconContainer.tap = null;
       document.removeEventListener('keyup', onGlobalKeyUp);
     }
 
