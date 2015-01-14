@@ -37,7 +37,8 @@ Main fab for entering/exit the experiment.
         left: 1px;
       }
       /* fix for repeating background image in safari */
-      :host::shadow core-icon div {
+      polyfill-rule {
+        content: ':host::shadow core-icon div';
         background-repeat: no-repeat;
       }
       :host([playing])::shadow core-icon {
@@ -374,6 +375,9 @@ Fab for exiting the experiment.
         position: absolute;
         top: -216px;
         left: 8px;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 50% 100%;
+        -webkit-transition: all 100ms ease-out 100ms;
         transform: scale(0,0);
         transform-origin: 50% 100%;
         transition: all 100ms ease-out 100ms;
@@ -384,9 +388,16 @@ Fab for exiting the experiment.
         top: 4px;
         left: 4px;
       }
+      /* fix for incorrectly-sized icon in safari */
+      polyfill-rule {
+        content: ':host::shadow core-icon';
+        height: 15px !important;
+        width: 16px !important;
+      }
       :host([open]) {
         opacity: 1;
         visibility: visible;
+        -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
     </style>
@@ -528,6 +539,9 @@ Fab for resetting the experiment loop to default
         position: absolute;
         top: -144px;
         left: 8px;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 50% 100%;
+        -webkit-transition: all 100ms ease-out 50ms;
         transform: scale(0,0);
         transform-origin: 50% 100%;
         transition: all 100ms ease-out 50ms;
@@ -538,9 +552,16 @@ Fab for resetting the experiment loop to default
         top: 3px;
         left: 3px;
       }
+      /* fix for incorrectly-sized icon in safari */
+      polyfill-rule {
+        content: ':host::shadow core-icon';
+        height: 18px !important;
+        width: 18px !important;
+      }
       :host([open]) {
         opacity: 1;
         visibility: visible;
+        -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
     </style>
@@ -583,8 +604,10 @@ Dialog to confirm or cancel experiment reset.
         padding: 20px;
         position: absolute;
         right: 70px;
-        transition: transform 300ms ease-in-out;
         -webkit-transition: -webkit-transform 300ms ease-in-out;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 100% 100%;
+        transition: transform 300ms ease-in-out;
         transform: scale(0,0);
         transform-origin: 100% 100%;
         width: 220px;
@@ -592,6 +615,7 @@ Dialog to confirm or cancel experiment reset.
       }
 
       :host([active]) {
+        -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
 
@@ -681,6 +705,9 @@ Fab for triggering the share dialog.
         position: absolute;
         top: -72px;
         left: 8px;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 50% 100%;
+        -webkit-transition: all 100ms ease-out 0;
         transform: scale(0,0);
         transform-origin: 50% 100%;
         transition: all 100ms ease-out 0;
@@ -691,9 +718,16 @@ Fab for triggering the share dialog.
         left: 4px;
         top: 4px;
       }
+      /* fix for incorrectly-sized icon in safari */
+      polyfill-rule {
+        content: ':host::shadow core-icon';
+        height: 15px !important;
+        width: 17px !important;
+      }
       :host([open]) {
         opacity: 1;
         visibility: visible;
+        -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
     </style>
@@ -702,12 +736,7 @@ Fab for triggering the share dialog.
 
   <script>
     Polymer({
-      eventDelegates: {
-        tap: 'onTap'
-      },
-      onTap: function() {
-        this.fire('share-click');
-      }
+
     });
   </script>
 </polymer-element>
@@ -722,7 +751,7 @@ Dialog to share the user's custom experiment/song
 @element experiment-share-dialog
 @blurb Dialog to share the user's custom experiment/song
 -->
-<polymer-element name="experiment-share-dialog" attributes="url plainURL">
+<polymer-element name="experiment-share-dialog" attributes="active url plainURL">
   <template>
     <style>
       :host {
@@ -736,8 +765,10 @@ Dialog to share the user's custom experiment/song
         padding: 20px 10px 20px 20px;
         position: absolute;
         right: 70px;
-        transition: transform 300ms ease-in-out;
         -webkit-transition: -webkit-transform 300ms ease-in-out;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 100% 100%;
+        transition: transform 300ms ease-in-out;
         transform: scale(0,0);
         transform-origin: 100% 100%;
         width: 220px;
@@ -745,6 +776,7 @@ Dialog to share the user's custom experiment/song
       }
 
       :host([active]) {
+        -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
 
@@ -775,6 +807,15 @@ Dialog to share the user's custom experiment/song
       paper-item a {
         color: #424242;
         text-decoration: none;
+      }
+
+      /* fix for incorrect typography in safari */
+      polyfill-rule {
+        content: ':host::shadow paper-item a';
+        color: #424242 !important;
+        font-size: 16px !important;
+        font-weight: 400 !important;
+        letter-spacing: 0 !important;
       }
 
       core-icon {
@@ -843,6 +884,12 @@ Dialog to share the user's custom experiment/song
 
   <script>
     Polymer({
+      publish: {
+        active: {
+          value: false,
+          reflect: true
+        }
+      },
       linkSelect: function() {
         this.$.urlInput.select();
       },
@@ -868,6 +915,7 @@ Main parent container for all of the fab elements.
         display: block;
         position: absolute;
         /*z-index: 100002;*/
+        -webkit-transition: all 300ms ease-out;
         transition: all 300ms ease-out;
       }
       :host([fixed="fixed"]) {
