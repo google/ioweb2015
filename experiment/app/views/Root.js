@@ -118,8 +118,8 @@ module.exports = function(audioManager, stateManager) {
       v.loadData(stateManager.currentData()[v.name]);
     }
 
-    document.body.appendChild(logoElement);
-    document.body.appendChild(logoDialog);
+    viewportElement.appendChild(logoElement);
+    viewportElement.appendChild(logoDialog);
     document.body.appendChild(viewportElement);
 
     logoClick();

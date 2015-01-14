@@ -922,9 +922,6 @@ Main parent container for all of the fab elements.
       onFabClick: function(event) {
         this.dialogVisible = true;
 
-        // get bounds of fab click target
-        this.fabBounds = event.target.getBoundingClientRect();
-
         if (experiment.canLoad()) {
           this.experimentSupported = true;
           experiment.load(15000).then(function(app) {
@@ -950,8 +947,7 @@ Main parent container for all of the fab elements.
 
         this.async(function(){
           this.mode = 'active';
-          var bounds = this.fabBounds;
-          var rect = bounds;
+          var rect = this.getBoundingClientRect();
           var top = rect.top + (rect.height / 2);
           var left = rect.left + (rect.width / 2);
           this.app.start('.js-experiment-instrument', '.js-experiment-visualizer', [left, top]);
@@ -985,15 +981,17 @@ Main parent container for all of the fab elements.
       onExitYes: function(event) {
         this.exitVisible = false;
 
-        this.app.tearDown();
+        var rect = this.getBoundingClientRect();
+        var top = rect.top + (rect.height / 2);
+        var left = rect.left + (rect.width / 2);
+        this.app.tearDown([left, top]);
+
         this.mode = 'pre';
         this.playmode = 'playing';
         this.miniFabs = false;
-
         this.fixed = 'unfixed';
+
         window.removeEventListener('scroll', this.boundOnScroll);
-        this.app.tearDown();
-        this.mode = 'pre';
       },
 
       onExitNo: function(event) {
