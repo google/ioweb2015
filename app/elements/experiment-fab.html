@@ -7,8 +7,11 @@
 
 <!--
 Main fab for entering/exit the experiment.
+
 ##### Example
+
   <experiment-fab></experiment-fab>
+
 @element experiment-fab
 @blurb Main fab for entering/exit the experiment.
 @extends paper-fab
@@ -67,8 +70,11 @@ Main fab for entering/exit the experiment.
 
 <!--
 This is a rainbow circle border that spins around the experiment-fab while the experiment is loading
+
 ##### Example
+
   <experiment-loading-fab></experiment-loading-fab>
+
 @element experiment-loading-fab
 @blurb This is a rainbow circle border that spins around the experiment-fab while the experiment is loading.
 -->
@@ -129,8 +135,11 @@ This is a rainbow circle border that spins around the experiment-fab while the e
 
 <!--
 Dialog that animates in when experiment fab is clicked. If experiment is supported, user can cancel out of the dialog or enter into the experiment.
+
 ##### Example
+
   <experiment-loading-dialog></experiment-loading-dialog>
+
 @element experiment-loading-dialog
 @blurb Dialog that animates in when experiment fab is clicked. If experiment is supported, user can cancel out of the dialog or enter into the experiment.
 -->
@@ -294,8 +303,11 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
 
 <!--
 Semi-opaque overlay that shows when experiment dialog is opened.
+
 ##### Example
+
   <experiment-overlay></experiment-overlay>
+
 @element experiment-overlay
 @blurb Semi-opaque overlay that shows when experiment dialog is opened.
 -->
@@ -328,8 +340,11 @@ Semi-opaque overlay that shows when experiment dialog is opened.
 
 <!--
 Fab for exiting the experiment.
+
 ##### Example
+
   <experiment-exit-fab></experiment-exit-fab>
+
 @element experiment-exit-fab
 @blurb Fab for exiting the experiment.
 @extends paper-fab
@@ -381,8 +396,11 @@ Fab for exiting the experiment.
 
 <!--
 Dialog to confirm or cancel experiment exit.
+
 ##### Example
+
   <experiment-exit-dialog></experiment-exit-dialog>
+
 @element experiment-exit-dialog
 @blurb Dialog to confirm or cancel experiment exit.
 -->
@@ -472,8 +490,11 @@ Dialog to confirm or cancel experiment exit.
 
 <!--
 Fab for resetting the experiment loop to default
+
 ##### Example
+
   <experiment-reset-fab></experiment-reset-fab>
+
 @element experiment-reset-fab
 @blurb Fab for resetting the experiment loop to default.
 @extends paper-fab
@@ -524,8 +545,11 @@ Fab for resetting the experiment loop to default
 
 <!--
 Dialog to confirm or cancel experiment reset.
+
 ##### Example
+
   <experiment-reset-dialog></experiment-reset-dialog>
+
 @element experiment-reset-dialog
 @blurb Dialog to confirm or cancel experiment reset.
 -->
@@ -614,8 +638,11 @@ Dialog to confirm or cancel experiment reset.
 
 <!--
 Fab for triggering the share dialog.
+
 ##### Example
+
   <experiment-share-fab></experiment-share-fab>
+
 @element experiment-share-fab
 @blurb Fab for triggering the share dialog.
 @extends paper-fab
@@ -667,8 +694,11 @@ Fab for triggering the share dialog.
 
 <!--
 Dialog to share the user's custom experiment/song
+
 ##### Example
+
   <experiment-share-dialog></experiment-share-dialog>
+
 @element experiment-share-dialog
 @blurb Dialog to share the user's custom experiment/song
 -->
@@ -817,7 +847,7 @@ Main parent container for all of the fab elements.
       :host {
         display: block;
         position: absolute;
-        z-index: 100002;
+        /*z-index: 100002;*/
         transition: all 300ms ease-out;
       }
       :host([fixed="fixed"]) {
