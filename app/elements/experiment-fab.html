@@ -98,19 +98,19 @@ This is a rainbow circle border that spins around the experiment-fab while the e
 
       @-webkit-keyframes rotating {
         from {
-            -webkit-transform: rotate(0deg);
+          -webkit-transform: rotate(0deg);
         }
         to {
-            -webkit-transform: rotate(360deg);
+          -webkit-transform: rotate(360deg);
         }
       }
 
       @keyframes rotating {
         from {
-            transform: rotate(0deg);
+          transform: rotate(0deg);
         }
         to {
-            transform: rotate(360deg);
+          transform: rotate(360deg);
         }
       }
 
@@ -311,7 +311,7 @@ Semi-opaque overlay that shows when experiment dialog is opened.
 @element experiment-overlay
 @blurb Semi-opaque overlay that shows when experiment dialog is opened.
 -->
-<polymer-element name="experiment-overlay" noscript>
+<polymer-element name="experiment-overlay" on-tap="{{overlayClose}}">
   <template>
     <style>
       :host {
@@ -336,6 +336,13 @@ Semi-opaque overlay that shows when experiment dialog is opened.
     </style>
     <content></content>
   </template>
+  <script>
+    Polymer({
+      overlayClose: function() {
+        this.fire('overlay-close');
+      }
+    });
+  </script>
 </polymer-element>
 
 <!--
@@ -910,6 +917,7 @@ Main parent container for all of the fab elements.
         'exit-click': 'onExitClick',
         'exit-yes': 'onExitYes',
         'exit-no': 'onExitNo',
+        'overlay-close': 'onOverlayClose',
         'reset-click': 'onResetClick',
         'reset-no': 'onResetCancel',
         'share-cancel': 'onShareCancel'
@@ -917,9 +925,12 @@ Main parent container for all of the fab elements.
 
       ready: function() {
         this.boundOnScroll = this.onScroll.bind(this);
+        this.bindEscape = this.onEscKeyUp.bind(this)
       },
 
       onFabClick: function(event) {
+        document.addEventListener('keyup', this.bindEscape);
+
         this.dialogVisible = true;
 
         if (experiment.canLoad()) {
@@ -937,12 +948,20 @@ Main parent container for all of the fab elements.
         }
       },
 
+      onEscKeyUp: function(event) {
+        if (event.keyCode === 27) {
+          this.dialogVisible = false;
+        }
+      },
+
       experimentOff: function(event) {
         this.dialogVisible = false;
+        document.removeEventListener('keyup', this.bindEscape);
       },
 
       experimentOn: function(event) {
         this.dialogVisible = false;
+        document.removeEventListener('keyup', this.bindEscape);
         this.playmode = 'playing';
 
         this.async(function(){
@@ -996,6 +1015,10 @@ Main parent container for all of the fab elements.
 
       onExitNo: function(event) {
         this.exitVisible = false;
+      },
+
+      onOverlayClose: function(event) {
+        this.dialogVisible = false;
       },
 
       onResetClick: function(event) {
