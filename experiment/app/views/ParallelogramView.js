@@ -58,20 +58,20 @@ module.exports = (function() {
         currentBeat = beatNum;
       });
 
-      // audioManager.playbackBus.onPlayback(function(note, tags, sound) {
-      //   if (renderPause) { return; }
+      audioManager.playbackBus.onPlayback(function(note, tags, sound) {
+        if (renderPause) { return; }
 
-      //   if (tags & PARALLELOGRAM_TAG) {
-      //     var parallelogram = parallelograms[note.pid];
-      //     if (parallelogram) {
-      //       parallelogram.popUp(0, 0, sound);
+        if (tags & PARALLELOGRAM_TAG) {
+          var parallelogram = parallelograms[note.pid];
+          if (parallelogram) {
+            parallelogram.popUp(0, 0, sound);
 
-      //       setTimeout(function() {
-      //         parallelogram.popDown(FADE_OUT_DURATION);
-      //       }, (note.duration - FADE_OUT_DURATION) * 1000);
-      //     }
-      //   }
-      // });
+            setTimeout(function() {
+              parallelogram.popDown(FADE_OUT_DURATION);
+            }, (note.duration - FADE_OUT_DURATION) * 1000);
+          }
+        }
+      });
 
       isReady = true;
     }
