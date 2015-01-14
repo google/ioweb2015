@@ -31,10 +31,9 @@ module.exports = (function() {
 
   /**
    * Returns the default state is no serialized state is available.
-   * @param {AudioManager} audioManager - The central audio manager.
-   * @return {GuitarInstrumentModel}
+   * @return {Object}
    */
-  function getDefault(audioManager) {
+  function getDefault() {
     return {
       'rows': 3,
       'cols': 5,

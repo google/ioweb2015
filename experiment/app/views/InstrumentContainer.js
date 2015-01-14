@@ -231,7 +231,7 @@ module.exports = (function() {
       output = output.concat(data.recorded.map(r => r.serializeModel()));
 
       // Purposefully left in for user insight into our data structures.
-      console && console.table && console.table(output);
+      console.table(output);
     }
 
     /**

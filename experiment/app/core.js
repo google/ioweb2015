@@ -52,7 +52,7 @@ module.exports = function Experiment() {
     audioManager = new AudioManager();
     audioManager.init();
 
-    stateManager = new StateManager(audioManager);
+    stateManager = new StateManager();
 
     // Create the RootView, which controls all visuals in the experiment.
     rootView = new RootView(audioManager, stateManager);
