@@ -28,7 +28,7 @@ module.exports = (function() {
 
     var dots = [];
 
-    var state = 'unStrung';  //  'strung'
+    var state = 'unStrung'; // 'strung'
 
     var spring1;
     var spring2;
@@ -302,7 +302,7 @@ module.exports = (function() {
      */
     function renderLine() {
       lineGraphic.clear();
-      lineGraphic.lineStyle(3, 0xffffff, 1);
+      lineGraphic.lineStyle(5, 0xffffff, 1);
       lineGraphic.moveTo(anchorPoint1.position.x, anchorPoint1.position.y);
       lineGraphic.quadraticCurveTo(capsuleBody.position[0], capsuleBody.position[1], anchorPoint2.position.x, anchorPoint2.position.y);
 
