@@ -21,8 +21,6 @@ module.exports = (function() {
 
     var container = new PIXI.DisplayObjectContainer();
 
-    var velocity = 0;
-
     var shape = new PIXI.Circle(0, 0, model.radius);
     container.alpha = 0.8;
 

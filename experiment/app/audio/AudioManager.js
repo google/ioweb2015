@@ -98,6 +98,22 @@ module.exports = (function() {
     }
 
     /**
+     * Fade the audio volume in.
+     * @param {number} duration - The fade in duration.
+     * @param {number} delay - The fade in delay.
+     */
+    function fadeIn(duration, delay) {
+      return animate({ volume: 0 }, duration, {
+        volume: DEFAULT_VOLUME,
+        ease: Linear.easeNone,
+        delay: delay,
+        onUpdate: function() {
+          setVolume(this.target.volume);
+        }
+      });
+    }
+
+    /**
      * Fade the audio volume out then stop.
      * @param {number} duration - The fade out duration.
      */
@@ -119,10 +135,14 @@ module.exports = (function() {
     function start() {
       if (isRunning) { return; }
 
+      setVolume(0);
+
       analyser.connect(audioContext.destination);
 
       isRunning = true;
       sequencer.start();
+
+      fadeIn(2.25, 0.75);
     }
 
     /**
