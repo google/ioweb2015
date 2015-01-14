@@ -118,8 +118,8 @@ module.exports = function(audioManager, stateManager) {
       v.loadData(stateManager.currentData()[v.name]);
     }
 
-    viewportElement.appendChild(logoElement);
-    viewportElement.appendChild(logoDialog);
+    document.body.appendChild(logoElement);
+    document.body.appendChild(logoDialog);
     document.body.appendChild(viewportElement);
 
     logoClick();
@@ -373,6 +373,7 @@ module.exports = function(audioManager, stateManager) {
     document.getElementById('yesButton').addEventListener('click', function() {
       logoElement.parentNode.removeChild(logoElement);
       logoDialog.parentNode.removeChild(logoDialog);
+      cleanUp();
       experimentFab.exitExperiment();
     });
     document.getElementById('noButton').addEventListener('click', function() {
