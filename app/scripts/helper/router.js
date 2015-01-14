@@ -24,15 +24,31 @@ IOWA.Router = (function() {
 
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
-  function playMastheadRipple(x, y) {
+
+  /**
+   * Animates a ripple effect over the masthead.
+   * @param {Number} x X coordinate of the center of the ripple.
+   * @param {Number} y Y coordinate of the center of the ripple.
+   * @param {string?} color Optional color for the ripple effect.
+   * @private
+   */
+  function playMastheadRipple(x, y, color) {
     IOWA.Elements.Ripple.style.transition = '';
     var translate = ['translate(', x, 'px,', y, 'px)'].join('');
     IOWA.Elements.Ripple.style.transform = [translate, ' scale(0.0)'].join('');
+    IOWA.Elements.Ripple.style.opacity = 1;
     // Force recalculate style.
     /*jshint -W030 */
     IOWA.Elements.Ripple.offsetTop;
     /*jshint +W030 */
-    IOWA.Elements.Ripple.style.transition = 'transform 1s';
+    if (color) {
+      IOWA.Elements.Ripple.style.transition = 'transform 1s, opacity 1s';
+      IOWA.Elements.Ripple.style.backgroundColor = color;
+      IOWA.Elements.Ripple.style.opacity = 0;
+    } else {
+      IOWA.Elements.Ripple.style.backgroundColor = '';
+      IOWA.Elements.Ripple.style.transition = 'transform 1s';
+    }
     IOWA.Elements.Ripple.style.transform = [translate, ' scale(1)'].join('');
   }
 
@@ -58,8 +74,16 @@ IOWA.Router = (function() {
           var pageName = parsePageNameFromAbsolutePath(el.pathname);
           var pageMeta = IOWA.Elements.Template.pages[pageName];
           IOWA.Elements.Template.nextPage = pageName;
-          playMastheadRipple(e.x, e.y);
-          IOWA.History.pushState(null, '', el.href);
+          var color;
+          var currentPage = IOWA.Elements.Template.selectedPage;
+          if (currentPage !== pageName) {
+            if (IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
+                IOWA.Elements.Template.pages[pageName].mastheadBgClass) {
+              color = '#fff';
+            }
+            playMastheadRipple(e.x, e.y, color);
+            IOWA.History.pushState(null, '', el.href);
+          }
           // TODO: Add GA pageview.
           // TODO: Update meta.
         }
