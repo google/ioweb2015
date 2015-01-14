@@ -211,9 +211,27 @@ module.exports = (function() {
         instrumentView.stopRecording();
       }
 
-      if ('function' === typeof instrumentView.logRecorded) {
-        instrumentView.logRecorded();
-      }
+      logRecorded();
+    }
+
+    /**
+     * When finished recording, console.table the new data so
+     * developers can get an idea of the data.
+     */
+    function logRecorded() {
+      if (!console || !console.table) { return; }
+
+      var data = instrumentView.getData();
+      if (data.recorded.length <= 0) { return; }
+
+      var output = [
+        data.recorded[0].keys
+      ];
+
+      output = output.concat(data.recorded.map(r => r.serializeModel()));
+
+      // Purposefully left in for user insight into our data structures.
+      console && console.table && console.table(output);
     }
 
     /**

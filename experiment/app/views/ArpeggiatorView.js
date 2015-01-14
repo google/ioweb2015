@@ -451,20 +451,6 @@ module.exports = (function() {
       renderPause = false;
     }
 
-    function logRecorded() {
-      if (!console || !console.table) { return; }
-      if (data.recorded.length <= 0) { return; }
-
-      var output = [
-        data.recorded[0].keys
-      ];
-
-      output = output.concat(data.recorded.map(r => r.serializeModel()));
-
-      // Purposefully left in for user insight into our data structures.
-      console && console.table && console.table(output);
-    }
-
     return {
       init,
       animationCollapsed,
@@ -476,7 +462,6 @@ module.exports = (function() {
       startRecording,
       stopRecording,
       loadData,
-      logRecorded,
       name: INSTRUMENT_NAME,
       dataModel: ArpeggiatorDataModel,
       getData: () => data,
