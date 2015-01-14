@@ -369,10 +369,11 @@ module.exports = function(audioManager, stateManager) {
    * Add click handlers to yes/no buttons
    */
   function dialogClick() {
+    var experimentFab = document.querySelector('experiment-fab-container');
     document.getElementById('yesButton').addEventListener('click', function() {
       logoElement.parentNode.removeChild(logoElement);
       logoDialog.parentNode.removeChild(logoDialog);
-      cleanUp();
+      experimentFab.exitExperiment();
     });
     document.getElementById('noButton').addEventListener('click', function() {
       logoDialog.classList.remove('active');

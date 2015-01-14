@@ -1012,7 +1012,10 @@ Main parent container for all of the fab elements.
 
       onExitYes: function(event) {
         this.exitVisible = false;
+        this.exitExperiment();
+      },
 
+      exitExperiment: function(event) {
         var rect = this.getBoundingClientRect();
         var top = rect.top + (rect.height / 2);
         var left = rect.left + (rect.width / 2);
