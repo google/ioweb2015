@@ -53,8 +53,9 @@ IOWA.Router = (function() {
         if (el.hasAttribute('data-ajax-link')) {
           e.preventDefault();
           e.stopPropagation();
-          var parts = el.href.split('/');
-          var pageName = parts[parts.length - 1] || 'home';
+          // We can get the full absolute path from the <a> element's pathname:
+          // http://stackoverflow.com/questions/736513
+          var pageName = parsePageNameFromAbsolutePath(el.pathname);
           var pageMeta = IOWA.Elements.Template.pages[pageName];
           IOWA.Elements.Template.nextPage = pageName;
           playMastheadRipple(e.x, e.y);
@@ -69,13 +70,11 @@ IOWA.Router = (function() {
 
   /**
    * Renders a new page by fetching partials through ajax.
-   * @param {string} url The url of the new page.
+   * @param {string} pageName The name of the new page.
    * @private
    */
-  function renderPage(url) {
-    var parts = url.split('/');
-    var pageName = parts[parts.length - 1] || 'home';
-    var importURL = url + '?partial';
+  function renderPage(pageName) {
+    var importURL = pageName + '?partial';
 
     if (pageName !== IOWA.Elements.Template.selectedPage) {
       Polymer.import([importURL], function() {
@@ -141,11 +140,20 @@ IOWA.Router = (function() {
   }
 
   /**
+   * Parses the page name out of the last entry in absolutePath, split on '/'.
+   * Defaults to 'home' if absolutePath ends in '/' or is ''.
+   * @private
+   */
+  function parsePageNameFromAbsolutePath(absolutePath) {
+    return absolutePath.split('/').pop() || 'home';
+  }
+
+  /**
    * Renders a new page for the current location.
    * @private
    */
   function renderCurrentPage() {
-    renderPage(location.href);
+    renderPage(parsePageNameFromAbsolutePath(window.location.pathname));
   }
 
   /**
