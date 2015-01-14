@@ -21,5 +21,5 @@ function serveFromCacheOrNetwork(request) {
 }
 
 // TODO: /temporary_api/ can be removed once /api/ is available.
-shed.router.get('/temporary_api/(.+)', serveFromCacheOrNetwork);
-shed.router.get('/api/(.+)', serveFromCacheOrNetwork);
+shed.router.get('(.+)temporary_api/(.+)', serveFromCacheOrNetwork);
+shed.router.get('(.+)api/(.+)', serveFromCacheOrNetwork);

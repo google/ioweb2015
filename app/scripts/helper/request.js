@@ -36,8 +36,8 @@ IOWA.Request = (function() {
         // cache should be faster, but better safe than sorry.
         // Also check to make sure there's actually content returned, since the SW code will return
         // a HTTP 204 with an empty body if the request wasn't found in the cache.
-        if (this.status < 400 && freshContentPending && this.responseText) {
-          cachedResponse = this.responseText;
+        if (this.status < 400 && freshContentPending && this.response) {
+          cachedResponse = this.response;
           cachedContentCallback(JSON.parse(cachedResponse));
         }
       };
@@ -50,11 +50,11 @@ IOWA.Request = (function() {
     freshXhr.setRequestHeader('X-Cache-Only', 'false');
 
     freshXhr.onload = function() {
-      if (this.status < 400 && this.responseText != cachedResponse) {
+      if (this.status < 400 && this.response != cachedResponse) {
         // Indicate that we've received the fresh content, just in case the request for cached
         // content is still pending.
         freshContentPending = false;
-        freshContentCallback(JSON.parse(this.responseText));
+        freshContentCallback(JSON.parse(this.response));
       }
     };
 
