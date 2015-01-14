@@ -76,7 +76,7 @@ module.exports = (function() {
         dot.drawCircle(0, 0, size);
         dot.endFill();
 
-        dotTextures[size] = dot.generateTexture();
+        dotTextures[size] = dot.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
       }
 
       var dotContainer = new PIXI.DisplayObjectContainer();

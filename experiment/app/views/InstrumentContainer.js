@@ -17,6 +17,8 @@ module.exports = (function() {
   const CONTENT_VERTICAL_BUFFER_MOBILE = 32;
   const MOBILE_MAX = 767;
 
+  var isRetina = window.devicePixelRatio > 1.5;
+
   /**
    * A container that wraps a sub instruments.
    * @param {AudioManager} audioManager - The shared audioManager.
@@ -244,12 +246,29 @@ module.exports = (function() {
       wrapperElement.classList.add('experiment-instrument--' + pid);
       viewportElement.appendChild(wrapperElement);
 
+      var antialias = true;
+      var resolution = 1;
+
+      if (isRetina) {
+        antialias = false;
+        resolution = 2;
+      }
+
+      if (window.navigator.userAgent.match(/Safari/)) {
+        antialias = false;
+      }
+
       // create a renderer passing in the options
       renderer = new PIXI.WebGLRenderer(window.innerWidth, window.innerHeight, {
-        antialias: true,
+        antialias: antialias,
         transparent: false,
-        resolution: 1//window.devicePixelRatio > 1 ? 2 : 1
+        resolution: resolution
       });
+
+      if (isRetina) {
+        animate.set(renderer.view, { scaleX: 0.5, scaleY: 0.5 });
+        renderer.view.style.transformOrigin = '0 0';
+      }
 
       stage = new PIXI.Stage(bgColor);
 

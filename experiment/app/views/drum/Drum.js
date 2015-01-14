@@ -45,7 +45,7 @@ module.exports = (function() {
     hitCircleGfx.drawShape(shape);
     hitCircleGfx.endFill();
 
-    var hitTexture = hitCircleGfx.generateTexture();
+    var hitTexture = hitCircleGfx.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
 
     var self = {
       pid,
