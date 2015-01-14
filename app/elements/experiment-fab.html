@@ -36,6 +36,10 @@ Main fab for entering/exit the experiment.
         top: 2px;
         left: 1px;
       }
+      /* fix for repeating background image in safari */
+      :host::shadow core-icon div {
+        background-repeat: no-repeat;
+      }
       :host([playing])::shadow core-icon {
         height: 17px;
         width: 12px;
