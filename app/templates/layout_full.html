@@ -92,7 +92,6 @@ limitations under the License.
   <link rel="import" href="elements/elements.html">
 </head>
 <body id="page-{% .Slug %}">
-
 <div class="io-logo-container {% template "mastheadBgClass" .%}">
   <io-logo width="312" height="165" page="{% .Slug %}"></io-logo>
 </div>
@@ -187,16 +186,16 @@ limitations under the License.
             </paper-tab>
           </paper-tabs>
         </core-toolbar>
-        <div class="masthead-container {{ {active: !pageTransitioning} | tokenList }}" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+        <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="io-logo large"></div>
-          <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
+          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
         <experiment-fab-container mode="{{mode}}" playmode="{{playmode}}"></experiment-fab-container>
       </header>
 
-      <main class="io-main {{ {active: !pageTransitioning} | tokenList }}" >
+      <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}" >
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
       </main>
 

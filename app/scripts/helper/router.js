@@ -114,12 +114,19 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-    IOWA.Elements.Template.pageTransitioning = true;
+    IOWA.Elements.Template.pageTransitioningIn = false;
+    IOWA.Elements.Template.pageTransitioningOut = true;
     // Replace content and end transition.
     setTimeout(function() {
       requestAnimationFrame(function() {
         replaceTemplateContent(currentPageTemplates);
-        IOWA.Elements.Template.pageTransitioning = false;
+        // Wait for a new frame before transitioning in.
+        requestAnimationFrame(
+          function() {
+            IOWA.Elements.Template.pageTransitioningOut = false;
+            IOWA.Elements.Template.pageTransitioningIn = true;
+          }
+        );
         // Transition in post-processing.
         document.body.id = 'page-' + pageName;
         IOWA.Elements.Template.selectedPage = pageName;

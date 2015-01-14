@@ -143,13 +143,39 @@ h3, h4, h5, h6 {
 }
 
 .io-main {
-  transition: transform 0.6s, opacity 0.4s;
-  transform: translateY(300px);
-  opacity: 0;
-
-  &.active {
+  
+  .transition-up-delay {
+    transition: transform 0.6s, opacity 0.6s;
     transform: translateY(0);
     opacity: 1;
+  }
+
+  .transition-up {
+    transition: transform 0.6s, opacity 0.6s;
+    transform: translateY(0);
+    opacity: 1;
+    position: relative;
+  }
+
+  &.transitionIn {
+    .transition-up-delay {
+      transform: translateY(0);
+      transition-delay: 0.2s;
+    }
+  }
+
+  &.transitionOut {
+
+    .transition-up-delay {
+      transform: translateY(100px);
+      opacity: 0;
+    }
+
+    .transition-up {
+      transform: translateY(100px);
+      opacity: 0;
+      transition-delay: 0.2s;
+    }
   }
 }
 
@@ -162,13 +188,7 @@ h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  // background-color: $color-bluegrey-100;
-  will-change: clip, opacity;
-  transition: opacity 300ms ease-in-out;
-
-  &.fadeout {
-    opacity: 0;
-  }
+  will-change: clip;
 
   io-logo {
     will-change: transform;
