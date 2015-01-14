@@ -33,7 +33,7 @@ IOWA.Router = (function() {
    */
   function playMastheadRipple(x, y, color) {
     IOWA.Elements.Ripple.style.transition = '';
-    var translate = ['translate(', x, 'px,', y, 'px)'].join('');
+    var translate = ['translate3d(', x, 'px,', y, 'px, 0)',].join('');
     IOWA.Elements.Ripple.style.transform = [translate, ' scale(0.0)'].join('');
     IOWA.Elements.Ripple.style.opacity = 1;
     // Force recalculate style.
@@ -80,7 +80,7 @@ IOWA.Router = (function() {
                 IOWA.Elements.Template.pages[pageName].mastheadBgClass) {
               color = '#fff';
             }
-            playMastheadRipple(e.x, e.y, color);
+            playMastheadRipple(e.pageX, e.pageY, color);
             IOWA.History.pushState(null, '', el.href);
           }
           // TODO: Add GA pageview.
