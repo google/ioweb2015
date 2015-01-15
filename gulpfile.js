@@ -176,7 +176,8 @@ gulp.task('copy-bower-dependencies', function() {
 gulp.task('copy-backend', function(cb) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
-    BACKEND_DIR + '/app.yaml'
+    BACKEND_DIR + '/*.yaml',
+    BACKEND_DIR + '/*.pem'
   ], {base: './'})
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .on('end', function() {
