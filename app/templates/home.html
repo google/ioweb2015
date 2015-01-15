@@ -32,9 +32,31 @@
         <countdown-timer bgcolor="#00BCD4"
                          date="Mar 10 2015 09:00:00 GMT-0700 (PDT)"
                          dateadjustment="5" easeintime="490" waittime="100"
-                         easeouttime="390">
-          <i18n-msg msgid="untilreg">until registration opens</i18n-msg>
+                         easeouttime="390" thresholdInformation="{{thresholdInformation}}">
         </countdown-timer>
+        <template if="{{ thresholdInformation.thresholdDays }}">
+          <h4 class="countdown-label">
+            <i18n-msg msgid="daysuntilreg">Days until registration opens</i18n-msg>
+          </h4>
+        </template>
+
+        <template if="{{ thresholdInformation.thresholdHours }}">
+          <h4 class="countdown-label">
+            <i18n-msg msgid="hoursuntilreg">Hours until registration opens</i18n-msg>
+          </h4>
+        </template>
+
+        <template if="{{ thresholdInformation.thresholdMinutes }}">
+          <h4 class="countdown-label">
+            <i18n-msg msgid="minutesuntilreg">Minutues until registration opens</i18n-msg>
+          </h4>
+        </template>
+
+        <template if="{{ thresholdInformation.thresholdSeconds }}">
+          <h4 class="countdown-label">
+            <i18n-msg msgid="secondsuntilreg">Seconds until registration opens</i18n-msg>
+          </h4>
+        </template>
       </div>
     </section>
 
