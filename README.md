@@ -49,6 +49,9 @@ Not that this does not change the way the backend code is compiled
 or the front-end is built. It merely changes a variable values,
 which the app takes into account when rendering a page or responding to a request.
 
+Running in `stage` or `prod` requires real credentials when accessing external services.
+You'll need to run a one-off `gulp decrypt` which will decrypt a service account private key.
+
 You can also use GAE dev appserver by running `gulp serve:gae`. This is closer to what
 we're using in our webapp environment but a bit slower on startup.
 You'll need `gcloud` tool and `app` component to do this.
