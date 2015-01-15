@@ -42,6 +42,8 @@ module.exports = function(audioManager, stateManager) {
   var onWindowScrollStop = debounce(onWindowScrollStopUnDebounced, 250, { leading: false, trailing: true });
   var continueAnimating = true;
 
+  var containerElem = document.querySelector('#content-container') || document.body;
+
   var didEnterRecordingModeCallback;
   var didExitRecordingModeCallback;
 
@@ -120,7 +122,8 @@ module.exports = function(audioManager, stateManager) {
 
     viewportElement.appendChild(logoElement);
     viewportElement.appendChild(logoDialog);
-    document.body.appendChild(viewportElement);
+
+    containerElem.appendChild(viewportElement);
 
     logoClick();
     dialogClick();
@@ -505,7 +508,8 @@ module.exports = function(audioManager, stateManager) {
     var w = window.innerWidth;
     var h = window.innerHeight;
 
-    var rect = document.body.getBoundingClientRect();
+
+    var rect = containerElem.getBoundingClientRect();
     // viewportElement.style.width = `${rect.width}px`;
     viewportElement.style.height = `${rect.height}px`;
 

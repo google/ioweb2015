@@ -994,7 +994,7 @@ Main parent container for all of the fab elements.
           value: false
         },
         dialogAnimateDirection: {
-          value:'animate-up',
+          value: 'animate-up',
           reflect: true
         }
       },
@@ -1027,7 +1027,7 @@ Main parent container for all of the fab elements.
 
       trackFab: function(event) {
         var fabPos = this.getBoundingClientRect();
-        if (fabPos.top < 460) {
+        if (fabPos.top < 480) {
           this.dialogAnimateDirection = 'animate-down';
         } else {
           this.dialogAnimateDirection = 'animate-up';
