@@ -25,18 +25,18 @@ module.exports = (function() {
       request.onload = function() {
         // Asynchronously decode the audio file data in request.response
         audioContext.decodeAudioData(
-            request.response,
-            function(buffer) {
-              if (!buffer) {
-                console.warn('error decoding file data: ' + url);
-                return;
-              }
-              bufferList[url] = buffer;
-              resolve(buffer);
-            },
-            function(error) {
-              reject('decodeAudioData error', error);
+          request.response,
+          function(buffer) {
+            if (!buffer) {
+              console.warn('error decoding file data: ' + url);
+              return;
             }
+            bufferList[url] = buffer;
+            resolve(buffer);
+          },
+          function(error) {
+            reject('decodeAudioData error', error);
+          }
         );
       };
 

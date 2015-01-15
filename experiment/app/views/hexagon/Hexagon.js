@@ -64,7 +64,7 @@ module.exports = (function() {
       textureGfx.beginFill(0xffffff);
       textureGfx.drawShape(shape);
       textureGfx.endFill();
-      cachedTexture = textureGfx.generateTexture();
+      cachedTexture = textureGfx.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
     }
 
     // TODO: Maybe disable shadow on mobile?

@@ -1,141 +1,155 @@
-const LINE_COLOR = '#BDBDBD';
-const LINE_WIDTH = 2;
-const MIN_DECIBELS = -150;
-const MAX_DECIBELS = 0;
-const SMOOTHING_TIME_CONSTANT = 0.9;
-const FFT_SIZE = 128;
-const PERCENT_VALUE = 256;
-
 var animate = require('app/util/animate');
 
-/**
- * Create analyser node for bar visualisation.
- * @param {Object} audioManager - The audio manager.
- * @param {element} canvas - The canvas upon which to draw.
- * @return {Object} self
- */
-module.exports = function BarVisualizer(audioManager, canvas) {
+module.exports = (function() {
   'use strict';
 
-  var self = {
-    render,
-    resize,
-    enable,
-    init,
-    disable
-  };
-
-  var analyser = audioManager.analyser;
-  var canvasContext = canvas.getContext('2d');
-
-  analyser.minDecibels = MIN_DECIBELS;
-  analyser.maxDecibels = MAX_DECIBELS;
-
-  var freqDomain = new Uint8Array(analyser.frequencyBinCount);
-
-  var intervalID;
-
-  function init() {
-    pops();
-    intervalID = window.setInterval(pops , 200);
-  }
-
-  function pops() {
-    var inc = 0;
-    var direction = 'up';
-    for(var i = 0; i < freqDomain.length*2; i++) {
-      tweenById(i, inc);
-
-      if (inc < 26 && direction  === 'up') {
-        inc = inc + 1;
-      } else {
-        direction = 'down';
-        inc = inc - 1;
-      }
-    }
-  }
-  var iconSizes = [];
-  var iconSizesTween = [];
-  var lasticonSizesTween = [];
+  const LINE_COLOR = '#BDBDBD';
+  const LINE_WIDTH = 2;
+  const MIN_DECIBELS = -150;
+  const MAX_DECIBELS = 0;
+  const SMOOTHING_TIME_CONSTANT = 0.9;
+  const FFT_SIZE = 128;
+  const PERCENT_VALUE = 256;
 
   /**
-   * Draw bars to canvas based on audio frequency data.
+   * Create analyser node for bar visualisation.
+   * @param {Object} audioManager - The audio manager.
+   * @param {element} canvas - The canvas upon which to draw.
+   * @constructor
    */
-  function drawBars() {
-    var canvasWidth = canvas.width;
-    var canvasHeight = canvas.height;
+  return function BarVisualizer(audioManager, canvas) {
+    var self = {
+      render,
+      resize,
+      enable,
+      init,
+      disable
+    };
 
-    canvasContext.fillStyle = 'white';
-    canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
-
+    var analyser = audioManager.analyser;
     analyser.smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
     analyser.fftSize = FFT_SIZE;
-    analyser.getByteFrequencyData(freqDomain);
 
-    // draw the bars
-    var inc = 0;
-    var direction = 'up';
+    var canvasContext = canvas.getContext('2d');
 
-    for(var i = 0; i < freqDomain.length*2; i++) {
+    analyser.minDecibels = MIN_DECIBELS;
+    analyser.maxDecibels = MAX_DECIBELS;
 
-      var value = iconSizesTween[i];
-      var percent = value / PERCENT_VALUE;
+    var freqDomain = new Uint8Array(analyser.frequencyBinCount);
 
-      var height = canvasHeight * percent;
-      var offset = canvasHeight - height;
-      var barWidth = LINE_WIDTH;
-      canvasContext.fillStyle = LINE_COLOR;
-      canvasContext.fillRect((i+1) * 5 * LINE_WIDTH, offset, barWidth, height);
+    var timeoutID;
+    var barSizes = [];
+    var barSizeTweens = [];
+    var lastBarSizeTweens = [];
+    var lastTweenObject = [];
 
-      if ( inc < 26 && direction  === 'up') {
-        inc = inc + 1;
-      } else {
-        direction = 'down';
-        inc = inc - 1;
+    function init() {
+      pops();
+    }
+
+    function pops() {
+      var inc = 0;
+      var direction = 'up';
+
+      for (let i = 0; i < (freqDomain.length * 2); i++) {
+        tweenById(i, inc);
+
+        if (inc < 26 && direction  === 'up') {
+          inc = inc + 1;
+        } else {
+          direction = 'down';
+          inc = inc - 1;
+        }
+      }
+
+      timeoutID = window.setTimeout(pops, 200);
+    }
+
+    /**
+     * Draw bars to canvas based on audio frequency data.
+     */
+    function drawBars() {
+      var canvasWidth = canvas.width;
+      var canvasHeight = canvas.height;
+
+      canvasContext.fillStyle = 'white';
+      canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      analyser.getByteFrequencyData(freqDomain);
+
+      // draw the bars
+      var inc = 0;
+      var direction = 'up';
+
+      for (let i = 0; i < (freqDomain.length * 2); i++) {
+        let value = barSizeTweens[i];
+        let percent = value / PERCENT_VALUE;
+        let height = canvasHeight * percent;
+        let offset = canvasHeight - height;
+        let barWidth = LINE_WIDTH;
+
+        canvasContext.fillStyle = LINE_COLOR;
+        canvasContext.fillRect((i + 1) * 5 * LINE_WIDTH, offset, barWidth, height);
+
+        if (inc < 26 && direction === 'up') {
+          inc = inc + 1;
+        } else {
+          direction = 'down';
+          inc = inc - 1;
+        }
       }
     }
-  }
 
-  function tweenById(id, inc) {
-    iconSizes[id] = freqDomain[inc];
-    var object = {};
-    if (lasticonSizesTween[id]) {
-      object.radius = lasticonSizesTween[id];
-      lasticonSizesTween[id] = iconSizes[id];
-    } else {
-      object.radius = 100;
-      lasticonSizesTween[id] = iconSizes[id];
+    function tweenById(id, inc) {
+      barSizes[id] = freqDomain[inc];
+
+      if (!lastTweenObject[id]) {
+        lastTweenObject[id] = [
+          { height: 0 },
+          { height: 0, onUpdate: tweenByIdUpdate, onUpdateParams: [id] }
+        ];
+      }
+
+      if (lastBarSizeTweens[id]) {
+        lastTweenObject[id][0].height = lastBarSizeTweens[id];
+        lastBarSizeTweens[id] = barSizes[id];
+      } else {
+        lastTweenObject[id][0].height = 100;
+        lastBarSizeTweens[id] = barSizes[id];
+      }
+
+      lastTweenObject[id][1].height = barSizes[id];
+      animate.to(lastTweenObject[id][0], 0.2, lastTweenObject[id][1]);
     }
-    animate.to(object, 0.2, { radius:iconSizes[id], onUpdate:tweenByIdUpdate, onUpdateParams: [object, id]});
-  }
 
-  function tweenByIdUpdate(object, id) {
-    iconSizesTween[id] = object.radius;
-  }
+    function tweenByIdUpdate(id) {
+      barSizeTweens[id] = lastTweenObject[id][0].height;
+    }
 
-  /**
-   * On render, draw bars
-   */
-  function render() {
-    drawBars();
-  }
+    /**
+     * On render, draw bars
+     */
+    function render() {
+      drawBars();
+    }
 
-  /**
-   * On resize, draw bars
-   */
-  function resize() {
-    drawBars();
-  }
+    /**
+     * On resize, draw bars
+     */
+    function resize() {
+      drawBars();
+    }
 
-  /**
-   * Enable visualizer
-   */
-  function enable() {}
+    /**
+     * Enable visualizer
+     */
+    function enable() {}
 
-  /**
-   * Disable visualizer
-   */
-  function disable() {}
+    /**
+     * Disable visualizer
+     */
+    function disable() {}
 
-  return self;
-};
+    return self;
+  };
+})();

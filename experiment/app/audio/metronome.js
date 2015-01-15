@@ -31,22 +31,24 @@ module.exports = (function() {
         postMessage('tick');
       }
 
-      global.onmessage = (function(e) {
+      var intervalFunc = setInterval;
+      var clearIntervalFunc = clearInterval;
+
+      global.onmessage = function(e) {
         /* jshint sub: true */
         if (e.data === 'start') {
-          // lastTick = performance.now();
-          timerID = this['setInterval'](ticker, interval);
+          timerID = intervalFunc(ticker, interval);
         } else if (e.data.interval) {
           interval = e.data.interval;
           if (timerID) {
-            this['clearInterval'](timerID);
-            timerID = this['setInterval'](ticker, interval);
+            clearIntervalFunc(timerID);
+            timerID = intervalFunc(ticker, interval);
           }
         } else if (e.data === 'stop') {
-          this['clearInterval'](timerID);
+          clearIntervalFunc(timerID);
           timerID = null;
         }
-      }).bind(this);
+      };
     }
 
     /**

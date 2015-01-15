@@ -52,9 +52,7 @@ module.exports = (function() {
       lastPlay = audioContext.currentTime;
 
       // Return a single-playback specific method to change volume.
-      return {
-        setVolume: v => gainNode.gain.value = v
-      };
+      return gainNode;
     }
 
     return {

@@ -17,6 +17,8 @@ module.exports = (function() {
   const CONTENT_VERTICAL_BUFFER_MOBILE = 32;
   const MOBILE_MAX = 767;
 
+  var isRetina = false;//window.devicePixelRatio > 1.5;
+
   /**
    * A container that wraps a sub instruments.
    * @param {AudioManager} audioManager - The shared audioManager.
@@ -44,7 +46,7 @@ module.exports = (function() {
     var isPaused = false;
 
     var instrumentView;
-    var controlsBG, backIcon, recordButton, debugFrame;
+    var controlsBG, backIcon, backIconContainer, recordButton, debugFrame;
 
     var onActivateCallback_;
     var onBackCallback_;
@@ -129,6 +131,10 @@ module.exports = (function() {
       backIcon.position.x = 20;
       backIcon.position.y = 20;
 
+      backIconContainer = new PIXI.DisplayObjectContainer();
+      backIconContainer.hitArea = new PIXI.Rectangle(0, 0, 56, 56);
+      backIconContainer.addChild(backIcon);
+
       recordButton = new RecordButton(audioManager, 10, 4);
       recordButton.container.position.x = window.innerWidth - 150;
       recordButton.container.position.y = 28;
@@ -137,7 +143,7 @@ module.exports = (function() {
 
       var controlContainer = new PIXI.DisplayObjectContainer();
       controlContainer.addChild(controlsBG);
-      controlContainer.addChild(backIcon);
+      controlContainer.addChild(backIconContainer);
       controlContainer.addChild(recordButton.container);
 
       controlContainer.alpha = 0;
@@ -170,8 +176,8 @@ module.exports = (function() {
     function showControls(delay) {
       stage.addChild(controls);
 
-      backIcon.interactive = true;
-      backIcon.buttonMode = true;
+      backIconContainer.interactive = true;
+      backIconContainer.buttonMode = true;
 
       return animate.to(controls, 0.6, { alpha: 1, delay: delay });
     }
@@ -182,9 +188,9 @@ module.exports = (function() {
      * @return {Promise}
      */
     function hideControls(delay) {
-      backIcon.interactive = false;
-      backIcon.buttonMode = false;
-      backIcon.click = null;
+      backIconContainer.interactive = false;
+      backIconContainer.buttonMode = false;
+      backIconContainer.click = null;
 
       return animate.to(controls, 0.6, {
         alpha: 0,
@@ -211,9 +217,27 @@ module.exports = (function() {
         instrumentView.stopRecording();
       }
 
-      if ('function' === typeof instrumentView.logRecorded) {
-        instrumentView.logRecorded();
-      }
+      logRecorded();
+    }
+
+    /**
+     * When finished recording, console.table the new data so
+     * developers can get an idea of the data.
+     */
+    function logRecorded() {
+      if (!console || !console.table) { return; }
+
+      var data = instrumentView.getData();
+      if (data.recorded.length <= 0) { return; }
+
+      var output = [
+        data.recorded[0].keys
+      ];
+
+      output = output.concat(data.recorded.map(r => r.serializeModel()));
+
+      // Purposefully left in for user insight into our data structures.
+      console.table(output);
     }
 
     /**
@@ -226,12 +250,31 @@ module.exports = (function() {
       wrapperElement.classList.add('experiment-instrument--' + pid);
       viewportElement.appendChild(wrapperElement);
 
+      var antialias = true;
+      var resolution = 1;
+
+      if (isRetina) {
+        antialias = false;
+        resolution = 2;
+      }
+
+      if (window.navigator.userAgent.match(/Safari/) &&
+          window.navigator.userAgent.match(/Version\/8/)) {
+        antialias = false;
+      }
+
       // create a renderer passing in the options
       renderer = new PIXI.WebGLRenderer(window.innerWidth, window.innerHeight, {
-        antialias: true,
+        antialias: antialias,
         transparent: false,
-        resolution: 1//window.devicePixelRatio > 1 ? 2 : 1
+        resolution: resolution
       });
+
+      if (isRetina) {
+        animate.set(renderer.view, { scaleX: 0.5, scaleY: 0.5 });
+        renderer.view.style.transformOrigin = '0 0';
+        renderer.view.style.webkitTransformOrigin = '0 0';
+      }
 
       stage = new PIXI.Stage(bgColor);
 
@@ -290,7 +333,7 @@ module.exports = (function() {
      * Add listeners for when the view is expanded.
      */
     function addExpandedEventListeners() {
-      backIcon.click = backIcon.tap = function() {
+      backIconContainer.click = backIconContainer.tap = function() {
         onBackCallback_(self);
       };
 
@@ -308,7 +351,7 @@ module.exports = (function() {
      * Remove listeners for when the view is expanded.
      */
     function removeExpandedEventListeners() {
-      backIcon.click = backIcon.tap = null;
+      backIconContainer.click = backIconContainer.tap = null;
       document.removeEventListener('keyup', onGlobalKeyUp);
     }
 
@@ -480,7 +523,7 @@ module.exports = (function() {
      * @param {number} y - The y position.
      */
     function setPos(x, y) {
-      TweenMax.set(wrapperElement, { x, y });
+      animate.set(wrapperElement, { x, y });
     }
 
     /**

@@ -1,3 +1,6 @@
+/**
+ * Cube coordinate data structure. Used for hexagon math.
+ */
 module.exports = (function() {
   'use strict';
 
@@ -8,6 +11,13 @@ module.exports = (function() {
 
   var cubeCache = [];
 
+  /**
+   * Get a cube instance from the cache given coordinates.
+   * @param {number} x - The x coordinate.
+   * @param {number} y - The y coordinate.
+   * @param {number} z - The z coordinate.
+   * @return {Cube}
+   */
   function getCube(x, y, z) {
     cubeCache[x] = cubeCache[x] || [];
     cubeCache[x][y] = cubeCache[x][y] || [];
@@ -19,9 +29,20 @@ module.exports = (function() {
     return cubeCache[x][y][z];
   }
 
+  /**
+   * The Cube data structure.
+   * @param {number} x - The x coordinate.
+   * @param {number} y - The y coordinate.
+   * @param {number} z - The z coordinate.
+   * @constructor
+   */
   function Cube(x, y, z) {
     var neighbors;
 
+    /**
+     * Get all 6 neighbors.
+     * @return {array<Cube>}
+     */
     function getNeighbors() {
       if (!neighbors) {
         neighbors = NEIGHBOR_DELTAS.map(mapping => getCube(x + mapping[0], y + mapping[1], z + mapping[2]));
@@ -30,13 +51,21 @@ module.exports = (function() {
       return neighbors;
     }
 
-    // even-q layout
+    /**
+     * Convert cubic to row/column format. Using even-q layout.
+     * @return {array<number>}
+     */
     function getRowColumn() {
       var q = x;
       var r = z + (x + (x&1)) / 2;
       return [r, q];
     }
 
+    /**
+     * Get a ring of positions given a radius.
+     * @param {number} radius - The radius.
+     * @return {array<Cube>}
+     */
     function getRing(radius) {
       if (radius <= 0) { return [getCube(x,y,z)]; }
 
@@ -57,10 +86,18 @@ module.exports = (function() {
       return results;
     }
 
+    /**
+     * Convert data structure to plain array.
+     * @return {array<number>}
+     */
     function serializeModel() {
       return [x, y, z];
     }
 
+    /**
+     * Convert to code, which can be reevaluated.
+     * @return {string}
+     */
     function toCodeString() {
       return `Cube.getCube(${x}, ${y}, ${z})`;
     }

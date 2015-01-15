@@ -41,7 +41,7 @@ module.exports = (function() {
 
     var data;
 
-    var APPLICATION_STATE = 'collapsed';
+    var currentState = 'collapsed';
 
     var hexagons = [];
     var currentBeat;
@@ -54,6 +54,8 @@ module.exports = (function() {
     var sideLength;
     var halfSideLength;
     var smallRadius;
+
+    var isListening = false;
 
     /**
      * Initialize the view.
@@ -79,7 +81,8 @@ module.exports = (function() {
     }
 
     /**
-     *
+     * Resize all the hexagons.
+     * @param {number} _radius - The new hexagon radius.
      */
     function updateHexagonSizes(_radius) {
       radius = _radius;
@@ -93,18 +96,27 @@ module.exports = (function() {
       smallRadius = Math.sqrt((radius * radius) - (halfSideLength * halfSideLength));
     }
 
+    /**
+     * Initialize view data.
+     * @param {Model} d - The new data model.
+     */
     function loadData(d) {
       data = d;
 
       currentTrack = audioManager.createRecordedTrack(
-          data.recorded,
-          CHANNEL,
-          HEXAGON_TAG
-          );
+        data.recorded,
+        CHANNEL,
+        HEXAGON_TAG
+      );
 
       audioManager.addTrack(currentTrack);
     }
 
+    /**
+     * Activate a single hexagon which ripples.
+     * @param {Cube} cubePos - Which cube to activate.
+     * @param {boolean=false} dontRecord - If we should skip recording. Used for audio reactive.
+     */
     function activateHexagon(cubePos, dontRecord) {
       if (!dontRecord) {
         audioManager.playSoundImmediately(soundForPos(cubePos), CHANNEL);
@@ -124,6 +136,13 @@ module.exports = (function() {
       while (activateRing(cubePos, expandingRadius++, expandingRadius * 0.1));
     }
 
+    /**
+     * Activate (animated ripple) a hexagon.
+     * @param {Cube} cubePos - The cube position.
+     * @param {number} ringRadius - The current radius.
+     * @param {number} delay - When to animate.
+     * @return {boolean}
+     */
     function activateRing(cubePos, ringRadius, delay) {
       var drawable = false;
 
@@ -138,6 +157,12 @@ module.exports = (function() {
       return drawable;
     }
 
+    /**
+     * Draw a cube at a logical row/col.
+     * @param {number} row - The row.
+     * @param {number} col - The col.
+     * @return {Hexagon}
+     */
     function drawCube(row, col) {
       var hexagon = new Hexagon(radius, 0xffab91);
 
@@ -152,6 +177,12 @@ module.exports = (function() {
       return hexagon;
     }
 
+    /**
+     * Build the view at a logical row/col.
+     * @param {number} row - The row.
+     * @param {number} col - The col.
+     * @return {Cube}
+     */
     function buildAtRowCol(row, col) {
       var c = Cube.evenQToCube(row, col);
 
@@ -165,6 +196,10 @@ module.exports = (function() {
       return c;
     }
 
+    /**
+     * Clean-up and remove a hexagon.
+     * @param {Hexagon} h - The hexagon.
+     */
     function removeHexagon(h) {
       var c = h.getCube();
 
@@ -175,6 +210,10 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Create all the views.
+     * @return {array<Hexagon>}
+     */
     function buildViews() {
       var averageHeight = smallRadius * 2;
       var rows = Math.ceil((window.innerHeight / averageHeight) / 2);
@@ -192,55 +231,70 @@ module.exports = (function() {
       return cubes.map(c => c.hexagon);
     }
 
+    /**
+     * When closed.
+     */
     function animationCollapsed() {
-      APPLICATION_STATE = 'collapsed';
+      currentState = 'collapsed';
 
       audioManager.addTrack(currentTrack);
       removeEventListeners();
     }
 
+    /**
+     * When open.
+     */
     function animationExpanded() {
-      APPLICATION_STATE = 'expand';
+      currentState = 'expand';
 
       audioManager.removeTrack(currentTrack);
       addEventListeners();
     }
 
-    var isListening = false;
-
+    /**
+     * Attach event listeners.
+     */
     function addEventListeners() {
       if (isListening) { return; }
 
       isListening = true;
       hexagons.forEach(h => h.addEventListeners());
-      // document.addEventListener('keydown', onHexagonKeyDown);
+      document.addEventListener('keyup', onHexagonKeyUp);
     }
 
+    /**
+     * Detach event listeners.
+     */
     function removeEventListeners() {
       if (!isListening) { return; }
 
       isListening = false;
       hexagons.forEach(h => h.removeEventListeners());
-      // document.removeEventListener('keydown', onHexagonKeyDown);
+      document.removeEventListener('keyup', onHexagonKeyUp);
     }
 
-    // const NUMBER_KEY_RANGE = [49, 53];
+    const NUMBER_KEY_RANGE = [49, 53];
 
-    // /**
-    //  * Keydown handler for hexagons.
-    //  * @param {event} evt - The keydown event.
-    //  */
-    // function onHexagonKeyDown(evt) {
-    //   if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
-    //     // activateHexagon(evt.keyCode - NUMBER_KEY_RANGE[0]);
-    //     debugger;
-    //     var cubePosition = Cube.getCube(0,0,0);
-    //     activateHexagon(cubePosition);
-    //     console.log(evt.keyCode);
-    //   }
-    // }
+    /**
+     * Keyup handler for hexagons.
+     * @param {event} evt - The keyup event.
+     */
+    function onHexagonKeyUp(evt) {
+      if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
+        var keyPos = (evt.keyCode-2) - NUMBER_KEY_RANGE[0];
+        var cubePosition = Cube.evenQToCube(0,keyPos,0);
+        activateHexagon(cubePosition);
+      }
+    }
 
     var lastBoundsWidth;
+
+    /**
+     * On resize.
+     * @param {number} _w - The width.
+     * @param {number} _h - The height.
+     * @param {number} boundsWidth - The bounding box width.
+     */
     function resize(_w, _h, boundsWidth) {
       if (lastBoundsWidth === boundsWidth) { return; }
 
@@ -264,40 +318,44 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Render loop.
+     * @param {number} delta - The animation delta.
+     */
     function render(delta) {
-      if (renderPause) { return; }
-
-      if (APPLICATION_STATE === 'expand') {
-        renderExpanded(delta);
-      } else {
-        renderCollapsed(delta);
-      }
+      // no-op, all animations handled by tweens
     }
 
+    /**
+     * Start recording data.
+     */
     function startRecording() {
       isRecording = true;
       data.recorded = [];
     }
 
+    /**
+     * Stop recording data.
+     */
     function stopRecording() {
       isRecording = false;
       currentTrack = audioManager.createRecordedTrack(
-          data.recorded,
-          CHANNEL,
-          HEXAGON_TAG
-          );
+        data.recorded,
+        CHANNEL,
+        HEXAGON_TAG
+      );
     }
 
-    function renderExpanded() {
-    }
-
-    function renderCollapsed() {
-    }
-
+    /**
+     * Disable rendering.
+     */
     function disable() {
       renderPause = true;
     }
 
+    /**
+     * Start rendering.
+     */
     function enable() {
       renderPause = false;
     }

@@ -1,7 +1,5 @@
 var LinkedList = require('app/util/LinkedList');
 
-
-
 /**
  * A pool of objects.
  * @constructor

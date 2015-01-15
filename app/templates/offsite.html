@@ -8,7 +8,7 @@
 
 {% define "content" %}
   <div class="card__container transition-up">
-    <div class="card">
+    <div class="card js-experiment-visualizer">
       <div class="card-content">
         <h2 class="card__title"><i18n-msg msgid="livestream">Live stream</i18n-msg></h2>
         <h3>Watch the keynote and selected sessions in real-time, from your laptop or mobile device.</h3>
@@ -16,16 +16,16 @@
     </div>
   </div>
   <div class="transition-up-delay">
-    <section class="card__photo--stage page__section"></section>
+    <section class="card__photo--stage page__section js-experiment-instrument"></section>
 
     <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-      <div class="card" auto-vertical flex>
+      <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
           <h3 class="card__title"><i18n-msg msgid="ioextendevents">I/O Extended events</i18n-msg></h3>
           <h4>I/O Extended includes anything from live streaming sessions, to local developer demos, to hackathons. These events are brought to you by our Google Developer Groups, Student Ambassadors, and local developers.</h4>
         </div>
       </div>
-      <div class="card" auto-vertical flex>
+      <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
           <h3 class="card__title"><i18n-msg msgid="hostioextend">Host an I/O Extended event</i18n-msg></h3>
           <h4>We've got you covered with all the information you need to bring I/O to your neighborhood.</h4>
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <section class="page__section page__section--attend bg-dark-grey">
+    <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument">
       <h2>We're compiling a map of I/O Extended events in your area. Check back to find one close to you.</h2>
       <div class="action__links" layout vertical>
         <paper-button>
