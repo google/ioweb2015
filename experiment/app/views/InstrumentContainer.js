@@ -272,6 +272,7 @@ module.exports = (function() {
       if (isRetina) {
         animate.set(renderer.view, { scaleX: 0.5, scaleY: 0.5 });
         renderer.view.style.transformOrigin = '0 0';
+        renderer.view.style.webkitTransformOrigin = '0 0';
       }
 
       stage = new PIXI.Stage(bgColor);
