@@ -3,6 +3,7 @@
   TBC
 -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-scroll-threshold/core-scroll-threshold.html">
 
 <script src="countdown-timer-namespace.js"></script>
 <script src="countdown-timer-enumerations.js"></script>
@@ -62,6 +63,11 @@ Creates a countdown timer to a specific date.
     <div class="countdown-timer">
       <canvas id="surface"></canvas>
     </div>
+    <core-scroll-threshold id="threshold"
+      on-lower-trigger="{{ start }}"
+      lowerTriggered="{{ lowerTriggered }}"
+      lowerThreshold="{{ lowerThreshold }}">
+    </core-scroll-threshold>
 
     <template if="{{ thresholdDays }}">
       <h4 class="countdown-label">
@@ -216,6 +222,21 @@ Creates a countdown timer to a specific date.
        * @private
        */
       attached: function() {
+
+        // We need to add 100 onto the threshold because the countdown timer
+        // is 100px nearer the bottom when this calculation is made. After the
+        // page has animated in, it'll be 100px further away from the bottom.
+        var THRESHOLD_ADJUSTMENT = 100;
+
+        // Make sure we only start the timer when we hit the top of the element.
+        var elementRect = this.getBoundingClientRect();
+        var scrollContainer = document.querySelector(
+            'core-drawer-panel > div[main]');
+        var thresholdValue = scrollContainer.scrollHeight -
+            Math.round(elementRect.bottom) + THRESHOLD_ADJUSTMENT;
+
+        this.lowerThreshold = thresholdValue;
+        this.$.threshold.scrollTarget = scrollContainer;
 
         // Create the timer and set it with whatever the current
         // values are. If the user updates any values then the
