@@ -33,7 +33,7 @@ module.exports = function(audioManager, stateManager) {
   var visualizerViews = [];
   var lastFrame = 0;
   var isPaused = false;
-  var pauseAfterFrame = false; // TODO: pause during wipe if needed
+  var pauseAfterFrame = false;
   var isExpanded = false;
 
   var onWindowResize = throttle(onWindowResizeUnThrottled, 200);
@@ -269,9 +269,11 @@ module.exports = function(audioManager, stateManager) {
       renderChildren(secDelta);
     }
 
-    if (pauseAfterFrame) {
+    if (pauseAfterFrame === 1) {
       isPaused = true;
       pauseAfterFrame = false;
+    } else {
+      pauseAfterFrame--;
     }
   }
 

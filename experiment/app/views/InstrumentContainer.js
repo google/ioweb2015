@@ -258,7 +258,8 @@ module.exports = (function() {
         resolution = 2;
       }
 
-      if (window.navigator.userAgent.match(/Safari/)) {
+      if (window.navigator.userAgent.match(/Safari/) &&
+          window.navigator.userAgent.match(/Version\/8/)) {
         antialias = false;
       }
 
