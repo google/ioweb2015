@@ -39,6 +39,16 @@ $name: 'page-registration';
   .io-countdown {
     margin: 100px 0;
   }
+  .page__section {
+    margin-top: -77px;
+  }
+}
+
+
+@media (min-width: $desktop-breakpoint-min) {
+  .page__section {
+    margin-top: -57px;
+  }
 }
 
 }
