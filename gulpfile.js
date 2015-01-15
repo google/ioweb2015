@@ -176,7 +176,8 @@ gulp.task('copy-bower-dependencies', function() {
 gulp.task('copy-backend', function(cb) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
-    BACKEND_DIR + '/app.yaml'
+    BACKEND_DIR + '/*.yaml',
+    BACKEND_DIR + '/*.pem'
   ], {base: './'})
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .on('end', function() {
@@ -244,7 +245,7 @@ gulp.task('serve', ['sass', 'backend', 'generate-service-worker-dev'], function(
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var startArgs = ['-d', APP_DIR, '-listen', serverAddr];
-  var start = spawn.bind(null, BACKEND_DIR + '/bin/server', startArgs, {stdio: 'inherit'});
+  var start = spawn.bind(null, 'bin/server', startArgs, {cwd: BACKEND_DIR, stdio: 'inherit'});
 
   if (noWatch) {
     start();
@@ -366,8 +367,18 @@ gulp.task('addgithooks', function() {
     .pipe(gulp.dest('.git/hooks'));
 });
 
+gulp.task('godeps', function() {
+  spawn('go', ['get', '-d', './' + BACKEND_DIR + '/...'], {stdio: 'inherit'});
+});
+
+gulp.task('decrypt', function() {
+  var key = BACKEND_DIR + '/service-account.pem';
+  var args = ['aes-256-cbc', '-d', '-in', key + '.enc', '-out', key];
+  spawn('openssl', args, {stdio: 'inherit'});
+});
+
 gulp.task('setup', function(cb) {
-  runSequence('bower', 'addgithooks', 'default', cb);
+  runSequence('bower', 'godeps', 'addgithooks', 'default', cb);
 });
 
 // Watch file changes and reload running server

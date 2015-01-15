@@ -28,6 +28,8 @@ handlers:
 
 - url: /temporary_api
   static_dir: app/temporary_api
+  # need access from the backend
+  application_readable: true
   http_headers:
     Access-Control-Allow-Origin: "*"
 

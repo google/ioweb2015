@@ -7,18 +7,21 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+
+	"golang.org/x/net/context"
 )
 
 var (
 	rootDir    string
 	listenAddr string
-	appEnv     string
+	// app environment: "dev", "stage" or "prod"
+	// don't refer to this directly, use env(c) func instead.
+	appEnv string
 )
 
 // main is the entry point of the standalone server.
@@ -32,7 +35,10 @@ func main() {
 	flag.StringVar(&appEnv, "env", appEnv, "app environment: dev, stage or prod")
 	flag.Parse()
 
-	http.HandleFunc("/", catchAllHandler)
+	cache = newMemoryCache()
+
+	http.HandleFunc("/", withLogging(catchAllHandler))
+	http.HandleFunc("/api/extended", withLogging(serveIOExtEntries))
 
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
@@ -41,11 +47,6 @@ func main() {
 // or responds with a rendered template if no static asset found
 // under the in-flight request.
 func catchAllHandler(w http.ResponseWriter, r *http.Request) {
-	logmsg := fmt.Sprintf("%s %s", r.Method, r.URL.Path)
-	defer func() {
-		log.Println(logmsg)
-	}()
-
 	p := path.Clean("/" + r.URL.Path)
 	if p == "/" {
 		p += "index"
@@ -60,11 +61,16 @@ func catchAllHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, p)
 }
 
-// env returns current app environment: "dev", "stage" or "prod".
-// The environment is determined by either APP_ENV process environment
-// or '-env' command line flag.
-func env(_ *http.Request) string {
-	// Request arg is accepted to make the func compatible
-	// with GAE version.
-	return appEnv
+// withLogging wraps handler func h into a closure that logs
+// incoming requests and passes it on to h.
+func withLogging(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s", r.Method, r.URL.Path)
+		h(w, r)
+	}
+}
+
+// newContext returns a newly created context of the in-flight request r.
+func newContext(r *http.Request) context.Context {
+	return context.WithValue(context.Background(), ctxKeyEnv, appEnv)
 }
