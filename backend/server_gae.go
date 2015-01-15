@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strings"
 
+	"golang.org/x/net/context"
+
 	"appengine"
 )
 
@@ -16,27 +18,38 @@ import (
 var rootDir = "app"
 
 func init() {
+	cache = &gaeMemcache{}
+
 	http.HandleFunc("/", serveTemplate)
+	http.HandleFunc("/api/extended", serveIOExtEntries)
 }
 
-// env returns current app environment: "dev", "stage" or "prod".
-// The environment is determined by the app version which request r
-// was routed to:
-//   "-prod" suffix results into "prod" env
-//   "-stage" suffix results into "stage"
-//   default is "dev"
-// App version is specified in app.yaml.
-func env(r *http.Request) string {
-	c := appengine.NewContext(r)
-	v := appengine.VersionID(c)
+// newContext returns a newly created context of the in-flight request r.
+func newContext(r *http.Request) context.Context {
+	ac := appengine.NewContext(r)
+	v := appengine.VersionID(ac)
 	if i := strings.Index(v, "."); i > 0 {
 		v = v[:i]
 	}
+	var appEnv string
 	switch {
+	default:
+		appEnv = "dev"
 	case strings.HasSuffix(v, "-prod"):
-		return "prod"
+		appEnv = "prod"
 	case strings.HasSuffix(v, "-stage"):
-		return "stage"
+		appEnv = "stage"
 	}
-	return "dev"
+	c := context.WithValue(context.Background(), ctxKeyEnv, appEnv)
+	return context.WithValue(c, ctxKeyGAEContext, ac)
+}
+
+// appengineContext extracts appengine.Context value from the context c
+// associated with an in-flight request.
+func appengineContext(c context.Context) appengine.Context {
+	ac, ok := c.Value(ctxKeyGAEContext).(appengine.Context)
+	if !ok || ac == nil {
+		panic("never reached: no appengine.Context found")
+	}
+	return ac
 }

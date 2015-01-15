@@ -244,7 +244,7 @@ gulp.task('serve', ['sass', 'backend', 'generate-service-worker-dev'], function(
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var startArgs = ['-d', APP_DIR, '-listen', serverAddr];
-  var start = spawn.bind(null, BACKEND_DIR + '/bin/server', startArgs, {stdio: 'inherit'});
+  var start = spawn.bind(null, 'bin/server', startArgs, {cwd: BACKEND_DIR, stdio: 'inherit'});
 
   if (noWatch) {
     start();
