@@ -43,8 +43,8 @@
   height: 110px;
   padding: 20px;
   position: absolute;
-  left: 150px;
-  top: 40px;
+  left: 80px;
+  top: 18px;
   transition: transform 300ms ease-in-out;
   transform: scale(0,0);
   transform-origin: 0 0;
