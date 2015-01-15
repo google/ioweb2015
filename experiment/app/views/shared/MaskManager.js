@@ -1,6 +1,7 @@
 var { vec2 } = require('p2');
 var { Promise } = require('es6-promise');
 var animate = require('app/util/animate');
+var currentScrollPosition = require('app/util/currentScrollPosition');
 
 module.exports = (function() {
   'use strict';
@@ -223,7 +224,7 @@ module.exports = (function() {
      */
     function addMask() {
       viewportElement.classList.add(maskClass);
-      viewportElement.style.webkitMaskPosition = `0 ${window.scrollY}px`;
+      viewportElement.style.webkitMaskPosition = `0 ${currentScrollPosition().y}px`;
     }
 
     /**

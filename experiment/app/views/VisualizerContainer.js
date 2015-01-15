@@ -1,6 +1,7 @@
 var animate = require('app/util/animate');
 var {Promise} = require('es6-promise');
 var zIndexes = require('app/util/zIndexes');
+var currentScrollPosition = require('app/util/currentScrollPosition');
 
 module.exports = (function() {
   'use strict';
@@ -79,8 +80,10 @@ module.exports = (function() {
       }
 
       var { top, left, width, height } = elementToMimic.getBoundingClientRect();
-      elemRect.top = top + window.scrollY;
-      elemRect.left = left + window.scrollX;
+      var { x, y } = currentScrollPosition();
+
+      elemRect.top = top + y;
+      elemRect.left = left + x;
       elemRect.width = width;
       elemRect.height = height;
 

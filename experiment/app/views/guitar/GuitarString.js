@@ -170,8 +170,8 @@ module.exports = (function() {
     function createMouseCollider() {
       mouseColliderBodyShape = new p2.Circle(1);
       mouseColliderBody = new p2.Body({
-        mass:1,
-        position: [80,500],
+        mass: 1,
+        position: [80, 500],
         velocity: [0, 0],
         force: [0, 0],
         type: 1,
@@ -234,8 +234,8 @@ module.exports = (function() {
       spring1 = new p2.LinearSpring(capsuleBody, plane, {
         restLength: 0.5,
         stiffness: 10,
-        localAnchorA: [-capsuleShape.length/2,0],
-        worldAnchorB: [200,200],
+        localAnchorA: [-capsuleShape.length / 2, 0],
+        worldAnchorB: [200, 200],
       });
 
       world.addSpring(spring1);
@@ -244,8 +244,8 @@ module.exports = (function() {
         restLength: 0.5,
         stiffness: 10,
         damping: 1,
-        localAnchorA: [capsuleShape.length/2,0],
-        worldAnchorB: [0,0],
+        localAnchorA: [capsuleShape.length / 2, 0],
+        worldAnchorB: [0, 0],
       });
 
       world.addSpring(spring2);
@@ -505,10 +505,10 @@ module.exports = (function() {
       mouseColliderBody.position[0] = mouseColliderGraphic.position.x;
       mouseColliderBody.position[1] = mouseColliderGraphic.position.y;
 
-      lastMouseX =  currentMouseX;
+      lastMouseX = currentMouseX;
       currentMouseX = mouseColliderBody.position[0];
 
-      lastMouseY =  currentMouseY;
+      lastMouseY = currentMouseY;
       currentMouseY = mouseColliderBody.position[1];
 
       renderLine();

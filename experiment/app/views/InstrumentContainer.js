@@ -4,6 +4,7 @@ var {Promise} = require('es6-promise');
 var backImage = require('url?limit=10000!app/images/back-arrow.png');
 var RecordButton = require('app/views/RecordButton');
 var zIndexes = require('app/util/zIndexes');
+var currentScrollPosition = require('app/util/currentScrollPosition');
 
 module.exports = (function() {
   'use strict';
@@ -550,8 +551,10 @@ module.exports = (function() {
       if (!isReady) { return; }
 
       var { top, left, width, height } = elementToMimic.getBoundingClientRect();
-      elemRect.top = top + window.scrollY;
-      elemRect.left = left + window.scrollX;
+      var { x, y } = currentScrollPosition();
+
+      elemRect.top = top + y;
+      elemRect.left = left + x;
       elemRect.width = width;
       elemRect.height = height;
 
@@ -561,27 +564,7 @@ module.exports = (function() {
 
       resizeControls(window.innerWidth);
 
-      if (!isExpanded) {
-        displayContainerCenter.position.y = ~~(elemRect.height / 2);
-        displayContainerCenter.position.x = ~~(elemRect.width / 2);
-
-        setPos(elemRect.left, elemRect.top);
-        wrapperElement.style.width = elemRect.width + 'px';
-        wrapperElement.style.height = elemRect.height + 'px';
-
-        let[optimalWidth, optimalHeight] = optimalBounds(elemRect.width, elemRect.height);
-
-        tweenData.width = elemRect.width;
-        tweenData.height = elemRect.height;
-        tweenData.optimalWidth = optimalWidth;
-        tweenData.optimalHeight = optimalHeight;
-
-        instrumentView.resize(elemRect.width, elemRect.height, optimalWidth, optimalHeight);
-
-        updateDebugFrame(optimalWidth, optimalHeight);
-
-        displayContainer.hitArea = new PIXI.Rectangle(0, 0, elemRect.width, elemRect.height);
-      } else {
+      if (isExpanded) {
         setPos(0, getDocumentScrollTop());
         wrapperElement.style.width = window.innerWidth + 'px';
         wrapperElement.style.height = window.innerHeight + 'px';
@@ -600,6 +583,26 @@ module.exports = (function() {
         updateDebugFrame(optimalWidth, optimalHeight);
 
         displayContainer.hitArea = new PIXI.Rectangle(0, 0, w, h);
+      } else {
+        displayContainerCenter.position.y = Math.floor(elemRect.height / 2);
+        displayContainerCenter.position.x = Math.floor(elemRect.width / 2);
+
+        setPos(elemRect.left, elemRect.top);
+        wrapperElement.style.width = elemRect.width + 'px';
+        wrapperElement.style.height = elemRect.height + 'px';
+
+        let [optimalWidth, optimalHeight] = optimalBounds(elemRect.width, elemRect.height);
+
+        tweenData.width = elemRect.width;
+        tweenData.height = elemRect.height;
+        tweenData.optimalWidth = optimalWidth;
+        tweenData.optimalHeight = optimalHeight;
+
+        instrumentView.resize(elemRect.width, elemRect.height, optimalWidth, optimalHeight);
+
+        updateDebugFrame(optimalWidth, optimalHeight);
+
+        displayContainer.hitArea = new PIXI.Rectangle(0, 0, elemRect.width, elemRect.height);
       }
     }
 
