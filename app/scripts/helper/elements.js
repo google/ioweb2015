@@ -80,6 +80,8 @@ IOWA.Elements = (function() {
     });
 
     IOWA.Elements.Template = template;
+    IOWA.Elements.ScrollContainer = document.querySelector(
+        'core-drawer-panel > div[main]');
   };
 
   return {

@@ -229,13 +229,11 @@ Creates a countdown timer to a specific date.
 
         // Make sure we only start the timer when we hit the top of the element.
         var elementRect = this.getBoundingClientRect();
-        var scrollContainer = document.querySelector(
-            'core-drawer-panel > div[main]');
-        var thresholdValue = scrollContainer.scrollHeight -
+        var thresholdValue = IOWA.Elements.ScrollContainer.scrollHeight -
             Math.round(elementRect.bottom) + THRESHOLD_ADJUSTMENT;
 
         this.lowerThreshold = thresholdValue;
-        this.$.threshold.scrollTarget = scrollContainer;
+        this.$.threshold.scrollTarget = IOWA.Elements.ScrollContainer;
 
         // Create the timer and set it with whatever the current
         // values are. If the user updates any values then the
