@@ -11,7 +11,7 @@ module.exports = (function() {
   const MAX_CONTENT_WIDTH = 1024;
   const CONTENT_ASPECT_RATIO_HORIZONTAL = 2 / 1;
   const CONTENT_ASPECT_RATIO_VERTICAL = 3 / 2;
-  const CONTENT_HORIZONTAL_BUFFER_DESKTOP = 32;
+  const CONTENT_HORIZONTAL_BUFFER_DESKTOP = 64;
   const CONTENT_HORIZONTAL_BUFFER_MOBILE = 24;
   const CONTENT_VERTICAL_BUFFER_DESKTOP = 175;
   const CONTENT_VERTICAL_BUFFER_MOBILE = 32;
@@ -495,8 +495,12 @@ module.exports = (function() {
           CONTENT_VERTICAL_BUFFER_DESKTOP;
 
       if (isExpanded) {
-        horizontalBuffer *= 4;
-        verticalBuffer *= 4;
+        if (isMobile) {
+          horizontalBuffer *= 4;
+          verticalBuffer *= 4;
+        } else {
+          verticalBuffer = horizontalBuffer;
+        }
       }
 
       var relativeWidth = (containerWidth - (horizontalBuffer * 2));
