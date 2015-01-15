@@ -98,6 +98,22 @@ module.exports = (function() {
     }
 
     /**
+     * Fade the audio volume in.
+     * @param {number} duration - The fade in duration.
+     * @param {number} delay - The fade in delay.
+     */
+    function fadeIn(duration, delay) {
+      return animate({ volume: 0 }, duration, {
+        volume: DEFAULT_VOLUME,
+        ease: Linear.easeNone,
+        delay: delay,
+        onUpdate: function() {
+          setVolume(this.target.volume);
+        }
+      });
+    }
+
+    /**
      * Fade the audio volume out then stop.
      * @param {number} duration - The fade out duration.
      */
@@ -119,10 +135,14 @@ module.exports = (function() {
     function start() {
       if (isRunning) { return; }
 
+      setVolume(0);
+
       analyser.connect(audioContext.destination);
 
       isRunning = true;
       sequencer.start();
+
+      fadeIn(2.25, 0.75);
     }
 
     /**
@@ -160,6 +180,13 @@ module.exports = (function() {
       return sequencer.createLoopingTrack(sound, frequency, channel, tags);
     }
 
+    /**
+     * Create a track from a list of played notes.
+     * @param {array<object>} playedNotes - The played notes.
+     * @param {Channel} channel - The channel.
+     * @param {number} tags - The tags.
+     * @return {Track}
+     */
     function createRecordedTrack(playedNotes, channel, tags) {
       var trackDef = {};
 
@@ -172,12 +199,16 @@ module.exports = (function() {
       return createTrack(trackDef, channel, tags);
     }
 
+    /**
+     * Add a track.
+     * @param {Track} track - The track.
+     */
     function addTrack(track) {
       sequencer.addTrack(track);
     }
 
     /**
-     * Remove a sound loop.
+     * Remove a track.
      * @param {Track} track - The track.
      */
     function removeTrack(track) {
@@ -264,11 +295,23 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Play a sound immediately.
+     * @param {string|number} soundName - The sound.
+     * @param {Channel} channel - The channel.
+     * @return {AudioNode}
+     */
     function playSoundImmediately(soundName, channel) {
       var channelOut = channel ? channel.target : gainNode;
       return getSound(soundName).play(channelOut);
     }
 
+    /**
+     * Play a sound on next sequencer beat.
+     * @param {string|number} soundName - The sound.
+     * @param {Channel} channel - The channel.
+     * @return {AudioNode}
+     */
     function playSoundOnNextBeat(soundName, channel) {
       var channelOut = channel ? channel.target : gainNode;
       sequencer.playNext(getSound(soundName), channelOut);
@@ -287,10 +330,21 @@ module.exports = (function() {
       });
     }
 
+    /**
+     * Notify the playback bus that a sound will play in the future.
+     * @param {Sound} sound - The sound.
+     * @param {number} time - The time.
+     * @param {number} note - Which note.
+     * @param {number} tags - The tags.
+     */
     function willPlayback(sound, time, note, tags) {
       playbackBus.schedule(time - audioContext.currentTime, sound, note, tags);
     }
 
+    /**
+     * When ticking, progress the playback bus.
+     * @param {number} delta - The delta.
+     */
     function render(delta) {
       playbackBus.tick(delta);
     }

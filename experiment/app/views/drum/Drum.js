@@ -6,6 +6,14 @@ var {Promise} = require('es6-promise');
 module.exports = (function() {
   'use strict';
 
+  /**
+   * Creates a new drum.
+   * @param {Object} model - The model for this drum.
+   * @param {string} color - The color for this drum.
+   * @param {string} soundName - The soundName for this drum.
+   * @param {Object} physicsWorld - The physics for this drum.
+   * @constructor
+   */
   return function Drum(model, color, soundName, physicsWorld) {
     var pid = model.pid;
     var isDragging = false;
@@ -35,7 +43,7 @@ module.exports = (function() {
     hitCircleGfx.drawShape(shape);
     hitCircleGfx.endFill();
 
-    var hitTexture = hitCircleGfx.generateTexture();
+    var hitTexture = hitCircleGfx.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
 
     var self = {
       pid,
@@ -47,11 +55,14 @@ module.exports = (function() {
       removeEventListeners,
       onActivate,
       setPosition,
-      emitCircle
+      showCollision
     };
 
     var physicsBody = addToPhysics();
 
+    /**
+     * Add event listeners.
+     */
     function addEventListeners() {
       container.interactive = true;
       container.buttonMode = true;
@@ -87,6 +98,9 @@ module.exports = (function() {
       };
     }
 
+    /**
+     * Remove event listeners.
+     */
     function removeEventListeners() {
       container.interactive = false;
       container.buttonMode = false;
@@ -96,19 +110,44 @@ module.exports = (function() {
       container.mousemove = container.touchmove = null;
     }
 
+    /**
+     * On activate callback.
+     * @param {function} cb - The activation callback.
+     */
     var onActivationCallback;
     function onActivate(cb) {
       onActivationCallback = cb;
     }
 
+    /**
+     * Activate drum ball.
+     * @param {Object} ball - The ball object.
+     */
     function activate(ball) {
-      emitCircle(0);
+      showCollision(0);
       if (onActivationCallback) {
         onActivationCallback(self, ball);
       }
     }
 
-    function emitCircle(delay) {
+    var tweenData = { y: 0 };
+
+    /**
+     * Update the visual position of the drum during a tween.
+     */
+    function visualUpdate() {
+      container.position.y = tweenData.y;
+    }
+
+    /**
+     * Emit a circle.
+     * @param {number} delay - The delay duration.
+     */
+    function showCollision(delay) {
+      tweenData.y = model.y - 25;
+      TweenMax.killTweensOf(tweenData);
+      TweenMax.to(tweenData, 0.2, { y: model.y, onUpdate: visualUpdate, ease: Expo.easeOut });
+
       var hitCircle = new PIXI.Sprite(hitTexture);
       hitCircle.anchor.x = hitCircle.anchor.y = 0.5;
       container.addChildAt(hitCircle, 0);
@@ -121,6 +160,9 @@ module.exports = (function() {
       });
     }
 
+    /**
+     * Add drum object to physics.
+     */
     function addToPhysics() {
       var shapeDef = new p2.Circle(model.radius);
       var bodyDef = new p2.Body({
@@ -138,16 +180,23 @@ module.exports = (function() {
 
     var drumPosition = { x: 0, y: 0 };
 
+    /**
+     * Set position of the drum.
+     * @param {number} x - The X position of the drum.
+     * @param {number} y - The Y position of the drum.
+     */
     function setPosition(x, y) {
       drumPosition.x = x;
       drumPosition.y = y;
+
       animate.to(container.position, 0.1, drumPosition);
 
       model.x = physicsBody.position[0] = x;
-      model.y =  physicsBody.position[1] = y;
+      model.y = physicsBody.position[1] = y;
     }
 
     function render() {
+      // no-op
     }
 
     return self;

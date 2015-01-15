@@ -41,7 +41,7 @@
   border-radius: 3px;
   box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
   font-family: 'Roboto', sans-serif;
-  height: 100px;
+  height: 110px;
   padding: 20px;
   position: absolute;
   left: 150px;
@@ -65,8 +65,33 @@
 }
 
 .button-container {
-  margin-top: 20px;
+  float: right;
+  margin-top: 10px;
 }
+
+  .button-container button {
+    background: #fff;
+    border: none;
+    color: #64B5F6;
+    cursor: pointer;
+    display: block;
+    float: left;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 20px;
+    text-transform: uppercase;
+  }
+
+  .button-container button:focus {
+    outline: none;
+  }
+
+  #noButton {
+    color: #646464;
+  }
 
   @media screen and (max-width: 767px) {
     .experiment-logo {
@@ -88,6 +113,8 @@
 }
 
 .experiment-visualizer {
+  border-radius: 2px;
+  box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
   position: absolute;
   margin: 0;
   padding: 0;

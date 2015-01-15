@@ -8,6 +8,9 @@ module.exports = function unlockAudioOnMobile(audioContext) {
     window.addEventListener('touchstart', unlock, false);
   }
 
+  /**
+   * Unlock audio playback on iOS.
+   */
   function unlock() {
     if (!isLocked) {
       return;

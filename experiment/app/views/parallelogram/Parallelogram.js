@@ -251,7 +251,9 @@ module.exports = (function() {
         animate.to(target, fadeDuration - 0.1, {
           volume: 0,
           onUpdate: function(myNote) {
-            myNote.setVolume(target.volume);
+            if (myNote) {
+              myNote.gain.value = target.volume;
+            }
           }.bind(null, notePlaying)
         });
 

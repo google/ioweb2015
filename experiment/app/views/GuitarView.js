@@ -11,6 +11,11 @@ module.exports = (function() {
 
   const VIEW_NAME = 'GuitarView';
 
+  /**
+   * Controls the Guitar instrument view.
+   * @param {AudioManager} audioManager - The shared audio manager.
+   * @constructor
+   */
   return function GuitarView(audioManager) {
     const GUITAR_TAG = audioManager.addTag(VIEW_NAME);
     const CHANNEL = audioManager.channels.create();
@@ -47,10 +52,18 @@ module.exports = (function() {
 
     var gridCount;
 
+    /**
+     * Add the note to the guitar note pool.
+     * @param {number} pid - The pid of the note.
+     */
     function addToPool(pid) {
       pidPool.push(pid);
     }
 
+    /**
+     * Remove the note from the guitar note pool.
+     * @param {number} pid - The pid of the note.
+     */
     function removeFromPool(pid) {
       var idx = pidPool.indexOf(pid);
 
@@ -59,6 +72,12 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Initialize the guitar view.
+     * @param {PIXI.Stage} stage_ - The PIXI stage of the view.
+     * @param {number} pid_ - The ID of the view.
+     * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The center point of the view.
+     */
     function init(stage_, pid_, displayContainerCenter_) {
       stage = stage_;
       pid = pid_;
@@ -87,6 +106,10 @@ module.exports = (function() {
       isReady = true;
     }
 
+    /**
+     * Load guitar data.
+     * @param {Model} initialData - The guitar data.
+     */
     function loadData(initialData) {
       if (initialData.strings.length <= 0) { return; }
 
@@ -115,11 +138,17 @@ module.exports = (function() {
       audioManager.addTrack(currentTrack);
     }
 
+    /**
+     * Start recording the guitar note.
+     */
     function startRecording() {
       isRecording = true;
       allData.recorded = [];
     }
 
+    /**
+     * Stop recording the guitar note.
+     */
     function stopRecording() {
       currentTrack = audioManager.createRecordedTrack(
           allData.recorded,
@@ -130,6 +159,11 @@ module.exports = (function() {
       isRecording = false;
     }
 
+    /**
+     * Add the recorded guitar note to the loop.
+     * @param {number} pid - The pid of the note.
+     * @param {string} sound - The played guitar note.
+     */
     function addRecordedItem(pid, sound) {
       if (!isRecording) { return; }
 
@@ -140,6 +174,10 @@ module.exports = (function() {
       }));
     }
 
+    /**
+     * Create a new guitar string.
+     * @param {Model} data - The data for each guitar string.
+     */
     function createStringFromModel(data) {
       removeFromPool(data.pid);
 
@@ -163,6 +201,9 @@ module.exports = (function() {
       return guitarString;
     }
 
+    /**
+     * Add event listeners.
+     */
     function addEventListeners() {
       stage.interactive = true;
       stage.touchstart = function(data) {
@@ -179,10 +220,16 @@ module.exports = (function() {
       };
     }
 
+    /**
+     * Remove event listeners.
+     */
     function removeEventListeners() {
       stage.mousemove = stage.touchmove = null;
     }
 
+    /**
+     * Create the grid of dots in the guitar view.
+     */
     function createDotGrid() {
       for (let i = 0; i < gridCount; i++) {
         let dot = new Dot(i);
@@ -206,6 +253,10 @@ module.exports = (function() {
       redrawDotGrid();
     }
 
+    /**
+     * Activate the dot
+     * @param {Object} dot - The clicked dot.
+     */
     function activateDot(dot) {
       if (isRecording) { return; }
       if (APPLICATION_STATE === 'collapsed') { return; }
@@ -230,6 +281,10 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Start drawing the string from the clicked dot.
+     * @param {Object} dot - The clicked dot.
+     */
     function startString(dot) {
       if (isDrawing) { return; }
 
@@ -257,6 +312,10 @@ module.exports = (function() {
       };
     }
 
+    /**
+     * Destroy the string if dot is re-clicked without attaching the string to another dot.
+     * @param {Object} dot - The clicked dot.
+     */
     function destroyString(dot) {
       var guitarString = dot.getString();
 
@@ -275,6 +334,10 @@ module.exports = (function() {
       baseLayer.mousemove = baseLayer.touchmove = null;
     }
 
+    /**
+     * Restart drawing the string.
+     * @param {Object} dot - The clicked dot.
+     */
     function restartString(dot) {
       if (isUndrawing) { return; }
 
@@ -304,6 +367,10 @@ module.exports = (function() {
       };
     }
 
+    /**
+     * Complete the string when end dot is clicked.
+     * @param {Object} dot - The clicked dot.
+     */
     function endString(dot) {
       isDrawing = false;
       isUndrawing = false;
@@ -318,12 +385,22 @@ module.exports = (function() {
       baseLayer.mousemove = baseLayer.touchmove = null;
     }
 
+    /**
+     * Get the position of the guitar view.
+     * @param {number} x - The x position of the view.
+     * @param {number} y - The x position of the view.
+     * @param {number} xSpacing - The x spacing.
+     * @param {number} ySpacing - The y spacing.
+     */
     function getPosition(x, y, xSpacing, ySpacing) {
       var pos = vec2.fromValues(x * xSpacing, y * ySpacing);
       vec2.rotate(pos, pos, currentRotation);
       return pos;
     }
 
+    /**
+     * Redraw the dot grid.
+     */
     function redrawDotGrid() {
       var startingX = -Math.floor(allData.cols / 2);
 
@@ -347,6 +424,9 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Do things when the guitar animation is collapsed.
+     */
     function animationCollapsed() {
       APPLICATION_STATE = 'collapsed';
 
@@ -355,6 +435,9 @@ module.exports = (function() {
       removeEventListeners();
     }
 
+    /**
+     * Do things when the guitar animation is expanded.
+     */
     function animationExpanded() {
       APPLICATION_STATE = 'expand';
 
@@ -363,6 +446,13 @@ module.exports = (function() {
       addEventListeners();
     }
 
+    /**
+     * Resize the guitar view on resize.
+     * @param {number} w - The width of the guitar view.
+     * @param {number} h - The height of the guitar view.
+     * @param {number} boundsWidth - The bounding width of the guitar view.
+     * @param {number} boundsHeight - The bounding height of the guitar view.
+     */
     var lastBoundsWidth;
     var lastBoundsHeight;
     function resize(w, h, boundsWidth, boundsHeight) {
@@ -374,6 +464,9 @@ module.exports = (function() {
       updateSpacing();
     }
 
+    /**
+     * Update the spacing in the guitar grid.
+     */
     function updateSpacing() {
       if (!allData) { return; }
 
@@ -399,12 +492,20 @@ module.exports = (function() {
       redrawDotGrid();
     }
 
+    /**
+     * Render everything on RAF.
+     * @param {number} delta - The delta.
+     */
     function render(delta) {
       if (renderPause === false) {
         renderBodies(delta);
       }
     }
 
+    /**
+     * Render the guitar strings on RAF.
+     * @param {number} delta - The delta.
+     */
     function renderBodies(delta) {
       for (let pid in guitarStrings) {
         if (guitarStrings.hasOwnProperty(pid)) {
@@ -413,14 +514,23 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Disable the strings.
+     */
     function disable() {
       renderPause = true;
     }
 
+    /**
+     * Enable the strings.
+     */
     function enable() {
       renderPause = false;
     }
 
+    /**
+     * Get all of the string data.
+     */
     function getData() {
       allData.strings = [];
 

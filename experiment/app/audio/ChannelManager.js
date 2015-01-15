@@ -1,4 +1,3 @@
-var Set = require('es6-set');
 var animate = require('app/util/animate');
 
 module.exports = (function() {
@@ -41,7 +40,7 @@ module.exports = (function() {
    * @param {GainNode} gainNode - The final output of all channels.
    */
   return function ChannelManager(audioContext, gainNode) {
-    var channels = new Set();
+    var channels = [];
 
     /**
      * Create and register a new channel.
@@ -49,7 +48,7 @@ module.exports = (function() {
      */
     function create() {
       var chan = new Channel(audioContext, gainNode);
-      channels.add(chan);
+      channels.push(chan);
 
       unmute(chan);
 
@@ -104,7 +103,8 @@ module.exports = (function() {
      * @param {number} duration - The fade duration.
      */
     function muteAllExcept(exceptChan, duration) {
-      for (let chan of channels) {
+      for (let i = 0; i < channels.length; i++) {
+        let chan = channels[i];
         if (chan !== exceptChan) {
           mute(chan, duration);
         }
@@ -117,7 +117,8 @@ module.exports = (function() {
      * @param {number} duration - The fade duration.
      */
     function unmuteAllExcept(exceptChan, duration) {
-      for (let chan of channels) {
+      for (let i = 0; i < channels.length; i++) {
+        let chan = channels[i];
         if (chan !== exceptChan) {
           unmute(chan, duration);
         }

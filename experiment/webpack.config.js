@@ -1,7 +1,6 @@
 var webpack = require('webpack');
 var CompressionPlugin = require('compression-webpack-plugin');
 
-
 module.exports = {
   entry: {
     experiment: './app/index.js',

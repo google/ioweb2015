@@ -40,10 +40,9 @@ module.exports = (function() {
 
   /**
    * Returns the default state is no serialized state is available.
-   * @param {AudioManager} audioManager - The central audio manager.
-   * @return {DrumInstrumentModel}
+   * @return {Object}
    */
-  function getDefault(audioManager) {
+  function getDefault() {
     return {
       'drums': [
         {

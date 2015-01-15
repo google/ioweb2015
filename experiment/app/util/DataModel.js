@@ -66,8 +66,8 @@ module.exports = (function() {
           },
           set: function(v) {
             if (Array.isArray(type)) {
-              let arrayType = type[0];
-              v = v.map(i => new arrayType(i));
+              let ArrayType = type[0];
+              v = v.map(i => new ArrayType(i));
             } else if ('function' === typeof type.loadFromJSON) {
               if (!(v instanceof type)) {
                 v = type.loadFromJSON(v);
