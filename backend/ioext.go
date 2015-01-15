@@ -38,9 +38,17 @@ type extEntry struct {
 
 // ioExtEntries returns a slice of extEntry items,
 // fetching them from ioExtSheet Google Spreadsheet using List Feed.
-func ioExtEntries(c context.Context) ([]*extEntry, error) {
-	data, err := cache.get(c, cacheKeyIOExtended)
-	if err != nil {
+// Cache can be invalidated by providing refresh = true.
+func ioExtEntries(c context.Context, refresh bool) ([]*extEntry, error) {
+	var (
+		data []byte
+		err  error
+	)
+	if !refresh {
+		data, err = cache.get(c, cacheKeyIOExtended)
+	}
+
+	if err != nil || data == nil {
 		data, err = fetchSheetListFeed(c, ioExtSheet)
 		if err != nil {
 			return nil, err

@@ -39,6 +39,9 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 // serveIOExtEntries responds with I/O extended entries in JSON format.
 // See extEntry struct definition for more details.
 func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	_, refresh := r.Form["refresh"]
+
 	c := newContext(r)
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
@@ -49,7 +52,7 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entries, err := ioExtEntries(c)
+	entries, err := ioExtEntries(c, refresh)
 	if err != nil {
 		log.Printf("ioExtEntries: %v", err)
 		writeJSONError(w, err)
