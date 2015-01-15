@@ -14,9 +14,9 @@ app/elements/**/*.css
 # Built Experiment
 app/experiment
 
-# backend stuff
+# backend stuff, keys
 backend/bin
-backend/service-account.pem
+*.pem
 
 # Other generated/common stuff.
 .tmp
