@@ -138,12 +138,12 @@ h3, h4, h5, h6 {
 
   h4 {
     @include typo-button();
-    margin-right: 180px;
+    // margin-right: 180px;
   }
 }
 
 .io-main {
-  
+
   .transition-up-delay {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateY(0);
