@@ -1,9 +1,9 @@
-<!--
-  @license
-  TBC
--->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<<<<<<< HEAD
 <link rel="import" href="../../bower_components/core-scroll-threshold/core-scroll-threshold.html">
+=======
+<link rel="import" href="../../bower_components/i18n-msg/i18n-msg.html">
+>>>>>>> Fixes #201
 
 <script src="countdown-timer-namespace.js"></script>
 <script src="countdown-timer-enumerations.js"></script>
@@ -34,8 +34,7 @@ Creates a countdown timer to a specific date.
 @status alpha
 -->
 <polymer-element name="countdown-timer"
-    attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart">
-
+                 attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart">
   <template>
     <style>
       :host {
@@ -72,31 +71,33 @@ Creates a countdown timer to a specific date.
     <template if="{{ thresholdDays }}">
       <h4 class="countdown-label">
         <i18n-msg msgid="days">Days</i18n-msg>
+        <content></content>
       </h4>
     </template>
 
     <template if="{{ thresholdHours }}">
       <h4 class="countdown-label">
-        <i18n-msg msgid="hours">Hours</i18n-msg
+        <i18n-msg msgid="hours">Hours</i18n-msg>
+        <content></content>
       </h4>
     </template>
 
     <template if="{{ thresholdMinutes }}">
       <h4 class="countdown-label">
         <i18n-msg msgid="minutes">Minutes</i18n-msg>
+        <content></content>
       </h4>
     </template>
 
     <template if="{{ thresholdSeconds }}">
       <h4 class="countdown-label">
         <i18n-msg msgid="seconds">Seconds</i18n-msg>
+        <content></content>
       </h4>
     </template>
   </template>
-
   <script>
   (function() {
-
     Polymer({
 
       timer: null,
@@ -321,5 +322,4 @@ Creates a countdown timer to a specific date.
 
   })();
   </script>
-
 </polymer-element>

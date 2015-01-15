@@ -176,9 +176,9 @@
     "description": "Short label",
     "message": "Days"
   },
-  "daysuntilreg": {
+  "untilreg": {
     "description": "Short label used on the registration page. By the countdown timer",
-    "message": "Days until registration opens"
+    "message": "until registration opens"
   },
   "agenda": {
     "description": "Link text. Please keep short. Used on the schedule page.",
