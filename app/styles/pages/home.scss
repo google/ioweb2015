@@ -99,6 +99,8 @@ $name: 'page-home';
 }
 
 @media (min-width: $tablet-breakpoint-min) {
+  $overlayCardTop: 100px;
+
   .masthead-container {
     .io-logo {
       width: 256px;
@@ -108,8 +110,9 @@ $name: 'page-home';
 
   .home-photo {
     height: 745px;
-    margin-top: -134px;
+    margin-top: -146px;
   }
+
   #registration {
     position: relative;
     margin-bottom: -325px;
@@ -127,18 +130,30 @@ $name: 'page-home';
     }
   }
   .page__section--attend {
-    margin-bottom: -255px;
+    margin-bottom: -215px;
   }
   .attend__globe {
     height: 500px;
   }
   #join {
     position: relative;
+    margin-top: -46px;
+    padding-top: $overlayCardTop;
+
     .join__social {
       position: absolute;
-      top: 40px;
+      top: $overlayCardTop;
       right: $desktopKeyline;
     }
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid) {
+  .home-photo {
+     margin-top: -182px;
+  }
+  .page__section--attend {
+    margin-bottom: -251px;
   }
 }
 
