@@ -11,6 +11,11 @@ module.exports = (function() {
 
   const VIEW_NAME = 'DrumView';
 
+  /**
+   * Controls the Drum instrument view.
+   * @param {AudioManager} audioManager - The shared audio manager.
+   * @constructor
+   */
   return function DrumView(audioManager) {
     var world = new p2.World();
 
@@ -49,6 +54,12 @@ module.exports = (function() {
     var maxWidth = 1100;
     var maxHeight = 700;
 
+    /**
+     * Initialize the drum view.
+     * @param {PIXI.Stage} stage_ - The PIXI stage of the view.
+     * @param {number} pid_ - The pid of the note.
+     * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The center point of the view.
+     */
     function init(stage_, pid_, displayContainerCenter_) {
       stage = stage_;
       pid = pid_;
@@ -88,16 +99,19 @@ module.exports = (function() {
             var d = drumLookup[note.pid];
 
             if (d) {
-              d.emitCircle();
+              d.showCollision();
             }
           }
         }
       });
 
-      //renderBodies( null )
       isReady = true;
     }
 
+    /**
+     * Record each drum sound
+     * @param {Model} d - The drum data.
+     */
     function recordSound(d) {
       if (!isRecording) { return; }
 
@@ -108,12 +122,18 @@ module.exports = (function() {
       }));
     }
 
+    /**
+     * Start recording the drum notes.
+     */
     function startRecording() {
       isRecording = true;
 
       data.recorded = [];
     }
 
+    /**
+     * Stop recording the drum notes.
+     */
     function stopRecording() {
       isRecording = false;
 
@@ -124,11 +144,18 @@ module.exports = (function() {
           );
     }
 
+    /**
+     * Get the next drum PID.
+     */
     function getNextPID() {
       DropballEntityPIDInc = DropballEntityPIDInc + 1;
       return DropballEntityPIDInc;
     }
 
+    /**
+     * Load all of the drum data.
+     * @param {Model} d - The drum data.
+     */
     function loadData(d) {
       data = d;
 
@@ -163,6 +190,15 @@ module.exports = (function() {
       });
     }
 
+    /**
+     * Add drum bodies.
+     * @param {PIXI.DisplayObjectContainer} sprite - The drum sprite.
+     * @param {number} x - The x position of the drum body.
+     * @param {number} y - The y position of the drum body.
+     * @param {number} width - The width of the drum body.
+     * @param {number} height - The height of the drum body.
+     * @param {number} density - The density of the drum body.
+     */
     function addBody(sprite, x, y, width, height, density) {
       var shapeDef;
       var bodyDef;
@@ -204,6 +240,11 @@ module.exports = (function() {
       return body;
     }
 
+    /**
+     * Dot collisions.
+     * @param {Object} bodyA - The dot being dropped.
+     * @param {Object} bodyB - The dot being hit.
+     */
     function collisionStart(bodyA, bodyB) {
       if (bodyB.customType === 'floor') {
         dotEmitterObj[bodyA.pid].destroy();
@@ -211,21 +252,35 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Pause drum view.
+     */
     function disable() {
       renderPause = true;
     }
 
+    /**
+     * Unpause drum view.
+     */
     function enable() {
       renderPause = false;
     }
 
+    /**
+     * When drum animation is collapsed.
+     */
     function animationCollapsed() {
       APPLICATION_STATE = 'collapsed';
+
+      cleanupDots();
 
       audioManager.addTrack(currentTrack);
       removeEventListeners();
     }
 
+    /**
+     * When drum animation is expanded.
+     */
     function animationExpanded() {
       APPLICATION_STATE = 'expand';
 
@@ -233,24 +288,49 @@ module.exports = (function() {
       addEventListeners();
     }
 
+    /**
+     * Kill all living dots.
+     */
+    function cleanupDots() {
+      for (let i = 0; i < emitters.length; i++) {
+        emitters[i].killAllDots();
+      }
+    }
+
+    /**
+     * Add event listeners.
+     */
     function addEventListeners() {
       events.addListener('BEAT', onBeat);
 
       drums.forEach(d => d.addEventListeners());
     }
 
+    /**
+     * Remove event listeners.
+     */
     function removeEventListeners() {
       events.removeListener('BEAT', onBeat);
 
       drums.forEach(d => d.removeEventListeners());
     }
 
+    /**
+     * On beat, emit beat number.
+     * @param {number} beatNumber - The current beat number.
+     */
     function onBeat(beatNumber) {
       for (let i = 0; i < emitters.length; i++) {
         emitters[i].onBeat(beatNumber);
       }
     }
 
+    /**
+     * On resize, resize the guitar view.
+     * @param {number} w - The width of the guitar view.
+     * @param {number} h - The height of the guitar view.
+     * @param {number} optimalWidth - The optimal width of the guitar view.
+     */
     function resize(w, h, optimalWidth) {
       if (!isReady) { return; }
 
@@ -259,6 +339,10 @@ module.exports = (function() {
       displayContainerCenter.scale.y = -zoom; // Note: we flip the y axis to make 'up' the physics 'up'
     }
 
+    /**
+     * Render the drums on RAF.
+     * @param {number} delta - The delta.
+     */
     function render(delta) {
       if (renderPause === false) {
         if (APPLICATION_STATE === 'expand') {
@@ -269,16 +353,28 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Render the expanded drum view bodies
+     * @param {number} delta - The delta.
+     */
     function renderExpanded(delta) {
       renderBodies(delta);
       world.step(1 / 60, delta * 1000);
     }
 
+    /**
+     * Render the collapsed drum view bodies.
+     * @param {number} delta - The delta.
+     */
     function renderCollapsed(delta) {
       renderBodies(delta);
       world.step(1 / 60, delta * 1000);
     }
 
+    /**
+     * Render the drum view bodies.
+     * @param {number} delta - The delta.
+     */
     function renderBodies(delta) {
       for (let i = 0; i < drums.length; i++) {
         drums[i].render(delta);

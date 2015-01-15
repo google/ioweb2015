@@ -25,27 +25,50 @@
 
     <section id="registration" class="page__section js-experiment-instrument bg-cyan">
       <h2>Registration opens<br>March 10 at 9AM PST</h2>
-      <paper-button class="registration__setreminder" hidden?="{{isPhoneSize}}" 
+      <!-- <paper-button class="registration__setreminder" hidden?="{{isPhoneSize}}"
           data-track-link="home-set-reminder">
         <core-icon icon="social:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg>
-      </paper-button>
+      </paper-button> -->
       <div class="io-countdown" layout vertical center>
-        <countdown-timer autostart
-                         bgcolor="#00BCD4"
+        <countdown-timer bgcolor="#00BCD4"
                          date="Mar 10 2015 09:00:00 GMT-0700 (PDT)"
                          dateadjustment="5" easeintime="490" waittime="100"
-                         easeouttime="390"></countdown-timer>
+                         easeouttime="390" thresholdInformation="{{thresholdInformation}}">
+        </countdown-timer>
+        <template if="{{ thresholdInformation.thresholdDays }}">
+          <h4 class="countdown-label">
+            <i18n-msg msgid="daysuntilreg">Days until registration opens</i18n-msg>
+          </h4>
+        </template>
+
+        <template if="{{ thresholdInformation.thresholdHours }}">
+          <h4 class="countdown-label">
+            <i18n-msg msgid="hoursuntilreg">Hours until registration opens</i18n-msg>
+          </h4>
+        </template>
+
+        <template if="{{ thresholdInformation.thresholdMinutes }}">
+          <h4 class="countdown-label">
+            <i18n-msg msgid="minutesuntilreg">Minutues until registration opens</i18n-msg>
+          </h4>
+        </template>
+
+        <template if="{{ thresholdInformation.thresholdSeconds }}">
+          <h4 class="countdown-label">
+            <i18n-msg msgid="secondsuntilreg">Seconds until registration opens</i18n-msg>
+          </h4>
+        </template>
       </div>
     </section>
 
     <div class="registration__card card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-      <template if="{{isPhoneSize}}">
+      <!-- <template if="{{isPhoneSize}}">
         <div class="card js-experiment-visualizer" auto-vertical flex>
           <div class="card-content">
             <a href="#"><core-icon icon="social:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg></a>
           </div>
         </div>
-      </template>
+      </template> -->
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content hide-on-mobile">
           <h3>I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between.</h3>

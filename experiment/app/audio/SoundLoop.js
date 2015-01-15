@@ -36,20 +36,17 @@ module.exports = (function() {
           let instrument = audioManager.getSound(instrumentName);
 
           audioManager.willPlayback(
-              instrument.play(gainNode, time + (i * bpm)),
-              time + (i * bpm),
-              { beatNum: note + i },
-              tags
+            instrument.play(gainNode, time + (i * bpm)),
+            time + (i * bpm),
+            { beatNum: note + i },
+            tags
           );
         }
       }
 
       gainNode.connect(target);
 
-      // Return a single-playback specific method to change volume.
-      return {
-        setVolume: v => gainNode.gain.value = v
-      };
+      return gainNode;
     }
 
     return {

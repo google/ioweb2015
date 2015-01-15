@@ -33,7 +33,7 @@ module.exports = function(audioManager, stateManager) {
   var visualizerViews = [];
   var lastFrame = 0;
   var isPaused = false;
-  var pauseAfterFrame = false; // TODO: pause during wipe if needed
+  var pauseAfterFrame = false;
   var isExpanded = false;
 
   var onWindowResize = throttle(onWindowResizeUnThrottled, 200);
@@ -57,6 +57,11 @@ module.exports = function(audioManager, stateManager) {
 
   var maskManager = new MaskManager('experiment-is-masked');
 
+  /**
+   * Initialize the view and start the central rAF loop.
+   * @param {string} instrumentSelector - DOM element for instruments
+   * @param {string} visualizerSelector - DOM element for visualizers
+   */
   function init(instrumentSelector, visualizerSelector) {
     // TODO, replace with polymer container?
     viewportElement = document.createElement('div');
@@ -70,7 +75,7 @@ module.exports = function(audioManager, stateManager) {
     logoDialog = document.createElement('div');
     logoDialog.classList.add('logo-dialog');
     logoDialog.insertAdjacentHTML('beforeend',
-      '<h4>Exit the Experiment?</h4><div class="button-container"><button id="yesButton">Yes</button><button id="noButton">No</button></div>');
+      '<h4>Exit the Experiment?</h4><div class="button-container"><button id="noButton">Cancel</button><button id="yesButton">Yes</button></div>');
 
     maskManager.init(viewportElement);
 
@@ -85,9 +90,9 @@ module.exports = function(audioManager, stateManager) {
     var instrumentData = [];
     for (let i = 0; i < instrumentViews.length; i++) {
       stateManager.registerInstrument(
-          instrumentViews[i].getView().name,
-          instrumentViews[i].getView().dataModel,
-          instrumentViews[i].getView().getData
+        instrumentViews[i].getView().name,
+        instrumentViews[i].getView().dataModel,
+        instrumentViews[i].getView().getData
       );
 
       instrumentData.push(instrumentViews[i].getView().name);
@@ -113,14 +118,17 @@ module.exports = function(audioManager, stateManager) {
       v.loadData(stateManager.currentData()[v.name]);
     }
 
-    document.body.appendChild(logoElement);
-    document.body.appendChild(logoDialog);
+    viewportElement.appendChild(logoElement);
+    viewportElement.appendChild(logoDialog);
     document.body.appendChild(viewportElement);
 
     logoClick();
     dialogClick();
   }
 
+  /**
+   * Pause animations.
+   */
   function stop() {
     continueAnimating = false;
     window.removeEventListener('resize', onWindowResize);
@@ -128,6 +136,10 @@ module.exports = function(audioManager, stateManager) {
     window.removeEventListener('scroll', onWindowScrollStop);
   }
 
+  /**
+   * Animate experiment in from fab.
+   * @param {array} [x, y] - the x and y position to animate from.
+   */
   function animateIn([x, y]) {
     animate();
 
@@ -140,6 +152,10 @@ module.exports = function(audioManager, stateManager) {
     });
   }
 
+  /**
+   * Animate experiment out to fab.
+   * @param {array} [x, y] - the x and y position to animate toward.
+   */
   function animateOut([x, y]) {
     disableScrolling();
 
@@ -149,13 +165,16 @@ module.exports = function(audioManager, stateManager) {
     });
   }
 
+  /**
+   * Remove experiment viewport element.
+   */
   function cleanUp() {
     viewportElement.parentNode.removeChild(viewportElement);
     viewportElement = null;
   }
 
   /**
-   * Figure out which view replaces which DOM element.
+   * Figure out which instrument view replaces which DOM element.
    * @param {Element} elem - The element.
    * @param {number} pid - The unique ID.
    * @return {Object}
@@ -174,6 +193,12 @@ module.exports = function(audioManager, stateManager) {
     }
   }
 
+  /**
+   * Figure out which visualizer view replaces which DOM element.
+   * @param {Element} elem - The element.
+   * @param {number} pid - The unique ID.
+   * @return {Object}
+   */
   function getVisualizerForElem(elem, pid) {
     if (pid === 0) {
       return [WaveVisualizer, instrumentViews[0]];
@@ -206,6 +231,10 @@ module.exports = function(audioManager, stateManager) {
     return views;
   }
 
+  /**
+   * Map visualizers to DOM elements.
+   * @return {array<VisualizerContainer>}
+   */
   function createVisualizerContainers() {
     return visualizerElements.map(function(elem, i) {
       var pixiObject = new VisualizerContainer(audioManager, elem, viewportElement);
@@ -240,9 +269,11 @@ module.exports = function(audioManager, stateManager) {
       renderChildren(secDelta);
     }
 
-    if (pauseAfterFrame) {
+    if (pauseAfterFrame === 1) {
       isPaused = true;
       pauseAfterFrame = false;
+    } else {
+      pauseAfterFrame--;
     }
   }
 
@@ -293,10 +324,11 @@ module.exports = function(audioManager, stateManager) {
 
     audioManager.channels.muteAllExcept(view.getChannel());
 
+    logoElement.classList.add('hidden');
+    logoDialog.classList.remove('active');
+
     return Promise.all([
-      logoElement.classList.add('hidden'),
-      logoDialog.classList.remove('active'),
-      hideOnScreenVisualizers(),
+      hideOnScreenVisualizers(view),
       view.expandView()
     ]).then(function() {
       disableAllInstancesExcept(view);
@@ -316,8 +348,9 @@ module.exports = function(audioManager, stateManager) {
       didExitRecordingModeCallback();
     }
 
+    logoElement.classList.remove('hidden');
+
     return Promise.all([
-      logoElement.classList.remove('hidden'),
       showOnScreenVisualizers(),
       view.contractView()
     ]).then(function() {
@@ -340,17 +373,24 @@ module.exports = function(audioManager, stateManager) {
    * Add click handlers to yes/no buttons
    */
   function dialogClick() {
+    var experimentFab = document.querySelector('experiment-fab-container');
     document.getElementById('yesButton').addEventListener('click', function() {
       logoElement.parentNode.removeChild(logoElement);
       logoDialog.parentNode.removeChild(logoDialog);
-      cleanUp();
+      experimentFab.exitExperiment();
     });
     document.getElementById('noButton').addEventListener('click', function() {
       logoDialog.classList.remove('active');
     });
   }
 
+  /**
+   * Is the visualizer currently on screen?
+   * @param {Object} visualizerView - The visualizer view
+   * @return {boolean}
+   */
   function isVisualizerOnScreen(visualizerView) {
+
     var { top, height } = visualizerView.getElemRect();
 
     var visualizerTop = top;
@@ -360,28 +400,65 @@ module.exports = function(audioManager, stateManager) {
     var scrollBottom = scrollTop + window.innerHeight;
 
     return (
-        (visualizerBottom >= scrollTop) &&
-        (visualizerTop <= scrollBottom)
+      (visualizerBottom >= scrollTop) &&
+      (visualizerTop <= scrollBottom)
     );
   }
 
-  function hideOnScreenVisualizer(visualizerView) {
+  /**
+   * Hide current on screen visualizer
+   * @param {InstrumentContainer} openingView - The opening view.
+   * @param {Object} visualizerView - The visualizer view
+   * @return {function}
+   */
+  function hideOnScreenVisualizer(openingView, visualizerView) {
+    var screenBottom = window.scrollY + window.innerHeight;
     var screenMidPoint = window.scrollY + (window.innerHeight / 2);
 
-    var { top, height } = visualizerView.getElemRect();
-    var viewMidPoint = top + (height / 2);
+    var openingRect = openingView.getElemRect();
+    var openingViewBottom = openingRect.top + openingRect.height;
 
-    return visualizerView.hide(viewMidPoint < screenMidPoint ? 'top' : 'bottom');
+    var visualizerRect = visualizerView.getElemRect();
+    var visualizerBottom = visualizerRect.top + visualizerRect.height;
+    var viewMidPoint = visualizerRect.top + (visualizerRect.height / 2);
+    var closestDirection = viewMidPoint < screenMidPoint ? 'top' : 'bottom';
+
+    var entirelyInView = (
+      (visualizerRect.top >= window.scrollY) &&
+      (visualizerBottom <= screenBottom)
+    );
+
+    var direction;
+    if (!entirelyInView) {
+      direction = closestDirection;
+    } else if ((openingRect.top <= window.scrollY) && (openingViewBottom <= screenBottom)) {
+      direction = 'bottom';
+    } else if ((openingRect.top > window.scrollY) && (openingViewBottom > screenBottom)) {
+      direction = 'top';
+    } else {
+      direction = closestDirection;
+    }
+
+    return visualizerView.hide(direction);
   }
 
-  function hideOnScreenVisualizers() {
+  /**
+   * Hide on screen visualizers
+   * @param {InstrumentContainer} view - The opening view.
+   * @return {Promise}
+   */
+  function hideOnScreenVisualizers(view) {
     var animations = visualizerViews
         .filter(isVisualizerOnScreen)
-        .map(hideOnScreenVisualizer);
+        .map(v => hideOnScreenVisualizer(view, v));
 
     return Promise.all(animations);
   }
 
+  /**
+   * Show on screen visualizers
+   * @return {Promise}
+   */
   function showOnScreenVisualizers() {
     var animations = visualizerViews
         .filter(v => v.isHidden())

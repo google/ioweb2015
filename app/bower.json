@@ -27,6 +27,7 @@
     "core-a11y-keys": "Polymer/core-a11y-keys#^0.5.2",
     "core-drawer-panel": "Polymer/core-drawer-panel#^0.5.2",
     "core-menu": "Polymer/core-menu#^0.5.2",
+    "core-scroll-threshold": "Polymer/core-scroll-threshold#^0.5.2",
     "google-apis": "GoogleWebComponents/google-apis#^0.4.3",
     "google-youtube": "GoogleWebComponents/google-youtube#^1.0.1",
     "i18n-msg": "ebidel/i18n-msg#^0.0.1",

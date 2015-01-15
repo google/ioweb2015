@@ -1,8 +1,6 @@
-<!--
-  @license
-  TBC
--->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-scroll-threshold/core-scroll-threshold.html">
+<link rel="import" href="../../bower_components/i18n-msg/i18n-msg.html">
 
 <script src="countdown-timer-namespace.js"></script>
 <script src="countdown-timer-enumerations.js"></script>
@@ -33,8 +31,7 @@ Creates a countdown timer to a specific date.
 @status alpha
 -->
 <polymer-element name="countdown-timer"
-    attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart">
-
+                 attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart thresholdInformation">
   <template>
     <style>
       :host {
@@ -48,49 +45,47 @@ Creates a countdown timer to a specific date.
         width: 100%;
         height: 100%;
       }
-
-      .countdown-label {
-        font-family: 'Roboto',sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        text-transform: uppercase;
-        line-height: 1;
-        letter-spacing: 0.04em;
-        margin-left: 90px;
-      }
     </style>
     <div class="countdown-timer">
       <canvas id="surface"></canvas>
     </div>
+    <core-scroll-threshold id="threshold"
+      on-lower-trigger="{{ start }}"
+      lowerTriggered="{{ lowerTriggered }}"
+      lowerThreshold="{{ lowerThreshold }}">
+    </core-scroll-threshold>
 
     <template if="{{ thresholdDays }}">
       <h4 class="countdown-label">
         <i18n-msg msgid="days">Days</i18n-msg>
+        <content></content>
       </h4>
     </template>
 
     <template if="{{ thresholdHours }}">
       <h4 class="countdown-label">
-        <i18n-msg msgid="hours">Hours</i18n-msg
+        <i18n-msg msgid="hours">Hours</i18n-msg>
+        <content></content>
       </h4>
     </template>
 
     <template if="{{ thresholdMinutes }}">
       <h4 class="countdown-label">
         <i18n-msg msgid="minutes">Minutes</i18n-msg>
+        <content></content>
       </h4>
     </template>
 
     <template if="{{ thresholdSeconds }}">
       <h4 class="countdown-label">
         <i18n-msg msgid="seconds">Seconds</i18n-msg>
+        <content></content>
       </h4>
     </template>
-  </template>
 
+  </template>
   <script>
   (function() {
-
     Polymer({
 
       timer: null,
@@ -170,6 +165,15 @@ Creates a countdown timer to a specific date.
         this.timer.start();
       },
 
+      created: function() {
+        this.thresholdInformation = {
+          thresholdDays: false,
+          thresholdHours: false,
+          thresholdMinutes: false,
+          thresholdSeconds: false
+        };
+      },
+
       /**
        * Resets the timer.
        *
@@ -227,16 +231,26 @@ Creates a countdown timer to a specific date.
 
         if (!this.autoStart) {
           this.timer.drawIfAnimationIsNotRunning();
+
+          // We need to add 100 onto the threshold because the main page is
+          // transformed 100px nearer the bottom when this calculation is made.
+          var THRESHOLD_ADJUSTMENT = 100;
+
+          // Make sure we only start the timer when we hit the top of the element.
+          var elementRect = this.getBoundingClientRect();
+          var thresholdValue = IOWA.Elements.ScrollContainer.scrollHeight -
+              Math.round(elementRect.bottom) + THRESHOLD_ADJUSTMENT;
+
+          this.lowerThreshold = thresholdValue;
+          this.$.threshold.scrollTarget = IOWA.Elements.ScrollContainer;
+
           return;
         }
 
         this.start();
       },
 
-      thresholdDays: false,
-      thresholdHours: false,
-      thresholdMinutes: false,
-      thresholdSeconds: false,
+      thresholdInformation: null,
 
       /**
        * Fires an event from the countdown timer when it has reached a
@@ -248,26 +262,28 @@ Creates a countdown timer to a specific date.
        */
       onTimerThresholdReached_: function(thresholdInformation) {
 
-        this.thresholdDays = false;
-        this.thresholdHours = false;
-        this.thresholdMinutes = false;
-        this.thresholdSeconds = false;
+        this.thresholdInformation = {
+          thresholdDays: false,
+          thresholdHours: false,
+          thresholdMinutes: false,
+          thresholdSeconds: false
+        };
 
         switch (thresholdInformation.label) {
           case "Days":
-            this.thresholdDays = true;
+            this.thresholdInformation.thresholdDays = true;
             break;
 
           case "Hours":
-            this.thresholdHours = true;
+            this.thresholdInformation.thresholdHours = true;
             break;
 
           case "Minutes":
-            this.thresholdMinutes = true;
+            this.thresholdInformation.thresholdMinutes = true;
             break;
 
           case "Seconds":
-            this.thresholdSeconds = true;
+            this.thresholdInformation.thresholdSeconds = true;
             break;
         }
 
@@ -302,5 +318,4 @@ Creates a countdown timer to a specific date.
 
   })();
   </script>
-
 </polymer-element>

@@ -14,8 +14,9 @@ app/elements/**/*.css
 # Built Experiment
 app/experiment
 
-# Standalone backend server
+# backend stuff, keys
 backend/bin
+*.pem
 
 # Other generated/common stuff.
 .tmp

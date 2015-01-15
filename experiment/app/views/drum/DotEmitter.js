@@ -15,6 +15,17 @@ module.exports = function DotEmitter() {
 
   var beatModulo;
 
+  /**
+   * Creates a new arpeggiator sliver.
+   * @param {PIXI.Stage} stage_ - The PIXI stage for this emitter.
+   * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The PIXI display container for this emitter.
+   * @param {Object} world_ - This emitter world.
+   * @param {number} startX_ - The X start position for this emitter.
+   * @param {number} startY_ - The Y start position for this emitter.
+   * @param {Object} dotEmitterObj_ - The dot emitter object.
+   * @param {function} getNextPIDFunc_ - Get the next dot PID.
+   * @param {number} beatModulo_ - The frequency of dots emitted.
+   */
   function init(stage_, displayContainerCenter_, world_, startX_, startY_, dotEmitterObj_, getNextPIDFunc_, beatModulo_) {
     stage = stage_;
     world = world_;
@@ -28,14 +39,32 @@ module.exports = function DotEmitter() {
     beatModulo = beatModulo_;
   }
 
+  /**
+   * Drop balls onto drums.
+   */
   function dropBall() {
     var dropBallEntity = new DropBallEntity();
     var pid = getNextPIDFunc();
-    dropBallEntity.init(stage, pid, displayContainerCenter, world, startX, startY, dotEmitterObj );
+    dropBallEntity.init(stage, pid, displayContainerCenter, world, startX, startY, dotEmitterObj);
     dotEmitterObj[pid] = dropBallEntity;
     return dropBallEntity;
   }
 
+  /**
+   * Kill all living dots.
+   */
+  function killAllDots() {
+    for (var key in dotEmitterObj) {
+      if (dotEmitterObj.hasOwnProperty(key)) {
+        dotEmitterObj[key].destroy();
+      }
+    }
+  }
+
+  /**
+   * On the beat, drop balls onto drums.
+   * @param {number} beatNumber - The beat number.
+   */
   function onBeat(beatNumber) {
     if (beatNumber % beatModulo === 0) {
       var ball = dropBall();
@@ -66,7 +95,8 @@ module.exports = function DotEmitter() {
   }
 
   return {
-    init: init,
-    onBeat: onBeat
+    init,
+    onBeat,
+    killAllDots
   };
 };

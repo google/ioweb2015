@@ -8,7 +8,7 @@
 
 {% define "content" %}
   <div class="card__container transition-up">
-    <div class="card">
+    <div class="card js-experiment-visualizer">
       <div class="card-content">
         <h2>Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</h2>
       </div>
@@ -19,7 +19,7 @@
   </div>
 
   <div class="transition-up-delay">
-    <section class="page__section pics__section" layout horizontal>
+    <section class="page__section pics__section js-experiment-instrument" layout horizontal>
       <div class="photo__about" flex two></div>
       <div layout vertical flex>
         <div class="photo__about--top" layout vertical flex></div>
@@ -28,7 +28,7 @@
     </section>
 
     <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-      <div class="card" auto-vertical flex>
+      <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
           <h3>Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President for Android, Chrome &amp; Apps, Sundar Pichai.</h3>
         </div>
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <section id="hashtag" class="page__section bg-cyan">
+    <section id="hashtag" class="page__section bg-cyan js-experiment-instrument">
       <div class="io__hash"></div>
     </section>
   </div>

@@ -12,6 +12,13 @@ module.exports = (function() {
     'stringbass_F'
   ];
 
+  /**
+   * Creates a new Guitar String.
+   * @param {Object} audioManager - The shared audio manager.
+   * @param {Channel} channel - The audio channel for this guitar string.
+   * @param {Model} model - The model for this guitar string.
+   * @param {Constructor}
+   */
   return function GuitarString(audioManager, channel, model) {
     var pointA;
     var pointB;
@@ -21,7 +28,7 @@ module.exports = (function() {
 
     var dots = [];
 
-    var state = 'unStrung';  //  'strung'
+    var state = 'unStrung'; // 'strung'
 
     var spring1;
     var spring2;
@@ -60,8 +67,6 @@ module.exports = (function() {
       dragMouseCollisionCheck,
       updatePoints,
       updateSpacing,
-      getOtherPointPosition,
-      getOtherPointId,
       destroy,
       playNote,
       bumpStringDepths,
@@ -77,6 +82,12 @@ module.exports = (function() {
       getModel: () => model
     };
 
+    /**
+     * Initialize guitar string.
+     * @param {number} pid_ - The ID for this string.
+     * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The PIXI display container
+     * @param {PIXI.DisplayObjectContainer} baseLayer_ - The base P
+     */
     function init(pid_, displayContainerCenter_, baseLayer_) {
       model.pid = pid_;
       displayContainerCenter = displayContainerCenter_;
@@ -103,10 +114,16 @@ module.exports = (function() {
       createPoints();
     }
 
+    /**
+     * Add event listeners.
+     */
     function addEventListeners() {
       world.on('endContact', onContact);
     }
 
+    /**
+     * Play sound on contact with string.
+     */
     function onContact() {
       if (isplayingInteractionSound === false && lastMouseX !== currentMouseX &&  lastMouseY !== currentMouseY && sound !== undefined) {
         isplayingInteractionSound = true;
@@ -116,10 +133,17 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Reset currently playing interaction sound.
+     */
     function resetisplayingInteractionSound() {
       isplayingInteractionSound = false;
     }
 
+    /**
+     * Check for collision with string when mouse dragged.
+     * @param {PIXI.InteractionData} data - The interaction data of the string.
+     */
     function dragMouseCollisionCheck(data) {
       var newPosition = data.getLocalPosition(baseLayer);
       mouseColliderGraphic.position.x = newPosition.x;
@@ -130,6 +154,9 @@ module.exports = (function() {
       currentMouseX = newPosition.x;
     }
 
+    /**
+     * Remove event listeners.
+     */
     function removeEventListeners() {
       world.off('endContact', onContact);
 
@@ -137,6 +164,9 @@ module.exports = (function() {
       displayContainerCenter.mousemove = displayContainerCenter.touchmove = null;
     }
 
+    /**
+     * Create physics for the mouse interaction with the string.
+     */
     function createMouseCollider() {
       mouseColliderBodyShape = new p2.Circle(1);
       mouseColliderBody = new p2.Body({
@@ -161,6 +191,10 @@ module.exports = (function() {
       mouseColliderGraphic.position.x = -1100;
     }
 
+    /**
+     * Update spacing between strings.
+     * @param {number} units - Pixels between strings.
+     */
     function updateSpacing(units) {
       var internalLen = lineDistance - 29;
 
@@ -175,6 +209,9 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Create springy physics for string interaction.
+     */
     function createSprings() {
       lineDistance = getlineDistance(anchorPoint1.position, anchorPoint2.position);
       capsuleShape = new p2.Capsule(Math.floor(lineDistance) - 30,20);
@@ -214,6 +251,9 @@ module.exports = (function() {
       world.addSpring(spring2);
     }
 
+    /**
+     * Create anchor points for strings.
+     */
     function createAnchorGraphics() {
       anchorPoint1 = new PIXI.Graphics();
       anchorPoint1.beginFill(0x000000);
@@ -229,6 +269,9 @@ module.exports = (function() {
       anchorPoint2.position.y = 200;
     }
 
+    /**
+     * Resize strung strings on resize.
+     */
     function resizeStrung() {
       lineDistance = getlineDistance(anchorPoint1.position, anchorPoint2.position);
       capsuleBody.removeShape(capsuleShape);
@@ -236,7 +279,12 @@ module.exports = (function() {
       capsuleBody.addShape(capsuleShape);
     }
 
-   function getlineDistance(point1, point2) {
+    /**
+     * Get the distance between both ends of the strings.
+     * @param {number} point1 - The first string point.
+     * @param {number} point2 - The second string point.
+     */
+    function getlineDistance(point1, point2) {
       var xs = 0;
       var ys = 0;
 
@@ -249,9 +297,12 @@ module.exports = (function() {
       return Math.sqrt(xs + ys);
     }
 
+    /**
+     * Render the string line.
+     */
     function renderLine() {
       lineGraphic.clear();
-      lineGraphic.lineStyle(3, 0xffffff, 1);
+      lineGraphic.lineStyle(5, 0xffffff, 1);
       lineGraphic.moveTo(anchorPoint1.position.x, anchorPoint1.position.y);
       lineGraphic.quadraticCurveTo(capsuleBody.position[0], capsuleBody.position[1], anchorPoint2.position.x, anchorPoint2.position.y);
 
@@ -261,75 +312,125 @@ module.exports = (function() {
       lineGraphicShadow.quadraticCurveTo(capsuleBody.position[0]+10, capsuleBody.position[1]+10, anchorPoint2.position.x, anchorPoint2.position.y);
     }
 
+    /**
+     * Ensure that strings have a correct z-index.
+     */
     function bumpStringDepths() {
       displayContainerCenter.setChildIndex(lineGraphicShadow, displayContainerCenter.children.length-1);
       displayContainerCenter.setChildIndex(lineGraphic, displayContainerCenter.children.length-1);
     }
 
+    /**
+     * Create string endpoints.
+     */
     function createPoints() {
       for (let i = 0; i <= SEGMENTS; i++) {
         points.push(new PIXI.Point(0, 0));
       }
     }
 
+    /**
+     * Set initial string endpoints.
+     * @param {PIXI.Point} pointA_ - The first interactive string point.
+     * @param {PIXI.Point} pointB_ - The second interactive string point.
+     */
     function setInitPoints(pointA_, pointB_) {
       pointA = pointA_;
       pointB = pointB_;
-      getRun(pointA, pointB, SEGMENTS );
+      getRun(pointA, pointB, SEGMENTS);
     }
 
+    /**
+     * Update string endpoints for mouse.
+     * @param {PIXI.Point} pointA_ - The first interactive string point.
+     * @param {PIXI.Point} pointB_ - The second interactive string point.
+     */
     function updatePointsMouse(pointA_, pointB_) {
       pointA = pointA_;
       pointB = pointB_;
-      getRun(pointA, pointB, SEGMENTS );
+      getRun(pointA, pointB, SEGMENTS);
     }
 
+    /**
+     * Update string endpoints.
+     * @param {PIXI.Point} pointA_ - The first interactive string point.
+     * @param {PIXI.Point} pointB_ - The second interactive string point.
+     */
     function updatePoints(pointA_, pointB_) {
       pointA = pointA_;
       pointB = pointB_;
 
-      getRun(pointA, pointB, SEGMENTS );
+      getRun(pointA, pointB, SEGMENTS);
 
       state = 'strung';
       resizeStrung();
     }
 
+    /**
+     * Update the string dot positions.
+     */
     function updateDotPosition() {
       if (dots[0] && dots[1]) {
         updatePoints(dots[0].getPosition(), dots[1].getPosition());
       }
     }
 
+    /**
+     * Set grid dots.
+     * @param {Object} a - The first grid dot for the string.
+     * @param {Object} b - The second grid dot for the string.
+     */
     function setDots(a, b) {
       setFirstDot(a);
       setSecondDot(b);
       updateDotPosition();
     }
 
+    /**
+     * Set first dot.
+     * @param {Object} a - The first grid dot for the string.
+     */
     function setFirstDot(a) {
       dots[0] = a;
       model.pointA = a && a.pid;
     }
 
+    /**
+     * Set second dot.
+     * @param {Object} b - The second grid dot for the string.
+     */
     function setSecondDot(b) {
       dots[1] = b;
       model.pointB = b && b.pid;
       updateDotPosition();
     }
 
+    /**
+     * Get first dot.
+     * @param {Object} a - The first grid dot for the string.
+     */
     function getFirstDot() {
       return dots[0];
     }
 
+    /**
+     * Get second dot.
+     * @param {Object} a - The first grid dot for the string.
+     */
     function getSecondDot() {
       return dots[1];
     }
-
+    /**
+     * Update points on resize.
+     */
     function updatePointsResize() {
       getRun(pointA, pointB, SEGMENTS );
       resizeStrung();
     }
 
+    /**
+     * Destroy a string.
+     */
     function destroy() {
       world.removeBody(mouseColliderBody);
       removeEventListeners();
@@ -344,26 +445,13 @@ module.exports = (function() {
       world = null;
     }
 
-    function getOtherPointPosition(item) {
-      if (item.position.x === points[0].x && item.position.y === points[0].y) {
-        return pointB;
-      } else {
-        return pointA;
-      }
-    }
-
-    function getOtherPointId(item, pointObject) {
-      var idA = pointObject.pointA;
-      var idB = pointObject.pointB;
-
-      if (item.position.x === points[0].x && item.position.y === points[0].y) {
-        pointObject.pointA = idB;
-      } else {
-        pointObject.pointA = idA;
-      }
-    }
-
-    function getRun(point1, point2, SEGMENTS ) {
+    /**
+     * Get the other point ID.
+     * @param {Object} point1 - ?
+     * @param {Object} point2 - ?
+     * @param {Object} SEGMENTS - ?
+     */
+    function getRun(point1, point2, SEGMENTS) {
       var xs = point2.x - point1.x;
       var ys = point2.y - point1.y;
       var stepx = xs/SEGMENTS;
@@ -375,15 +463,26 @@ module.exports = (function() {
       }
     }
 
+    /**
+     * Render on RAF.
+     * @param {number} delta - The delta.
+     */
     function render(delta) {
       renderBodies(delta);
     }
 
+    /**
+     * Play the note associated with the string.
+     */
     function playNote() {
       capsuleBody.position[0] = points[1].x + 80;
       capsuleBody.position[1] = points[1].y + 80;
     }
 
+    /**
+     * Render bodies.
+     * @param {number} delta - The delta.
+     */
     function renderBodies(delta) {
       if (!world) { return; }
 
@@ -396,6 +495,9 @@ module.exports = (function() {
       renderStringBodies();
     }
 
+    /**
+     * Render string bodies.
+     */
     function renderStringBodies() {
       spring2.setWorldAnchorB([anchorPoint1.position.x,anchorPoint1.position.y]);
       spring1.setWorldAnchorB([anchorPoint2.position.x,anchorPoint2.position.y]);
@@ -412,6 +514,10 @@ module.exports = (function() {
       renderLine();
     }
 
+    /**
+     * On activate callback.
+     * @param {function} cb - Callback function.
+     */
     function onActivate(cb) {
       onActivateCallback_ = cb;
     }

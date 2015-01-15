@@ -2,6 +2,19 @@
 
 ### Setup
 
+Prerequisites
+
+* [Go 1.4](https://golang.org/dl/).
+* Optional: [gcloud tool](https://cloud.google.com/sdk/#Quick_Start)
+  and [app](https://cloud.google.com/sdk/gcloud-app#Installation) component
+  to run and deploy GAE-based backend (hint: `gcloud components update app`).
+
+  Once `gcloud` and `app` component are installed, you'll need to do a one-off
+  configuration by executing the following command: `gcloud config set project <project-id>`.
+  Project ID can be any non-empty string if you just want to run the app locally.
+
+Setup
+
 1. `git clone https://github.com/GoogleChrome/ioweb2015.git`
 2. `cd ioweb2015`
 3. `npm install`
@@ -14,18 +27,6 @@ If you plan on modifying source code, be a good citizen and:
    The plugin should automatically pick up the [.editorconfig](.editorconfig) settings.
 2. Obey the pre-commit hook that's installed as part of `gulp setup`.
    It will check for JavaScript and code style errors before committing to the `master` branch.
-
-To run a backend server you'll need:
-
-1. [Go 1.4](https://golang.org/dl/).
-2. Optional: [gcloud tool](https://cloud.google.com/sdk/#Quick_Start)
-   and [app](https://cloud.google.com/sdk/gcloud-app#Installation) component
-   to run and deploy GAE-based backend (hint: `gcloud components update app`).
-
-   Once `gcloud` and `app` component are installed, you'll need to do a one-off
-   configuration by executing the following command: `gcloud config set project <project-id>`.
-
-   Project ID can be any non-empty string if you just want to run the app locally.
 
 ### Running
 
@@ -47,6 +48,9 @@ modifying `APP_ENV` environment variable:
 Not that this does not change the way the backend code is compiled
 or the front-end is built. It merely changes a variable values,
 which the app takes into account when rendering a page or responding to a request.
+
+Running in `stage` or `prod` requires real credentials when accessing external services.
+You'll need to run a one-off `gulp decrypt` which will decrypt a service account private key.
 
 You can also use GAE dev appserver by running `gulp serve:gae`. This is closer to what
 we're using in our webapp environment but a bit slower on startup.
