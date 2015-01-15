@@ -223,9 +223,8 @@ Creates a countdown timer to a specific date.
        */
       attached: function() {
 
-        // We need to add 100 onto the threshold because the countdown timer
-        // is 100px nearer the bottom when this calculation is made. After the
-        // page has animated in, it'll be 100px further away from the bottom.
+        // We need to add 100 onto the threshold because the main page is
+        // transformed 100px nearer the bottom when this calculation is made.
         var THRESHOLD_ADJUSTMENT = 100;
 
         // Make sure we only start the timer when we hit the top of the element.
