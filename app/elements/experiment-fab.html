@@ -1091,7 +1091,7 @@ Main parent container for all of the fab elements.
           this.recording = false;
         }.bind(this));
 
-        window.addEventListener('scroll', this.boundOnScroll);
+        IOWA.Elements.ScrollContainer.addEventListener('scroll', this.boundOnScroll);
       },
 
       onScroll: function(event) {
@@ -1120,7 +1120,7 @@ Main parent container for all of the fab elements.
         this.miniFabs = false;
         this.fixed = 'unfixed';
 
-        window.removeEventListener('scroll', this.boundOnScroll);
+        IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
       },
 
       onExitNo: function(event) {
