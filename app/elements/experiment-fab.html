@@ -1021,13 +1021,13 @@ Main parent container for all of the fab elements.
       },
 
       attached: function() {
-        this.trackFab();
+        this.bindFab = this.trackFab.bind(this);
+        IOWA.Elements.ScrollContainer.addEventListener('scroll', this.bindFab);
       },
 
       trackFab: function(event) {
         var fabPos = this.getBoundingClientRect();
-        console.log(fabPos);
-        if (fabPos.top < 480) {
+        if (fabPos.top < 460) {
           this.dialogAnimateDirection = 'animate-down';
         } else {
           this.dialogAnimateDirection = 'animate-up';
@@ -1068,6 +1068,7 @@ Main parent container for all of the fab elements.
       experimentOn: function(event) {
         this.dialogVisible = false;
         document.removeEventListener('keyup', this.bindEscape);
+        IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.bindFab);
         this.playmode = 'playing';
 
         this.async(function(){
