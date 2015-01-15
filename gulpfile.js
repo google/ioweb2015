@@ -11,14 +11,12 @@ var $ = require('gulp-load-plugins')();
 var pagespeed = require('psi');
 var del = require('del');
 var i18n_replace = require('./gulp_scripts/i18n_replace');
+var generateServiceWorker = require('./gulp_scripts/generate_service_worker');
 var runSequence = require('run-sequence');
 var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var opn = require('opn');
-var chmod = require('gulp-chmod');
-var swPrecache = require('sw-precache');
-var glob = require('glob');
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -241,7 +239,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 
-gulp.task('serve', ['sass', 'backend', 'generate-service-worker-dev'], function() {
+gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var startArgs = ['-d', APP_DIR, '-listen', serverAddr];
@@ -281,7 +279,7 @@ gulp.task('serve', ['sass', 'backend', 'generate-service-worker-dev'], function(
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['sass', 'generate-service-worker-dev'], function() {
+gulp.task('serve:gae', ['generate-service-worker-dev'], function() {
   var appEnv = process.env.APP_ENV || 'dev';
   var restoreAppYaml = changeBackendGaeAppVersion('v-' + appEnv);
 
@@ -363,7 +361,7 @@ gulp.task('bower', function(cb) {
 
 gulp.task('addgithooks', function() {
   return gulp.src('.git-hooks/*')
-    .pipe(chmod(755))
+    .pipe($.chmod(755))
     .pipe(gulp.dest('.git/hooks'));
 });
 
@@ -421,70 +419,38 @@ function changeBackendGaeAppVersion(version, appYamlPath) {
   return fs.writeFileSync.bind(fs, appYamlPath, appYaml, null);
 }
 
-// Load custom tasks from the `tasks` directory
-try { require('require-dir')('tasks'); } catch (err) {}
-
-// TODO (jeffposnick): Refactor this out of the main gulpfile.
-function generateServiceWorkerFileContents(rootDir, handleFetch) {
-  var regex = /([^\/]+)\.html$/;
-  var templateDir = rootDir + '/templates/';
-  var dynamicUrlToDependencies = {
-    './': [templateDir + 'layout_full.html', templateDir + 'home.html'],
-    './?partial': [templateDir + 'layout_partial.html', templateDir + 'home.html']
-  };
-
-  // This isn't pretty, but it works for our dynamic URL mapping.
-  glob.sync(templateDir + '!(layout_*).html').forEach(function(template) {
-    var matches = template.match(regex);
-    if (matches) {
-      var path = matches[1];
-      var partialPath = path + '?partial';
-      dynamicUrlToDependencies[path] = [templateDir + 'layout_full.html', template];
-      dynamicUrlToDependencies[partialPath] = [templateDir + 'layout_partial.html', template];
-    }
-  });
-
-  return swPrecache({
-    dynamicUrlToDependencies: dynamicUrlToDependencies,
-    handleFetch: handleFetch,
-    importScripts: [
-      'bower_components/shed/dist/shed.js',
-      'scripts/shed-offline-analytics.js',
-      'scripts/shed-cache-then-network.js'
-    ],
-    logger: $.util.log,
-    staticFileGlobs: [
-      rootDir + '/bower_components/**/*.{html,js,css}',
-      rootDir + '/elements/**',
-      rootDir + '/fonts/**',
-      rootDir + '/images/**',
-      rootDir + '/scripts/**',
-      rootDir + '/styles/**/*.css',
-      rootDir + '/templates/**/*_partial.html',
-      rootDir + '/*.{html,ico,json}'
-    ],
-    stripPrefix: rootDir + '/'
-  });
-}
-
-gulp.task('generate-service-worker-dev', function() {
+gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
   del([APP_DIR + '/service-worker.js']);
 
-  // Passing in false will cause the service worker to precache the resources (to confirm it works),
-  // but not actually serve files from the cache (so that live reloading still works in dev).
-  // TODO (jeffposnick): Use a flag to toggle this behavior.
-  var serviceWorkerFileContents = generateServiceWorkerFileContents(APP_DIR, false);
-
-  return $.file('service-worker.js', serviceWorkerFileContents, {src: true})
-    .pipe(gulp.dest(APP_DIR));
+  // Run with --fetch-dev to generate a service-worker.js that will handle fetch events.
+  // By default, the generated service-worker.js will precache resources, but not actually serve
+  // them. This is preferable for dev, since things like live reload will work as expected.
+  generateServiceWorker(APP_DIR, !!argv['fetch-dev'], function(error, serviceWorkerFileContents) {
+    if (error) {
+      return callback(error);
+    }
+    fs.writeFile(APP_DIR + '/service-worker.js', serviceWorkerFileContents, function(error) {
+      if (error) {
+        return callback(error);
+      }
+      callback();
+    });
+  });
 });
 
-gulp.task('generate-service-worker-dist', function() {
+gulp.task('generate-service-worker-dist', function(callback) {
   var distDir = DIST_STATIC_DIR + '/' + APP_DIR;
   del([distDir + '/service-worker.js']);
 
-  var serviceWorkerFileContents = generateServiceWorkerFileContents(distDir, true);
-
-  return $.file('service-worker.js', serviceWorkerFileContents, {src: true})
-    .pipe(gulp.dest(distDir));
+  generateServiceWorker(distDir, true, function(error, serviceWorkerFileContents) {
+    if (error) {
+      return callback(error);
+    }
+    fs.writeFile(distDir + '/service-worker.js', serviceWorkerFileContents, function(error) {
+      if (error) {
+        return callback(error);
+      }
+      callback();
+    });
+  });
 });
