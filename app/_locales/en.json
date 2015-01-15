@@ -177,8 +177,20 @@
     "message": "Days"
   },
   "daysuntilreg": {
-    "description": "Short label used on the registration page. By the countdown timer",
+    "description": "Short label used on the home/registration page to signify days left until registration opens",
     "message": "Days until registration opens"
+  },
+  "hoursuntilreg": {
+    "description": "Short label used on the home/registration page to signify hours left until registration opens",
+    "message": "Hours until registration opens"
+  },
+  "minutesuntilreg": {
+    "description": "Short label used on the home/registration page to signify minutues left until registration opens",
+    "message": "Minutes until registration opens"
+  },
+  "secondsuntilreg": {
+    "description": "Short label used on the home/registration page to signify seconds left until registration opens",
+    "message": "Seconds until registration opens"
   },
   "agenda": {
     "description": "Link text. Please keep short. Used on the schedule page.",
