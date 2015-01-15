@@ -37,7 +37,7 @@
 
 .masthead {
   position: relative;
-  min-height: 400px;
+  min-height: 420px;
   height: 66vh; // ~2/3 viewport height
   max-height: 550px;
 
@@ -84,8 +84,8 @@
 }
 
 @mixin masthead-ripple($radius) {
-  height: 2*$radius;
-  width: 2*$radius;
+  height: 2 * $radius;
+  width: 2 * $radius;
   left: -$radius;
   top: -$radius;
 }
@@ -98,8 +98,8 @@
   .masthead__ripple__content { @include masthead-ripple($desktop-breakpoint-max); }
 }
 
-@media (min-width: $desktop-breakpoint-max) {
-  .masthead__ripple__content { @include masthead-ripple(2*$desktop-breakpoint-max); }
+@media (min-width: $desktop-breakpoint-max + 1) {
+  .masthead__ripple__content { @include masthead-ripple(1.2 * $desktop-breakpoint-max); }
 }
 
 
@@ -187,6 +187,7 @@ experiment-fab-container {
   .masthead {
     position: relative;
     margin-bottom: -115px;
+    min-height: 540px;
 
     core-toolbar {
       .io-logo {
@@ -222,14 +223,23 @@ experiment-fab-container {
   }
 }
 
+@media (min-width: $tablet-breakpoint-max) {
+  .masthead {
+    min-height: 600px;
+  }
+}
+
+
 @media (min-width: $desktop-breakpoint-mid) {
+  .masthead {
+    min-height: 700px;
+  }
   .masthead-container {
     max-width: 896px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
-
   .masthead-container {
     max-width: 1024px;
   }
