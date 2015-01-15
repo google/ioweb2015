@@ -2,6 +2,19 @@
 
 ### Setup
 
+Prerequisites
+
+* [Go 1.4](https://golang.org/dl/).
+* Optional: [gcloud tool](https://cloud.google.com/sdk/#Quick_Start)
+  and [app](https://cloud.google.com/sdk/gcloud-app#Installation) component
+  to run and deploy GAE-based backend (hint: `gcloud components update app`).
+
+  Once `gcloud` and `app` component are installed, you'll need to do a one-off
+  configuration by executing the following command: `gcloud config set project <project-id>`.
+  Project ID can be any non-empty string if you just want to run the app locally.
+
+Setup
+
 1. `git clone https://github.com/GoogleChrome/ioweb2015.git`
 2. `cd ioweb2015`
 3. `npm install`
@@ -14,18 +27,6 @@ If you plan on modifying source code, be a good citizen and:
    The plugin should automatically pick up the [.editorconfig](.editorconfig) settings.
 2. Obey the pre-commit hook that's installed as part of `gulp setup`.
    It will check for JavaScript and code style errors before committing to the `master` branch.
-
-To run a backend server you'll need:
-
-1. [Go 1.4](https://golang.org/dl/).
-2. Optional: [gcloud tool](https://cloud.google.com/sdk/#Quick_Start)
-   and [app](https://cloud.google.com/sdk/gcloud-app#Installation) component
-   to run and deploy GAE-based backend (hint: `gcloud components update app`).
-
-   Once `gcloud` and `app` component are installed, you'll need to do a one-off
-   configuration by executing the following command: `gcloud config set project <project-id>`.
-
-   Project ID can be any non-empty string if you just want to run the app locally.
 
 ### Running
 

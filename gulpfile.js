@@ -366,8 +366,12 @@ gulp.task('addgithooks', function() {
     .pipe(gulp.dest('.git/hooks'));
 });
 
+gulp.task('godeps', function() {
+  spawn('go', ['get', '-d', './' + BACKEND_DIR + '/...'], {stdio: 'inherit'});
+});
+
 gulp.task('setup', function(cb) {
-  runSequence('bower', 'addgithooks', 'default', cb);
+  runSequence('bower', 'godeps', 'addgithooks', 'default', cb);
 });
 
 // Watch file changes and reload running server
