@@ -19,7 +19,6 @@
     "gulp-changed": "^1.0.0",
     "gulp-chmod": "^1.2.0",
     "gulp-csso": "^0.2.9",
-    "gulp-file": "^0.2.0",
     "gulp-flatten": "^0.0.2",
     "gulp-foreach": "0.0.1",
     "gulp-if": "^1.2.1",

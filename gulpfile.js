@@ -429,9 +429,12 @@ gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
     if (error) {
       return callback(error);
     }
-    $.file('service-worker.js', serviceWorkerFileContents, {src: true})
-      .pipe(gulp.dest(APP_DIR));
-    callback();
+    fs.writeFile(APP_DIR + '/service-worker.js', serviceWorkerFileContents, function(error) {
+      if (error) {
+        return callback(error);
+      }
+      callback();
+    });
   });
 });
 
@@ -443,8 +446,11 @@ gulp.task('generate-service-worker-dist', function(callback) {
     if (error) {
       return callback(error);
     }
-    $.file('service-worker.js', serviceWorkerFileContents, {src: true})
-      .pipe(gulp.dest(distDir));
-    callback();
+    fs.writeFile(distDir + '/service-worker.js', serviceWorkerFileContents, function(error) {
+      if (error) {
+        return callback(error);
+      }
+      callback();
+    });
   });
 });
