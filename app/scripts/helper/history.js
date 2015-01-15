@@ -17,7 +17,9 @@
 /**
  * @fileOverview History management for IOWA project.
  *
- * Triggers 'popstate' event on pushstate method call.
+ * Triggers 'popstate' event on pushstate method call. IOWA app performs 
+ * all navigation off history state changes. Having the same event on pop and 
+ * push states allow to have uniform behavior on forward and back navigation.
  */
 IOWA.History = (function(exports) {
   var history = exports.history;
