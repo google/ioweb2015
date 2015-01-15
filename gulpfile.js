@@ -370,6 +370,12 @@ gulp.task('godeps', function() {
   spawn('go', ['get', '-d', './' + BACKEND_DIR + '/...'], {stdio: 'inherit'});
 });
 
+gulp.task('decrypt', function() {
+  var key = BACKEND_DIR + '/service-account.pem';
+  var args = ['aes-256-cbc', '-d', '-in', key + '.enc', '-out', key];
+  spawn('openssl', args, {stdio: 'inherit'});
+});
+
 gulp.task('setup', function(cb) {
   runSequence('bower', 'godeps', 'addgithooks', 'default', cb);
 });
