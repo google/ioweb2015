@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+window.IOWA = window.IOWA || {};
+
 IOWA.Analytics = (function(exports) {
 
   "use strict";
@@ -109,9 +111,16 @@ IOWA.Analytics = (function(exports) {
    * @param {string} action
    * @param {string=} opt_label
    * @param {number=} opt_value
+   * @param {function} opt_callback Optional callback to be invoked after the
+   *                   hit is recorded.
    */
-  Analytics.prototype.trackEvent = function(category, action, opt_label, opt_value) {
-    ga('send', 'event', category, action, opt_label, opt_value, {useBeacon: true});
+  Analytics.prototype.trackEvent = function(category, action, opt_label, opt_value, opt_callback) {
+    var obj = {useBeacon: true};
+    if (typeof opt_callback === 'function') {
+      obj.hitCallback = opt_callback;
+    }
+
+    ga('send', 'event', category, action, opt_label, opt_value, obj);
   };
 
   /**
@@ -122,6 +131,15 @@ IOWA.Analytics = (function(exports) {
    */
   Analytics.prototype.trackError = function(location, message) {
     ga('send', 'event', 'error', location, String(message));
+
+    // Note: GA has exception type but it does not show up in realtime so catching
+    // errors would be 24hrs delayed. Stick with an error event until we decide
+    // to switch. It also looks difficult to get this data out later on:
+    // http://stackoverflow.com/questions/21718481/report-for-exceptions-from-google-analytics-analytics-js-exception-tracking
+    // ga('send', 'exception', {
+    //   //'exFatal': true,
+    //   'exDescription': location + ' ' + String(message)
+    // });
   };
 
   /**
