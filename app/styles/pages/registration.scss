@@ -39,15 +39,23 @@ $name: 'page-registration';
   .io-countdown {
     margin: 100px 0;
   }
-  .page__section {
-    margin-top: -77px;
+  .page__section--countdown {
+    margin-top: -137px;
+    padding-top: 138px;
   }
 }
 
-
 @media (min-width: $desktop-breakpoint-min) {
-  .page__section {
-    margin-top: -57px;
+  .page__section--countdown {
+    margin-top: -165px;
+    padding-top: 165px;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-max) {
+  .page__section--countdown {
+    margin-top: -129px;
+    padding-top: 130px;
   }
 }
 
