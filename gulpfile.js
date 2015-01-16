@@ -20,33 +20,21 @@ var opn = require('opn');
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
-var BACKEND_APP_YAML = BACKEND_DIR + '/app.yaml';
 var EXPERIMENT_DIR = 'experiment';
+var BACKEND_APP_YAML = BACKEND_DIR + '/app.yaml';
+
+var DIST_STATIC_DIR = 'dist';
+var DIST_EXPERIMENT_DIR = APP_DIR + '/experiment';
 
 var STATIC_VERSION = 1; // Cache busting static assets.
 var VERSION = argv.build || STATIC_VERSION;
 
-// TODO(ericbidelman|bckenny): fill in with default static asset base URL
-// var STATIC_BASE_URL = argv.baseurl ? argv.baseurl : '';
-// var STATIC_URL = argv.pretty ? '' : (STATIC_BASE_URL + VERSION + '/');
-
+// TODO: update this URL to be correct for prod.
 var EXPERIMENT_STATIC_URL = '/experiment/';
-
-var DIST_STATIC_DIR = 'dist';
-var DIST_EXPERIMENT_DIR = 'app/experiment';
-// var PROD_DIR = APP_DIR + '/dist_prod';
-// var STATIC_DIR = APP_DIR + '/dist_static';
-// var PRETTY_DIR = APP_DIR + '/dist_pretty';
-
-// path for files (mostly index_*.html) with short cache periods
-// var DIST_PROD_DIR = argv.pretty ? PRETTY_DIR : PROD_DIR;
-
-// path for static resources
-// var DIST_STATIC_DIR = argv.pretty ? PRETTY_DIR : (STATIC_DIR + '/' + VERSION);
 
 // TODO(ericbidelman): also remove generated .css files.
 gulp.task('clean', function(cleanCallback) {
-  del([DIST_STATIC_DIR], cleanCallback);
+  del([DIST_STATIC_DIR, DIST_EXPERIMENT_DIR], cleanCallback);
 });
 
 gulp.task('sass', function() {
@@ -109,7 +97,7 @@ gulp.task('fonts', function () {
 // });
 
 // vulcanize main site elements separately.
-gulp.task('vulcanize-elements', ['clean', 'sass'], function() {
+gulp.task('vulcanize-elements', ['sass'], function() {
   return gulp.src([
       APP_DIR + '/elements/elements.html'
     ], {base: './'})
@@ -117,6 +105,7 @@ gulp.task('vulcanize-elements', ['clean', 'sass'], function() {
       strip: !argv.pretty,
       csp: true,
       inline: true,
+      // abspath: '/',
       dest: 'elements/'
     }))
     // .pipe(i18n_replace({
@@ -144,11 +133,12 @@ gulp.task('copy-assets', ['copy-bower-dependencies'], function() {
   return gulp.src([
     APP_DIR + '/*.{html,txt,ico}',
     APP_DIR + '/manifest.json',
+    APP_DIR + '/clear_cache.html',
     APP_DIR + '/styles/**.css',
     APP_DIR + '/elements/**/images/*',
     APP_DIR + '/templates/*.html',
-    // The service worker script needs to be at the top-level of the site.
-    APP_DIR + '/sw.js'
+    APP_DIR + '/sw.js', // Note: sw script needs to be in the root of the site.
+    DIST_EXPERIMENT_DIR + '/**/*',
   ], {base: './'})
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .pipe($.size({title: 'copy-assets'}));
@@ -324,7 +314,7 @@ gulp.task('js', ['jshint', 'jscs', 'uglify']);
 gulp.task('build-experiment', buildExperiment);
 
 // Copy experiment files.
-gulp.task('copy-experiment', function(cb) {
+gulp.task('copy-experiment-to-site', ['build-experiment'], function(cb) {
   gulp.src([
     EXPERIMENT_DIR + '/public/js/*.*',
     EXPERIMENT_DIR + '/public/cataudiosprite.mp3',
@@ -351,8 +341,9 @@ gulp.task('backend:test', function(cb) {
 });
 
 gulp.task('default', ['clean'], function(cb) {
-  runSequence('build-experiment', 'copy-experiment', 'sass', 'vulcanize', ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'],
-    'generate-service-worker-dist', cb);
+  runSequence('copy-experiment-to-site', 'sass', 'vulcanize',
+              ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'],
+              'generate-service-worker-dist', cb);
 });
 
 gulp.task('bower', function(cb) {
@@ -380,6 +371,8 @@ gulp.task('setup', function(cb) {
   runSequence('bower', 'godeps', 'addgithooks', 'default', cb);
 });
 
+// -----------------------------------------------------------------------------
+
 // Watch file changes and reload running server
 // or rebuild stuff.
 function watch() {
@@ -390,10 +383,10 @@ function watch() {
   gulp.watch([APP_DIR + '/bower.json'], ['bower']);
 }
 
-// Build experiment
+// Build experiment and place inside app.
 function buildExperiment(cb) {
   var args = [EXPERIMENT_STATIC_URL];
-  var build = spawn('./bin/build', args, {cwd: EXPERIMENT_DIR, stdio: 'inherit' });
+  var build = spawn('./bin/build', args, {cwd: EXPERIMENT_DIR, stdio: 'inherit'});
   build.on('close', cb);
 }
 
