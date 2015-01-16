@@ -108,7 +108,7 @@ IOWA.Analytics = (function(exports) {
    * @param {string} category
    * @param {string} action
    * @param {string=} opt_label
-   * @param {(string|number)=} opt_value
+   * @param {number=} opt_value
    */
   Analytics.prototype.trackEvent = function(category, action, opt_label, opt_value) {
     ga('send', 'event', category, action, opt_label, opt_value, {useBeacon: true});
