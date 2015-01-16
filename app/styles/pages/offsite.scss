@@ -28,7 +28,7 @@ $icon-margin: 10px;
 .card__photo--stage {
   height: 310px;
   background-image: url(../images/offsite/stage-750.jpg);
-  background-position: 0% 50%;
+  background-position: 0 50%;
   background-size: 120%;
   background-repeat: no-repeat;
 }
@@ -37,6 +37,7 @@ $icon-margin: 10px;
   position: relative;
   color: #fff;
   @extend .bg-globe;
+  background-position: 50% 0%;
 
   .action__links {
     align-items: flex-start;
@@ -62,7 +63,7 @@ $icon-margin: 10px;
     margin-bottom: -285px;
   }
   .page__section--attend {
-    background-position: 50% 0;
+    margin-top: -58px;
 
     h2 {
       max-width: 58%;
@@ -90,7 +91,12 @@ $icon-margin: 10px;
   .card__photo--stage {
     margin-top: -93px;
   }
+}
 
+@media (min-width: $desktop-breakpoint-max) {
+  .card__photo--stage {
+    margin-top: -57px;
+  }
 }
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {

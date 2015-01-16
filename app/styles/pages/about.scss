@@ -62,12 +62,35 @@ $name: 'page-about';
 @media (min-width: $tablet-breakpoint-min) {
   .pics__section {
     height: 745px;
-    margin-top: -134px;
+    margin-top: -110px;
     margin-bottom: -50px;
   }
   #hashtag {
-    margin-top: -320px;
-    padding-top: 340px;
+    margin-top: -319px;
+    padding-top: 320px;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-min) {
+  #hashtag {
+    margin-top: -383px;
+    padding-top: 383px;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid) {
+  .pics__section {
+    margin-top: -134px;
+  }
+  #hashtag {
+    margin-top: -319px;
+    padding-top: 320px;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-max) {
+  #hashtag {
+    margin-top: -283px;
   }
 }
 
