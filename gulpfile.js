@@ -175,7 +175,8 @@ gulp.task('copy-backend', function(cb) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
     BACKEND_DIR + '/*.yaml',
-    BACKEND_DIR + '/*.pem'
+    BACKEND_DIR + '/*.pem',
+    BACKEND_DIR + '/whitelist'
   ], {base: './'})
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .on('end', function() {
