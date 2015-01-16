@@ -918,6 +918,10 @@ Main parent container for all of the fab elements.
         -webkit-transition: all 300ms ease-out;
         transition: all 300ms ease-out;
       }
+      :host([mini]) {
+        widht: 40px;
+        height: 40px;
+      }
       :host([fixed="fixed"]) {
         position: fixed;
         top: 50%;
@@ -927,7 +931,7 @@ Main parent container for all of the fab elements.
     <template if="{{mode == 'pre'}}">
 
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
-      <experiment-fab src="../images/experiment-fab-animation.gif" on-tap="{{onFabClick}}"></experiment-fab>
+      <experiment-fab src="../images/experiment-fab-animation.gif" on-tap="{{onFabClick}}" mini?="{{mini}}"></experiment-fab>
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}"></experiment-loading-dialog>
 
@@ -969,6 +973,10 @@ Main parent container for all of the fab elements.
         fixed: {
           value: 'unfixed',
           reflect: true
+        },
+        mini: {
+          reflect: true,
+          value: false
         }
       },
 
