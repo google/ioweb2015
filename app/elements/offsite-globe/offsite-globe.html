@@ -1,0 +1,156 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<script src="offsite-globe-namespace.js"></script>
+<script src="matrix4x4.js"></script>
+<script src="shader-program.js"></script>
+<script src="geometry.js"></script>
+
+<!--
+Makes a globe or whatever.
+
+    <offsite-globe></offsite-globe>
+
+@element offsite-globe
+-->
+<polymer-element name="offsite-globe" attributes="">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #canvas {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <canvas id="canvas"></canvas>
+  </template>
+  <script>
+  (function() {
+    var ShaderProgram = IOWA.OffsiteGlobe.ShaderProgram;
+    var Matrix4x4 = IOWA.OffsiteGlobe.Matrix4x4;
+    var generateGeometry = IOWA.OffsiteGlobe.generateGeometry;
+
+    Polymer({
+      /**
+       * Shader program to render globe.
+       *
+       * @property globeProgram
+       * @type ShaderProgram
+       * @default null
+       */
+      globeProgram: null,
+
+      globeArrayBuffer: null,
+
+      globeIndexBuffer: null,
+
+      projectionTransform: null,
+
+      gl: null,
+
+      theta: 0,
+
+      animate: false,
+
+      created: function() {
+        this.projectionTransform = new Matrix4x4();
+      },
+
+      ready: function() {
+
+      },
+
+      attached: function() {
+        var gl = this.gl = this.$.canvas.getContext('webgl');
+
+        // TODO(bckenny): no reason not to inline these
+        ShaderProgram.fromXhr(gl, 'elements/offsite-globe/shaders/simple.vert', 'elements/offsite-globe/shaders/simple.frag')
+          .then(function(program) {
+            this.globeProgram = program;
+            program.use();
+            gl.enableVertexAttribArray(program.attributes.coord);
+
+            this.init();
+          }.bind(this));
+
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+        if (!gl.getExtension('OES_standard_derivatives')) {
+          throw new Error('no OES_standard_derivatives available');
+        }
+
+        this.animate = true;
+      },
+
+      init: function() {
+        var gl = this.gl;
+        this.resize();
+
+        var globeGeometry = generateGeometry();
+
+        this.globeArrayBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.globeArrayBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, globeGeometry.geometryArray, gl.STATIC_DRAW);
+
+        this.globeIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.globeIndexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, globeGeometry.indexArray, gl.STATIC_DRAW);
+
+        this.update();
+      },
+
+      resize: function() {
+        var canvas = this.$.canvas;
+        var resolutionScale = window.devicePixelRatio > 1 ? 2 : 1;
+        var width = canvas.offsetWidth;
+        var height = canvas.offsetHeight;
+        canvas.width = width * resolutionScale;
+        canvas.height = height * resolutionScale;
+        this.gl.viewport(0, 0, width * resolutionScale, height * resolutionScale);
+
+        this.projectionTransform.identity()
+          .perspective(Math.PI / 3, width/height, 1, 3)
+          .translate(0, 0, -2);
+      },
+
+      update: function() {
+        /* jshint bitwise: false */
+        var gl = this.gl;
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        this.theta += Math.PI / 240;
+
+        var worldTransform = new Matrix4x4()
+          .rotateY(this.theta)
+          .rotateX(this.theta / 3)
+          .translate(-0.5, -0.5, 0.5);
+
+        this.globeProgram.use();
+
+        // attribute offsets
+        gl.vertexAttribPointer(this.globeProgram.attributes.coord, 4, gl.FLOAT, false, 16, 0);
+
+        // set uniforms
+        this.globeProgram.uniforms.globeMatrix(worldTransform.m_);
+        this.globeProgram.uniforms.viewMatrix(this.projectionTransform.m_);
+
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+        if (this.animate) {
+          window.requestAnimationFrame(this.update.bind(this));
+        }
+      },
+
+      detached: function() {
+        this.animate = false;
+      }
+    });
+  })();
+  </script>
+</polymer-element>
