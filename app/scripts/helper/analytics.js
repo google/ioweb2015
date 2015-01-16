@@ -36,7 +36,7 @@ IOWA.Analytics = (function(exports) {
       // See https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#localhost
       opts.cookieDomain = 'none';
     } else {
-      opts.cookiePath = '/events/io2015';
+      opts.cookiePath = '/io2015';
     }
 
     ga('create', trackingCode, opts);
@@ -110,17 +110,18 @@ IOWA.Analytics = (function(exports) {
    * @param {string} category
    * @param {string} action
    * @param {string=} opt_label
-   * @param {number=} opt_value
    * @param {function} opt_callback Optional callback to be invoked after the
    *                   hit is recorded.
    */
   Analytics.prototype.trackEvent = function(category, action, opt_label, opt_value, opt_callback) {
-    var obj = {useBeacon: true};
-    if (typeof opt_callback === 'function') {
-      obj.hitCallback = opt_callback;
-    }
-
-    ga('send', 'event', category, action, opt_label, opt_value, obj);
+    ga('send', {
+      hitType: 'event',
+      eventCategory: category,
+      eventAction: action,
+      eventLabel: opt_label,
+      eventValue: opt_value,
+      hitCallback: opt_callback
+    });
   };
 
   /**

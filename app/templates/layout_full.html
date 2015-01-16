@@ -83,9 +83,32 @@ limitations under the License.
     }
   </script>
 
-  <script src="scripts/helper/analytics.js"></script>
-
+  <!-- Unsupported browser checks need to come before webcomponents.js is loaded,
+       otherwise unsupported browsers will error out and not record a pageview.
+       Analytics lib is also loaded up front for error reporting. -->
   <script>
+    window.ENV = {% .Env %}; // Used in analytics.js
+  </script>
+  <script src="scripts/helper/analytics.js"></script>
+  <script>
+  (function() {
+    "use strict";
+
+    // Setup error tracking before anything else runs.
+    window.onerror = function(message, file, lineNumber, columnNumber, error) {
+      // We don't want to trigger any errors inside window.onerror, so wrap in a try/catch.
+      try {
+        // Some browsers don't support error param yet.
+        if (error !== undefined) {
+          message = error.stack;
+        }
+
+        IOWA.Analytics.trackError(file + ':' + lineNumber, message);
+      } catch (e) {
+        // no-op
+      }
+    };
+
     /**
      * @param {string} param URL parameter to look for.
      * @return {string|undefined} undefined if the URL parameter does not exist.
@@ -94,8 +117,7 @@ limitations under the License.
       if (!window.location.search) {
         return;
       }
-      var m = new RegExp(param + '=([^&]*)').exec(
-          window.location.search.substring(1));
+      var m = new RegExp(param + '=([^&]*)').exec(window.location.search.substring(1));
       if (!m) {
         return;
       }
@@ -107,10 +129,9 @@ limitations under the License.
     // missing features, but some browsers are known to not work under it.
     // https://www.polymer-project.org/resources/compatibility.html
     var ignoreCheck = getUrlParameter('ignore_browser_check') == 'true';
+    var uaString = navigator.userAgent;
 
     var supported =  ignoreCheck || (function whatBrowserYouBe() {
-      var uaString = navigator.userAgent;
-
       // Sorry IE < 10.
       var msie = /MSIE +([\d\.]+)/.exec(uaString);
       if (msie && msie[1]) {
@@ -137,12 +158,13 @@ limitations under the License.
       return true;
     })();
 
-    if (supported) {
+    if (!supported) {
       // Note: pageview is recorded when IOWA.Analytics is setup.
       IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', uaString, null, function() {
         window.location = 'upgrade.html';
       });
     }
+  })();
   </script>
 
   <!-- Page styles -->
@@ -293,9 +315,6 @@ limitations under the License.
 <io-toast id="toast" duration="9000"></io-toast>
 
 <!-- TODO: Move to automatic concatenation via codekit-gulp -->
-<script>
-  window.ENV = {% .Env %};
-</script>
 <script src="scripts/main.js"></script>
 <script src="scripts/helper/elements.js"></script>
 <script src="scripts/helper/history.js"></script>

@@ -28,19 +28,4 @@
   //   });
   // }
 
-  exports.onerror = function(message, file, lineNumber, columnNumber, error) {
-    // We don't want to trigger any errors inside window.onerror, so wrap in a try/catch.
-    try {
-      // Some browsers don't support error param yet.
-      if (error !== undefined) {
-        message = error.stack;
-
-      }
-
-      IOWA.Analytics.trackError(file + ':' + lineNumber, message);
-    } catch (e) {
-      // no-op
-    }
-  };
-
 })(window);
