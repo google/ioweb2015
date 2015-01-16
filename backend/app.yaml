@@ -6,6 +6,11 @@ threadsafe: yes
 
 handlers:
 
+- url: /experiment
+  static_dir: app/experiment
+  http_headers:
+    Access-Control-Allow-Origin: "*"
+
 - url: /fonts
   static_dir: app/fonts
   http_headers:
