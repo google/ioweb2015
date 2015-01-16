@@ -6,22 +6,75 @@
 package main
 
 import (
+	"bufio"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/net/context"
 
 	"appengine"
+	"appengine/user"
 )
 
-// rootDir is relative to basedir of app.yaml is (app root)
-var rootDir = "app"
+var (
+	// rootDir is relative to basedir of app.yaml is (app root)
+	rootDir = "app"
+	// whitemap contains whitelisted email addresses or domains.
+	// whitelisted domains should be prefixed with "@", e.g. @example.org
+	whitemap map[string]bool
+)
 
 func init() {
 	cache = &gaeMemcache{}
+	initWhitelist()
 
-	http.HandleFunc("/", serveTemplate)
+	http.HandleFunc("/", checkWhitelist(serveTemplate))
 	http.HandleFunc("/api/extended", serveIOExtEntries)
+}
+
+func initWhitelist() {
+	whitemap = make(map[string]bool)
+	f, err := os.Open(filepath.Join(rootDir, "..", "whitelist"))
+	if err != nil {
+		panic(err)
+	}
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		whitemap[scanner.Text()] = true
+	}
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+}
+
+// isWhitelisted returns a value of the whitemap for the key
+// of either email or its domain.
+func isWhitelisted(email string) bool {
+	if v, ok := whitemap[email]; ok {
+		return v
+	}
+	i := strings.Index(email, "@")
+	return whitemap[email[i:]]
+}
+
+func checkWhitelist(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ac := appengine.NewContext(r)
+		u := user.Current(ac)
+		if u == nil || !isWhitelisted(u.Email) {
+			url, err := user.LoginURL(ac, r.URL.Path)
+			if err != nil {
+				ac.Errorf("user.LoginURL(%q): %v", r.URL.Path, err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			http.Redirect(w, r, url, http.StatusFound)
+			return
+		}
+		h(w, r)
+	}
 }
 
 // newContext returns a newly created context of the in-flight request r.
