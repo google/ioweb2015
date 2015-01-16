@@ -83,6 +83,92 @@ limitations under the License.
     }
   </script>
 
+  <!-- Unsupported browser checks need to come before webcomponents.js is loaded,
+       otherwise unsupported browsers will error out and not record a pageview.
+       Analytics lib is also loaded up front for error reporting. -->
+  <script>
+    window.ENV = {% .Env %}; // Used in analytics.js
+  </script>
+  <script src="scripts/helper/analytics.js"></script>
+  <script>
+  (function() {
+    "use strict";
+
+    // Setup error tracking before anything else runs.
+    window.onerror = function(message, file, lineNumber, columnNumber, error) {
+      // We don't want to trigger any errors inside window.onerror, so wrap in a try/catch.
+      try {
+        // Some browsers don't support error param yet.
+        if (error !== undefined) {
+          message = error.stack;
+        }
+
+        IOWA.Analytics.trackError(file + ':' + lineNumber, message);
+      } catch (e) {
+        // no-op
+      }
+    };
+
+    /**
+     * @param {string} param URL parameter to look for.
+     * @return {string|undefined} undefined if the URL parameter does not exist.
+     */
+    function getUrlParameter(param) {
+      if (!window.location.search) {
+        return;
+      }
+      var m = new RegExp(param + '=([^&]*)').exec(window.location.search.substring(1));
+      if (!m) {
+        return;
+      }
+      return decodeURIComponent(m[1]);
+    }
+
+    // If ?ignore_browser_check=true is in the URL, the user is coming back from
+    // "upgrade your browser" and we let them proceed.
+    var ignoreCheck = getUrlParameter('ignore_browser_check') == 'true';
+    var uaString = navigator.userAgent;
+
+    // Check if browser is supported by web components polyfill.
+    // Feature detection isn't sufficient; webcomponentsjs attempts to polyfill
+    // missing features, but some browsers are known to not work under it.
+    // https://www.polymer-project.org/resources/compatibility.html
+    var supported = ignoreCheck || (function whatBrowserYouBe() {
+      // Sorry IE < 10.
+      var msie = /MSIE +([\d\.]+)/.exec(uaString);
+      if (msie && msie[1]) {
+        if (msie[1] === '7.0') {
+          var tridentVersion = /Trident\/(\d.\d)/.exec(uaString);
+          if (tridentVersion && tridentVersion[1]) {
+            return parseInt(tridentVersion[1], 10) >= 6;
+          } else {
+            return false;
+          }
+        } else {
+          return parseInt(msie[1], 10) >= 10;
+        }
+      }
+      // Sorry older Android browser.
+      if (uaString.indexOf('Chrome') === -1 && uaString.indexOf('Android') !== -1) {
+        return !/^Google/.test(navigator.vendor);
+      }
+      // Sorry Opera < 15.
+      if (uaString.indexOf('Opera') !== -1) {
+        return false;
+      }
+      // Everyone else goes through.
+      return true;
+    })();
+
+    if (!supported) {
+      // Note: pageview is recorded when IOWA.Analytics is setup.
+      IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', uaString, null, function() {
+        window.location = 'upgrade.html';
+      });
+    }
+  })();
+  </script>
+
   <!-- Page styles -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
   <link rel="stylesheet" href="styles/main.css">
@@ -231,12 +317,8 @@ limitations under the License.
 <io-toast id="toast" duration="9000"></io-toast>
 
 <!-- TODO: Move to automatic concatenation via codekit-gulp -->
-<script>
-  window.ENV = {% .Env %};
-</script>
 <script src="scripts/main.js"></script>
 <script src="scripts/helper/elements.js"></script>
-<script src="scripts/helper/analytics.js"></script>
 <script src="scripts/helper/history.js"></script>
 <script src="scripts/helper/router.js"></script>
 <script src="scripts/helper/request.js"></script>
