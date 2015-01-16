@@ -124,14 +124,16 @@ limitations under the License.
       return decodeURIComponent(m[1]);
     }
 
+    // If ?ignore_browser_check=true is in the URL, the user is coming back from
+    // "upgrade your browser" and we let them proceed.
+    var ignoreCheck = getUrlParameter('ignore_browser_check') == 'true';
+    var uaString = navigator.userAgent;
+
     // Check if browser is supported by web components polyfill.
     // Feature detection isn't sufficient; webcomponentsjs attempts to polyfill
     // missing features, but some browsers are known to not work under it.
     // https://www.polymer-project.org/resources/compatibility.html
-    var ignoreCheck = getUrlParameter('ignore_browser_check') == 'true';
-    var uaString = navigator.userAgent;
-
-    var supported =  ignoreCheck || (function whatBrowserYouBe() {
+    var supported = ignoreCheck || (function whatBrowserYouBe() {
       // Sorry IE < 10.
       var msie = /MSIE +([\d\.]+)/.exec(uaString);
       if (msie && msie[1]) {

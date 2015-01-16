@@ -110,7 +110,8 @@ IOWA.Analytics = (function(exports) {
    * @param {string} category
    * @param {string} action
    * @param {string=} opt_label
-   * @param {function} opt_callback Optional callback to be invoked after the
+   * @param {number=} opt_value
+   * @param {function()} opt_callback Optional callback to be invoked after the
    *                   hit is recorded.
    */
   Analytics.prototype.trackEvent = function(category, action, opt_label, opt_value, opt_callback) {
