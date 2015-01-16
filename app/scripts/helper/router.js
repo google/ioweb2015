@@ -62,6 +62,32 @@ IOWA.Router = (function() {
    * @param {Event} e Event that triggered navigation.
    * @private
    */
+  function handleAjaxLink(e, el) {
+    e.preventDefault();
+    e.stopPropagation();
+    // We can get the full absolute path from the <a> element's pathname:
+    // http://stackoverflow.com/questions/736513
+    var pageName = parsePageNameFromAbsolutePath(el.pathname);
+    var pageMeta = IOWA.Elements.Template.pages[pageName];
+    IOWA.Elements.Template.nextPage = pageName;
+    var color;
+    var currentPage = IOWA.Elements.Template.selectedPage;
+    if (currentPage !== pageName) {
+      if (IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
+          IOWA.Elements.Template.pages[pageName].mastheadBgClass) {
+        color = '#fff';
+      }
+      playMastheadRipple(e.pageX, e.pageY, color);
+      IOWA.History.pushState({'path': el.pathname}, '', el.href);
+    }
+    // TODO: Update meta.
+  }
+
+  /**
+   * Navigates to a new page. Uses ajax for data-ajax-link links.
+   * @param {Event} e Event that triggered navigation.
+   * @private
+   */
   function navigate(e) {
     // Allow user to open new tabs.
     if (e.metaKey || e.ctrlKey) {
@@ -70,28 +96,14 @@ IOWA.Router = (function() {
     // Inject page if <a> has the data-ajax-link attribute.
     for (var i = 0; i < e.path.length; ++i) {
       var el = e.path[i];
-      if (el.localName == 'a') {
-        if (el.hasAttribute('data-ajax-link')) {
-          e.preventDefault();
-          e.stopPropagation();
-          // We can get the full absolute path from the <a> element's pathname:
-          // http://stackoverflow.com/questions/736513
-          var pageName = parsePageNameFromAbsolutePath(el.pathname);
-          var pageMeta = IOWA.Elements.Template.pages[pageName];
-          IOWA.Elements.Template.nextPage = pageName;
-          var color;
-          var currentPage = IOWA.Elements.Template.selectedPage;
-          if (currentPage !== pageName) {
-            if (IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
-                IOWA.Elements.Template.pages[pageName].mastheadBgClass) {
-              color = '#fff';
-            }
-            playMastheadRipple(e.pageX, e.pageY, color);
-            IOWA.History.pushState({'path': el.pathname}, '', el.href);
-          }
-          // TODO: Update meta.
+      if (el.localName === 'a' || el.localName === 'paper-button') {
+        if (el.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent('link', 'click', el.getAttribute('data-track-link'));
         }
-        return; // found first anchor, quit here.
+        if (el.hasAttribute('data-ajax-link')) {
+          handleAjaxLink(e, el);
+        }
+        return; // found first navigation element, quit here.
       }
     }
   }
