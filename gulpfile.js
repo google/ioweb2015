@@ -443,7 +443,7 @@ gulp.task('generate-service-worker-dist', function(callback) {
   var distDir = DIST_STATIC_DIR + '/' + APP_DIR;
   del([distDir + '/service-worker.js']);
 
-  generateServiceWorker(distDir, true, function(error, serviceWorkerFileContents) {
+  generateServiceWorker(distDir, false, function(error, serviceWorkerFileContents) {
     if (error) {
       return callback(error);
     }
