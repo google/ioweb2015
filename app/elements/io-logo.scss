@@ -20,22 +20,22 @@
   display: inline-block;
   user-select: none;
   transform-origin: 0 50%;
-  background-color: transparent !important;
+  z-index: 1; // above background outside this element.
 }
 
-:host-context(.bg-light-grey) #o2 {
+:host(.bg-light-grey) #o2 {
   background-color: $color-body;
 }
 
-:host-context(.bg-dark-grey) #o2 {
+:host(.bg-dark-grey) #o2 {
   background-color: $color-bluegrey-700;
 }
 
-:host-context(.bg-medium-grey) #o2 {
+:host(.bg-medium-grey) #o2 {
   background-color: $color-bluegrey-100;
 }
 
-:host-context(.bg-cyan) #o2 {
+:host(.bg-cyan) #o2 {
   background-color: $color-cyan-500;
 }
 

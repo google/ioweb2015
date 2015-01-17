@@ -150,10 +150,16 @@ $name: 'page-home';
 
 @media (min-width: $desktop-breakpoint-mid) {
   .home-photo {
-     margin-top: -182px;
+    margin-top: -182px;
   }
   .page__section--attend {
     margin-bottom: -251px;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-max) {
+  .home-photo {
+    margin-top: -134px;
   }
 }
 
