@@ -101,6 +101,10 @@ $name: 'page-home';
 @media (min-width: $tablet-breakpoint-min) {
   $overlayCardTop: 100px;
 
+  .io__hash {
+    margin: 80px auto;
+  }
+
   .masthead-container {
     .io-logo {
       width: 256px;
