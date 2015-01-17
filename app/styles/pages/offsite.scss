@@ -64,6 +64,9 @@ $icon-margin: 10px;
     margin-top: -73px;
     margin-bottom: -226px;
   }
+  .play__button__container {
+    margin-bottom: 130px;
+  }
   .page__section--attend {
     margin-top: -80px;
     padding-top: $marginTop;
@@ -98,6 +101,8 @@ $icon-margin: 10px;
   .page__section--attend {
     margin-top: -108px;
     padding-top: $marginTop;
+    background-size: cover;
+    background-position: 50% 140px;
 
     .action__links {
       top: $marginTop;

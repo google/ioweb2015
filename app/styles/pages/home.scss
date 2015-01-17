@@ -115,18 +115,13 @@ $name: 'page-home';
 
   #registration {
     position: relative;
-    margin-bottom: -325px;
+    margin-bottom: -264px;
     .registration__setreminder {
       background: #fff;
       color: $color-cyan-A700;
       position: absolute;
       top: 40px;
       right: $desktopKeyline;
-    }
-  }
-  .registration__card {
-    core-icon {
-      display: none;
     }
   }
   .page__section--attend {
@@ -149,6 +144,9 @@ $name: 'page-home';
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
+  #registration {
+    margin-bottom: -248px;
+  }
   .home-photo {
     margin-top: -182px;
   }
