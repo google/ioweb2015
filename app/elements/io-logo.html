@@ -105,6 +105,15 @@ can be applied before Polymer is ready and the element is upgraded.
      */
     masthead: null,
 
+    /**
+     * The colored background element that will be scaled down to the masthead size.
+     *
+     * @property backgroundTarget
+     * @type Element
+     * @default null
+     */
+    backgroundTarget: null,
+
     ready: function() {
       this.heightChanged();
       this.widthChanged();
@@ -181,13 +190,14 @@ can be applied before Polymer is ready and the element is upgraded.
         scale = 0.58;
       }
 
-      // TODO(ericbidelman): coordinate with Ewa on delaying <main> transition up.
-      // this.parentElement.style.zIndex = 1;
+      // Insure masthead is behind top transition up card up and fab.
+      this.parentElement.style.zIndex = 1;
 
       // Masthead clipping.
-      var mastheadClipAnimation = new Animation(this.parentElement, [
-        {clip: 'rect(0, ' + containerWidth + 'px, ' + containerHeight + 'px, 0)'},
-        {clip: 'rect(0, ' + masthead.width + 'px, ' + masthead.height + 'px, 0)'}
+      // var mastheadClipAnimation = new Animation(this.parentElement, [
+      var mastheadClipAnimation = new Animation(this.backgroundTarget, [
+        {transform: 'translateY(0)'},
+        {transform: 'translateY(-' + (containerHeight - masthead.height) + 'px)'}
       ], {
         duration: 500,
         iterations: 1,
