@@ -200,14 +200,14 @@ with the attribute `iologodestination`.
       this.destination = document.querySelector('[iologodestination]');
 
       var current = this.getBoundingClientRect();
-      var destination = this.destination.getBoundingClientRect();
-      var masthead = this.masthead.getBoundingClientRect();
+      var dest = this.destination.getBoundingClientRect();
+      var mast = this.masthead.getBoundingClientRect();
 
       var containerWidth = document.documentElement.clientWidth;
       var containerHeight = document.documentElement.clientHeight;
 
-      var diffX = destination.left - current.left;
-      var diffY = destination.top - current.top;
+      var diffX = dest.left - current.left;
+      var diffY = dest.top - current.top;
 
       // Magic padding/margin offsets to get the I/O logo in its final position.
       if (containerWidth > 769) { // Tablet/desktop
@@ -225,7 +225,7 @@ with the attribute `iologodestination`.
       // var mastheadClipAnimation = new Animation(this.parentElement, [
       var mastheadClipAnimation = new Animation(this.backgroundTarget, [
         {transform: 'translateY(0)'},
-        {transform: 'translateY(-' + (containerHeight - masthead.height) + 'px)'}
+        {transform: 'translateY(-' + (containerHeight - mast.height) + 'px)'}
       ], {
         duration: 500,
         iterations: 1,
