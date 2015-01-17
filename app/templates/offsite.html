@@ -16,7 +16,11 @@
     </div>
   </div>
   <div class="transition-up-delay">
-    <section class="card__photo--stage page__section js-experiment-instrument"></section>
+    <section class="card__photo--stage page__section js-experiment-instrument" layout vertical center-center>
+      <div class="play__button__container">
+        <h4><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></h4>
+      </div>
+    </section>
 
     <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
       <div class="card js-experiment-visualizer" auto-vertical flex>
@@ -41,9 +45,9 @@
     <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument">
       <h2>We're compiling a map of I/O Extended events in your area. Check back to find one close to you.</h2>
       <div class="action__links" layout vertical>
-        <paper-button data-track-link="offsite-notify-me">
+        <!-- <paper-button data-track-link="offsite-notify-me">
           <core-icon icon="social:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
-        </paper-button>
+        </paper-button> -->
         <paper-button data-track-link="offsite-view-2014-events">
           <core-icon icon="maps:place"></core-icon><i18n-msg msgid="viewlastyear">View 2014 events</i18n-msg>
         </paper-button>

@@ -39,6 +39,10 @@ h3, h4, h5, h6 {
 .link-spacing {
   > a {
     margin-right: $desktopKeyline;
+
+    &:last-of-type {
+      margin-right: 0;
+    }
   }
 }
 
@@ -203,6 +207,33 @@ h3, h4, h5, h6 {
   }
 }
 
+.play__button {
+  height: 56px;
+  width: 56px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 88px;
+  margin: auto;
+  cursor: pointer;
+}
+
+.play__button__container {
+  background: url(../images/play-video-button.png) no-repeat 50% 0;
+  background-size: 56px;
+  display: flex;
+  align-items: flex-end;
+  height: 100px;
+
+  h4 {
+    color: white;
+    // background: rgba(0,0,0,.25);
+    // padding: 5px 10px;
+    // border-radius: 100px;
+  }
+}
+
 @media (max-width: $phone-breakpoint-max) {
   .io-countdown {
     margin: $desktopKeyline auto;
@@ -229,6 +260,12 @@ h3, h4, h5, h6 {
   }
   .bg-globe {
     background-position: 50% 0;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid) {
+  .io__hash {
+    margin: 180px auto;
   }
 }
 

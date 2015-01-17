@@ -63,6 +63,10 @@
     "description": "Link text. Please keep this short. Watches the video from the 2014 event.",
     "message": "Watch the 2014 I/O Recap Video"
   },
+  "ioextendedwatch": {
+    "description": "On the offsite page. Link to watch the video from I/O extended last year.",
+    "message": "Watch the 2014 I/O Extended recap video"
+  },
   "join-from-offsite": {
     "description": "Link text. Please keep this short. Links to the page for offsite participants.",
     "message": "Join from your location"
