@@ -7,12 +7,36 @@ transitions from the center of the screen to its ending position in the masthead
 For all other pages, the logo only fades out after its animation is done. This
 is because there is no destination position to transition to.
 
-A container element is expected to wrap the `<io-logo>` and expand to the full
-viewport width/height. This feature is not baked into the element so styling
-can be applied before Polymer is ready and the element is upgraded.
+`<io-logo>` is expected to be within a container element. The container should
+expand to the full viewport width/height and vertically/horizontally center
+its children using CSS flebox (or similar). The `<io-logo>` element doesn't
+provide this feature by default so styling can be applied on the outside by
+the main page, before Polymer is ready and the element is upgraded.
+
+## Partner elements
+
+`<io-logo>` queries for and transitions elements outside itself.
+
+The container element should  contain a child element with the
+`iologobackground` attribute. This element should expand to its parent's
+width/height using CSS and have a background color the same as the masthead.
+
+`<io-logo>` determines the masthead element on the page by querying for an
+element with the `.masthead` class.
+
+`<io-logo>` determines homepage I/O logo element by querying for an element
+with the attribute `iologodestination`.
+
+#### Example
+
+    <div class="masthead">
+      ...
+      <div iologodestination></div>
+    </div>
 
     <div class="io-logo-container">
-      <io-logo width="312" height="165"></io-logo>
+      <io-logo width="312" height="165" class="bg-medium-grey"></io-logo>
+      <div class="bg-medium-grey" iologobackground></div>
     </div>
 
 @element io-logo
@@ -171,6 +195,10 @@ can be applied before Polymer is ready and the element is upgraded.
     },
 
     moveLogo: function() {
+      this.backgroundTarget = this.parentElement.querySelector('[iologobackground]');
+      this.masthead = document.querySelector('.masthead');
+      this.destination = document.querySelector('[iologodestination]');
+
       var current = this.getBoundingClientRect();
       var destination = this.destination.getBoundingClientRect();
       var masthead = this.masthead.getBoundingClientRect();

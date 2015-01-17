@@ -73,17 +73,7 @@ IOWA.Elements = (function() {
       }
     };
 
-    template.addEventListener('template-bound', function() {
-      updateElements();
-
-      // Setup transition to/from elements on intro logo sequence. Note these
-      // are setup after template-bound occurs. That is fine because the intro
-      // logo element will be upgraded by this point and doesn't need these
-      // elements until the "I/O" is ready to move to its final location.
-      IOWA.Elements.IOLogo.backgroundTarget = document.querySelector('#io-logo-background');
-      IOWA.Elements.IOLogo.masthead = IOWA.Elements.Masthead;
-      IOWA.Elements.IOLogo.destination = document.querySelector('.masthead-container .io-logo');
-    });
+    template.addEventListener('template-bound', updateElements);
 
     IOWA.Elements.Template = template;
     IOWA.Elements.ScrollContainer = document.querySelector(
