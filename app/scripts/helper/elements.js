@@ -28,6 +28,18 @@ IOWA.Elements = (function() {
     });
 
     var ripple = document.querySelector('.masthead__ripple__content');
+
+    var parentRect = ripple.parentNode.getBoundingClientRect();
+
+    var radius = Math.floor(Math.sqrt(parentRect.width*parentRect.width + 
+      parentRect.height*parentRect.height));
+    
+    ripple.style.width = 2*radius + 'px';
+    ripple.style.height = 2*radius + 'px';
+    ripple.style.left = -radius + 'px';
+    ripple.style.top = -radius + 'px';
+
+
     var masthead = document.querySelector('.masthead');
     var i18n = document.createElement('io-i18n');
     i18n.msgid = 'home';
@@ -72,6 +84,8 @@ IOWA.Elements = (function() {
         mastheadBgClass: 'bg-cyan'
       }
     };
+    template.mastheadBgClass = template.pages[template.selectedPage];
+
 
     template.addEventListener('template-bound', updateElements);
 
