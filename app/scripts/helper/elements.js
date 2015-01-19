@@ -163,21 +163,20 @@ IOWA.Elements = (function() {
             var onStateChange = function(e) {
               if (e.detail.data == 1) { // Playing state is video.state == 1.
                 thumbnail.classList.add('fadeout');
-                this.toggleOverlayNav();
 
                 video.removeEventListener('google-youtube-state-change', onStateChange);
               }
             }.bind(this);
 
-            video.addEventListener('google-youtube-state-change', onStateChange);
-
             if (video.playsupported) {
               video.play();
+              video.addEventListener('google-youtube-state-change', onStateChange);
             } else {
               // If video can't auto-play, fade out thumbnail and toggle navbar.
               thumbnail.classList.add('fadeout');
-              this.toggleOverlayNav();
             }
+
+            this.toggleOverlayNav(); // Drop down back button control.
           }
 
         }.bind(this);
@@ -186,14 +185,12 @@ IOWA.Elements = (function() {
     };
 
     template.playVideo = function(e, detail, sender) {
-
-      this.fullscreenVideoActive = true;
       this.currentCard = sender;
+      this.fullscreenVideoActive = true; // Stamp the template's DOM.
+    };
 
-      // Wait one rAF so the template has stamped the DOM.
-      this.async(function() {
-        this.cardVideoTakeover(this.currentCard);
-      });
+    template.videoReady = function(e, detail, sender) {
+      this.cardVideoTakeover(this.currentCard);
     };
 
     template.addEventListener('template-bound', updateElements);
