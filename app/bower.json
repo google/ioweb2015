@@ -30,7 +30,7 @@
     "core-scroll-threshold": "Polymer/core-scroll-threshold#^0.5.2",
     "google-apis": "GoogleWebComponents/google-apis#^0.4.3",
     "google-youtube": "GoogleWebComponents/google-youtube#^1.0.1",
-    "i18n-msg": "ebidel/i18n-msg#^0.0.1",
+    "i18n-msg": "ebidel/i18n-msg#^0.0.2",
     "paper-button": "Polymer/paper-button#552f5bbc1796207ebff82171316d639c0d5b7afd",
     "paper-dropdown": "Polymer/paper-dropdown#^0.5.2",
     "paper-dropdown-menu": "Polymer/paper-dropdown-menu#^0.5.2",
