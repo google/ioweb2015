@@ -31,6 +31,8 @@ Makes a globe or whatever.
     var Matrix4x4 = IOWA.OffsiteGlobe.Matrix4x4;
     var generateGeometry = IOWA.OffsiteGlobe.generateGeometry;
 
+    var tmpTransform = new Matrix4x4();
+
     Polymer({
       /**
        * Shader program to render globe.
@@ -52,6 +54,8 @@ Makes a globe or whatever.
       theta: 0,
 
       animate: false,
+
+      drawCount: 0,
 
       created: function() {
         this.projectionTransform = new Matrix4x4();
@@ -102,6 +106,8 @@ Makes a globe or whatever.
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.globeIndexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, globeGeometry.indexArray, gl.STATIC_DRAW);
 
+        this.drawCount = globeGeometry.indexArray.length;
+
         this.update();
       },
 
@@ -126,10 +132,9 @@ Makes a globe or whatever.
 
         this.theta += Math.PI / 240;
 
-        var worldTransform = new Matrix4x4()
+        var worldTransform = tmpTransform.identity()
           .rotateY(this.theta)
-          .rotateX(this.theta / 3)
-          .translate(-0.5, -0.5, 0.5);
+          .rotateX(this.theta / 3);
 
         this.globeProgram.use();
 
@@ -140,7 +145,7 @@ Makes a globe or whatever.
         this.globeProgram.uniforms.globeMatrix(worldTransform.m_);
         this.globeProgram.uniforms.viewMatrix(this.projectionTransform.m_);
 
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, this.drawCount, gl.UNSIGNED_SHORT, 0);
 
         if (this.animate) {
           window.requestAnimationFrame(this.update.bind(this));
