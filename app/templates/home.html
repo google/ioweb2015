@@ -77,7 +77,7 @@
           <a href="schedule" data-ajax-link data-track-link="home-check-agenda"><core-icon icon="event"></core-icon> Check the agenda</a>
         </div>
       </div>
-      <div class="card js-experiment-visualizer" layout vertical auto-vertical flex>
+      <div class="card js-experiment-visualizer" layout vertical auto-vertical flex on-tap="{{playVideo}}">
         <div flex class="card__photo card__photo--recap hide-on-mobile"></div>
         <div class="card-content">
           <img src="images/play-video-button.png" class="play__button">
@@ -144,4 +144,12 @@
       </div>
     </section>
   </div>
+
+  <template if="{{fullscreenVideoActive}}">
+    <div class="fullvideo__container" fit hidden>
+      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" fit>
+      <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit></google-youtube>
+    </div>
+  </template>
+
 {% end %}
