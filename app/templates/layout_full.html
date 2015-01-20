@@ -163,7 +163,7 @@ limitations under the License.
     if (!supported) {
       // Note: pageview is recorded when IOWA.Analytics is setup.
       IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', uaString, null, function() {
-        window.location = 'upgrade.html';
+        window.location = 'upgrade';
       });
     }
   })();

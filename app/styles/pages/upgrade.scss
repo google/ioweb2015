@@ -23,16 +23,49 @@ $name: 'page-upgrade';
 @import '../base/_typography';
 
 
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $color-cyan-500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
 ##{$name} {
 
+.iologo {
+  height: 200px;
+}
+
+.page__section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.link-spacing {
+  display: flex;
+  flex-direction: column;
+}
 
 
 @media (max-width: $phone-breakpoint-max) {
-
+  .link-spacing {
+    a:not(:last-of-type) {
+      padding-bottom: $desktopKeyline;
+    }
+  }
+  .page__section {
+    flex: 1;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-
+  .link-spacing {
+    flex-direction: row;
+  }
 }
 
 @media (min-width: $desktop-breakpoint-mid) {

@@ -55,44 +55,29 @@ limitations under the License.
   <meta property="og:description" content="Google I/O 2015 brings developers together for an immersive, two-day experience focused on exploring the next generation of technology.">
   <meta property="og:image" content="images/io.png">
 
-  <script type="application/ld+json">
-    {
-      "@context": "http://schema.org",
-      "@type": "Event",
-      "name": "Google I/O 2015",
-      "url": ".?utm_source=schema_org_event",
-      "image": "images/io.png",
-      "location": {
-        "@type": "Place",
-        "name": "Todovenue",
-        "address": {
-          "@type" : "PostalAddress",
-          "streetAddress" : "34 Todo St.",
-          "addressLocality" : "Todoville",
-          "addressRegion" : "TO",
-          "postalCode" : "34343",
-          "addressCountry" : "US"
-        }
-      },
-      "startDate": "2015-01-01T00:00Z",
-      "endDate": "2015-01-02T00:00Z",
-      "offers" : {
-        "@type" : "Offer",
-        "url" : "tickets?utm_source=schema_org_event"
-      }
-    }
-  </script>
-
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/pages/upgrade.css">
 </head>
 <body id="page-upgrade">
 
-<div id="upgrade">
-  <div id="upgrade-content">
-    <p><i18n-msg msgid="upgrade-warning">PLACEHOLDER_i18n</i18n-msg></p>
-    <div class="redbutton"><a href="#"></a></div>
+<section class="page__section">
+  <img src="images/io15.png" class="iologo">
+</section>
+
+<div class="card__container">
+  <div class="card">
+    <div class="card-content">
+      <h2><i18n-msg msgid="upgrade-browser">Your browser doesn't support the technology used on this site. To experience the Google I/O 2015 site as intended, please upgrade your browser.</i18n-msg></h2>
+    </div>
+    <div class="card-content link-spacing">
+      <a href="https://whatbrowser.org/" data-track-link="upgrade-whatbrowser-dot-org">
+        <i18n-msg msgid="upgrade-warning">Upgrade your browser</i18n-msg>
+      </a>
+      <a href="./?ignore_browser_check=true" data-track-link="upgrade-continue-to-site">
+        <i18n-msg msgid="upgrade-gotosite">Continue to I/O 2015</i18n-msg>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -100,13 +85,6 @@ limitations under the License.
   window.ENV = location.host.match('localhost') ? 'dev' : 'prod';
 </script>
 <script src="scripts/helper/analytics.js"></script>
-<script>
-var a = document.querySelector('.redbutton a');
-if (a) {
-  a.href = 'https://santatracker.google.com' +
-      location.pathname.replace(/[^\/]*$/, '') + '?ignore_browser_check=true';
-}
-</script>
 </body>
 </html>
 
