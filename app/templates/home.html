@@ -8,24 +8,19 @@
 {% end %}
 
 {% define "content" %}
-  <div class="card__container slide-up">
-    
-
+  <div class="card__container transition-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
         <h2>Google I/O is for developers—the creative coders who are building what's next. Together we'll explore the latest in tech, mobile &amp; beyond.</h2>
       </div>
       <div class="card-content link-spacing">
-        <a href="about" data-ajax-link data-anim-card data-track-link="home-learn-more-about-io">Learn more about I/O</a>
+        <a href="about" data-ajax-link data-track-link="home-learn-more-about-io">Learn more about I/O</a>
         <a href="#">I/O in photos</a>
       </div>
     </div>
-    <div class="masthead__ripple">
-      <div class="ripple__content {{ pages[nextPage].mastheadBgClass }}"></div>
-    </div>
   </div>
 
-  <div class="slide-up-delay">
+  <div class="transition-up-delay">
     <section class="home-photo page__section js-experiment-instrument"></section>
 
     <section id="registration" class="page__section js-experiment-instrument bg-cyan">

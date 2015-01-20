@@ -245,36 +245,36 @@ limitations under the License.
 
       <header class="masthead {% template "mastheadBgClass" .%} js-experiment-instrument" layout vertical>
         <div class="masthead__ripple">
-          <div class="masthead__ripple__content {{ rippleBgClass }}" id="masthead-ripple"></div>
+          <div class="masthead__ripple__content {{ pages[nextPage].mastheadBgClass }}" id="masthead-ripple"></div>
         </div>
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
 
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-          <div flex><a href="./" data-ajax-link data-anim-ripple><div class="io-logo"></div></a></div>
-          <paper-tabs class="white {{ rippleBgClass }}" link noink
+          <div flex><a href="./" data-ajax-link><div class="io-logo"></div></a></div>
+          <paper-tabs class="white {{ pages[nextPage].mastheadBgClass }}" link noink
             valueattr="label" selected="{{selectedPage}}">
             <paper-tab label="about">
-              <a href="about" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="about" data-ajax-link layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="schedule">
-              <a href="schedule" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="schedule" data-ajax-link layout horizontal center>
                 <i18n-msg msgid="schedule">Schedule</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="onsite">
-              <a href="onsite" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="onsite" data-ajax-link layout horizontal center>
                 <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="offsite">
-              <a href="offsite" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="offsite" data-ajax-link layout horizontal center>
                 <i18n-msg msgid="attend-offsite">Attend offsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="registration">
-              <a href="registration" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="registration" data-ajax-link layout horizontal center>
                 <i18n-msg msgid="registration">Registration</i18n-msg>
               </a>
             </paper-tab>
@@ -282,14 +282,14 @@ limitations under the License.
         </core-toolbar>
         <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="io-logo large" iologodestination></div>
-          <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
+          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
         <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}"></experiment-fab-container>
       </header>
 
-      <main class="io-main">
+      <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}" >
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
       </main>
 
@@ -326,7 +326,6 @@ limitations under the License.
 
 <!-- TODO: Move to automatic concatenation via codekit-gulp -->
 <script src="scripts/main.js"></script>
-<script src="scripts/helper/page-animation.js"></script>
 <script src="scripts/helper/util.js"></script>
 <script src="scripts/helper/elements.js"></script>
 <script src="scripts/helper/history.js"></script>
