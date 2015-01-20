@@ -214,12 +214,13 @@ experiment-fab-container {
     right: $desktopKeyline;
   }
 
-  paper-icon-button {
-    display: none;
-  }
-
-  #navbar paper-tabs {
-    display: inherit;
+  #navbar {
+    paper-tabs {
+      display: inherit;
+    }
+    paper-icon-button {
+      display: none;
+    }
   }
 }
 

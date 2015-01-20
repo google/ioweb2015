@@ -231,5 +231,9 @@
   "submitevent": {
     "description": "Offsite page. Link for developers to submit their own event",
     "message": "Submit your event"
+  },
+  "io-in-photos": {
+    "description": "Extended page. Nav bar title when the photo carousel is open.",
+    "message": "I/O in Photos"
   }
 }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 $name: 'page-home';
 
 @import '../base/_layout';
@@ -44,11 +43,6 @@ $name: 'page-home';
   background: url(../images/home/Image-01.jpg) no-repeat 50% 0;
   background-size: cover;
   height: 310px;
-}
-
-.card__photo--recap {
-  background-image: url(../images/home/recap-500.jpg);
-  background-position: 50% 0 !important;
 }
 
 .page__section--attend {
@@ -100,6 +94,10 @@ $name: 'page-home';
 
 @media (min-width: $tablet-breakpoint-min) {
   $overlayCardTop: 100px;
+
+  .io__hash {
+    margin: 80px auto;
+  }
 
   .masthead-container {
     .io-logo {
