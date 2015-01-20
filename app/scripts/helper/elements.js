@@ -52,17 +52,14 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
 
     ioLogo.addEventListener('finish', function() {
-      IOWA.Elements.Template.pageTransitioningOut = false;
-      IOWA.Elements.Template.pageTransitioningIn = true;
+      IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
     });
   };
 
   var init = function() {
-
     var template = document.getElementById('t');
     template.pages = {};
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
-    template.pageTransitioningOut = true;
 
     template.pages = {
       'schedule': {
@@ -85,7 +82,6 @@ IOWA.Elements = (function() {
       }
     };
     template.mastheadBgClass = template.pages[template.selectedPage];
-
 
     template.addEventListener('template-bound', updateElements);
 

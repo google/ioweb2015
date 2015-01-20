@@ -54,6 +54,17 @@ h3, h4, h5, h6 {
   }
 }
 
+.bg-white {
+  background-color: #fff;
+  color: #07434D;
+
+  h1, h2, h3, h4 {
+    color: inherit;
+  }
+
+  
+}
+
 .bg-cyan {
   background-color: $color-cyan-500;
   color: #07434D;
@@ -147,39 +158,15 @@ h3, h4, h5, h6 {
 }
 
 .io-main {
-
-  .transition-up-delay {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateY(0);
-    opacity: 1;
+  .slide-up-delay {
+    transform: translateY(100px);
+    opacity: 0;
   }
 
-  .transition-up {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateY(0);
-    opacity: 1;
+  .slide-up {
+    transform: translateY(100px);
+    opacity: 0;
     position: relative;
-  }
-
-  &.transitionIn {
-    .transition-up-delay {
-      transform: translateY(0);
-      transition-delay: 0.2s;
-    }
-  }
-
-  &.transitionOut {
-
-    .transition-up-delay {
-      transform: translateY(100px);
-      opacity: 0;
-    }
-
-    .transition-up {
-      transform: translateY(100px);
-      opacity: 0;
-      transition-delay: 0.2s;
-    }
   }
 }
 

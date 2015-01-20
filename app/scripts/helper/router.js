@@ -24,114 +24,6 @@ IOWA.Router = (function() {
 
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
-  function canRunFastRipple() {
-    // Right now the only answer to this is Chrome,
-    // but in future I'm hopeful we can expand this.
-    var userAgent = navigator.userAgent;
-    return (/Chrome/gi).test(userAgent);
-  }
-
-  /**
-   * Animates a ripple effect over the masthead.
-   * @param {Number} x X coordinate of the center of the ripple.
-   * @param {Number} y Y coordinate of the center of the ripple.
-   * @param {string?} color Optional color for the ripple effect.
-   * @private
-   */
-  function playRipple(ripple, x, y, color, callback) {
-
-    
-
-    var duration = '0.5s';
-
-    ripple.style.backgroundColor = 'red';
-    ripple.style.webkitTransition = '';
-    ripple.style.transition = '';
-
-    var translate = ['translate3d(', x, 'px,', y, 'px, 0)',].join('');
-    ripple.style.webkitTransform = [translate, ' scale(0.3)'].join('');
-    ripple.style.transform = [translate, ' scale(0.3)'].join('');
-    ripple.style.opacity = color ? 0.5 : 1;
-    // Force recalculate style.
-    /*jshint -W030 */
-    ripple.offsetTop;
-
-
-    //debugger;
-    /*jshint +W030 */
-    
-   
-    if (color) {
-      ripple.style.webkitTransition = '-webkit-transform ' + duration + ', opacity ' + duration + '';
-      ripple.style.transition = 'transform ' + duration + ', opacity 0.5s';
-      ripple.style.backgroundColor = color;
-      ripple.style.opacity = 0;
-    } else {
-      ripple.style.backgroundColor = '';
-      ripple.style.webkitTransition = '-webkit-transform ' + duration + '';
-      ripple.style.transition = 'transform ' + duration + '';
-    }
-    ripple.style.webkitTransform = [translate, ' scale(1)'].join('');
-    ripple.style.transform = [translate, ' scale(1)'].join('');
-    
-
-    //setTimeout(callback, 600) //Wait for the ripple to finish.
-      // TODO: give a smaller delay if chrome.
-
-    
-  }
-
-  /**
-   * Animates a ripple effect over the masthead.
-   * @param {Number} x X coordinate of the center of the ripple.
-   * @param {Number} y Y coordinate of the center of the ripple.
-   * @param {string?} color Optional color for the ripple effect.
-   * @private
-   */
-  function playMastheadRipple(x, y, color, callback) {
-    playRipple(IOWA.Elements.Ripple, x, y, color, callback); 
-  }
-
-  
-  /**
-   * Navigates to a new page. Uses ajax for data-ajax-link links.
-   * @param {Event} e Event that triggered navigation.
-   * @private
-   */
-  function playCardTransition(el, x, y) {
-    var card = null;
-    var currentEl = el;
-    while (!card) {
-      currentEl = currentEl.parentNode;
-      if (currentEl.classList.contains('card__container')) {
-        card = currentEl;
-      }
-    }
-    var ripple = card.querySelector('.ripple__content');
-    
-    var rippleRect = ripple.getBoundingClientRect();
-
-    console.log(rippleRect)
-
-    var radius = Math.floor(Math.sqrt(rippleRect.width*rippleRect.width + 
-      rippleRect.height*rippleRect.height));
-
-    ripple.style.width = 2*radius + 'px';
-    ripple.style.height = 2*radius + 'px';
-    ripple.style.left = -radius + 'px';
-    ripple.style.top = -radius + 'px';
-
-    ripple.style.zIndex = 1;
-
-    console.log(x, rippleRect.left, y, rippleRect.top)
-    playRipple(ripple, x - rippleRect.left, y - rippleRect.top);
-
-    var card = 
-    
-
-  };
-
-
   /**
    * Navigates to a new page. Uses ajax for data-ajax-link links.
    * @param {Event} e Event that triggered navigation.
@@ -150,34 +42,54 @@ IOWA.Router = (function() {
     if (currentPage !== pageName) {
 
       if (el.hasAttribute('data-anim-ripple')) {
-        if (IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
-            IOWA.Elements.Template.pages[pageName].mastheadBgClass) {
-          color = '#fff';
-        }
         var callback = function(el) {
+          IOWA.PageAnimation.play(
+              IOWA.PageAnimation.slideContentOut(function() {
+                IOWA.History.pushState({'path': el.pathname}, '', el.href);
+          }));
+        };
+        var isFadeRipple = (
+            IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
+            IOWA.Elements.Template.pages[pageName].mastheadBgClass);
+        
+        IOWA.Elements.Template.rippleBgClass = isFadeRipple ?
+          'bg-white' : 
+          IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+
+        /*
+        // TODO: BUG: interesting, causes Web Animations opacity bug.
+        var sequence = new AnimationSequence([
+          IOWA.PageAnimation.ripple(
+              IOWA.Elements.Ripple, e.pageX, e.pageY, 400, isFadeRipple),
+          IOWA.PageAnimation.slideContentOut()
+        ]);
+        sequence.callback = callback.bind(this, el);
+        */
+
+        IOWA.PageAnimation.play(
+          IOWA.PageAnimation.ripple(
+            IOWA.Elements.Ripple, e.pageX, e.pageY, 400, isFadeRipple, callback.bind(this, el)));
+        
+      } else if (el.hasAttribute('data-anim-card'))  {
+        var callback = function(el, card) {
+          // TODO: There's jank/bug on bringing the content in, 
+          // especially in the masthead.
+          IOWA.Elements.Template.rippleBgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
           IOWA.History.pushState({'path': el.pathname}, '', el.href);
         };
-        requestAnimationFrame(function() {
-          //Wait for the ripple to finish.
-          // TODO: give a smaller delay if chrome.
-          IOWA.Elements.Template.rippleBgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
-          playMastheadRipple(e.pageX, e.pageY, color);
-          setTimeout(callback.bind(this, el), 500);
-        });
-      } else if (el.hasAttribute('data-anim-card'))  {
-        requestAnimationFrame(function() {
-
-          playCardTransition(el, e.pageX, e.pageY);
-          //setTimeout(callback.bind(this, el), 500);
-        });
-        //IOWA.History.pushState({'path': el.pathname}, '', el.href);
-
+        var card = null;
+        var currentEl = el;
+        while (!card) {
+          currentEl = currentEl.parentNode;
+          if (currentEl.classList.contains('card__container')) {
+            card = currentEl;
+          }
+        }
+        IOWA.PageAnimation.play(IOWA.PageAnimation.cardToMasthead(
+            card, e.pageX, e.pageY, 300, callback.bind(this, el, card)));
       } else {
         IOWA.History.pushState({'path': el.pathname}, '', el.href);
       }
-      
-
-      
     }
     // TODO: Update meta.
   }
@@ -251,29 +163,22 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-    IOWA.Elements.Template.pageTransitioningIn = false;
-    IOWA.Elements.Template.pageTransitioningOut = true;
-    // Replace content and end transition.
+    replaceTemplateContent(currentPageTemplates);
+    document.body.id = 'page-' + pageName;
+    IOWA.Elements.Template.selectedPage = pageName;
+    var pageMeta = IOWA.Elements.Template.pages[pageName];
+    document.title = pageMeta.title || 'Google I/O 2015';
+    
+    var masthead = IOWA.Elements.Masthead;
+    masthead.className = masthead.className.replace(
+        MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
+
     setTimeout(function() {
-      requestAnimationFrame(function() {
-        replaceTemplateContent(currentPageTemplates);
-        // Wait for a new frame before transitioning in.
-        requestAnimationFrame(
-          function() {
-            IOWA.Elements.Template.pageTransitioningOut = false;
-            IOWA.Elements.Template.pageTransitioningIn = true;
-          }
-        );
-        // Transition in post-processing.
-        document.body.id = 'page-' + pageName;
-        IOWA.Elements.Template.selectedPage = pageName;
-        var pageMeta = IOWA.Elements.Template.pages[pageName];
-        document.title = pageMeta.title || 'Google I/O 2015';
-        var masthead = IOWA.Elements.Masthead;
-        masthead.className = masthead.className.replace(
-            MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
-      });
-    }, 600); // Wait for the ripple to play before transitioning.
+      IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
+    }, 50); // Wait for the... Good question. Maybe template binding?
+    // TODO: BUG: Anyways, something to investigate. Web Animations
+    // are not working properly without this delay (Chrome crashes).
+   
   }
 
   /**
@@ -290,8 +195,6 @@ IOWA.Router = (function() {
    * @private
    */
   function renderCurrentPage() {
-    console.log('popstate')
-    console.log(window.location.pathname)
     renderPage(parsePageNameFromAbsolutePath(window.location.pathname));
   }
 
@@ -320,11 +223,13 @@ IOWA.Router = (function() {
   function init() {
     window.addEventListener('popstate', renderCurrentPage);
     document.addEventListener('click', navigate);
+    
   }
 
   return {
     init: init,
-    getPageName: parsePageNameFromAbsolutePath
+    getPageName: parsePageNameFromAbsolutePath,
+    animatePageIn: animatePageIn
   };
 
 })();

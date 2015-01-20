@@ -277,20 +277,20 @@ limitations under the License.
         </core-toolbar>
         <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="io-logo large" iologodestination></div>
-          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
+          <div class="masthead-meta" layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
         <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}"></experiment-fab-container>
       </header>
 
-      <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}" >
+      <main class="io-main" >
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
       </main>
 
     </template>
 
-    <footer layout horizontal>
+    <footer layout horizontal class="slide-up-delay">
       <img src="images/google-logo.svg" self-end>
       <div class="footer-content" flex layout vertical end>
         <a href="#navbar" class="footer-backtotop">Back to the top <core-icon icon="hardware:keyboard-arrow-up"></core-icon></a>
@@ -321,6 +321,7 @@ limitations under the License.
 
 <!-- TODO: Move to automatic concatenation via codekit-gulp -->
 <script src="scripts/main.js"></script>
+<script src="scripts/helper/page-animation.js"></script>
 <script src="scripts/helper/elements.js"></script>
 <script src="scripts/helper/history.js"></script>
 <script src="scripts/helper/router.js"></script>
