@@ -88,6 +88,7 @@ IOWA.Elements = (function() {
     /**
      * Material design video animation.
      *
+     * @param {Element} card The card element to perform the takeover on.
      * @param {bool} opt_reverse If true, runs the animation in reverse.
      */
     template.cardVideoTakeover = function(card, opt_reverse) {
@@ -96,6 +97,13 @@ IOWA.Elements = (function() {
       }
 
       var reverse = opt_reverse || false;
+
+      // Forward animation sequence. The reverse sequence is played when reverse == true.
+      // 1. Fade out the play button on the card.
+      // 2. Transform/scale the video container down to the location and size of the clicked card.
+      // 3. Remove 2's transform. This scales up video container to fill the viewport.
+      // 4. Drop down the video controls overlay bar.
+      // 5. Auto-play the video (on desktop). When it reaches the playing state, fade out the video thumbnail.
 
       var cardPhoto = card.querySelector('.card__photo');
       var videoContainer = document.querySelector('.fullvideo__container');
@@ -125,10 +133,8 @@ IOWA.Elements = (function() {
 
       playButtonPlayer.onfinish = function(e) {
 
-        var startTransform = [
-          'translate(' + cardPhotoMetrics.left + 'px, ' + top + 'px)',
-          'scale(' + scaleX + ', ' + scaleY + ')'
-        ].join(' ');
+        var startTransform = 'translate(' + cardPhotoMetrics.left + 'px, ' + top + 'px) ' +
+                             'scale(' + scaleX + ', ' + scaleY + ')';
 
         if (!reverse) {
           // Scale down the video container before unhiding it.
