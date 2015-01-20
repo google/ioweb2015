@@ -26,18 +26,24 @@ IOWA.PageAnimation = (function() {
   var CONTENT_SLIDE_LENGTH = '100px';
 
   var CONTENT_SLIDE_OPTIONS = {
-      duration: CONTENT_SLIDE_DURATION, 
+      duration: CONTENT_SLIDE_DURATION,
       easing: CONTENT_SLIDE_EASING,
-      fill: 'forwards'  
+      fill: 'forwards'
   };
 
   var CONTENT_SLIDE_DELAY_OPTIONS = {
-      duration: CONTENT_SLIDE_DURATION, 
+      duration: CONTENT_SLIDE_DURATION,
       delay: CONTENT_SLIDE_DELAY,
       easing: CONTENT_SLIDE_EASING,
-      fill: 'forwards'  
+      fill: 'forwards'
   };
 
+  /**
+   * Returns an animation to slide and fade out the main content of the page.
+   * Used together with slideContentIn for page transitions.
+   * @param {Function} callback Callback to be called when animation finishes.
+   * @return {WebAnimation} Page animation definition.
+   */
   function slideContentOut(callback) {
     var main = document.querySelector('.io-main .slide-up');
     var mainDelayed = document.querySelector('.io-main .slide-up-delay');
@@ -53,23 +59,20 @@ IOWA.PageAnimation = (function() {
     var animation =  new AnimationGroup([
       new Animation(main, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
-      new Animation(masthead, [{ opacity: 1 }, { opacity: 0 }], 
+      new Animation(masthead, [{ opacity: 1 }, { opacity: 0 }],
           CONTENT_SLIDE_OPTIONS)
     ]);
     animation.callback = callback;
     return animation;
   }
 
-  function play(animation) {
-    var player = document.timeline.play(animation);
-    if (animation.callback) {
-      player.onfinish = function(e) {
-        animation.callback();
-      };
-    }
-  }
-
-  // TODO: Should be possible by reversing slideout animation.
+  /**
+   * Returns an animation to slide up and fade in the main content of the page.
+   * Used together with slideContentOut for page transitions.
+   * TODO: Should be possible by reversing slideout animation.
+   * @param {Function} callback Callback to be called when animation finishes.
+   * @return {WebAnimation} Page animation definition.
+   */
   function slideContentIn(callback) {
     var main = document.querySelector('.slide-up');
     var mainDelayed = document.querySelector('.slide-up-delay');
@@ -85,36 +88,56 @@ IOWA.PageAnimation = (function() {
     var animationGroup =  new AnimationGroup([
       new Animation(main, [start, end], CONTENT_SLIDE_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
-      new Animation(masthead, [{ opacity: 0 }, { opacity: 1 }], 
+      new Animation(masthead, [{ opacity: 0 }, { opacity: 1 }],
           CONTENT_SLIDE_OPTIONS)
     ]);
     animationGroup.callback = callback;
     return animationGroup;
   }
 
+  /**
+   * Returns an animation to play a color ink ripple.
+   * @param {Element} ripple Ripple DOM element.
+   * @param {number} x X coordinate of the center of the ripple.
+   * @param {number} x Y coordinate of the center of the ripple.
+   * @param {boolean} isFadeRipple If true, play a temporary glimpse ripple.
+   *     If false, play a regular opaque color ripple.
+   * @param {Function} callback Callback to be called when animation finishes.
+   * @return {WebAnimation} Ripple animation definition.
+   */
   function rippleEffect(ripple, x, y, duration, isFadeRipple, callback) {
-    var translate = ['translate3d(', x, 'px,', y, 'px, 0)',].join('');
+    var translate = 'translate3d(' + x + 'px,' + y + 'px, 0)';
     var start = {
-      transform: [translate, ' scale(0)'].join(''),
+      transform: translate + ' scale(0)',
       opacity: isFadeRipple ? 0.5 : 1
     };
     var end = {
-      transform: [translate, ' scale(1)'].join(''),
+      transform: translate + ' scale(1)',
       opacity: isFadeRipple ? 0 : 1
     };
     var animation = new Animation(ripple, [start, end], {
-        duration: duration, 
+        duration: duration,
         fill: 'forwards'  // Makes ripple keep its state at the end of animation
     });
     animation.callback = callback;
     return animation;
   }
 
+  /**
+   * Returns an animation to play a hero card takeover animation. The card
+   *     plays a ripple on itself and grows to cover the masthead.
+   * @param {Element} card Card DOM element.
+   * @param {number} x X coordinate of the center of the ripple.
+   * @param {number} x Y coordinate of the center of the ripple.
+   * @param {number} duration Duration of the animation.
+   * @param {Function} callback Callback to be called when animation finishes.
+   * @return {WebAnimation} Ripple animation definition.
+   */
   function cardToMasthead(card, x, y, duration, callback) {
     var ripple = card.querySelector('.ripple__content');
     var rippleRect = ripple.getBoundingClientRect();
 
-    var radius = Math.floor(Math.sqrt(rippleRect.width * rippleRect.width + 
+    var radius = Math.floor(Math.sqrt(rippleRect.width * rippleRect.width +
         rippleRect.height * rippleRect.height));
     ripple.style.width = 2 * radius + 'px';
     ripple.style.height = 2 * radius + 'px';
@@ -126,12 +149,11 @@ IOWA.PageAnimation = (function() {
     var scaleX = mastheadRect.width / rippleRect.width;
     var scaleY = mastheadRect.height / rippleRect.height;
 
-    var translate = [
-        'translate3d(', -rippleRect.left, 'px,', 
-        -rippleRect.top, 'px, 0)',].join('');
-    var scale = ['scale(', scaleX, ', ', scaleY, ')'].join('');
+    var translate = 'translate3d(' + (-rippleRect.left) + 'px,' +
+        (-rippleRect.top)  + 'px, 0)';
+    var scale = 'scale(' + scaleX + ', ' + scaleY + ')';
     var start = {
-      transform: ['translate3d(0, 0, 0) scale(1)'].join('')
+      transform: 'translate3d(0, 0, 0) scale(1)'
     };
     var end = {
       transform: [translate, scale].join(' ')
@@ -139,8 +161,8 @@ IOWA.PageAnimation = (function() {
     card.style.transformOrigin = '0 0';
 
     var cardTransition = new Animation(card, [start, end], {
-        duration: duration, 
-        fill: 'forwards'  
+        duration: duration,
+        fill: 'forwards'
     });
 
     var animationGroup = new AnimationGroup([
@@ -150,6 +172,20 @@ IOWA.PageAnimation = (function() {
 
     animationGroup.callback = callback;
     return animationGroup;
+  }
+
+  /**
+   * Plays an animation, animation group or animation sequence. Calls
+   *     a callback when it finishes, if one was assigned.
+   * @param {TimedSequence} Animation of AnimationGroup or AnimationSequence.
+   */
+  function play(animation) {
+    var player = document.timeline.play(animation);
+    if (animation.callback) {
+      player.onfinish = function(e) {
+        animation.callback();
+      };
+    }
   }
 
   return {

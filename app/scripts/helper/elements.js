@@ -31,9 +31,9 @@ IOWA.Elements = (function() {
 
     var parentRect = ripple.parentNode.getBoundingClientRect();
 
-    var radius = Math.floor(Math.sqrt(parentRect.width * parentRect.width + 
+    var radius = Math.floor(Math.sqrt(parentRect.width * parentRect.width +
       parentRect.height * parentRect.height));
-    
+
     ripple.style.width = 2 * radius + 'px';
     ripple.style.height = 2 * radius + 'px';
     ripple.style.left = -radius + 'px';

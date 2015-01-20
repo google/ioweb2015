@@ -52,9 +52,9 @@ IOWA.Router = (function() {
         var isFadeRipple = (
             IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
             IOWA.Elements.Template.pages[pageName].mastheadBgClass);
-        
+
         IOWA.Elements.Template.rippleBgClass = isFadeRipple ?
-          'bg-white' : 
+          'bg-white' :
           IOWA.Elements.Template.pages[pageName].mastheadBgClass;
 
         /*
@@ -70,10 +70,10 @@ IOWA.Router = (function() {
         IOWA.PageAnimation.play(
             IOWA.PageAnimation.ripple(
                 IOWA.Elements.Ripple, e.pageX, e.pageY, 400, isFadeRipple, callback.bind(null, el)));
-        
+
       } else if (el.hasAttribute('data-anim-card'))  {
         callback = function(el, card) {
-          // TODO: There's jank/bug on bringing the content in, 
+          // TODO: There's jank/bug on bringing the content in,
           // especially in the masthead.
           IOWA.Elements.Template.rippleBgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
           IOWA.History.pushState({'path': el.pathname}, '', el.href);
@@ -169,7 +169,7 @@ IOWA.Router = (function() {
     IOWA.Elements.Template.selectedPage = pageName;
     var pageMeta = IOWA.Elements.Template.pages[pageName];
     document.title = pageMeta.title || 'Google I/O 2015';
-    
+
     var masthead = IOWA.Elements.Masthead;
     masthead.className = masthead.className.replace(
         MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
@@ -179,7 +179,7 @@ IOWA.Router = (function() {
     }, 50); // Wait for the... Good question. Maybe template binding?
     // TODO: BUG: Anyways, something to investigate. Web Animations
     // are not working properly without this delay (Chrome crashes).
-   
+
   }
 
   /**
@@ -224,7 +224,7 @@ IOWA.Router = (function() {
   function init() {
     window.addEventListener('popstate', renderCurrentPage);
     document.addEventListener('click', navigate);
-    
+
   }
 
   return {
