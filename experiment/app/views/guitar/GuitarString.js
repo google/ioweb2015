@@ -302,12 +302,12 @@ module.exports = (function() {
      */
     function renderLine() {
       lineGraphic.clear();
-      lineGraphic.lineStyle(5, 0xffffff, 1);
+      lineGraphic.lineStyle(7, 0xffffff, 1);
       lineGraphic.moveTo(anchorPoint1.position.x, anchorPoint1.position.y);
       lineGraphic.quadraticCurveTo(capsuleBody.position[0], capsuleBody.position[1], anchorPoint2.position.x, anchorPoint2.position.y);
 
       lineGraphicShadow.clear();
-      lineGraphicShadow.lineStyle(8, 0x000000, 0.1);
+      lineGraphicShadow.lineStyle(7, 0x000000, 0.1);
       lineGraphicShadow.moveTo(anchorPoint1.position.x, anchorPoint1.position.y);
       lineGraphicShadow.quadraticCurveTo(capsuleBody.position[0]+10, capsuleBody.position[1]+10, anchorPoint2.position.x, anchorPoint2.position.y);
     }
