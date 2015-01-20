@@ -42,7 +42,7 @@ IOWA.PageAnimation = (function() {
    * Returns an animation to slide and fade out the main content of the page.
    * Used together with slideContentIn for page transitions.
    * @param {Function} callback Callback to be called when animation finishes.
-   * @return {WebAnimation} Page animation definition.
+   * @return {Animation} Page animation definition.
    */
   function slideContentOut(callback) {
     var main = document.querySelector('.io-main .slide-up');
@@ -71,7 +71,7 @@ IOWA.PageAnimation = (function() {
    * Used together with slideContentOut for page transitions.
    * TODO: Should be possible by reversing slideout animation.
    * @param {Function} callback Callback to be called when animation finishes.
-   * @return {WebAnimation} Page animation definition.
+   * @return {Animation} Page animation definition.
    */
   function slideContentIn(callback) {
     var main = document.querySelector('.slide-up');
@@ -103,7 +103,7 @@ IOWA.PageAnimation = (function() {
    * @param {boolean} isFadeRipple If true, play a temporary glimpse ripple.
    *     If false, play a regular opaque color ripple.
    * @param {Function} callback Callback to be called when animation finishes.
-   * @return {WebAnimation} Ripple animation definition.
+   * @return {Animation} Ripple animation definition.
    */
   function rippleEffect(ripple, x, y, duration, isFadeRipple, callback) {
     var translate = 'translate3d(' + x + 'px,' + y + 'px, 0)';
@@ -131,7 +131,7 @@ IOWA.PageAnimation = (function() {
    * @param {number} x Y coordinate of the center of the ripple.
    * @param {number} duration Duration of the animation.
    * @param {Function} callback Callback to be called when animation finishes.
-   * @return {WebAnimation} Ripple animation definition.
+   * @return {Animation} Ripple animation definition.
    */
   function cardToMasthead(card, x, y, duration, callback) {
     var ripple = card.querySelector('.ripple__content');
