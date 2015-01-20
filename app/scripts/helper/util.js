@@ -48,9 +48,7 @@ IOWA.Util = IOWA.Util || (function() {
    * https://events.google.com/io2015/about -> https://events.google.com/io2015/
    */
   function getStaticBaseURL() {
-    var origin = location.host + location.pathname; // No location.origin in IE10 :(
-    return location.href.substring(location.protocol + '//' + origin,
-                                   location.href.lastIndexOf('/') + 1);
+    return location.href.substring(0, location.href.lastIndexOf('/') + 1);
   }
 
   return {

@@ -105,7 +105,6 @@ gulp.task('vulcanize-elements', ['sass'], function() {
       strip: !argv.pretty,
       csp: true,
       inline: true,
-      // abspath: '/',
       dest: 'elements/'
     }))
     // .pipe(i18n_replace({
