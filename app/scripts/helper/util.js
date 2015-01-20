@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-CDS.Util = (function() {
+window.IOWA = window.IOWA || {};
+
+IOWA.Util = IOWA.Util || (function() {
 
   "use strict";
-  var appElement = document.querySelector('.app');
-
-  function makeObject(keys, defaultValue) {
-
-    var obj = {};
-    for (var i = 0; i < keys.length; i++) {
-      obj[keys[i]] = defaultValue;
-    }
-
-    return obj;
-  }
 
   function getWindowScrollPosition() {
-    if (typeof window.scrollY === 'undefined')
+    if (typeof window.scrollY === 'undefined') {
       return document.documentElement.scrollTop;
-    else
+    } else {
       return window.scrollY;
+    }
   }
 
   function isIOS() {
@@ -46,26 +38,27 @@ CDS.Util = (function() {
       !(/Chrome/gi).test(userAgent);
   }
 
-  function canRunFastClipAnimations() {
-    // Right now the only answer to this is Chrome,
-    // but in future I'm hopeful we can expand this.
-    var userAgent = navigator.userAgent;
-    return (/Chrome/gi).test(userAgent);
-  }
-
   function isIE() {
     var userAgent = navigator.userAgent;
     return (/Trident/gi).test(userAgent);
   }
 
+  /**
+   * Returns the static base URL of the running app.
+   * https://events.google.com/io2015/about -> https://events.google.com/io2015/
+   */
+  function getStaticBaseURL() {
+    var origin = location.host + location.pathname; // No location.origin in IE10 :(
+    return location.href.substring(location.protocol + '//' + origin,
+                                   location.href.lastIndexOf('/') + 1);
+  }
+
   return {
-    appElement: appElement,
     isIE: isIE,
     isIOS: isIOS,
     isSafari: isSafari,
-    canRunFastClipAnimations: canRunFastClipAnimations,
-    makeObject: makeObject,
-    getWindowScrollPosition: getWindowScrollPosition
+    getWindowScrollPosition: getWindowScrollPosition,
+    getStaticBaseURL: getStaticBaseURL
   };
 
 })();
