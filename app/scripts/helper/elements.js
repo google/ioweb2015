@@ -31,14 +31,13 @@ IOWA.Elements = (function() {
 
     var parentRect = ripple.parentNode.getBoundingClientRect();
 
-    var radius = Math.floor(Math.sqrt(parentRect.width*parentRect.width + 
-      parentRect.height*parentRect.height));
+    var radius = Math.floor(Math.sqrt(parentRect.width * parentRect.width + 
+      parentRect.height * parentRect.height));
     
-    ripple.style.width = 2*radius + 'px';
-    ripple.style.height = 2*radius + 'px';
+    ripple.style.width = 2 * radius + 'px';
+    ripple.style.height = 2 * radius + 'px';
     ripple.style.left = -radius + 'px';
     ripple.style.top = -radius + 'px';
-
 
     var masthead = document.querySelector('.masthead');
     var i18n = document.createElement('io-i18n');

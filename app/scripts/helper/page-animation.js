@@ -49,7 +49,7 @@ IOWA.PageAnimation = (function() {
     var end = {
       transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
       opacity: 0
-    }
+    };
     var animation =  new AnimationGroup([
       new Animation(main, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
@@ -58,7 +58,7 @@ IOWA.PageAnimation = (function() {
     ]);
     animation.callback = callback;
     return animation;
-  };
+  }
 
   function play(animation) {
     var player = document.timeline.play(animation);
@@ -81,7 +81,7 @@ IOWA.PageAnimation = (function() {
     var end = {
       transform: 'translate(0, 0)',
       opacity: 1
-    }
+    };
     var animationGroup =  new AnimationGroup([
       new Animation(main, [start, end], CONTENT_SLIDE_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
@@ -101,7 +101,7 @@ IOWA.PageAnimation = (function() {
     var end = {
       transform: [translate, ' scale(1)'].join(''),
       opacity: isFadeRipple ? 0 : 1
-    }
+    };
     var animation = new Animation(ripple, [start, end], {
         duration: duration, 
         fill: 'forwards'  // Makes ripple keep its state at the end of animation
@@ -114,8 +114,8 @@ IOWA.PageAnimation = (function() {
     var ripple = card.querySelector('.ripple__content');
     var rippleRect = ripple.getBoundingClientRect();
 
-    var radius = Math.floor(Math.sqrt(rippleRect.width*rippleRect.width + 
-      rippleRect.height*rippleRect.height));
+    var radius = Math.floor(Math.sqrt(rippleRect.width * rippleRect.width + 
+        rippleRect.height * rippleRect.height));
     ripple.style.width = 2 * radius + 'px';
     ripple.style.height = 2 * radius + 'px';
     ripple.style.left = -radius + 'px';
@@ -123,8 +123,8 @@ IOWA.PageAnimation = (function() {
     ripple.style.zIndex = 1;
 
     var mastheadRect = IOWA.Elements.Masthead.getBoundingClientRect();
-    var scaleX = mastheadRect.width/rippleRect.width;
-    var scaleY = mastheadRect.height/rippleRect.height;
+    var scaleX = mastheadRect.width / rippleRect.width;
+    var scaleY = mastheadRect.height / rippleRect.height;
 
     var translate = [
         'translate3d(', -rippleRect.left, 'px,', 
@@ -135,7 +135,7 @@ IOWA.PageAnimation = (function() {
     };
     var end = {
       transform: [translate, scale].join(' ')
-    }
+    };
     card.style.transformOrigin = '0 0';
 
     var cardTransition = new Animation(card, [start, end], {
@@ -150,7 +150,7 @@ IOWA.PageAnimation = (function() {
 
     animationGroup.callback = callback;
     return animationGroup;
-  };
+  }
 
   return {
     slideContentOut: slideContentOut,
@@ -158,6 +158,6 @@ IOWA.PageAnimation = (function() {
     ripple: rippleEffect,
     cardToMasthead: cardToMasthead,
     play: play
-  }
+  };
 
 })();

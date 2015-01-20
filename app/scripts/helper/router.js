@@ -38,15 +38,16 @@ IOWA.Router = (function() {
     var pageMeta = IOWA.Elements.Template.pages[pageName];
     IOWA.Elements.Template.nextPage = pageName;
     var color;
+    var callback;
     var currentPage = IOWA.Elements.Template.selectedPage;
     if (currentPage !== pageName) {
 
       if (el.hasAttribute('data-anim-ripple')) {
-        var callback = function(el) {
+        callback = function(el) {
           IOWA.PageAnimation.play(
               IOWA.PageAnimation.slideContentOut(function() {
                 IOWA.History.pushState({'path': el.pathname}, '', el.href);
-          }));
+              }));
         };
         var isFadeRipple = (
             IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
@@ -67,11 +68,11 @@ IOWA.Router = (function() {
         */
 
         IOWA.PageAnimation.play(
-          IOWA.PageAnimation.ripple(
-            IOWA.Elements.Ripple, e.pageX, e.pageY, 400, isFadeRipple, callback.bind(this, el)));
+            IOWA.PageAnimation.ripple(
+                IOWA.Elements.Ripple, e.pageX, e.pageY, 400, isFadeRipple, callback.bind(null, el)));
         
       } else if (el.hasAttribute('data-anim-card'))  {
-        var callback = function(el, card) {
+        callback = function(el, card) {
           // TODO: There's jank/bug on bringing the content in, 
           // especially in the masthead.
           IOWA.Elements.Template.rippleBgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
@@ -86,7 +87,7 @@ IOWA.Router = (function() {
           }
         }
         IOWA.PageAnimation.play(IOWA.PageAnimation.cardToMasthead(
-            card, e.pageX, e.pageY, 300, callback.bind(this, el, card)));
+            card, e.pageX, e.pageY, 300, callback.bind(null, el, card)));
       } else {
         IOWA.History.pushState({'path': el.pathname}, '', el.href);
       }
