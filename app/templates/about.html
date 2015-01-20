@@ -33,15 +33,14 @@
           <h3>Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President for Android, Chrome &amp; Apps, Sundar Pichai.</h3>
         </div>
         <div class="card-content">
-          <a href="#" data-track-link="about-see-keynote-and-sessions">See the 2014 Keynote and sessions</a>
+          <a href="https://www.google.com/events/io/schedule" target="_blank" data-track-link="about-see-keynote-and-sessions">See the 2014 Keynote and sessions</a>
         </div>
       </div>
-      <div class="card" layout vertical auto-vertical flex>
+      <div class="card" layout vertical auto-vertical flex on-tap="{{playVideo}}">
         <div flex class="card__photo card__photo--recap"></div>
         <div class="card-content">
           <img src="images/play-video-button.png" class="play__button">
           <a href="https://www.youtube.com/watch?v=ksvdvCDO7pA" data-track-link="about-watch-2014-recap-video"><core-icon icon="av:play-circle-fill"></core-icon> <i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></a>
-
         </div>
       </div>
     </div>
@@ -50,4 +49,11 @@
       <div class="io__hash"></div>
     </section>
   </div>
+
+  <template if="{{fullscreenVideoActive}}">
+    <div class="fullvideo__container" on-google-youtube-ready="{{videoReady}}" fit hidden>
+      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" fit>
+      <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit></google-youtube>
+    </div>
+  </template>
 {% end %}

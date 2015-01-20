@@ -53,12 +53,6 @@ $name: 'page-about';
   border-right: 0;
 }
 
-.card__photo--recap {
-  background-image: url(../images/home/recap-500.jpg);
-  background-position: 50% 0;
-  min-height: 200px;
-}
-
 @media (min-width: $tablet-breakpoint-min) {
   .pics__section {
     height: 745px;

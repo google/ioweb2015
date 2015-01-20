@@ -218,14 +218,13 @@ with the attribute `iologodestination`.
         scale = 0.58;
       }
 
-      // Ensure masthead is behind top transition up card up and fab.
+      // Ensure masthead is behind top transition up card up and FAB.
       this.parentElement.style.zIndex = 1;
 
       // Masthead clipping.
-      // var mastheadClipAnimation = new Animation(this.parentElement, [
       var mastheadClipAnimation = new Animation(this.backgroundTarget, [
         {transform: 'translateY(0)'},
-        {transform: 'translateY(-' + (containerHeight - mast.height) + 'px)'}
+        {transform: 'translateY(-' + Math.max(containerHeight - mast.height, 0) + 'px)'}
       ], {
         duration: 500,
         iterations: 1,

@@ -5,6 +5,8 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/i18n-msg/i18n-msg.html">
 
+<script src="../scripts/helper/util.js"></script>
+
 <!--
 Main fab for entering/exit the experiment.
 
@@ -60,7 +62,6 @@ Main fab for entering/exit the experiment.
     </style>
     <shadow></shadow>
   </template>
-
   <script>
     Polymer({
       publish: {
@@ -83,7 +84,7 @@ This is a rainbow circle border that spins around the experiment-fab while the e
 @element experiment-loading-fab
 @blurb This is a rainbow circle border that spins around the experiment-fab while the experiment is loading.
 -->
-<polymer-element name="experiment-loading-circle" noscript>
+<polymer-element name="experiment-loading-circle">
   <template>
     <style>
       :host {
@@ -133,9 +134,17 @@ This is a rainbow circle border that spins around the experiment-fab while the e
         animation: none;
       }
     </style>
-    <shadow></shadow>
-    <content></content>
   </template>
+  <script>
+    Polymer({
+      get componentDir() {
+        return IOWA.Util.getStaticBaseURL();
+      },
+      created: function() {
+        this.style.backgroundImage = 'url(' + this.componentDir + 'images/loading-circle.png)';
+      }
+    });
+  </script>
 </polymer-element>
 
 <!--
@@ -225,9 +234,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
 
     <template if="{{supported}}">
 
-      <h4>
-        <i18n-msg msgid="headphones-on">Headphones on</i18n-msg>
-      </h4>
+      <h4><i18n-msg msgid="headphones-on">Headphones on</i18n-msg></h4>
       <p>
         <i18n-msg msgid="experiment-ahead">Web Audio API experiment ahead</i18n-msg>
       </p>
@@ -250,7 +257,6 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
     </template>
 
     <template if="{{!supported}}">
-
       <p>
         <i18n-msg msgid="experiment-unsupported">Unsupported.</i18n-msg>
       </p>
@@ -259,11 +265,9 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           <i18n-msg msgid="cancel">Cancel</i18n-msg>
         </paper-button>
       </div>
-
     </template>
 
     <template if="{{experimentFailed}}">
-
       <p>
         <i18n-msg msgid="experiment-failed">The experiment failed to load.</i18n-msg>
       </p>
@@ -272,11 +276,9 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           <i18n-msg msgid="close-dialog">Close</i18n-msg>
         </paper-button>
       </div>
-
     </template>
 
   </template>
-
   <script>
     Polymer({
       publish: {
@@ -292,6 +294,14 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           value: false,
           reflect: true
         }
+      },
+
+      get componentDir() {
+        return IOWA.Util.getStaticBaseURL();
+      },
+
+      created: function() {
+        this.style.backgroundImage = 'url(' + this.componentDir + 'images/headphones-on.png)';
       },
 
       onExperimentOff: function() {
@@ -337,9 +347,7 @@ Semi-opaque overlay that shows when experiment dialog is opened.
         opacity: 1;
         visibility: visible;
       }
-
     </style>
-    <content></content>
   </template>
   <script>
     Polymer({
@@ -403,7 +411,6 @@ Fab for exiting the experiment.
     </style>
     <shadow></shadow>
   </template>
-
   <script>
     Polymer({
       eventDelegates: {
@@ -567,7 +574,6 @@ Fab for resetting the experiment loop to default
     </style>
     <shadow></shadow>
   </template>
-
   <script>
     Polymer({
       eventDelegates: {
@@ -733,10 +739,9 @@ Fab for triggering the share dialog.
     </style>
     <shadow></shadow>
   </template>
-
   <script>
     Polymer({
-
+      // Constructor needed when extending an element.
     });
   </script>
 </polymer-element>
@@ -914,7 +919,6 @@ Main parent container for all of the fab elements.
       :host {
         display: block;
         position: absolute;
-        /*z-index: 100002;*/
         -webkit-transition: all 300ms ease-out;
         transition: all 300ms ease-out;
       }
@@ -931,7 +935,7 @@ Main parent container for all of the fab elements.
     <template if="{{mode == 'pre'}}">
 
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
-      <experiment-fab src="../images/experiment-fab-animation.gif" on-tap="{{onFabClick}}" mini?="{{mini}}"></experiment-fab>
+      <experiment-fab src="{{componentDir}}images/experiment-fab-animation.gif" on-tap="{{onFabClick}}" mini?="{{mini}}"></experiment-fab>
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}"></experiment-loading-dialog>
 
@@ -941,20 +945,20 @@ Main parent container for all of the fab elements.
 
     <template if="{{mode == 'active'}}">
 
-      <experiment-exit-fab src="../images/exit-experiment.png" mini open?="{{miniFabs}}"></experiment-exit-fab>
+      <experiment-exit-fab src="{{componentDir}}images/exit-experiment.png" mini open?="{{miniFabs}}"></experiment-exit-fab>
       <experiment-exit-dialog active?="{{exitVisible}}"></experiment-exit-dialog>
 
-      <experiment-reset-fab src="../images/reset-experiment.png" mini open?="{{miniFabs}}"></experiment-reset-fab>
+      <experiment-reset-fab src="{{componentDir}}images/reset-experiment.png" mini open?="{{miniFabs}}"></experiment-reset-fab>
       <experiment-reset-dialog active?="{{resetVisible}}"></experiment-reset-dialog>
 
-      <experiment-share-fab src="../images/share-experiment.png" mini open?="{{miniFabs}}" on-tap="{{onShareClick}}"></experiment-share-fab>
+      <experiment-share-fab src="{{componentDir}}images/share-experiment.png" mini open?="{{miniFabs}}" on-tap="{{onShareClick}}"></experiment-share-fab>
       <experiment-share-dialog active?="{{shareVisible}}" url="{{shareURL}}" plainURL="{{unencodedURL}}"></experiment-share-dialog>
 
       <template if="{{playmode == 'playing'}}">
-        <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="../images/pause-experiment.png" on-tap="{{playingFabClick}}" playing></experiment-fab>
+        <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{componentDir}}images/pause-experiment.png" on-tap="{{playingFabClick}}" playing></experiment-fab>
       </template>
       <template if="{{playmode == 'paused'}}">
-        <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="../images/play-experiment.png" on-tap="{{pausedFabClick}}" paused></experiment-fab>
+        <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{componentDir}}images/play-experiment.png" on-tap="{{pausedFabClick}}" paused></experiment-fab>
       </template>
 
     </template>
@@ -990,6 +994,10 @@ Main parent container for all of the fab elements.
         'reset-click': 'onResetClick',
         'reset-no': 'onResetCancel',
         'share-cancel': 'onShareCancel'
+      },
+
+      get componentDir() {
+        return IOWA.Util.getStaticBaseURL();
       },
 
       ready: function() {
