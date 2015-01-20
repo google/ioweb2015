@@ -85,6 +85,28 @@ limitations under the License.
   window.ENV = location.host.match('localhost') ? 'dev' : 'prod';
 </script>
 <script src="scripts/helper/analytics.js"></script>
+<script>
+document.addEventListener('click', function(e) {
+  // Find the link that was clicked.
+  var link = null;
+  for (var i = 0, el; el = e.path[i]; ++i) {
+    var el = e.path[i];
+    if (el.localName == 'a') {
+      link = el;
+      break;
+    }
+  }
+
+  if (link && link.hasAttribute('data-track-link')) {
+    e.preventDefault();
+
+    // Record outbound link in GA.
+    IOWA.Analytics.trackEvent('link', 'click', el.getAttribute('data-track-link'), null, function() {
+      location.href = el.href;
+    });
+  }
+});
+</script>
 </body>
 </html>
 
