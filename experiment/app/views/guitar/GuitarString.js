@@ -256,12 +256,12 @@ module.exports = (function() {
      */
     function createAnchorGraphics() {
       anchorPoint1 = new PIXI.Graphics();
-      anchorPoint1.beginFill(0x000000);
+      anchorPoint1.beginFill(0xffffff);
       anchorPoint1.drawCircle(0, 0,3);
       displayContainerCenter.addChild(anchorPoint1);
 
       anchorPoint2 = new PIXI.Graphics();
-      anchorPoint2.beginFill(0x000000);
+      anchorPoint2.beginFill(0xffffff);
       anchorPoint2.drawCircle(0, 0, 3);
       displayContainerCenter.addChild(anchorPoint2);
 
