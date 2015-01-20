@@ -1,0 +1,112 @@
+<!--
+Copyright 2014 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Google I/O 2015 brings developers together for an immersive, two-day experience focused on exploring the next generation of technology.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Google I/O 2015 - Upgrade your browser</title>
+
+  <!-- See http://updates.html5rocks.com/2014/11/Support-for-installable-web-apps-with-webapp-manifest-in-chrome-38-for-Android -->
+  <link rel="manifest" href="manifest.json">
+  <!-- See http://updates.html5rocks.com/2014/11/Support-for-theme-color-in-Chrome-39-for-Android -->
+  <meta name="theme-color" content="#eceff1">
+
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes"> <!-- fallback for manifest.json -->
+  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Google I/O 2015">
+
+  <!-- Homescreen icons. -->
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="images/touch/google-touch-icon-48x48.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="images/touch/google-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="images/touch/google-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="images/touch/google-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="images/touch/google-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="images/touch/google-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="images/touch/google-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="images/touch/google-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="images/touch/google-touch-icon-192x192.png">
+
+  <!-- Tile icon for Win8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/touch/google-touch-icon-144x144.png">
+  <meta name="msapplication-TileColor" content="#eceff1">
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <meta property="og:title" content="Google I/O 2015">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="Google I/O 2015 brings developers together for an immersive, two-day experience focused on exploring the next generation of technology.">
+  <meta property="og:image" content="images/io.png">
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Event",
+      "name": "Google I/O 2015",
+      "url": ".?utm_source=schema_org_event",
+      "image": "images/io.png",
+      "location": {
+        "@type": "Place",
+        "name": "Todovenue",
+        "address": {
+          "@type" : "PostalAddress",
+          "streetAddress" : "34 Todo St.",
+          "addressLocality" : "Todoville",
+          "addressRegion" : "TO",
+          "postalCode" : "34343",
+          "addressCountry" : "US"
+        }
+      },
+      "startDate": "2015-01-01T00:00Z",
+      "endDate": "2015-01-02T00:00Z",
+      "offers" : {
+        "@type" : "Offer",
+        "url" : "tickets?utm_source=schema_org_event"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/pages/upgrade.css">
+</head>
+<body id="page-upgrade">
+
+<div id="upgrade">
+  <div id="upgrade-content">
+    <p><i18n-msg msgid="upgrade-warning">PLACEHOLDER_i18n</i18n-msg></p>
+    <div class="redbutton"><a href="#"></a></div>
+  </div>
+</div>
+
+<script>
+  window.ENV = location.host.match('localhost') ? 'dev' : 'prod';
+</script>
+<script src="scripts/helper/analytics.js"></script>
+<script>
+var a = document.querySelector('.redbutton a');
+if (a) {
+  a.href = 'https://santatracker.google.com' +
+      location.pathname.replace(/[^\/]*$/, '') + '?ignore_browser_check=true';
+}
+</script>
+</body>
+</html>
+
