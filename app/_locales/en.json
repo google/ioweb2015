@@ -186,19 +186,19 @@
   },
   "daysuntilreg": {
     "description": "Short label used on the home/registration page to signify days left until registration opens",
-    "message": "Days until registration opens"
+    "message": "Days until registration begins"
   },
   "hoursuntilreg": {
-    "description": "Short label used on the home/registration page to signify hours left until registration opens",
-    "message": "Hours until registration opens"
+    "description": "Short label used on the home/registration page to signify hours left until registration begins",
+    "message": "Hours until registration begins"
   },
   "minutesuntilreg": {
-    "description": "Short label used on the home/registration page to signify minutues left until registration opens",
-    "message": "Minutes until registration opens"
+    "description": "Short label used on the home/registration page to signify minutues left until registration begins",
+    "message": "Minutes until registration begins"
   },
   "secondsuntilreg": {
-    "description": "Short label used on the home/registration page to signify seconds left until registration opens",
-    "message": "Seconds until registration opens"
+    "description": "Short label used on the home/registration page to signify seconds left until registration begins",
+    "message": "Seconds until registration begins"
   },
   "agenda": {
     "description": "Link text. Please keep short. Used on the schedule page.",
@@ -224,6 +224,10 @@
     "description": "Offsite page. Card title description",
     "message": "I/O Extended events"
   },
+  "ioextendevents-details": {
+    "description": "Offsite page. Card content",
+    "message": "I/O Extended events may include live streamed sessions, local developer demos, hackathons and more. These events are brought to you by our Google Developer Groups, Student Ambassadors, and local developers."
+  },
   "hostioextend": {
     "description": "Offsite page. Card title description for developers to submit their own event details",
     "message": "Host an I/O Extended event"
@@ -239,5 +243,25 @@
   "io-in-photos": {
     "description": "Extended page. Nav bar title when the photo carousel is open.",
     "message": "I/O in Photos"
+  },
+  "see-photos-2014": {
+    "description": "About page. Link for people to see photos from 2014",
+    "message": "See photos from I/O 2014"
+  },
+  "io-description": {
+    "description": "Home page. Describes Google I/O.",
+    "message": "Google I/O is for developers—the creative coders who are building what's next. Together we'll explore the latest in tech, mobile &amp; beyond."
+  },
+  "io-extended-invitation": {
+    "description": "Home page. Invites developers unable to attend I/O itself to go to an Extended event.",
+    "message": "If you aren't able to join us for I/O in person this year, you can still make an event out of it. Host or find an I/O Extended event near you and watch the live stream in the company of other developers."
+  },
+  "back-to-top": {
+    "description": "Links back to the top of the page.",
+    "message": "Back to top"
+  },
+  "watch-keynote-and-sessions": {
+    "description": "Offsite page. Invites users to watch the keynote and session videos.",
+    "message": "Watch the keynote and select sessions in real-time, from your laptop or mobile device."
   }
 }
