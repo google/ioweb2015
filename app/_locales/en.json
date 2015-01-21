@@ -148,6 +148,10 @@
     "description": "Headline for share dialog",
     "message": "Share Your Song"
   },
+  "share-text": {
+    "description": "Social sharing pre-populated text.",
+    "message": "Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person Smarch xx-xx, 2015."
+  },
   "gplus-share": {
     "description": "Google plus share text",
     "message": "Google+"
