@@ -230,7 +230,8 @@ IOWA.Elements = (function() {
         break;
 
         default:
-         // noop
+
+        return;
       }
 
       var options = 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=' +
