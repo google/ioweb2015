@@ -50,6 +50,7 @@ module.exports = (function() {
           'y': 262.109375,
           'radius': 70,
           'color': 0xb387ff,
+          'hovercolor': 0x976AFF,
           'sound': 15,
           'pid': 0
         },
@@ -58,6 +59,7 @@ module.exports = (function() {
           'y': 423.2421875,
           'radius': 35,
           'color': 0x4527A0,
+          'hovercolor': 0x603ACF,
           'sound': 13,
           'pid': 1
         },
@@ -66,6 +68,7 @@ module.exports = (function() {
           'y': -79.4921875,
           'radius': 150,
           'color': 0xede7f6,
+          'hovercolor': 0xFFFFFF,
           'sound': 14,
           'pid': 2
         },
@@ -74,6 +77,7 @@ module.exports = (function() {
           'y': 209.47265625,
           'radius': 70,
           'color': 0xb387ff,
+          'hovercolor': 0x976AFF,
           'sound': 15,
           'pid': 3
         },
@@ -82,6 +86,7 @@ module.exports = (function() {
           'y': 510.25390625,
           'radius': 35,
           'color': 0x4527A0,
+          'hovercolor': 0x603ACF,
           'sound': 13,
           'pid': 4
         },
@@ -90,6 +95,7 @@ module.exports = (function() {
           'y': 200.87890625,
           'radius': 150,
           'color': 0xede7f6,
+          'hovercolor': 0xFFFFFF,
           'sound': 1,
           'pid': 5
         }

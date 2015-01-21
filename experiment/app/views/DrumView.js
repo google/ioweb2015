@@ -168,7 +168,7 @@ module.exports = (function() {
       audioManager.addTrack(currentTrack);
 
       drums = data.drums.map(function(drumDef) {
-        var drum = new Drum(drumDef, drumDef.color, drumDef.sound, world);
+        var drum = new Drum(drumDef, drumDef.color, drumDef.hovercolor, drumDef.sound, world);
 
         drum.setPosition(drumDef.x, drumDef.y);
 

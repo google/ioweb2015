@@ -119,13 +119,39 @@ module.exports = (function() {
      * Enable interactivity on the dot.
      */
     function enable() {
+      var gridDotChild = gridDot.children[1];
+
       gridDot.interactive = true;
+      gridDotMiddle.interactive = true;
+
+      gridDot.mouseover = function(mouseData){
+        gridDotChild.tint = 0x1156B0;
+      }
+
+      gridDot.mouseout = function(mouseData){
+        gridDotChild.tint = 0x0d47a0;
+      }
+
+      gridDotMiddle.mouseover = function(mouseData) {
+        animate.to(gridDotMiddle.scale, 0.1, {
+          x: 1.25,
+          y: 1.25
+        });
+      }
+
+      gridDotMiddle.mouseout = function(mouseData) {
+        animate.to(gridDotMiddle.scale, 0.1, {
+          x: 1,
+          y: 1
+        });
+      }
 
       gridDot.mousedown = gridDot.touchstart = function( /* data */ ) {
        // data.originalEvent.preventDefault();
         // console.log( data.originalEvent.type + " originalEvent" )
         onActivateCallback_(self);
       };
+
     }
 
     /**
@@ -133,7 +159,10 @@ module.exports = (function() {
      */
     function disable() {
       gridDot.interactive = false;
+      gridDotMiddle.interactive = false;
       gridDot.mousedown = gridDot.touchstart = null;
+      gridDotMiddle.mouseover = null;
+      gridDotMiddle.mouseout = null;
     }
 
     /**

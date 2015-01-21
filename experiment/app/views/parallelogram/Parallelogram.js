@@ -5,10 +5,21 @@ module.exports = (function() {
   'use strict';
 
   const BLACK = 0x000000;
+  const WHITE = 0xFFFFFF;
   const BOUNDS_PADDING = 15;
   const SHADOW_SCALE = 0.85;
 
-  return function Parallelogram(color, note, keyID, pid, audioManager) {
+  /**
+   * Creates a new parallelogram.
+   * @param {string} color - The color for this parallelogram.
+   * @param {string} hoverColor - The hover color for this parallelogram.
+   * @param {string} note - The note to be played by this parallelogram.
+   * @param {number} keyID - The Key ID for this parallelogram.
+   * @param {number} pid - The unique id for this parallelogram.
+   * @param {AudioManager} audioManager - The audioManager context.
+   * @constructor
+   */
+  return function Parallelogram(color, hoverColor, note, keyID, pid, audioManager) {
     var notePlaying;
     var startTime;
     var endTime;
@@ -82,9 +93,10 @@ module.exports = (function() {
       circle.position.y = shapeHeight/2;
 
       parallelogram.clear();
-      parallelogram.beginFill(color);
+      parallelogram.beginFill(WHITE);
       parallelogram.drawShape(shape);
       parallelogram.endFill();
+      parallelogram.tint = color;
 
       shadow.clear();
       shadow.beginFill(BLACK, 0.2);
@@ -119,6 +131,7 @@ module.exports = (function() {
     function addEventListeners() {
       container.interactive = true;
       container.buttonMode = true;
+      parallelogram.interactive = true;
 
       container.mousedown = container.mousedownoutside = container.touchstart = container.touchstartoutside = function(data) {
         var point = data.getLocalPosition(container);
@@ -128,6 +141,14 @@ module.exports = (function() {
       container.mouseup = container.mouseupoutside = container.touchend = container.touchendoutside = function() {
         onDeactivateCallback(self);
       };
+
+      parallelogram.mouseover = function(mouseData){
+        parallelogram.tint = hoverColor;
+      }
+
+      parallelogram.mouseout = function(mouseData){
+        parallelogram.tint = color;
+      }
 
       document.addEventListener('keydown', onParallelogramsKeyDown);
       document.addEventListener('keyup', onParallelogramsKeyUp);
@@ -140,6 +161,7 @@ module.exports = (function() {
     function removeEventListeners() {
       container.interactive = false;
       container.buttonMode = false;
+      parallelogram.interactive = false;
 
       container.mousedown = container.mousedownoutside = container.touchstart = container.touchstartoutside = null;
       container.mouseup = container.mouseupoutside = container.touchend = container.touchendoutside = null;
