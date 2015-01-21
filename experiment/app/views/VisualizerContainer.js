@@ -11,9 +11,10 @@ module.exports = (function() {
    * @param {AudioManager} audioManager - The shared audioManager.
    * @param {Element} elementToMimic_ - The element to watch for our dimensions.
    * @param {Element} viewportElement - The root experiment element.
+   * @param {AudioNode} analysers - The audio analysers.
    * @constructor
    */
-  return function VisualizerContainer(audioManager, elementToMimic_, viewportElement) {
+  return function VisualizerContainer(audioManager, elementToMimic_, viewportElement, analysers) {
     var pid;
 
     var wrapperElement;
@@ -37,7 +38,7 @@ module.exports = (function() {
 
       createRenderer();
 
-      subView = new SubView(audioManager, canvas);
+      subView = new SubView(audioManager, canvas, analysers);
       subView.init();
       wrapperElement.appendChild(canvas);
 

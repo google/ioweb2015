@@ -240,7 +240,7 @@ module.exports = function(audioManager, stateManager) {
    */
   function createVisualizerContainers() {
     return visualizerElements.map(function(elem, i) {
-      var pixiObject = new VisualizerContainer(audioManager, elem, viewportElement);
+      var pixiObject = new VisualizerContainer(audioManager, elem, viewportElement, instrumentViews.map(function(i) { return { a: i.getChannel().analyser, c: i.getView().backgroundColor }; }));
       var visualizer = getVisualizerForElem(elem, i);
       if (visualizer) {
         pixiObject.init(i, visualizer[0]); // TODO: Use guid?

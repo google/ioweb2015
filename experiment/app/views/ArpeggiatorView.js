@@ -565,6 +565,7 @@ module.exports = (function() {
       stopRecording,
       loadData,
       name: INSTRUMENT_NAME,
+      backgroundColor: THEME.center[0],
       dataModel: ArpeggiatorDataModel,
       getData: () => data,
       getChannel: () => CHANNEL
