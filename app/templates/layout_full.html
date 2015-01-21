@@ -127,13 +127,14 @@ limitations under the License.
     // If ?ignore_browser_check=true is in the URL, the user is coming back from
     // "upgrade your browser" and we let them proceed.
     var ignoreCheck = getUrlParameter('ignore_browser_check') == 'true';
-    var uaString = navigator.userAgent;
 
     // Check if browser is supported by web components polyfill.
     // Feature detection isn't sufficient; webcomponentsjs attempts to polyfill
     // missing features, but some browsers are known to not work under it.
     // https://www.polymer-project.org/resources/compatibility.html
     var supported = ignoreCheck || (function whatBrowserYouBe() {
+      var uaString = navigator.userAgent;
+
       // Sorry IE < 10.
       var msie = /MSIE +([\d\.]+)/.exec(uaString);
       if (msie && msie[1]) {
@@ -162,7 +163,7 @@ limitations under the License.
 
     if (!supported) {
       // Note: pageview is recorded when IOWA.Analytics is setup.
-      IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', uaString, null, function() {
+      IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', null, null, function() {
         window.location = 'upgrade';
       });
     }
