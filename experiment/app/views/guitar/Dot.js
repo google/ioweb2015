@@ -14,6 +14,7 @@ module.exports = (function() {
   return function Dot(pid) {
     var onActivateCallback_;
 
+    var gridDotChild;
     var gridDotMiddle;
     var gridDotUpperWhiteTouch;
     var gridDot;
@@ -24,6 +25,7 @@ module.exports = (function() {
     buildViews();
 
     var self = {
+      gridDotChild,
       gridDotMiddle,
       gridDotUpperWhiteTouch,
       gridDot,
@@ -50,9 +52,26 @@ module.exports = (function() {
       if (v) {
         animateMiddleDot(1);
         animateWhiteCircle();
+        gridDotUpper.interactive = false;
+        gridDotMiddle.interactive = true;
+        gridDotMiddle.mouseover = function(mouseData) {
+          animate.to(gridDotMiddle.scale, 0.1, {
+            x: 1.25,
+            y: 1.25
+          });
+        }
+
+        gridDotMiddle.mouseout = function(mouseData) {
+          animate.to(gridDotMiddle.scale, 0.1, {
+            x: 1,
+            y: 1
+          });
+        }
+
       } else {
         animateMiddleDot(0);
         animateWhiteCircle();
+        gridDotMiddle.interactive = false;
       }
     }
 
@@ -112,6 +131,8 @@ module.exports = (function() {
       gridDot.id = pid;
       gridDot.hitArea = new PIXI.Circle(0, 0, 25);
 
+      gridDotChild = gridDot.children[1];
+
       enable();
     }
 
@@ -119,31 +140,17 @@ module.exports = (function() {
      * Enable interactivity on the dot.
      */
     function enable() {
-      var gridDotChild = gridDot.children[1];
 
       gridDot.interactive = true;
-      gridDotMiddle.interactive = true;
 
-      gridDot.mouseover = function(mouseData){
+      gridDotUpper.interactive = true;
+
+      gridDotUpper.mouseover = function(mouseData){
         gridDotChild.tint = 0x1156B0;
       }
 
-      gridDot.mouseout = function(mouseData){
+      gridDotUpper.mouseout = function(mouseData){
         gridDotChild.tint = 0x0d47a0;
-      }
-
-      gridDotMiddle.mouseover = function(mouseData) {
-        animate.to(gridDotMiddle.scale, 0.1, {
-          x: 1.25,
-          y: 1.25
-        });
-      }
-
-      gridDotMiddle.mouseout = function(mouseData) {
-        animate.to(gridDotMiddle.scale, 0.1, {
-          x: 1,
-          y: 1
-        });
       }
 
       gridDot.mousedown = gridDot.touchstart = function( /* data */ ) {
@@ -159,11 +166,7 @@ module.exports = (function() {
      */
     function disable() {
       gridDot.interactive = false;
-      gridDotMiddle.interactive = false;
-      gridDotUpper.interactive = false;
       gridDot.mousedown = gridDot.touchstart = null;
-      gridDotMiddle.mouseover = null;
-      gridDotMiddle.mouseout = null;
     }
 
     /**
@@ -176,6 +179,7 @@ module.exports = (function() {
 
       animate.to(gridDotUpperWhiteTouch.scale, 0.5, { x: 1.2, y: 1.2, delay:delay });
       animate.to(gridDotUpperWhiteTouch, 0.5, { alpha: 0, delay:delay });
+      gridDotChild.tint = 0x0d47a0;
     }
 
     /**
@@ -208,6 +212,7 @@ module.exports = (function() {
     function setPosition(pos) {
       positionTarget.x = pos.x;
       positionTarget.y = pos.y;
+      gridDotChild.tint = 0x0d47a0;
 
       animate.to(position, 0.3, positionTarget);
     }
