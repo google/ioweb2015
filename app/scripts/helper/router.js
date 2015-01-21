@@ -70,6 +70,7 @@ IOWA.Router = (function() {
             rippleAnim,
             IOWA.PageAnimation.slideContentOut()
           ]);
+          animation.pageState = 'slideContentOut';
           callback = function() {
             IOWA.History.pushState({'path': el.pathname}, '', el.href);
           };
@@ -78,9 +79,10 @@ IOWA.Router = (function() {
           // Run animations sequentially, then change the page.
           callback = function(el) {
             IOWA.PageAnimation.play(
-                IOWA.PageAnimation.slideContentOut(function() {
+                IOWA.PageAnimation.slideContentOut(), function() {
+                  IOWA.Elements.Template.contentHidden = true;
                   IOWA.History.pushState({'path': el.pathname}, '', el.href);
-                }));
+                });
           };
           IOWA.PageAnimation.play(rippleAnim, callback.bind(null, el));
         }
@@ -179,25 +181,35 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-    replaceTemplateContent(currentPageTemplates);
 
+    var callback = function() {
+      replaceTemplateContent(currentPageTemplates);
+      document.body.id = 'page-' + pageName;
+      IOWA.Elements.Template.selectedPage = pageName;
+      var pageMeta = IOWA.Elements.Template.pages[pageName];
+      document.title = pageMeta.title || 'Google I/O 2015';
 
-    document.body.id = 'page-' + pageName;
-    IOWA.Elements.Template.selectedPage = pageName;
-    var pageMeta = IOWA.Elements.Template.pages[pageName];
-    document.title = pageMeta.title || 'Google I/O 2015';
+      var masthead = IOWA.Elements.Masthead;
+      masthead.className = masthead.className.replace(
+          MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
 
-    var masthead = IOWA.Elements.Masthead;
-    masthead.className = masthead.className.replace(
-        MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
+      setTimeout(function() {
+        var animation = IOWA.PageAnimation.slideContentIn();
+        animation.pageState = 'slideContentIn';
+        IOWA.PageAnimation.play(animation);
+        //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
+      }, 50); // Wait for the... Good question. Maybe template binding?
+      // TODO: BUG: Anyways, something to investigate. Web Animations
+      // are not working properly without this delay (Chrome crashes).
+    };
 
-
-    setTimeout(function() {
-      debugger;
-      IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
-    }, 50); // Wait for the... Good question. Maybe template binding?
-    // TODO: BUG: Anyways, something to investigate. Web Animations
-    // are not working properly without this delay (Chrome crashes).
+    if (IOWA.PageAnimation.pageState !== 'slideContentOut') {
+      var animation = IOWA.PageAnimation.slideContentOut();
+      animation.pageState = 'slideContentOut';
+      IOWA.PageAnimation.play(animation, callback);
+    } else {
+      callback();
+    }
   }
 
   /**

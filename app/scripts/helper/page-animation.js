@@ -38,15 +38,16 @@ IOWA.PageAnimation = (function() {
       fill: 'forwards'
   };
 
-  var canRunSimultanousAnimations = (/Chrome/gi).test(navigator.userAgent);
+  var canRunSimultanousAnimations = (/Safari/gi).test(navigator.userAgent ||
+      (/Chrome/gi).test(navigator.userAgent));
+  var pageState = null;
 
   /**
    * Returns an animation to slide and fade out the main content of the page.
    * Used together with slideContentIn for page transitions.
-   * @param {Function} callback Callback to be called when animation finishes.
    * @return {Animation} Page animation definition.
    */
-  function slideContentOut(callback) {
+  function slideContentOut() {
     var main = document.querySelector('.io-main .slide-up');
     var mainDelayed = document.querySelector('.io-main .slide-up-delay');
     var masthead = IOWA.Elements.Masthead.querySelector('.masthead-meta');
@@ -66,7 +67,7 @@ IOWA.PageAnimation = (function() {
       new Animation(IOWA.Elements.Footer, [{ opacity: 1 }, { opacity: 0 }],
           CONTENT_SLIDE_OPTIONS)
     ]);
-    animation.callback = callback;
+    animation.pageState = 'slideContentOut';
     return animation;
   }
 
@@ -74,10 +75,9 @@ IOWA.PageAnimation = (function() {
    * Returns an animation to slide up and fade in the main content of the page.
    * Used together with slideContentOut for page transitions.
    * TODO: Should be possible by reversing slideout animation.
-   * @param {Function} callback Callback to be called when animation finishes.
    * @return {Animation} Page animation definition.
    */
-  function slideContentIn(callback) {
+  function slideContentIn() {
     var main = document.querySelector('.slide-up');
     var mainDelayed = document.querySelector('.slide-up-delay');
     var masthead = IOWA.Elements.Masthead.querySelector('.masthead-meta');
@@ -97,7 +97,7 @@ IOWA.PageAnimation = (function() {
       new Animation(IOWA.Elements.Footer, [{ opacity: 0 }, { opacity: 1 }],
           CONTENT_SLIDE_OPTIONS)
     ]);
-    animationGroup.callback = callback;
+    animationGroup.pageState = 'slideContentIn';
     return animationGroup;
   }
 
@@ -110,10 +110,9 @@ IOWA.PageAnimation = (function() {
    * @param {string} duration color Ripple color.
    * @param {boolean} isFadeRipple If true, play a temporary glimpse ripple.
    *     If false, play a regular opaque color ripple.
-   * @param {Function} callback Callback to be called when animation finishes.
    * @return {Animation} Ripple animation definition.
    */
-  function rippleEffect(ripple, x, y, duration, color, isFadeRipple, callback) {
+  function rippleEffect(ripple, x, y, duration, color, isFadeRipple) {
     var translate = 'translate3d(' + x + 'px,' + y + 'px, 0)';
     var start = {
       transform: translate + ' scale(0)',
@@ -129,7 +128,6 @@ IOWA.PageAnimation = (function() {
         duration: duration,
         fill: 'forwards'  // Makes ripple keep its state at the end of animation
     });
-    animation.callback = callback;
     return animation;
   }
 
@@ -140,10 +138,9 @@ IOWA.PageAnimation = (function() {
    * @param {number} x X coordinate of the center of the ripple.
    * @param {number} x Y coordinate of the center of the ripple.
    * @param {number} duration Duration of the animation.
-   * @param {Function} callback Callback to be called when animation finishes.
    * @return {Animation} Ripple animation definition.
    */
-  function cardToMasthead(card, x, y, duration, callback) {
+  function cardToMasthead(card, x, y, duration) {
     var ripple = card.querySelector('.ripple__content');
     var rippleRect = ripple.getBoundingClientRect();
 
@@ -179,8 +176,6 @@ IOWA.PageAnimation = (function() {
       rippleEffect(ripple, x - rippleRect.left, y - rippleRect.top, duration),
       cardTransition
     ]);
-
-    animationGroup.callback = callback;
     return animationGroup;
   }
 
@@ -191,6 +186,9 @@ IOWA.PageAnimation = (function() {
    */
   function play(animation, callback) {
     var player = document.timeline.play(animation);
+    if (animation.pageState) {
+      IOWA.PageAnimation.pageState = animation.pageState;
+    }
     if (callback) {
       player.onfinish = function(e) {
         callback();
@@ -200,6 +198,7 @@ IOWA.PageAnimation = (function() {
 
   return {
     canRunSimultanousAnimations: canRunSimultanousAnimations,
+    pageState: pageState,
     slideContentOut: slideContentOut,
     slideContentIn: slideContentIn,
     ripple: rippleEffect,
