@@ -77,7 +77,6 @@ module.exports = (function() {
 
       analyser.getByteFrequencyData(freqDomain);
 
-      // draw the bars
       var inc = 0;
       var direction = 'up';
 
@@ -91,7 +90,7 @@ module.exports = (function() {
         canvasContext.fillStyle = LINE_COLOR;
         canvasContext.fillRect((i + 1) * 5 * LINE_WIDTH, offset, barWidth, height);
 
-        if (inc < 26 && direction === 'up') {
+        if ((inc < 26) && (direction === 'up')) {
           inc = inc + 1;
         } else {
           direction = 'down';

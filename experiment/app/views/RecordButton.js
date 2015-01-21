@@ -1,6 +1,7 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var animate = require('app/util/animate');
 var events = require('app/util/events');
+var retinaInlineSprite = require('app/util/retinaInlineSprite');
 var recordImage = require('url?limit=10000!app/images/record-button.png');
 var checkmarkImage = require('url?limit=10000!app/images/checkmark.png');
 var oneNumber = require('url?limit=10000!app/images/1.png');
@@ -82,31 +83,26 @@ module.exports = (function() {
     mintCircle.endFill();
     mintCircle.alpha = 0;
 
-    var recordIcon = new PIXI.Sprite.fromImage(recordImage);
-    recordIcon.scale.x = 0.5;
-    recordIcon.scale.y = 0.5;
+    var recordIcon = retinaInlineSprite(recordImage);
     recordIcon.position.x = CIRCLE_RADIUS + 2;
     recordIcon.position.y = CIRCLE_RADIUS + 2;
     recordIcon.anchor.set(0.5, 0.5);
 
-    var checkmarkCircle = new PIXI.Sprite.fromImage(checkmarkImage);
-    checkmarkCircle.scale.x = 0;
-    checkmarkCircle.scale.y = 0;
+    var checkmarkCircle = retinaInlineSprite(checkmarkImage);
     checkmarkCircle.position.x = CIRCLE_RADIUS + 2;
     checkmarkCircle.position.y = CIRCLE_RADIUS + 2;
     checkmarkCircle.anchor.set(0.5, 0.5);
+    checkmarkCircle.alpha = 0;
 
-    var readyText = new PIXI.Sprite.fromImage(getReadyImage);
-    var recordingText = new PIXI.Sprite.fromImage(recordingImage);
-    var recordingCompleteText = new PIXI.Sprite.fromImage(recordingComplete);
+    var readyText = retinaInlineSprite(getReadyImage);
+    var recordingText = retinaInlineSprite(recordingImage);
+    var recordingCompleteText = retinaInlineSprite(recordingComplete);
     var textImages = [readyText, recordingText, recordingCompleteText];
 
     for (let i = 0; i < textImages.length; i++) {
       let textImage = textImages[i];
       textImage.position.x = -205;
       textImage.position.y = 30;
-      textImage.scale.x = 0.5;
-      textImage.scale.y = 0.5;
       textImage.alpha = 0;
       container.addChild(textImage);
     }
@@ -119,11 +115,9 @@ module.exports = (function() {
     container.addChild(checkmarkCircle);
 
     for (let i = 0; i < numberImages.length; i++) {
-      let numberImage = new PIXI.Sprite.fromImage(numberImages[i]);
+      let numberImage = retinaInlineSprite(numberImages[i]);
       numberImage.position.x = CIRCLE_RADIUS + 1;
       numberImage.position.y = CIRCLE_RADIUS + 2;
-      numberImage.scale.x = 0.5;
-      numberImage.scale.y = 0.5;
       numberImage.anchor.set(0.5, 0.5);
       numberImage.alpha = 0;
       container.addChild(numberImage);
@@ -245,12 +239,12 @@ module.exports = (function() {
       });
 
       animate.fromTo(numberImageGraphic.scale, 0.15, {
-        x: 0.4,
-        y: 0.4,
-        ease: Elastic.easeIn
-      }, {
         x: 0.7,
         y: 0.7
+      }, {
+        x: 1,
+        y: 1,
+        ease: Elastic.easeIn
       }).then(hideNumber.bind(null, numberImageGraphic));
     }
 
@@ -373,8 +367,8 @@ module.exports = (function() {
         x: 0,
         y: 0
       }, {
-        x: 0.5,
-        y: 0.5
+        x: 1,
+        y: 1
       }
       );
       for (var i = 0; i < textImages.length; i++) {
@@ -407,8 +401,8 @@ module.exports = (function() {
     function finishedAnimation() {
       hideText(textImages[1], 0);
       animate.to(checkmarkCircle.scale, 0.25, {
-        x: 0.48,
-        y: 0.48
+        x: 1,
+        y: 1
       }).then(animate.to(checkmarkCircle.scale, 0.25, {
         delay: 2,
         x: 0,

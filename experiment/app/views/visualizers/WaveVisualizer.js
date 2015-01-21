@@ -7,187 +7,153 @@ module.exports = (function() {
 
   const LINE_COLOR = '#BDBDBD';
   const LINE_WIDTH = 1;
-  const FFT_SIZE = 64;
-  const SMOOTHING_TIME_CONSTANT = 0.9;
-  const SEGMENTS = 10;
+  const FFT_SIZE = 256;
+  const SMOOTHING_TIME_CONSTANT = 0.3;
 
   /**
    * Create analyser node for wave visualisation.
    * @param {Object} audioManager - The audio manager.
    * @param {element} canvas - The canvas upon which to draw.
+   * @param {array} instruments - The instruments.
    * @return {Object} self
    */
-  return function WaveVisualizer(audioManager, canvas) {
+  return function WaveVisualizer(audioManager, canvas, instruments) {
     var self = {
       render,
       resize,
-      enable,
-      init,
-      disable
+      init
     };
 
-    var analyser = audioManager.analyser;
-    analyser.fftSize = FFT_SIZE;
-    analyser.smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
+    var analysers = instruments.map(i => i.a);
+    var segments = analysers.map((_, i) => 15 + ~~(25 * (1 - (i / (analysers.length - 1)))));
+    var colors = instruments.map(i => `#${i.c.toString(16)}`);
 
     var canvasContext = canvas.getContext('2d');
-
-    var freqDomain = new Uint8Array(analyser.frequencyBinCount);
-
-    var amplitude = 20;
 
     var xMax = canvas.width;
     var yMax = canvas.height;
 
-    var renderReady = false;
-
-    var points = [];
-    var splinePoints = [];
-    var splineTween = [];
-    var lastSplineTween = [];
-    var lastTweenObject = [];
-    var timeoutID;
-    var factor = 1;
+    var currentPoints = [];
+    var targetPoints = [];
+    var domains = [];
 
     function init() {
-      pops();
-    }
+      for (let i = 0; i < analysers.length; i++) {
+        currentPoints[i] = [];
+        targetPoints[i] = [];
 
-    function pops() {
-      createPoints();
+        analysers[i].fftSize = FFT_SIZE;
+        analysers[i].smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
+        domains[i] = new Uint8Array(analysers[i].frequencyBinCount);
 
-      for (let i = 0; i < splinePoints.length; i++) {
-        tweenById(i);
+        for (let j = 0; j < segments[i] + 1; j++) {
+          var everyOther = j * 2;
+          currentPoints[i][everyOther] = 0;
+          currentPoints[i][everyOther+1] = 0;
+          targetPoints[i][everyOther] = 0;
+          targetPoints[i][everyOther+1] = 0;
+        }
       }
-
-      timeoutID = window.setTimeout(pops, 300);
-    }
-    function tweenById(id) {
-      splineTween[id] = splinePoints[id];
-
-      if (!lastTweenObject[id]) {
-        lastTweenObject[id] = [
-          { radius: 0 },
-          { radius: 0, onUpdate: tweenByIdUpdate, onUpdateParams: [id] }
-        ];
-      }
-
-      if (lastSplineTween[id]) {
-        lastTweenObject[id][0].radius = lastSplineTween[id];
-        lastSplineTween[id] = splinePoints[id];
-      } else {
-        lastSplineTween[id] = splinePoints[id];
-      }
-
-      lastTweenObject[id][1].radius = splinePoints[id];
-      animate.to(lastTweenObject[id][0], 0.3, lastTweenObject[id][1]);
-    }
-
-    function tweenByIdUpdate(id) {
-      splineTween[id] = lastTweenObject[id][0].radius;
     }
 
     /**
      * Draw oscillating wave to canvas
      */
     function drawWave() {
-      var canvasWidth = canvas.width;
-      var canvasHeight = canvas.height;
-
-      xMax = canvasWidth;
-      yMax = canvasHeight;
-      canvasContext.clearRect(0, 0, xMax, yMax);
-
-      analyser.getByteFrequencyData(freqDomain);
-
-      canvasContext.lineWidth = LINE_WIDTH;
-      canvasContext.strokeStyle = LINE_COLOR;
-      canvasContext.fillStyle = 'white';
+      canvasContext.fillStyle = 'rgba(255,255,255,0.5)';
       canvasContext.fillRect(0, 0, xMax, yMax);
 
-      if (renderReady === true) {
+      canvasContext.lineWidth = LINE_WIDTH;
+
+      for (let i = 0; i < currentPoints.length; i++) {
+        canvasContext.save();
+        canvasContext.globalAlpha = 0.75;
+
+        let yOffset = 30 + ((i + 1) / currentPoints.length) * 260;
+        yOffset = yMax / 2;
+        canvasContext.translate(0, yOffset);
+
+        canvasContext.strokeStyle = colors[i];
         canvasContext.beginPath();
-        curve(canvasContext, splineTween, 0.5);
+        curve(canvasContext, currentPoints[i], 0.5);
         canvasContext.stroke();
+        canvasContext.restore();
       }
     }
 
     /**
      * On render, draw wave
      */
-    function render() {
+    function render(delta) {
+      getRun();
+      tickChase(delta);
       drawWave();
+    }
+
+    /**
+     * Chase the target points.
+     * @param {number} delta - The animation delta.
+     */
+    function tickChase(delta) {
+      for (let i = 0; i < targetPoints.length; i++) {
+        for (let j = 0; j < targetPoints[i].length; j += 2) {
+          currentPoints[i][j] = targetPoints[i][j];
+          currentPoints[i][j+1] += (targetPoints[i][j+1] - currentPoints[i][j+1]) * 0.3;
+        }
+      }
     }
 
     /**
      * On resize, draw wave
      */
     function resize() {
-      createPoints();
+      xMax = canvas.width;
+      yMax = canvas.height;
+
+      getRun();
+      tickChase(0);
       drawWave();
     }
 
-    function getRun(point1, point2, SEGMENTS) {
-      splinePoints.length = 0;
+    var base = 10;
+    var maxAmp = Math.pow(base, 1);
 
-      var xs = point2.x - point1.x;
-      var ys = point2.y - point1.y;
-      var stepX = xs / SEGMENTS;
-      var stepY = ys / SEGMENTS;
+    function getRun() {
+      var x1 = -1;
+      var x2 = xMax;
 
-      for (let i = 0; i < SEGMENTS + 1; i++) {
-        points[i].x = point1.x + (stepX * i);
-        points[i].y = point1.y + (stepY * i);
-        amplitude = freqDomain[i];
-        points[i].y = points[i].y + (Math.random() * (amplitude)) * factor;
+      var xs = x2 - x1;
 
-        if (factor === 1) {
-          factor = -1;
-        } else {
-          factor = 1;
+      for (let i = 0; i < targetPoints.length; i++) {
+        let stepX = xs / segments[i];
+        analysers[i].getByteFrequencyData(domains[i]);
+
+        targetPoints[i].length = 0;
+
+        for (let j = 0; j < segments[i] + 1; j++) {
+          let x = x1 + (stepX * j);
+
+          let amplitude = domains[i][j] / 256;
+
+          amplitude = Math.pow(base + i, amplitude) / maxAmp;
+
+          if (amplitude <= 0.4) { amplitude = 0; }
+          if (amplitude >= 1) { amplitude = 1; }
+
+          amplitude *= (30 * i);
+
+          let y = (amplitude * (j % 2 === 0 ? 1 : -1));
+
+          if ((j === 0) || (j === segments[i])) {
+            y = 0;
+          }
+
+          var everyOther = j * 2;
+          targetPoints[i][everyOther] = x;
+          targetPoints[i][everyOther+1] = y;
         }
-
-        if (i === 0 ) {
-          points[i].y = yMax/2;
-        } else if (i === SEGMENTS) {
-          points[i].y = yMax/2;
-        }
-
-        var everyOther = i * 2;
-        splinePoints[everyOther] = points[i].x;
-        splinePoints[everyOther+1] = points[i].y;
       }
     }
-
-    function setPoint(idx, x, y) {
-      points[idx] = points[idx] || new PIXI.Point(0, 0);
-      points[idx].x = x;
-      points[idx].y = y;
-    }
-
-    function createPoints() {
-      setPoint(0, -1, yMax / 2);
-
-      for (let i = 0; i <= SEGMENTS; i++) {
-        setPoint(i + 1, 0, yMax / 2);
-      }
-
-      points[SEGMENTS].x = xMax;
-
-      getRun(points[0], points[SEGMENTS], SEGMENTS);
-
-      renderReady = true;
-    }
-
-    /**
-     * Enable visualizer
-     */
-    function enable() {}
-
-    /**
-     * Disable visualizer
-     */
-    function disable() {}
 
     return self;
   };

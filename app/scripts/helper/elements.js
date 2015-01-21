@@ -224,9 +224,11 @@ IOWA.Elements = (function() {
 
         case 'twitter':
           height = 253;
+          var el = document.getElementById('share-dialog-text');
+
           url = 'https://twitter.com/share?text=' +
-                encodeURIComponent(document.title) + '&url=' +
-                encodeURIComponent(location.href);
+                encodeURIComponent(el.textContent || 'Google I/O 2015') +
+                '&url=' + encodeURIComponent(location.href);
         break;
 
         default:

@@ -3,6 +3,7 @@ var reqAnimFrame = require('app/util/raf');
 var { Promise } = require('es6-promise');
 var throttle = require('lodash.throttle');
 var debounce = require('lodash.debounce');
+var currentScrollPosition = require('app/util/currentScrollPosition');
 
 var MaskManager = require('app/views/shared/MaskManager');
 
@@ -41,6 +42,8 @@ module.exports = function(audioManager, stateManager) {
   var onWindowScrollStop = debounce(onWindowScrollStopUnDebounced, 250, { leading: false, trailing: true });
   var continueAnimating = true;
 
+  var containerElem = document.querySelector('#content-container') || document.body;
+
   var didEnterRecordingModeCallback;
   var didExitRecordingModeCallback;
 
@@ -63,7 +66,6 @@ module.exports = function(audioManager, stateManager) {
    * @param {string} visualizerSelector - DOM element for visualizers
    */
   function init(instrumentSelector, visualizerSelector) {
-    // TODO, replace with polymer container?
     viewportElement = document.createElement('div');
     viewportElement.classList.add('experiment-viewport');
 
@@ -120,7 +122,8 @@ module.exports = function(audioManager, stateManager) {
 
     viewportElement.appendChild(logoElement);
     viewportElement.appendChild(logoDialog);
-    document.body.appendChild(viewportElement);
+
+    containerElem.appendChild(viewportElement);
 
     logoClick();
     dialogClick();
@@ -237,7 +240,7 @@ module.exports = function(audioManager, stateManager) {
    */
   function createVisualizerContainers() {
     return visualizerElements.map(function(elem, i) {
-      var pixiObject = new VisualizerContainer(audioManager, elem, viewportElement);
+      var pixiObject = new VisualizerContainer(audioManager, elem, viewportElement, instrumentViews.map(function(i) { return { a: i.getChannel().analyser, c: i.getView().backgroundColor }; }));
       var visualizer = getVisualizerForElem(elem, i);
       if (visualizer) {
         pixiObject.init(i, visualizer[0]); // TODO: Use guid?
@@ -396,7 +399,7 @@ module.exports = function(audioManager, stateManager) {
     var visualizerTop = top;
     var visualizerBottom = visualizerTop + height;
 
-    var scrollTop = window.scrollY;
+    var scrollTop = currentScrollPosition().y;
     var scrollBottom = scrollTop + window.innerHeight;
 
     return (
@@ -412,8 +415,10 @@ module.exports = function(audioManager, stateManager) {
    * @return {function}
    */
   function hideOnScreenVisualizer(openingView, visualizerView) {
-    var screenBottom = window.scrollY + window.innerHeight;
-    var screenMidPoint = window.scrollY + (window.innerHeight / 2);
+    var scrollY = currentScrollPosition().y;
+
+    var screenBottom = scrollY + window.innerHeight;
+    var screenMidPoint = scrollY + (window.innerHeight / 2);
 
     var openingRect = openingView.getElemRect();
     var openingViewBottom = openingRect.top + openingRect.height;
@@ -424,16 +429,16 @@ module.exports = function(audioManager, stateManager) {
     var closestDirection = viewMidPoint < screenMidPoint ? 'top' : 'bottom';
 
     var entirelyInView = (
-      (visualizerRect.top >= window.scrollY) &&
+      (visualizerRect.top >= scrollY) &&
       (visualizerBottom <= screenBottom)
     );
 
     var direction;
     if (!entirelyInView) {
       direction = closestDirection;
-    } else if ((openingRect.top <= window.scrollY) && (openingViewBottom <= screenBottom)) {
+    } else if ((openingRect.top <= scrollY) && (openingViewBottom <= screenBottom)) {
       direction = 'bottom';
-    } else if ((openingRect.top > window.scrollY) && (openingViewBottom > screenBottom)) {
+    } else if ((openingRect.top > scrollY) && (openingViewBottom > screenBottom)) {
       direction = 'top';
     } else {
       direction = closestDirection;
@@ -503,7 +508,8 @@ module.exports = function(audioManager, stateManager) {
     var w = window.innerWidth;
     var h = window.innerHeight;
 
-    var rect = document.body.getBoundingClientRect();
+
+    var rect = containerElem.getBoundingClientRect();
     // viewportElement.style.width = `${rect.width}px`;
     viewportElement.style.height = `${rect.height}px`;
 
@@ -565,8 +571,9 @@ module.exports = function(audioManager, stateManager) {
    * @return {boolean}
    */
   function isInViewport(view) {
-    var top = window.scrollY;
-    var bottom = window.scrollY + window.innerHeight;
+    var { y } = currentScrollPosition();
+    var top = y;
+    var bottom = y + window.innerHeight;
     var rect = view.getElemRect();
 
     return (rect.top <= bottom) && ((rect.top + rect.height) >= top);

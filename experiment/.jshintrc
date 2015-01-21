@@ -19,6 +19,7 @@
   "unused": true,
   "predef": ["-Promise", "-Set", "-Symbol"],
   "globals": {
+    "IOWA": true,
     "TweenMax": true,
     "TweenLite": true,
     "Cubic": true,
