@@ -34,12 +34,12 @@ module.exports = (function() {
         {
           'sound': 'parallelogram_G-minor',
           'color': 0x4dd0e0,
-          'hovercolor': 0x9FE6EE
+          'hovercolor': 0x3DCCDE
         },
         {
           'sound': 'parallelogram_G-sharp-major',
           'color': 0xb1eaf2,
-          'hovercolor': 0x3DCCDE
+          'hovercolor': 0x9FE6EE
         },
         {
           'sound': 'parallelogram_A-sharp-major',

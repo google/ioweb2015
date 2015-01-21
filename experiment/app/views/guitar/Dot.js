@@ -160,6 +160,7 @@ module.exports = (function() {
     function disable() {
       gridDot.interactive = false;
       gridDotMiddle.interactive = false;
+      gridDotUpper.interactive = false;
       gridDot.mousedown = gridDot.touchstart = null;
       gridDotMiddle.mouseover = null;
       gridDotMiddle.mouseout = null;
