@@ -63,7 +63,7 @@ func checkWhitelist(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ac := appengine.NewContext(r)
 		u := user.Current(ac)
-		if u == nil || !isWhitelisted(u.Email) {
+		if u == nil {
 			url, err := user.LoginURL(ac, r.URL.Path)
 			if err != nil {
 				ac.Errorf("user.LoginURL(%q): %v", r.URL.Path, err)
@@ -71,6 +71,11 @@ func checkWhitelist(h http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 			http.Redirect(w, r, url, http.StatusFound)
+			return
+		}
+		if !isWhitelisted(u.Email) {
+			ac.Errorf("%s is not whitelisted", u.Email)
+			http.Error(w, "Access denied, sorry. Try with a different account.", http.StatusForbidden)
 			return
 		}
 		h(w, r)
