@@ -28,14 +28,16 @@ module.exports = (function() {
    */
   return function Sliver(container, polygon, depth, colorSets, hasLeftShadow, hasRightShadow, highlight) {
 
+    var shadowLength;
+
     if (depth === 3) {
-      const SHADOW_LENGTH = 15;
+      shadowLength = 15;
     } else if (depth === 2) {
-      const SHADOW_LENGTH = 30;
+      shadowLength = 30;
     } else if (depth === 1) {
-      const SHADOW_LENGTH = 45;
+      shadowLength = 45;
     } else {
-      const SHADOW_LENGTH = 0;
+      shadowLength = 0;
     }
 
     const [
@@ -186,8 +188,8 @@ module.exports = (function() {
      * @param {Boolean} reverse = reverse or not?
      */
     function drawShadow(x1, y1, x2, y2, reverse) {
-      for (let i = 0; i < SHADOW_LENGTH; i++) {
-        renderShadow(i, x1, y1, x2, y2, reverse, SHADOW_RANGE.getAt(1 - i / (SHADOW_LENGTH-1)));
+      for (let i = 0; i < shadowLength; i++) {
+        renderShadow(i, x1, y1, x2, y2, reverse, SHADOW_RANGE.getAt(1 - i / (shadowLength-1)));
       }
     }
 
