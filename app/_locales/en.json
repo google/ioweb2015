@@ -40,8 +40,12 @@
     "message": "San Francisco"
   },
   "iodate": {
-    "description": "The data of Google I/O",
+    "description": "The date of Google I/O",
     "message": "Smarch xx - xx"
+  },
+  "iomonth": {
+    "description": "The month of the Google I/O event",
+    "message": "Smarch"
   },
   "learnmore": {
     "description": "Link text. Links to a page with the event's details.",
@@ -263,5 +267,21 @@
   "watch-keynote-and-sessions": {
     "description": "Offsite page. Invites users to watch the keynote and session videos.",
     "message": "Watch the keynote and select sessions in real-time, from your laptop or mobile device."
+  },
+  "badge-pickup": {
+    "description": "Schedule page. Users can pick up their badges.",
+    "message": "Badge pick-up"
+  },
+  "sessions-sandbox": {
+    "description": "Schedule page. Sessions and sandbox session label.",
+    "message": "Sessions &amp; Sandbox"
+  },
+  "lunch": {
+    "description": "Schedule page. Lunch label.",
+    "message": "Lunch"
+  },
+  "afterhours": {
+    "description": "Schedule page. After hours label.",
+    "message": "After Hours"
   }
 }
