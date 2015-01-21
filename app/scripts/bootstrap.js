@@ -22,7 +22,10 @@ if ('serviceWorker' in navigator) {
   }).then(function(registration) {
     // Check to see if there's an updated version of service-worker.js with new files to cache:
     // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-registration-update-method
-    registration.update();
+    // Note: registration.update() is not yet widely implemented.
+    if (typeof registration.update == 'function') {
+      registration.update();
+    }
 
     registration.onupdatefound = function() {
       // updatefound is also fired the very first time the SW is installed, and there's no need to
