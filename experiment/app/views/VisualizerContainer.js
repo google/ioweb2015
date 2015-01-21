@@ -1,6 +1,7 @@
 var animate = require('app/util/animate');
 var {Promise} = require('es6-promise');
 var zIndexes = require('app/util/zIndexes');
+var currentScrollPosition = require('app/util/currentScrollPosition');
 
 module.exports = (function() {
   'use strict';
@@ -10,9 +11,10 @@ module.exports = (function() {
    * @param {AudioManager} audioManager - The shared audioManager.
    * @param {Element} elementToMimic_ - The element to watch for our dimensions.
    * @param {Element} viewportElement - The root experiment element.
+   * @param {AudioNode} analysers - The audio analysers.
    * @constructor
    */
-  return function VisualizerContainer(audioManager, elementToMimic_, viewportElement) {
+  return function VisualizerContainer(audioManager, elementToMimic_, viewportElement, analysers) {
     var pid;
 
     var wrapperElement;
@@ -36,7 +38,7 @@ module.exports = (function() {
 
       createRenderer();
 
-      subView = new SubView(audioManager, canvas);
+      subView = new SubView(audioManager, canvas, analysers);
       subView.init();
       wrapperElement.appendChild(canvas);
 
@@ -79,8 +81,10 @@ module.exports = (function() {
       }
 
       var { top, left, width, height } = elementToMimic.getBoundingClientRect();
-      elemRect.top = top + window.scrollY;
-      elemRect.left = left + window.scrollX;
+      var { x, y } = currentScrollPosition();
+
+      elemRect.top = top + y;
+      elemRect.left = left + x;
       elemRect.width = width;
       elemRect.height = height;
 

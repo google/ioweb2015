@@ -673,7 +673,9 @@ window.experiment.customDataz = function() {
             console.log('exit');
           });
 
-          app.start('.row', '.card', [left, top]);
+          setTimeout(function() {
+            app.start('.row', '.card', [left, top]);
+          }, 1500);
         }, function() {
           console.error('experiment loading failed');
         });
