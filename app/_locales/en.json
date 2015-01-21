@@ -283,5 +283,17 @@
   "afterhours": {
     "description": "Schedule page. After hours label.",
     "message": "After Hours"
+  },
+  "upgrade-browser": {
+    "description": "Message for users to upgrade their browser.",
+    "message": "Your browser doesn't support the technology used on this site. To experience the Google I/O 2015 site as intended, please upgrade your browser."
+  },
+  "upgrade-warning": {
+    "description": "Link text for users to go back to the website if the choose to proceed, despite that their browser version may not work.",
+    "message": "Upgrade your browser"
+  },
+  "upgrade-gotosite": {
+    "description": "Link text for users to upgrade their browser if it is old.",
+    "message": "Continue to I/O 2015"
   }
 }
