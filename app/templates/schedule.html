@@ -17,15 +17,15 @@
       <div class="card__container">
         <div class="card">
           <div class="card-content">
-            <h2>Smarch xx, 2015</h2>
+            <h2><i18n-msg msgid="iomonth">Smarch</i18-msg> xx, 2015</h2>
           </div>
           <div class="card-content">
             <div layout horizontal>
               <core-icon icon="schedule"></core-icon>
               <div class="schedule-rows">
                 <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                  <span class="schedule-time" auto-vertical flex>4:00 PM - 6:00 PM</span>
-                  <span auto-vertical flex>Badge pick-up</span>
+                  <span class="schedule-time" auto-vertical flex>9AM - 6PM</span>
+                  <span auto-vertical flex two><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></span>
                 </div>
               </div>
             </div>
@@ -38,23 +38,27 @@
       <div class="card__container">
         <div class="card">
           <div class="card-content">
-            <h2>Smarch xx, 2015</h2>
+            <h2><i18n-msg msgid="iomonth">Smarch</i18-msg> xx, 2015</h2>
           </div>
           <div class="card-content">
             <div layout horizontal>
               <core-icon icon="schedule"></core-icon>
               <div class="schedule-rows">
                 <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                  <span class="schedule-time" auto-vertical flex>8:00 AM - 10:00 AM</span>
-                  <span auto-vertical flex>Breakfast</span>
+                  <span class="schedule-time" auto-vertical flex>8AM - 9AM</span>
+                  <span auto-vertical flex two><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></span>
                 </div>
                 <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                  <span class="schedule-time" auto-vertical flex>9:00 AM - 11:30 AM</span>
-                  <span auto-vertical flex>Keynote</span>
+                  <span class="schedule-time" auto-vertical flex>9AM - 5PM</span>
+                  <span auto-vertical flex two><i18n-msg msgid="sessions-sandbox">Sessions &amp; Sandbox</i18-msg></span>
                 </div>
                 <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
                   <span class="schedule-time" auto-vertical flex>11:30 AM - 1:30 PM</span>
-                  <span auto-vertical flex>Lunch</span>
+                  <span auto-vertical flex two><i18n-msg msgid="lunch">Lunch</i18-msg></span>
+                </div>
+                <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                  <span class="schedule-time" auto-vertical flex>6:30PM - 10PM</span>
+                  <span auto-vertical flex two><i18n-msg msgid="afterhours">After Hours</i18-msg></span>
                 </div>
               </div>
             </div>
@@ -67,23 +71,19 @@
       <div class="card__container">
         <div class="card">
           <div class="card-content">
-            <h2>Smarch xx, 2015</h2>
+            <h2><i18n-msg msgid="iomonth">Smarch</i18-msg> xx, 2015</h2>
           </div>
           <div class="card-content">
             <div layout horizontal>
               <core-icon icon="schedule"></core-icon>
               <div class="schedule-rows">
                 <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                  <span class="schedule-time" auto-vertical flex>8:00 AM - 10:00 AM</span>
-                  <span auto-vertical flex>Breakfast</span>
+                  <span class="schedule-time" auto-vertical flex>9AM - 5PM</span>
+                  <span auto-vertical flex two><i18n-msg msgid="sessions-sandbox">Sessions &amp; Sandbox</i18-msg></span>
                 </div>
                 <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                  <span class="schedule-time" auto-vertical flex>9:00 AM - 11:30 AM</span>
-                  <span auto-vertical flex>Sessions</span>
-                </div>
-                <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                  <span class="schedule-time" auto-vertical flex>9:00 AM - 5:00 PM</span>
-                  <span auto-vertical flex>Codelabs</span>
+                  <span class="schedule-time" auto-vertical flex>11:30 AM - 1:30 PM</span>
+                  <span auto-vertical flex two><i18n-msg msgid="lunch">Lunch</i18-msg></span>
                 </div>
               </div>
             </div>
