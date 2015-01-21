@@ -133,8 +133,6 @@ This is a rainbow circle border that spins around the experiment-fab while the e
         -webkit-animation: none;
         animation: none;
       }
-
-      :host([]);
     </style>
   </template>
   <script>
@@ -1026,8 +1024,10 @@ Main parent container for all of the fab elements.
       },
 
       trackFab: function(event) {
+        var MIN_HEIGHT = 480;
+
         var fabPos = this.getBoundingClientRect();
-        if (fabPos.top < 480) {
+        if (fabPos.top < MIN_HEIGHT) {
           this.dialogAnimateDirection = 'animate-down';
         } else {
           this.dialogAnimateDirection = 'animate-up';
