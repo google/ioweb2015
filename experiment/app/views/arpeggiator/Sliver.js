@@ -10,7 +10,7 @@ module.exports = (function() {
   const ARPEGGIATOR_COLORS = require('app/data/arp-colors.json');
   const MAX_RADIUS = ARPEGGIATOR_COLORS.centerRadius;
   const SAFE_ZONE = 1.0 - ARPEGGIATOR_COLORS.safeZone;
-  const SHADOW_RANG = new FloatRange(0.3, 0);
+  const SHADOW_RANGE = new FloatRange(0.18, 0);
   const CENTER_RANGE = new FloatRange(0, MAX_RADIUS);
 
   var distanceGradients = {};
@@ -27,7 +27,18 @@ module.exports = (function() {
    * @constructor
    */
   return function Sliver(container, polygon, depth, colorSets, hasLeftShadow, hasRightShadow, highlight) {
-    const SHADOW_LENGTH = 15 * (1 + (1 - depth / 3));
+
+    var shadowLength;
+
+    if (depth === 3) {
+      shadowLength = 15;
+    } else if (depth === 2) {
+      shadowLength = 30;
+    } else if (depth === 1) {
+      shadowLength = 45;
+    } else {
+      shadowLength = 0;
+    }
 
     const [
       COLOR_A,
@@ -177,8 +188,8 @@ module.exports = (function() {
      * @param {Boolean} reverse = reverse or not?
      */
     function drawShadow(x1, y1, x2, y2, reverse) {
-      for (let i = 0; i < SHADOW_LENGTH; i++) {
-        renderShadow(i, x1, y1, x2, y2, reverse, SHADOW_RANG.getAt(1 - i / (SHADOW_LENGTH-1)));
+      for (let i = 0; i < shadowLength; i++) {
+        renderShadow(i, x1, y1, x2, y2, reverse, SHADOW_RANGE.getAt(1 - i / (shadowLength-1)));
       }
     }
 
