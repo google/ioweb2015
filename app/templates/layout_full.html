@@ -286,44 +286,6 @@ limitations under the License.
             <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
               <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
             </div>
-            <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
-
-              <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-              <div flex><a href="./" data-ajax-link><div class="io-logo"></div></a></div>
-              <paper-tabs class="white {{ pages[nextPage].mastheadBgClass }}" link noink
-                valueattr="label" selected="{{selectedPage}}">
-                <paper-tab label="about">
-                  <a href="about" data-ajax-link layout horizontal center>
-                    <i18n-msg msgid="about">About</i18n-msg>
-                  </a>
-                </paper-tab>
-                <paper-tab label="schedule">
-                  <a href="schedule" data-ajax-link layout horizontal center>
-                    <i18n-msg msgid="schedule">Schedule</i18n-msg>
-                  </a>
-                </paper-tab>
-                <paper-tab label="onsite">
-                  <a href="onsite" data-ajax-link layout horizontal center>
-                    <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
-                  </a>
-                </paper-tab>
-                <paper-tab label="offsite">
-                  <a href="offsite" data-ajax-link layout horizontal center>
-                    <i18n-msg msgid="attend-offsite">Attend offsite</i18n-msg>
-                  </a>
-                </paper-tab>
-                <paper-tab label="registration">
-                  <a href="registration" data-ajax-link layout horizontal center>
-                    <i18n-msg msgid="registration">Registration</i18n-msg>
-                  </a>
-                </paper-tab>
-              </paper-tabs>
-            </core-toolbar>
-            <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
-              <div class="io-logo large" iologodestination></div>
-              <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
-                <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
-              </div>
             <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}"></experiment-fab-container>
           </header>
 
