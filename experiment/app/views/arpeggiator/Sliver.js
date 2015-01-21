@@ -27,7 +27,6 @@ module.exports = (function() {
    * @constructor
    */
   return function Sliver(container, polygon, depth, colorSets, hasLeftShadow, hasRightShadow, highlight) {
-    console.log(depth);
 
     if (depth === 3) {
       const SHADOW_LENGTH = 15;
