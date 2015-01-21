@@ -27,57 +27,38 @@ html, body {
   height: 100%;
   width: 100%;
   background-color: $color-cyan-500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  overflow: auto;
 }
 
 ##{$name} {
+
+#upgrade {
+  margin-top: $desktopKeyline;
+}
 
 .iologo {
   height: 200px;
 }
 
 .page__section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
 }
 
 .link-spacing {
-  display: flex;
-  flex-direction: column;
+  line-height: 0;
 }
-
 
 @media (max-width: $phone-breakpoint-max) {
   .link-spacing {
-    a:not(:last-of-type) {
+    a {
       padding-bottom: $desktopKeyline;
+
+      &:not(:last-of-type) {
+        float: left;
+      }
+
     }
   }
-  .page__section {
-    flex: 1;
-  }
-}
-
-@media (min-width: $tablet-breakpoint-min) {
-  .link-spacing {
-    flex-direction: row;
-  }
-}
-
-@media (min-width: $desktop-breakpoint-mid) {
-
-}
-
-@media (min-width: $desktop-breakpoint-max) {
-
-}
-
-@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-
 }
 
 }
