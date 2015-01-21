@@ -21,6 +21,8 @@ import (
 var (
 	// rootDir is relative to basedir of app.yaml is (app root)
 	rootDir = "app"
+	// httpPrefix is the URL path prefix to serve the app from
+	httpPrefix = "/io2015"
 	// whitemap contains whitelisted email addresses or domains.
 	// whitelisted domains should be prefixed with "@", e.g. @example.org
 	whitemap map[string]bool
@@ -110,4 +112,8 @@ func appengineContext(c context.Context) appengine.Context {
 		panic("never reached: no appengine.Context found")
 	}
 	return ac
+}
+
+func logHandler(h http.Handler) http.Handler {
+	return h
 }

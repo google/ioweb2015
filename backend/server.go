@@ -17,8 +17,10 @@ import (
 )
 
 var (
-	rootDir    string
-	listenAddr string
+	rootDir    = "app"
+	listenAddr = "127.0.0.1:8080"
+	// URL path prefix to serve from
+	httpPrefix = "/io2015"
 	// app environment: "dev", "stage" or "prod"
 	// don't refer to this directly, use env(c) func instead.
 	appEnv string
@@ -30,17 +32,25 @@ func main() {
 	if appEnv == "" {
 		appEnv = "dev"
 	}
-	flag.StringVar(&rootDir, "d", "app", "app root dir")
-	flag.StringVar(&listenAddr, "listen", "127.0.0.1:8080", "address to listen on")
+	flag.StringVar(&rootDir, "d", rootDir, "app root dir")
+	flag.StringVar(&listenAddr, "listen", listenAddr, "address to listen on")
+	flag.StringVar(&httpPrefix, "prefix", httpPrefix, "URL path prefix to serve from")
 	flag.StringVar(&appEnv, "env", appEnv, "app environment: dev, stage or prod")
 	flag.Parse()
 
-	cache = newMemoryCache()
+	if httpPrefix == "" || httpPrefix[0] != '/' {
+		httpPrefix = "/" + httpPrefix
+	}
 
-	http.HandleFunc("/", withLogging(catchAllHandler))
-	http.HandleFunc("/api/extended", withLogging(serveIOExtEntries))
+	cache = newMemoryCache()
+	registerHandlers()
 
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
+}
+
+// newContext returns a newly created context of the in-flight request r.
+func newContext(r *http.Request) context.Context {
+	return context.WithValue(context.Background(), ctxKeyEnv, appEnv)
 }
 
 // catchAllHandler serves either static content from rootDir
@@ -61,16 +71,11 @@ func catchAllHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, p)
 }
 
-// withLogging wraps handler func h into a closure that logs
-// incoming requests and passes it on to h.
-func withLogging(h http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+// logHandlers wraps handler h into a closure that logs
+// incoming requests and passes it on to the h.
+func logHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s", r.Method, r.URL.Path)
-		h(w, r)
-	}
-}
-
-// newContext returns a newly created context of the in-flight request r.
-func newContext(r *http.Request) context.Context {
-	return context.WithValue(context.Background(), ctxKeyEnv, appEnv)
+		h.ServeHTTP(w, r)
+	})
 }

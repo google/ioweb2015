@@ -10,6 +10,27 @@ import (
 	"strings"
 )
 
+func registerHandlers() {
+	handle("/", catchAllHandler)
+	handle("/api/extended", serveIOExtEntries)
+	// setup root redirect if we're prefixed
+	if httpPrefix != "/" {
+		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
+	}
+}
+
+func handler(fn func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	var h http.Handler = http.HandlerFunc(fn)
+	if httpPrefix != "/" {
+		h = http.StripPrefix(httpPrefix, h)
+	}
+	return logHandler(h)
+}
+
+func handle(pattern string, fn func(w http.ResponseWriter, r *http.Request)) {
+	http.Handle(path.Join(httpPrefix, pattern), handler(fn))
+}
+
 // serveTemplate responds with text/html content of the executed template
 // found under request base path.
 // 'home' template is assumed if request path ends with '/'.
