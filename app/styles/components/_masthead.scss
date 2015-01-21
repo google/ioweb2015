@@ -224,17 +224,7 @@ experiment-fab-container {
   }
 }
 
-@media (min-width: $tablet-breakpoint-max) {
-  .masthead {
-    min-height: 600px;
-  }
-}
-
-
 @media (min-width: $desktop-breakpoint-mid) {
-  .masthead {
-    min-height: 700px;
-  }
   .masthead-container {
     max-width: 896px;
   }
