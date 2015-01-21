@@ -77,6 +77,7 @@ module.exports = (function() {
     var optimalWidth;
     var optimalHeight;
 
+    var isDragging = false;
     var isRecording = false;
     var circleRadius = 54;
 
@@ -163,8 +164,6 @@ module.exports = (function() {
       circleGraphic.interactive = true;
       circleGraphic.buttonMode = true;
       circleGraphic.defaultCursor = '-webkit-grab';
-
-      var isDragging = false;
 
       circleGraphic.mousedown = circleGraphic.touchstart = function() {
         isDragging = true;
@@ -378,6 +377,11 @@ module.exports = (function() {
      * Play the arpeggiator loop and record if in recording state.
      */
     function playLoop() {
+
+      if (!isDragging) {
+        return;
+      }
+
       var mapping = QUAD_MAPPING[currentQuadrant];
 
       var note = new ArpeggiatorNoteModel({
@@ -565,6 +569,7 @@ module.exports = (function() {
       stopRecording,
       loadData,
       name: INSTRUMENT_NAME,
+      backgroundColor: THEME.center[0],
       dataModel: ArpeggiatorDataModel,
       getData: () => data,
       getChannel: () => CHANNEL

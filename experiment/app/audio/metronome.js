@@ -23,16 +23,16 @@ module.exports = (function() {
      * @param {window} global - The global scope.
      */
     function workerInit(global) {
-      /* jshint worker: true, validthis: true  */
+      /* jshint worker: true, validthis: true */
       var timerID = null;
       var interval = 100;
+
+      var intervalFunc = 'function' === typeof setInterval ? setInterval : this['setInterval'];
+      var clearIntervalFunc = 'function' === typeof clearInterval ? clearInterval : this['clearInterval'];
 
       function ticker() {
         postMessage('tick');
       }
-
-      var intervalFunc = setInterval;
-      var clearIntervalFunc = clearInterval;
 
       global.onmessage = function(e) {
         /* jshint sub: true */

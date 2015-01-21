@@ -165,21 +165,30 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
         background-size: 75%;
         box-sizing: border-box;
         border-radius: 3px;
-        bottom: 80px;
         box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
         font-family: 'Roboto', sans-serif;
-        height: 480px;
+        height: 460px;
         padding: 20px;
         position: absolute;
-        right: 0;
+        right: 70px;
         -webkit-transition: -webkit-transform 300ms ease-in-out;
         -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 100% 100%;
         transition: transform 300ms ease-in-out;
         transform: scale(0,0);
-        transform-origin: 100% 100%;
         width: 360px;
         z-index: 2;
+      }
+
+      :host(.animate-up) {
+        bottom: 0;
+        -webkit-transform-origin: 100% 100%;
+        transform-origin: 100% 100%;
+      }
+
+      :host(.animate-down) {
+        top: 0;
+        -webkit-transform-origin: 100% 0;
+        transform-origin: 100% 0;
       }
 
       @media screen and (max-width: 767px) {
@@ -937,7 +946,7 @@ Main parent container for all of the fab elements.
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
       <experiment-fab src="{{componentDir}}images/experiment-fab-animation.gif" on-tap="{{onFabClick}}" mini?="{{mini}}"></experiment-fab>
 
-      <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}"></experiment-loading-dialog>
+      <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
       <experiment-overlay active?="{{dialogVisible}}"></experiment-overlay>
 
@@ -981,6 +990,10 @@ Main parent container for all of the fab elements.
         mini: {
           reflect: true,
           value: false
+        },
+        dialogAnimateDirection: {
+          value: 'animate-up',
+          reflect: true
         }
       },
 
@@ -1003,6 +1016,22 @@ Main parent container for all of the fab elements.
       ready: function() {
         this.boundOnScroll = this.onScroll.bind(this);
         this.bindEscape = this.onEscKeyUp.bind(this);
+      },
+
+      attached: function() {
+        this.bindFab = this.trackFab.bind(this);
+        IOWA.Elements.ScrollContainer.addEventListener('scroll', this.bindFab);
+      },
+
+      trackFab: function(event) {
+        var MIN_HEIGHT = 480;
+
+        var fabPos = this.getBoundingClientRect();
+        if (fabPos.top < MIN_HEIGHT) {
+          this.dialogAnimateDirection = 'animate-down';
+        } else {
+          this.dialogAnimateDirection = 'animate-up';
+        }
       },
 
       onFabClick: function(event) {
@@ -1039,6 +1068,7 @@ Main parent container for all of the fab elements.
       experimentOn: function(event) {
         this.dialogVisible = false;
         document.removeEventListener('keyup', this.bindEscape);
+        IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.bindFab);
         this.playmode = 'playing';
 
         this.async(function(){

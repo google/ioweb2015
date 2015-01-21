@@ -15,47 +15,49 @@
  */
 
 
-$name: 'page-registration';
+$name: 'page-upgrade';
 
 @import '../base/_layout';
 @import '../base/_color';
 @import '../base/_breakpoints';
+@import '../base/_typography';
 
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $color-cyan-500;
+  overflow: auto;
+}
 
 ##{$name} {
 
-.io-countdown {
-  h4 {
-    color: $color-cyan-A700;
-    margin-right: 0;
-  }
+#upgrade {
+  margin-top: $desktopKeyline;
 }
 
-.card-content h2 {
-  padding-bottom: $tabletKeyline;
+.iologo {
+  height: 200px;
 }
 
-@media (min-width: $tablet-breakpoint-min) {
-  .io-countdown {
-    margin: 100px 0;
-  }
-  .page__section--countdown {
-    margin-top: -137px;
-    padding-top: 138px;
-  }
+.page__section {
+  text-align: center;
 }
 
-@media (min-width: $desktop-breakpoint-min) {
-  .page__section--countdown {
-    margin-top: -165px; // adjustments for section is snug against previous.
-    padding-top: 165px;
-  }
+.link-spacing {
+  line-height: 0;
 }
 
-@media (min-width: $desktop-breakpoint-max) {
-  .page__section--countdown {
-    margin-top: -129px; // adjustments for section is snug against previous.
-    padding-top: 129px;
+@media (max-width: $phone-breakpoint-max) {
+  .link-spacing {
+    a {
+      padding-bottom: $desktopKeyline;
+
+      &:not(:last-of-type) {
+        float: left;
+      }
+
+    }
   }
 }
 

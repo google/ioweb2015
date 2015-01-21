@@ -93,7 +93,7 @@ $name: 'page-home';
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  $overlayCardTop: 100px;
+  $overlayCardTop: 180px;
 
   .io__hash {
     margin: 80px auto;
@@ -123,14 +123,14 @@ $name: 'page-home';
     }
   }
   .page__section--attend {
-    margin-bottom: -215px;
+    margin-bottom: -153px;
   }
   .attend__globe {
     height: 500px;
   }
   #join {
     position: relative;
-    margin-top: -46px;
+    margin-top: -144px;
     padding-top: $overlayCardTop;
 
     .join__social {
@@ -149,13 +149,16 @@ $name: 'page-home';
     margin-top: -182px;
   }
   .page__section--attend {
-    margin-bottom: -251px;
+    margin-bottom: -201px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
   .home-photo {
     margin-top: -134px;
+  }
+  .page__section--attend {
+    margin-bottom: -153px;
   }
 }
 

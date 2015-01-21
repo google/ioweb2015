@@ -61,7 +61,6 @@ IOWA.Router = (function() {
 
         var color = isFadeRipple ?
             '#fff': IOWA.Elements.Template.rippleColors[bgClass];
-
         var rippleAnim = IOWA.PageAnimation.ripple(
               IOWA.Elements.Ripple, e.pageX, e.pageY, 400, color, isFadeRipple);
 
@@ -141,6 +140,8 @@ IOWA.Router = (function() {
    */
   function renderPage(pageName) {
     var importURL = pageName + '?partial';
+    //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentOut());
+
 
     Polymer.import([importURL], function() {
       // Don't proceed if import didn't load correctly.
@@ -179,6 +180,8 @@ IOWA.Router = (function() {
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
     replaceTemplateContent(currentPageTemplates);
+
+
     document.body.id = 'page-' + pageName;
     IOWA.Elements.Template.selectedPage = pageName;
     var pageMeta = IOWA.Elements.Template.pages[pageName];
@@ -188,12 +191,13 @@ IOWA.Router = (function() {
     masthead.className = masthead.className.replace(
         MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
 
+
     setTimeout(function() {
+      debugger;
       IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
     }, 50); // Wait for the... Good question. Maybe template binding?
     // TODO: BUG: Anyways, something to investigate. Web Animations
     // are not working properly without this delay (Chrome crashes).
-
   }
 
   /**
@@ -238,7 +242,6 @@ IOWA.Router = (function() {
   function init() {
     window.addEventListener('popstate', renderCurrentPage);
     document.addEventListener('click', navigate);
-
   }
 
   return {

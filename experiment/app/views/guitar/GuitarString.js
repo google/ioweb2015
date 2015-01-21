@@ -170,8 +170,8 @@ module.exports = (function() {
     function createMouseCollider() {
       mouseColliderBodyShape = new p2.Circle(1);
       mouseColliderBody = new p2.Body({
-        mass:1,
-        position: [80,500],
+        mass: 1,
+        position: [80, 500],
         velocity: [0, 0],
         force: [0, 0],
         type: 1,
@@ -234,8 +234,8 @@ module.exports = (function() {
       spring1 = new p2.LinearSpring(capsuleBody, plane, {
         restLength: 0.5,
         stiffness: 10,
-        localAnchorA: [-capsuleShape.length/2,0],
-        worldAnchorB: [200,200],
+        localAnchorA: [-capsuleShape.length / 2, 0],
+        worldAnchorB: [200, 200],
       });
 
       world.addSpring(spring1);
@@ -244,8 +244,8 @@ module.exports = (function() {
         restLength: 0.5,
         stiffness: 10,
         damping: 1,
-        localAnchorA: [capsuleShape.length/2,0],
-        worldAnchorB: [0,0],
+        localAnchorA: [capsuleShape.length / 2, 0],
+        worldAnchorB: [0, 0],
       });
 
       world.addSpring(spring2);
@@ -256,12 +256,12 @@ module.exports = (function() {
      */
     function createAnchorGraphics() {
       anchorPoint1 = new PIXI.Graphics();
-      anchorPoint1.beginFill(0x000000);
+      anchorPoint1.beginFill(0xffffff);
       anchorPoint1.drawCircle(0, 0,3);
       displayContainerCenter.addChild(anchorPoint1);
 
       anchorPoint2 = new PIXI.Graphics();
-      anchorPoint2.beginFill(0x000000);
+      anchorPoint2.beginFill(0xffffff);
       anchorPoint2.drawCircle(0, 0, 3);
       displayContainerCenter.addChild(anchorPoint2);
 
@@ -302,12 +302,12 @@ module.exports = (function() {
      */
     function renderLine() {
       lineGraphic.clear();
-      lineGraphic.lineStyle(5, 0xffffff, 1);
+      lineGraphic.lineStyle(7, 0xffffff, 1);
       lineGraphic.moveTo(anchorPoint1.position.x, anchorPoint1.position.y);
       lineGraphic.quadraticCurveTo(capsuleBody.position[0], capsuleBody.position[1], anchorPoint2.position.x, anchorPoint2.position.y);
 
       lineGraphicShadow.clear();
-      lineGraphicShadow.lineStyle(8, 0x000000, 0.1);
+      lineGraphicShadow.lineStyle(7, 0x000000, 0.1);
       lineGraphicShadow.moveTo(anchorPoint1.position.x, anchorPoint1.position.y);
       lineGraphicShadow.quadraticCurveTo(capsuleBody.position[0]+10, capsuleBody.position[1]+10, anchorPoint2.position.x, anchorPoint2.position.y);
     }
@@ -505,10 +505,10 @@ module.exports = (function() {
       mouseColliderBody.position[0] = mouseColliderGraphic.position.x;
       mouseColliderBody.position[1] = mouseColliderGraphic.position.y;
 
-      lastMouseX =  currentMouseX;
+      lastMouseX = currentMouseX;
       currentMouseX = mouseColliderBody.position[0];
 
-      lastMouseY =  currentMouseY;
+      lastMouseY = currentMouseY;
       currentMouseY = mouseColliderBody.position[1];
 
       renderLine();

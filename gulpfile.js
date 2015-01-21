@@ -134,6 +134,7 @@ gulp.task('copy-assets', ['copy-bower-dependencies'], function() {
     APP_DIR + '/manifest.json',
     APP_DIR + '/clear_cache.html',
     APP_DIR + '/styles/**.css',
+    APP_DIR + '/styles/pages/upgrade.css',
     APP_DIR + '/elements/**/images/*',
     APP_DIR + '/templates/*.html',
     APP_DIR + '/sw.js', // Note: sw script needs to be in the root of the site.

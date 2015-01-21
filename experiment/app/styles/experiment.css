@@ -15,19 +15,18 @@
   }
 
 .experiment-logo {
-  background-size: 84px 60px;
+  background-size: 42px 30px;
   background-position: 50% 50%;
   background-repeat: no-repeat;
   cursor: pointer;
   left: 0;
   position: absolute;
   top: 0;
-  width: 170px;
-  height: 132px;
+  height: 60px;
+  width: 88px;
   z-index: 100003;
   opacity: 1;
   visibility: visible;
-  transition: 300ms all ease-out;
 }
 
   .experiment-logo.hidden {
@@ -44,8 +43,8 @@
   height: 110px;
   padding: 20px;
   position: absolute;
-  left: 150px;
-  top: 40px;
+  left: 80px;
+  top: 18px;
   transition: transform 300ms ease-in-out;
   transform: scale(0,0);
   transform-origin: 0 0;
@@ -94,11 +93,6 @@
   }
 
   @media screen and (max-width: 767px) {
-    .experiment-logo {
-      background-size: 42px 30px;
-      height: 60px;
-      width: 88px;
-    }
     .logo-dialog {
       left: 80px;
       top: 18px;
