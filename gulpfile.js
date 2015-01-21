@@ -30,9 +30,8 @@ var DIST_EXPERIMENT_DIR = APP_DIR + '/experiment';
 
 var STATIC_VERSION = 1; // Cache busting static assets.
 var VERSION = argv.build || STATIC_VERSION;
-
-// TODO: update this URL to be correct for prod.
-var EXPERIMENT_STATIC_URL = '/experiment/';
+var URL_PREFIX = (argv.urlPrefix || '').replace(/\/+$/g, '') || '/io2015';
+var EXPERIMENT_STATIC_URL = URL_PREFIX + '/experiment/';
 
 // Clears files cached by gulp-cache (e.g. anything using $.cache).
 gulp.task('clear', function (done) {
@@ -124,6 +123,10 @@ gulp.task('copy-backend', function(cb) {
     BACKEND_DIR + '/*.pem',
     BACKEND_DIR + '/whitelist'
   ], {base: './'})
+  // app.yaml
+  .pipe($.replace(/(- url:) */g, '$1 ' + URL_PREFIX))
+  // server_gae.go
+  .pipe($.replace(/(httpPrefix = ")[^"]*/g, '$1' + URL_PREFIX))
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .on('end', function() {
     var destLink = [DIST_STATIC_DIR, BACKEND_DIR, APP_DIR].join('/');
