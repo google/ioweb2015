@@ -245,13 +245,13 @@ limitations under the License.
 
       <header class="masthead {% template "mastheadBgClass" .%} js-experiment-instrument" layout vertical>
         <div class="masthead__ripple">
-          <div class="masthead__ripple__content {{ rippleBgClass }}" id="masthead-ripple"></div>
+          <div class="masthead__ripple__content" id="masthead-ripple"></div>
         </div>
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
 
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
           <div flex><a href="./" data-ajax-link data-anim-ripple><div class="io-logo"></div></a></div>
-          <paper-tabs class="white {{ rippleBgClass }}" link noink
+          <paper-tabs class="white {{ mastheadBgClass }}" link noink
             valueattr="label" selected="{{selectedPage}}">
             <paper-tab label="about">
               <a href="about" data-ajax-link data-anim-ripple layout horizontal center>

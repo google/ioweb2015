@@ -38,6 +38,8 @@ IOWA.PageAnimation = (function() {
       fill: 'forwards'
   };
 
+  var canRunSimultanousAnimations = (/Chrome/gi).test(navigator.userAgent);
+
   /**
    * Returns an animation to slide and fade out the main content of the page.
    * Used together with slideContentIn for page transitions.
@@ -60,6 +62,8 @@ IOWA.PageAnimation = (function() {
       new Animation(main, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
       new Animation(masthead, [{ opacity: 1 }, { opacity: 0 }],
+          CONTENT_SLIDE_OPTIONS),
+      new Animation(IOWA.Elements.Footer, [{ opacity: 1 }, { opacity: 0 }],
           CONTENT_SLIDE_OPTIONS)
     ]);
     animation.callback = callback;
@@ -89,6 +93,8 @@ IOWA.PageAnimation = (function() {
       new Animation(main, [start, end], CONTENT_SLIDE_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
       new Animation(masthead, [{ opacity: 0 }, { opacity: 1 }],
+          CONTENT_SLIDE_OPTIONS),
+      new Animation(IOWA.Elements.Footer, [{ opacity: 0 }, { opacity: 1 }],
           CONTENT_SLIDE_OPTIONS)
     ]);
     animationGroup.callback = callback;
@@ -99,21 +105,25 @@ IOWA.PageAnimation = (function() {
    * Returns an animation to play a color ink ripple.
    * @param {Element} ripple Ripple DOM element.
    * @param {number} x X coordinate of the center of the ripple.
-   * @param {number} x Y coordinate of the center of the ripple.
+   * @param {number} y Y coordinate of the center of the ripple.
+   * @param {number} duration How long is the animation.
+   * @param {string} duration color Ripple color.
    * @param {boolean} isFadeRipple If true, play a temporary glimpse ripple.
    *     If false, play a regular opaque color ripple.
    * @param {Function} callback Callback to be called when animation finishes.
    * @return {Animation} Ripple animation definition.
    */
-  function rippleEffect(ripple, x, y, duration, isFadeRipple, callback) {
+  function rippleEffect(ripple, x, y, duration, color, isFadeRipple, callback) {
     var translate = 'translate3d(' + x + 'px,' + y + 'px, 0)';
     var start = {
       transform: translate + ' scale(0)',
-      opacity: isFadeRipple ? 0.5 : 1
+      opacity: isFadeRipple ? 0.5 : 1,
+      backgroundColor: color
     };
     var end = {
       transform: translate + ' scale(1)',
-      opacity: isFadeRipple ? 0 : 1
+      opacity: isFadeRipple ? 0 : 1,
+      backgroundColor: color
     };
     var animation = new Animation(ripple, [start, end], {
         duration: duration,
@@ -179,16 +189,17 @@ IOWA.PageAnimation = (function() {
    *     a callback when it finishes, if one was assigned.
    * @param {TimedSequence} Animation of AnimationGroup or AnimationSequence.
    */
-  function play(animation) {
+  function play(animation, callback) {
     var player = document.timeline.play(animation);
-    if (animation.callback) {
+    if (callback) {
       player.onfinish = function(e) {
-        animation.callback();
+        callback();
       };
     }
   }
 
   return {
+    canRunSimultanousAnimations: canRunSimultanousAnimations,
     slideContentOut: slideContentOut,
     slideContentIn: slideContentIn,
     ripple: rippleEffect,
