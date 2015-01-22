@@ -68,9 +68,9 @@ module.exports = (function() {
     }
 
     /**
-     * Draw oscillating wave to canvas
+     * Draw oscillating bars to canvas
      */
-    function drawWave() {
+    function drawBars() {
       canvasContext.fillStyle = 'rgba(255,255,255,1)';
       canvasContext.fillRect(0, 0, xMax, yMax);
 
@@ -102,7 +102,7 @@ module.exports = (function() {
     var delay = frameWait;
 
     /**
-     * On render, draw wave
+     * On render, draw bars
      */
     function render(delta) {
       delay--;
@@ -115,11 +115,11 @@ module.exports = (function() {
 
       getRun();
       tickChase(delta);
-      drawWave();
+      drawBars();
     }
 
     /**
-     * On resize, draw wave
+     * On resize, draw bars
      */
     function resize() {
       xMax = canvas.width;
@@ -129,7 +129,7 @@ module.exports = (function() {
 
       getRun();
       tickChase(0);
-      drawWave();
+      drawBars();
     }
 
     /**
@@ -147,18 +147,6 @@ module.exports = (function() {
           currentPoints[i][j+1] += (targetY - currentPoints[i][j+1]) * 0.05;
         }
       }
-    }
-
-    /**
-     * On resize, draw wave
-     */
-    function resize() {
-      xMax = canvas.width;
-      yMax = canvas.height;
-
-      getRun();
-      tickChase(0);
-      drawWave();
     }
 
     var base = 10;
