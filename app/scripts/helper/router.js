@@ -24,6 +24,34 @@ IOWA.Router = (function() {
 
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
+  var currentPageTransition = null;
+
+  /**
+   * Navigates to a new page. Uses ajax for data-ajax-link links.
+   * @param {Event} e Event that triggered navigation.
+   * @private
+   */
+  function playHeroTransition(e, el, rippleColor) {
+    var callback = function(el, card) {
+      // TODO: There's jank/flicker on bringing the content in,
+      // especially in the masthead.
+      //IOWA.Elements.Template.mastheadBgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+      IOWA.History.pushState({'path': el.pathname}, '', el.href);
+    };
+    var card = null;
+    var currentEl = el;
+    while (!card) {
+      currentEl = currentEl.parentNode;
+      if (currentEl.classList.contains('card__container')) {
+        card = currentEl;
+      }
+    }
+    IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverOut(
+        card, e.pageX, e.pageY, 300, rippleColor),
+        callback.bind(null, el, card));
+  }
+
+
   /**
    * Navigates to a new page. Uses ajax for data-ajax-link links.
    * @param {Event} e Event that triggered navigation.
@@ -39,15 +67,17 @@ IOWA.Router = (function() {
     IOWA.Elements.Template.nextPage = pageName;
     var callback;
     var currentPage = IOWA.Elements.Template.selectedPage;
+    var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+    IOWA.Elements.Template.mastheadBgClass = bgClass;
+    var isFadeRipple = (
+        IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
+        bgClass);
+    var rippleColor = isFadeRipple ?
+        '#fff': IOWA.Elements.Template.rippleColors[bgClass];
+
     if (currentPage !== pageName) {
 
       if (el.hasAttribute('data-anim-ripple')) {
-
-        var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
-        IOWA.Elements.Template.mastheadBgClass = bgClass;
-        var isFadeRipple = (
-            IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
-            bgClass);
 
         /*
         // TODO: BUG: interesting, causes Web Animations opacity bug.
@@ -59,10 +89,8 @@ IOWA.Router = (function() {
         sequence.callback = callback.bind(this, el);
         */
 
-        var color = isFadeRipple ?
-            '#fff': IOWA.Elements.Template.rippleColors[bgClass];
         var rippleAnim = IOWA.PageAnimation.ripple(
-              IOWA.Elements.Ripple, e.pageX, e.pageY, 400, color, isFadeRipple);
+              IOWA.Elements.Ripple, e.pageX, e.pageY, 400, rippleColor, isFadeRipple);
 
         if (IOWA.PageAnimation.canRunSimultanousAnimations) {
           // Run animations simultaneously, then change the page.
@@ -80,29 +108,13 @@ IOWA.Router = (function() {
           callback = function(el) {
             IOWA.PageAnimation.play(
                 IOWA.PageAnimation.slideContentOut(), function() {
-                  IOWA.Elements.Template.contentHidden = true;
                   IOWA.History.pushState({'path': el.pathname}, '', el.href);
                 });
           };
           IOWA.PageAnimation.play(rippleAnim, callback.bind(null, el));
         }
       } else if (el.hasAttribute('data-anim-card'))  {
-        callback = function(el, card) {
-          // TODO: There's jank/flicker on bringing the content in,
-          // especially in the masthead.
-          IOWA.Elements.Template.rippleBgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
-          IOWA.History.pushState({'path': el.pathname}, '', el.href);
-        };
-        var card = null;
-        var currentEl = el;
-        while (!card) {
-          currentEl = currentEl.parentNode;
-          if (currentEl.classList.contains('card__container')) {
-            card = currentEl;
-          }
-        }
-        IOWA.PageAnimation.play(IOWA.PageAnimation.cardToMasthead(
-            card, e.pageX, e.pageY, 300), callback.bind(null, el, card));
+        playHeroTransition(e, el, rippleColor);
       } else {
         IOWA.History.pushState({'path': el.pathname}, '', el.href);
       }
@@ -142,8 +154,6 @@ IOWA.Router = (function() {
    */
   function renderPage(pageName) {
     var importURL = pageName + '?partial';
-    //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentOut());
-
 
     Polymer.import([importURL], function() {
       // Don't proceed if import didn't load correctly.
@@ -194,21 +204,46 @@ IOWA.Router = (function() {
           MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
 
       setTimeout(function() {
-        var animation = IOWA.PageAnimation.slideContentIn();
-        animation.pageState = 'slideContentIn';
-        IOWA.PageAnimation.play(animation);
-        //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
-      }, 50); // Wait for the... Good question. Maybe template binding?
-      // TODO: BUG: Anyways, something to investigate. Web Animations
-      // are not working properly without this delay (Chrome crashes).
+        if (IOWA.PageAnimation.pageState === 'pageCardTakeoverOut') {
+          var animationIn = IOWA.PageAnimation.pageCardTakeoverIn();
+
+        } else  {
+          var animationIn = IOWA.PageAnimation.pageSlideIn();
+
+        }
+        IOWA.PageAnimation.play(animationIn);
+      }, 50); // Wait for the currentPageTemplates to render fully.
+      // Web Animations are not working properly without this delay
+      // (Chrome crashes).
     };
 
-    if (IOWA.PageAnimation.pageState !== 'slideContentOut') {
+    console.log(IOWA.PageAnimation.pageState)
+    var masthead = IOWA.Elements.Masthead;
+      masthead.className = masthead.className.replace(
+          MASTHEAD_BG_CLASS_REGEX,
+          ' ' + IOWA.Elements.Template.mastheadBgClass + ' ');
+
+      var bgClass = IOWA.Elements.Template.mastheadBgClass;
+      var rippleColor = IOWA.Elements.Template.rippleColors[bgClass];
+      IOWA.Elements.Ripple.style.backgroundColor = rippleColor;
+
+
+    if (IOWA.PageAnimation.pageState === 'pageCardTakeoverOut') {
+
+
+
+      var animationIn = IOWA.PageAnimation.pageCardTakeoverIn();
+
+      callback(animationIn);
+
+    } else if (IOWA.PageAnimation.pageState === 'pageSlideIn') {
       var animation = IOWA.PageAnimation.slideContentOut();
-      animation.pageState = 'slideContentOut';
       IOWA.PageAnimation.play(animation, callback);
     } else {
-      callback();
+
+      var animationIn = IOWA.PageAnimation.pageSlideIn();
+
+      callback(animationIn);
     }
   }
 

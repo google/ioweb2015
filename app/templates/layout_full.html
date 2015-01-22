@@ -282,7 +282,7 @@ limitations under the License.
           </paper-tabs>
         </core-toolbar>
         <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
-          <div class="io-logo large" iologodestination></div>
+          <div class="io-logo large" id="io-logo-large" iologodestination></div>
           <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
