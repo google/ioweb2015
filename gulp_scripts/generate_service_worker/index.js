@@ -28,7 +28,8 @@ module.exports = function(rootDir, handleFetch, callback) {
       'bower_components/shed/dist/shed.js',
       'scripts/shed/offline-analytics.js',
       'scripts/shed/cache-then-network.js',
-      'scripts/shed/google-fonts.js'
+      'scripts/shed/google-fonts.js',
+      'scripts/shed/experiment.js'
     ],
     logger: util.log,
     staticFileGlobs: [
