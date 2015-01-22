@@ -38,7 +38,7 @@ gulp.task('clear', function (done) {
 });
 
 // TODO(ericbidelman): also remove generated .css files.
-gulp.task('clean', function(cleanCallback) {
+gulp.task('clean', ['clear'], function(cleanCallback) {
   del([DIST_STATIC_DIR, DIST_EXPERIMENT_DIR], cleanCallback);
 });
 
