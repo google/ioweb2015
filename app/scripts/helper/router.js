@@ -142,9 +142,6 @@ IOWA.Router = (function() {
    */
   function renderPage(pageName) {
     var importURL = pageName + '?partial';
-    //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentOut());
-
-
     Polymer.import([importURL], function() {
       // Don't proceed if import didn't load correctly.
       var htmlImport = document.querySelector(
