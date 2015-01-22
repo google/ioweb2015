@@ -32,10 +32,13 @@ module.exports = (function() {
     circle.tint = color;
 
     var shadow = new PIXI.Graphics();
-    shadow.beginFill(0x000000, 0.09);
+    var blurFilter = new PIXI.BlurFilter();
+    shadow.boundsPadding = 10;
+    shadow.filters = [blurFilter];
+    shadow.beginFill(0x000000, 0.2);
     shadow.drawShape(shape);
     shadow.endFill();
-    shadow.position.y = -3;
+    shadow.position.y = -4;
     shadow.position.x = 3;
     container.addChild(shadow);
     container.addChild(circle);
@@ -77,7 +80,7 @@ module.exports = (function() {
         container.parent.setChildIndex( container , container.parent.children.length-1);
 
         animate.to(container.scale, 0.5, { x: 1.1, y: 1.1 });
-        animate.to(shadow.position, 0.5, { x: 1, y: -16 });
+        animate.to(shadow.position, 0.5, { x: 3, y: -12 });
         isDragging = true;
       };
 
@@ -88,7 +91,7 @@ module.exports = (function() {
         interactionData = null;
 
         animate.to(container.scale, 0.5, { x: 1, y: 1 });
-        animate.to(shadow.position, 0.5, { x: 3, y: -3 });
+        animate.to(shadow.position, 0.5, { x: 3, y: -4 });
       };
 
       circle.mouseover = function(mouseData){
