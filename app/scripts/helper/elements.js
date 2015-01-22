@@ -42,7 +42,7 @@ IOWA.Elements = (function() {
 
     var masthead = document.querySelector('.masthead');
     var footer = document.querySelector('footer');
-    var i18n = document.createElement('io-i18n');
+    var i18n = document.createElement('i18n-msg');
 
     IOWA.Elements.Drawer = drawer;
     IOWA.Elements.I18n = i18n;

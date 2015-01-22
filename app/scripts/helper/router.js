@@ -80,7 +80,6 @@ IOWA.Router = (function() {
           callback = function(el) {
             IOWA.PageAnimation.play(
                 IOWA.PageAnimation.slideContentOut(), function() {
-                  IOWA.Elements.Template.contentHidden = true;
                   IOWA.History.pushState({'path': el.pathname}, '', el.href);
                 });
           };
