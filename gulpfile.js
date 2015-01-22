@@ -32,7 +32,7 @@ var VERSION = argv.build || STATIC_VERSION;
 // TODO: update this URL to be correct for prod.
 var EXPERIMENT_STATIC_URL = '/experiment/';
 
-// Clears files cached by gulp-cache.
+// Clears files cached by gulp-cache (e.g. anything using $.cache).
 gulp.task('clear', function (done) {
   return $.cache.clearAll(done);
 });
