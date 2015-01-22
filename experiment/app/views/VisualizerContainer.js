@@ -1,7 +1,7 @@
 var animate = require('app/util/animate');
 var {Promise} = require('es6-promise');
 var zIndexes = require('app/util/zIndexes');
-var currentScrollPosition = require('app/util/currentScrollPosition');
+var currentViewportDetails = require('app/util/currentViewportDetails');
 
 module.exports = (function() {
   'use strict';
@@ -81,7 +81,7 @@ module.exports = (function() {
       }
 
       var { top, left, width, height } = elementToMimic.getBoundingClientRect();
-      var { x, y } = currentScrollPosition();
+      var { x, y } = currentViewportDetails();
 
       elemRect.top = top + y;
       elemRect.left = left + x;
@@ -133,10 +133,11 @@ module.exports = (function() {
      */
     var buffer = 15;
     function hiddenPosition() {
+      var scrollY = currentViewportDetails().y;
       if (isHidden === 'top') {
-        return window.scrollY - elemRect.height - buffer;
+        return scrollY - elemRect.height - buffer;
       } else {
-        return window.scrollY + window.innerHeight + buffer;
+        return scrollY + window.innerHeight + buffer;
       }
     }
 

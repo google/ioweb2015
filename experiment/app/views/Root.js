@@ -3,7 +3,7 @@ var reqAnimFrame = require('app/util/raf');
 var { Promise } = require('es6-promise');
 var throttle = require('lodash.throttle');
 var debounce = require('lodash.debounce');
-var currentScrollPosition = require('app/util/currentScrollPosition');
+var currentViewportDetails = require('app/util/currentViewportDetails');
 
 var MaskManager = require('app/views/shared/MaskManager');
 
@@ -111,9 +111,9 @@ module.exports = function(audioManager, stateManager) {
     window.addEventListener('resize', onWindowResize);
     onWindowResize();
 
-    window.addEventListener('scroll', onWindowScrollStart);
-    window.addEventListener('scroll', onWindowScrollStop);
-    onWindowScrollStopUnDebounced();
+    var scrollElement = currentViewportDetails().scrollElement;
+    scrollElement.addEventListener('scroll', onWindowScrollStart);
+    scrollElement.addEventListener('scroll', onWindowScrollStop);
 
     for (let i = 0; i < instrumentViews.length; i++) {
       let v = instrumentViews[i].getView();
@@ -123,6 +123,7 @@ module.exports = function(audioManager, stateManager) {
     viewportElement.appendChild(logoElement);
     viewportElement.appendChild(logoDialog);
 
+    containerElem.style.position = 'relative';
     containerElem.appendChild(viewportElement);
 
     logoClick();
@@ -135,8 +136,10 @@ module.exports = function(audioManager, stateManager) {
   function stop() {
     continueAnimating = false;
     window.removeEventListener('resize', onWindowResize);
-    window.removeEventListener('scroll', onWindowScrollStart);
-    window.removeEventListener('scroll', onWindowScrollStop);
+
+    var scrollElement = currentViewportDetails().scrollElement;
+    scrollElement.removeEventListener('scroll', onWindowScrollStart);
+    scrollElement.removeEventListener('scroll', onWindowScrollStop);
   }
 
   /**
@@ -174,6 +177,8 @@ module.exports = function(audioManager, stateManager) {
   function cleanUp() {
     viewportElement.parentNode.removeChild(viewportElement);
     viewportElement = null;
+
+    containerElem.style.position = '';
   }
 
   /**
@@ -393,13 +398,12 @@ module.exports = function(audioManager, stateManager) {
    * @return {boolean}
    */
   function isVisualizerOnScreen(visualizerView) {
-
     var { top, height } = visualizerView.getElemRect();
 
     var visualizerTop = top;
     var visualizerBottom = visualizerTop + height;
 
-    var scrollTop = currentScrollPosition().y;
+    var scrollTop = currentViewportDetails().y;
     var scrollBottom = scrollTop + window.innerHeight;
 
     return (
@@ -415,7 +419,7 @@ module.exports = function(audioManager, stateManager) {
    * @return {function}
    */
   function hideOnScreenVisualizer(openingView, visualizerView) {
-    var scrollY = currentScrollPosition().y;
+    var scrollY = currentViewportDetails().y;
 
     var screenBottom = scrollY + window.innerHeight;
     var screenMidPoint = scrollY + (window.innerHeight / 2);
@@ -487,7 +491,8 @@ module.exports = function(audioManager, stateManager) {
    * Disable scrolling.
    */
   function disableScrolling() {
-    window.addEventListener('scroll', killEvents);
+    var scrollElement = currentViewportDetails().scrollElement;
+    scrollElement.addEventListener('scroll', killEvents);
     window.addEventListener('mousewheel', killEvents);
     window.addEventListener('touchmove', killEvents);
   }
@@ -496,7 +501,8 @@ module.exports = function(audioManager, stateManager) {
    * Enable scrolling.
    */
   function enableScrolling() {
-    window.removeEventListener('scroll', killEvents);
+    var scrollElement = currentViewportDetails().scrollElement;
+    scrollElement.removeEventListener('scroll', killEvents);
     window.removeEventListener('mousewheel', killEvents);
     window.removeEventListener('touchmove', killEvents);
   }
@@ -508,10 +514,7 @@ module.exports = function(audioManager, stateManager) {
     var w = window.innerWidth;
     var h = window.innerHeight;
 
-
-    var rect = containerElem.getBoundingClientRect();
-    // viewportElement.style.width = `${rect.width}px`;
-    viewportElement.style.height = `${rect.height}px`;
+    viewportElement.style.height = `${currentViewportDetails().height}px`;
 
     for (var i = 0; i < instrumentViews.length; i++) {
       instrumentViews[i].resize(w, h);
@@ -571,12 +574,12 @@ module.exports = function(audioManager, stateManager) {
    * @return {boolean}
    */
   function isInViewport(view) {
-    var { y } = currentScrollPosition();
-    var top = y;
-    var bottom = y + window.innerHeight;
+    var top = currentViewportDetails().y;
+    var bottom = top + window.innerHeight;
     var rect = view.getElemRect();
+    var inView = (rect.top <= bottom) && ((rect.top + rect.height) >= top);
 
-    return (rect.top <= bottom) && ((rect.top + rect.height) >= top);
+    return inView;
   }
 
   /**
