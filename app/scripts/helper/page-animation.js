@@ -38,9 +38,6 @@ IOWA.PageAnimation = (function() {
       fill: 'forwards'
   };
 
-  var canRunSimultanousAnimations = (/Safari/gi).test(navigator.userAgent ||
-      (/Chrome/gi).test(navigator.userAgent));
-
   /**
    * Fades element out.
    * @param {Element} el DOM element.
@@ -270,7 +267,6 @@ IOWA.PageAnimation = (function() {
   }
 
   return {
-    canRunSimultanousAnimations: canRunSimultanousAnimations,
     contentSlideOut: contentSlideOut,
     contentSlideIn: contentSlideIn,
     pageSlideIn: pageSlideIn,
