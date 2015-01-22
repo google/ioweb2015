@@ -40,6 +40,12 @@ IOWA.PageAnimation = (function() {
 
   var canRunSimultanousAnimations = (/Safari/gi).test(navigator.userAgent ||
       (/Chrome/gi).test(navigator.userAgent));
+
+  /**
+   * Page state informs the caller about the current state of the page,
+   * e.g. whether the content is slid in, fade out etc.
+   * @type {=string?}
+   */
   var pageState = null;
 
   /**
@@ -187,6 +193,7 @@ IOWA.PageAnimation = (function() {
   function play(animation, callback) {
     var player = document.timeline.play(animation);
     if (animation.pageState) {
+      // Update the information about current animated page state.
       IOWA.PageAnimation.pageState = animation.pageState;
     }
     if (callback) {

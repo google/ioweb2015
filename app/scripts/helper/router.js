@@ -169,6 +169,33 @@ IOWA.Router = (function() {
   }
 
   /**
+   * Updates the page elements during the page transition.
+   * @param {string} pageName New page identifier.
+   * @param {NodeList} currentPageTemplates Content templates to be rendered.
+   * @private
+   */
+  function updatePageElements(pageName, currentPageTemplates) {
+    replaceTemplateContent(currentPageTemplates);
+    document.body.id = 'page-' + pageName;
+    IOWA.Elements.Template.selectedPage = pageName;
+    var pageMeta = IOWA.Elements.Template.pages[pageName];
+    document.title = pageMeta.title || 'Google I/O 2015';
+
+    var masthead = IOWA.Elements.Masthead;
+    masthead.className = masthead.className.replace(
+        MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
+
+    setTimeout(function() {
+      var animation = IOWA.PageAnimation.slideContentIn();
+      animation.pageState = 'slideContentIn';
+      IOWA.PageAnimation.play(animation);
+      //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
+    }, 50); // Wait for the... Good question. Maybe template binding?
+    // TODO: BUG: Anyways, something to investigate. Web Animations
+    // are not working properly without this delay (Chrome crashes).
+  }
+
+  /**
    * Runs animated page transition.
    * @param {string} pageName New page identifier.
    * @private
@@ -177,34 +204,13 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-
-    var callback = function() {
-      replaceTemplateContent(currentPageTemplates);
-      document.body.id = 'page-' + pageName;
-      IOWA.Elements.Template.selectedPage = pageName;
-      var pageMeta = IOWA.Elements.Template.pages[pageName];
-      document.title = pageMeta.title || 'Google I/O 2015';
-
-      var masthead = IOWA.Elements.Masthead;
-      masthead.className = masthead.className.replace(
-          MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
-
-      setTimeout(function() {
-        var animation = IOWA.PageAnimation.slideContentIn();
-        animation.pageState = 'slideContentIn';
-        IOWA.PageAnimation.play(animation);
-        //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
-      }, 50); // Wait for the... Good question. Maybe template binding?
-      // TODO: BUG: Anyways, something to investigate. Web Animations
-      // are not working properly without this delay (Chrome crashes).
-    };
-
     if (IOWA.PageAnimation.pageState !== 'slideContentOut') {
       var animation = IOWA.PageAnimation.slideContentOut();
       animation.pageState = 'slideContentOut';
-      IOWA.PageAnimation.play(animation, callback);
+      IOWA.PageAnimation.play(animation, updatePageElements.bind(
+          null, pageName, currentPageTemplates));
     } else {
-      callback();
+      updatePageElements(pageName, currentPageTemplates);
     }
   }
 
