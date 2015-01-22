@@ -82,7 +82,7 @@ IOWA.PageAnimation = (function() {
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
       elementFadeOut(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
       elementFadeOut(IOWA.Elements.IOLogoLarge, CONTENT_SLIDE_OPTIONS),
-      elementFadeOut(IOWA.Elements.Footer, { duration : 0 }),
+      elementFadeOut(IOWA.Elements.Footer, { duration: 0 }),
     ]);
   }
 
