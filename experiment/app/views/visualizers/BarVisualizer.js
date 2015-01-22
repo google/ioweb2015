@@ -1,153 +1,202 @@
-var animate = require('app/util/animate');
-
 module.exports = (function() {
   'use strict';
 
-  const LINE_COLOR = '#BDBDBD';
   const LINE_WIDTH = 2;
-  const MIN_DECIBELS = -150;
-  const MAX_DECIBELS = 0;
-  const SMOOTHING_TIME_CONSTANT = 0.9;
-  const FFT_SIZE = 128;
-  const PERCENT_VALUE = 256;
+  const FFT_SIZE = 512;
+  const SMOOTHING_TIME_CONSTANT = 0.3;
+  const STEPS = 7;
+
+  var currentInstanceId = 0;
 
   /**
    * Create analyser node for bar visualisation.
    * @param {Object} audioManager - The audio manager.
    * @param {element} canvas - The canvas upon which to draw.
-   * @constructor
+   * @param {array} instruments - The instruments.
+   * @return {Object} self
    */
-  return function BarVisualizer(audioManager, canvas) {
+  return function BarVisualizer(audioManager, canvas, instruments) {
+    var guid = currentInstanceId++;
+
     var self = {
       render,
       resize,
-      enable,
-      init,
-      disable
+      init
     };
 
-    var analyser = audioManager.analyser;
-    analyser.smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
-    analyser.fftSize = FFT_SIZE;
+    var order = {
+      'DrumView': 1,
+      'ArpeggiatorView': 2,
+      'HexagonView': 3,
+      'GuitarView': 4,
+      'ParallelogramView': 5
+    };
+
+    var analysers = instruments.sort(function(a, b) {
+      return order[a.n] - order[b.n];
+    }).map(i => i.a);
+
+    var colors = instruments.map(i => `#${i.c.toString(16)}`);
 
     var canvasContext = canvas.getContext('2d');
 
-    analyser.minDecibels = MIN_DECIBELS;
-    analyser.maxDecibels = MAX_DECIBELS;
+    var xMax = canvas.width;
+    var yMax = canvas.height;
+    var segments = Math.ceil(xMax / STEPS);
 
-    var freqDomain = new Uint8Array(analyser.frequencyBinCount);
-
-    var timeoutID;
-    var barSizes = [];
-    var barSizeTweens = [];
-    var lastBarSizeTweens = [];
-    var lastTweenObject = [];
+    var currentPoints = [];
+    var targetPoints = [];
+    var domains = [];
 
     function init() {
-      pops();
-    }
+      for (let i = 0; i < analysers.length; i++) {
+        currentPoints[i] = [];
+        targetPoints[i] = [];
 
-    function pops() {
-      var inc = 0;
-      var direction = 'up';
+        analysers[i].fftSize = FFT_SIZE;
+        analysers[i].smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
+        domains[i] = new Uint8Array(analysers[i].frequencyBinCount);
 
-      for (let i = 0; i < (freqDomain.length * 2); i++) {
-        tweenById(i, inc);
-
-        if (inc < 26 && direction  === 'up') {
-          inc = inc + 1;
-        } else {
-          direction = 'down';
-          inc = inc - 1;
-        }
-      }
-
-      timeoutID = window.setTimeout(pops, 200);
-    }
-
-    /**
-     * Draw bars to canvas based on audio frequency data.
-     */
-    function drawBars() {
-      var canvasWidth = canvas.width;
-      var canvasHeight = canvas.height;
-
-      canvasContext.fillStyle = 'white';
-      canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
-
-      analyser.getByteFrequencyData(freqDomain);
-
-      var inc = 0;
-      var direction = 'up';
-
-      for (let i = 0; i < (freqDomain.length * 2); i++) {
-        let value = barSizeTweens[i];
-        let percent = value / PERCENT_VALUE;
-        let height = canvasHeight * percent;
-        let offset = canvasHeight - height;
-        let barWidth = LINE_WIDTH;
-
-        canvasContext.fillStyle = LINE_COLOR;
-        canvasContext.fillRect((i + 1) * 5 * LINE_WIDTH, offset, barWidth, height);
-
-        if ((inc < 26) && (direction === 'up')) {
-          inc = inc + 1;
-        } else {
-          direction = 'down';
-          inc = inc - 1;
+        for (let j = 0; j < segments + 1; j++) {
+          var everyOther = j * 2;
+          currentPoints[i][everyOther] = 0;
+          currentPoints[i][everyOther+1] = 0;
+          targetPoints[i][everyOther] = 0;
+          targetPoints[i][everyOther+1] = 0;
         }
       }
     }
 
-    function tweenById(id, inc) {
-      barSizes[id] = freqDomain[inc];
-
-      if (!lastTweenObject[id]) {
-        lastTweenObject[id] = [
-          { height: 0 },
-          { height: 0, onUpdate: tweenByIdUpdate, onUpdateParams: [id] }
-        ];
-      }
-
-      if (lastBarSizeTweens[id]) {
-        lastTweenObject[id][0].height = lastBarSizeTweens[id];
-        lastBarSizeTweens[id] = barSizes[id];
-      } else {
-        lastTweenObject[id][0].height = 100;
-        lastBarSizeTweens[id] = barSizes[id];
-      }
-
-      lastTweenObject[id][1].height = barSizes[id];
-      animate.to(lastTweenObject[id][0], 0.2, lastTweenObject[id][1]);
-    }
-
-    function tweenByIdUpdate(id) {
-      barSizeTweens[id] = lastTweenObject[id][0].height;
-    }
-
     /**
-     * On render, draw bars
+     * Draw oscillating wave to canvas
      */
-    function render() {
-      drawBars();
+    function drawWave() {
+      canvasContext.fillStyle = 'rgba(255,255,255,1)';
+      canvasContext.fillRect(0, 0, xMax, yMax);
+
+      for (let i = 0; i < currentPoints.length; i++) {
+        canvasContext.save();
+        canvasContext.globalAlpha = 0.6;
+
+        canvasContext.lineWidth = LINE_WIDTH;
+        canvasContext.strokeStyle = colors[i];
+
+        for (var j = 0; j < currentPoints[i].length; j += 2) {
+          var x = currentPoints[i][j];
+
+          if (guid % 2 !== 0) {
+            x = xMax - x;
+          }
+
+          canvasContext.beginPath();
+          canvasContext.moveTo(x, yMax);
+          canvasContext.lineTo(x, currentPoints[i][j+1]);
+          canvasContext.stroke();
+        }
+
+        canvasContext.restore();
+      }
+    }
+
+    var frameWait = 1;
+    var delay = frameWait;
+
+    /**
+     * On render, draw wave
+     */
+    function render(delta) {
+      delay--;
+
+      if (delay > 0) {
+        return;
+      }
+
+      delay = frameWait;
+
+      getRun();
+      tickChase(delta);
+      drawWave();
     }
 
     /**
-     * On resize, draw bars
+     * Chase the target points.
+     * @param {number} delta - The animation delta.
+     */
+    function tickChase(delta) {
+      for (let i = 0; i < targetPoints.length; i++) {
+        for (let j = 0; j < targetPoints[i].length; j += 2) {
+          currentPoints[i][j] = targetPoints[i][j];
+
+          var targetY = targetPoints[i][j+1] || 0;
+
+          currentPoints[i][j+1] = currentPoints[i][j+1] || 0;
+          currentPoints[i][j+1] += (targetY - currentPoints[i][j+1]) * 0.05;
+        }
+      }
+    }
+
+    /**
+     * On resize, draw wave
      */
     function resize() {
-      drawBars();
+      xMax = canvas.width;
+      yMax = canvas.height;
+
+      segments = Math.ceil(xMax / STEPS);
+
+      getRun();
+      tickChase(0);
+      drawWave();
     }
 
-    /**
-     * Enable visualizer
-     */
-    function enable() {}
+    var base = 10;
+    var maxAmp = Math.pow(base, 1);
 
-    /**
-     * Disable visualizer
-     */
-    function disable() {}
+    function getRun() {
+      var baseAmp = yMax - 25;
+
+      for (let i = 0; i < targetPoints.length; i++) {
+        analysers[i].getByteFrequencyData(domains[i]);
+
+        targetPoints[i].length = 0;
+
+        let rightEdge = Math.floor(analysers[i].frequencyBinCount * 0.8);
+
+        for (let j = 0; j < segments; j++) {
+          let x = (STEPS * j);
+
+          let shiftRight = Math.floor(STEPS * (i + 0.8) * ((xMax / STEPS) / (targetPoints.length + 0.4)));
+          let shiftRightIndexes = Math.floor(shiftRight / STEPS);
+
+          let idx = Math.floor((j / segments) * rightEdge);
+
+          if (j < shiftRightIndexes) {
+            let distance = shiftRightIndexes - j;
+            idx = shiftRightIndexes + distance;
+          } else {
+            idx = idx - shiftRightIndexes;
+          }
+
+          let amplitude = (domains[i][idx] / 255);// || 0;
+
+          amplitude = Math.pow(base, amplitude) / maxAmp;
+
+          // console.log(amplitude, baseAmp)
+          if (amplitude <= 0.1) { amplitude = 0; }
+          if (amplitude >= 1) { amplitude = 1; }
+
+          amplitude = (amplitude * baseAmp * 2.5);
+
+          // if (i === 4) {
+          //   x = xMax + 1 - (xMax % STEPS) - x;
+          // }
+
+          var everyOther = j * 2;
+          targetPoints[i][everyOther] = x;
+          targetPoints[i][everyOther+1] = yMax - amplitude;
+        }
+      }
+    }
 
     return self;
   };

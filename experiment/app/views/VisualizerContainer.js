@@ -69,7 +69,7 @@ module.exports = (function() {
      * @param {number} y - The y position of the visualizer.
      */
     function setPos(x, y) {
-      animate.set(wrapperElement, { x, y });
+      animate.set(wrapperElement, { x: Math.floor(x), y: Math.floor(y) });
     }
 
     /**

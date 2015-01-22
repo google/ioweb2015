@@ -1,11 +1,8 @@
-var PIXI = require('pixi.js/bin/pixi.dev.js');
-var animate = require('app/util/animate');
 var curve = require('vendor/curve_func');
 
 module.exports = (function() {
   'use strict';
 
-  const LINE_COLOR = '#BDBDBD';
   const LINE_WIDTH = 1;
   const FFT_SIZE = 256;
   const SMOOTHING_TIME_CONSTANT = 0.3;
@@ -69,9 +66,7 @@ module.exports = (function() {
         canvasContext.save();
         canvasContext.globalAlpha = 0.75;
 
-        let yOffset = 30 + ((i + 1) / currentPoints.length) * 260;
-        yOffset = yMax / 2;
-        canvasContext.translate(0, yOffset);
+        canvasContext.translate(0, yMax / 2);
 
         canvasContext.strokeStyle = colors[i];
         canvasContext.beginPath();
@@ -103,10 +98,21 @@ module.exports = (function() {
       }
     }
 
+    var frameWait = 1;
+    var delay = frameWait;
+
     /**
-     * On resize, draw wave
+     * On render, draw wave
      */
-    function resize() {
+    function render(delta) {
+      delay--;
+
+      if (delay > 0) {
+        return;
+      }
+
+      delay = frameWait;
+
       xMax = canvas.width;
       yMax = canvas.height;
 
@@ -123,6 +129,7 @@ module.exports = (function() {
       var x2 = xMax;
 
       var xs = x2 - x1;
+      var baseAmp = yMax / 12;
 
       for (let i = 0; i < targetPoints.length; i++) {
         let stepX = xs / segments[i];
@@ -133,14 +140,14 @@ module.exports = (function() {
         for (let j = 0; j < segments[i] + 1; j++) {
           let x = x1 + (stepX * j);
 
-          let amplitude = domains[i][j] / 256;
+          let amplitude = domains[i][j] / 255;
 
           amplitude = Math.pow(base + i, amplitude) / maxAmp;
 
           if (amplitude <= 0.4) { amplitude = 0; }
           if (amplitude >= 1) { amplitude = 1; }
 
-          amplitude *= (30 * i);
+          amplitude *= (baseAmp * (i + 1));
 
           let y = (amplitude * (j % 2 === 0 ? 1 : -1));
 
