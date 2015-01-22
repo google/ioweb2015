@@ -25,39 +25,6 @@ IOWA.Router = (function() {
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
   /**
-   * Animates a ripple effect over the masthead.
-   * @param {Number} x X coordinate of the center of the ripple.
-   * @param {Number} y Y coordinate of the center of the ripple.
-   * @param {string?} color Optional color for the ripple effect.
-   * @private
-   */
-  function playMastheadRipple(x, y, color) {
-    IOWA.Elements.Ripple.style.webkitTransition = '';
-    IOWA.Elements.Ripple.style.transition = '';
-    var translate = ['translate3d(', x, 'px,', y, 'px, 0)',].join('');
-    IOWA.Elements.Ripple.style.webkitTransform = [translate, ' scale(0.0)'].join('');
-    IOWA.Elements.Ripple.style.transform = [translate, ' scale(0.0)'].join('');
-    IOWA.Elements.Ripple.style.opacity = 1;
-    // Force recalculate style.
-    /*jshint -W030 */
-    IOWA.Elements.Ripple.offsetTop;
-    IOWA.Elements.Ripple.style.backgroundColor = 'red';
-    /*jshint +W030 */
-    if (color) {
-      IOWA.Elements.Ripple.style.webkitTransition = '-webkit-transform 1s, opacity 1s';
-      IOWA.Elements.Ripple.style.transition = 'transform 1s, opacity 1s';
-      IOWA.Elements.Ripple.style.backgroundColor = color;
-      IOWA.Elements.Ripple.style.opacity = 0;
-    } else {
-      IOWA.Elements.Ripple.style.backgroundColor = '';
-      IOWA.Elements.Ripple.style.webkitTransition = '-webkit-transform 1s';
-      IOWA.Elements.Ripple.style.transition = 'transform 1s';
-    }
-    IOWA.Elements.Ripple.style.webkitTransform = [translate, ' scale(1)'].join('');
-    IOWA.Elements.Ripple.style.transform = [translate, ' scale(1)'].join('');
-  }
-
-  /**
    * Navigates to a new page. Uses ajax for data-ajax-link links.
    * @param {Event} e Event that triggered navigation.
    * @private
@@ -70,15 +37,74 @@ IOWA.Router = (function() {
     var pageName = parsePageNameFromAbsolutePath(el.pathname);
     var pageMeta = IOWA.Elements.Template.pages[pageName];
     IOWA.Elements.Template.nextPage = pageName;
-    var color;
+    var callback;
     var currentPage = IOWA.Elements.Template.selectedPage;
     if (currentPage !== pageName) {
-      if (IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
-          IOWA.Elements.Template.pages[pageName].mastheadBgClass) {
-        color = '#fff';
+
+      if (el.hasAttribute('data-anim-ripple')) {
+
+        var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+        IOWA.Elements.Template.mastheadBgClass = bgClass;
+        var isFadeRipple = (
+            IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
+            bgClass);
+
+        /*
+        // TODO: BUG: interesting, causes Web Animations opacity bug.
+        var sequence = new AnimationSequence([
+          IOWA.PageAnimation.ripple(
+              IOWA.Elements.Ripple, e.pageX, e.pageY, 400, isFadeRipple),
+          IOWA.PageAnimation.slideContentOut()
+        ]);
+        sequence.callback = callback.bind(this, el);
+        */
+
+        var color = isFadeRipple ?
+            '#fff': IOWA.Elements.Template.rippleColors[bgClass];
+        var rippleAnim = IOWA.PageAnimation.ripple(
+              IOWA.Elements.Ripple, e.pageX, e.pageY, 400, color, isFadeRipple);
+
+        if (IOWA.PageAnimation.canRunSimultanousAnimations) {
+          // Run animations simultaneously, then change the page.
+          var animation = new AnimationGroup([
+            rippleAnim,
+            IOWA.PageAnimation.slideContentOut()
+          ]);
+          animation.pageState = 'slideContentOut';
+          callback = function() {
+            IOWA.History.pushState({'path': el.pathname}, '', el.href);
+          };
+          IOWA.PageAnimation.play(animation, callback.bind(null, el));
+        } else {
+          // Run animations sequentially, then change the page.
+          callback = function(el) {
+            IOWA.PageAnimation.play(
+                IOWA.PageAnimation.slideContentOut(), function() {
+                  IOWA.History.pushState({'path': el.pathname}, '', el.href);
+                });
+          };
+          IOWA.PageAnimation.play(rippleAnim, callback.bind(null, el));
+        }
+      } else if (el.hasAttribute('data-anim-card'))  {
+        callback = function(el, card) {
+          // TODO: There's jank/flicker on bringing the content in,
+          // especially in the masthead.
+          IOWA.Elements.Template.rippleBgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+          IOWA.History.pushState({'path': el.pathname}, '', el.href);
+        };
+        var card = null;
+        var currentEl = el;
+        while (!card) {
+          currentEl = currentEl.parentNode;
+          if (currentEl.classList.contains('card__container')) {
+            card = currentEl;
+          }
+        }
+        IOWA.PageAnimation.play(IOWA.PageAnimation.cardToMasthead(
+            card, e.pageX, e.pageY, 300), callback.bind(null, el, card));
+      } else {
+        IOWA.History.pushState({'path': el.pathname}, '', el.href);
       }
-      playMastheadRipple(e.pageX, e.pageY, color);
-      IOWA.History.pushState({'path': el.pathname}, '', el.href);
     }
     // TODO: Update meta.
   }
@@ -115,19 +141,16 @@ IOWA.Router = (function() {
    */
   function renderPage(pageName) {
     var importURL = pageName + '?partial';
-
-    if (pageName !== IOWA.Elements.Template.selectedPage) {
-      Polymer.import([importURL], function() {
-        // Don't proceed if import didn't load correctly.
-        var htmlImport = document.querySelector(
-            'link[rel="import"][href="' + importURL + '"]');
-        if (htmlImport && !htmlImport.import) {
-          return;
-        }
-        // Update content of the page.
-        injectPageContent(pageName, htmlImport.import);
-      });
-    }
+    Polymer.import([importURL], function() {
+      // Don't proceed if import didn't load correctly.
+      var htmlImport = document.querySelector(
+          'link[rel="import"][href="' + importURL + '"]');
+      if (htmlImport && !htmlImport.import) {
+        return;
+      }
+      // Update content of the page.
+      injectPageContent(pageName, htmlImport.import);
+    });
   }
 
   /**
@@ -146,6 +169,33 @@ IOWA.Router = (function() {
   }
 
   /**
+   * Updates the page elements during the page transition.
+   * @param {string} pageName New page identifier.
+   * @param {NodeList} currentPageTemplates Content templates to be rendered.
+   * @private
+   */
+  function updatePageElements(pageName, currentPageTemplates) {
+    replaceTemplateContent(currentPageTemplates);
+    document.body.id = 'page-' + pageName;
+    IOWA.Elements.Template.selectedPage = pageName;
+    var pageMeta = IOWA.Elements.Template.pages[pageName];
+    document.title = pageMeta.title || 'Google I/O 2015';
+
+    var masthead = IOWA.Elements.Masthead;
+    masthead.className = masthead.className.replace(
+        MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
+
+    setTimeout(function() {
+      var animation = IOWA.PageAnimation.slideContentIn();
+      animation.pageState = 'slideContentIn';
+      IOWA.PageAnimation.play(animation);
+      //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
+    }, 50); // Wait for the... Good question. Maybe template binding?
+    // TODO: BUG: Anyways, something to investigate. Web Animations
+    // are not working properly without this delay (Chrome crashes).
+  }
+
+  /**
    * Runs animated page transition.
    * @param {string} pageName New page identifier.
    * @private
@@ -154,29 +204,14 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-    IOWA.Elements.Template.pageTransitioningIn = false;
-    IOWA.Elements.Template.pageTransitioningOut = true;
-    // Replace content and end transition.
-    setTimeout(function() {
-      requestAnimationFrame(function() {
-        replaceTemplateContent(currentPageTemplates);
-        // Wait for a new frame before transitioning in.
-        requestAnimationFrame(
-          function() {
-            IOWA.Elements.Template.pageTransitioningOut = false;
-            IOWA.Elements.Template.pageTransitioningIn = true;
-          }
-        );
-        // Transition in post-processing.
-        document.body.id = 'page-' + pageName;
-        IOWA.Elements.Template.selectedPage = pageName;
-        var pageMeta = IOWA.Elements.Template.pages[pageName];
-        document.title = pageMeta.title || 'Google I/O 2015';
-        var masthead = IOWA.Elements.Masthead;
-        masthead.className = masthead.className.replace(
-            MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
-      });
-    }, 600); // Wait for the ripple to play before transitioning.
+    if (IOWA.PageAnimation.pageState !== 'slideContentOut') {
+      var animation = IOWA.PageAnimation.slideContentOut();
+      animation.pageState = 'slideContentOut';
+      IOWA.PageAnimation.play(animation, updatePageElements.bind(
+          null, pageName, currentPageTemplates));
+    } else {
+      updatePageElements(pageName, currentPageTemplates);
+    }
   }
 
   /**
@@ -225,7 +260,8 @@ IOWA.Router = (function() {
 
   return {
     init: init,
-    getPageName: parsePageNameFromAbsolutePath
+    getPageName: parsePageNameFromAbsolutePath,
+    animatePageIn: animatePageIn
   };
 
 })();
