@@ -27,9 +27,10 @@ Makes a globe or whatever.
   </template>
   <script>
   (function() {
+    /* global IOWA */
     var ShaderProgram = IOWA.OffsiteGlobe.ShaderProgram;
     var Matrix4x4 = IOWA.OffsiteGlobe.Matrix4x4;
-    var generateGeometry = IOWA.OffsiteGlobe.generateGeometry;
+    var generateIcosphere = IOWA.OffsiteGlobe.generateIcosphere;
 
     var tmpTransform = new Matrix4x4();
 
@@ -96,7 +97,7 @@ Makes a globe or whatever.
         var gl = this.gl;
         this.resize();
 
-        var globeGeometry = generateGeometry();
+        var globeGeometry = generateIcosphere(16);
 
         this.globeArrayBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.globeArrayBuffer);
@@ -130,7 +131,7 @@ Makes a globe or whatever.
         var gl = this.gl;
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        this.theta += Math.PI / 240;
+        this.theta += Math.PI / 480;
 
         var worldTransform = tmpTransform.identity()
           .rotateY(this.theta)
