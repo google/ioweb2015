@@ -3,7 +3,7 @@
 {% define "mastheadBgClass" %}bg-medium-grey{% end %}
 
 {% define "masthead" %}
-  <h2 class="masthead-title">Smarch xx - xx, 2015</h2>
+  <h2 class="masthead-title"><i18n-msg msgid="iodate">Smarch xx - xx</i18n-msg>, 2015</h2>
   <h5 class="masthead-subtitle">Moscone Center West,<br>San Francisco, CA</h5>
 {% end %}
 
@@ -18,9 +18,13 @@
       </div>
       <div class="card-content link-spacing">
         <a href="about" data-ajax-link data-anim-card
-            data-track-link="home-learn-more-about-io">Learn more about I/O</a>
-        <a href="#"
-            data-track-link="home-io-in-photos">I/O in photos</a>
+           data-track-link="home-learn-more-about-io">
+            <i18n-msg msgid="learnmore">Learn more about I/O</i18n-msg>
+        </a>
+        <a href="about#photos" data-ajax-link data-anim-card
+           data-track-link="home-io-in-photos">
+          <i18n-msg msgid="io-in-photos">I/O in photos</i18n-msg>
+        </a>
       </div>
     </div>
   </div>
@@ -29,7 +33,7 @@
     <section class="home-photo page__section js-experiment-instrument"></section>
 
     <section id="registration" class="page__section js-experiment-instrument bg-cyan">
-      <h2>Registration opens<br>March 10 at 9AM PST</h2>
+      <h2><i18n-msg msgid="registration-opens">Registration opens</i18n-msg><br>March 10 at 9AM PST</h2>
       <!-- <paper-button class="registration__setreminder" hidden?="{{isPhoneSize}}"
           data-track-link="home-set-reminder">
         <core-icon icon="social:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg>
@@ -76,10 +80,10 @@
       </template> -->
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content hide-on-mobile">
-          <h3>I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between.</h3>
+          <h3><i18n-msg msgid="io-description-card">I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between.</i18n-msg></h3>
         </div>
         <div class="card-content">
-          <a href="schedule" data-ajax-link data-track-link="home-check-agenda"><core-icon icon="event"></core-icon> Check the agenda</a>
+          <a href="schedule" data-ajax-link data-track-link="home-check-agenda"><core-icon icon="event"></core-icon> <i18n-msg msgid="registration-agenda">Check the agenda</i18n-msg></a>
         </div>
       </div>
       <div class="card js-experiment-visualizer" layout vertical auto-vertical flex on-tap="{{playVideo}}">
@@ -108,13 +112,15 @@
           <h2><i18n-msg msgid="io-extended-invitation">If you aren't able to join us for I/O in person this year, you can still make an event out of it. Host or find an I/O Extended event near you and watch the live stream in the company of other developers.</i18n-msg></h2>
         </div>
         <div class="card-content">
-          <a href="offsite" data-ajax-link data-track-link="home-join-from-your-location">Join from your location</a>
+          <a href="offsite" data-ajax-link data-track-link="home-join-from-your-location">
+            <i18n-msg msgid="join-from-offsite">Join from your location<i18n-msg>
+          </a>
         </div>
       </div>
     </div>
 
     <section id="join" class="page__section js-experiment-instrument bg-light-grey">
-      <h2>Join the conversation<br>now at #io15</h2>
+      <h2><i18n-msg msgid="join-convo">Join the conversation now at #io15</i18n-msg></h2>
       <div class="join__social" layout vertical end hidden?="{{isPhoneSize}}">
         <a href="https://plus.google.com/+GoogleDevelopers" data-track-link="home-social-plus-google-developers">
           +googledevelopers<core-icon icon="social:post-gplus"></core-icon>

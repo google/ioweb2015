@@ -59,6 +59,10 @@
     "description": "The month of the Google I/O event",
     "message": "Smarch"
   },
+  "io-description-card": {
+    "description": "Description of the event.",
+    "message": "I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between."
+  },
   "learnmore": {
     "description": "Link text. Links to a page with the event's details.",
     "message": "Learn more about I/O"
@@ -71,7 +75,7 @@
     "description": "Subheader of the registration section",
     "message": "Registration opens"
   },
-  "registration-opens": {
+  "registration-agenda": {
     "description": "Link text. Please keep this short. Links to the event schedule page.",
     "message": "Check the agenda"
   },

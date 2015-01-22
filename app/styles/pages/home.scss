@@ -67,6 +67,10 @@ $name: 'page-home';
 }
 
 #join {
+  h2 {
+    max-width: 300px;
+  }
+
   .join__social {
     a {
       margin-bottom: 15px;
