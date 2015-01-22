@@ -97,14 +97,24 @@ module.exports = (function() {
     function addEventListeners() {
       container.interactive = true;
       container.buttonMode = true;
+
       container.click = container.tap = function() {
         onActivateCallback(cube);
       };
+
+      container.mouseover = function(mouseData){
+        background.tint = 0xC44441;
+      }
+
+      container.mouseout = function(mouseData){
+        background.tint = color;
+      }
     }
 
     function removeEventListeners() {
       container.interactive = false;
       container.buttonMode = false;
+      background.tint = color;
       container.click = container.tap  = null;
     }
 

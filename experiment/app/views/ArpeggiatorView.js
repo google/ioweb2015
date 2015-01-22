@@ -367,10 +367,10 @@ module.exports = (function() {
       isRecording = false;
 
       currentTrack = audioManager.createRecordedTrack(
-          data.recorded,
-          CHANNEL,
-          ARPEGIATOR_TAG
-          );
+        data.recorded,
+        CHANNEL,
+        ARPEGIATOR_TAG
+      );
     }
 
     /**

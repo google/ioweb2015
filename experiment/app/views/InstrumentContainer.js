@@ -4,7 +4,7 @@ var {Promise} = require('es6-promise');
 var backImage = require('url?limit=10000!app/images/back-arrow.png');
 var RecordButton = require('app/views/RecordButton');
 var zIndexes = require('app/util/zIndexes');
-var currentScrollPosition = require('app/util/currentScrollPosition');
+var currentViewportDetails = require('app/util/currentViewportDetails');
 
 module.exports = (function() {
   'use strict';
@@ -84,7 +84,7 @@ module.exports = (function() {
       controls = makeControls();
 
       instrumentView = new SubView(audioManager);
-      createRenderer(instrumentView.backgroundColor || 0xffffff);
+      createRenderer(instrumentView.backgroundColor);
 
       displayContainer.addChild(displayContainerSub);
       displayContainerSub.addChild(displayContainerCenter);
@@ -313,7 +313,7 @@ module.exports = (function() {
      * @return {number}
      */
     function getDocumentScrollTop() {
-      return Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+      return currentViewportDetails().y;
     }
 
     /**
@@ -338,7 +338,7 @@ module.exports = (function() {
     function addContractedEventListeners() {
       displayContainer.interactive = true;
       displayContainer.buttonMode = true;
-      displayContainer.click = function() {
+      displayContainer.mousedown = function() {
         onActivateCallback_(self);
       };
     }
@@ -573,7 +573,7 @@ module.exports = (function() {
       if (!isReady) { return; }
 
       var { top, left, width, height } = elementToMimic.getBoundingClientRect();
-      var { x, y } = currentScrollPosition();
+      var { x, y } = currentViewportDetails();
 
       elemRect.top = top + y;
       elemRect.left = left + x;

@@ -32,8 +32,13 @@ var VERSION = argv.build || STATIC_VERSION;
 // TODO: update this URL to be correct for prod.
 var EXPERIMENT_STATIC_URL = '/experiment/';
 
+// Clears files cached by gulp-cache (e.g. anything using $.cache).
+gulp.task('clear', function (done) {
+  return $.cache.clearAll(done);
+});
+
 // TODO(ericbidelman): also remove generated .css files.
-gulp.task('clean', function(cleanCallback) {
+gulp.task('clean', ['clear'], function(cleanCallback) {
   del([DIST_STATIC_DIR, DIST_EXPERIMENT_DIR], cleanCallback);
 });
 
@@ -52,13 +57,6 @@ gulp.task('sass', function() {
     ]))
     .pipe(gulp.dest(APP_DIR))
     .pipe($.size({title: 'styles'}));
-});
-
-// Copy Web Fonts To Dist
-gulp.task('fonts', function () {
-  return gulp.src([APP_DIR + '/fonts/**'])
-    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/fonts'))
-    .pipe($.size({title: 'fonts'}));
 });
 
 // gulp.task('vulcanize-scenes', ['clean', 'sass', 'compile-scenes'], function() {
@@ -342,7 +340,7 @@ gulp.task('backend:test', function(cb) {
 
 gulp.task('default', ['clean'], function(cb) {
   runSequence('copy-experiment-to-site', 'sass', 'vulcanize',
-              ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'],
+              ['js', 'images', 'copy-assets', 'copy-backend'],
               'generate-service-worker-dist', cb);
 });
 

@@ -10,11 +10,12 @@ module.exports = (function() {
    * Creates a new drum.
    * @param {Object} model - The model for this drum.
    * @param {string} color - The color for this drum.
+   * @param {string} hoverColor - The hover color for this drum.
    * @param {string} soundName - The soundName for this drum.
    * @param {Object} physicsWorld - The physics for this drum.
    * @constructor
    */
-  return function Drum(model, color, soundName, physicsWorld) {
+  return function Drum(model, color, hoverColor, soundName, physicsWorld) {
     var pid = model.pid;
     var isDragging = false;
     var interactionData;
@@ -25,15 +26,19 @@ module.exports = (function() {
     container.alpha = 0.8;
 
     var circle = new PIXI.Graphics();
-    circle.beginFill(color);
+    circle.beginFill(0xffffff);
     circle.drawShape(shape);
     circle.endFill();
+    circle.tint = color;
 
     var shadow = new PIXI.Graphics();
-    shadow.beginFill(0x000000, 0.09);
+    var blurFilter = new PIXI.BlurFilter();
+    shadow.boundsPadding = 10;
+    shadow.filters = [blurFilter];
+    shadow.beginFill(0x000000, 0.2);
     shadow.drawShape(shape);
     shadow.endFill();
-    shadow.position.y = -3;
+    shadow.position.y = -4;
     shadow.position.x = 3;
     container.addChild(shadow);
     container.addChild(circle);
@@ -66,6 +71,7 @@ module.exports = (function() {
     function addEventListeners() {
       container.interactive = true;
       container.buttonMode = true;
+      circle.interactive = true;
 
       container.mousedown = container.touchstart = function(data) {
         interactionData = data;
@@ -74,7 +80,7 @@ module.exports = (function() {
         container.parent.setChildIndex( container , container.parent.children.length-1);
 
         animate.to(container.scale, 0.5, { x: 1.1, y: 1.1 });
-        animate.to(shadow.position, 0.5, { x: 1, y: -16 });
+        animate.to(shadow.position, 0.5, { x: 3, y: -12 });
         isDragging = true;
       };
 
@@ -85,8 +91,16 @@ module.exports = (function() {
         interactionData = null;
 
         animate.to(container.scale, 0.5, { x: 1, y: 1 });
-        animate.to(shadow.position, 0.5, { x: 3, y: -3 });
+        animate.to(shadow.position, 0.5, { x: 3, y: -4 });
       };
+
+      circle.mouseover = function(mouseData){
+        circle.tint = hoverColor;
+      }
+
+      circle.mouseout = function(mouseData){
+        circle.tint = color;
+      }
 
       // set the callbacks for when the mouse or a touch moves
       container.mousemove = container.touchmove = function() {
@@ -104,6 +118,7 @@ module.exports = (function() {
     function removeEventListeners() {
       container.interactive = false;
       container.buttonMode = false;
+      circle.interactive = false;
 
       container.mousedown = container.touchstart = null;
       container.mouseup = container.mouseupoutside = container.touchend = container.touchendoutside = null;

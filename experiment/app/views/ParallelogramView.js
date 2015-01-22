@@ -116,7 +116,7 @@ module.exports = (function() {
 
       for (let i = 0; i < data.parallelograms.length; i++) {
         let paralellogramDef = data.parallelograms[i];
-        var parallelogram = new Parallelogram(paralellogramDef.color, paralellogramDef.sound, keyEvents[i], i, audioManager);
+        var parallelogram = new Parallelogram(paralellogramDef.color, paralellogramDef.hovercolor, paralellogramDef.sound, keyEvents[i], i, audioManager);
         parallelogram.onActivate(onActivate);
         parallelogram.onDeactivate(onDeactivate);
         parallelograms.push(parallelogram);

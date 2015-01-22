@@ -84,10 +84,12 @@ IOWA.Router = (function() {
         var sequence = new AnimationSequence([
           IOWA.PageAnimation.ripple(
               IOWA.Elements.Ripple, e.pageX, e.pageY, 400, isFadeRipple),
-          IOWA.PageAnimation.slideContentOut()
+          IOWA.PageAnimation.contentSlideOut()
         ]);
         sequence.callback = callback.bind(this, el);
         */
+
+        currentPageTransition = 'masthead-ripple-transition';
 
         var rippleAnim = IOWA.PageAnimation.ripple(
               IOWA.Elements.Ripple, e.pageX, e.pageY, 400, rippleColor, isFadeRipple);
@@ -96,9 +98,8 @@ IOWA.Router = (function() {
           // Run animations simultaneously, then change the page.
           var animation = new AnimationGroup([
             rippleAnim,
-            IOWA.PageAnimation.slideContentOut()
+            IOWA.PageAnimation.contentSlideOut()
           ]);
-          animation.pageState = 'slideContentOut';
           callback = function() {
             IOWA.History.pushState({'path': el.pathname}, '', el.href);
           };
@@ -107,15 +108,17 @@ IOWA.Router = (function() {
           // Run animations sequentially, then change the page.
           callback = function(el) {
             IOWA.PageAnimation.play(
-                IOWA.PageAnimation.slideContentOut(), function() {
+                IOWA.PageAnimation.contentSlideOut(), function() {
                   IOWA.History.pushState({'path': el.pathname}, '', el.href);
                 });
           };
           IOWA.PageAnimation.play(rippleAnim, callback.bind(null, el));
         }
       } else if (el.hasAttribute('data-anim-card'))  {
+        currentPageTransition = 'hero-card-transition';
         playHeroTransition(e, el, rippleColor);
       } else {
+        currentPageTransition = '';
         IOWA.History.pushState({'path': el.pathname}, '', el.href);
       }
     }
@@ -154,7 +157,6 @@ IOWA.Router = (function() {
    */
   function renderPage(pageName) {
     var importURL = pageName + '?partial';
-
     Polymer.import([importURL], function() {
       // Don't proceed if import didn't load correctly.
       var htmlImport = document.querySelector(
@@ -183,6 +185,36 @@ IOWA.Router = (function() {
   }
 
   /**
+   * Updates the page elements during the page transition.
+   * @param {string} pageName New page identifier.
+   * @param {NodeList} currentPageTemplates Content templates to be rendered.
+   * @private
+   */
+  function updatePageElements(pageName, currentPageTemplates) {
+    replaceTemplateContent(currentPageTemplates);
+    document.body.id = 'page-' + pageName;
+    IOWA.Elements.Template.selectedPage = pageName;
+    var pageMeta = IOWA.Elements.Template.pages[pageName];
+    document.title = pageMeta.title || 'Google I/O 2015';
+
+    var masthead = IOWA.Elements.Masthead;
+    masthead.className = masthead.className.replace(
+        MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
+
+    setTimeout(function() {
+      var animationIn = (
+          currentPageTransition === 'hero-card-transition') ?
+          IOWA.PageAnimation.pageCardTakeoverIn() :
+          IOWA.PageAnimation.pageSlideIn();
+      console.log(animationIn)
+      IOWA.PageAnimation.play(animationIn);
+      currentPageTransition = '';
+    }, 50); // Wait for the... Good question. Maybe template binding?
+    // TODO: BUG: Anyways, something to investigate. Web Animations
+    // are not working properly without this delay (Chrome crashes).
+  }
+
+  /**
    * Runs animated page transition.
    * @param {string} pageName New page identifier.
    * @private
@@ -192,58 +224,22 @@ IOWA.Router = (function() {
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
 
-    var callback = function() {
-      replaceTemplateContent(currentPageTemplates);
-      document.body.id = 'page-' + pageName;
-      IOWA.Elements.Template.selectedPage = pageName;
-      var pageMeta = IOWA.Elements.Template.pages[pageName];
-      document.title = pageMeta.title || 'Google I/O 2015';
-
-      var masthead = IOWA.Elements.Masthead;
-      masthead.className = masthead.className.replace(
-          MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
-
-      setTimeout(function() {
-        if (IOWA.PageAnimation.pageState === 'pageCardTakeoverOut') {
-          var animationIn = IOWA.PageAnimation.pageCardTakeoverIn();
-
-        } else  {
-          var animationIn = IOWA.PageAnimation.pageSlideIn();
-
-        }
-        IOWA.PageAnimation.play(animationIn);
-      }, 50); // Wait for the currentPageTemplates to render fully.
-      // Web Animations are not working properly without this delay
-      // (Chrome crashes).
-    };
-
-    console.log(IOWA.PageAnimation.pageState)
+    console.log('currentPageTransition: ', currentPageTransition)
     var masthead = IOWA.Elements.Masthead;
-      masthead.className = masthead.className.replace(
-          MASTHEAD_BG_CLASS_REGEX,
-          ' ' + IOWA.Elements.Template.mastheadBgClass + ' ');
+    masthead.className = masthead.className.replace(
+        MASTHEAD_BG_CLASS_REGEX,
+        ' ' + IOWA.Elements.Template.mastheadBgClass + ' ');
 
-      var bgClass = IOWA.Elements.Template.mastheadBgClass;
-      var rippleColor = IOWA.Elements.Template.rippleColors[bgClass];
-      IOWA.Elements.Ripple.style.backgroundColor = rippleColor;
+    var bgClass = IOWA.Elements.Template.mastheadBgClass;
+    var rippleColor = IOWA.Elements.Template.rippleColors[bgClass];
+    IOWA.Elements.Ripple.style.backgroundColor = rippleColor;
 
-
-    if (IOWA.PageAnimation.pageState === 'pageCardTakeoverOut') {
-
-
-
-      var animationIn = IOWA.PageAnimation.pageCardTakeoverIn();
-
-      callback(animationIn);
-
-    } else if (IOWA.PageAnimation.pageState === 'pageSlideIn') {
-      var animation = IOWA.PageAnimation.slideContentOut();
-      IOWA.PageAnimation.play(animation, callback);
+    if (!currentPageTransition) {
+      var animation = IOWA.PageAnimation.contentSlideOut();
+      IOWA.PageAnimation.play(animation, updatePageElements.bind(
+          null, pageName, currentPageTemplates));
     } else {
-
-      var animationIn = IOWA.PageAnimation.pageSlideIn();
-
-      callback(animationIn);
+      updatePageElements(pageName, currentPageTemplates);
     }
   }
 

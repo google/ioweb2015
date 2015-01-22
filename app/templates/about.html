@@ -3,20 +3,18 @@
 {% define "mastheadBgClass" %}bg-dark-grey{% end %}
 
 {% define "masthead" %}
-  <h1>About</h1>
+  <h1><i18n-msg msgid="about">About</i18n-msg></h1>
 {% end %}
 
 {% define "content" %}
   <div class="card__container slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
-        <h2>Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</h2>
+        <h2><i18n-msg msgid="about-io">Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</i18n-msg></h2>
       </div>
       <div class="card-content">
         <a href="#" data-track-link="about-view-photos-from-past-io">
-        <i18n-msg msgid="see-photos-2014">
-          See photos from I/O 2014
-        </i18n-msg>
+          <i18n-msg msgid="see-photos-2014">See photos from I/O 2014</i18n-msg>
         </a>
       </div>
     </div>
@@ -34,10 +32,12 @@
     <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
-          <h3>Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President for Android, Chrome &amp; Apps, Sundar Pichai.</h3>
+          <h3><i18n-msg msgid="about-sundar">Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President, Products, Sundar Pichai.</i18n-msg></h3>
         </div>
         <div class="card-content">
-          <a href="https://www.google.com/events/io/schedule" target="_blank" data-track-link="about-see-keynote-and-sessions">See the 2014 Keynote and sessions</a>
+          <a href="https://www.google.com/events/io/schedule" target="_blank" data-track-link="about-see-keynote-and-sessions">
+            <i18n-msg msgid="about-see-keynote">See the 2014 Keynote and sessions</i18n-msg>
+          </a>
         </div>
       </div>
       <div class="card" layout vertical auto-vertical flex on-tap="{{playVideo}}">

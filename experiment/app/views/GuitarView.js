@@ -151,10 +151,10 @@ module.exports = (function() {
      */
     function stopRecording() {
       currentTrack = audioManager.createRecordedTrack(
-          allData.recorded,
-          CHANNEL,
-          GUITAR_TAG
-          );
+        allData.recorded,
+        CHANNEL,
+        GUITAR_TAG
+      );
 
       isRecording = false;
     }
@@ -218,13 +218,26 @@ module.exports = (function() {
           }
         }
       };
+
+      for (let key in dots) {
+        if (dots.hasOwnProperty(key)) {
+          dots[key].addEventListeners();
+        }
+      }
     }
 
     /**
      * Remove event listeners.
      */
     function removeEventListeners() {
-      stage.mousemove = stage.touchmove = null;
+      stage.interactive = false;
+      stage.touchstart = stage.mousemove = stage.touchmove = null;
+
+      for (let key in dots) {
+        if (dots.hasOwnProperty(key)) {
+          dots[key].removeEventListeners();
+        }
+      }
     }
 
     /**
