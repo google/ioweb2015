@@ -32,8 +32,13 @@ var VERSION = argv.build || STATIC_VERSION;
 // TODO: update this URL to be correct for prod.
 var EXPERIMENT_STATIC_URL = '/experiment/';
 
+// Clears files cached by gulp-cache (e.g. anything using $.cache).
+gulp.task('clear', function (done) {
+  return $.cache.clearAll(done);
+});
+
 // TODO(ericbidelman): also remove generated .css files.
-gulp.task('clean', function(cleanCallback) {
+gulp.task('clean', ['clear'], function(cleanCallback) {
   del([DIST_STATIC_DIR, DIST_EXPERIMENT_DIR], cleanCallback);
 });
 
