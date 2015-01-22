@@ -119,6 +119,20 @@ module.exports = (function() {
     }
 
     /**
+     * On resize, draw wave
+     */
+    function resize() {
+      xMax = canvas.width;
+      yMax = canvas.height;
+
+      segments = Math.ceil(xMax / STEPS);
+
+      getRun();
+      tickChase(0);
+      drawWave();
+    }
+
+    /**
      * Chase the target points.
      * @param {number} delta - The animation delta.
      */
@@ -141,8 +155,6 @@ module.exports = (function() {
     function resize() {
       xMax = canvas.width;
       yMax = canvas.height;
-
-      segments = Math.ceil(xMax / STEPS);
 
       getRun();
       tickChase(0);
@@ -181,7 +193,6 @@ module.exports = (function() {
 
           amplitude = Math.pow(base, amplitude) / maxAmp;
 
-          // console.log(amplitude, baseAmp)
           if (amplitude <= 0.1) { amplitude = 0; }
           if (amplitude >= 1) { amplitude = 1; }
 

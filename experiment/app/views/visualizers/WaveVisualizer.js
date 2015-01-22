@@ -76,10 +76,21 @@ module.exports = (function() {
       }
     }
 
+    var frameWait = 1;
+    var delay = frameWait;
+
     /**
      * On render, draw wave
      */
     function render(delta) {
+      delay--;
+
+      if (delay > 0) {
+        return;
+      }
+
+      delay = frameWait;
+
       getRun();
       tickChase(delta);
       drawWave();
@@ -98,21 +109,10 @@ module.exports = (function() {
       }
     }
 
-    var frameWait = 1;
-    var delay = frameWait;
-
     /**
-     * On render, draw wave
+     * On resize, draw wave
      */
-    function render(delta) {
-      delay--;
-
-      if (delay > 0) {
-        return;
-      }
-
-      delay = frameWait;
-
+    function resize() {
       xMax = canvas.width;
       yMax = canvas.height;
 
