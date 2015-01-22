@@ -59,13 +59,6 @@ gulp.task('sass', function() {
     .pipe($.size({title: 'styles'}));
 });
 
-// Copy Web Fonts To Dist
-gulp.task('fonts', function () {
-  return gulp.src([APP_DIR + '/fonts/**'])
-    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/fonts'))
-    .pipe($.size({title: 'fonts'}));
-});
-
 // gulp.task('vulcanize-scenes', ['clean', 'sass', 'compile-scenes'], function() {
 //   return gulp.src([
 //       'scenes/*/*-scene*.html'
@@ -347,7 +340,7 @@ gulp.task('backend:test', function(cb) {
 
 gulp.task('default', ['clean'], function(cb) {
   runSequence('copy-experiment-to-site', 'sass', 'vulcanize',
-              ['js', 'images', 'fonts', 'copy-assets', 'copy-backend'],
+              ['js', 'images', 'copy-assets', 'copy-backend'],
               'generate-service-worker-dist', cb);
 });
 
