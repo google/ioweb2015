@@ -60,4 +60,24 @@
       <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit></google-youtube>
     </div>
   </template>
+
+<script>
+(function() {
+
+function scrollToElement(el, opt_topPadding) {
+  var padding = opt_topPadding || 0;
+  var metrics = el.getBoundingClientRect();
+  IOWA.Elements.ScrollContainer.scrollTop = metrics.top - padding;
+}
+
+// Page-specific JS that runs whenever this page is loaded or navigated to.
+if (location.hash.substring(1) == 'photos') {
+  var el = document.querySelector('.pics__section');
+
+  // TODO(ericbidelman): wait until page transition is done before scrolling to element.
+  scrollToElement(el, 200);
+}
+
+})();
+</script>
 {% end %}
