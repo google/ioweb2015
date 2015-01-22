@@ -9,7 +9,7 @@
   },
   "about-sundar": {
     "description": "Description of what I/O is.",
-    "message": "Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President, Products, Sundar Pichai."
+    "message": "Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President of Products, Sundar Pichai."
   },
   "about-io": {
     "description": "Description of what I/O is.",
@@ -267,6 +267,10 @@
   "see-photos-2014": {
     "description": "About page. Link for people to see photos from 2014",
     "message": "See photos from I/O 2014"
+  },
+  "see-more-photos": {
+    "description": "About page. Link to open photo gallery to see more photos from last year.",
+    "message": "See more photos from past I/Os"
   },
   "io-description": {
     "description": "Home page. Describes Google I/O.",

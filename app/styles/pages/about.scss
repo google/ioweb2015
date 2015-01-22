@@ -16,7 +16,9 @@
 
 $name: 'page-about';
 
+@import '../base/_color';
 @import '../base/_breakpoints';
+@import '../base/_typography';
 
 
 ##{$name} {
@@ -27,9 +29,26 @@ $name: 'page-about';
   }
 }
 
+main {
+  paper-button {
+    @include typo-button();
+    color: $color-cyan-A400;
+    white-space: nowrap;
+  }
+
+  core-icon {
+    margin-left: 10px;
+  }
+}
+
 .pics__section {
   height: 310px;
   padding: 0;
+
+  paper-button {
+    position: absolute;
+    bottom: 20%;
+  }
 }
 
 .photo__about {
@@ -51,6 +70,7 @@ $name: 'page-about';
   @extend .photo__about;
   background-image: url(../images/about/Image-03.jpg);
   border-right: 0;
+  position: relative;
 }
 
 @media (min-width: $tablet-breakpoint-min) {
