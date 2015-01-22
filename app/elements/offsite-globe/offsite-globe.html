@@ -32,6 +32,13 @@ Makes a globe or whatever.
     var Matrix4x4 = IOWA.OffsiteGlobe.Matrix4x4;
     var generateIcosphere = IOWA.OffsiteGlobe.generateIcosphere;
 
+    /**
+     * Polyfilled performance.now. Only good for relative timing, not absolute.
+     * @type {function(): number}
+     */
+    var nowish = (window.performance && window.performance.now) ?
+          window.performance.now.bind(window.performance) : Date.now;
+
     var tmpTransform = new Matrix4x4();
 
     Polymer({
@@ -69,6 +76,8 @@ Makes a globe or whatever.
       attached: function() {
         var gl = this.gl = this.$.canvas.getContext('webgl');
 
+        // TODO(bckenny): perf analytics for everything here
+
         // TODO(bckenny): no reason not to inline these
         ShaderProgram.fromXhr(gl, 'elements/offsite-globe/shaders/simple.vert', 'elements/offsite-globe/shaders/simple.frag')
           .then(function(program) {
@@ -97,7 +106,13 @@ Makes a globe or whatever.
         var gl = this.gl;
         this.resize();
 
-        var globeGeometry = generateIcosphere(16);
+        var count = 24;
+        var startTime = nowish();
+        var globeGeometry = generateIcosphere(count);
+        var endTime = nowish();
+        // TODO(bckenny): determine if 1 second is reasonable max time
+        IOWA.Analytics.trackPerf('globe', 'geometry creation',
+            Math.ceil(endTime - startTime), null, 1000);
 
         this.globeArrayBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.globeArrayBuffer);
