@@ -1,4 +1,3 @@
-version: v-dev
 runtime: go
 api_version: go1
 threadsafe: yes

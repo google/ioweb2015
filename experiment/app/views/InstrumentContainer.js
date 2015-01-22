@@ -339,7 +339,6 @@ module.exports = (function() {
       displayContainer.interactive = true;
       displayContainer.buttonMode = true;
       displayContainer.mousedown = function() {
-        alert('hello');
         onActivateCallback_(self);
       };
     }
