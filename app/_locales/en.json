@@ -7,6 +7,18 @@
     "description": "Top navbar single-word link text. Please keep this short. Links to the site's About page. Page supplies more info about the event.",
     "message": "About"
   },
+  "about-sundar": {
+    "description": "Description of what I/O is.",
+    "message": "Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President, Products, Sundar Pichai."
+  },
+  "about-io": {
+    "description": "Description of what I/O is.",
+    "message": "Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech."
+  },
+  "about-see-keynote": {
+    "description": "Link text see the list of 2014 keynote and video sessions.",
+    "message": "See the 2014 Keynote and sessions"
+  },
   "schedule": {
     "description": "Top navbar single-word link text. Please keep this short. Links to the event schedule page.",
     "message": "Schedule"
