@@ -34,9 +34,9 @@ module.exports = (function() {
       setPosition,
       animateWhiteCircle,
       onActivate,
-      enable,
-      disable,
       animateMiddleDot,
+      addEventListeners,
+      removeEventListeners,
       getString: () => guitarString,
       setString,
       getPosition: () => position
@@ -52,27 +52,53 @@ module.exports = (function() {
       if (v) {
         animateMiddleDot(1);
         animateWhiteCircle();
-        gridDotUpper.interactive = false;
-        gridDotMiddle.interactive = true;
-        gridDotMiddle.mouseover = function(mouseData) {
-          animate.to(gridDotMiddle.scale, 0.1, {
-            x: 1.25,
-            y: 1.25
-          });
-        }
 
-        gridDotMiddle.mouseout = function(mouseData) {
-          animate.to(gridDotMiddle.scale, 0.1, {
-            x: 1,
-            y: 1
-          });
-        }
-
+        addStrungEvents();
       } else {
         animateMiddleDot(0);
         animateWhiteCircle();
+
+        addUnstrungEvents();
+      }
+    }
+
+    var isListening = false;
+
+    function addStrungEvents() {
+      if (isListening) {
+        gridDotUpper.interactive = false;
+        gridDotMiddle.interactive = true;
+      }
+    }
+
+    function addUnstrungEvents() {
+      if (isListening) {
         gridDotMiddle.interactive = false;
       }
+    }
+
+    function addEventListeners() {
+      if (isListening) { return; }
+
+      isListening = true;
+
+      gridDot.interactive = true;
+
+      gridDotUpper.interactive = true;
+
+      if (guitarString) {
+        addStrungEvents();
+      } else {
+        addUnstrungEvents();
+      }
+    }
+
+    function removeEventListeners() {
+      if (!isListening) { return; }
+
+      isListening = false;
+
+      gridDot.interactive = false;
     }
 
     /**
@@ -114,6 +140,14 @@ module.exports = (function() {
 
       gridDotUpper = createDotGraphic(25, 0x536dfd);
       gridDotUpper.alpha = 0;
+      gridDotUpper.buttonMode = true;
+      gridDotUpper.mouseover = function(mouseData){
+        gridDotChild.tint = 0x1156B0;
+      }
+
+      gridDotUpper.mouseout = function(mouseData){
+        gridDotChild.tint = 0x0d47a0;
+      }
 
       gridDotUpperWhiteTouch = createDotGraphic(30, 0xffffff);
       gridDotUpperWhiteTouch.scale.x = gridDotUpperWhiteTouch.scale.y = 0.3;
@@ -121,6 +155,20 @@ module.exports = (function() {
 
       gridDotMiddle = createDotGraphic(10, 0x536dfd);
       gridDotMiddle.alpha = 0;
+      gridDotMiddle.buttonMode = true;
+      gridDotMiddle.mouseover = function(mouseData) {
+        animate.to(gridDotMiddle.scale, 0.1, {
+          x: 1.25,
+          y: 1.25
+        });
+      }
+
+      gridDotMiddle.mouseout = function(mouseData) {
+        animate.to(gridDotMiddle.scale, 0.1, {
+          x: 1,
+          y: 1
+        });
+      }
 
       var shadowDotUpper2 = createDotGraphic(10, 0x000000);
       shadowDotUpper2.alpha = 0.09;
@@ -130,43 +178,14 @@ module.exports = (function() {
 
       gridDot.id = pid;
       gridDot.hitArea = new PIXI.Circle(0, 0, 25);
-
-      gridDotChild = gridDot.children[1];
-
-      enable();
-    }
-
-    /**
-     * Enable interactivity on the dot.
-     */
-    function enable() {
-
-      gridDot.interactive = true;
-
-      gridDotUpper.interactive = true;
-
-      gridDotUpper.mouseover = function(mouseData){
-        gridDotChild.tint = 0x1156B0;
-      }
-
-      gridDotUpper.mouseout = function(mouseData){
-        gridDotChild.tint = 0x0d47a0;
-      }
-
+      gridDot.buttonMode = true;
       gridDot.mousedown = gridDot.touchstart = function( /* data */ ) {
        // data.originalEvent.preventDefault();
         // console.log( data.originalEvent.type + " originalEvent" )
         onActivateCallback_(self);
       };
 
-    }
-
-    /**
-     * Disable interactivity on the dot.
-     */
-    function disable() {
-      gridDot.interactive = false;
-      gridDot.mousedown = gridDot.touchstart = null;
+      gridDotChild = gridDot.children[1];
     }
 
     /**

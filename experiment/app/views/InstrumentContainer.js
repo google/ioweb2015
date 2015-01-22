@@ -84,7 +84,7 @@ module.exports = (function() {
       controls = makeControls();
 
       instrumentView = new SubView(audioManager);
-      createRenderer(instrumentView.backgroundColor || 0xffffff);
+      createRenderer(instrumentView.backgroundColor);
 
       displayContainer.addChild(displayContainerSub);
       displayContainerSub.addChild(displayContainerCenter);
@@ -338,7 +338,8 @@ module.exports = (function() {
     function addContractedEventListeners() {
       displayContainer.interactive = true;
       displayContainer.buttonMode = true;
-      displayContainer.click = function() {
+      displayContainer.mousedown = function() {
+        alert('hello');
         onActivateCallback_(self);
       };
     }
