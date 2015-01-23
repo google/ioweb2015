@@ -209,7 +209,7 @@
     "message": "Hours until registration begins"
   },
   "minutesuntilreg": {
-    "description": "Short label used on the home/registration page to signify minutues left until registration begins",
+    "description": "Short label used on the home/registration page to signify minutes left until registration begins",
     "message": "Minutes until registration begins"
   },
   "secondsuntilreg": {
