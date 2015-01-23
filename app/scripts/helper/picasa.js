@@ -16,7 +16,7 @@
 
 window.IOWA = window.IOWA || {};
 
-IOWA.Picasa = (function(exports) {
+IOWA.Picasa = (function() {
 
   "use strict";
 
@@ -52,4 +52,4 @@ IOWA.Picasa = (function(exports) {
     fetch: fetch
   };
 
-})(window);
+})();

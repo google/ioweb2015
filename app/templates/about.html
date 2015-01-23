@@ -68,41 +68,41 @@
     </div>
   </template>
 
-<script>
-(function() {
+  <script>
+  (function() {
 
-function scrollToElement(el, opt_topPadding) {
-  var padding = opt_topPadding || 0;
-  var metrics = el.getBoundingClientRect();
-  IOWA.Elements.ScrollContainer.scrollTop = metrics.top - padding;
-}
+    function scrollToElement(el, opt_topPadding) {
+      var padding = opt_topPadding || 0;
+      var metrics = el.getBoundingClientRect();
+      IOWA.Elements.ScrollContainer.scrollTop = metrics.top - padding;
+    }
 
-// Page-specific JS that runs when this page is loaded for the first time.
-function firstLoadSetup(page) {
-  if (page.hasBeenLoaded) {
-    return;
-  }
+    // Page-specific JS that runs when this page is loaded for the first time.
+    function firstLoadSetup(page) {
+      if (page.hasBeenLoaded) {
+        return;
+      }
 
-  IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
-    e.preventDefault();
+      IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
+        e.preventDefault();
 
-    IOWA.Elements.Template.toggleOverlayNav();
-  };
+        IOWA.Elements.Template.toggleOverlayNav();
+      };
 
-  page.hasBeenLoaded = true;
-}
+      page.hasBeenLoaded = true;
+    }
 
-var thisPage = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+    var thisPage = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
 
-firstLoadSetup(thisPage);
+    firstLoadSetup(thisPage);
 
-if (location.hash.substring(1) == 'photos') {
-  var el = document.querySelector('.pics__section');
+    if (location.hash.substring(1) == 'photos') {
+      var el = document.querySelector('.pics__section');
 
-  // TODO(ericbidelman): wait until page transition is done before scrolling to element.
-  scrollToElement(el, 200);
-}
+      // TODO(ericbidelman): wait until page transition is done before scrolling to element.
+      scrollToElement(el, 200);
+    }
 
-})();
-</script>
+  })();
+  </script>
 {% end %}
