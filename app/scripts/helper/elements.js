@@ -52,7 +52,14 @@ IOWA.Elements = (function() {
     IOWA.Elements.Footer = footer;
 
     ioLogo.addEventListener('finish', function() {
-      IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender());
+      var optionallyLaunchExperiment = function() {
+        if (window.location.hash.indexOf('experiment') > -1) {
+          var fab = document.querySelector('experiment-fab-container');
+          fab.onFabClick();
+        }
+      };
+      IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender(),
+          optionallyLaunchExperiment);
     });
     window.addEventListener('resize', function() {
       IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
