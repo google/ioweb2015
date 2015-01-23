@@ -103,7 +103,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/*.{html,txt,ico}',
     APP_DIR + '/manifest.json',
     APP_DIR + '/clear_cache.html',
-    APP_DIR + '/styles/*.css',
+    APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
     APP_DIR + '/elements/**/images/*',
     APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js',
