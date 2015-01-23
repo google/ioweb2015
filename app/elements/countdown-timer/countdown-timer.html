@@ -228,6 +228,16 @@ Creates a countdown timer to a specific date.
         this.configureTimer_();
         this.timer.setOnTimerThresholdReachedCallback(
           this.onTimerThresholdReached_.bind(this));
+      },
+
+      /**
+       * Lifecycle event that either draws the timer once or starts it (depends
+       * on `autoStart`'s value'). Moved to domReady to ensure that the canvas
+       * dimensions will be correct.
+       *
+       * @private
+       */
+      domReady: function() {
 
         if (!this.autoStart) {
           this.timer.drawIfAnimationIsNotRunning();

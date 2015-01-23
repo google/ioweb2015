@@ -1,6 +1,7 @@
 IOWA.CountdownTimer.Element = function(el) {
 
   this.renderer_ = new IOWA.CountdownTimer.NumberRenderer(el);
+  this.renderer_.init();
 
   this.currentDayCountValue_ = 0;
   this.targetDayCountValue_ = 0;
@@ -267,6 +268,7 @@ IOWA.CountdownTimer.Element.prototype = {
     if (this.animationRunning_)
       return;
 
+    this.renderer_.init();
     this.renderer_.clear();
     this.renderer_.draw(this.currentDayValue, 1,
         IOWA.CountdownTimer.Animation.In);

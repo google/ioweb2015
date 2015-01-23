@@ -10,7 +10,6 @@ IOWA.CountdownTimer.NumberRenderer = function(el) {
   this.letterPadding_ = 6;
   this.freezeDigitCount_ = 0;
 
-  this.configureCanvas_();
   this.addEventListeners_();
 };
 
@@ -841,5 +840,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
   freeze: function(freezeCount) {
     this.freezeDigitCount_ = freezeCount;
+  },
+
+  init: function() {
+    this.configureCanvas_();
   }
 };
