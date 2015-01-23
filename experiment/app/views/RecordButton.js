@@ -93,6 +93,8 @@ module.exports = (function() {
     checkmarkCircle.position.y = CIRCLE_RADIUS + 2;
     checkmarkCircle.anchor.set(0.5, 0.5);
     checkmarkCircle.alpha = 0;
+    checkmarkCircle.scale.x = 0;
+    checkmarkCircle.scale.y = 0;
 
     var readyText = retinaInlineSprite(getReadyImage);
     var recordingText = retinaInlineSprite(recordingImage);
@@ -242,9 +244,8 @@ module.exports = (function() {
         x: 0.7,
         y: 0.7
       }, {
-        x: 1,
-        y: 1,
-        ease: Elastic.easeIn
+        x: 1.1,
+        y: 1.1
       }).then(hideNumber.bind(null, numberImageGraphic));
     }
 
@@ -256,8 +257,7 @@ module.exports = (function() {
       animate.to(numberImageGraphic.scale, 0.15, {
         delay: 0.6,
         x: 0.5,
-        y: 0.5,
-        ease: Elastic.easeOut
+        y: 0.5
       });
 
       animate.to(numberImageGraphic, 0.2, {
@@ -361,8 +361,8 @@ module.exports = (function() {
      */
     function resetRecord() {
       arcCircle.clear();
-      mintCircle.alpha = 0;
-      hideText(textImages[2], 2);
+      checkmarkCircle.alpha = 0;
+      hideText(textImages[2], 0);
       animate.fromTo(recordIcon.scale, 0.3, {
         x: 0,
         y: 0
@@ -383,8 +383,8 @@ module.exports = (function() {
     /**
      * Animate the countdown/record circle
      * @param {string} color - The color of the stroke.
-     * param {number} startedTime - The start time of the animation.
-     * param {number} duration - The duration of the recording.
+     * @param {number} startedTime - The start time of the animation.
+     * @param {number} duration - The duration of the recording.
      */
     function radialAnimation(color, startedTime, duration) {
       var targetRadians = (Math.PI * 2) * (startedTime / duration);
@@ -400,6 +400,9 @@ module.exports = (function() {
      */
     function finishedAnimation() {
       hideText(textImages[1], 0);
+      checkmarkCircle.alpha = 1;
+      mintCircle.alpha = 0;
+      showText(textImages[2]);
       animate.to(checkmarkCircle.scale, 0.25, {
         x: 1,
         y: 1
@@ -409,8 +412,9 @@ module.exports = (function() {
         y: 0
       })
       );
-      showText(textImages[2]);
-      resetRecord();
+      setTimeout(function(){
+        resetRecord();
+      }, 2100);
     }
 
     return self;

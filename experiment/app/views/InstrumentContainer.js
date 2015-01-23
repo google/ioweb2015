@@ -188,9 +188,10 @@ module.exports = (function() {
         animate.to(backIconContainer, 0.1, {
           alpha: 1
         });
-        animate.to(recordButton.container.scale, 0.2, {
+        animate.to(recordButton.container.scale, 0.33, {
           x: 1,
-          y: 1
+          y: 1,
+          ease: Back.easeOut
         });
       });
     }
@@ -205,15 +206,15 @@ module.exports = (function() {
       backIconContainer.buttonMode = false;
       backIconContainer.click = null;
 
-      return animate.to(controls, 0.3, {
+      return animate.to(controls, 0.2, {
         y: -100,
         delay: delay
       }).then(function() {
         stage.addChild(controls);
-        animate.to(backIconContainer, 0.1, {
+        animate.set(backIconContainer, {
           alpha: 0
         });
-        animate.to(recordButton.container.scale, 0.2, {
+        animate.set(recordButton.container.scale, {
           x: 0,
           y: 0
         });
