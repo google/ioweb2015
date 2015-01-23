@@ -73,7 +73,7 @@
   },
   "registration-opens": {
     "description": "Subheader of the registration section",
-    "message": "Registration opens"
+    "message": "Registration begins"
   },
   "registration-agenda": {
     "description": "Link text. Please keep this short. Links to the event schedule page.",
