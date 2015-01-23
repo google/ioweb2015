@@ -25,8 +25,61 @@ IOWA.Router = (function() {
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
   /**
-   * Navigates to a new page. Uses ajax for data-ajax-link links.
+   * Tells what kind of transition is currently happening on the page,
+   * e.g. 'hero-card-transition' or 'masthead-ripple-transition'.
+   * @type {=string?}
+   */
+  var currentPageTransition = null;
+
+  /**
+   * Navigates to a new page via a hero card takeover transition.
    * @param {Event} e Event that triggered navigation.
+   * @param {Element} el Element clicked.
+   * @param {string} rippleColor Color of the ripple on the card.
+   * @private
+   */
+  function playHeroTransition(e, el, rippleColor) {
+    // TODO: This may need some perf tweaking for FF.
+    var card = null;
+    var currentEl = el;
+    while (!card) {
+      currentEl = currentEl.parentNode;
+      if (currentEl.classList.contains('card__container')) {
+        card = currentEl;
+      }
+    }
+    IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverOut(
+        card, e.pageX, e.pageY, 300, rippleColor), function() {
+      IOWA.History.pushState({'path': el.pathname}, '', el.href);
+    });
+  }
+
+  /**
+   * Navigates to a new page via a hero card takeover transition.
+   * @param {Event} e Event that triggered navigation.
+   * @param {Element} el Element clicked.
+   * @param {string} rippleColor Color of the ripple on the card.
+   * @param {boolean} isFadeRipple If true, ripple will just glimpse and fade.
+   * @private
+   */
+  function playMastheadRippleTransition(e, el, rippleColor, isFadeRipple) {
+    var callback;
+    var rippleAnim = IOWA.PageAnimation.ripple(
+          IOWA.Elements.Ripple, e.pageX, e.pageY, 400,
+          rippleColor, isFadeRipple);
+    var animation = new AnimationGroup([
+      rippleAnim,
+      IOWA.PageAnimation.contentSlideOut()
+    ]);
+    IOWA.PageAnimation.play(animation, function() {
+      IOWA.History.pushState({'path': el.pathname}, '', el.href);
+    });
+  }
+
+  /**
+   * Navigates to a new page via ajax and page transitions.
+   * @param {Event} e Event that triggered navigation.
+   * @param {Element} el Element clicked.
    * @private
    */
   function handleAjaxLink(e, el) {
@@ -35,74 +88,27 @@ IOWA.Router = (function() {
     // We can get the full absolute path from the <a> element's pathname:
     // http://stackoverflow.com/questions/736513
     var pageName = parsePageNameFromAbsolutePath(el.pathname);
-    var pageMeta = IOWA.Elements.Template.pages[pageName];
     IOWA.Elements.Template.nextPage = pageName;
-    var callback;
+
     var currentPage = IOWA.Elements.Template.selectedPage;
+    var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+
+    IOWA.Elements.Template.mastheadBgClass = bgClass;
+    var isFadeRipple = (
+        IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
+        bgClass);
+    var rippleColor = isFadeRipple ?
+        '#fff': IOWA.Elements.Template.rippleColors[bgClass];
+
     if (currentPage !== pageName) {
-
       if (el.hasAttribute('data-anim-ripple')) {
-
-        var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
-        IOWA.Elements.Template.mastheadBgClass = bgClass;
-        var isFadeRipple = (
-            IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
-            bgClass);
-
-        /*
-        // TODO: BUG: interesting, causes Web Animations opacity bug.
-        var sequence = new AnimationSequence([
-          IOWA.PageAnimation.ripple(
-              IOWA.Elements.Ripple, e.pageX, e.pageY, 400, isFadeRipple),
-          IOWA.PageAnimation.slideContentOut()
-        ]);
-        sequence.callback = callback.bind(this, el);
-        */
-
-        var color = isFadeRipple ?
-            '#fff': IOWA.Elements.Template.rippleColors[bgClass];
-        var rippleAnim = IOWA.PageAnimation.ripple(
-              IOWA.Elements.Ripple, e.pageX, e.pageY, 400, color, isFadeRipple);
-
-        if (IOWA.PageAnimation.canRunSimultanousAnimations) {
-          // Run animations simultaneously, then change the page.
-          var animation = new AnimationGroup([
-            rippleAnim,
-            IOWA.PageAnimation.slideContentOut()
-          ]);
-          animation.pageState = 'slideContentOut';
-          callback = function() {
-            IOWA.History.pushState({'path': el.pathname}, '', el.href);
-          };
-          IOWA.PageAnimation.play(animation, callback.bind(null, el));
-        } else {
-          // Run animations sequentially, then change the page.
-          callback = function(el) {
-            IOWA.PageAnimation.play(
-                IOWA.PageAnimation.slideContentOut(), function() {
-                  IOWA.History.pushState({'path': el.pathname}, '', el.href);
-                });
-          };
-          IOWA.PageAnimation.play(rippleAnim, callback.bind(null, el));
-        }
+        currentPageTransition = 'masthead-ripple-transition';
+        playMastheadRippleTransition(e, el, rippleColor, isFadeRipple);
       } else if (el.hasAttribute('data-anim-card'))  {
-        callback = function(el, card) {
-          // TODO: There's jank/flicker on bringing the content in,
-          // especially in the masthead.
-          IOWA.Elements.Template.rippleBgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
-          IOWA.History.pushState({'path': el.pathname}, '', el.href);
-        };
-        var card = null;
-        var currentEl = el;
-        while (!card) {
-          currentEl = currentEl.parentNode;
-          if (currentEl.classList.contains('card__container')) {
-            card = currentEl;
-          }
-        }
-        IOWA.PageAnimation.play(IOWA.PageAnimation.cardToMasthead(
-            card, e.pageX, e.pageY, 300), callback.bind(null, el, card));
+        currentPageTransition = 'hero-card-transition';
+        playHeroTransition(e, el, rippleColor);
       } else {
+        currentPageTransition = '';
         IOWA.History.pushState({'path': el.pathname}, '', el.href);
       }
     }
@@ -186,11 +192,13 @@ IOWA.Router = (function() {
         MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
 
     setTimeout(function() {
-      var animation = IOWA.PageAnimation.slideContentIn();
-      animation.pageState = 'slideContentIn';
-      IOWA.PageAnimation.play(animation);
-      //IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
-    }, 50); // Wait for the... Good question. Maybe template binding?
+      var animationIn = (
+          currentPageTransition === 'hero-card-transition') ?
+          IOWA.PageAnimation.pageCardTakeoverIn() :
+          IOWA.PageAnimation.pageSlideIn();
+      IOWA.PageAnimation.play(animationIn);
+      currentPageTransition = '';
+    }, 100); // Wait for the... Good question. Maybe template binding?
     // TODO: BUG: Anyways, something to investigate. Web Animations
     // are not working properly without this delay (Chrome crashes).
   }
@@ -204,9 +212,17 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-    if (IOWA.PageAnimation.pageState !== 'slideContentOut') {
-      var animation = IOWA.PageAnimation.slideContentOut();
-      animation.pageState = 'slideContentOut';
+    var masthead = IOWA.Elements.Masthead;
+    masthead.className = masthead.className.replace(
+        MASTHEAD_BG_CLASS_REGEX,
+        ' ' + IOWA.Elements.Template.mastheadBgClass + ' ');
+
+    var bgClass = IOWA.Elements.Template.mastheadBgClass;
+    var rippleColor = IOWA.Elements.Template.rippleColors[bgClass];
+    IOWA.Elements.Ripple.style.backgroundColor = rippleColor;
+
+    if (!currentPageTransition) {
+      var animation = IOWA.PageAnimation.contentSlideOut();
       IOWA.PageAnimation.play(animation, updatePageElements.bind(
           null, pageName, currentPageTemplates));
     } else {

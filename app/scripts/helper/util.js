@@ -51,12 +51,29 @@ IOWA.Util = IOWA.Util || (function() {
     return location.href.substring(0, location.href.lastIndexOf('/') + 1);
   }
 
+  /**
+   * Adjusts the size of the ripple to fully cover the parent element.
+   * @param {Element} ripple The ripple DOM element.
+   * @return {Object} parentRect Parent bounding rect, for reuse.
+   */
+  var resizeRipple = function(ripple) {
+    var parentRect = ripple.parentNode.getBoundingClientRect();
+    var radius = Math.floor(Math.sqrt(parentRect.width * parentRect.width +
+      parentRect.height * parentRect.height));
+    ripple.style.width = 2 * radius + 'px';
+    ripple.style.height = 2 * radius + 'px';
+    ripple.style.left = -radius + 'px';
+    ripple.style.top = -radius + 'px';
+    return parentRect;
+  };
+
   return {
     isIE: isIE,
     isIOS: isIOS,
     isSafari: isSafari,
     getWindowScrollPosition: getWindowScrollPosition,
-    getStaticBaseURL: getStaticBaseURL
+    getStaticBaseURL: getStaticBaseURL,
+    resizeRipple: resizeRipple
   };
 
 })();

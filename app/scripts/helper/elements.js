@@ -18,19 +18,10 @@ IOWA.Elements = (function() {
 
   "use strict";
 
-  var resizeRipple = function(ripple) {
-    var parentRect = ripple.parentNode.getBoundingClientRect();
-    var radius = Math.floor(Math.sqrt(parentRect.width * parentRect.width +
-      parentRect.height * parentRect.height));
-    ripple.style.width = 2 * radius + 'px';
-    ripple.style.height = 2 * radius + 'px';
-    ripple.style.left = -radius + 'px';
-    ripple.style.top = -radius + 'px';
-  };
-
   var updateElements = function() {
     var toast = document.getElementById('toast');
     var ioLogo = document.querySelector('io-logo');
+    var main = document.querySelector('.io-main');
 
     var drawer = document.querySelector('core-drawer-panel');
     drawer.addEventListener('core-activate', function(e) {
@@ -38,25 +29,33 @@ IOWA.Elements = (function() {
     });
 
     var ripple = document.querySelector('.masthead__ripple__content');
-    resizeRipple(ripple);
+    IOWA.Util.resizeRipple(ripple);
 
     var masthead = document.querySelector('.masthead');
+    var mastheadMeta = document.querySelector('.masthead-meta');
     var footer = document.querySelector('footer');
     var i18n = document.createElement('i18n-msg');
+
+    var ioLogoLarge = masthead.querySelector('#io-logo-large');
+    var nav = masthead.querySelector('#navbar');
 
     IOWA.Elements.Drawer = drawer;
     IOWA.Elements.I18n = i18n;
     IOWA.Elements.Masthead = masthead;
+    IOWA.Elements.MastheadMeta = mastheadMeta;
+    IOWA.Elements.Main = main;
+    IOWA.Elements.Nav = nav;
     IOWA.Elements.Ripple = ripple;
     IOWA.Elements.Toast = toast;
     IOWA.Elements.IOLogo = ioLogo;
+    IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
 
     ioLogo.addEventListener('finish', function() {
-      IOWA.PageAnimation.play(IOWA.PageAnimation.slideContentIn());
+      IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender());
     });
     window.addEventListener('resize', function() {
-      resizeRipple(IOWA.Elements.Ripple);
+      IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
     });
   };
 

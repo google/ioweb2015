@@ -38,25 +38,36 @@ IOWA.PageAnimation = (function() {
       fill: 'forwards'
   };
 
-  var canRunSimultanousAnimations = (/Safari/gi).test(navigator.userAgent ||
-      (/Chrome/gi).test(navigator.userAgent));
+  /**
+   * Fades element out.
+   * @param {Element} el DOM element.
+   * @param {Object} option Options for the transition, e.g. duration.
+   * @return {Animation} Ripple animation definition.
+   */
+  function elementFadeOut(el, options) {
+    options.fill = 'forwards'; // Always keep the state at the end of animation.
+    return new Animation(el, [{opacity: 1}, {opacity: 0}], options);
+  }
 
   /**
-   * Page state informs the caller about the current state of the page,
-   * e.g. whether the content is slid in, fade out etc.
-   * @type {=string?}
+   * Fades element in.
+   * @param {Element} el DOM element.
+   * @param {Object} option Options for the transition, e.g. duration.
+   * @return {Animation} Ripple animation definition.
    */
-  var pageState = null;
+  function elementFadeIn(el, options) {
+    options.fill = 'forwards'; // Always keep the state at the end of animation.
+    return new Animation(el, [{opacity: 0}, {opacity: 1}], options);
+  }
 
   /**
    * Returns an animation to slide and fade out the main content of the page.
-   * Used together with slideContentIn for page transitions.
+   * Used together with contentSlideIn for page transitions.
    * @return {Animation} Page animation definition.
    */
-  function slideContentOut() {
-    var main = document.querySelector('.io-main .slide-up');
-    var mainDelayed = document.querySelector('.io-main .slide-up-delay');
-    var masthead = IOWA.Elements.Masthead.querySelector('.masthead-meta');
+  function contentSlideOut() {
+    var main = IOWA.Elements.Main.querySelector('.slide-up');
+    var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
     var start = {
       transform: 'translate(0, 0)',
       opacity: 1
@@ -65,28 +76,24 @@ IOWA.PageAnimation = (function() {
       transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
       opacity: 0
     };
-    var animation =  new AnimationGroup([
+    return new AnimationGroup([
       new Animation(main, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
-      new Animation(masthead, [{ opacity: 1 }, { opacity: 0 }],
-          CONTENT_SLIDE_OPTIONS),
-      new Animation(IOWA.Elements.Footer, [{ opacity: 1 }, { opacity: 0 }],
-          CONTENT_SLIDE_OPTIONS)
+      elementFadeOut(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
+      elementFadeOut(IOWA.Elements.IOLogoLarge, CONTENT_SLIDE_OPTIONS),
+      elementFadeOut(IOWA.Elements.Footer, {duration: 0}) // Hide instantly.
     ]);
-    animation.pageState = 'slideContentOut';
-    return animation;
   }
 
   /**
    * Returns an animation to slide up and fade in the main content of the page.
-   * Used together with slideContentOut for page transitions.
+   * Used together with contentSlideOut for page transitions.
    * TODO: Should be possible by reversing slideout animation.
    * @return {Animation} Page animation definition.
    */
-  function slideContentIn() {
-    var main = document.querySelector('.slide-up');
-    var mainDelayed = document.querySelector('.slide-up-delay');
-    var masthead = IOWA.Elements.Masthead.querySelector('.masthead-meta');
+  function contentSlideIn() {
+    var main = IOWA.Elements.Main.querySelector('.slide-up');
+    var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
     var start = {
       transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
       opacity: 0
@@ -95,16 +102,33 @@ IOWA.PageAnimation = (function() {
       transform: 'translate(0, 0)',
       opacity: 1
     };
-    var animationGroup =  new AnimationGroup([
+    return new AnimationGroup([
       new Animation(main, [start, end], CONTENT_SLIDE_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
-      new Animation(masthead, [{ opacity: 0 }, { opacity: 1 }],
-          CONTENT_SLIDE_OPTIONS),
-      new Animation(IOWA.Elements.Footer, [{ opacity: 0 }, { opacity: 1 }],
-          CONTENT_SLIDE_OPTIONS)
+      elementFadeIn(IOWA.Elements.Footer, CONTENT_SLIDE_DELAY_OPTIONS)
     ]);
-    animationGroup.pageState = 'slideContentIn';
-    return animationGroup;
+  }
+
+  /**
+   * Returns an animation to slide the top nav out of the screen.
+   * @return {Animation} Page animation definition.
+   */
+  function navSlideOut() {
+    return new Animation(IOWA.Elements.Nav, [
+       {transform: 'translateY(0)'},
+       {transform: 'translateY(-100%)'}
+    ], CONTENT_SLIDE_OPTIONS);
+  }
+
+  /**
+   * Returns an animation to slide the top nav into the screen.
+   * @return {Animation} Page animation definition.
+   */
+  function navSlideIn() {
+    return new Animation(IOWA.Elements.Nav, [
+       {transform: 'translateY(-100%)'},
+       {transform: 'translateY(0)'}
+    ], CONTENT_SLIDE_OPTIONS);
   }
 
   /**
@@ -138,51 +162,93 @@ IOWA.PageAnimation = (function() {
   }
 
   /**
+   * An animation for the first page render. It slides the content in
+   * and fades in the masthead meta.
+   * @return {Animation} Ripple animation definition.
+   */
+  function pageFirstRender() {
+    return new AnimationGroup([
+      contentSlideIn(),
+      elementFadeIn(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS)
+    ], CONTENT_SLIDE_OPTIONS);
+  }
+
+  /**
+   * An animation for the page slide in transition. It slides the content in
+   * and fades in the masthead meta and IO logo.
+   * @return {Animation} Ripple animation definition.
+   */
+  function pageSlideIn() {
+    var animationGroup =  new AnimationGroup([
+      contentSlideIn(),
+      elementFadeIn(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
+      elementFadeIn(IOWA.Elements.IOLogoLarge, CONTENT_SLIDE_OPTIONS)
+    ], CONTENT_SLIDE_OPTIONS);
+    return animationGroup;
+  }
+
+  /**
    * Returns an animation to play a hero card takeover animation. The card
    *     plays a ripple on itself and grows to cover the masthead.
    * @param {Element} card Card DOM element.
    * @param {number} x X coordinate of the center of the ripple.
    * @param {number} x Y coordinate of the center of the ripple.
    * @param {number} duration Duration of the animation.
+   * @param {string} color Color of the ripple.
    * @return {Animation} Ripple animation definition.
    */
-  function cardToMasthead(card, x, y, duration) {
+  function pageCardTakeoverOut(card, x, y, duration, color) {
     var ripple = card.querySelector('.ripple__content');
-    var rippleRect = ripple.getBoundingClientRect();
-
-    var radius = Math.floor(Math.sqrt(rippleRect.width * rippleRect.width +
-        rippleRect.height * rippleRect.height));
-    ripple.style.width = 2 * radius + 'px';
-    ripple.style.height = 2 * radius + 'px';
-    ripple.style.left = -radius + 'px';
-    ripple.style.top = -radius + 'px';
-    ripple.style.zIndex = 1;
+    var rippleRect = IOWA.Util.resizeRipple(ripple);
+    ripple.style.backgroundColor = color;
+    ripple.parentNode.style.zIndex = 2;
 
     var mastheadRect = IOWA.Elements.Masthead.getBoundingClientRect();
     var scaleX = mastheadRect.width / rippleRect.width;
     var scaleY = mastheadRect.height / rippleRect.height;
-
+    var scale = 'scale(' + scaleX + ', ' + scaleY + ')';
     var translate = 'translate3d(' + (-rippleRect.left) + 'px,' +
         (-rippleRect.top)  + 'px, 0)';
-    var scale = 'scale(' + scaleX + ', ' + scaleY + ')';
-    var start = {
-      transform: 'translate3d(0, 0, 0) scale(1)'
-    };
-    var end = {
-      transform: [translate, scale].join(' ')
-    };
-    card.style.transformOrigin = '0 0';
 
-    var cardTransition = new Animation(card, [start, end], {
+    card.style.transformOrigin = '0 0';
+    var cardTransition = new Animation(card, [
+        {transform: 'translate3d(0, 0, 0) scale(1)'},
+        {transform: [translate, scale].join(' ')}
+      ], {
         duration: duration,
         fill: 'forwards'
     });
 
+    var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
+
+    // First run the hero card takeover...
     var animationGroup = new AnimationGroup([
       rippleEffect(ripple, x - rippleRect.left, y - rippleRect.top, duration),
-      cardTransition
+      cardTransition,
+      navSlideOut(),
+      elementFadeOut(mainDelayed, CONTENT_SLIDE_OPTIONS)
     ]);
-    return animationGroup;
+
+    // ...then hide the content under the hero unit.
+    return new AnimationSequence([
+      animationGroup,
+      elementFadeOut(IOWA.Elements.Ripple, {duration: 0}), // Hide instantly.
+      elementFadeOut(IOWA.Elements.IOLogoLarge, {duration: 0}), // Same.
+      elementFadeOut(IOWA.Elements.Footer, {duration: 0}),  // Same.
+      elementFadeOut(IOWA.Elements.MastheadMeta, {duration: 0}) // Same.
+    ]);
+  }
+
+  /**
+   * An animation for the page hero card transition. It slides the page
+   * and the top navigation in.
+   * @return {Animation} Ripple animation definition.
+   */
+  function pageCardTakeoverIn() {
+    return new AnimationGroup([
+      pageSlideIn(),
+      navSlideIn()
+    ], CONTENT_SLIDE_OPTIONS);
   }
 
   /**
@@ -192,10 +258,6 @@ IOWA.PageAnimation = (function() {
    */
   function play(animation, callback) {
     var player = document.timeline.play(animation);
-    if (animation.pageState) {
-      // Update the information about current animated page state.
-      IOWA.PageAnimation.pageState = animation.pageState;
-    }
     if (callback) {
       player.onfinish = function(e) {
         callback();
@@ -204,12 +266,13 @@ IOWA.PageAnimation = (function() {
   }
 
   return {
-    canRunSimultanousAnimations: canRunSimultanousAnimations,
-    pageState: pageState,
-    slideContentOut: slideContentOut,
-    slideContentIn: slideContentIn,
+    contentSlideOut: contentSlideOut,
+    contentSlideIn: contentSlideIn,
+    pageSlideIn: pageSlideIn,
+    pageCardTakeoverOut: pageCardTakeoverOut,
+    pageCardTakeoverIn: pageCardTakeoverIn,
+    pageFirstRender: pageFirstRender,
     ripple: rippleEffect,
-    cardToMasthead: cardToMasthead,
     play: play
   };
 
