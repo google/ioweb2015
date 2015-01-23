@@ -12,8 +12,8 @@
       <div class="card-content">
         <h2><i18n-msg msgid="about-io">Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</i18n-msg></h2>
       </div>
-      <div class="card-content">
-        <a href="#" data-track-link="about-view-photos-from-past-io">
+      <div class="card-content card-content--paper">
+        <a href="#" data-track-link="about-view-photos-card" on-click="{{togglePhotoGallery}}">
           <i18n-msg msgid="see-photos-2014">See photos from I/O 2014</i18n-msg>
         </a>
       </div>
@@ -25,14 +25,21 @@
       <div class="photo__about" flex two></div>
       <div layout vertical flex>
         <div class="photo__about--top" layout vertical flex></div>
-        <div class="photo__about--bottom" layout vertical flex></div>
+        <div class="photo__about--bottom" layout vertical flex>
+          <paper-button hidden?="{{isPhoneSize}}"
+                        data-track-link="about-view-photos-section"
+                        on-tap="{{togglePhotoGallery}}">
+            <i18n-msg msgid="see-more-photos">See more photos from past I/Os</i18n-msg>
+            <core-icon icon="image:photo-camera"></core-icon>
+          </paper-button>
+        </div>
       </div>
     </section>
 
     <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
-          <h3><i18n-msg msgid="about-sundar">Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President, Products, Sundar Pichai.</i18n-msg></h3>
+          <h3><i18n-msg msgid="about-sundar">Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President of Products, Sundar Pichai.</i18n-msg></h3>
         </div>
         <div class="card-content">
           <a href="https://www.google.com/events/io/schedule" target="_blank" data-track-link="about-see-keynote-and-sessions">
@@ -60,4 +67,42 @@
       <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit></google-youtube>
     </div>
   </template>
+
+  <script>
+  (function() {
+
+    function scrollToElement(el, opt_topPadding) {
+      var padding = opt_topPadding || 0;
+      var metrics = el.getBoundingClientRect();
+      IOWA.Elements.ScrollContainer.scrollTop = metrics.top - padding;
+    }
+
+    // Page-specific JS that runs when this page is loaded for the first time.
+    function firstLoadSetup(page) {
+      if (page.hasBeenLoaded) {
+        return;
+      }
+
+      IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
+        e.preventDefault();
+
+        IOWA.Elements.Template.toggleOverlayNav();
+      };
+
+      page.hasBeenLoaded = true;
+    }
+
+    var thisPage = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+
+    firstLoadSetup(thisPage);
+
+    if (location.hash.substring(1) == 'photos') {
+      var el = document.querySelector('.pics__section');
+
+      // TODO(ericbidelman): wait until page transition is done before scrolling to element.
+      scrollToElement(el, 200);
+    }
+
+  })();
+  </script>
 {% end %}

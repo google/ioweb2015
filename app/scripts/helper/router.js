@@ -91,18 +91,19 @@ IOWA.Router = (function() {
     IOWA.Elements.Template.nextPage = pageName;
 
     var currentPage = IOWA.Elements.Template.selectedPage;
-    var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+    var bgClass = IOWA.Elements.Template.pages[pageName] &&
+        IOWA.Elements.Template.pages[pageName].mastheadBgClass;
 
     IOWA.Elements.Template.navBgClass = bgClass;
-    var isFadeRipple = (
-        IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
-        bgClass);
     var rippleColor = isFadeRipple ?
         '#fff': IOWA.Elements.Template.rippleColors[bgClass];
 
     if (currentPage !== pageName) {
       if (el.hasAttribute('data-anim-ripple')) {
         currentPageTransition = 'masthead-ripple-transition';
+        var isFadeRipple = (
+        IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
+            bgClass);
         playMastheadRippleTransition(e, el, rippleColor, isFadeRipple);
       } else if (el.hasAttribute('data-anim-card'))  {
         currentPageTransition = 'hero-card-transition';

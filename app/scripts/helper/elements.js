@@ -103,6 +103,7 @@ IOWA.Elements = (function() {
       }
 
       nav.classList.toggle('active');
+      this.fire('overlay-navbar-toggle', nav.classList.contains('active'));
     };
 
     /**

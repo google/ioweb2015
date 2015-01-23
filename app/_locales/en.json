@@ -9,7 +9,7 @@
   },
   "about-sundar": {
     "description": "Description of what I/O is.",
-    "message": "Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President, Products, Sundar Pichai."
+    "message": "Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President of Products, Sundar Pichai."
   },
   "about-io": {
     "description": "Description of what I/O is.",
@@ -59,6 +59,14 @@
     "description": "The month of the Google I/O event",
     "message": "Smarch"
   },
+  "reg-begins": {
+    "description": "When registration begins",
+    "message": "Registration begins March 10 at 9AM PST"
+  },
+  "io-description-card": {
+    "description": "Description of the event.",
+    "message": "I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between."
+  },
   "learnmore": {
     "description": "Link text. Links to a page with the event's details.",
     "message": "Learn more about I/O"
@@ -69,9 +77,9 @@
   },
   "registration-opens": {
     "description": "Subheader of the registration section",
-    "message": "Registration opens"
+    "message": "Registration begins"
   },
-  "registration-opens": {
+  "registration-agenda": {
     "description": "Link text. Please keep this short. Links to the event schedule page.",
     "message": "Check the agenda"
   },
@@ -209,7 +217,7 @@
     "message": "Hours until registration begins"
   },
   "minutesuntilreg": {
-    "description": "Short label used on the home/registration page to signify minutues left until registration begins",
+    "description": "Short label used on the home/registration page to signify minutes left until registration begins",
     "message": "Minutes until registration begins"
   },
   "secondsuntilreg": {
@@ -263,6 +271,10 @@
   "see-photos-2014": {
     "description": "About page. Link for people to see photos from 2014",
     "message": "See photos from I/O 2014"
+  },
+  "see-more-photos": {
+    "description": "About page. Link to open photo gallery to see more photos from last year.",
+    "message": "See more photos from past I/Os"
   },
   "io-description": {
     "description": "Home page. Describes Google I/O.",

@@ -51,9 +51,9 @@ limitations under the License.
   <meta name="msapplication-tap-highlight" content="no">
 
   <meta property="og:title" content="Google I/O 2015">
-  <meta property="og:type" content="website">
   <meta property="og:description" content="Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person Smarch xx-xx, 2015.">
-  <meta property="og:image" content="images/io.png">
+  <meta property="og:type" content="Event">
+  <meta property="og:image" content="images/io15-color.png">
 
   <script type="application/ld+json">
     {
@@ -61,25 +61,21 @@ limitations under the License.
       "@type": "Event",
       "name": "Google I/O 2015",
       "url": ".?utm_source=schema_org_event",
-      "image": "images/io.png",
+      "image": "images/io15-color.png",
       "location": {
         "@type": "Place",
-        "name": "Todovenue",
+        "name": "Moscone Center West",
         "address": {
           "@type" : "PostalAddress",
-          "streetAddress" : "34 Todo St.",
-          "addressLocality" : "Todoville",
-          "addressRegion" : "TO",
-          "postalCode" : "34343",
+          "streetAddress" : "747 Howard Street",
+          "addressLocality" : "San Francisco",
+          "addressRegion" : "CA",
+          "postalCode" : "94103",
           "addressCountry" : "US"
         }
       },
-      "startDate": "2015-01-01T00:00Z",
-      "endDate": "2015-01-02T00:00Z",
-      "offers" : {
-        "@type" : "Offer",
-        "url" : "tickets?utm_source=schema_org_event"
-      }
+      "startDate": "2015-05-28T09:00",
+      "endDate": "2015-05-29T04:00"
     }
   </script>
 
@@ -198,32 +194,32 @@ limitations under the License.
     <div class="drawer-panel-content">
       <core-menu>
         <paper-item>
-          <a href="./" data-ajax-link>
+          <a href="./" data-ajax-link data-track-link="nav-drawer-home">
             <i18n-msg msgid="home">Home</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="about" data-ajax-link>
+          <a href="about" data-ajax-link data-track-link="nav-drawer-about">
             <i18n-msg msgid="about">About</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="schedule" data-ajax-link>
+          <a href="schedule" data-ajax-link data-track-link="nav-drawer-schedule">
             <i18n-msg msgid="schedule">Schedule</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="onsite" data-ajax-link>
+          <a href="onsite" data-ajax-link data-track-link="nav-drawer-onsite">
             <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="offsite" data-ajax-link>
+          <a href="offsite" data-ajax-link data-track-link="nav-drawer-offsite">
             <i18n-msg msgid="attend-offsite">Attend offsite</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="registration" data-ajax-link>
+          <a href="registration" data-ajax-link data-track-link="nav-drawer-registration">
             <i18n-msg msgid="registration">Registration</i18n-msg>
           </a>
         </paper-item>
@@ -253,31 +249,31 @@ limitations under the License.
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
 
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-          <div flex><a href="./" data-ajax-link data-anim-ripple><div class="io-logo"></div></a></div>
+          <div flex><a href="./" data-ajax-link data-track-link="nav-home" data-anim-ripple><div class="io-logo"></div></a></div>
           <paper-tabs class="white {{ navBgClass }}" link noink
             valueattr="label" selected="{{selectedPage}}">
             <paper-tab label="about">
-              <a href="about" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="about" data-ajax-link data-track-link="nav-about" data-anim-ripple layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="schedule">
-              <a href="schedule" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="schedule" data-ajax-link data-track-link="nav-schedule" data-anim-ripple layout horizontal center>
                 <i18n-msg msgid="schedule">Schedule</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="onsite">
-              <a href="onsite" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="onsite" data-ajax-link data-track-link="nav-onsite" data-anim-ripple layout horizontal center>
                 <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="offsite">
-              <a href="offsite" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="offsite" data-ajax-link data-track-link="nav-offsite" data-anim-ripple layout horizontal center>
                 <i18n-msg msgid="attend-offsite">Attend offsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="registration">
-              <a href="registration" data-ajax-link data-anim-ripple layout horizontal center>
+              <a href="registration" data-ajax-link data-track-link="nav-registration" data-anim-ripple layout horizontal center>
                 <i18n-msg msgid="registration">Registration</i18n-msg>
               </a>
             </paper-tab>
@@ -302,9 +298,9 @@ limitations under the License.
 
         <img src="images/google-logo.svg" self-end>
         <div class="footer-content" flex layout vertical end>
-          <a href="#navbar" class="footer-backtotop">Back to the top <core-icon icon="hardware:keyboard-arrow-up"></core-icon></a>
+          <a href="#navbar" class="footer-backtotop">Back to the top <core-icon icon="expand-less"></core-icon></a>
           <nav layout vertical end justified>
-            <span><a href="faq" data-ajax-link>FAQ</a></span>
+            <span><a href="faq" data-ajax-link data-track-link="footer-faq">FAQ</a></span>
             <span><a href="https://www.google.com/events/io" target="_blank">I/O 2014</a></span>
             <paper-dropdown-menu label="Google Developers">
               <paper-dropdown valign="bottom" class="dropdown">
@@ -340,6 +336,7 @@ limitations under the License.
 <script src="scripts/helper/history.js"></script>
 <script src="scripts/helper/router.js"></script>
 <script src="scripts/helper/request.js"></script>
+<script src="scripts/helper/picasa.js"></script>
 <script src="scripts/bootstrap.js"></script>
 <!-- endbuild -->
 <script>

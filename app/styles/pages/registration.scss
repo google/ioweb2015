@@ -47,14 +47,14 @@ $name: 'page-registration';
 
 @media (min-width: $desktop-breakpoint-min) {
   .page__section--countdown {
-    margin-top: -165px; // adjustments for section is snug against previous.
-    padding-top: 165px;
+    margin-top: -137px; // adjustment so section is snug against the previous one.
+    padding-top: 137px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
   .page__section--countdown {
-    margin-top: -129px; // adjustments for section is snug against previous.
+    margin-top: -129px; // adjustment so section is snug against the previous one.
     padding-top: 129px;
   }
 }
