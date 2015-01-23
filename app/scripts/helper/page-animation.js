@@ -46,7 +46,7 @@ IOWA.PageAnimation = (function() {
    */
   function elementFadeOut(el, options) {
     options.fill = 'forwards'; // Always keep the state at the end of animation.
-    return new Animation(el, [{ opacity: 1 }, { opacity: 0 }], options);
+    return new Animation(el, [{opacity: 1}, {opacity: 0}], options);
   }
 
   /**
@@ -57,7 +57,7 @@ IOWA.PageAnimation = (function() {
    */
   function elementFadeIn(el, options) {
     options.fill = 'forwards'; // Always keep the state at the end of animation.
-    return new Animation(el, [{ opacity: 0 }, { opacity: 1 }], options);
+    return new Animation(el, [{opacity: 0}, {opacity: 1}], options);
   }
 
   /**
@@ -66,9 +66,8 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function contentSlideOut() {
-    var main = document.querySelector('.io-main .slide-up');
-    var mainDelayed = document.querySelector('.io-main .slide-up-delay');
-    var masthead = IOWA.Elements.Masthead.querySelector('.masthead-meta');
+    var main = IOWA.Elements.Main.querySelector('.slide-up');
+    var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
     var start = {
       transform: 'translate(0, 0)',
       opacity: 1
@@ -82,7 +81,7 @@ IOWA.PageAnimation = (function() {
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
       elementFadeOut(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
       elementFadeOut(IOWA.Elements.IOLogoLarge, CONTENT_SLIDE_OPTIONS),
-      elementFadeOut(IOWA.Elements.Footer, { duration: 0 }),
+      elementFadeOut(IOWA.Elements.Footer, {duration: 0}) // Hide instantly.
     ]);
   }
 
@@ -93,8 +92,8 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function contentSlideIn() {
-    var main = document.querySelector('.slide-up');
-    var mainDelayed = document.querySelector('.slide-up-delay');
+    var main = IOWA.Elements.Main.querySelector('.slide-up');
+    var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
     var start = {
       transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
       opacity: 0
@@ -116,8 +115,8 @@ IOWA.PageAnimation = (function() {
    */
   function navSlideOut() {
     return new Animation(IOWA.Elements.Nav, [
-       { transform: 'translateY(0)' },
-       { transform: 'translateY(-100px)' }
+       {transform: 'translateY(0)'},
+       {transform: 'translateY(-100%)'}
     ], CONTENT_SLIDE_OPTIONS);
   }
 
@@ -127,7 +126,7 @@ IOWA.PageAnimation = (function() {
    */
   function navSlideIn() {
     return new Animation(IOWA.Elements.Nav, [
-       {transform: 'translateY(-100px)'},
+       {transform: 'translateY(-100%)'},
        {transform: 'translateY(0)'}
     ], CONTENT_SLIDE_OPTIONS);
   }
@@ -213,14 +212,14 @@ IOWA.PageAnimation = (function() {
 
     card.style.transformOrigin = '0 0';
     var cardTransition = new Animation(card, [
-        { transform: 'translate3d(0, 0, 0) scale(1)' },
-        { transform: [translate, scale].join(' ') }
+        {transform: 'translate3d(0, 0, 0) scale(1)'},
+        {transform: [translate, scale].join(' ')}
       ], {
         duration: duration,
         fill: 'forwards'
     });
 
-    var mainDelayed = document.querySelector('.slide-up-delay');
+    var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
 
     // First run the hero card takeover...
     var animationGroup = new AnimationGroup([
@@ -233,10 +232,10 @@ IOWA.PageAnimation = (function() {
     // ...then hide the content under the hero unit.
     return new AnimationSequence([
       animationGroup,
-      elementFadeOut(IOWA.Elements.Ripple, {'duration': 0}),
-      elementFadeOut(IOWA.Elements.IOLogoLarge, {'duration': 0}),
-      elementFadeOut(IOWA.Elements.Footer, {'duration': 0}),
-      elementFadeOut(IOWA.Elements.MastheadMeta, {'duration': 0}),
+      elementFadeOut(IOWA.Elements.Ripple, {duration: 0}), // Hide instantly.
+      elementFadeOut(IOWA.Elements.IOLogoLarge, {duration: 0}), // Same.
+      elementFadeOut(IOWA.Elements.Footer, {duration: 0}),  // Same.
+      elementFadeOut(IOWA.Elements.MastheadMeta, {duration: 0}) // Same.
     ]);
   }
 

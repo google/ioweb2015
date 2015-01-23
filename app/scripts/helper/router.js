@@ -198,7 +198,7 @@ IOWA.Router = (function() {
           IOWA.PageAnimation.pageSlideIn();
       IOWA.PageAnimation.play(animationIn);
       currentPageTransition = '';
-    }, 50); // Wait for the... Good question. Maybe template binding?
+    }, 100); // Wait for the... Good question. Maybe template binding?
     // TODO: BUG: Anyways, something to investigate. Web Animations
     // are not working properly without this delay (Chrome crashes).
   }
