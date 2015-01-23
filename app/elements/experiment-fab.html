@@ -1218,6 +1218,8 @@ Main parent container for all of the fab elements.
 
       onExitClick: function(event) {
         this.exitVisible = true;
+        this.resetVisible = false;
+        this.shareVisible = false;
       },
 
       onExitYes: function(event) {
@@ -1254,6 +1256,8 @@ Main parent container for all of the fab elements.
 
       onResetClick: function(event) {
         this.resetVisible = true;
+        this.exitVisible = false;
+        this.shareVisible = false;
       },
 
       onResetCancel: function(event) {
@@ -1262,6 +1266,8 @@ Main parent container for all of the fab elements.
 
       onShareClick: function(event) {
         this.shareVisible = true;
+        this.exitVisible = false;
+        this.resetVisible = false;
 
         this.app.serialize().then(function(url) {
           this.unencodedURL = url;
