@@ -2,7 +2,7 @@ var glob = require('glob');
 var swPrecache = require('sw-precache');
 var util = require('gulp-util');
 
-module.exports = function(rootDir, handleFetch, callback) {
+module.exports = function(rootDir, handleFetch, importScripts, callback) {
   var regex = /([^\/]+)\.html$/;
   var templateDir = rootDir + '/templates/';
   var dynamicUrlToDependencies = {
@@ -22,15 +22,10 @@ module.exports = function(rootDir, handleFetch, callback) {
   });
 
   var config = {
+    cacheId: 'iowebapp',
     dynamicUrlToDependencies: dynamicUrlToDependencies,
     handleFetch: handleFetch,
-    importScripts: [
-      'bower_components/shed/dist/shed.js',
-      'scripts/shed/offline-analytics.js',
-      'scripts/shed/cache-then-network.js',
-      'scripts/shed/google-fonts.js',
-      'scripts/shed/experiment.js'
-    ],
+    importScripts: importScripts,
     logger: util.log,
     staticFileGlobs: [
       rootDir + '/bower_components/**/*.{html,js,css}',
@@ -39,7 +34,6 @@ module.exports = function(rootDir, handleFetch, callback) {
       rootDir + '/images/**',
       rootDir + '/scripts/**',
       rootDir + '/styles/**/*.css',
-      rootDir + '/templates/**/*_partial.html',
       rootDir + '/*.{html,ico,json}'
     ],
     stripPrefix: rootDir + '/'

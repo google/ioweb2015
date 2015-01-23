@@ -89,7 +89,7 @@ limitations under the License.
   <script>
     window.ENV = {% .Env %}; // Used in analytics.js
   </script>
-  <script src="scripts/helper/analytics.js"></script>
+  <script src="scripts/analytics.js"></script>
   <script>
   (function() {
     "use strict";
@@ -332,7 +332,7 @@ limitations under the License.
 
 <io-toast id="toast" duration="9000"></io-toast>
 
-<!-- TODO: Move to automatic concatenation via codekit-gulp -->
+<!-- build:js scripts/site-scripts.js -->
 <script src="scripts/main.js"></script>
 <script src="scripts/helper/util.js"></script>
 <script src="scripts/helper/page-animation.js"></script>
@@ -341,6 +341,7 @@ limitations under the License.
 <script src="scripts/helper/router.js"></script>
 <script src="scripts/helper/request.js"></script>
 <script src="scripts/bootstrap.js"></script>
+<!-- endbuild -->
 <script>
   if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
     IOWA.Elements.Template.pages[{% .Slug %}] = {};

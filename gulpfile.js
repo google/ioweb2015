@@ -17,6 +17,7 @@ var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var opn = require('opn');
+var merge = require('merge-stream');
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -59,41 +60,6 @@ gulp.task('sass', function() {
     .pipe($.size({title: 'styles'}));
 });
 
-// gulp.task('vulcanize-scenes', ['clean', 'sass', 'compile-scenes'], function() {
-//   return gulp.src([
-//       'scenes/*/*-scene*.html'
-//     ], {base: './'})
-//     // gulp-vulcanize doesn't currently handle multiple files in multiple
-//     // directories well right now, so vulcanize them one at a time
-//     .pipe($.foreach(function(stream, file) {
-//       var dest = path.dirname(path.relative(__dirname, file.path));
-//       return stream.pipe($.vulcanize({
-//         excludes: {
-//           // these are inlined in elements.html
-//           imports: [
-//             'jquery.html$',
-//             'modernizr.html$',
-//             'polymer.html$',
-//             'base-scene.html$',
-//             'i18n-msg.html$',
-//             'core-a11y-keys.html$',
-//             'core-shared-lib.html$',
-//             'google-maps-api.html$',
-//           ]
-//         },
-//         strip: !argv.pretty,
-//         csp: true,
-//         inline: true,
-//         dest: dest
-//       }))
-//       .pipe(i18n_replace({
-//         strict: !!argv.strict,
-//         path: '_messages',
-//       }))
-//       .pipe(gulp.dest(path.join(DIST_STATIC_DIR, dest)));
-//     }));
-// });
-
 // vulcanize main site elements separately.
 gulp.task('vulcanize-elements', ['sass'], function() {
   return gulp.src([
@@ -125,37 +91,28 @@ gulp.task('vulcanize-elements', ['sass'], function() {
 // });
 
 // copy needed assets (images, polymer elements, etc) to /dist directory
-// gulp.task('copy-assets', ['clean', 'vulcanize', 'i18n_index'], function() {
-gulp.task('copy-assets', ['copy-bower-dependencies'], function() {
-  return gulp.src([
+gulp.task('copy-assets', function() {
+  var assets = $.useref.assets();
+
+  var templateStream = gulp.src([APP_DIR + '/templates/*.html'], {base: './'})
+    .pipe(assets)
+    .pipe(assets.restore())
+    .pipe($.useref());
+
+  var otherAssetStream = gulp.src([
     APP_DIR + '/*.{html,txt,ico}',
     APP_DIR + '/manifest.json',
     APP_DIR + '/clear_cache.html',
-    APP_DIR + '/styles/**.css',
+    APP_DIR + '/styles/*.css',
     APP_DIR + '/styles/pages/upgrade.css',
     APP_DIR + '/elements/**/images/*',
-    APP_DIR + '/templates/*.html',
-    APP_DIR + '/sw.js', // Note: sw script needs to be in the root of the site.
-    DIST_EXPERIMENT_DIR + '/**/*',
-  ], {base: './'})
-  .pipe(gulp.dest(DIST_STATIC_DIR))
-  .pipe($.size({title: 'copy-assets'}));
-});
+    APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js',
+    DIST_EXPERIMENT_DIR + '/**/*'
+  ], {base: './'});
 
-// Copy over third-party bower dependencies that we need to DIST_STATIC_DIR.
-// This will include some bower metadata-cruft, but since we won't actually
-// reference that cruft from anywhere, it presumably shouldn't incur overhead.
-gulp.task('copy-bower-dependencies', function() {
-  var bowerPackagesToCopy = [
-    'shed',
-    'webcomponentsjs'
-  ];
-  var directoryPaths = bowerPackagesToCopy.map(function(bowerPackageToCopy) {
-    return APP_DIR + '/bower_components/' + bowerPackageToCopy + '/**';
-  });
-
-  return gulp.src(directoryPaths, {base: './'})
-    .pipe(gulp.dest(DIST_STATIC_DIR));
+  return merge(templateStream, otherAssetStream)
+    .pipe(gulp.dest(DIST_STATIC_DIR))
+    .pipe($.size({title: 'copy-assets'}));
 });
 
 // Copy backend files.
@@ -175,7 +132,7 @@ gulp.task('copy-backend', function(cb) {
 
 // Lint JavaScript
 gulp.task('jshint', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
@@ -184,20 +141,45 @@ gulp.task('jshint', function() {
 
 // Check JS style
 gulp.task('jscs', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jscs());
 });
 
 // Crush JS
-// TODO: /sw.js isn't being uglified. It needs to be copied into the top-level
-// directory of the site, which is currently being done in the copy-assets task.
-gulp.task('uglify', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js'])
+gulp.task('concat-and-uglify-js', ['js'], function() {
+  // The ordering of the scripts in the gulp.src() array matter!
+  var siteScripts = [
+    'main.js',
+    'helper/util.js',
+    'helper/page-animation.js',
+    'helper/elements.js',
+    'helper/history.js',
+    'helper/router.js',
+    'helper/request.js',
+    'bootstrap.js'
+  ].map(function(script) {
+    return APP_DIR + '/scripts/' + script;
+  });
+
+  var siteScriptStream = gulp.src(siteScripts)
     .pipe(reload({stream: true, once: true}))
-    .pipe($.uglify({preserveComments: 'some'}).on('error', function(){}))
+    .pipe($.concat('site-scripts.js'));
+
+  // analytics.js is loaded separately and shouldn't be concatenated.
+  var analyticsScriptStream = gulp.src([APP_DIR + '/scripts/analytics.js']);
+
+  var serviceWorkerScriptStream = gulp.src([
+    APP_DIR + '/bower_components/shed/dist/shed.js',
+    APP_DIR + '/scripts/shed/*.js'
+  ])
+    .pipe(reload({stream: true, once: true}))
+    .pipe($.concat('shed-scripts.js'));
+
+  return merge(siteScriptStream, analyticsScriptStream).add(serviceWorkerScriptStream)
+    .pipe($.uglify({preserveComments: 'some'}).on('error', function () {}))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/scripts'))
-    .pipe($.size({title: 'uglify'}));
+    .pipe($.size({title: 'concat-and-uglify-js'}));
 });
 
 // Optimize Images
@@ -228,7 +210,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 
-gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
+gulp.task('serve', ['backend', 'generate-service-worker-dev', 'sass'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var startArgs = ['-d', APP_DIR, '-listen', serverAddr];
@@ -268,7 +250,7 @@ gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['generate-service-worker-dev'], function() {
+gulp.task('serve:gae', ['generate-service-worker-dev', 'sass'], function() {
   var appEnv = process.env.APP_ENV || 'dev';
   var restoreAppYaml = changeBackendGaeAppVersion('v-' + appEnv);
 
@@ -306,7 +288,7 @@ gulp.task('serve:dist', ['default'], function() {
 
 gulp.task('vulcanize', ['vulcanize-elements']);
 
-gulp.task('js', ['jshint', 'jscs', 'uglify']);
+gulp.task('js', ['jshint', 'jscs']);
 
 // Build experiment and place inside app.
 gulp.task('build-experiment', buildExperiment);
@@ -340,7 +322,7 @@ gulp.task('backend:test', function(cb) {
 
 gulp.task('default', ['clean'], function(cb) {
   runSequence('copy-experiment-to-site', 'sass', 'vulcanize',
-              ['js', 'images', 'copy-assets', 'copy-backend'],
+              ['concat-and-uglify-js', 'images', 'copy-assets', 'copy-backend'],
               'generate-service-worker-dist', cb);
 });
 
@@ -411,13 +393,20 @@ function changeBackendGaeAppVersion(version, appYamlPath) {
   return fs.writeFileSync.bind(fs, appYamlPath, appYaml, null);
 }
 
-gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
+gulp.task('generate-service-worker-dev', function(callback) {
   del([APP_DIR + '/service-worker.js']);
+  var importScripts = [
+    'bower_components/shed/dist/shed.js',
+    'scripts/shed/offline-analytics.js',
+    'scripts/shed/cache-then-network.js',
+    'scripts/shed/google-fonts.js',
+    'scripts/shed/experiment.js'
+  ];
 
   // Run with --fetch-dev to generate a service-worker.js that will handle fetch events.
   // By default, the generated service-worker.js will precache resources, but not actually serve
   // them. This is preferable for dev, since things like live reload will work as expected.
-  generateServiceWorker(APP_DIR, !!argv['fetch-dev'], function(error, serviceWorkerFileContents) {
+  generateServiceWorker(APP_DIR, !!argv['fetch-dev'], importScripts, function(error, serviceWorkerFileContents) {
     if (error) {
       return callback(error);
     }
@@ -433,8 +422,9 @@ gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
 gulp.task('generate-service-worker-dist', function(callback) {
   var distDir = DIST_STATIC_DIR + '/' + APP_DIR;
   del([distDir + '/service-worker.js']);
+  var importScripts = ['scripts/shed-scripts.js'];
 
-  generateServiceWorker(distDir, true, function(error, serviceWorkerFileContents) {
+  generateServiceWorker(distDir, true, importScripts, function(error, serviceWorkerFileContents) {
     if (error) {
       return callback(error);
     }
