@@ -1131,7 +1131,12 @@ Main parent container for all of the fab elements.
         }
       },
 
-      onFabClick: function(event) {
+      onFabClick: function() {
+        this.launch();
+        window.history.replaceState({}, 'Experiment', '#experiment');
+      },
+
+      launch: function() {
         document.addEventListener('keyup', this.bindEscape);
 
         this.dialogVisible = true;
