@@ -1207,7 +1207,6 @@ Main parent container for all of the fab elements.
           this.recording = false;
         }.bind(this));
 
-        window.addEventListener('scroll', this.boundOnScroll);
       },
 
       onScroll: function(event) {
@@ -1227,6 +1226,9 @@ Main parent container for all of the fab elements.
       },
 
       exitExperiment: function(event) {
+
+        IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
+
         var rect = this.getBoundingClientRect();
         var top = rect.top + (rect.height / 2);
         var left = rect.left + (rect.width / 2);
@@ -1235,10 +1237,11 @@ Main parent container for all of the fab elements.
         this.mode = 'pre';
         this.playmode = 'playing';
         this.miniFabs = false;
-        this.fixed = 'unfixed';
         this.pauseOverlay = false;
 
-        window.removeEventListener('scroll', this.boundOnScroll);
+        this.async(function() {
+          this.fixed = 'unfixed';
+        }, null, 1500);
       },
 
       onExitNo: function(event) {
