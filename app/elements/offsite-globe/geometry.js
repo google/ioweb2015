@@ -64,7 +64,7 @@ IOWA.OffsiteGlobe.generateGeometry = (function() {
     // don't share verts between columns as it buys little memory savings and
     // a slim chance of hitting the cache but pays with loss of coherency
     var vertCount = 5 * ((2 * divisions + 3) * divisions + 1);
-    var geometryArray = new Float32Array(vertCount * 5 * SIZE);
+    var geometryArray = new Float32Array(vertCount * SIZE);
 
     // temp coordinate buffers for interpolation end points
     var left = new Float32Array(SIZE);

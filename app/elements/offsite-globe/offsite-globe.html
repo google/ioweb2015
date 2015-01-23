@@ -40,6 +40,10 @@ Makes a globe or whatever.
     var nowish = (window.performance && window.performance.now) ?
           window.performance.now.bind(window.performance) : Date.now;
 
+    /**
+     * Matrix used for ephemeral transformations.
+     * @type {!Matrix4x4}
+     */
     var tmpTransform = new Matrix4x4();
 
     Polymer({
@@ -52,21 +56,86 @@ Makes a globe or whatever.
        */
       globeProgram: null,
 
+      /**
+       * ArrayBuffer for globe geometry.
+       *
+       * @property globeArrayBuffer
+       * @type WebGLBuffer
+       * @default null
+       */
       globeArrayBuffer: null,
 
+      /**
+       * ArrayBuffer for globe indices.
+       *
+       * @property globeIndexBuffer
+       * @type WebGLBuffer
+       * @default null
+       */
       globeIndexBuffer: null,
 
+      /**
+       * World to NDC transform.
+       *
+       * @property projectionTransform
+       * @type Matrix4x4
+       * @default null
+       */
       projectionTransform: null,
 
+      /**
+       * WebGL context.
+       *
+       * @property gl
+       * @type WebGLRenderingContext
+       * @default null
+       */
       gl: null,
 
+      /**
+       * Globe rotation state.
+       *
+       * @property theta
+       * @type number
+       * @default 0
+       */
       theta: 0,
 
+      /**
+       * Whether to actively animate the globe.
+       *
+       * @property animate
+       * @type boolean
+       * @default false
+       */
       animate: false,
 
+      /**
+       * Number of primitives to draw to render the globe.
+       *
+       * @property drawCount
+       * @type number
+       * @default 0
+       */
       drawCount: 0,
 
+      /**
+       * The globe cubemap texture object.
+       *
+       * @property globeCubemap
+       * @type WebGLTexture
+       * @default null
+       */
       globeCubemap: null,
+
+      /**
+       * Timeout for outliers on perf analytics.
+       *
+       * @property MAX_PERF_TIMEOUT_
+       * @type number
+       * @default 1000
+       */
+      MAX_PERF_TIMEOUT_: 1000,
 
       /**
        * Number of times to divide each edge of icosahedron geometry generator.
@@ -84,47 +153,48 @@ Makes a globe or whatever.
 
       },
 
+      // TODO(bckenny): perf analytics for everything here
+
       attached: function() {
         var gl = this.gl = this.$.canvas.getContext('webgl');
+        if (!gl) {
+          // attempt with experimental
+          gl = this.gl = this.$.canvas.getContext('experimental-webgl');
 
-        // TODO(bckenny): perf analytics for everything here
+          if (!gl) {
+            // TODO(bckenny): give up
+            return;
+          }
+        }
 
         // TODO(bckenny): no reason not to inline these
-        ShaderProgram.fromXhr(gl, 'elements/offsite-globe/shaders/simple.vert', 'elements/offsite-globe/shaders/simple.frag')
-          .then(function(program) {
-            this.globeProgram = program;
-            program.use();
-            gl.enableVertexAttribArray(program.attributes.coord);
-
-            this.init();
-          }.bind(this));
+        var vertUrl = this.resolvePath('shaders/simple.vert');
+        var fragUrl = this.resolvePath('shaders/simple.frag');
+        Promise.all([
+          ShaderProgram.fromXhr(gl, vertUrl, fragUrl),
+          this.loadTextures(gl),
+        ])
+          .then(this.init.bind(this))
+          .catch(function() {
+            // TODO(bckenny): give up
+          });
 
         // gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
-
         // gl.enable(gl.BLEND);
         // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-        // if (!gl.getExtension('OES_standard_derivatives')) {
-        //   throw new Error('no OES_standard_derivatives available');
-        // }
-
-        this.animate = true;
-      },
-
-      init: function() {
-        var gl = this.gl;
         this.resize();
 
         var startTime = nowish();
         var globeGeometry = generateGeometry(this.divisions_);
         var globeIndices = generateIndexArray(this.divisions_);
         var endTime = nowish();
-        // TODO(bckenny): determine if 1 second is reasonable max time
+
         IOWA.Analytics.trackPerf('globe', 'geometry creation',
-            Math.ceil(endTime - startTime), null, 1000);
-        console.log('geometry time: ' + Math.ceil(endTime - startTime));
+            Math.ceil(endTime - startTime), null, this.MAX_PERF_TIMEOUT_);
+        // console.log('geometry time: ' + Math.ceil(endTime - startTime));
 
         this.globeArrayBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.globeArrayBuffer);
@@ -135,11 +205,17 @@ Makes a globe or whatever.
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, globeIndices, gl.STATIC_DRAW);
 
         this.drawCount = globeIndices.length;
+      },
 
-        this.loadTextures(gl).then(function(globeCubemap) {
-          this.globeCubemap = globeCubemap;
-          this.update();
-        }.bind(this));
+      init: function(assets) {
+        this.globeProgram = assets[0];
+        this.globeProgram.use();
+        this.gl.enableVertexAttribArray(this.globeProgram.attributes.coord);
+
+        this.globeCubemap = assets[1];
+
+        this.animate = true;
+        this.update();
       },
 
       // TODO(bckenny): call this when page is resized
@@ -150,7 +226,8 @@ Makes a globe or whatever.
         var height = canvas.offsetHeight;
         canvas.width = width * resolutionScale;
         canvas.height = height * resolutionScale;
-        this.gl.viewport(0, 0, width * resolutionScale, height * resolutionScale);
+        this.gl.viewport(0, 0, width * resolutionScale,
+            height * resolutionScale);
 
         this.projectionTransform.identity()
           .perspective(Math.PI / 8.3, width/height, 1, 3)
@@ -186,26 +263,40 @@ Makes a globe or whatever.
 
         ).then(function(faceData) {
           // create cubemap texture from six loaded images
+          var textureStartTime = nowish();
           var textureId = gl.createTexture();
           gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureId);
           for (var i = 0; i < faceData.length; i++) {
             gl.texImage2D(faceData[i].target, 0, gl.RGB, gl.RGB,
                 gl.UNSIGNED_BYTE, faceData[i].texture);
           }
-          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER,
+              gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER,
+              gl.LINEAR_MIPMAP_LINEAR);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S,
+              gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T,
+              gl.CLAMP_TO_EDGE);
           gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
 
           // TODO(bckenny): extension prefixes
-          var filterExtension = gl.getExtension('EXT_texture_filter_anisotropic');
+          var filterExtension = gl.getExtension(
+              'EXT_texture_filter_anisotropic');
 
           // set to maximum anisotropic filtering if it exists
           if (filterExtension) {
-            var maxAnisotropy = gl.getParameter(filterExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
-            gl.texParameterf(gl.TEXTURE_CUBE_MAP, filterExtension.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+            var maxAnisotropy = gl.getParameter(
+                filterExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+            gl.texParameterf(gl.TEXTURE_CUBE_MAP,
+                filterExtension.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
           }
+          var textureEndTime = nowish();
+          IOWA.Analytics.trackPerf('globe', 'cubemap creation',
+              Math.ceil(textureEndTime - textureStartTime), null,
+              this.MAX_PERF_TIMEOUT_);
+          // console.log('texture creation time: ' +
+              // (textureEndTime - textureStartTime).toFixed(2));
 
           return textureId;
         });
@@ -219,12 +310,12 @@ Makes a globe or whatever.
         var worldTransform = tmpTransform.identity()
           .rotateX(-Math.PI / 16)
           .rotateY(this.theta);
-          // .rotateX(this.theta / 3);
 
         this.globeProgram.use();
 
         // attribute offsets
-        gl.vertexAttribPointer(this.globeProgram.attributes.coord, 4, gl.FLOAT, false, 16, 0);
+        gl.vertexAttribPointer(this.globeProgram.attributes.coord, 4, gl.FLOAT,
+            false, 16, 0);
 
         // set uniforms
         this.globeProgram.uniforms.globeMatrix(worldTransform.m_);

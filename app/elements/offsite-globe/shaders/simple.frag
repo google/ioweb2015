@@ -2,15 +2,18 @@
 
 precision mediump float;
 
-varying vec3 worldCoord;
+varying vec3 spaceCoord;
 varying vec3 globeCoord;
 
 uniform samplerCube globeCubemap;
 
+const vec3 sunDirection = vec3(.3, .4, 1);
+
 void main() {
-  vec3 normal = normalize(worldCoord); //normalize(cross(dFdx(worldCoord), dFdy(worldCoord)));
-  float light = max(0., dot(normal, normalize(vec3(.3, .4, 1))));
-  vec3 color = textureCube(globeCubemap, normalize(globeCoord).stp).rgb;
+  vec3 color = textureCube(globeCubemap, globeCoord.stp).rgb;
+
+  vec3 normal = normalize(spaceCoord); //normalize(cross(dFdx(spaceCoord), dFdy(spaceCoord)));
+  float light = max(0., dot(normal, normalize(sunDirection)));
 
   gl_FragColor = vec4(color * light, 1.);
 }
