@@ -38,6 +38,13 @@ $icon-margin: 10px;
   color: #fff;
   @extend .bg-globe;
   background-position: 50% 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+
+  h2 {
+    padding: 0 $mobileKeyline 0 $mobileKeyline;
+  }
 
   .action__links {
     align-items: flex-start;
@@ -51,7 +58,7 @@ $icon-margin: 10px;
     }
   }
   .attend__globe {
-    min-height: 150px;
+    height: 150px;
   }
 }
 
@@ -73,6 +80,7 @@ $icon-margin: 10px;
 
     h2 {
       max-width: 58%;
+      padding: 0 $desktopKeyline 0 $desktopKeyline;
     }
 
     .action__links {
