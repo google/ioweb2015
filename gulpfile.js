@@ -210,7 +210,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 
-gulp.task('serve', ['backend', 'generate-service-worker-dev', 'sass'], function() {
+gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var startArgs = ['-d', APP_DIR, '-listen', serverAddr];
@@ -250,7 +250,7 @@ gulp.task('serve', ['backend', 'generate-service-worker-dev', 'sass'], function(
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['generate-service-worker-dev', 'sass'], function() {
+gulp.task('serve:gae', ['generate-service-worker-dev'], function() {
   var appEnv = process.env.APP_ENV || 'dev';
   var restoreAppYaml = changeBackendGaeAppVersion('v-' + appEnv);
 
@@ -393,7 +393,7 @@ function changeBackendGaeAppVersion(version, appYamlPath) {
   return fs.writeFileSync.bind(fs, appYamlPath, appYaml, null);
 }
 
-gulp.task('generate-service-worker-dev', function(callback) {
+gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
   del([APP_DIR + '/service-worker.js']);
   var importScripts = [
     'bower_components/shed/dist/shed.js',
