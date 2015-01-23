@@ -83,7 +83,7 @@ module.exports = function Experiment() {
    */
   function start(instrumentSelector = '.row', visualizerSelector = '.box', fromPos = [0,0]) {
     // Start sound engine.
-    audioManager.start();
+    audioManager.fadeIn(2.25, 0.75);
 
     // Find base elements and layout views.
     rootView.init(instrumentSelector, visualizerSelector);
@@ -144,7 +144,9 @@ module.exports = function Experiment() {
    */
   function tearDown(fromPos = [0,0]) {
     // Stop sound engine.
-    audioManager.fadeOut(0.5);
+    audioManager.fadeOut(0.5).then(function() {
+      audioManager.tearDown();
+    });
 
     // Animate transition out.
     rootView.animateOut(fromPos).then(function() {
@@ -157,14 +159,14 @@ module.exports = function Experiment() {
    * Pause the experiment audio.
    */
   function pause() {
-    audioManager.stop();
+    audioManager.fadeOut(0.75);
   }
 
   /**
    * Play the experiment audio.
    */
   function play() {
-    audioManager.start();
+    audioManager.fadeIn(0.75);
   }
 
   /**
