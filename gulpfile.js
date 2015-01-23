@@ -18,6 +18,7 @@ var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var opn = require('opn');
 var merge = require('merge-stream');
+var glob = require('glob');
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -395,13 +396,8 @@ function changeBackendGaeAppVersion(version, appYamlPath) {
 
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
   del([APP_DIR + '/service-worker.js']);
-  var importScripts = [
-    'bower_components/shed/dist/shed.js',
-    'scripts/shed/offline-analytics.js',
-    'scripts/shed/cache-then-network.js',
-    'scripts/shed/google-fonts.js',
-    'scripts/shed/experiment.js'
-  ];
+  var importScripts = glob.sync('scripts/shed/*.js', {cwd: APP_DIR});
+  importScripts.unshift('bower_components/shed/dist/shed.js');
 
   // Run with --fetch-dev to generate a service-worker.js that will handle fetch events.
   // By default, the generated service-worker.js will precache resources, but not actually serve
