@@ -153,8 +153,8 @@ Makes a globe or whatever.
         this.gl.viewport(0, 0, width * resolutionScale, height * resolutionScale);
 
         this.projectionTransform.identity()
-          .perspective(Math.PI / 3, width/height, 1, 3)
-          .translate(0, 0, -2);
+          .perspective(Math.PI / 8.3, width/height, 1, 3)
+          .translate(-0.017, -0.688, -2);
       },
 
       // TODO(bckenny): can use lower res images on non-retina (for default
@@ -217,6 +217,7 @@ Makes a globe or whatever.
         this.theta += Math.PI / 960;
 
         var worldTransform = tmpTransform.identity()
+          .rotateX(-Math.PI / 16)
           .rotateY(this.theta);
           // .rotateX(this.theta / 3);
 
