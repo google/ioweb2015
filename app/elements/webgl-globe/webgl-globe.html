@@ -12,7 +12,7 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
-<polymer-element name="webgl-globe" attributes="">
+<polymer-element name="webgl-globe">
   <template>
     <style>
       :host {
@@ -28,10 +28,10 @@ Makes a globe or whatever.
   <script>
   (function() {
     /* global IOWA */
-    var ShaderProgram = IOWA.webglGlobe.ShaderProgram;
-    var Matrix4x4 = IOWA.webglGlobe.Matrix4x4;
-    var generateGeometry = IOWA.webglGlobe.generateGeometry;
-    var generateIndexArray = IOWA.webglGlobe.generateIndexArray;
+    var ShaderProgram = IOWA.WebglGlobe.ShaderProgram;
+    var Matrix4x4 = IOWA.WebglGlobe.Matrix4x4;
+    var generateGeometry = IOWA.WebglGlobe.generateGeometry;
+    var generateIndexArray = IOWA.WebglGlobe.generateIndexArray;
 
     /**
      * Polyfilled performance.now. Only good for relative timing, not absolute.
@@ -75,7 +75,7 @@ Makes a globe or whatever.
       globeIndexBuffer: null,
 
       /**
-       * World to NDC transform.
+       * World to Normalized Device Coordinates transform.
        *
        * @property projectionTransform
        * @type Matrix4x4
@@ -101,6 +101,7 @@ Makes a globe or whatever.
        */
       theta: 0,
 
+      // TODO(bckenny): publish as an attribute
       /**
        * Whether to actively animate the globe.
        *
@@ -149,10 +150,6 @@ Makes a globe or whatever.
         this.projectionTransform = new Matrix4x4();
       },
 
-      ready: function() {
-
-      },
-
       // TODO(bckenny): perf analytics for everything here
 
       attached: function() {
@@ -162,6 +159,7 @@ Makes a globe or whatever.
           gl = this.gl = this.$.canvas.getContext('experimental-webgl');
 
           if (!gl) {
+            IOWA.Analytics.trackEvent('globe', 'webgl unsupported');
             // TODO(bckenny): give up
             return;
           }
@@ -172,18 +170,15 @@ Makes a globe or whatever.
         var fragUrl = this.resolvePath('shaders/simple.frag');
         Promise.all([
           ShaderProgram.fromXhr(gl, vertUrl, fragUrl),
-          this.loadTextures(gl),
-        ])
-          .then(this.init.bind(this))
-          .catch(function() {
+          this.loadTextures(gl)
+        ]).then(this.init.bind(this))
+          .catch(function(reason) {
             // TODO(bckenny): give up
+            IOWA.Analytics.trackError('globe initialization', reason);
           });
 
-        // gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
-        // gl.enable(gl.BLEND);
-        // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
         this.resize();
 
@@ -194,7 +189,6 @@ Makes a globe or whatever.
 
         IOWA.Analytics.trackPerf('globe', 'geometry creation',
             Math.ceil(endTime - startTime), null, this.MAX_PERF_TIMEOUT_);
-        // console.log('geometry time: ' + Math.ceil(endTime - startTime));
 
         this.globeArrayBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.globeArrayBuffer);
@@ -230,7 +224,7 @@ Makes a globe or whatever.
             height * resolutionScale);
 
         this.projectionTransform.identity()
-          .perspective(Math.PI / 8.3, width/height, 1, 3)
+          .perspective(Math.PI / 8.3, width / height, 1, 3)
           .translate(-0.017, -0.688, -2);
       },
 
@@ -246,6 +240,7 @@ Makes a globe or whatever.
           'positive-z.jpg': gl.TEXTURE_CUBE_MAP_POSITIVE_Z
         };
 
+        // load six face image and initialize once all are loaded
         return Promise.all(
           Object.keys(globeFaces).map(function(faceName) {
             return new Promise(function(resolve, reject) {
@@ -295,8 +290,6 @@ Makes a globe or whatever.
           IOWA.Analytics.trackPerf('globe', 'cubemap creation',
               Math.ceil(textureEndTime - textureStartTime), null,
               this.MAX_PERF_TIMEOUT_);
-          // console.log('texture creation time: ' +
-              // (textureEndTime - textureStartTime).toFixed(2));
 
           return textureId;
         });

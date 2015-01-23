@@ -5,7 +5,7 @@
  * @constructor
  * @struct
  */
-IOWA.webglGlobe.Matrix4x4 = function() {
+IOWA.WebglGlobe.Matrix4x4 = function() {
   /**
    * The internal representation of the matix.
    * @private {Float32Array}
@@ -16,13 +16,13 @@ IOWA.webglGlobe.Matrix4x4 = function() {
 };
 
 /** @typedef {Array<number>|Float32Array} */
-IOWA.webglGlobe.ArrayLike;
+IOWA.WebglGlobe.ArrayLike;
 
 /**
  * Reset matrix to the identity transformation.
- * @return {!IOWA.webglGlobe.Matrix4x4} This matrix.
+ * @return {!IOWA.WebglGlobe.Matrix4x4} This matrix.
  */
-IOWA.webglGlobe.Matrix4x4.prototype.identity = function() {
+IOWA.WebglGlobe.Matrix4x4.prototype.identity = function() {
   for (var i = 0; i < this.m_.length; i++) {
     this.m_[i] = i % 5 ? 0 : 1;
   }
@@ -37,9 +37,9 @@ IOWA.webglGlobe.Matrix4x4.prototype.identity = function() {
  * @param {number} aspect
  * @param {number} near
  * @param {number} far
- * @return {!IOWA.webglGlobe.Matrix4x4}
+ * @return {!IOWA.WebglGlobe.Matrix4x4}
  */
-IOWA.webglGlobe.Matrix4x4.prototype.perspective = function(fov, aspect, near, far) {
+IOWA.WebglGlobe.Matrix4x4.prototype.perspective = function(fov, aspect, near, far) {
   var cx = Math.cos(fov/2);
   var cy = cx;
   var s = -Math.sin(fov/2);
@@ -90,11 +90,11 @@ IOWA.webglGlobe.Matrix4x4.prototype.perspective = function(fov, aspect, near, fa
 /**
  * Sets this matrix to the local transformation within the view transformation.
  * view and/or local can also be this matrix.
- * @param {!IOWA.webglGlobe.Matrix4x4} view
- * @param {!IOWA.webglGlobe.Matrix4x4} local
- * @return {!IOWA.webglGlobe.Matrix4x4}
+ * @param {!IOWA.WebglGlobe.Matrix4x4} view
+ * @param {!IOWA.WebglGlobe.Matrix4x4} local
+ * @return {!IOWA.WebglGlobe.Matrix4x4}
  */
-IOWA.webglGlobe.Matrix4x4.prototype.product = function(view, local) {
+IOWA.WebglGlobe.Matrix4x4.prototype.product = function(view, local) {
   var v = view.m;
   var l = local.m;
 
@@ -141,9 +141,9 @@ IOWA.webglGlobe.Matrix4x4.prototype.product = function(view, local) {
 /**
  * Rotate the matrix by angle theta about the x axis.
  * @param {number} theta The rotation angle, in radians.
- * @return {!IOWA.webglGlobe.Matrix4x4} This matrix.
+ * @return {!IOWA.WebglGlobe.Matrix4x4} This matrix.
  */
-IOWA.webglGlobe.Matrix4x4.prototype.rotateX = function(theta) {
+IOWA.WebglGlobe.Matrix4x4.prototype.rotateX = function(theta) {
   var cos = Math.cos(theta);
   var sin = Math.sin(theta);
 
@@ -175,9 +175,9 @@ IOWA.webglGlobe.Matrix4x4.prototype.rotateX = function(theta) {
 /**
  * Rotate the matrix by angle theta about the y axis.
  * @param {number} theta The rotation angle, in radians.
- * @return {!IOWA.webglGlobe.Matrix4x4} This matrix.
+ * @return {!IOWA.WebglGlobe.Matrix4x4} This matrix.
  */
-IOWA.webglGlobe.Matrix4x4.prototype.rotateY = function(theta) {
+IOWA.WebglGlobe.Matrix4x4.prototype.rotateY = function(theta) {
   var cos = Math.cos(theta);
   var sin = Math.sin(theta);
 
@@ -209,9 +209,9 @@ IOWA.webglGlobe.Matrix4x4.prototype.rotateY = function(theta) {
 /**
  * Rotate the matrix by angle theta about the z axis.
  * @param {number} theta The rotation angle, in radians.
- * @return {!IOWA.webglGlobe.Matrix4x4} This matrix.
+ * @return {!IOWA.WebglGlobe.Matrix4x4} This matrix.
  */
-IOWA.webglGlobe.Matrix4x4.prototype.rotateZ = function(theta) {
+IOWA.WebglGlobe.Matrix4x4.prototype.rotateZ = function(theta) {
   var cos = Math.cos(theta);
   var sin = Math.sin(theta);
 
@@ -243,9 +243,9 @@ IOWA.webglGlobe.Matrix4x4.prototype.rotateZ = function(theta) {
 /**
  * Apply a scale of factor scale.
  * @param {number} scale
- * @return {!IOWA.webglGlobe.Matrix4x4} This matrix.
+ * @return {!IOWA.WebglGlobe.Matrix4x4} This matrix.
  */
-IOWA.webglGlobe.Matrix4x4.prototype.scaleUniform = function(scale) {
+IOWA.WebglGlobe.Matrix4x4.prototype.scaleUniform = function(scale) {
   var m = this.m_;
 
   m[0] *= scale;
@@ -270,11 +270,11 @@ IOWA.webglGlobe.Matrix4x4.prototype.scaleUniform = function(scale) {
  * Transforms the four-vector vec and places result in destVec. Returns destVec.
  * destVec and vec refer to the same vector object (so transformation is done in
  * place).
- * @param {!IOWA.webglGlobe.ArrayLike} destVec
- * @param {!IOWA.webglGlobe.ArrayLike} vec
- * @return {!IOWA.webglGlobe.ArrayLike} destVec
+ * @param {!IOWA.WebglGlobe.ArrayLike} destVec
+ * @param {!IOWA.WebglGlobe.ArrayLike} vec
+ * @return {!IOWA.WebglGlobe.ArrayLike} destVec
  */
-IOWA.webglGlobe.Matrix4x4.prototype.transformVec4 = function(destVec, vec) {
+IOWA.WebglGlobe.Matrix4x4.prototype.transformVec4 = function(destVec, vec) {
   var m = this.m_;
   var v0 = vec[0];
   var v1 = vec[1];
@@ -293,12 +293,12 @@ IOWA.webglGlobe.Matrix4x4.prototype.transformVec4 = function(destVec, vec) {
  * Transform vector at vecOffset in vec and place result at destVecOffset in
  * destVec. Result can be written in place by giving the same values for destVec
  * as for vec.
- * @param {!IOWA.webglGlobe.ArrayLike} destVec
+ * @param {!IOWA.WebglGlobe.ArrayLike} destVec
  * @param {number} destVecOffset
- * @param {!IOWA.webglGlobe.ArrayLike} vec
+ * @param {!IOWA.WebglGlobe.ArrayLike} vec
  * @param {number} vecOffset
  */
-IOWA.webglGlobe.Matrix4x4.prototype.transformOffsetVec4 = function(destVec, destVecOffset, vec, vecOffset) {
+IOWA.WebglGlobe.Matrix4x4.prototype.transformOffsetVec4 = function(destVec, destVecOffset, vec, vecOffset) {
   var m = this.m_;
   vecOffset = vecOffset || 0;
   var v0 = vec[0 + vecOffset];
@@ -318,9 +318,9 @@ IOWA.webglGlobe.Matrix4x4.prototype.transformOffsetVec4 = function(destVec, dest
  * @param {number} tx
  * @param {number} ty
  * @param {number} tz
- * @return {!IOWA.webglGlobe.Matrix4x4} This matrix.
+ * @return {!IOWA.WebglGlobe.Matrix4x4} This matrix.
  */
-IOWA.webglGlobe.Matrix4x4.prototype.translate = function(tx, ty, tz) {
+IOWA.WebglGlobe.Matrix4x4.prototype.translate = function(tx, ty, tz) {
   var m = this.m_;
 
   m[12] += m[0]*tx + m[4]*ty + m[8]*tz;

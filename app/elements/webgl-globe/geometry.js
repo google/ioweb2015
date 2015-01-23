@@ -7,11 +7,14 @@
  * @param {number} divisions
  * @return {!Float32Array}
  */
-IOWA.webglGlobe.generateGeometry = (function() {
+IOWA.WebglGlobe.generateGeometry = (function() {
   'use strict';
 
-  // attribute components per vertex
-  var SIZE = 4;
+  /**
+   * Attribute components per vertex.
+   * @private {number}
+   */
+  var COMPONENTS_PER_VERTEX_ = 4;
 
   // normalized coordinates of icosahedron vertices, all of which lie soley in
   // the x-, y-, or z-planes.
@@ -37,8 +40,9 @@ IOWA.webglGlobe.generateGeometry = (function() {
   ];
 
   /**
-   * Linearly interpolate a vector of SIZE components between from (at
-   * fromIndex) and to (at toIndex) at t. Result put in dest (at destIndex).
+   * Linearly interpolate a vector of COMPONENTS_PER_VERTEX_ components between
+   * `from` (at `fromIndex`) and `to` (at `toIndex`) at interpolation parameter
+   * `t`. Result put in `dest` (at `destIndex`).
    * @param {!Float32Array} dest
    * @param {number} destIndex
    * @param {!Float32Array} from
@@ -48,7 +52,7 @@ IOWA.webglGlobe.generateGeometry = (function() {
    * @param {number} t
    */
   function lerpVert(dest, destIndex, from, fromIndex, to, toIndex, t) {
-    for (var i = 0; i < SIZE; i++) {
+    for (var i = 0; i < COMPONENTS_PER_VERTEX_; i++) {
       var a = from[fromIndex + i];
       var b = to[toIndex + i];
       // TODO(bckenny): may want to special-case t=0 and t=1 in case of floating
@@ -64,51 +68,58 @@ IOWA.webglGlobe.generateGeometry = (function() {
     // don't share verts between columns as it buys little memory savings and
     // a slim chance of hitting the cache but pays with loss of coherency
     var vertCount = 5 * ((2 * divisions + 3) * divisions + 1);
-    var geometryArray = new Float32Array(vertCount * SIZE);
+    var geometryArray = new Float32Array(vertCount * COMPONENTS_PER_VERTEX_);
 
     // temp coordinate buffers for interpolation end points
-    var left = new Float32Array(SIZE);
-    var mid = new Float32Array(SIZE);
-    var right = new Float32Array(SIZE);
+    var left = new Float32Array(COMPONENTS_PER_VERTEX_);
+    var mid = new Float32Array(COMPONENTS_PER_VERTEX_);
+    var right = new Float32Array(COMPONENTS_PER_VERTEX_);
 
     // current pointer into geometry array
     var geomCursor = 0;
 
     // generate five sets of faces
     for (var i = 0; i < 5; i++) {
-      // indices of corners of top pair of faces in array CORNERS
+      // indices (into array CORNERS) of corners of top pair of faces
       // slightly insane values here just a result of ordering of CORNERS and
       // topology of icosahedron. There may be a simpler ordering.
       var topLeft = 0;
-      var topRight = ((i + 1) % 5 + 1) * SIZE;
-      var bottomLeft = (i + 1) * SIZE;
-      var bottomRight = ((i + 1) % 5 + 6) * SIZE;
+      var topRight = ((i + 1) % 5 + 1) * COMPONENTS_PER_VERTEX_;
+      var bottomLeft = (i + 1) * COMPONENTS_PER_VERTEX_;
+      var bottomRight = ((i + 1) % 5 + 6) * COMPONENTS_PER_VERTEX_;
 
-      // first line of verts gets its very own loop to avoid some singularities
+      // first line of verts gets its very own loop to avoid division by zero
+      // when looping over rows in inner loop, below
       var u;
       for (var ui = 0; ui < divisions + 1; ui++) {
         u = ui / divisions;
-        lerpVert(geometryArray, geomCursor * SIZE, CORNERS, topLeft, CORNERS,
+        lerpVert(geometryArray, geomCursor * COMPONENTS_PER_VERTEX_, CORNERS, topLeft, CORNERS,
             topRight, u);
         geomCursor++;
       }
 
       // two or more, use a for
       for (var j = 0; j < 2; j++) {
+        // loop over rows of vertices
         for (var vi = 1; vi < divisions + 1; vi++) {
           var v = vi / divisions;
           lerpVert(left, 0, CORNERS, topLeft, CORNERS, bottomLeft, v);
           lerpVert(mid, 0, CORNERS, topRight, CORNERS, bottomLeft, v);
           lerpVert(right, 0, CORNERS, topRight, CORNERS, bottomRight, v);
 
+          // each row of vertices is divided into a left and right triangle,
+          // each with its own loop here. The left triangle goes from `left` to
+          // `mid`, while the right goes from `mid` to `right`.
           for (ui = 0; ui < divisions - vi; ui++) {
             u = ui / (divisions - vi);
-            lerpVert(geometryArray, geomCursor * SIZE, left, 0, mid, 0, u);
+            lerpVert(geometryArray, geomCursor * COMPONENTS_PER_VERTEX_, left, 0,
+                mid, 0, u);
             geomCursor++;
           }
           for (ui = 0; ui < vi + 1; ui++) {
             u = ui / vi;
-            lerpVert(geometryArray, geomCursor * SIZE, mid, 0, right, 0, u);
+            lerpVert(geometryArray, geomCursor * COMPONENTS_PER_VERTEX_, mid, 0,
+                right, 0, u);
             geomCursor++;
           }
         }
@@ -116,8 +127,8 @@ IOWA.webglGlobe.generateGeometry = (function() {
         // switch to corners of bottom pair of faces
         topLeft = bottomLeft;
         topRight = bottomRight;
-        bottomLeft = (i + 6) * SIZE;
-        bottomRight = 11 * SIZE;
+        bottomLeft = (i + 6) * COMPONENTS_PER_VERTEX_;
+        bottomRight = 11 * COMPONENTS_PER_VERTEX_;
       }
     }
 
@@ -132,7 +143,7 @@ IOWA.webglGlobe.generateGeometry = (function() {
  * @param {number} divisions
  * @return {!Uint16Array}
  */
-IOWA.webglGlobe.generateIndexArray = function(divisions) {
+IOWA.WebglGlobe.generateIndexArray = function(divisions) {
   'use strict';
 
   divisions = Math.max(1, divisions);

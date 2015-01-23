@@ -13,7 +13,7 @@
  * @constructor
  * @struct
  */
-IOWA.webglGlobe.ShaderProgram = function(gl, opt_vertexSrc, opt_fragmentSrc) {
+IOWA.WebglGlobe.ShaderProgram = function(gl, opt_vertexSrc, opt_fragmentSrc) {
   /**
    * The WebGL context.
    * @private {!WebGLRenderingContext}
@@ -94,7 +94,7 @@ IOWA.webglGlobe.ShaderProgram = function(gl, opt_vertexSrc, opt_fragmentSrc) {
  * @enum {string}
  * @private
  */
-IOWA.webglGlobe.ShaderProgram.UNIFORM_SETTERS_ = {
+IOWA.WebglGlobe.ShaderProgram.UNIFORM_SETTERS_ = {
   0x1406: 'uniform1f', /* FLOAT */
   0x8b50: 'uniform2f', /* FLOAT_VEC2 */
   0x8b51: 'uniform3f', /* FLOAT_VEC3 */
@@ -118,7 +118,7 @@ IOWA.webglGlobe.ShaderProgram.UNIFORM_SETTERS_ = {
  * @enum {string}
  * @private
  */
-IOWA.webglGlobe.ShaderProgram.UNIFORM_MATRIX_SETTERS_ = {
+IOWA.WebglGlobe.ShaderProgram.UNIFORM_MATRIX_SETTERS_ = {
   0x8b5a: 'uniformMatrix2fv', /* FLOAT_MAT2 */
   0x8b5b: 'uniformMatrix3fv', /* FLOAT_MAT3 */
   0x8b5c: 'uniformMatrix4fv', /* FLOAT_MAT4 */
@@ -133,13 +133,13 @@ IOWA.webglGlobe.ShaderProgram.UNIFORM_MATRIX_SETTERS_ = {
  * @param {string} fragmentUrl URL for the fragment shader.
  * @return {!Promise}
  */
-IOWA.webglGlobe.ShaderProgram.fromXhr = function(gl, vertexUrl, fragmentUrl) {
-  var program = new IOWA.webglGlobe.ShaderProgram(gl);
+IOWA.WebglGlobe.ShaderProgram.fromXhr = function(gl, vertexUrl, fragmentUrl) {
+  var program = new IOWA.WebglGlobe.ShaderProgram(gl);
 
   return Promise.all([
-    IOWA.webglGlobe.ShaderProgram.promiseXhr_(vertexUrl)
+    IOWA.WebglGlobe.ShaderProgram.promiseXhr_(vertexUrl)
         .then(program.setVertexShader.bind(program)),
-    IOWA.webglGlobe.ShaderProgram.promiseXhr_(fragmentUrl)
+    IOWA.WebglGlobe.ShaderProgram.promiseXhr_(fragmentUrl)
         .then(program.setFragmentShader.bind(program))
   ]).then(function() {
     program.link();
@@ -154,13 +154,13 @@ IOWA.webglGlobe.ShaderProgram.fromXhr = function(gl, vertexUrl, fragmentUrl) {
  * @return {!Promise}
  * @private
  */
-IOWA.webglGlobe.ShaderProgram.promiseXhr_ = function(url) {
+IOWA.WebglGlobe.ShaderProgram.promiseXhr_ = function(url) {
   return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url);
     xhr.onload = function(e) {
       if (this.status === 200) {
-        resolve(this.responseText);
+        resolve(this.response);
       } else {
         reject(this.statusText);
       }
@@ -176,7 +176,7 @@ IOWA.webglGlobe.ShaderProgram.promiseXhr_ = function(url) {
  * Returns true if the shaders have succesfully compiled and have been linked.
  * @return {boolean}
  */
-IOWA.webglGlobe.ShaderProgram.prototype.isReady = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.isReady = function() {
   return this.programLinked_;
 };
 
@@ -187,7 +187,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.isReady = function() {
  * @return {boolean} Whether the shader compiled successfully.
  * @private
  */
-IOWA.webglGlobe.ShaderProgram.prototype.compileShader_ = function(src, shader) {
+IOWA.WebglGlobe.ShaderProgram.prototype.compileShader_ = function(src, shader) {
   this.gl_.shaderSource(shader, src);
   this.gl_.compileShader(shader);
 
@@ -209,7 +209,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.compileShader_ = function(src, shader) {
  * @param {string} src
  * @throws {Error}
  */
-IOWA.webglGlobe.ShaderProgram.prototype.setFragmentShader = function(src) {
+IOWA.WebglGlobe.ShaderProgram.prototype.setFragmentShader = function(src) {
   this.fragmentCompiled_ = this.compileShader_(src, this.fragmentShader_);
 
   if (!this.fragmentCompiled_) {
@@ -227,7 +227,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.setFragmentShader = function(src) {
  * @param {string} src
  * @throws {Error}
  */
-IOWA.webglGlobe.ShaderProgram.prototype.setVertexShader = function(src) {
+IOWA.WebglGlobe.ShaderProgram.prototype.setVertexShader = function(src) {
   this.vertexCompiled_ = this.compileShader_(src, this.vertexShader_);
 
   if (!this.vertexCompiled_) {
@@ -242,7 +242,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.setVertexShader = function(src) {
  * fragment shader, if any.
  * @return {string}
  */
-IOWA.webglGlobe.ShaderProgram.prototype.getFragmentShaderInfoLog = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.getFragmentShaderInfoLog = function() {
   return this.gl_.getShaderInfoLog(this.fragmentShader_);
 };
 
@@ -250,7 +250,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.getFragmentShaderInfoLog = function() {
  * Returns the contents of the information log for this program object, if any.
  * @return {string}
  */
-IOWA.webglGlobe.ShaderProgram.prototype.getProgramInfoLog = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.getProgramInfoLog = function() {
   return this.gl_.getProgramInfoLog(this.program);
 };
 
@@ -259,7 +259,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.getProgramInfoLog = function() {
  * vertex shader, if any.
  * @return {string}
  */
-IOWA.webglGlobe.ShaderProgram.prototype.getVertexShaderInfoLog = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.getVertexShaderInfoLog = function() {
   return this.gl_.getShaderInfoLog(this.vertexShader_);
 };
 
@@ -268,7 +268,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.getVertexShaderInfoLog = function() {
  * this.attributes. Previous enumeration of attribute locations is discarded.
  * @private
  */
-IOWA.webglGlobe.ShaderProgram.prototype.initAttributes_ = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.initAttributes_ = function() {
   var count = this.gl_.getProgramParameter(
       this.program, this.gl_.ACTIVE_ATTRIBUTES);
 
@@ -288,7 +288,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.initAttributes_ = function() {
  * @param {function(this:WebGLRenderingContext, (!Array<number>|!ArrayBufferView))} setVec
  * @return {function(!Array<number>|!ArrayBufferView|...[number])}
  */
-IOWA.webglGlobe.ShaderProgram.createUniformSetter_ = function(set, setVec) {
+IOWA.WebglGlobe.ShaderProgram.createUniformSetter_ = function(set, setVec) {
   return function setUniform() {
     if (Array.isArray(arguments[0]) || ArrayBuffer.isView(arguments[0])) {
       setVec(arguments[0]);
@@ -304,7 +304,7 @@ IOWA.webglGlobe.ShaderProgram.createUniformSetter_ = function(set, setVec) {
  * @private
  * @throws {Error} If uniform of unknown type is found.
  */
-IOWA.webglGlobe.ShaderProgram.prototype.initUniforms_ = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.initUniforms_ = function() {
   var gl = this.gl_;
   this.uniforms = {};
 
@@ -316,7 +316,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.initUniforms_ = function() {
     var location = gl.getUniformLocation(this.program, name);
 
     // float, vec*, or sampler uniforms
-    var ShaderProgram = IOWA.webglGlobe.ShaderProgram;
+    var ShaderProgram = IOWA.WebglGlobe.ShaderProgram;
     if (ShaderProgram.UNIFORM_SETTERS_[info.type]) {
       var setterMethod = ShaderProgram.UNIFORM_SETTERS_[info.type];
       var set = gl[setterMethod].bind(gl, location);
@@ -350,7 +350,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.initUniforms_ = function() {
  * shaders fail to link.
  * @throws {Error}
  */
-IOWA.webglGlobe.ShaderProgram.prototype.link = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.link = function() {
   if (!this.vertexCompiled_) {
     throw new Error('Current vertex shader has not been compiled');
   }
@@ -376,7 +376,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.link = function() {
  * not check program status before attempting; if necessary, use isReady()
  * first to check if program has successfully compiled and linked.
  */
-IOWA.webglGlobe.ShaderProgram.prototype.use = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.use = function() {
   this.gl_.useProgram(this.program);
 };
 
@@ -389,7 +389,7 @@ IOWA.webglGlobe.ShaderProgram.prototype.use = function() {
  * @return {boolean} The validation status.
  * @see http://www.khronos.org/opengles/sdk/2.0/docs/man/glValidateProgram.xml
  */
-IOWA.webglGlobe.ShaderProgram.prototype.validateProgram = function() {
+IOWA.WebglGlobe.ShaderProgram.prototype.validateProgram = function() {
   this.gl_.validateProgram(this.program);
   return this.gl_.getProgramParameter(this.program, this.gl_.VALIDATE_STATUS);
 };
