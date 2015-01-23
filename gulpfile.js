@@ -150,6 +150,7 @@ gulp.task('jscs', function() {
 // Crush JS
 gulp.task('concat-and-uglify-js', ['js'], function() {
   // The ordering of the scripts in the gulp.src() array matter!
+  // This order needs to match the order in templates/layout_full.html
   var siteScripts = [
     'main.js',
     'helper/util.js',
