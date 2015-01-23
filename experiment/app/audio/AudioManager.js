@@ -35,7 +35,7 @@ module.exports = (function() {
     // Central volume control node.
     var gainNode = audioContext.createGain();
 
-    const DEFAULT_VOLUME = 0.6;
+    const DEFAULT_VOLUME = 1.0;
     setVolume(DEFAULT_VOLUME);
 
     // Central audio analyzer node.

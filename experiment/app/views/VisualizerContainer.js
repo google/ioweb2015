@@ -116,7 +116,7 @@ module.exports = (function() {
      * Play the visualizer.
      */
     function enable() {
-      if (!isReady || isPaused) { return; }
+      if (!isReady || !isPaused) { return; }
       isPaused = false;
     }
 
@@ -124,7 +124,7 @@ module.exports = (function() {
      * Pause the visualizer.
      */
     function disable() {
-      if (!isReady || !isPaused) { return; }
+      if (!isReady || isPaused) { return; }
       isPaused = true;
     }
 

@@ -13,7 +13,7 @@ module.exports = (function() {
    * @param {Object} audioContext - The Web Audio context.
    * @param {GainNode} gainNode - The final output of all channels.
    */
-  function Channel(audioContext, gainNode) {
+  function Channel(audioContext, gainNode, baseVolume) {
     var output = audioContext.createGain();
     output.connect(gainNode);
 
@@ -24,6 +24,8 @@ module.exports = (function() {
     this.analyser = analyser;
     this.target = analyser;
     this.muted = true;
+
+    this.baseVolume = baseVolume;
 
     this.setVolume = function(v) {
       output.gain.value = v;
@@ -46,8 +48,8 @@ module.exports = (function() {
      * Create and register a new channel.
      * @return {Channel}
      */
-    function create() {
-      var chan = new Channel(audioContext, gainNode);
+    function create(baseVolume=0.5) {
+      var chan = new Channel(audioContext, gainNode, baseVolume);
       channels.push(chan);
 
       unmute(chan);
@@ -61,18 +63,20 @@ module.exports = (function() {
      * @param {number} duration - The fade duration.
      */
     function mute(chan, duration) {
-      if (!chan.muted) {
-        duration = duration || FADE_OUT_DURATION;
-        chan.muted = true;
+      if (chan.muted) { return; }
 
-        animate({ volume: 1 }, duration, {
-          volume: MUTE_LEVEL,
-          ease: Linear.easeNone,
-          onUpdate: function() {
-            chan.setVolume(this.target.volume);
-          }
-        });
-      }
+      duration = duration || FADE_OUT_DURATION;
+      chan.muted = true;
+
+      var muteLevel = MUTE_LEVEL * chan.baseVolume;
+
+      animate({ volume: chan.baseVolume }, duration, {
+        volume: muteLevel,
+        ease: Linear.easeNone,
+        onUpdate: function() {
+          chan.setVolume(this.target.volume);
+        }
+      });
     }
 
     /**
@@ -81,20 +85,22 @@ module.exports = (function() {
      * @param {number} duration - The fade duration.
      */
     function unmute(chan, duration) {
-      if (chan.muted) {
-        duration = duration || FADE_IN_DURATION;
+      if (!chan.muted) { return; }
 
-        chan.setVolume(MUTE_LEVEL);
-        chan.muted = false;
+      duration = duration || FADE_IN_DURATION;
 
-        animate({ volume: MUTE_LEVEL }, duration, {
-          volume: 1,
-          ease: Linear.easeNone,
-          onUpdate: function() {
-            chan.setVolume(this.target.volume);
-          }
-        });
-      }
+      var muteLevel = MUTE_LEVEL * chan.baseVolume;
+
+      chan.setVolume(muteLevel);
+      chan.muted = false;
+
+      animate({ volume: muteLevel }, duration, {
+        volume: chan.baseVolume,
+        ease: Linear.easeNone,
+        onUpdate: function() {
+          chan.setVolume(this.target.volume);
+        }
+      });
     }
 
     /**

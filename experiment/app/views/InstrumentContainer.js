@@ -649,6 +649,7 @@ module.exports = (function() {
      */
     function render(delta) {
       if (!isReady || isPaused) { return; }
+
       renderer.render(stage);
       instrumentView.render(delta);
 

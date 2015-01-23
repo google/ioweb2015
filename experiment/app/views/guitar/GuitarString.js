@@ -99,8 +99,10 @@ module.exports = (function() {
       baseLayer.dragging = true;
 
       world = new p2.World({
-        gravity: [-0.01, -0.01]
+        gravity: [-0.1, -0.1]
       });
+
+      world.emitImpactEvent = false;
 
       displayContainerCenter.addChild(lineGraphicShadow);
       displayContainerCenter.addChild(lineGraphic);
@@ -214,14 +216,15 @@ module.exports = (function() {
      */
     function createSprings() {
       lineDistance = getlineDistance(anchorPoint1.position, anchorPoint2.position);
-      capsuleShape = new p2.Capsule(Math.floor(lineDistance) - 30,20);
+      capsuleShape = new p2.Capsule(Math.floor(lineDistance) - 30, 20);
       capsuleBody = new p2.Body({
         mass: 1,
         position: [0,0],
         velocity: [1, 1],
         force: [10, 10],
         type: 1,
-        angularVelocity: 1
+        angularVelocity: 1,
+        damping: 0.3
       });
 
       var plane = new p2.Body({

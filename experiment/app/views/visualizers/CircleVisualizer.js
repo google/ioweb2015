@@ -1,15 +1,16 @@
 var p2 = require('p2');
+var vec2 = p2.vec2;
 
 module.exports = (function() {
   'use strict';
 
-  const LINE_WIDTH = 1;
+  const LINE_WIDTH = 6;
   const FFT_SIZE = 512;
   const SMOOTHING_TIME_CONSTANT = 0.3;
   const PARTICLE_COUNT = 100;
+  const PARTICLE_SIZES = [20, 25, 30, 35, 40, 45];
   const PARTICLE_STROKE_WIDTH = 1;
-  const PARTICLE_STROKE_COLOR = 'black';
-  const PARTICLE_RELATIVE_SIZE = 1 / 5;
+  const PARTICLE_STROKE_COLOR = 'rgba(0,0,0,0.2)';
 
   /**
    * Create analyser node for bar visualisation.
@@ -40,11 +41,20 @@ module.exports = (function() {
     var particles = [];
 
     var baseInstrumentRadius = 80;
-    var particleRadius = 10;
     var world;
+    var particleImages = {};
 
     function init() {
       world = new p2.World();
+      world.applySpringForces = false;
+      world.applyDamping = false;
+      world.applyGravity = false;
+      world.emitImpactEvent = false;
+
+      for (let i = 0; i < PARTICLE_SIZES.length; i++) {
+        let s = PARTICLE_SIZES[i];
+        particleImages[s] = cacheParticleCanvas(s);
+      }
 
       for (let i = 0; i < analysers.length; i++) {
         analysers[i].fftSize = FFT_SIZE;
@@ -53,7 +63,8 @@ module.exports = (function() {
 
         var circleBody = new p2.Body({
           position: [0, 0],
-          mass: 0
+          mass: 0,
+          angularVelocity: 10
         });
 
         circleBody.circleShape = new p2.Circle(baseInstrumentRadius);
@@ -69,15 +80,19 @@ module.exports = (function() {
       }
 
       for (let i = 0; i < PARTICLE_COUNT; i++) {
-        let randomX = Math.random() * xMax;
-        let randomY = Math.random() * yMax;
+        let randomX = Math.random() * 1000;
+        let randomY = -100;
 
         var particleBody = new p2.Body({
           position: [randomX, randomY],
-          mass: 1
+          mass: 1,
+          angularVelocity: 10
         });
 
-        particleBody.circleShape = new p2.Circle(particleRadius);
+        particleBody.isParticle = true;
+
+        let radius = PARTICLE_SIZES[i % PARTICLE_SIZES.length];
+        particleBody.circleShape = new p2.Circle(radius);
         particleBody.addShape(particleBody.circleShape);
 
         particles.push(particleBody);
@@ -85,65 +100,82 @@ module.exports = (function() {
       }
     }
 
+    var positionValues = [
+      [0.25, 0.6],
+      [0.05, 0.05],
+      [0.55, 0.4],
+      [0.8, 0.8],
+      [0.95, 0.1]
+    ];
+
     function positionInstrumentCircles() {
-      baseInstrumentRadius = xMax / (circles.length * 4);
-      particleRadius = baseInstrumentRadius * PARTICLE_RELATIVE_SIZE;
+      baseInstrumentRadius = (xMax / (circles.length * 20)) + LINE_WIDTH;
 
       for (let i = 0; i < circles.length; i++) {
-        circles[i].position[0] = (baseInstrumentRadius * 2) + (i * baseInstrumentRadius * 3.5);
-        circles[i].position[1] = 0;
+        circles[i].position[0] = (xMax * positionValues[i][0]) - (xMax / 2);
+        circles[i].position[1] = (yMax * positionValues[i][1]) - (yMax / 2);
         targetRadius[i] = baseInstrumentRadius;
       }
+    }
+
+    function cacheParticleCanvas(radius) {
+      var particleCanvas = document.createElement('canvas');
+      particleCanvas.width = ((radius + PARTICLE_STROKE_WIDTH) * 2);
+      particleCanvas.height = ((radius + PARTICLE_STROKE_WIDTH) * 2);
+
+      var particleContext = particleCanvas.getContext('2d');
+      particleContext.lineWidth = PARTICLE_STROKE_WIDTH;
+      particleContext.strokeStyle = PARTICLE_STROKE_COLOR;
+
+      particleContext.beginPath();
+      particleContext.arc(
+        radius + PARTICLE_STROKE_WIDTH,
+        radius + PARTICLE_STROKE_WIDTH,
+        radius,
+        0,
+        Math.PI * 2
+      );
+      particleContext.stroke();
+
+      return particleCanvas;
     }
 
     /**
      * Draw oscillating wave to canvas
      */
     function drawCircles() {
-      canvasContext.fillStyle = 'rgba(255,255,255,1)';
+      canvasContext.fillStyle = 'white';
       canvasContext.fillRect(0, 0, xMax, yMax);
+
+      for (let i = 0; i < particles.length; i++) {
+        let r = particles[i].circleShape.radius;
+        canvasContext.drawImage(
+          particleImages[r],
+          particles[i].position[0] - r + (xMax / 2),
+          particles[i].position[1] - r + (yMax / 2)
+        );
+      }
 
       for (let i = 0; i < circles.length; i++) {
         canvasContext.save();
 
         canvasContext.lineWidth = LINE_WIDTH;
         canvasContext.strokeStyle = colors[i];
-        canvasContext.translate(0, yMax / 2);
 
         canvasContext.beginPath();
 
         canvasContext.arc(
-          circles[i].position[0],
-          circles[i].position[1],
+          circles[i].position[0] + (xMax / 2),
+          circles[i].position[1] + (yMax / 2),
           circles[i].circleShape.radius,
           0,
           Math.PI * 2
         );
         canvasContext.stroke();
+        canvasContext.fill();
 
         canvasContext.restore();
       }
-
-      canvasContext.save();
-      canvasContext.translate(0, yMax / 2);
-      canvasContext.lineWidth = PARTICLE_STROKE_WIDTH;
-      canvasContext.strokeStyle = PARTICLE_STROKE_COLOR;
-
-      for (let i = 0; i < particles.length; i++) {
-        canvasContext.beginPath();
-
-        canvasContext.arc(
-          particles[i].position[0],
-          particles[i].position[1],
-          particles[i].circleShape.radius,
-          0,
-          Math.PI * 2
-        );
-
-        canvasContext.stroke();
-      }
-
-      canvasContext.restore();
     }
 
     var frameWait = 1;
@@ -163,7 +195,43 @@ module.exports = (function() {
 
       getRun();
       tickChase(delta);
+      stepPhysics(delta);
       drawCircles();
+    }
+
+    function stepPhysics(delta) {
+      attractParticles(delta);
+
+      world.step(1 / 60);
+    }
+
+    var force = vec2.create();
+
+    function attractParticles(delta) {
+      var gravity = 4000;
+
+      for (let j = 0; j < circles.length; j++) {
+        var circle = circles[j];
+
+        for (let i = 0; i < particles.length; i++) {
+          attract(gravity, delta, circle, particles[i]);
+        }
+      }
+    }
+
+    function attract(amount, delta, attractor, particle) {
+      var attractorPos = attractor.position;
+      var particlePos = particle.position;
+
+      vec2.subtract(force, attractorPos, particlePos);
+      var distance = Math.min(vec2.length(force), 10);
+
+      vec2.normalize(force, force);
+
+      var strength = delta * (amount / (distance));
+      vec2.scale(force, force, strength);
+
+      vec2.add(particle.velocity, particle.velocity, force);
     }
 
     /**
@@ -173,7 +241,7 @@ module.exports = (function() {
     function tickChase(delta) {
       for (let i = 0; i < circles.length; i++) {
         targetRadius[i] = targetRadius[i] || baseInstrumentRadius;
-        circles[i].circleShape.radius += (targetRadius[i] - circles[i].circleShape.radius) * 0.05;
+        circles[i].circleShape.radius += (targetRadius[i] - circles[i].circleShape.radius) * 0.08;
       }
     }
 
@@ -207,7 +275,7 @@ module.exports = (function() {
         if (amplitude <= 0) { amplitude = 0; }
         if (amplitude >= 1) { amplitude = 1; }
 
-        targetRadius[i] = baseInstrumentRadius + (amplitude * baseInstrumentRadius * 0.75);
+        targetRadius[i] = baseInstrumentRadius + (amplitude * baseInstrumentRadius * 8);
       }
     }
 

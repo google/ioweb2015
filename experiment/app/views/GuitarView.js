@@ -18,7 +18,7 @@ module.exports = (function() {
    */
   return function GuitarView(audioManager) {
     const GUITAR_TAG = audioManager.addTag(VIEW_NAME);
-    const CHANNEL = audioManager.channels.create();
+    const CHANNEL = audioManager.channels.create(0.8);
 
     var stage;
     var renderPause = false;
