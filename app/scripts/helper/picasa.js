@@ -29,15 +29,6 @@ IOWA.Picasa = (function(exports) {
                  '?alt=jsonc&kind=photo&hl=', lang, '&imgmax=1152&max-results=5000',
                  '&v=2'].join('');
 
-  // function getLink_(rel, links) {
-  //   for (var i = 0, link; link = links[i]; ++i) {
-  //     if (link.rel === rel) {
-  //       return link;
-  //     }
-  //   }
-  //   return null;
-  // }
-
   function fetch(url, opt_startIndex) {
     var startIndex = opt_startIndex || 1;
 
@@ -56,9 +47,6 @@ IOWA.Picasa = (function(exports) {
 
     xhr.send();
   }
-
-  // var startIndex = 1;
-  // fetch(feedUrl, startIndex);
 
   return {
     fetch: fetch
