@@ -35,9 +35,12 @@ Main fab for entering/exit the experiment.
       }
       :host::shadow core-icon {
         height: 19px;
-        width: 22px;
+        width: 19px;
         top: 2px;
-        left: 1px;
+        left: 2px;
+      }
+      :host::shadow paper-ripple {
+        color: #cfd8dc;
       }
       /* fix for repeating background image in safari */
       polyfill-rule {
@@ -364,6 +367,7 @@ Semi-opaque overlay that shows when experiment dialog is opened.
       :host {
         background: rgba(0,0,0,0.4);
         background-size: 100%;
+        cursor: pointer;
         position: fixed;
         left: 0;
         top: 0;
@@ -425,6 +429,9 @@ Fab for triggering the share dialog.
         width: 17px;
         left: 4px;
         top: 4px;
+      }
+      :host::shadow paper-ripple {
+        color: #949fa3;
       }
       /* fix for incorrectly-sized icon in safari */
       polyfill-rule {
@@ -666,6 +673,9 @@ Fab for resetting the experiment loop to default
         top: 3px;
         left: 3px;
       }
+      :host::shadow paper-ripple {
+        color: #949fa3;
+      }
       /* fix for incorrectly-sized icon in safari */
       polyfill-rule {
         content: ':host::shadow core-icon';
@@ -851,7 +861,10 @@ Fab for exiting the experiment.
         left: 4px;
       }
       :host::shadow paper-ripple {
-        color: #cc3300;
+        color: #cfd8dc;
+      }
+      :host::shadow paper-ripple {
+        color: #949fa3;
       }
       /* fix for incorrectly-sized icon in safari */
       polyfill-rule {
@@ -1210,6 +1223,7 @@ Main parent container for all of the fab elements.
         this.playmode = 'playing';
         this.miniFabs = false;
         this.fixed = 'unfixed';
+        this.pauseOverlay = false;
 
         window.removeEventListener('scroll', this.boundOnScroll);
       },
