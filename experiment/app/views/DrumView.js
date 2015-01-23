@@ -20,6 +20,7 @@ module.exports = (function() {
     var world = new p2.World({
       gravity: [0, -900.78]
     });
+
     world.applySpringForces = false;
     world.applyDamping = false;
     world.emitImpactEvent = false;
@@ -33,13 +34,13 @@ module.exports = (function() {
     var drums;
     var drumLookup = {};
 
-    // textures
     var groundT;
 
     var dotEmitterObj = {};
 
-    // sprites
     var ground;
+    var foreground;
+    var background;
 
     var PIDINC = 0;
     var renderPause = false;
@@ -72,6 +73,12 @@ module.exports = (function() {
 
       groundT = new PIXI.DisplayObjectContainer();
       displayContainerCenter.addChild(groundT);
+
+      foreground = new PIXI.DisplayObjectContainer();
+      background = new PIXI.DisplayObjectContainer();
+
+      displayContainerCenter.addChild(background);
+      displayContainerCenter.addChild(foreground);
 
       ground = addBody(groundT, 0, -maxHeight, 4000, 10);
 
@@ -182,7 +189,8 @@ module.exports = (function() {
           recordSound(d);
         });
 
-        displayContainerCenter.addChild(drum.container);
+        foreground.addChild(drum.container);
+        background.addChild(drum.hitCircleContainer);
         drumLookup[drum.pid] = drum;
 
         return drum;
