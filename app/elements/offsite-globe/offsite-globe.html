@@ -30,7 +30,8 @@ Makes a globe or whatever.
     /* global IOWA */
     var ShaderProgram = IOWA.OffsiteGlobe.ShaderProgram;
     var Matrix4x4 = IOWA.OffsiteGlobe.Matrix4x4;
-    var generateIcosphere = IOWA.OffsiteGlobe.generateIcosphere;
+    var generateGeometry = IOWA.OffsiteGlobe.generateGeometry;
+    var generateIndexArray = IOWA.OffsiteGlobe.generateIndexArray;
 
     /**
      * Polyfilled performance.now. Only good for relative timing, not absolute.
@@ -65,6 +66,16 @@ Makes a globe or whatever.
 
       drawCount: 0,
 
+      globeCubemap: null,
+
+      /**
+       * Number of times to divide each edge of icosahedron geometry generator.
+       * @property divisions_
+       * @type number
+       * @default 16
+       */
+      divisions_: 16,
+
       created: function() {
         this.projectionTransform = new Matrix4x4();
       },
@@ -88,16 +99,16 @@ Makes a globe or whatever.
             this.init();
           }.bind(this));
 
-        gl.enable(gl.DEPTH_TEST);
+        // gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
 
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        // gl.enable(gl.BLEND);
+        // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-        if (!gl.getExtension('OES_standard_derivatives')) {
-          throw new Error('no OES_standard_derivatives available');
-        }
+        // if (!gl.getExtension('OES_standard_derivatives')) {
+        //   throw new Error('no OES_standard_derivatives available');
+        // }
 
         this.animate = true;
       },
@@ -106,27 +117,32 @@ Makes a globe or whatever.
         var gl = this.gl;
         this.resize();
 
-        var count = 24;
         var startTime = nowish();
-        var globeGeometry = generateIcosphere(count);
+        var globeGeometry = generateGeometry(this.divisions_);
+        var globeIndices = generateIndexArray(this.divisions_);
         var endTime = nowish();
         // TODO(bckenny): determine if 1 second is reasonable max time
         IOWA.Analytics.trackPerf('globe', 'geometry creation',
             Math.ceil(endTime - startTime), null, 1000);
+        console.log('geometry time: ' + Math.ceil(endTime - startTime));
 
         this.globeArrayBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.globeArrayBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, globeGeometry.geometryArray, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, globeGeometry, gl.STATIC_DRAW);
 
         this.globeIndexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.globeIndexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, globeGeometry.indexArray, gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, globeIndices, gl.STATIC_DRAW);
 
-        this.drawCount = globeGeometry.indexArray.length;
+        this.drawCount = globeIndices.length;
 
-        this.update();
+        this.loadTextures(gl).then(function(globeCubemap) {
+          this.globeCubemap = globeCubemap;
+          this.update();
+        }.bind(this));
       },
 
+      // TODO(bckenny): call this when page is resized
       resize: function() {
         var canvas = this.$.canvas;
         var resolutionScale = window.devicePixelRatio > 1 ? 2 : 1;
@@ -141,16 +157,68 @@ Makes a globe or whatever.
           .translate(0, 0, -2);
       },
 
-      update: function() {
-        /* jshint bitwise: false */
-        var gl = this.gl;
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      // TODO(bckenny): can use lower res images on non-retina (for default
+      // zoom, at least)
+      loadTextures: function(gl) {
+        var globeFaces = {
+          'negative-x.jpg': gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+          'negative-y.jpg': gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+          'negative-z.jpg': gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+          'positive-x.jpg': gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+          'positive-y.jpg': gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+          'positive-z.jpg': gl.TEXTURE_CUBE_MAP_POSITIVE_Z
+        };
 
-        this.theta += Math.PI / 480;
+        return Promise.all(
+          Object.keys(globeFaces).map(function(faceName) {
+            return new Promise(function(resolve, reject) {
+              var textureImage = new Image();
+              textureImage.onload = function() {
+                resolve({
+                  target: globeFaces[faceName],
+                  texture: textureImage
+                });
+              };
+              textureImage.onerror = reject;
+              textureImage.src = this.resolvePath('textures/' + faceName);
+            }.bind(this));
+          }, this)
+
+        ).then(function(faceData) {
+          // create cubemap texture from six loaded images
+          var textureId = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureId);
+          for (var i = 0; i < faceData.length; i++) {
+            gl.texImage2D(faceData[i].target, 0, gl.RGB, gl.RGB,
+                gl.UNSIGNED_BYTE, faceData[i].texture);
+          }
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+
+          // TODO(bckenny): extension prefixes
+          var filterExtension = gl.getExtension('EXT_texture_filter_anisotropic');
+
+          // set to maximum anisotropic filtering if it exists
+          if (filterExtension) {
+            var maxAnisotropy = gl.getParameter(filterExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+            gl.texParameterf(gl.TEXTURE_CUBE_MAP, filterExtension.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+          }
+
+          return textureId;
+        });
+      },
+
+      update: function() {
+        var gl = this.gl;
+
+        this.theta += Math.PI / 960;
 
         var worldTransform = tmpTransform.identity()
-          .rotateY(this.theta)
-          .rotateX(this.theta / 3);
+          .rotateY(this.theta);
+          // .rotateX(this.theta / 3);
 
         this.globeProgram.use();
 
@@ -160,6 +228,10 @@ Makes a globe or whatever.
         // set uniforms
         this.globeProgram.uniforms.globeMatrix(worldTransform.m_);
         this.globeProgram.uniforms.viewMatrix(this.projectionTransform.m_);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubemap);
+        this.globeProgram.uniforms.globeCubemap(0);
 
         gl.drawElements(gl.TRIANGLES, this.drawCount, gl.UNSIGNED_SHORT, 0);
 
