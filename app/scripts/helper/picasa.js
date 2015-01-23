@@ -24,10 +24,10 @@ IOWA.Picasa = (function() {
   var ALBUM_ID = '6029456067262589905';
   var lang = document.documentElement.lang;
 
-  var feedUrl = ['https://picasaweb.google.com/data/feed/api/user/',
-                 GDEVELOPER_USER_ID, '/albumid/', ALBUM_ID,
-                 '?alt=jsonc&kind=photo&hl=', lang, '&imgmax=1152&max-results=5000',
-                 '&v=2'].join('');
+  var feedUrl = 'https://picasaweb.google.com/data/feed/api/user/' +
+                 GDEVELOPER_USER_ID + '/albumid/' + ALBUM_ID +
+                 '?alt=jsonc&kind=photo&hl=' + lang + '&imgmax=1152&max-results=5000' +
+                 '&v=2';
 
   function fetch(url, opt_startIndex) {
     var startIndex = opt_startIndex || 1;
