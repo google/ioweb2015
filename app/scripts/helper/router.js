@@ -187,6 +187,7 @@ IOWA.Router = (function() {
     document.title = (IOWA.Elements.Template.pages[pageName].title ||
         'Google I/O 2015');
 
+    // Prepare the page for a smooth masthead transition.
     IOWA.Elements.Template.navBgClass = mastheadBgClass;
     // This cannot be updated via data binding, because the masthead
     // is visible before the binding happens.
@@ -195,6 +196,7 @@ IOWA.Router = (function() {
     // Hide the masthead ripple before proceeding with page transition.
     IOWA.PageAnimation.play(
       IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
+    IOWA.Elements.ScrollContainer.scrollTop = 0;
 
     setTimeout(function() {
       var animationIn = (
