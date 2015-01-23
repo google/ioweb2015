@@ -96,7 +96,7 @@ module.exports = (function() {
           'radius': 150,
           'color': 0xede7f6,
           'hovercolor': 0xFFFFFF,
-          'sound': 1,
+          'sound': 14,
           'pid': 5
         }
       ],

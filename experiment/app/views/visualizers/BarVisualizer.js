@@ -1,3 +1,6 @@
+var floor = Math.floor;
+var pow = Math.pow;
+
 module.exports = (function() {
   'use strict';
 
@@ -68,9 +71,9 @@ module.exports = (function() {
     }
 
     /**
-     * Draw oscillating wave to canvas
+     * Draw oscillating bars to canvas
      */
-    function drawWave() {
+    function drawBars() {
       canvasContext.fillStyle = 'rgba(255,255,255,1)';
       canvasContext.fillRect(0, 0, xMax, yMax);
 
@@ -102,7 +105,7 @@ module.exports = (function() {
     var delay = frameWait;
 
     /**
-     * On render, draw wave
+     * On render, draw bars
      */
     function render(delta) {
       delay--;
@@ -115,11 +118,11 @@ module.exports = (function() {
 
       getRun();
       tickChase(delta);
-      drawWave();
+      drawBars();
     }
 
     /**
-     * On resize, draw wave
+     * On resize, draw bars
      */
     function resize() {
       xMax = canvas.width;
@@ -129,7 +132,7 @@ module.exports = (function() {
 
       getRun();
       tickChase(0);
-      drawWave();
+      drawBars();
     }
 
     /**
@@ -149,18 +152,6 @@ module.exports = (function() {
       }
     }
 
-    /**
-     * On resize, draw wave
-     */
-    function resize() {
-      xMax = canvas.width;
-      yMax = canvas.height;
-
-      getRun();
-      tickChase(0);
-      drawWave();
-    }
-
     var base = 10;
     var maxAmp = Math.pow(base, 1);
 
@@ -172,15 +163,15 @@ module.exports = (function() {
 
         targetPoints[i].length = 0;
 
-        let rightEdge = Math.floor(analysers[i].frequencyBinCount * 0.8);
+        let rightEdge = floor(analysers[i].frequencyBinCount * 0.8);
 
         for (let j = 0; j < segments; j++) {
           let x = (STEPS * j);
 
-          let shiftRight = Math.floor(STEPS * (i + 0.8) * ((xMax / STEPS) / (targetPoints.length + 0.4)));
-          let shiftRightIndexes = Math.floor(shiftRight / STEPS);
+          let shiftRight = floor(STEPS * (i + 0.8) * ((xMax / STEPS) / (targetPoints.length + 0.4)));
+          let shiftRightIndexes = floor(shiftRight / STEPS);
 
-          let idx = Math.floor((j / segments) * rightEdge);
+          let idx = floor((j / segments) * rightEdge);
 
           if (j < shiftRightIndexes) {
             let distance = shiftRightIndexes - j;
@@ -189,18 +180,14 @@ module.exports = (function() {
             idx = idx - shiftRightIndexes;
           }
 
-          let amplitude = (domains[i][idx] / 255);// || 0;
+          let amplitude = (domains[i][idx] / 255);
 
-          amplitude = Math.pow(base, amplitude) / maxAmp;
+          amplitude = pow(base, amplitude) / maxAmp;
 
           if (amplitude <= 0.1) { amplitude = 0; }
           if (amplitude >= 1) { amplitude = 1; }
 
           amplitude = (amplitude * baseAmp * 2.5);
-
-          // if (i === 4) {
-          //   x = xMax + 1 - (xMax % STEPS) - x;
-          // }
 
           var everyOther = j * 2;
           targetPoints[i][everyOther] = x;

@@ -138,7 +138,7 @@ module.exports = (function() {
       backIconContainer.alpha = 0;
 
       recordButton = new RecordButton(audioManager, 10, 4);
-      recordButton.container.position.x = window.innerWidth - 150;
+      recordButton.container.position.x = window.innerWidth - 62;
       recordButton.container.position.y = 56;
       recordButton.container.pivot.set(28,28);
       recordButton.container.scale.x = 0;
@@ -167,10 +167,7 @@ module.exports = (function() {
       controlsBG.clear();
       controlsBG.beginFill(0x000000, 0.1);
       controlsBG.drawShape(rect);
-      recordButton.container.position.x = window.innerWidth - 105;
-      if (window.innerWidth < 768) {
-        recordButton.container.position.x = window.innerWidth - 75;
-      }
+      recordButton.container.position.x = window.innerWidth - 62;
     }
 
     /**
@@ -652,6 +649,7 @@ module.exports = (function() {
      */
     function render(delta) {
       if (!isReady || isPaused) { return; }
+
       renderer.render(stage);
       instrumentView.render(delta);
 

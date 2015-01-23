@@ -17,13 +17,18 @@ module.exports = (function() {
    * @constructor
    */
   return function DrumView(audioManager) {
-    var world = new p2.World();
+    var world = new p2.World({
+      gravity: [0, -900.78]
+    });
+    world.applySpringForces = false;
+    world.applyDamping = false;
+    world.emitImpactEvent = false;
 
     var stage;
     var data;
 
     const DRUM_TAG = audioManager.addTag(VIEW_NAME);
-    const CHANNEL = audioManager.channels.create();
+    const CHANNEL = audioManager.channels.create(0.6);
 
     var drums;
     var drumLookup = {};
@@ -344,31 +349,10 @@ module.exports = (function() {
      * @param {number} delta - The delta.
      */
     function render(delta) {
-      if (renderPause === false) {
-        if (APPLICATION_STATE === 'expand') {
-          renderExpanded(delta);
-        } else {
-          renderCollapsed(delta);
-        }
-      }
-    }
+      if (renderPause) { return; }
 
-    /**
-     * Render the expanded drum view bodies
-     * @param {number} delta - The delta.
-     */
-    function renderExpanded(delta) {
       renderBodies(delta);
-      world.step(1 / 60, delta * 1000);
-    }
-
-    /**
-     * Render the collapsed drum view bodies.
-     * @param {number} delta - The delta.
-     */
-    function renderCollapsed(delta) {
-      renderBodies(delta);
-      world.step(1 / 60, delta * 1000);
+      world.step(1 / 60);
     }
 
     /**

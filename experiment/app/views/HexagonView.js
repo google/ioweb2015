@@ -35,7 +35,7 @@ module.exports = (function() {
     var currentTrack;
 
     const HEXAGON_TAG = audioManager.addTag(VIEW_NAME);
-    const CHANNEL = audioManager.channels.create();
+    const CHANNEL = audioManager.channels.create(0.65);
 
     var isRecording = false;
 

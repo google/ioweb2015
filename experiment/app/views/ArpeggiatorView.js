@@ -56,7 +56,7 @@ module.exports = (function() {
    */
   return function ArpeggiatorView(audioManager) {
     const ARPEGIATOR_TAG = audioManager.addTag(INSTRUMENT_NAME);
-    const CHANNEL = audioManager.channels.create();
+    const CHANNEL = audioManager.channels.create(0.45);
 
     var pid;
     var displayContainerCenter;

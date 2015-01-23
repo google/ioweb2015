@@ -22,7 +22,7 @@ module.exports = (function() {
    */
   return function ParallelogramView(audioManager) {
     const PARALLELOGRAM_TAG = audioManager.addTag(VIEW_NAME);
-    const CHANNEL = audioManager.channels.create();
+    const CHANNEL = audioManager.channels.create(0.7);
 
     var currentTrack;
     var data;

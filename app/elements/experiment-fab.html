@@ -27,16 +27,20 @@ Main fab for entering/exit the experiment.
         color: inherit;
         display: block;
         position: absolute;
-        opacity: 1;
-        visibility: visible;
         z-index: 2;
-        transition: all 300ms ease-out;
+        -webkit-transition: -webkit-transform 300ms ease-in-out;
+        -webkit-transform: scale(1,1);
+        transition: transform 300ms ease-in-out;
+        transform: scale(1,1);
       }
       :host::shadow core-icon {
         height: 19px;
-        width: 22px;
+        width: 19px;
         top: 2px;
-        left: 1px;
+        left: 2px;
+      }
+      :host::shadow paper-ripple {
+        color: #cfd8dc;
       }
       /* fix for repeating background image in safari */
       polyfill-rule {
@@ -56,8 +60,8 @@ Main fab for entering/exit the experiment.
         top: 4px;
       }
       :host([recording]) {
-        opacity: 0;
-        visibility: hidden;
+        -webkit-transform: scale(0,0);
+        transform: scale(0,0);
       }
     </style>
     <shadow></shadow>
@@ -161,8 +165,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
   <template>
     <style>
       :host {
-        background: #fff url(../../images/headphones-on.png) 60% 60% no-repeat;
-        background-size: 75%;
+        background: #fff;
         box-sizing: border-box;
         border-radius: 3px;
         box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
@@ -171,9 +174,9 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
         padding: 20px;
         position: absolute;
         right: 70px;
-        -webkit-transition: -webkit-transform 300ms ease-in-out;
+        -webkit-transition: -webkit-transform 200ms ease-in-out;
         -webkit-transform: scale(0,0);
-        transition: transform 300ms ease-in-out;
+        transition: transform 200ms ease-in-out;
         transform: scale(0,0);
         width: 360px;
         z-index: 2;
@@ -191,20 +194,44 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
         transform-origin: 100% 0;
       }
 
+      :host([active]) {
+        -webkit-transform: scale(1,1);
+        transform: scale(1,1);
+      }
+
+      :host([active]) .dialog-content {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transform: translate(0,0);
+        transform: translate(0,0);
+      }
+
+      .dialog-content {
+        background: transparent url(../../images/headphones-on.png) 60% 60% no-repeat;
+        background-size: 75%;
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        right: 20px;
+        bottom: 20px;
+        opacity: 0;
+        visibility: hidden;
+        -webkit-transition: all 150ms ease-in-out 200ms;
+        -webkit-transform: translate(0,40px);
+        transition: all 150ms ease-in-out 200ms;
+        transform: translate(0,40px);
+      }
+
       @media screen and (max-width: 767px) {
         :host {
           position: fixed;
           bottom: 0;
+          right: 0;
           width: 100%;
           height: 100%;
           -webkit-transform-origin: 91% 64%;
           transform-origin: 91% 64%;
         }
-      }
-
-      :host([active]) {
-        -webkit-transform: scale(1,1);
-        transform: scale(1,1);
       }
 
       h4 {
@@ -221,9 +248,9 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       }
 
       .button-container {
-        bottom: 20px;
+        bottom: 0;
         position: absolute;
-        right: 20px;
+        right: 0;
       }
 
       .experiment-button {
@@ -241,51 +268,54 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       }
     </style>
 
-    <template if="{{supported}}">
+    <div class="dialog-content">
+      <template if="{{supported}}">
 
-      <h4><i18n-msg msgid="headphones-on">Headphones on</i18n-msg></h4>
-      <p>
-        <i18n-msg msgid="experiment-ahead">Web Audio API experiment ahead</i18n-msg>
-      </p>
-      <div class="button-container">
-        <template if="{{!expLoaded}}">
-          <paper-button class="experiment-button" disabled>
-            <i18n-msg msgid="loading">Loading...</i18n-msg>
+        <h4><i18n-msg msgid="headphones-on">Chrome Experiment ahead</i18n-msg></h4>
+        <p>
+          <i18n-msg msgid="experiment-ahead">The Experiment features Web Audio API. <br>You might want to grab headphones.</i18n-msg>
+        </p>
+        <div class="button-container">
+          <template if="{{!expLoaded}}">
+            <paper-button class="experiment-button" disabled>
+              <i18n-msg msgid="loading">Loading...</i18n-msg>
+            </paper-button>
+          </template>
+          <template if="{{expLoaded}}">
+            <paper-button class="experiment-button" on-tap="{{onExperimentOn}}">
+              <i18n-msg msgid="make-noise">Make Some Noise</i18n-msg>
+            </paper-button>
+          </template>
+          <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
+            <i18n-msg msgid="cancel">Cancel</i18n-msg>
           </paper-button>
-        </template>
-        <template if="{{expLoaded}}">
-          <paper-button class="experiment-button" on-tap="{{onExperimentOn}}">
-            <i18n-msg msgid="make-noise">Make Some Noise</i18n-msg>
+        </div>
+
+      </template>
+
+      <template if="{{!supported}}">
+        <p>
+          <i18n-msg msgid="experiment-unsupported">Unsupported.</i18n-msg>
+        </p>
+        <div class="button-container">
+          <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
+            <i18n-msg msgid="cancel">Cancel</i18n-msg>
           </paper-button>
-        </template>
-        <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
-          <i18n-msg msgid="cancel">Cancel</i18n-msg>
-        </paper-button>
-      </div>
+        </div>
+      </template>
 
-    </template>
+      <template if="{{experimentFailed}}">
+        <p>
+          <i18n-msg msgid="experiment-failed">The experiment failed to load.</i18n-msg>
+        </p>
+        <div class="button-container">
+          <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
+            <i18n-msg msgid="close-dialog">Close</i18n-msg>
+          </paper-button>
+        </div>
+      </template>
 
-    <template if="{{!supported}}">
-      <p>
-        <i18n-msg msgid="experiment-unsupported">Unsupported.</i18n-msg>
-      </p>
-      <div class="button-container">
-        <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
-          <i18n-msg msgid="cancel">Cancel</i18n-msg>
-        </paper-button>
-      </div>
-    </template>
-
-    <template if="{{experimentFailed}}">
-      <p>
-        <i18n-msg msgid="experiment-failed">The experiment failed to load.</i18n-msg>
-      </p>
-      <div class="button-container">
-        <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
-          <i18n-msg msgid="close-dialog">Close</i18n-msg>
-        </paper-button>
-      </div>
-    </template>
+    </div>
 
   </template>
   <script>
@@ -307,10 +337,6 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
 
       get componentDir() {
         return IOWA.Util.getStaticBaseURL();
-      },
-
-      created: function() {
-        this.style.backgroundImage = 'url(' + this.componentDir + 'images/headphones-on.png)';
       },
 
       onExperimentOff: function() {
@@ -335,12 +361,13 @@ Semi-opaque overlay that shows when experiment dialog is opened.
 @element experiment-overlay
 @blurb Semi-opaque overlay that shows when experiment dialog is opened.
 -->
-<polymer-element name="experiment-overlay" on-tap="{{overlayClose}}">
+<polymer-element name="experiment-overlay">
   <template>
     <style>
       :host {
         background: rgba(0,0,0,0.4);
         background-size: 100%;
+        cursor: pointer;
         position: fixed;
         left: 0;
         top: 0;
@@ -360,340 +387,9 @@ Semi-opaque overlay that shows when experiment dialog is opened.
   </template>
   <script>
     Polymer({
-      overlayClose: function() {
-        this.fire('overlay-close');
-      }
     });
   </script>
 </polymer-element>
-
-<!--
-Fab for exiting the experiment.
-
-##### Example
-
-  <experiment-exit-fab></experiment-exit-fab>
-
-@element experiment-exit-fab
-@blurb Fab for exiting the experiment.
-@extends paper-fab
--->
-<polymer-element name="experiment-exit-fab" extends="paper-fab">
-  <template>
-    <style>
-      :host {
-        background: #fff;
-        background-repeat: no-repeat;
-        background-size: 20%;
-        color: inherit;
-        display: block;
-        opacity: 0;
-        visibility: hidden;
-        position: absolute;
-        top: -216px;
-        left: 8px;
-        -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 50% 100%;
-        -webkit-transition: all 100ms ease-out 100ms;
-        transform: scale(0,0);
-        transform-origin: 50% 100%;
-        transition: all 100ms ease-out 100ms;
-      }
-      :host::shadow core-icon {
-        height: 15px;
-        width: 16px;
-        top: 4px;
-        left: 4px;
-      }
-      /* fix for incorrectly-sized icon in safari */
-      polyfill-rule {
-        content: ':host::shadow core-icon';
-        height: 15px !important;
-        width: 16px !important;
-      }
-      :host([open]) {
-        opacity: 1;
-        visibility: visible;
-        -webkit-transform: scale(1,1);
-        transform: scale(1,1);
-      }
-    </style>
-    <shadow></shadow>
-  </template>
-  <script>
-    Polymer({
-      eventDelegates: {
-        tap: 'onTap'
-      },
-      onTap: function() {
-        this.fire('exit-click');
-      }
-    });
-  </script>
-</polymer-element>
-
-<!--
-Dialog to confirm or cancel experiment exit.
-
-##### Example
-
-  <experiment-exit-dialog></experiment-exit-dialog>
-
-@element experiment-exit-dialog
-@blurb Dialog to confirm or cancel experiment exit.
--->
-<polymer-element name="experiment-exit-dialog">
-  <template>
-    <style>
-      :host {
-        background: #fff;
-        box-sizing: border-box;
-        border-radius: 3px;
-        bottom: 232px;
-        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
-        font-family: 'Roboto', sans-serif;
-        height: 190px;
-        padding: 20px;
-        position: absolute;
-        right: 70px;
-        -webkit-transition: -webkit-transform 300ms ease-in-out;
-        -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 100% 100%;
-        transition: transform 300ms ease-in-out;
-        transform: scale(0,0);
-        transform-origin: 100% 100%;
-        width: 220px;
-        z-index: 1;
-      }
-
-      :host([active]) {
-        -webkit-transform: scale(1,1);
-        transform: scale(1,1);
-      }
-
-      h4 {
-        color: #424242;
-        font-size: 20px;
-        font-weight: 500;
-        margin: 0;
-      }
-
-      p {
-        font-size: 15px;
-        margin-bottom: 6px;
-      }
-
-      paper-button {
-        color: #64B5F6;
-        display: block;
-        float: left;
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      paper-button.cancel {
-        color: #646464;
-      }
-
-      .button-container {
-        float: right;
-      }
-    </style>
-
-    <h4>
-      <i18n-msg msgid="exit-experiment">Exit the Experiment?</i18n-msg>
-    </h4>
-    <p>
-      <i18n-msg msgid="exit-confirmation">Are you sure you want to exit the experiment and go back to the I/O website?</i18n-msg>
-    </p>
-
-    <div class="button-container">
-      <paper-button on-tap="{{exitNo}}" class="cancel">
-        <i18n-msg msgid="cancel">Cancel</i18n-msg>
-      </paper-button>
-      <paper-button on-tap="{{exitYes}}">
-        <i18n-msg msgid="yes">Yes</i18n-msg>
-      </paper-button>
-    </div>
-
-  </template>
-
-  <script>
-    Polymer({
-      exitYes: function() {
-        this.fire('exit-yes');
-      },
-      exitNo: function() {
-        this.fire('exit-no');
-      }
-    });
-  </script>
-</polymer-element>
-
-<!--
-Fab for resetting the experiment loop to default
-
-##### Example
-
-  <experiment-reset-fab></experiment-reset-fab>
-
-@element experiment-reset-fab
-@blurb Fab for resetting the experiment loop to default.
-@extends paper-fab
--->
-<polymer-element name="experiment-reset-fab" extends="paper-fab">
-  <template>
-    <style>
-      :host {
-        background: #fff;
-        background-repeat: no-repeat;
-        color: inherit;
-        display: block;
-        opacity: 0;
-        visibility: hidden;
-        position: absolute;
-        top: -144px;
-        left: 8px;
-        -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 50% 100%;
-        -webkit-transition: all 100ms ease-out 50ms;
-        transform: scale(0,0);
-        transform-origin: 50% 100%;
-        transition: all 100ms ease-out 50ms;
-      }
-      :host::shadow core-icon {
-        height: 18px;
-        width: 18px;
-        top: 3px;
-        left: 3px;
-      }
-      /* fix for incorrectly-sized icon in safari */
-      polyfill-rule {
-        content: ':host::shadow core-icon';
-        height: 18px !important;
-        width: 18px !important;
-      }
-      :host([open]) {
-        opacity: 1;
-        visibility: visible;
-        -webkit-transform: scale(1,1);
-        transform: scale(1,1);
-      }
-    </style>
-    <shadow></shadow>
-  </template>
-  <script>
-    Polymer({
-      eventDelegates: {
-        tap: 'onTap'
-      },
-      onTap: function() {
-        this.fire('reset-click');
-      }
-    });
-  </script>
-</polymer-element>
-
-<!--
-Dialog to confirm or cancel experiment reset.
-
-##### Example
-
-  <experiment-reset-dialog></experiment-reset-dialog>
-
-@element experiment-reset-dialog
-@blurb Dialog to confirm or cancel experiment reset.
--->
-<polymer-element name="experiment-reset-dialog">
-  <template>
-    <style>
-      :host {
-        background: #fff;
-        box-sizing: border-box;
-        border-radius: 3px;
-        bottom: 162px;
-        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
-        font-family: 'Roboto', sans-serif;
-        height: 190px;
-        padding: 20px;
-        position: absolute;
-        right: 70px;
-        -webkit-transition: -webkit-transform 300ms ease-in-out;
-        -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 100% 100%;
-        transition: transform 300ms ease-in-out;
-        transform: scale(0,0);
-        transform-origin: 100% 100%;
-        width: 220px;
-        z-index: 1;
-      }
-
-      :host([active]) {
-        -webkit-transform: scale(1,1);
-        transform: scale(1,1);
-      }
-
-      h4 {
-        color: #424242;
-        font-size: 20px;
-        font-weight: 500;
-        margin: 0;
-      }
-
-      p {
-        font-size: 15px;
-        margin-bottom: 6px;
-      }
-
-      paper-button {
-        color: #64B5F6;
-        display: block;
-        float: left;
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      paper-button.cancel {
-        color: #646464;
-      }
-
-      .button-container {
-        float: right;
-      }
-    </style>
-
-    <h4>
-      <i18n-msg msgid="reset-song">Reset the song?</i18n-msg>
-    </h4>
-    <p>
-      <i18n-msg msgid="reset-confirm">Are you sure you want to reset the song back to the default?</i18n-msg>
-    </p>
-
-    <div class="button-container">
-      <paper-button on-tap="{{resetNo}}" class="cancel">
-        <i18n-msg msgid="cancel">Cancel</i18n-msg>
-      </paper-button>
-      <paper-button on-tap="{{resetYes}}">
-        <i18n-msg msgid="yes">Yes</i18n-msg>
-      </paper-button>
-    </div>
-
-  </template>
-
-  <script>
-    Polymer({
-      resetYes: function() {
-        this.fire('reset-yes');
-      },
-      resetNo: function() {
-        this.fire('reset-no');
-      }
-    });
-  </script>
-</polymer-element>
-
 
 <!--
 Fab for triggering the share dialog.
@@ -718,7 +414,7 @@ Fab for triggering the share dialog.
         opacity: 0;
         visibility: hidden;
         position: absolute;
-        top: -72px;
+        top: 80px;
         left: 8px;
         -webkit-transform: scale(0,0);
         -webkit-transform-origin: 50% 100%;
@@ -726,12 +422,16 @@ Fab for triggering the share dialog.
         transform: scale(0,0);
         transform-origin: 50% 100%;
         transition: all 100ms ease-out 0;
+        z-index: 2;
       }
       :host::shadow core-icon {
         height: 15px;
         width: 17px;
         left: 4px;
         top: 4px;
+      }
+      :host::shadow paper-ripple {
+        color: #949fa3;
       }
       /* fix for incorrectly-sized icon in safari */
       polyfill-rule {
@@ -772,26 +472,42 @@ Dialog to share the user's custom experiment/song
         background: #fff;
         box-sizing: border-box;
         border-radius: 3px;
-        bottom: 88px;
+        top: 80px;
         box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
         font-family: 'Roboto', sans-serif;
-        height: 300px;
+        min-height: 300px;
         padding: 20px 10px 20px 20px;
         position: absolute;
-        right: 70px;
-        -webkit-transition: -webkit-transform 300ms ease-in-out;
-        -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 100% 100%;
-        transition: transform 300ms ease-in-out;
-        transform: scale(0,0);
-        transform-origin: 100% 100%;
+        right: 55px;
+        -webkit-transition: -webkit-transform 200ms ease-in-out;
+        -webkit-transform: scale(0,0) translate(0,0);
+        -webkit-transform-origin: 100% 0;
+        transition: transform 200ms ease-in-out;
+        transform: scale(0,0) translate(0,0);
+        transform-origin: 100% 0;
         width: 220px;
-        z-index: 1;
+        z-index: 2;
       }
 
       :host([active]) {
-        -webkit-transform: scale(1,1);
-        transform: scale(1,1);
+        -webkit-transform: scale(1,1) translate(-20px,0);
+        transform: scale(1,1) translate(-20px,0);
+      }
+
+      :host([active]) .dialog-content {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transform: translate(0,0);
+        transform: translate(0,0);
+      }
+
+      .dialog-content {
+        opacity: 0;
+        visibility: hidden;
+        -webkit-transition: all 150ms ease-in-out 200ms;
+        -webkit-transform: translate(0,30px);
+        transition: all 150ms ease-in-out 200ms;
+        transform: translate(0,30px);
       }
 
       .core-selected {
@@ -861,38 +577,42 @@ Dialog to share the user's custom experiment/song
       }
     </style>
 
-    <h4>
-      <i18n-msg msgid="share-your-song">Share Your Song</i18n-msg>
-    </h4>
+    <div class="dialog-content">
 
-    <core-menu>
-      <paper-item>
-        <a href="//plus.google.com/share?url={{url}}" target="_blank" layout horizontal center>
-          <core-icon class="share-icon" icon="social:post-gplus"></core-icon>
-          <i18n-msg msgid="gplus-share">Google+</i18n-msg>
-        </a>
-      </paper-item>
-      <paper-item>
-        <a href="//twitter.com/intent/tweet?text=check+out+my+I/O+song&url={{url}}" target="_blank" layout horizontal center>
-          <core-icon class="share-icon" icon="social:post-twitter"></core-icon>
-          <i18n-msg msgid-"twitter-share">Twitter</i18n-msg>
-        </a>
-      </paper-item>
-      <paper-item>
-        <a href="//www.facebook.com/sharer/sharer.php?u={{url}}" target="_blank" layout horizontal center>
-          <core-icon class="share-icon" icon="social:post-facebook"></core-icon>
-          <i18n-msg msgid="facebook-share">Facebook</i18n-msg>
-        </a>
-      </paper-item>
-      <paper-item class="share-url" noink on-tap="{{linkSelect}}">
-        <core-icon class="share-icon" icon="link"></core-icon>
-        <input id="urlInput" value="{{plainURL}}" readonly>
-      </paper-item>
-    </core-menu>
+      <h4>
+        <i18n-msg msgid="share-your-song">Share Your Song</i18n-msg>
+      </h4>
 
-    <paper-button class="cancel" on-tap="{{shareOff}}">
-      <i18n-msg msgid="cancel">Cancel</i18n-msg>
-    </paper-button>
+      <core-menu>
+        <paper-item>
+          <a href="//plus.google.com/share?url={{url}}" target="_blank" layout horizontal center>
+            <core-icon class="share-icon" icon="social:post-gplus"></core-icon>
+            <i18n-msg msgid="gplus-share">Google+</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item>
+          <a href="//twitter.com/intent/tweet?text=Make+music+with+instruments+inspired+by+material+design+for+Google+I/O.+Play,+record+and+share+at:&url={{url}}" target="_blank" layout horizontal center>
+            <core-icon class="share-icon" icon="social:post-twitter"></core-icon>
+            <i18n-msg msgid-"twitter-share">Twitter</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item>
+          <a href="//www.facebook.com/sharer/sharer.php?u={{url}}" target="_blank" layout horizontal center>
+            <core-icon class="share-icon" icon="social:post-facebook"></core-icon>
+            <i18n-msg msgid="facebook-share">Facebook</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item class="share-url" noink on-tap="{{linkSelect}}">
+          <core-icon class="share-icon" icon="link"></core-icon>
+          <input id="urlInput" value="{{plainURL}}" readonly>
+        </paper-item>
+      </core-menu>
+
+      <paper-button class="cancel" on-tap="{{shareOff}}">
+        <i18n-msg msgid="cancel">Cancel</i18n-msg>
+      </paper-button>
+
+    </div>
 
   </template>
 
@@ -916,6 +636,382 @@ Dialog to share the user's custom experiment/song
 </polymer-element>
 
 <!--
+Fab for resetting the experiment loop to default
+
+##### Example
+
+  <experiment-reset-fab></experiment-reset-fab>
+
+@element experiment-reset-fab
+@blurb Fab for resetting the experiment loop to default.
+@extends paper-fab
+-->
+<polymer-element name="experiment-reset-fab" extends="paper-fab">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        background-repeat: no-repeat;
+        color: inherit;
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        top: 144px;
+        left: 8px;
+        z-index: 2;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 50% 100%;
+        -webkit-transition: all 100ms ease-out 50ms;
+        transform: scale(0,0);
+        transform-origin: 50% 100%;
+        transition: all 100ms ease-out 50ms;
+      }
+      :host::shadow core-icon {
+        height: 18px;
+        width: 18px;
+        top: 3px;
+        left: 3px;
+      }
+      :host::shadow paper-ripple {
+        color: #949fa3;
+      }
+      /* fix for incorrectly-sized icon in safari */
+      polyfill-rule {
+        content: ':host::shadow core-icon';
+        height: 18px !important;
+        width: 18px !important;
+      }
+      :host([open]) {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transform: scale(1,1);
+        transform: scale(1,1);
+      }
+    </style>
+    <shadow></shadow>
+  </template>
+  <script>
+    Polymer({
+      eventDelegates: {
+        tap: 'onTap'
+      },
+      onTap: function() {
+        this.fire('reset-click');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+Dialog to confirm or cancel experiment reset.
+
+##### Example
+
+  <experiment-reset-dialog></experiment-reset-dialog>
+
+@element experiment-reset-dialog
+@blurb Dialog to confirm or cancel experiment reset.
+-->
+<polymer-element name="experiment-reset-dialog">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        box-sizing: border-box;
+        border-radius: 3px;
+        top: 144px;
+        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+        font-family: 'Roboto', sans-serif;
+        min-height: 190px;
+        padding: 20px;
+        position: absolute;
+        right: 55px;
+        -webkit-transition: -webkit-transform 200ms ease-in-out;
+        -webkit-transform: scale(0,0) translate(0,0);
+        -webkit-transform-origin: 100% 0;
+        transition: transform 200ms ease-in-out;
+        transform: scale(0,0) translate(0,0);
+        transform-origin: 100% 0;
+        width: 220px;
+        z-index: 2;
+      }
+
+      :host([active]) {
+        -webkit-transform: scale(1,1) translate(-20px, 0);
+        transform: scale(1,1) translate(-20px, 0);
+      }
+
+      :host([active]) .dialog-content {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transform: translate(0,0);
+        transform: translate(0,0);
+      }
+
+      .dialog-content {
+        opacity: 0;
+        visibility: hidden;
+        -webkit-transition: all 150ms ease-in-out 200ms;
+        -webkit-transform: translate(0,30px);
+        transition: all 150ms ease-in-out 200ms;
+        transform: translate(0,30px);
+      }
+
+      h4 {
+        color: #424242;
+        font-size: 20px;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      p {
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+
+      paper-button {
+        color: #64B5F6;
+        display: block;
+        float: left;
+        font-size: 14px;
+        font-weight: 600;
+        min-width: 3em;
+        text-transform: uppercase;
+      }
+
+      paper-button.cancel {
+        color: #646464;
+      }
+
+      .button-container {
+        float: right;
+      }
+    </style>
+
+    <div class="dialog-content">
+      <h4>
+        <i18n-msg msgid="reset-song">Reset the song?</i18n-msg>
+      </h4>
+      <p>
+        <i18n-msg msgid="reset-confirm">Are you sure you want to reset the song back to the default?</i18n-msg>
+      </p>
+
+      <div class="button-container">
+        <paper-button on-tap="{{resetNo}}" class="cancel">
+          <i18n-msg msgid="cancel">Cancel</i18n-msg>
+        </paper-button>
+        <paper-button on-tap="{{resetYes}}">
+          <i18n-msg msgid="yes">Yes</i18n-msg>
+        </paper-button>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      resetYes: function() {
+        this.fire('reset-yes');
+      },
+      resetNo: function() {
+        this.fire('reset-no');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+Fab for exiting the experiment.
+
+##### Example
+
+  <experiment-exit-fab></experiment-exit-fab>
+
+@element experiment-exit-fab
+@blurb Fab for exiting the experiment.
+@extends paper-fab
+-->
+<polymer-element name="experiment-exit-fab" extends="paper-fab">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        background-repeat: no-repeat;
+        background-size: 20%;
+        color: inherit;
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        top: 209px;
+        left: 8px;
+        z-index: 2;
+        -webkit-transform: scale(0,0);
+        -webkit-transform-origin: 50% 100%;
+        -webkit-transition: all 100ms ease-out 100ms;
+        transform: scale(0,0);
+        transform-origin: 50% 100%;
+        transition: all 100ms ease-out 100ms;
+      }
+      :host::shadow core-icon {
+        height: 15px;
+        width: 16px;
+        top: 4px;
+        left: 4px;
+      }
+      :host::shadow paper-ripple {
+        color: #cfd8dc;
+      }
+      :host::shadow paper-ripple {
+        color: #949fa3;
+      }
+      /* fix for incorrectly-sized icon in safari */
+      polyfill-rule {
+        content: ':host::shadow core-icon';
+        height: 15px !important;
+        width: 16px !important;
+      }
+      :host([open]) {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transform: scale(1,1);
+        transform: scale(1,1);
+      }
+    </style>
+    <shadow></shadow>
+  </template>
+  <script>
+    Polymer({
+      eventDelegates: {
+        tap: 'onTap'
+      },
+      onTap: function() {
+        this.fire('exit-click');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
+Dialog to confirm or cancel experiment exit.
+
+##### Example
+
+  <experiment-exit-dialog></experiment-exit-dialog>
+
+@element experiment-exit-dialog
+@blurb Dialog to confirm or cancel experiment exit.
+-->
+<polymer-element name="experiment-exit-dialog">
+  <template>
+    <style>
+      :host {
+        background: #fff;
+        box-sizing: border-box;
+        border-radius: 3px;
+        top: 209px;
+        box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.16),0px 2px 5px 0px rgba(0,0,0,0.23);
+        font-family: 'Roboto', sans-serif;
+        min-height: 190px;
+        padding: 20px;
+        position: absolute;
+        right: 55px;
+        -webkit-transition: -webkit-transform 200ms ease-in-out;
+        -webkit-transform: scale(0,0) translate(0,0);
+        -webkit-transform-origin: 100% 0;
+        transition: transform 200ms ease-in-out;
+        transform: scale(0,0) translate(0,0);
+        transform-origin: 100% 0;
+        width: 220px;
+        z-index: 2;
+      }
+
+      :host([active]) {
+        -webkit-transform: scale(1,1) translate(-20px, 0);
+        transform: scale(1,1) translate(-20px, 0);
+      }
+
+      :host([active]) .dialog-content {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transform: translate(0,0);
+        transform: translate(0,0);
+      }
+
+      .dialog-content {
+        opacity: 0;
+        visibility: hidden;
+        -webkit-transition: all 150ms ease-in-out 200ms;
+        -webkit-transform: translate(0,30px);
+        transition: all 150ms ease-in-out 200ms;
+        transform: translate(0,30px);
+      }
+
+      h4 {
+        color: #424242;
+        font-size: 20px;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      p {
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+
+      paper-button {
+        color: #64B5F6;
+        display: block;
+        float: left;
+        font-size: 14px;
+        font-weight: 600;
+        min-width: 3em;
+        text-transform: uppercase;
+      }
+
+      paper-button.cancel {
+        color: #646464;
+      }
+
+      .button-container {
+        float: right;
+      }
+    </style>
+
+    <div class="dialog-content">
+      <h4>
+        <i18n-msg msgid="exit-experiment">Exit the Experiment?</i18n-msg>
+      </h4>
+      <p>
+        <i18n-msg msgid="exit-confirmation">Are you sure you want to exit the experiment and go back to the I/O website?</i18n-msg>
+      </p>
+
+      <div class="button-container">
+        <paper-button on-tap="{{exitNo}}" class="cancel">
+          <i18n-msg msgid="cancel">Cancel</i18n-msg>
+        </paper-button>
+        <paper-button on-tap="{{exitYes}}">
+          <i18n-msg msgid="yes">Yes</i18n-msg>
+        </paper-button>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      exitYes: function() {
+        this.fire('exit-yes');
+      },
+      exitNo: function() {
+        this.fire('exit-no');
+      }
+    });
+  </script>
+</polymer-element>
+
+<!--
 Main parent container for all of the fab elements.
 ##### Example
   <experiment-fab-container></experiment-fab-container>
@@ -932,13 +1028,13 @@ Main parent container for all of the fab elements.
         transition: all 300ms ease-out;
       }
       :host([mini]) {
-        widht: 40px;
+        width: 40px;
         height: 40px;
       }
       :host([fixed="fixed"]) {
         position: fixed;
-        top: 50%;
-        margin-top: -28px;
+        right: 32px;
+        top: 30px;
       }
     </style>
     <template if="{{mode == 'pre'}}">
@@ -948,7 +1044,7 @@ Main parent container for all of the fab elements.
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
-      <experiment-overlay active?="{{dialogVisible}}"></experiment-overlay>
+      <experiment-overlay active?="{{dialogVisible}}" on-tap="{{onOverlayClose}}"></experiment-overlay>
 
     </template>
 
@@ -970,6 +1066,7 @@ Main parent container for all of the fab elements.
         <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{componentDir}}images/play-experiment.png" on-tap="{{pausedFabClick}}" paused></experiment-fab>
       </template>
 
+      <experiment-overlay active?="{{pauseOverlay}}" on-tap="{{pausedFabClick}}"></experiment-overlay>
     </template>
   </template>
 
@@ -1003,7 +1100,6 @@ Main parent container for all of the fab elements.
         'exit-click': 'onExitClick',
         'exit-yes': 'onExitYes',
         'exit-no': 'onExitNo',
-        'overlay-close': 'onOverlayClose',
         'reset-click': 'onResetClick',
         'reset-no': 'onResetCancel',
         'share-cancel': 'onShareCancel'
@@ -1014,20 +1110,21 @@ Main parent container for all of the fab elements.
       },
 
       ready: function() {
-        this.boundOnScroll = this.onScroll.bind(this);
         this.bindEscape = this.onEscKeyUp.bind(this);
       },
 
       attached: function() {
         this.bindFab = this.trackFab.bind(this);
+        this.boundOnScroll = this.onScroll.bind(this);
         IOWA.Elements.ScrollContainer.addEventListener('scroll', this.bindFab);
       },
 
       trackFab: function(event) {
-        var MIN_HEIGHT = 480;
+        // If the fab top position is less than the dialog height, animate downwards.
+        var DIALOG_HEIGHT = 480;
 
         var fabPos = this.getBoundingClientRect();
-        if (fabPos.top < MIN_HEIGHT) {
+        if (fabPos.top < DIALOG_HEIGHT) {
           this.dialogAnimateDirection = 'animate-down';
         } else {
           this.dialogAnimateDirection = 'animate-up';
@@ -1062,22 +1159,28 @@ Main parent container for all of the fab elements.
 
       experimentOff: function(event) {
         this.dialogVisible = false;
+        this.fixed == 'unfixed';
         document.removeEventListener('keyup', this.bindEscape);
+        IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
       },
 
       experimentOn: function(event) {
         this.dialogVisible = false;
         document.removeEventListener('keyup', this.bindEscape);
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.bindFab);
-        this.playmode = 'playing';
 
         this.async(function(){
-          this.mode = 'active';
           var rect = this.getBoundingClientRect();
           var top = rect.top + (rect.height / 2);
           var left = rect.left + (rect.width / 2);
           this.app.start('.js-experiment-instrument', '.js-experiment-visualizer', [left, top]);
+          IOWA.Elements.ScrollContainer.addEventListener('scroll', this.boundOnScroll);
         }, null, 300);
+
+        this.async(function() {
+          this.playmode = 'playing';
+          this.mode = 'active';
+        }, null, 2500);
 
         this.app.didEnterRecordingMode(function() {
           this.recording = true;
@@ -1095,7 +1198,8 @@ Main parent container for all of the fab elements.
       },
 
       onScroll: function(event) {
-        if (this.fixed == 'unfixed') {
+        var scrollFabPos = this.getBoundingClientRect();
+        if (scrollFabPos.top <= 30) {
           this.fixed = 'fixed';
         }
       },
@@ -1119,6 +1223,7 @@ Main parent container for all of the fab elements.
         this.playmode = 'playing';
         this.miniFabs = false;
         this.fixed = 'unfixed';
+        this.pauseOverlay = false;
 
         window.removeEventListener('scroll', this.boundOnScroll);
       },
@@ -1154,13 +1259,18 @@ Main parent container for all of the fab elements.
 
       playingFabClick: function(event) {
         this.playmode = 'paused';
+        this.pauseOverlay = true;
         this.miniFabs = true;
         this.app.pause();
       },
 
       pausedFabClick: function(event) {
         this.playmode = 'playing';
+        this.pauseOverlay = false;
         this.miniFabs = false;
+        this.exitVisible = false;
+        this.shareVisible = false;
+        this.resetVisible = false;
         this.app.play();
       }
 
