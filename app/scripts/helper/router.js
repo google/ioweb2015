@@ -93,7 +93,7 @@ IOWA.Router = (function() {
     var currentPage = IOWA.Elements.Template.selectedPage;
     var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
 
-    IOWA.Elements.Template.mastheadBgClass = bgClass;
+    IOWA.Elements.Template.navBgClass = bgClass;
     var isFadeRipple = (
         IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
         bgClass);
@@ -180,16 +180,21 @@ IOWA.Router = (function() {
    * @param {NodeList} currentPageTemplates Content templates to be rendered.
    * @private
    */
-  function updatePageElements(pageName, currentPageTemplates) {
+  function updatePageElements(pageName, currentPageTemplates, mastheadBgClass) {
     replaceTemplateContent(currentPageTemplates);
     document.body.id = 'page-' + pageName;
     IOWA.Elements.Template.selectedPage = pageName;
-    var pageMeta = IOWA.Elements.Template.pages[pageName];
-    document.title = pageMeta.title || 'Google I/O 2015';
+    document.title = (IOWA.Elements.Template.pages[pageName].title ||
+        'Google I/O 2015');
 
-    var masthead = IOWA.Elements.Masthead;
-    masthead.className = masthead.className.replace(
-        MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
+    IOWA.Elements.Template.navBgClass = mastheadBgClass;
+    // This cannot be updated via data binding, because the masthead
+    // is visible before the binding happens.
+    IOWA.Elements.Masthead.className = IOWA.Elements.Masthead.className.replace(
+        MASTHEAD_BG_CLASS_REGEX, ' ' + mastheadBgClass + ' ');
+    // Hide the masthead ripple before proceeding with page transition.
+    IOWA.PageAnimation.play(
+      IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
 
     setTimeout(function() {
       var animationIn = (
@@ -212,21 +217,13 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-    var masthead = IOWA.Elements.Masthead;
-    masthead.className = masthead.className.replace(
-        MASTHEAD_BG_CLASS_REGEX,
-        ' ' + IOWA.Elements.Template.mastheadBgClass + ' ');
-
-    var bgClass = IOWA.Elements.Template.mastheadBgClass;
-    var rippleColor = IOWA.Elements.Template.rippleColors[bgClass];
-    IOWA.Elements.Ripple.style.backgroundColor = rippleColor;
-
+    var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
     if (!currentPageTransition) {
       var animation = IOWA.PageAnimation.contentSlideOut();
       IOWA.PageAnimation.play(animation, updatePageElements.bind(
-          null, pageName, currentPageTemplates));
+          null, pageName, currentPageTemplates, bgClass));
     } else {
-      updatePageElements(pageName, currentPageTemplates);
+      updatePageElements(pageName, currentPageTemplates, bgClass);
     }
   }
 

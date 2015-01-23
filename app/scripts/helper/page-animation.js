@@ -266,6 +266,8 @@ IOWA.PageAnimation = (function() {
   }
 
   return {
+    elementFadeOut: elementFadeOut,
+    elementFadeIn: elementFadeIn,
     contentSlideOut: contentSlideOut,
     contentSlideIn: contentSlideIn,
     pageSlideIn: pageSlideIn,

@@ -92,6 +92,7 @@ IOWA.Elements = (function() {
       }
     };
     template.mastheadBgClass = template.pages[template.selectedPage];
+    template.navBgClass = template.pages[template.selectedPage];
 
     template.toggleOverlayNav = function() {
       var nav = document.querySelector('.navbar--overlay');
