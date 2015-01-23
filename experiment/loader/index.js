@@ -14,7 +14,7 @@ window.experiment = (function() {
 
   function hasWebGL() {
     var claimsSupport = false;
-    var canvas = createElement('canvas');
+    var canvas = document.createElement('canvas');
 
     if ('supportsContext' in canvas) {
       claimsSupport = canvas.supportsContext('webgl') || canvas.supportsContext('experimental-webgl');
