@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<script src="offsite-globe-namespace.js"></script>
+<script src="webgl-globe-namespace.js"></script>
 <script src="matrix4x4.js"></script>
 <script src="shader-program.js"></script>
 <script src="geometry.js"></script>
@@ -8,11 +8,11 @@
 <!--
 Makes a globe or whatever.
 
-    <offsite-globe></offsite-globe>
+    <webgl-globe></webgl-globe>
 
-@element offsite-globe
+@element webgl-globe
 -->
-<polymer-element name="offsite-globe" attributes="">
+<polymer-element name="webgl-globe" attributes="">
   <template>
     <style>
       :host {
@@ -28,10 +28,10 @@ Makes a globe or whatever.
   <script>
   (function() {
     /* global IOWA */
-    var ShaderProgram = IOWA.OffsiteGlobe.ShaderProgram;
-    var Matrix4x4 = IOWA.OffsiteGlobe.Matrix4x4;
-    var generateGeometry = IOWA.OffsiteGlobe.generateGeometry;
-    var generateIndexArray = IOWA.OffsiteGlobe.generateIndexArray;
+    var ShaderProgram = IOWA.webglGlobe.ShaderProgram;
+    var Matrix4x4 = IOWA.webglGlobe.Matrix4x4;
+    var generateGeometry = IOWA.webglGlobe.generateGeometry;
+    var generateIndexArray = IOWA.webglGlobe.generateIndexArray;
 
     /**
      * Polyfilled performance.now. Only good for relative timing, not absolute.

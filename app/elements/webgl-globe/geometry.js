@@ -7,7 +7,7 @@
  * @param {number} divisions
  * @return {!Float32Array}
  */
-IOWA.OffsiteGlobe.generateGeometry = (function() {
+IOWA.webglGlobe.generateGeometry = (function() {
   'use strict';
 
   // attribute components per vertex
@@ -132,7 +132,7 @@ IOWA.OffsiteGlobe.generateGeometry = (function() {
  * @param {number} divisions
  * @return {!Uint16Array}
  */
-IOWA.OffsiteGlobe.generateIndexArray = function(divisions) {
+IOWA.webglGlobe.generateIndexArray = function(divisions) {
   'use strict';
 
   divisions = Math.max(1, divisions);

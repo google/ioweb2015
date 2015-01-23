@@ -15,4 +15,4 @@
  */
 
 var IOWA = IOWA || {};
-IOWA.OffsiteGlobe = IOWA.OffsiteGlobe || {};
+IOWA.webglGlobe = IOWA.webglGlobe || {};
