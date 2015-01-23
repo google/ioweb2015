@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+.ripple {
+  z-index: -1;
+}
+
 .card__container, .card {
   z-index: 1;
 }
