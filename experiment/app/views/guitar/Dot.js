@@ -143,11 +143,11 @@ module.exports = (function() {
       gridDotUpper.buttonMode = true;
       gridDotUpper.mouseover = function(mouseData){
         gridDotChild.tint = 0x1156B0;
-      }
+      };
 
       gridDotUpper.mouseout = function(mouseData){
         gridDotChild.tint = 0x0d47a0;
-      }
+      };
 
       gridDotUpperWhiteTouch = createDotGraphic(30, 0xffffff);
       gridDotUpperWhiteTouch.scale.x = gridDotUpperWhiteTouch.scale.y = 0.3;
@@ -161,14 +161,14 @@ module.exports = (function() {
           x: 1.25,
           y: 1.25
         });
-      }
+      };
 
       gridDotMiddle.mouseout = function(mouseData) {
         animate.to(gridDotMiddle.scale, 0.1, {
           x: 1,
           y: 1
         });
-      }
+      };
 
       var shadowDotUpper2 = createDotGraphic(10, 0x000000);
       shadowDotUpper2.alpha = 0.09;
@@ -180,8 +180,6 @@ module.exports = (function() {
       gridDot.hitArea = new PIXI.Circle(0, 0, 25);
       gridDot.buttonMode = true;
       gridDot.mousedown = gridDot.touchstart = function( /* data */ ) {
-       // data.originalEvent.preventDefault();
-        // console.log( data.originalEvent.type + " originalEvent" )
         onActivateCallback_(self);
       };
 
