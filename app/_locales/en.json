@@ -59,6 +59,10 @@
     "description": "The month of the Google I/O event",
     "message": "Smarch"
   },
+  "reg-begins": {
+    "description": "When registration begins",
+    "message": "Registration begins March 10 at 9AM PST"
+  },
   "io-description-card": {
     "description": "Description of the event.",
     "message": "I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between."
