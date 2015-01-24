@@ -1,5 +1,6 @@
 {
   "name": "google-io-2015-experiment",
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "app/index.js",
