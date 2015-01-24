@@ -95,16 +95,20 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
+    template.closeOverlayNav = function(e, detail, sender) {
+      this.toggleOverlayNav();
+      this.fire('overlay-navbar-close');
+    };
+
     template.toggleOverlayNav = function() {
       var nav = document.querySelector('.navbar--overlay');
 
-      // If overlay bar is down, stop
+      // If overlay bar is coming down, stop videos and close them.
       if (nav.classList.contains('active')) {
         this.cardVideoTakeover(this.currentCard, true);
       }
 
       nav.classList.toggle('active');
-      this.fire('overlay-navbar-toggle', nav.classList.contains('active'));
     };
 
     /**
