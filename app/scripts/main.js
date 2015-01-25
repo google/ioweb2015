@@ -28,4 +28,12 @@
   //   });
   // }
 
+  // exports.addEventListener('page-transition-done', function(e) {
+  //   // TODO
+  // })
+
+  exports.addEventListener('resize', function() {
+    IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
+  });
+
 })(window);

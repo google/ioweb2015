@@ -211,7 +211,9 @@ IOWA.Router = (function() {
       if (currentPageTransition === 'hero-card-transition') {
         IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverIn());
       } else {
-        IOWA.PageAnimation.play(IOWA.PageAnimation.pageSlideIn());
+        IOWA.PageAnimation.play(IOWA.PageAnimation.pageSlideIn(), function() {
+          IOWA.Elements.Template.fire('page-transition-done');
+        });
       }
       currentPageTransition = '';
     }, 100); // Wait for the... Good question. Maybe template binding?
