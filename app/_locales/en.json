@@ -1,4 +1,8 @@
 {
+  "refresh-site": {
+    "description": "Keep short. Dialog text that comes up when there's an update to the site and the user should refresh the page.",
+    "message": "Please tap or refresh the page for the latest content."
+  },
   "home": {
     "description": "Top navbar single-word link text. Please keep this short. Links back to the site's main page.",
     "message": "Home"

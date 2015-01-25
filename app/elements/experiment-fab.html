@@ -11,13 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<script src="../experiment/js/loader.js"></script>
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/core-icons/social-icons.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/i18n-msg/i18n-msg.html">
+<link rel="import" href="io-icons.html">
 
+<script src="../experiment/js/loader.js"></script>
 <script src="../scripts/helper/util.js"></script>
 
 <!--
@@ -599,19 +599,19 @@ Dialog to share the user's custom experiment/song
       <core-menu>
         <paper-item>
           <a href="//plus.google.com/share?url={{url}}" target="_blank" layout horizontal center>
-            <core-icon class="share-icon" icon="social:post-gplus"></core-icon>
+            <core-icon class="share-icon" icon="io:post-gplus"></core-icon>
             <i18n-msg msgid="gplus-share">Google+</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
           <a href="//twitter.com/intent/tweet?text=Make+music+with+instruments+inspired+by+material+design+for+Google+I/O.+Play,+record+and+share+at:&url={{url}}" target="_blank" layout horizontal center>
-            <core-icon class="share-icon" icon="social:post-twitter"></core-icon>
+            <core-icon class="share-icon" icon="io:post-twitter"></core-icon>
             <i18n-msg msgid-"twitter-share">Twitter</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
           <a href="//www.facebook.com/sharer/sharer.php?u={{url}}" target="_blank" layout horizontal center>
-            <core-icon class="share-icon" icon="social:post-facebook"></core-icon>
+            <core-icon class="share-icon" icon="io:post-facebook"></core-icon>
             <i18n-msg msgid="facebook-share">Facebook</i18n-msg>
           </a>
         </paper-item>
