@@ -85,10 +85,13 @@
       var topCard = IOWA.Elements.Main.querySelector('.card__container.slide-up');
       var bottomCard = IOWA.Elements.Main.querySelector('.pics__section').nextElementSibling;
 
+      var button = IOWA.Elements.Main.querySelector('.photo__about--bottom paper-button');
+      var navOverlay = document.querySelector('.navbar--overlay');
+
       var reverse = opt_reverse || false;
 
       var animationOptions = {
-        duration: 600,
+        duration: 500,
         fill: 'forwards',
         direction: reverse ? 'reverse' : 'normal',
         easing: 'cubic-bezier(0.4,0,0.2,1)'
@@ -97,11 +100,19 @@
       var animation = new AnimationGroup([
         new Animation(topCard, [
           {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(-200px)', opacity: 0}
+          {transform: 'translateY(-100px)', opacity: 0}
         ], animationOptions),
         new Animation(bottomCard, [
           {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(200px)', opacity: 0}
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions),
+        new Animation(navOverlay, [
+          {transform: 'translateY(-100%)'},
+          {transform: 'translateY(0)'}
+        ], animationOptions),
+        new Animation(button, [
+          {opacity: 1, visibility: 'visible'},
+          {opacity: 0, visibility: 'hidden'}
         ], animationOptions)
       ]);
 
@@ -117,7 +128,6 @@
       page.hasBeenLoaded = true;
 
       IOWA.Elements.Template.closePhotoGallery = function(e, detail, sender) {
-        this.toggleOverlayNav();
         runPhotoGalleryAnimation(true);
 
         history.replaceState({}, null, location.pathname); // Remove #photos hash from URL.
@@ -140,8 +150,6 @@
           runPhotoGalleryAnimation(true); // reverse animation if gallery is open.
           page.galleryOpen = false;
         }
-
-        this.toggleOverlayNav();
       };
     }
 
