@@ -28,6 +28,9 @@
   //   });
   // }
 
+  // Pages that care to know when the page transitions are final should listen
+  // for the page-transition-done event. It's the responsibility of the subpage
+  // to  not add multiple listeners for this event on subsequent navigations.
   // exports.addEventListener('page-transition-done', function(e) {
   //   // TODO
   // })

@@ -22,6 +22,7 @@ IOWA.Elements = (function() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function() {
       IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender(), function() {
+        // Fire event when the page transitions are final.
         IOWA.Elements.Template.fire('page-transition-done');
       });
     });
