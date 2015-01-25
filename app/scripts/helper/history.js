@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Google Inc. All rights reserved.
+ * Copyright 2015 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 /**
  * @fileOverview History management for IOWA project.
  *
- * Triggers 'popstate' event on pushstate method call. IOWA app performs 
- * all navigation off history state changes. Having the same event on pop and 
+ * Triggers 'popstate' event on pushstate method call. IOWA app performs
+ * all navigation off history state changes. Having the same event on pop and
  * push states allow to have uniform behavior on forward and back navigation.
  */
 IOWA.History = (function(exports) {
@@ -30,7 +30,7 @@ IOWA.History = (function(exports) {
       history.onpushstate({state: state});
     }
     pushState.apply(history, [state, title, url]);
-    
+
     var evt = new Event('popstate');
     evt.state = state;
     exports.dispatchEvent(evt);
