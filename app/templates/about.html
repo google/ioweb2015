@@ -22,7 +22,7 @@
       <div class="card-content">
         <h2><i18n-msg msgid="about-io">Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</i18n-msg></h2>
       </div>
-      <div class="card-content card-content--paper">
+      <div class="card-content">
         <a href="#" data-track-link="about-view-photos-card" on-click="{{togglePhotoGallery}}">
           <i18n-msg msgid="see-photos-2014">See photos from I/O 2014</i18n-msg>
         </a>
@@ -81,14 +81,6 @@
   <script>
   (function() {
 
-    var SCROLL_GALLERY_OFFSET_Y = 25;
-
-    function scrollToGallery(opt_topPadding) {
-      var el = document.querySelector('.pics__section');
-      var padding = opt_topPadding || 0;
-      IOWA.Elements.ScrollContainer.scrollTop = el.offsetTop - padding;
-    }
-
     function runPhotoGalleryAnimation(opt_reverse, opt_callback) {
       var topCard = IOWA.Elements.Main.querySelector('.card__container.slide-up');
       var bottomCard = IOWA.Elements.Main.querySelector('.pics__section').nextElementSibling;
@@ -128,20 +120,20 @@
         this.toggleOverlayNav();
         runPhotoGalleryAnimation(true);
 
+        history.replaceState({}, null, location.pathname); // Remove #photos hash from URL.
+
         var page = this.pages[this.selectedPage];
         page.galleryOpen = false;
       };
 
       IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
-        e.preventDefault();
+        e && e.preventDefault();
 
         var page = this.pages[this.selectedPage];
 
         if (!page.galleryOpen) {
-          IOWA.Util.smoothScroll(
-              IOWA.Elements.Main.querySelector('.pics__section'), 400);
-
-          // scrollToGallery(SCROLL_GALLERY_OFFSET_Y);
+          var destEl = IOWA.Elements.Main.querySelector('.pics__section');
+          IOWA.Util.smoothScroll(destEl, 400);
           runPhotoGalleryAnimation(); // reverse animation if gallery is open.
           page.galleryOpen = true;
         } else {
@@ -160,7 +152,7 @@
       // TODO(ericbidelman): wait until page transition is done before scrolling to element.
       // For now, arbitrary delay.
       setTimeout(function() {
-        scrollToGallery(SCROLL_GALLERY_OFFSET_Y);
+        IOWA.Elements.Template.togglePhotoGallery();
       }, 100);
     }
 
