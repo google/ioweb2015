@@ -281,7 +281,7 @@ with the attribute `iologodestination`.
 
       player.onfinish = function(e) {
         var el = this.parentElement;
-        this.fire('finish');
+        this.fire('io-logo-animation-done');
         el.parentElement.removeChild(el);
       }.bind(this);
     }
