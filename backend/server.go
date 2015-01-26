@@ -26,8 +26,8 @@ var (
 	appEnv string
 )
 
-// main is the entry point of the standalone server.
-func main() {
+// init runs before main.
+func init() {
 	appEnv = os.Getenv("APP_ENV")
 	if appEnv == "" {
 		appEnv = "dev"
@@ -36,14 +36,24 @@ func main() {
 	flag.StringVar(&listenAddr, "listen", listenAddr, "address to listen on")
 	flag.StringVar(&httpPrefix, "prefix", httpPrefix, "URL path prefix to serve from")
 	flag.StringVar(&appEnv, "env", appEnv, "app environment: dev, stage or prod")
-	flag.Parse()
 
+	wrapHandler = logHandler
+}
+
+// main is the entry point of the standalone server.
+func main() {
+	flag.Parse()
 	if httpPrefix == "" || httpPrefix[0] != '/' {
 		httpPrefix = "/" + httpPrefix
 	}
 
 	cache = newMemoryCache()
-	registerHandlers()
+	handle("/", catchAllHandler)
+	handle("/api/extended", serveIOExtEntries)
+	// setup root redirect if we're prefixed
+	if httpPrefix != "/" {
+		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
+	}
 
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
@@ -71,8 +81,7 @@ func catchAllHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, p)
 }
 
-// logHandlers wraps handler h into a closure that logs
-// incoming requests and passes it on to the h.
+// logHandler logs each request before handing it over to the handler h.
 func logHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s", r.Method, r.URL.Path)

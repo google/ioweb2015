@@ -10,25 +10,32 @@ import (
 	"strings"
 )
 
-func registerHandlers() {
-	handle("/", catchAllHandler)
-	handle("/api/extended", serveIOExtEntries)
-	// setup root redirect if we're prefixed
-	if httpPrefix != "/" {
-		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
+// wrapHandler is the last in a handler chain call,
+// which wraps all app handlers.
+// A variable so that GAE and standalone can have different wrappers.
+var wrapHandler func(http.Handler) http.Handler
+
+// handle registers a handle function fn for the pattern prefixed
+// with httpPrefix.
+func handle(pattern string, fn func(w http.ResponseWriter, r *http.Request)) {
+	p := path.Join(httpPrefix, pattern)
+	if pattern[len(pattern)-1] == '/' {
+		p += "/"
 	}
+	http.Handle(p, handler(fn))
 }
 
+// handler creates a new func from fn with stripped prefix
+// and wrapped with wrapHandler.
 func handler(fn func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	var h http.Handler = http.HandlerFunc(fn)
 	if httpPrefix != "/" {
 		h = http.StripPrefix(httpPrefix, h)
 	}
-	return logHandler(h)
-}
-
-func handle(pattern string, fn func(w http.ResponseWriter, r *http.Request)) {
-	http.Handle(path.Join(httpPrefix, pattern), handler(fn))
+	if wrapHandler != nil {
+		h = wrapHandler(h)
+	}
+	return h
 }
 
 // serveTemplate responds with text/html content of the executed template
