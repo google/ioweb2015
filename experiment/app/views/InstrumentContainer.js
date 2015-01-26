@@ -227,6 +227,7 @@ module.exports = (function() {
     function onCountdownActivate() {
       backIconContainer.interactive = false;
       backIconContainer.alpha = 0;
+      document.removeEventListener('keyup', onGlobalKeyUp);
     }
 
     /**
@@ -246,6 +247,7 @@ module.exports = (function() {
         instrumentView.stopRecording();
         backIconContainer.interactive = true;
         backIconContainer.alpha = 1;
+        document.addEventListener('keyup', onGlobalKeyUp);
       }
 
       logRecorded();
