@@ -998,27 +998,26 @@ Main parent container for all of the fab elements.
       },
 
       exitExperiment: function(event) {
-
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
 
         var rect = this.getBoundingClientRect();
         var top = rect.top + (rect.height / 2);
         var left = rect.left + (rect.width / 2);
-        this.app.tearDown([left, top]);
+
+        this.app.tearDown([left, top]).then(function() {
+          this.fixed = 'unfixed';
+        }.bind(this));
 
         this.mode = 'pre';
         this.playmode = 'playing';
         this.miniFabs = false;
         this.showTooltips = false;
         this.pauseOverlay = false;
-
-        this.async(function() {
-          this.fixed = 'unfixed';
-        }, null, 1500);
       },
 
       resetExperiment: function(event) {
         console.log('This should reset the experiment');
+        this.app.reloadData();
       },
 
       onScroll: function(event) {
