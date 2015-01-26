@@ -36,7 +36,6 @@ module.exports = (function() {
   var circleTexture = circleGraphics.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
 
   return function RecordButton(audioManager) {
-
     var startBeat;
     var internalStartBeat;
     var prevWholeNumber;
@@ -54,7 +53,7 @@ module.exports = (function() {
 
     var container = new PIXI.DisplayObjectContainer();
 
-    container.interactive = true;
+    container.interactive = false;
     container.buttonMode = true;
 
     var circle = new PIXI.Sprite(circleTexture);
@@ -189,8 +188,10 @@ module.exports = (function() {
      * Add event listeners.
      */
     function addEventListeners() {
+      container.interactive = true;
+
       container.click = container.tap = function() {
-        if(!isCountdown) {
+        if (!isCountdown) {
           startBeat = timeToFirstBeat();
           internalStartBeat = timeToFirstBeat();
           prevWholeNumber = timeToFirstBeat();
@@ -204,6 +205,7 @@ module.exports = (function() {
      * Remove event listeners.
      */
     function removeEventListeners() {
+      container.interactive = false;
       container.click = container.tap = null;
     }
 

@@ -61,7 +61,8 @@ module.exports = (function() {
       removeEventListeners,
       onActivate,
       setPosition,
-      showCollision
+      showCollision,
+      tearDown
     };
 
     var physicsBody = addToPhysics();
@@ -124,6 +125,15 @@ module.exports = (function() {
       container.mousedown = container.touchstart = null;
       container.mouseup = container.mouseupoutside = container.touchend = container.touchendoutside = null;
       container.mousemove = container.touchmove = null;
+    }
+
+    /**
+     * Cleanup.
+     */
+    function tearDown() {
+      physicsWorld.removeBody(physicsBody);
+      removeEventListeners();
+      onActivationCallback = null;
     }
 
     /**

@@ -31,7 +31,8 @@ module.exports = function Experiment() {
     pause,
     play,
     didEnterRecordingMode,
-    didExitRecordingMode
+    didExitRecordingMode,
+    reloadData
   };
 
   /**
@@ -141,6 +142,7 @@ module.exports = function Experiment() {
   /**
    * Shut down the experiment.
    * @param {array<number>} fromPos - The origin point of the transition in (FAB).
+   * @return {Promise}
    */
   function tearDown(fromPos = [0,0]) {
     // Stop sound engine.
@@ -149,7 +151,7 @@ module.exports = function Experiment() {
     });
 
     // Animate transition out.
-    rootView.animateOut(fromPos).then(function() {
+    return rootView.animateOut(fromPos).then(function() {
       // Remove DOM nodes.
       rootView.cleanUp();
     });
@@ -183,6 +185,13 @@ module.exports = function Experiment() {
    */
   function didExitRecordingMode(cb) {
     rootView.didExitRecordingMode(cb);
+  }
+
+  /**
+   * Reload the global state.
+   */
+  function reloadData() {
+    rootView.reloadData();
   }
 
   return self;

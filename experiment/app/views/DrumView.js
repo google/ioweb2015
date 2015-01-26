@@ -31,7 +31,7 @@ module.exports = (function() {
     const DRUM_TAG = audioManager.addTag(VIEW_NAME);
     const CHANNEL = audioManager.channels.create(0.6);
 
-    var drums;
+    var drums = [];
     var drumLookup = {};
 
     var groundT;
@@ -169,13 +169,25 @@ module.exports = (function() {
      * @param {Model} d - The drum data.
      */
     function loadData(d) {
+      if (currentTrack) {
+        audioManager.removeTrack(currentTrack);
+      }
+
+      for (let i = 0; i < drums.length; i++) {
+        drums[i].tearDown();
+
+        foreground.removeChild(drums[i].container);
+        background.removeChild(drums[i].hitCircleContainer);
+        delete drumLookup[drums[i].pid];
+      }
+
       data = d;
 
       currentTrack = audioManager.createRecordedTrack(
-          data.recorded,
-          CHANNEL,
-          DRUM_TAG
-          );
+        data.recorded,
+        CHANNEL,
+        DRUM_TAG
+      );
 
       audioManager.addTrack(currentTrack);
 
