@@ -101,10 +101,10 @@ module.exports = (function() {
       renderer.updateTexture(recordIconImage.texture.baseTexture);
       renderer.updateTexture(recordCircle.texture.baseTexture);
       renderer.updateTexture(checkboxCircle.texture.baseTexture);
-      for (let i = 0; i < recordText.length; i++) {
+      for (let i = 0; i <= recordText.length; i++) {
         renderer.updateTexture(recordText[i].texture.baseTexture);
       }
-      for (let i = 0; i < recordNumbers.length; i++) {
+      for (let i = 0; i <= recordNumbers.length; i++) {
         renderer.updateTexture(recordNumbers[i].texture.baseTexture);
       }
 
