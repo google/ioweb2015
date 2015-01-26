@@ -132,6 +132,7 @@ module.exports = (function() {
       clearCircle,
       resetRecord,
       container,
+      onCountdownActivate,
       onRecordActivate,
       onRecordDeactivate,
       recordIcon,
@@ -165,6 +166,16 @@ module.exports = (function() {
     function timeToFirstBeat() {
       var beats = sequencer.loopLength() - currentBeat;
       return beats * sequencer.beatLength();
+    }
+
+    var onCountdownActivateCallback;
+
+    /**
+     * When countdown activated, pass the callback to the function.
+     * @param {function} cb - The callback to run.
+     */
+    function onCountdownActivate(cb) {
+      onCountdownActivateCallback = cb;
     }
 
     /**
@@ -270,6 +281,7 @@ module.exports = (function() {
      * Set up the countdown circle
      */
     function setupCountdown() {
+      onCountdownActivateCallback(self);
       isCountdown = true;
       startedCountingTime = 0;
       animate.fromTo(recordIcon.scale, 0.4, {

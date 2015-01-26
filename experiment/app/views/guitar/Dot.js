@@ -141,11 +141,11 @@ module.exports = (function() {
       gridDotUpper = createDotGraphic(25, 0x536dfd);
       gridDotUpper.alpha = 0;
       gridDotUpper.buttonMode = true;
-      gridDotUpper.mouseover = function(mouseData){
+      gridDotUpper.mouseover = function(){
         gridDotChild.tint = 0x1156B0;
       };
 
-      gridDotUpper.mouseout = function(mouseData){
+      gridDotUpper.mouseout = function(){
         gridDotChild.tint = 0x0d47a0;
       };
 
@@ -156,14 +156,14 @@ module.exports = (function() {
       gridDotMiddle = createDotGraphic(10, 0x536dfd);
       gridDotMiddle.alpha = 0;
       gridDotMiddle.buttonMode = true;
-      gridDotMiddle.mouseover = function(mouseData) {
+      gridDotMiddle.mouseover = function() {
         animate.to(gridDotMiddle.scale, 0.1, {
           x: 1.25,
           y: 1.25
         });
       };
 
-      gridDotMiddle.mouseout = function(mouseData) {
+      gridDotMiddle.mouseout = function() {
         animate.to(gridDotMiddle.scale, 0.1, {
           x: 1,
           y: 1

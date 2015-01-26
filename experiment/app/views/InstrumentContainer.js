@@ -137,12 +137,13 @@ module.exports = (function() {
       backIconContainer.addChild(backIcon);
       backIconContainer.alpha = 0;
 
-      recordButton = new RecordButton(audioManager, 10, 4);
+      recordButton = new RecordButton(audioManager);
       recordButton.container.position.x = window.innerWidth - 62;
       recordButton.container.position.y = 56;
       recordButton.container.pivot.set(28,28);
       recordButton.container.scale.x = 0;
       recordButton.container.scale.y = 0;
+      recordButton.onCountdownActivate(onCountdownActivate);
       recordButton.onRecordActivate(onRecordActivate);
       recordButton.onRecordDeactivate(onRecordDeactivate);
 
@@ -172,10 +173,9 @@ module.exports = (function() {
 
     /**
      * Animate the controls in.
-     * @param {number} delay - Animation delay.
      * @return {Promise}
      */
-    function showControls(delay) {
+    function showControls() {
       stage.addChild(controls);
 
       backIconContainer.interactive = true;
@@ -222,6 +222,14 @@ module.exports = (function() {
     }
 
     /**
+     * Activate countdown
+     */
+    function onCountdownActivate() {
+      backIconContainer.interactive = false;
+      backIconContainer.alpha = 0;
+    }
+
+    /**
      * Activate record button
      */
     function onRecordActivate() {
@@ -236,6 +244,8 @@ module.exports = (function() {
     function onRecordDeactivate() {
       if ('function' === typeof instrumentView.stopRecording) {
         instrumentView.stopRecording();
+        backIconContainer.interactive = true;
+        backIconContainer.alpha = 1;
       }
 
       logRecorded();
