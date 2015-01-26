@@ -9,12 +9,12 @@
 {% define "content" %}
 <!-- {{ {active: pages[selectedPage].galleryOpen} | tokenList }} -->
   <core-toolbar class="navbar--overlay" fit>
-    <paper-icon-button icon="arrow-back" on-tap="{{closePhotoGallery}}"></paper-icon-button>
+    <paper-icon-button icon="arrow-back" on-tap="{{closePhotoGallery}}" aria-label="Close gallery"></paper-icon-button>
     <span flex><i18n-msg msgid="io-in-photos">I/O in Photos</i18n-msg></span>
   </core-toolbar>
 
   <core-toolbar class="navbar--overlay" fit>
-    <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}"></paper-icon-button>
+    <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video"></paper-icon-button>
   </core-toolbar>
 
   <div class="card__container slide-up">
