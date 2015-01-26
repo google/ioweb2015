@@ -283,7 +283,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       }
     </style>
 
-    <div class="dialog-content">
+    <div id="dialogcontent" class="dialog-content">
       <template if="{{supported}}">
 
         <h4><i18n-msg msgid="headphones-on">Chrome Experiment ahead</i18n-msg></h4>
@@ -352,6 +352,10 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
 
       get componentDir() {
         return IOWA.Util.getStaticBaseURL();
+      },
+
+      ready: function() {
+        this.$.dialogcontent.style.backgroundImage = 'url(' + this.componentDir + 'images/headphones-on.png)';
       },
 
       onExperimentOff: function() {
@@ -787,7 +791,7 @@ Main parent container for all of the fab elements.
 @element experiment-fab-container
 @blurb Main parent container for all of the fab elements.
 -->
-<polymer-element name="experiment-fab-container" attributes="mini mode playmode fixed">
+<polymer-element name="experiment-fab-container" attributes="mini mode playmode fixed" aria-label="Try the Chrome experiment">
   <template>
     <style>
       :host {
