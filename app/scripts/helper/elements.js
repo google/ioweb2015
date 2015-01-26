@@ -103,14 +103,14 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
-    template.toggleOverlayNav = function() {
-      var nav = document.querySelector('.navbar--overlay');
+    template.toggleVideoOverlayNav = function() {
+      var nav = document.querySelector('.navbar__overlay--video');
       nav.classList.toggle('active');
     };
 
     template.closeVideoCard = function(e, detail, sender) {
       this.cardVideoTakeover(this.currentCard, true);
-      this.toggleOverlayNav();
+      this.toggleVideoOverlayNav();
     };
 
     /**
@@ -210,7 +210,7 @@ IOWA.Elements = (function() {
               thumbnail.classList.add('fadeout');
             }
 
-            this.toggleOverlayNav(); // Drop down back button control.
+            this.toggleVideoOverlayNav(); // Drop down back button control.
           }
 
         }.bind(this);

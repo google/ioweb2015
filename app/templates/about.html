@@ -8,12 +8,12 @@
 
 {% define "content" %}
 <!-- {{ {active: pages[selectedPage].galleryOpen} | tokenList }} -->
-  <core-toolbar class="navbar--overlay" fit>
+  <core-toolbar class="navbar__overlay navbar__overlay--gallery" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closePhotoGallery}}" aria-label="Close gallery"></paper-icon-button>
     <span flex><i18n-msg msgid="io-in-photos">I/O in Photos</i18n-msg></span>
   </core-toolbar>
 
-  <core-toolbar class="navbar--overlay" fit>
+  <core-toolbar class="navbar__overlay navbar__overlay--video" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video"></paper-icon-button>
   </core-toolbar>
 
@@ -86,7 +86,7 @@
       var bottomCard = IOWA.Elements.Main.querySelector('.pics__section').nextElementSibling;
 
       var button = IOWA.Elements.Main.querySelector('.photo__about--bottom paper-button');
-      var navOverlay = document.querySelector('.navbar--overlay');
+      var navOverlay = document.querySelector('.navbar__overlay--gallery');
 
       var reverse = opt_reverse || false;
 
