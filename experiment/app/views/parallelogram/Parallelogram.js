@@ -58,7 +58,8 @@ module.exports = (function() {
       addEventListeners,
       removeEventListeners,
       setSize,
-      setPosition
+      setPosition,
+      tearDown
     };
 
     var onActivateCallback;
@@ -168,6 +169,15 @@ module.exports = (function() {
 
       document.removeEventListener('keydown', onParallelogramsKeyDown);
       document.removeEventListener('keyup', onParallelogramsKeyUp);
+    }
+
+    /**
+     * Clean up.
+     */
+    function tearDown() {
+      removeEventListeners();
+      onActivateCallback = null;
+      onDeactivateCallback = null;
     }
 
     var scale = {

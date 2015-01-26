@@ -101,6 +101,10 @@ module.exports = (function() {
      * @param {Model} d - The new data model.
      */
     function loadData(d) {
+      if (currentTrack) {
+        audioManager.removeTrack(currentTrack);
+      }
+
       data = d;
 
       currentTrack = audioManager.createRecordedTrack(

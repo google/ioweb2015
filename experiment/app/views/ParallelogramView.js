@@ -112,6 +112,17 @@ module.exports = (function() {
      * @param {Model} d - The parallelogram data.
      */
     function loadData(d) {
+      if (currentTrack) {
+        audioManager.removeTrack(currentTrack);
+      }
+
+      for (let i = 0; i < parallelograms.length; i++) {
+        displayContainerCenter.removeChild(parallelograms[i].container);
+        parallelograms[i].tearDown();
+      }
+
+      parallelograms.length = 0;
+
       data = d;
 
       for (let i = 0; i < data.parallelograms.length; i++) {

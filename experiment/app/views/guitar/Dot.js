@@ -39,7 +39,8 @@ module.exports = (function() {
       removeEventListeners,
       getString: () => guitarString,
       setString,
-      getPosition: () => position
+      getPosition: () => position,
+      tearDown
     };
 
     /**
@@ -99,6 +100,14 @@ module.exports = (function() {
       isListening = false;
 
       gridDot.interactive = false;
+    }
+
+    /**
+     * Cleanup.
+     */
+    function tearDown() {
+      removeEventListeners();
+      onActivateCallback_ = null;
     }
 
     /**
