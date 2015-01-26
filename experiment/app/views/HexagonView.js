@@ -324,9 +324,8 @@ module.exports = (function() {
 
     /**
      * Render loop.
-     * @param {number} delta - The animation delta.
      */
-    function render(delta) {
+    function render() {
       // no-op, all animations handled by tweens
     }
 

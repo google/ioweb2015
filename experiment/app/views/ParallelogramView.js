@@ -286,9 +286,8 @@ module.exports = (function() {
 
     /**
      * Render the expanded parallelograms state.
-     * @param {number} delta - The delta.
      */
-    function render(delta) {
+    function render() {
       // no-op
     }
 

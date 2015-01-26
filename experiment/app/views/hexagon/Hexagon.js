@@ -101,11 +101,11 @@ module.exports = (function() {
         onActivateCallback(cube);
       };
 
-      container.mouseover = function(mouseData){
+      container.mouseover = function(){
         background.tint = 0xC44441;
       };
 
-      container.mouseout = function(mouseData){
+      container.mouseout = function(){
         background.tint = color;
       };
     }

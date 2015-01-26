@@ -143,13 +143,13 @@ module.exports = (function() {
         onDeactivateCallback(self);
       };
 
-      parallelogram.mouseover = function(mouseData){
+      parallelogram.mouseover = function(){
         parallelogram.tint = hoverColor;
-      }
+      };
 
-      parallelogram.mouseout = function(mouseData){
+      parallelogram.mouseout = function(){
         parallelogram.tint = color;
-      }
+      };
 
       document.addEventListener('keydown', onParallelogramsKeyDown);
       document.addEventListener('keyup', onParallelogramsKeyUp);

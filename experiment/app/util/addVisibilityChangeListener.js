@@ -14,13 +14,13 @@ module.exports = function addVisibilityChangeListener(start, stop) {
   if (hiddenProp) {
     var eventName = hiddenProp.replace(/hidden/, '') + 'visibilitychange';
 
-    function onVisibilityChange() {
+    var onVisibilityChange = function() {
       if (document[hiddenProp]) {
         stop();
       } else {
         start();
       }
-    }
+    };
 
     // Pause on tab change
     document.addEventListener(eventName, onVisibilityChange, false);
