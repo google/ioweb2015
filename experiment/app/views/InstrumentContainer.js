@@ -226,7 +226,9 @@ module.exports = (function() {
      */
     function onCountdownActivate() {
       backIconContainer.interactive = false;
-      backIconContainer.alpha = 0;
+      animate.to(backIconContainer, 0.33, {
+        alpha: 0
+      });
       document.removeEventListener('keyup', onGlobalKeyUp);
     }
 
@@ -246,7 +248,9 @@ module.exports = (function() {
       if ('function' === typeof instrumentView.stopRecording) {
         instrumentView.stopRecording();
         backIconContainer.interactive = true;
-        backIconContainer.alpha = 1;
+        animate.to(backIconContainer, 0.33, {
+          alpha: 1
+        });
         document.addEventListener('keyup', onGlobalKeyUp);
       }
 
