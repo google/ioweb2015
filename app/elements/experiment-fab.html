@@ -978,12 +978,10 @@ Main parent container for all of the fab elements.
           var left = rect.left + (rect.width / 2);
           this.app.start('.js-experiment-instrument', '.js-experiment-visualizer', [left, top]);
           IOWA.Elements.ScrollContainer.addEventListener('scroll', this.boundOnScroll);
-        }, null, 300);
 
-        this.async(function() {
           this.playmode = 'playing';
           this.mode = 'active';
-        }, null, 2500);
+        }, null, 300);
 
         this.app.didEnterRecordingMode(function() {
           this.recording = true;
