@@ -616,7 +616,7 @@ Dialog to share the user's custom experiment/song
         </paper-item>
         <paper-item class="share-url" noink on-tap="{{linkSelect}}">
           <core-icon class="share-icon" icon="link"></core-icon>
-          <input id="urlInput" value="{{plainURL}}" readonly>
+          <input id="urlInput" value="{{plainURL}}" on-tap="{{linkSelect}}" readonly>
         </paper-item>
       </core-menu>
 
@@ -637,7 +637,8 @@ Dialog to share the user's custom experiment/song
         }
       },
       linkSelect: function() {
-        this.$.urlInput.select();
+        this.$.urlInput.selectionStart = 0;
+        this.$.urlInput.selectionEnd = this.$.urlInput.value.length;
       },
 
       shareOff: function() {
@@ -1063,11 +1064,6 @@ Main parent container for all of the fab elements.
       onShareClick: function(event) {
         this.shareVisible = true;
         this.showTooltips = false;
-
-        this.app.serialize().then(function(url) {
-          this.unencodedURL = url;
-          this.shareURL = encodeURIComponent(url);
-        }.bind(this));
       },
 
       onShareCancel: function(event) {
@@ -1081,6 +1077,10 @@ Main parent container for all of the fab elements.
         this.miniFabs = true;
         this.showTooltips = true;
         this.app.pause();
+        this.app.serialize().then(function(url) {
+          this.unencodedURL = url;
+          this.shareURL = encodeURIComponent(url);
+        }.bind(this));
       },
 
       pausedFabClick: function(event) {
