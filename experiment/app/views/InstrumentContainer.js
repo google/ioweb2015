@@ -96,23 +96,6 @@ module.exports = (function() {
 
       stage.addChild(displayContainer);
 
-      // fixes for black graphic squares in 5th webGL container
-      var recordIconImage = recordButton.recordIcon;
-      var recordCircle = recordButton.circle;
-      var checkboxCircle = recordButton.checkmarkCircle;
-      var recordText = recordButton.textImages;
-      var recordNumbers = recordButton.numberImagePixiObjects;
-      renderer.updateTexture(backIcon.texture.baseTexture);
-      renderer.updateTexture(recordIconImage.texture.baseTexture);
-      renderer.updateTexture(recordCircle.texture.baseTexture);
-      renderer.updateTexture(checkboxCircle.texture.baseTexture);
-      for (let i = 0; i < recordText.length; i++) {
-        renderer.updateTexture(recordText[i].texture.baseTexture);
-      }
-      for (let i = 0; i < recordNumbers.length; i++) {
-        renderer.updateTexture(recordNumbers[i].texture.baseTexture);
-      }
-
       instrumentView.init(stage, pid, displayContainerCenter);
 
       // If Debug
@@ -125,6 +108,25 @@ module.exports = (function() {
       addContractedEventListeners();
 
       isReady = true;
+
+      setTimeout(function() {
+        // fixes for black graphic squares in 5th webGL container
+        var recordIconImage = recordButton.recordIcon;
+        var recordCircle = recordButton.circle;
+        var checkboxCircle = recordButton.checkmarkCircle;
+        var recordText = recordButton.textImages;
+        var recordNumbers = recordButton.numberImagePixiObjects;
+        renderer.updateTexture(backIcon.texture.baseTexture);
+        renderer.updateTexture(recordIconImage.texture.baseTexture);
+        renderer.updateTexture(recordCircle.texture.baseTexture);
+        renderer.updateTexture(checkboxCircle.texture.baseTexture);
+        for (let i = 0; i < recordText.length; i++) {
+          renderer.updateTexture(recordText[i].texture.baseTexture);
+        }
+        for (let i = 0; i < recordNumbers.length; i++) {
+          renderer.updateTexture(recordNumbers[i].texture.baseTexture);
+        }
+      }, 50);
     }
 
     /**
