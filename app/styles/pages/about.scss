@@ -23,8 +23,6 @@ $name: 'page-about';
 
 ##{$name} {
 
-$borderWidth: 3px;
-
 .masthead {
   h1 {
     color: #fff;
@@ -61,12 +59,9 @@ main {
     position: absolute;
     left: 0;
     width: 100%;
-    border-top: $borderWidth solid white;
 
     .photo__about {
       background-image: url(../images/about/Image-04.jpg);
-      border-right-width: 0;
-      border-left-width: $borderWidth;
     }
   }
 }
