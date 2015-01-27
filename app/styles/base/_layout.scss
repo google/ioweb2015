@@ -17,9 +17,10 @@
 $mobileKeyline: 16px;
 $tabletKeyline: 24px;
 $desktopKeyline: 32px;
+$largeKeyline: 72px;
 
 @mixin keyline-72l() {
-	padding-left: 72px;
+	padding-left: $largeKeyline;
 }
 
 @mixin keyline-24l() {
@@ -31,7 +32,7 @@ $desktopKeyline: 32px;
 }
 
 @mixin keyline-72() {
-	padding: 0 72px 0 72px;
+	padding: 0 $largeKeyline 0 $largeKeyline;
 }
 
 @mixin keyline-32() {

@@ -27,8 +27,8 @@ $icon-margin: 10px;
 
 .card__photo--stage {
   height: 310px;
-  background-image: url(../images/offsite/stage-750.jpg);
-  background-position: 0 50%;
+  background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url(../images/offsite/stage-887@2x.jpg);
+  background-position: 50% 50%;
   background-size: cover;
   background-repeat: no-repeat;
 }
@@ -122,12 +122,6 @@ $icon-margin: 10px;
   .card__photo--stage {
     margin-top: -57px;
     margin-bottom: -176px;
-  }
-}
-
-@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-  .card__photo--stage  {
-    background-image: url(../images/offsite/stage-750@2x.jpg);
   }
 }
 

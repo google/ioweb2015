@@ -75,23 +75,18 @@ main {
   background-image: url(../images/about/Image-01.jpg);
   background-position: 50% 0;
   background-size: cover;
-  border: 0 solid white;
-  border-right-width: $borderWidth;
 }
 
 .photo__about--top {
   background-image: url(../images/about/Image-02.jpg);
   background-position: 50% 0;
   background-size: cover;
-  border: 0 solid white;
-  border-bottom-width: $borderWidth;
 }
 
 .photo__about--bottom {
   background-image: url(../images/about/Image-03.jpg);
   background-position: 50% 0;
   background-size: cover;
-  border: 0 solid white;
   position: relative;
 }
 

@@ -37,8 +37,9 @@
 
 .masthead {
   position: relative;
-  min-height: 420px;
-  height: 66vh; // ~2/3 viewport height
+  // min-height: 420px;
+  min-height: 360px;
+  // height: 66vh; // ~2/3 viewport height
   max-height: 550px;
 
   &.bg-medium-grey {
@@ -122,7 +123,7 @@ core-drawer-panel {
     flex: none !important;
 
     a {
-      font-size: 12px;
+      font-size: 13px;
       color: inherit;
     }
   }
