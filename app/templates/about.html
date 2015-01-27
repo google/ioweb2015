@@ -7,7 +7,6 @@
 {% end %}
 
 {% define "content" %}
-<!-- {{ {active: pages[selectedPage].galleryOpen} | tokenList }} -->
   <core-toolbar class="navbar__overlay navbar__overlay--gallery" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closePhotoGallery}}" aria-label="Close gallery"></paper-icon-button>
     <span flex><i18n-msg msgid="io-in-photos">I/O in Photos</i18n-msg></span>
@@ -16,6 +15,8 @@
   <core-toolbar class="navbar__overlay navbar__overlay--video" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video"></paper-icon-button>
   </core-toolbar>
+
+  <io-gallery hidden?="{{!photoGalleryActive}}" fit></io-gallery>
 
   <div class="card__container slide-up">
     <div class="card js-experiment-visualizer">
@@ -90,8 +91,10 @@
 
       var reverse = opt_reverse || false;
 
+      var ANIMATION_DURATION = 500;
+
       var animationOptions = {
-        duration: 500,
+        duration: ANIMATION_DURATION,
         fill: 'forwards',
         direction: reverse ? 'reverse' : 'normal',
         easing: 'cubic-bezier(0.4,0,0.2,1)'
@@ -111,12 +114,31 @@
           {transform: 'translateY(0)'}
         ], animationOptions),
         new Animation(button, [
-          {opacity: 1, visibility: 'visible'},
-          {opacity: 0, visibility: 'hidden'}
+          {opacity: 1},
+          {opacity: 0}
         ], animationOptions)
       ]);
 
-      IOWA.PageAnimation.play(animation, opt_callback);
+      var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+      var galleryAnimation = new Animation(gallery, [
+        {opacity: 0}, {opacity: 1}
+      ], {
+        duration: ANIMATION_DURATION,
+        fill: 'forwards',
+        easing: 'cubic-bezier(0.4,0,0.2,1)',
+        direction: reverse ? 'reverse' : 'normal'
+      });
+
+      if (reverse) {
+        // Fade out gallery and slide back in page sections at the same time.
+        IOWA.PageAnimation.play(galleryAnimation);
+        IOWA.PageAnimation.play(animation, opt_callback);
+      } else {
+        // Slide out page sections, then fade in gallery.
+        IOWA.PageAnimation.play(animation, function() {
+          IOWA.PageAnimation.play(galleryAnimation, opt_callback);
+        });
+      }
     }
 
     // Page-specific JS that runs when this page is loaded for the first time.
@@ -128,27 +150,36 @@
       page.hasBeenLoaded = true;
 
       IOWA.Elements.Template.closePhotoGallery = function(e, detail, sender) {
-        runPhotoGalleryAnimation(true);
+
+        runPhotoGalleryAnimation(true, function() {
+          IOWA.Elements.Template.photoGalleryActive = false;
+        });
 
         history.replaceState({}, null, location.pathname); // Remove #photos hash from URL.
-
-        var page = this.pages[this.selectedPage];
-        page.galleryOpen = false;
       };
 
       IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
         e && e.preventDefault();
 
-        var page = this.pages[this.selectedPage];
+        var template = IOWA.Elements.Template;
 
-        if (!page.galleryOpen) {
+        if (!template.photoGalleryActive) {
+          // Smooth to gallery section.
           var destEl = IOWA.Elements.Main.querySelector('.pics__section');
           IOWA.Util.smoothScroll(destEl, 400);
-          runPhotoGalleryAnimation(); // reverse animation if gallery is open.
-          page.galleryOpen = true;
+
+          IOWA.Picasa.fetchPhotos(0, function(photos) {
+            template.photoGalleryActive = true;
+
+            var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+            gallery.photos = photos;
+
+            runPhotoGalleryAnimation();
+          });
+
         } else {
-          runPhotoGalleryAnimation(true); // reverse animation if gallery is open.
-          page.galleryOpen = false;
+          runPhotoGalleryAnimation(true); // reverse animation when gallery is open.
+          template.photoGalleryActive = false;
         }
       };
     }

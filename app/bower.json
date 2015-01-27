@@ -25,6 +25,8 @@
   "dependencies": {
     "closure-compiler": "https://dl.google.com/closure-compiler/compiler-latest.zip",
     "core-drawer-panel": "Polymer/core-drawer-panel#^0.5.4",
+    "core-image": "Polymer/core-image#^0.5.4",
+    "core-list": "Polymer/core-list#^0.5.4",
     "core-menu": "Polymer/core-menu#^0.5.4",
     "core-scroll-threshold": "Polymer/core-scroll-threshold#^0.5.4",
     "core-tooltip": "Polymer/core-tooltip#^0.5.2",

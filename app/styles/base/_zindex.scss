@@ -42,12 +42,16 @@ experiment-fab-container {
   z-index: 6;
 }
 
-.navbar__overlay {
+io-gallery {
   z-index: 7;
 }
 
+.navbar__overlay {
+  z-index: 8;
+}
+
 .io-logo-container {
-  z-index: 8; // highest
+  z-index: 9; // highest
 }
 
 experiment-fab-container[playmode="playing"],

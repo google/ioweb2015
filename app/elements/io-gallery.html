@@ -1,0 +1,79 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-list/core-list.html">
+<link rel="import" href="../bower_components/core-image/core-image.html">
+
+<!--
+The `<io-gallery>` element renders a fullscreen photo gallery.
+
+@element io-gallery
+-->
+<polymer-element name="io-gallery">
+  <template>
+    <style>
+      :host {
+        display: block;
+        opacity: 0;
+        will-change: opacity;
+        background: rgba(0,0,0,0.5);
+      }
+      core-list {
+        height: 100%;
+        width: 80vw;
+      }
+      core-image {
+        width: 100%;
+        height: 50vh;
+        background-color: #00BCD4;
+      }
+      .item {
+        box-sizing: border-box;
+        padding: 32px 0;
+      }
+      core-image::shadow #placeholder {
+        background-size: contain !important;
+      }
+    </style>
+    <div layout horizontal center-center fit>
+      <core-list data="{{photos}}" selectionEnabled="false" layout horizontal>
+        <template>
+           <div class="item">
+             <core-image _src="{{model.media.image.url}}" load?="{{!!model}}"
+                          sizing="cover" preload placeholder="images/io15-color.png" fade></core-image>
+           </div>
+        </template>
+      </core-list>
+    </div>
+  </template>
+  <script>
+  Polymer({
+
+    publish: {
+      /**
+       * The list of photos for the gallery.
+       *
+       * @property photos
+       * @type Array
+       * @default []
+       */
+      photos: {value: null}
+    },
+
+    created: function() {
+      this.photos = [];
+    }
+  });
+  </script>
+</polymer-element>
