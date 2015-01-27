@@ -518,7 +518,7 @@ module.exports = (function() {
      */
     function disable() {
       if (!isReady || isPaused) { return; }
-      console.log('disable', pid);
+
       isPaused = true;
       instrumentView.disable();
     }
@@ -528,7 +528,7 @@ module.exports = (function() {
      */
     function enable() {
       if (!isReady || !isPaused) { return; }
-      console.log('enable', pid);
+
       isPaused = false;
       instrumentView.enable();
     }

@@ -355,6 +355,8 @@ module.exports = function RootView(audioManager, stateManager) {
     logoElement.classList.add('hidden');
     logoDialog.classList.remove('active');
 
+    view.enable();
+
     return Promise.all([
       hideOnScreenVisualizers(view),
       view.expandView()
