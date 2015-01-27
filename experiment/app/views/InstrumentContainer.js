@@ -16,6 +16,7 @@ module.exports = (function() {
   const CONTENT_HORIZONTAL_BUFFER_MOBILE = 24;
   const CONTENT_VERTICAL_BUFFER_DESKTOP = 150;
   const CONTENT_VERTICAL_BUFFER_MOBILE = 32;
+  const CONTENT_CONTROLS_BUFFER = 70;
   const MOBILE_MAX = 767;
 
   var isRetina = false;//window.devicePixelRatio > 1.5;
@@ -415,9 +416,11 @@ module.exports = (function() {
         y: getDocumentScrollTop()
       });
 
+      var targetY = (window.innerHeight / 2) + getMarginOffset();
+
       var moveCenter = animate.to(displayContainerCenter, duration, {
         x: window.innerWidth / 2,
-        y: window.innerHeight / 2
+        y: targetY
       });
 
       var [optimalWidth, optimalHeight] = optimalBounds(window.innerWidth, window.innerHeight);
@@ -445,6 +448,25 @@ module.exports = (function() {
     }
 
     /**
+     * Calculate the margins of the instrument box.
+     * @return {number}
+     */
+    function getMarginOffset() {
+      var isFirst = pid === 0;
+
+      if (isExpanded) {
+        return instrumentView.supportsPortrait ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
+      } else {
+        if (isMobile) {
+          return isFirst ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
+        } else {
+          var equalMargins = Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
+          return (hasTopMargin ? equalMargins : 0) - (hasBottomMargin ? equalMargins : 0);
+        }
+      }
+    }
+
+    /**
      * Contract this view.
      * @return {Promise}
      */
@@ -458,12 +480,7 @@ module.exports = (function() {
         y: elemRect.top
       });
 
-      var targetY = elemRect.height / 2;
-      if (!isMobile && hasTopMargin && !hasBottomMargin) {
-        targetY += Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
-      } else if (!isMobile && !hasTopMargin && hasBottomMargin) {
-        targetY -= Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
-      }
+      var targetY = (elemRect.height / 2) + getMarginOffset();
 
       var moveCenter = animate.to(displayContainerCenter, duration, {
         x: elemRect.width / 2,
@@ -501,6 +518,7 @@ module.exports = (function() {
      */
     function disable() {
       if (!isReady || isPaused) { return; }
+      console.log('disable', pid);
       isPaused = true;
       instrumentView.disable();
     }
@@ -510,6 +528,7 @@ module.exports = (function() {
      */
     function enable() {
       if (!isReady || !isPaused) { return; }
+      console.log('enable', pid);
       isPaused = false;
       instrumentView.enable();
     }
@@ -548,6 +567,8 @@ module.exports = (function() {
      * @return {array<number>}
      */
     function optimalBounds(containerWidth, containerHeight) {
+      var isFirst = pid === 0;
+
       var optimalWidth;
       var optimalHeight;
 
@@ -558,11 +579,12 @@ module.exports = (function() {
           CONTENT_VERTICAL_BUFFER_MOBILE :
           CONTENT_VERTICAL_BUFFER_DESKTOP;
 
-      if (isExpanded) {
-        verticalBuffer = horizontalBuffer;
+      var isPortrait = isMobile && instrumentView.supportsPortrait && (containerHeight > containerWidth);
 
-        if (isMobile && instrumentView.supportsPortrait) {
-          verticalBuffer *= 2;
+      if (isExpanded) {
+        verticalBuffer = CONTENT_CONTROLS_BUFFER;
+
+        if (isPortrait) {
           horizontalBuffer *= 2;
         }
       }
@@ -571,9 +593,10 @@ module.exports = (function() {
       var relativeHeight;
 
       if (isMobile) {
-        relativeHeight = containerHeight - (verticalBuffer * 2);
+        let topBuffer = (isExpanded || isFirst) ? Math.max(CONTENT_CONTROLS_BUFFER, verticalBuffer) : verticalBuffer;
+        relativeHeight = containerHeight - (topBuffer * 2);
 
-        if (instrumentView.supportsPortrait) {
+        if (isPortrait) {
           return fitBounds(CONTENT_ASPECT_RATIO_VERTICAL, relativeWidth, relativeHeight);
         } else {
           return fitBounds(CONTENT_ASPECT_RATIO_HORIZONTAL, relativeWidth, relativeHeight);
@@ -581,11 +604,15 @@ module.exports = (function() {
       } else {
         relativeHeight = containerHeight;
 
+        let topBuffer;
         if (hasTopMargin) {
-          relativeHeight -= verticalBuffer;
+          topBuffer = verticalBuffer;
         } else {
-          relativeHeight -= CONTENT_VERTICAL_BUFFER_MOBILE;
+          topBuffer = CONTENT_VERTICAL_BUFFER_MOBILE;
         }
+
+        topBuffer = (isExpanded || (isMobile && isFirst)) ? Math.max(CONTENT_CONTROLS_BUFFER, topBuffer) : topBuffer;
+        relativeHeight -= topBuffer;
 
         if (hasBottomMargin) {
           relativeHeight -= verticalBuffer;
@@ -649,7 +676,7 @@ module.exports = (function() {
         wrapperElement.style.width = window.innerWidth + 'px';
         wrapperElement.style.height = window.innerHeight + 'px';
 
-        displayContainerCenter.position.y = ~~(window.innerHeight / 2);
+        displayContainerCenter.position.y = ~~(window.innerHeight / 2) + getMarginOffset();
         displayContainerCenter.position.x = ~~(window.innerWidth / 2);
 
         let [optimalWidth, optimalHeight] = optimalBounds(window.innerWidth, window.innerHeight);
@@ -665,12 +692,7 @@ module.exports = (function() {
         displayContainer.hitArea = new PIXI.Rectangle(0, 0, w, h);
       } else {
         displayContainerCenter.position.y = Math.floor(elemRect.height / 2);
-
-        if (!isMobile && hasTopMargin && !hasBottomMargin) {
-          displayContainerCenter.position.y += Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
-        } else if (!isMobile && !hasTopMargin && hasBottomMargin) {
-          displayContainerCenter.position.y -= Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
-        }
+        displayContainerCenter.position.y += getMarginOffset();
 
         displayContainerCenter.position.x = Math.floor(elemRect.width / 2);
 
