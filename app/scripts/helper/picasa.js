@@ -25,31 +25,28 @@ IOWA.Picasa = (function() {
   var lang = document.documentElement.lang;
 
   var feedUrl = 'https://picasaweb.google.com/data/feed/api/user/' +
-                 GDEVELOPER_USER_ID + '/albumid/' + ALBUM_ID +
-                 '?alt=jsonc&kind=photo&hl=' + lang + '&imgmax=1152&max-results=5000' +
-                 '&v=2';
+                GDEVELOPER_USER_ID + '/albumid/' + ALBUM_ID +
+                '?alt=jsonc&kind=photo&hl=' + lang +
+                '&imgmax=1152&max-results=5000&v=2';
 
-  function fetch(url, opt_startIndex) {
+  function fetch(opt_startIndex, callback) {
     var startIndex = opt_startIndex || 1;
 
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', url + '&start-index=' + startIndex);
+    xhr.open('GET', feedUrl + '&start-index=' + startIndex);
     xhr.onload = function(e) {
       if (this.status != 200) {
         return;
       }
       var photos = JSON.parse(this.response).data.items;
-      for (var i = 0; i < photos.length; ++i) {
-        var photo = photos[i];
-        console.log(photo.media.image.url);
-      }
+      callback(photos);
     };
 
     xhr.send();
   }
 
   return {
-    fetch: fetch
+    fetchPhotos: fetch
   };
 
 })();
