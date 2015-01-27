@@ -38,8 +38,8 @@ module.exports = (function() {
     var wrapperElement;
 
     var elementToMimic = elementToMimic_;
-    var hasTopMargin = !elementToMimic.classList.contains('js-experiment-instrument--no-top-margin')
-    var hasBottomMargin = !elementToMimic.classList.contains('js-experiment-instrument--no-bottom-margin')
+    var hasTopMargin = !elementToMimic.classList.contains('js-experiment-instrument--no-top-margin');
+    var hasBottomMargin = !elementToMimic.classList.contains('js-experiment-instrument--no-bottom-margin');
 
     var elemRect = { top: 0, left: 0, width: 0, height: 0 };
 
@@ -711,8 +711,8 @@ module.exports = (function() {
     function render(delta) {
       if (!isReady || isPaused) { return; }
 
-      renderer.render(stage);
       instrumentView.render(delta);
+      renderer.render(stage);
 
       if (isExpanded) {
         recordButton.render(delta);
