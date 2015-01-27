@@ -23,6 +23,12 @@ $name: 'page-schedule';
 
 ##{$name} {
 
+.masthead-meta {
+  h1 {
+    margin-bottom: $desktopKeyline;
+  }
+}
+
 .masthead-container {
   paper-tabs {
     text-transform: uppercase;

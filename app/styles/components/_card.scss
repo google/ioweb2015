@@ -50,7 +50,8 @@
     background-image: url(../images/home/recap-500.jpg);
     background-position: 50% 0 !important;
     cursor: pointer;
-    border-radius: inherit;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
     min-height: 200px;
   }
 }

@@ -48,8 +48,14 @@ $name: 'page-onsite';
   h4 {
     margin-bottom: $mobileKeyline;
   }
-  .sidebyside > * {
-    margin-bottom: $tabletKeyline;
+  .sidebyside {
+    > * {
+      margin-bottom: $tabletKeyline;
+    }
+
+    > :not(:last-child) {
+      margin-right: $largeKeyline;
+    }
   }
 }
 

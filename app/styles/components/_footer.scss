@@ -20,7 +20,7 @@ footer {
   @include keyline-16();
   padding-top: $mobileKeyline;
   padding-bottom: $mobileKeyline;
-  color: $color-gray;
+  color: $color-link-grey;
   font-size: 14px;
 
   a {
@@ -62,7 +62,7 @@ footer {
     nav {
       flex-direction: row !important;
       flex: 1;
-      width: 550px;
+      width: 60%;
     }
   }
 }
