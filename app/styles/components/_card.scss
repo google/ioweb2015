@@ -58,6 +58,12 @@
 
 @media (max-width: $phone-breakpoint-max) {
   .card {
+    border-bottom: 1px solid $color-light-grey-border;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
     .card-content {
       padding: $tabletKeyline $mobileKeyline;
     }

@@ -27,7 +27,7 @@ $icon-margin: 10px;
 
 .card__photo--stage {
   height: 310px;
-  background-image: url(../images/offsite/stage-887@2x.jpg);
+  background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url(../images/offsite/stage-887@2x.jpg);
   background-position: 50% 50%;
   background-size: cover;
   background-repeat: no-repeat;
