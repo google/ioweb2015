@@ -69,7 +69,7 @@ gulp.task('vulcanize-elements', ['sass'], function() {
       strip: !argv.pretty,
       csp: true,
       inline: true,
-      dest: 'elements/'
+      dest: 'app/elements/'
     }))
     // .pipe(i18n_replace({
     //   strict: !!argv.strict,
