@@ -60,12 +60,24 @@ Main fab for entering/exit the experiment.
       polyfill-rule {
         content: ':host::shadow core-icon div';
         background-repeat: no-repeat;
+        width: 19px;
+        height: 19px;
+      }
+      polyfill-rule {
+        content: 'experiment-fab[playing] core-icon div';
+        height: 17px;
+        width: 12px;
+      }
+      polyfill-rule {
+        content: 'experiment-fab[paused] core-icon div';
+        height: 16px;
+        width: 13px;
       }
       :host([playing])::shadow core-icon {
         height: 17px;
         width: 12px;
-        left: 5px;
-        top: 3px;
+        left: 6px;
+        top: 4px;
       }
       :host([paused])::shadow core-icon {
         height: 16px;
@@ -784,6 +796,7 @@ Main parent container for all of the fab elements.
       :host([mini]) {
         width: 40px;
         height: 40px;
+        right: 16px !important;
       }
       :host([fixed="fixed"]) {
         position: fixed;
@@ -802,6 +815,10 @@ Main parent container for all of the fab elements.
         margin-right: 15px;
         padding: 8px;
       }
+      polyfill-rule {
+        content: 'core-tooltip[large] .core-tooltip';
+        padding: 8px !important;
+      }
       .experiment-options-tooltip::shadow .core-tooltip {
         top: 12px !important;
       }
@@ -813,6 +830,27 @@ Main parent container for all of the fab elements.
       }
       .experiment-exit-tooltip {
         top: 230px;
+      }
+      :host([mini]) .experiment-options-tooltip::shadow .core-tooltip {
+        top: 5px !important;
+      }
+      :host([mini]) .experiment-share-tooltip {
+        top: 85px;
+      }
+      :host([mini]) .experiment-reset-tooltip {
+        top: 150px;
+      }
+      :host([mini]) .experiment-exit-tooltip {
+        top: 215px;
+      }
+      :host([mini]) experiment-share-fab,
+      :host([mini]) experiment-reset-fab,
+      :host([mini]) experiment-exit-fab {
+        left: 0;
+      }
+      :host([mini]) experiment-share-dialog {
+        top: 65px;
+        right: 38px;
       }
 
 
@@ -983,6 +1021,7 @@ Main parent container for all of the fab elements.
 
       exitExperiment: function(event) {
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
+        IOWA.Elements.ScrollContainer.addEventListener('scroll', this.bindFab);
 
         var rect = this.getBoundingClientRect();
         var top = rect.top + (rect.height / 2);
