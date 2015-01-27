@@ -32,22 +32,31 @@
   </div>
 
   <div class="slide-up-delay">
-    <section class="page__section pics__section js-experiment-instrument" layout horizontal>
-      <div class="photo__about" flex two></div>
-      <div layout vertical flex>
-        <div class="photo__about--top" layout vertical flex></div>
-        <div class="photo__about--bottom" layout vertical flex>
-          <paper-button hidden?="{{isPhoneSize}}"
-                        data-track-link="about-view-photos-section"
-                        on-tap="{{togglePhotoGallery}}">
-            <i18n-msg msgid="see-more-photos">See more photos from past I/Os</i18n-msg>
-            <core-icon icon="io:photo-camera" aria-hidden="true"></core-icon>
-          </paper-button>
+    <section class="page__section pics__section js-experiment-instrument" layout vertical>
+      <div layout horizontal>
+        <div class="photo__about" flex two></div>
+        <div layout vertical flex>
+          <div class="photo__about--top" layout vertical flex></div>
+          <div class="photo__about--bottom" layout vertical flex>
+            <paper-button hidden?="{{isPhoneSize}}"
+                          data-track-link="about-view-photos-section"
+                          on-tap="{{togglePhotoGallery}}">
+              <i18n-msg msgid="see-more-photos">See more photos from past I/Os</i18n-msg>
+              <core-icon icon="io:photo-camera" aria-hidden="true"></core-icon>
+            </paper-button>
+          </div>
         </div>
+      </div>
+      <div class="pics__section--under" layout horizontal>
+        <div layout vertical flex>
+          <div class="photo__about--top" layout vertical flex></div>
+          <div class="photo__about--bottom" layout vertical flex></div>
+        </div>
+        <div class="photo__about" flex two></div>
       </div>
     </section>
 
-    <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+    <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}" relative>
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
           <h3><i18n-msg msgid="about-sundar">Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President of Products, Sundar Pichai.</i18n-msg></h3>
@@ -85,6 +94,7 @@
     function runPhotoGalleryAnimation(opt_reverse, opt_callback) {
       var topCard = IOWA.Elements.Main.querySelector('.card__container.slide-up');
       var bottomCard = IOWA.Elements.Main.querySelector('.pics__section').nextElementSibling;
+      var bottomCard2 = IOWA.Elements.Main.querySelector('#hashtag');
 
       var button = IOWA.Elements.Main.querySelector('.photo__about--bottom paper-button');
       var navOverlay = document.querySelector('.navbar__overlay--gallery');
@@ -106,6 +116,10 @@
           {transform: 'translateY(-100px)', opacity: 0}
         ], animationOptions),
         new Animation(bottomCard, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions),
+        new Animation(bottomCard2, [
           {transform: 'translateY(0)', opacity: 1},
           {transform: 'translateY(100px)', opacity: 0}
         ], animationOptions),
@@ -166,7 +180,7 @@
         if (!template.photoGalleryActive) {
           // Smooth to gallery section.
           var destEl = IOWA.Elements.Main.querySelector('.pics__section');
-          IOWA.Util.smoothScroll(destEl, 400);
+          // IOWA.Util.smoothScroll(destEl, 400);
 
           IOWA.Picasa.fetchPhotos(0, function(photos) {
             template.photoGalleryActive = true;

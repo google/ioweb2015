@@ -23,6 +23,8 @@ $name: 'page-about';
 
 ##{$name} {
 
+$borderWidth: 3px;
+
 .masthead {
   h1 {
     color: #fff;
@@ -49,6 +51,24 @@ main {
     position: absolute;
     bottom: 20%;
   }
+
+  > div {
+    min-height: 310px;
+  }
+
+  .pics__section--under {
+    z-index: -1;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    border-top: $borderWidth solid white;
+
+    .photo__about {
+      background-image: url(../images/about/Image-04.jpg);
+      border-right-width: 0;
+      border-left-width: $borderWidth;
+    }
+  }
 }
 
 .photo__about {
@@ -56,20 +76,22 @@ main {
   background-position: 50% 0;
   background-size: cover;
   border: 0 solid white;
-  border-right-width: 3px;
+  border-right-width: $borderWidth;
 }
 
 .photo__about--top {
-  @extend .photo__about;
   background-image: url(../images/about/Image-02.jpg);
-  border-right: 0;
-  border-bottom-width: 3px;
+  background-position: 50% 0;
+  background-size: cover;
+  border: 0 solid white;
+  border-bottom-width: $borderWidth;
 }
 
 .photo__about--bottom {
-  @extend .photo__about;
   background-image: url(../images/about/Image-03.jpg);
-  border-right: 0;
+  background-position: 50% 0;
+  background-size: cover;
+  border: 0 solid white;
   position: relative;
 }
 
@@ -78,6 +100,11 @@ main {
     height: 745px;
     margin-top: -110px;
     margin-bottom: -50px;
+
+    > div {
+      min-height: 745px;
+    }
+
   }
   #hashtag {
     margin-top: -295px;
@@ -119,9 +146,15 @@ main {
   .photo__about--bottom {
     background-image: url(../images/about/Image-03@2x.jpg);
   }
-  .card__photo--recap  {
+  .card__photo--recap {
     background-image: url(../images/home/recap-500@2x.jpg);
   }
+  .pics__section--under {
+    .photo__about {
+      background-image: url(../images/about/Image-04@2x.jpg) !important;
+    }
+  }
+
 }
 
 
