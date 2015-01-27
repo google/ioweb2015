@@ -42,12 +42,16 @@
           data-track-link="home-set-reminder">
         <core-icon icon="io:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg>
       </paper-button> -->
+
       <div class="io-countdown" layout vertical center>
-        <countdown-timer bgcolor="#00BCD4"
-                         date="Mar 10 2015 09:00:00 GMT-0700 (PDT)"
-                         dateadjustment="5" easeintime="490" waittime="100"
-                         easeouttime="390" thresholdInformation="{{thresholdInformation}}">
-        </countdown-timer>
+        <a href="registration" data-ajax-link>
+          <countdown-timer bgcolor="#00BCD4"
+                           date="Mar 10 2015 09:00:00 GMT-0700 (PDT)"
+                           dateadjustment="5" easeintime="490" waittime="100"
+                           easeouttime="390" thresholdInformation="{{thresholdInformation}}">
+          </countdown-timer>
+        </a>
+
         <template if="{{ thresholdInformation.thresholdDays }}">
           <h4 class="countdown-label">
             <i18n-msg msgid="daysuntilreg">Days until registration begins</i18n-msg>
@@ -72,6 +76,7 @@
           </h4>
         </template>
       </div>
+
     </section>
 
     <div class="registration__card card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
