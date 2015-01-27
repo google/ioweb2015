@@ -11,7 +11,7 @@ module.exports = (function() {
 
   const MAX_CONTENT_WIDTH = 1024;
   const CONTENT_ASPECT_RATIO_HORIZONTAL = 2 / 1;
-  const CONTENT_ASPECT_RATIO_VERTICAL = 3 / 2;
+  const CONTENT_ASPECT_RATIO_VERTICAL = 2 / 3;
   const CONTENT_HORIZONTAL_BUFFER_DESKTOP = 64;
   const CONTENT_HORIZONTAL_BUFFER_MOBILE = 24;
   const CONTENT_VERTICAL_BUFFER_DESKTOP = 150;
@@ -526,6 +526,20 @@ module.exports = (function() {
     }
 
     /**
+     * Given an aspect ratio, fit a rectangle inside a container.
+     * @param {number} ratio - The aspect ratio.
+     * @param {number} w - The container width.
+     * @param {number} h - The container height.
+     * @return {array<number>}
+     */
+    function fitBounds(ratio, w, h) {
+      var wNew = ratio / Math.max(ratio / w, 1 / h);
+      var hNew = 1 / Math.max(ratio / w, 1 / h);
+
+      return [wNew, hNew];
+    }
+
+    /**
      * Calculate a nice bounding box based on screen size.
      * @param {number} containerWidth - The width.
      * @param {number} containerHeight - The height.
@@ -543,11 +557,11 @@ module.exports = (function() {
           CONTENT_VERTICAL_BUFFER_DESKTOP;
 
       if (isExpanded) {
-        if (isMobile) {
-          horizontalBuffer *= 4;
-          verticalBuffer *= 4;
-        } else {
-          verticalBuffer = horizontalBuffer;
+        verticalBuffer = horizontalBuffer;
+
+        if (isMobile && instrumentView.supportsPortrait) {
+          verticalBuffer *= 2;
+          horizontalBuffer *= 2;
         }
       }
 
@@ -558,11 +572,9 @@ module.exports = (function() {
         relativeHeight = containerHeight - (verticalBuffer * 2);
 
         if (instrumentView.supportsPortrait) {
-          optimalWidth = relativeHeight * (1 / CONTENT_ASPECT_RATIO_VERTICAL);
-          optimalHeight = relativeHeight;
+          return fitBounds(CONTENT_ASPECT_RATIO_VERTICAL, relativeWidth, relativeHeight);
         } else {
-          optimalWidth = relativeWidth;
-          optimalHeight = relativeWidth / CONTENT_ASPECT_RATIO_HORIZONTAL;
+          return fitBounds(CONTENT_ASPECT_RATIO_HORIZONTAL, relativeWidth, relativeHeight);
         }
       } else {
         relativeHeight = containerHeight;
@@ -580,15 +592,8 @@ module.exports = (function() {
         }
 
         var minWidth = Math.min(MAX_CONTENT_WIDTH, relativeWidth);
-        var minHeight = relativeHeight;
 
-        if ((minWidth / minHeight) > CONTENT_ASPECT_RATIO_HORIZONTAL) {
-          optimalWidth = relativeHeight * CONTENT_ASPECT_RATIO_HORIZONTAL;
-          optimalHeight = relativeHeight;
-        } else {
-          optimalWidth = minWidth;
-          optimalHeight = minWidth / CONTENT_ASPECT_RATIO_HORIZONTAL;
-        }
+        return fitBounds(CONTENT_ASPECT_RATIO_HORIZONTAL, minWidth, relativeHeight);
       }
 
       return [optimalWidth, optimalHeight];
