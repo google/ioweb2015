@@ -44,6 +44,10 @@ $name: 'page-onsite';
   ul {
     padding: 0;
     list-style: none;
+
+    li {
+      margin-bottom: $mobileKeyline;
+    }
   }
   h4 {
     margin-bottom: $mobileKeyline;
