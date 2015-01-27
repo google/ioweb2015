@@ -990,6 +990,8 @@ Main parent container for all of the fab elements.
       },
 
       experimentOn: function(event) {
+        var pageFooter = document.querySelector('footer');
+        pageFooter.style.display = 'none';
         this.dialogVisible = false;
         document.removeEventListener('keyup', this.bindEscape);
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.bindFab);
@@ -1022,6 +1024,9 @@ Main parent container for all of the fab elements.
       exitExperiment: function(event) {
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
         IOWA.Elements.ScrollContainer.addEventListener('scroll', this.bindFab);
+
+        var pageFooter = document.querySelector('footer');
+        pageFooter.style.display = 'flex';
 
         var rect = this.getBoundingClientRect();
         var top = rect.top + (rect.height / 2);
