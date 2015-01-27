@@ -64,7 +64,7 @@ gulp.task('sass', function() {
 gulp.task('vulcanize-elements', ['sass'], function() {
   return gulp.src([
       APP_DIR + '/elements/elements.html'
-    ], {base: './'})
+    ])
     .pipe($.vulcanize({
       strip: !argv.pretty,
       csp: true,
