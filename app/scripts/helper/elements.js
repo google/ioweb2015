@@ -228,6 +228,7 @@ IOWA.Elements = (function() {
       });
     };
 
+    // TODO: https://github.com/GoogleChrome/ioweb2015/issues/382
     // template.videoReady = function(e, detail, sender) {
     //   this.cardVideoTakeover(this.currentCard);
     // };

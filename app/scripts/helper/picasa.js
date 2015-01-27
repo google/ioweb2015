@@ -40,11 +40,6 @@ IOWA.Picasa = (function() {
       }
       var photos = JSON.parse(this.response).data.items;
       callback(photos);
-
-      // for (var i = 0; i < photos.length; ++i) {
-      //   var photo = photos[i];
-      //   console.log(photo.media.image.url);
-      // }
     };
 
     xhr.send();
