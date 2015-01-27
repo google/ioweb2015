@@ -94,7 +94,7 @@
     function runPhotoGalleryAnimation(opt_reverse, opt_callback) {
       var topCard = IOWA.Elements.Main.querySelector('.card__container.slide-up');
       var bottomCard = IOWA.Elements.Main.querySelector('.pics__section').nextElementSibling;
-      var bottomCard2 = IOWA.Elements.Main.querySelector('#hashtag');
+      var bottomSection = IOWA.Elements.Main.querySelector('#hashtag');
 
       var button = IOWA.Elements.Main.querySelector('.photo__about--bottom paper-button');
       var navOverlay = document.querySelector('.navbar__overlay--gallery');
@@ -119,7 +119,7 @@
           {transform: 'translateY(0)', opacity: 1},
           {transform: 'translateY(100px)', opacity: 0}
         ], animationOptions),
-        new Animation(bottomCard2, [
+        new Animation(bottomSection, [
           {transform: 'translateY(0)', opacity: 1},
           {transform: 'translateY(100px)', opacity: 0}
         ], animationOptions),
