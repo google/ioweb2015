@@ -139,9 +139,14 @@ h3, h4, h5, h6 {
   margin: 40px auto;
   margin-left: -$hashWidth / 2;
   height: 120px;
-
-  background: url(../images/io15hash.png) no-repeat 50% 50%;
+  background: url(../images/io15-hash-on-white.png) no-repeat 50% 50%;
   background-size: contain;
+}
+
+.bg-cyan {
+  .io__hash {
+    background-image: url(../images/io15-hash-on-blue.png);
+  }
 }
 
 .io-countdown {
