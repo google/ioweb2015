@@ -50,9 +50,9 @@ $name: 'page-home';
   color: #fff;
   @extend .bg-globe;
 
-  .attend__cityname {
+  name-cycler {
     color: $color-cyan-A400;
-    height: 48px; // same as line height.
+    vertical-align: top;
   }
 
   .attend__globe {
