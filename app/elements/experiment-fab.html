@@ -791,6 +791,7 @@ Main parent container for all of the fab elements.
       :host {
         display: block;
         position: absolute;
+        visibility: visible;
         -webkit-transition: all 300ms ease-out;
         transition: all 300ms ease-out;
       }
@@ -991,8 +992,7 @@ Main parent container for all of the fab elements.
       },
 
       experimentOn: function(event) {
-        var pageFooter = document.querySelector('footer');
-        pageFooter.style.display = 'none';
+        IOWA.Elements.Footer.style.display = 'none';
         this.dialogVisible = false;
         document.removeEventListener('keyup', this.bindEscape);
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.bindFab);
@@ -1001,11 +1001,15 @@ Main parent container for all of the fab elements.
           var rect = this.getBoundingClientRect();
           var top = rect.top + (rect.height / 2);
           var left = rect.left + (rect.width / 2);
-          this.app.start('.js-experiment-instrument', '.js-experiment-visualizer', [left, top]);
+          this.app.start('.js-experiment-instrument', '.js-experiment-visualizer', [left, top]).then(function() {
+            IOWA.Elements.Masthead.style.visibility = 'hidden';
+            IOWA.Elements.Main.style.visibility = 'hidden';
+          });
           IOWA.Elements.ScrollContainer.addEventListener('scroll', this.boundOnScroll);
 
           this.playmode = 'playing';
           this.mode = 'active';
+
         }, null, 300);
 
         this.app.didEnterRecordingMode(function() {
@@ -1025,9 +1029,9 @@ Main parent container for all of the fab elements.
       exitExperiment: function(event) {
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
         IOWA.Elements.ScrollContainer.addEventListener('scroll', this.bindFab);
-
-        var pageFooter = document.querySelector('footer');
-        pageFooter.style.display = 'flex';
+        IOWA.Elements.Masthead.style.visibility = '';
+        IOWA.Elements.Main.style.visibility = '';
+        IOWA.Elements.Footer.style.display = '';
 
         var rect = this.getBoundingClientRect();
         var top = rect.top + (rect.height / 2);

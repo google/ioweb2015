@@ -96,10 +96,12 @@ module.exports = function Experiment() {
     // Start requestAnimationFrame
     rootView.start();
 
-    // Animate transition in.
-    setTimeout(function() {
-      rootView.animateIn(fromPos);
-    }, 50);
+    return new Promise(function(resolve, reject){
+      // Animate transition in.
+      setTimeout(function() {
+        rootView.animateIn(fromPos).then(resolve);
+      }, 50);
+    });
   }
 
   const SHORTENER_API_URL = 'https://www.googleapis.com/urlshortener/v1/url';
