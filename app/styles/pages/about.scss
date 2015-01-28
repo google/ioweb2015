@@ -67,20 +67,20 @@ main {
 }
 
 .photo__about {
+  background-image: url(../images/about/Image-06.jpg);
+  background-position: 50% 0;
+  background-size: cover;
+}
+
+.photo__about--top {
   background-image: url(../images/about/Image-01.jpg);
   background-position: 100% 0;
   background-size: cover;
 }
 
-.photo__about--top {
+.photo__about--bottom {
   background-image: url(../images/about/Image-05.jpg);
   background-position: 0 0;
-  background-size: cover;
-}
-
-.photo__about--bottom {
-  background-image: url(../images/about/Image-06.jpg);
-  background-position: 90% 0;
   background-size: cover;
   position: relative;
 }
@@ -128,13 +128,13 @@ main {
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .photo__about {
-    background-image: url(../images/about/Image-01@2x.jpg);
+    background-image: url(../images/about/Image-06@2x.jpg);
   }
   .photo__about--top {
-    background-image: url(../images/about/Image-05@2x.jpg);
+    background-image: url(../images/about/Image-01@2x.jpg);
   }
   .photo__about--bottom {
-    background-image: url(../images/about/Image-06@2x.jpg);
+    background-image: url(../images/about/Image-05@2x.jpg);
   }
   .card__photo--recap {
     background-image: url(../images/home/recap-500@2x.jpg);
