@@ -105,6 +105,7 @@ IOWA.Router = (function() {
     var rippleColor = isFadeRipple ? '#fff' : template.rippleColors[bgClass];
 
     if (page !== pageName) {
+      IOWA.Elements.Template.fire('page-transition-start');
       if (el.hasAttribute('data-anim-ripple')) {
         currentPageTransition = 'masthead-ripple-transition';
         playMastheadRippleTransition(e, el, rippleColor, isFadeRipple);
