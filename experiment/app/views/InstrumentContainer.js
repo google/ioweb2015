@@ -19,7 +19,8 @@ module.exports = (function() {
   const CONTENT_CONTROLS_BUFFER = 70;
   const MOBILE_MAX = 767;
 
-  var isRetina = false;//window.devicePixelRatio > 1.5;
+  // Pixi.js has too many retina bugs to enable at this time.
+  var isRetina = false;
 
   /**
    * A container that wraps a sub instruments.

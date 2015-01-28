@@ -75,7 +75,7 @@ module.exports = (function() {
       textureGfx.beginFill(0xffffff);
       textureGfx.drawShape(shape);
       textureGfx.endFill();
-      cachedTexture = textureGfx.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
+      cachedTexture = textureGfx.generateTexture();
     }
 
     if (!hexagonShadow) {

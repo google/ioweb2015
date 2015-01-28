@@ -33,7 +33,7 @@ module.exports = (function() {
   circleGraphics.drawCircle(0, 0, CIRCLE_RADIUS);
   circleGraphics.endFill();
 
-  var circleTexture = circleGraphics.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
+  var circleTexture = circleGraphics.generateTexture();
 
   return function RecordButton(audioManager) {
     var startBeat;
