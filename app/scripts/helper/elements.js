@@ -194,27 +194,10 @@ IOWA.Elements = (function() {
             this.fullscreenVideoActive = false; // remove from DOM.
             this.currentCard = null;
           } else {
-            var onStateChange = function(e) {
-              if (e.detail.data == 1) { // Playing state is video.state == 1.
-                thumbnail.classList.add('fadeout');
-
-                video.removeEventListener('google-youtube-state-change', onStateChange);
-              }
-            }.bind(this);
-
-            if (video.playsupported) {
-              video.play();
-              video.addEventListener('google-youtube-state-change', onStateChange);
-            } else {
-              // If video can't auto-play, fade out thumbnail and toggle navbar.
-              thumbnail.classList.add('fadeout');
-            }
-
+            thumbnail.classList.add('fadeout');
             this.toggleVideoOverlayNav(); // Drop down back button control.
           }
-
         }.bind(this);
-
       }.bind(this);
     };
 
@@ -227,11 +210,6 @@ IOWA.Elements = (function() {
         this.cardVideoTakeover(this.currentCard);
       });
     };
-
-    // TODO: https://github.com/GoogleChrome/ioweb2015/issues/382
-    // template.videoReady = function(e, detail, sender) {
-    //   this.cardVideoTakeover(this.currentCard);
-    // };
 
     template.openShareWindow = function(e, detail, sender) {
       e.preventDefault();
