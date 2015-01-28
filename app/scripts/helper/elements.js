@@ -207,6 +207,8 @@ IOWA.Elements = (function() {
       this.currentCard = sender;
       this.fullscreenVideoActive = true; // Active the placeholder template.
 
+      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+
       // Wait one rAF for template to have stamped.
       this.async(function() {
         this.cardVideoTakeover(this.currentCard);
@@ -254,6 +256,11 @@ IOWA.Elements = (function() {
       var options = 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=' +
                     height + ',width=' + width;
       window.open(url, 'share', options);
+    };
+
+    template.backToTop = function(e, detail, sender) {
+      e.preventDefault();
+      IOWA.Util.smoothScroll(IOWA.Elements.Nav, 250);
     };
 
     template.addEventListener('template-bound', updateElements);

@@ -68,11 +68,11 @@
           </a>
         </div>
       </div>
-      <div class="card" layout vertical auto-vertical flex on-tap="{{playVideo}}">
+      <div class="card" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="about-watch-2014-recap-video">
         <div flex class="card__photo card__photo--recap"></div>
         <div class="card-content">
           <img src="images/play-video-button.png" class="play__button" alt="Play video">
-          <a href="https://www.youtube.com/watch?v=ksvdvCDO7pA" data-track-link="about-watch-2014-recap-video"><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></a>
+          <span class="anchor-like"><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
         </div>
       </div>
     </div>
@@ -84,7 +84,7 @@
 
   <template if="{{fullscreenVideoActive}}">
     <div class="fullvideo__container" fit hidden>
-      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" fit>
+      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch the I/O Recap Video" fit>
       <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit autoplay="1"></google-youtube>
     </div>
   </template>
