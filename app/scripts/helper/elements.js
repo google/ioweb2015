@@ -38,7 +38,7 @@ IOWA.Elements = (function() {
     var mastheadMeta = masthead.querySelector('.masthead-meta');
     var ioLogoLarge = masthead.querySelector('.io-logo.large');
     var nav = masthead.querySelector('#navbar');
-    var navMask = nav.querySelector('#nav-mask');
+    var navPaperTabs = nav.querySelector('paper-tabs');
     var fab = masthead.querySelector('experiment-fab-container');
     var footer = document.querySelector('footer');
     var toast = document.getElementById('toast');
@@ -53,7 +53,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.MastheadMeta = mastheadMeta;
     IOWA.Elements.Main = main;
     IOWA.Elements.Nav = nav;
-    IOWA.Elements.NavMask = navMask;
+    IOWA.Elements.NavPaperTabs = navPaperTabs;
     IOWA.Elements.Ripple = ripple;
     IOWA.Elements.FAB = fab;
     IOWA.Elements.Toast = toast;
@@ -280,10 +280,10 @@ IOWA.Elements = (function() {
 
     template.addEventListener('template-bound', updateElements);
     template.addEventListener('page-transition-done', function(e) {
-      IOWA.Elements.NavMask.style.zIndex = -1;
+      IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
     });
     template.addEventListener('page-transition-start', function(e) {
-      IOWA.Elements.NavMask.style.zIndex = 4;  // Above nav paper tabs.
+      IOWA.Elements.NavPaperTabs.style.pointerEvents = 'none';
     });
 
     IOWA.Elements.Template = template;
