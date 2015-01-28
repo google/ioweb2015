@@ -119,9 +119,9 @@ with the attribute `iologodestination`.
      *
      * @property START_DELAY
      * @type number
-     * @default 300
+     * @default 350
      */
-    START_DELAY: 300,
+    START_DELAY: 350,
 
     /**
      * The left/top of the destination node will be used to calculate the final
@@ -173,37 +173,34 @@ with the attribute `iologodestination`.
      * @method start
      */
     start: function() {
+      var DURATION = 400;
+
+      var animation = [
+        {transform: 'scale(0)'},
+        {transform: 'scale(1)'}
+      ];
+
       var sequence = new AnimationSequence([
-        new Animation(this.$.o2, [
-          {transform: 'scale(0)'},
-          {transform: 'scale(1)'}
-        ], {
+        new Animation(this.$.o2, animation, {
           delay: this.START_DELAY,
-          duration: 400,
+          endDelay: this.START_DELAY + this.SHOW_FOR,
+          duration: DURATION,
           easing: 'cubic-bezier(0,0,0.21,1)',
           fill: 'forwards'
+        }),
+        new Animation(this.$.o2, animation, {
+          duration: DURATION,
+          easing: 'ease-in-out',
+          fill: 'forwards',
+          direction: 'reverse'
         })
       ]);
 
-      var iteration = 0;
-
       var player = document.timeline.play(sequence);
 
-      // TODO(ericbidelman): this should be possible with creating the sequence
-      // direction: alternate and introducing a delay between reversing the
-      // animation. Inquire with WA folks.
-      // https://github.com/GoogleChrome/ioweb2015/issues/168
       player.onfinish = function(e) {
-        iteration++;
-        if (iteration >= 2) {
-          player.cancel();
-          this.moveLogo();
-          return;
-        }
-
-        this.async(function() {
-          player.reverse();
-        }, null, this.SHOW_FOR);
+        player.cancel();
+        this.moveLogo();
       }.bind(this);
     },
 
