@@ -517,6 +517,7 @@ module.exports = function RootView(audioManager, stateManager) {
     var scrollElement = currentViewportDetails().scrollElement;
     scrollElement.addEventListener('scroll', killEvents);
     window.addEventListener('mousewheel', killEvents);
+    window.addEventListener('wheel', killEvents);
     window.addEventListener('touchmove', killEvents);
   }
 
@@ -527,6 +528,7 @@ module.exports = function RootView(audioManager, stateManager) {
     var scrollElement = currentViewportDetails().scrollElement;
     scrollElement.removeEventListener('scroll', killEvents);
     window.removeEventListener('mousewheel', killEvents);
+    window.removeEventListener('wheel', killEvents);
     window.removeEventListener('touchmove', killEvents);
   }
 
