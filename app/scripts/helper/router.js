@@ -139,6 +139,8 @@ IOWA.Router = (function() {
         }
         if (el.hasAttribute('data-ajax-link')) {
           handleAjaxLink(e, el);
+        } else {
+          currentPageTransition = 'no-transition';
         }
         return; // found first navigation element, quit here.
       }
@@ -236,7 +238,7 @@ IOWA.Router = (function() {
       var animation = IOWA.PageAnimation.contentSlideOut();
       IOWA.PageAnimation.play(animation, updatePageElements.bind(
           null, pageName, currentPageTemplates, bgClass));
-    } else {
+    } else if (currentPageTransition !== 'no-transition') {
       updatePageElements(pageName, currentPageTemplates, bgClass);
     }
   }
