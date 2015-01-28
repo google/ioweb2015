@@ -205,6 +205,8 @@ IOWA.Elements = (function() {
       this.currentCard = sender;
       this.fullscreenVideoActive = true; // Active the placeholder template.
 
+      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+
       // Wait one rAF for template to have stamped.
       this.async(function() {
         this.cardVideoTakeover(this.currentCard);
