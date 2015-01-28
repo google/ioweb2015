@@ -17,6 +17,7 @@ var tenNumber = require('url?limit=10000!app/images/10.png');
 var getReadyImage = require('url?limit=10000!app/images/get-ready.png');
 var recordingImage = require('url?limit=10000!app/images/recording.png');
 var recordingComplete = require('url?limit=10000!app/images/recording-complete.png');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
   'use strict';
@@ -424,9 +425,9 @@ module.exports = (function() {
         delay: 2,
         x: 0,
         y: 0
-      })
-      );
-      setTimeout(function(){
+      }));
+
+      rAFTimeout(function(){
         resetRecord();
       }, 2100);
     }

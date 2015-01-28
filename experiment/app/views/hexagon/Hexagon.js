@@ -3,6 +3,7 @@ var { vec2 } = require('p2');
 var ColorGradient = require('toxiclibsjs/lib/toxi/color/ColorGradient');
 var TColor = require('toxiclibsjs/lib/toxi/color/TColor');
 var FloatRange = require('toxiclibsjs/lib/toxi/util/datatypes/FloatRange');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
   'use strict';
@@ -185,7 +186,7 @@ module.exports = (function() {
      * @param {number=0} delay - The delay.
      */
     function activate(delay) {
-      setTimeout(boostHeight, delay ? (delay * 1000) : 1);
+      rAFTimeout(boostHeight, delay ? (delay * 1000) : 0);
     }
 
     /**

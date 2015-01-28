@@ -1,5 +1,6 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var p2 = require('p2');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = function DropBallEntity() {
   'use strict';
@@ -41,7 +42,7 @@ module.exports = function DropBallEntity() {
 
     createSprites();
 
-    setTimeout(destroy, LIFETIME);
+    rAFTimeout(destroy, LIFETIME);
   }
 
   /**

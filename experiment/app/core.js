@@ -7,6 +7,7 @@ var audioSpriteCat = require('app/data/cataudiosprite.json');
 var audioLoopsDefault = require('app/data/loops.json');
 var audioLoopsCat = require('app/data/catloops.json');
 var {Promise} = require('es6-promise');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 /**
  * Main entry point into the experiment.
@@ -96,10 +97,10 @@ module.exports = function Experiment() {
     // Start requestAnimationFrame
     rootView.start();
 
-    return new Promise(function(resolve, reject){
+    return new Promise(function(resolve, reject) {
       // Animate transition in.
-      setTimeout(function() {
-        rootView.animateIn(fromPos).then(resolve);
+      rAFTimeout(function() {
+        rootView.animateIn(fromPos).then(resolve, reject);
       }, 50);
     });
   }
