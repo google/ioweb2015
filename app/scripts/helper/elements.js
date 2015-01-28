@@ -195,6 +195,7 @@ IOWA.Elements = (function() {
             this.currentCard = null;
           } else {
             thumbnail.classList.add('fadeout');
+
             this.toggleVideoOverlayNav(); // Drop down back button control.
           }
         }.bind(this);
