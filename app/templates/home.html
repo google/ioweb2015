@@ -166,9 +166,9 @@
   </div>
 
   <template if="{{fullscreenVideoActive}}">
-    <div class="fullvideo__container" on-google-youtube-ready="{{videoReady}}" fit hidden>
+    <div class="fullvideo__container" fit hidden>
       <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" fit>
-      <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit></google-youtube>
+      <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit autoplay="1"></google-youtube>
     </div>
   </template>
 {% end %}
