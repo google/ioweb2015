@@ -15,7 +15,6 @@
  */
 
 (function() {
-
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js', {
       scope: './'
@@ -28,17 +27,14 @@
       }
 
       registration.onupdatefound = function() {
-        // updatefound is also fired the very first time the SW is installed, and there's no need to
-        // prompt for a reload at that point. So check here to see if the page is already controlled,
-        // i.e. whether there's an existing service worker.
-        if (navigator.serviceWorker.controller) {
-          // The updatefound event implies that registration.installing is set; see
-          // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-container-updatefound-event
-          var installingWorker = registration.installing;
-          installingWorker.onstatechange = function() {
-            // TODO: How do we handle i18n of these strings?
-            switch (installingWorker.state) {
-              case 'installed':
+        // The updatefound event implies that registration.installing is set; see
+        // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-container-updatefound-event
+        var installingWorker = registration.installing;
+        installingWorker.onstatechange = function() {
+          // TODO: How do we handle i18n of these strings?
+          switch (installingWorker.state) {
+            case 'installed':
+              if (navigator.serviceWorker.controller) {
                 // Define a handler that will be used for the next io-toast tap, at which point it
                 // be automatically removed.
                 var tapHandler = function() {
@@ -49,15 +45,17 @@
                   });
                 };
 
-                IOWA.Elements.Toast.showMessage(
-                  'Please tap or refresh the page for the latest content.', tapHandler);
+                IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest content.',
+                  tapHandler);
+              } else {
+                IOWA.Elements.Toast.showMessage('Caching complete. This site is ready to work offline!');
+              }
               break;
 
-              case 'redundant':
-                throw 'The installing service worker became redundant.';
-            }
-          };
-        }
+            case 'redundant':
+              throw 'The installing service worker became redundant.';
+          }
+        };
       };
     }).catch(function(e) {
       IOWA.Analytics.trackError('navigator.serviceWorker.register() error', e);
@@ -75,5 +73,4 @@
   } else {
     document.addEventListener('polymer-ready', afterImports);
   }
-
 })();
