@@ -123,6 +123,7 @@ core-drawer-panel {
     flex: none !important;
 
     a {
+      flex: inherit;
       font-size: 13px;
       color: inherit;
     }
@@ -201,7 +202,7 @@ experiment-fab-container {
 
   #navbar {
     paper-tabs {
-      display: inherit;
+      display: inline-block;
     }
     paper-icon-button {
       display: none;
