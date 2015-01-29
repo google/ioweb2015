@@ -118,9 +118,9 @@ module.exports = (function() {
       }
       distanceGradient.addColorAt(CENTER_RANGE.getAt(1.0), CENTER_COLOR);
 
-      var dColors = distanceGradient.calcGradient(0, MAX_RADIUS + 1).colors;
+      var dColors = distanceGradient.calcGradient(0, MAX_RADIUS + 1).colors.map(c => c.toInt());
       distanceGradients[degrees] = distanceGradients[degrees] || {};
-      distanceGradients[degrees][distance] = dColors.map(c => c.toInt());
+      distanceGradients[degrees][distance] = dColors;
 
       return dColors;
     }

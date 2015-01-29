@@ -38,114 +38,109 @@
       "end": 19.28,
       "loop": false
     },
-    "arp_synth_D-sharp3": {
-      "start": 21,
-      "end": 22.071020408163264,
-      "loop": false
-    },
     "arp_synth_F": {
-      "start": 24,
-      "end": 25.227755102040817,
+      "start": 21,
+      "end": 22.227755102040817,
       "loop": false
     },
     "arp_synth_F2": {
+      "start": 24,
+      "end": 25.28,
+      "loop": false
+    },
+    "arp_synth_G": {
       "start": 27,
       "end": 28.28,
       "loop": false
     },
-    "arp_synth_G": {
-      "start": 30,
-      "end": 31.28,
-      "loop": false
-    },
     "arp_synth_G2": {
-      "start": 33,
-      "end": 34.25387755102041,
+      "start": 30,
+      "end": 31.25387755102041,
       "loop": false
     },
     "drumClap": {
-      "start": 36,
-      "end": 37.01877551020408,
+      "start": 33,
+      "end": 34.01877551020408,
       "loop": false
     },
     "drumKick": {
-      "start": 39,
-      "end": 39.78367346938776,
+      "start": 36,
+      "end": 36.78367346938776,
       "loop": false
     },
     "drumSnare": {
-      "start": 41,
-      "end": 41.6530612244898,
+      "start": 38,
+      "end": 38.6530612244898,
       "loop": false
     },
     "hexagon1": {
-      "start": 43,
-      "end": 45.97795918367347,
+      "start": 40,
+      "end": 42.97795918367347,
       "loop": false
     },
     "hexagon2": {
-      "start": 47,
-      "end": 50.13469387755102,
+      "start": 44,
+      "end": 47.13469387755102,
       "loop": false
     },
     "hexagon3": {
-      "start": 52,
-      "end": 55.160816326530615,
+      "start": 49,
+      "end": 52.160816326530615,
       "loop": false
     },
     "hexagon4": {
-      "start": 57,
-      "end": 60.2130612244898,
+      "start": 54,
+      "end": 57.2130612244898,
       "loop": false
     },
     "hexagon5": {
-      "start": 62,
-      "end": 65.29142857142857,
+      "start": 59,
+      "end": 62.29142857142857,
       "loop": false
     },
     "parallelogram_A-sharp-major": {
-      "start": 67,
-      "end": 72.48571428571428,
+      "start": 64,
+      "end": 69.48571428571428,
       "loop": false
     },
     "parallelogram_C-minor": {
-      "start": 74,
-      "end": 79.35510204081632,
+      "start": 71,
+      "end": 76.35510204081632,
       "loop": false
     },
     "parallelogram_D-sharp-major": {
-      "start": 81,
-      "end": 86.30285714285714,
+      "start": 78,
+      "end": 83.30285714285714,
       "loop": false
     },
     "parallelogram_G-minor": {
-      "start": 88,
-      "end": 93.51183673469387,
+      "start": 85,
+      "end": 90.51183673469387,
       "loop": false
     },
     "parallelogram_G-sharp-major": {
-      "start": 95,
-      "end": 100.4334693877551,
+      "start": 92,
+      "end": 97.4334693877551,
       "loop": false
     },
     "stringbass_A-sharp": {
-      "start": 102,
-      "end": 103.3061224489796,
+      "start": 99,
+      "end": 100.3061224489796,
       "loop": false
     },
     "stringbass_C2": {
-      "start": 105,
-      "end": 106.14938775510204,
+      "start": 102,
+      "end": 103.14938775510204,
       "loop": false
     },
     "stringbass_F": {
-      "start": 108,
-      "end": 109.12326530612245,
+      "start": 105,
+      "end": 106.12326530612245,
       "loop": false
     },
     "stringbass_G": {
-      "start": 111,
-      "end": 112.01877551020408,
+      "start": 108,
+      "end": 109.01877551020408,
       "loop": false
     }
   }
