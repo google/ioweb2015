@@ -46,10 +46,10 @@ if ('serviceWorker' in navigator) {
                 });
               };
 
-              IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest info.',
+              IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest content.',
                 tapHandler);
             } else {
-              IOWA.Elements.Toast.showMessage('Caching is complete. Your next visit will work offline!');
+              IOWA.Elements.Toast.showMessage('Caching complete. This site is ready to work offline!');
             }
           break;
 
