@@ -110,9 +110,22 @@ module.exports = function Experiment() {
 
   /**
    * Serialize the entire experiment to URL encoded data.
+   * @param {string=} extraParam - Additional URL params.
+   * @return {Promise}
    */
-  function serialize() {
-    var fullURL = window.location.origin + window.location.pathname + '?composition=' + stateManager.toURL();
+  function serialize(extraParams) {
+    extraParams = extraParams || '';
+
+    var fullURL = window.location.origin + window.location.pathname + '?experiment&composition=' + stateManager.toURL() + '&' + extraParams;
+    return shortenURL(fullURL);
+  }
+
+  /**
+   * Use Google's URL shortener to compress an URL for social.
+   * @param {string} fullURL - The full url.
+   * @return {Promise}
+   */
+  function shortenURL(fullURL) {
     var endpoint = `${SHORTENER_API_URL}?key=${SHORTENER_API_KEY}`;
 
     return new Promise(function(resolve, reject) {

@@ -477,7 +477,7 @@ Dialog to share the user's custom experiment/song
 @element experiment-share-dialog
 @blurb Dialog to share the user's custom experiment/song
 -->
-<polymer-element name="experiment-share-dialog" attributes="active url plainURL">
+<polymer-element name="experiment-share-dialog" attributes="active gplusShare twitterShare facebookShare copiedURLShare">
   <template>
     <style>
       :host {
@@ -597,26 +597,26 @@ Dialog to share the user's custom experiment/song
 
       <core-menu>
         <paper-item>
-          <a href="//plus.google.com/share?url={{url}}" target="_blank" layout horizontal center>
+          <a href="//plus.google.com/share?url={{gplusShare| encodeURI}}" target="_blank" layout horizontal center>
             <core-icon class="share-icon" icon="io:post-gplus"></core-icon>
             <i18n-msg msgid="gplus-share">Google+</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="//twitter.com/intent/tweet?text=Make+music+with+instruments+inspired+by+material+design+for+Google+I/O.+Play,+record+and+share+at:&url={{url}}" target="_blank" layout horizontal center>
+          <a href="//twitter.com/intent/tweet?text=Make+music+with+instruments+inspired+by+material+design+for+Google+I/O.+Play,+record+and+share+at:&url={{twitterShare | encodeURI}}" target="_blank" layout horizontal center>
             <core-icon class="share-icon" icon="io:post-twitter"></core-icon>
             <i18n-msg msgid-"twitter-share">Twitter</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
-          <a href="//www.facebook.com/sharer/sharer.php?u={{url}}" target="_blank" layout horizontal center>
+          <a href="//www.facebook.com/sharer/sharer.php?u={{facebookShare | encodeURI}}" target="_blank" layout horizontal center>
             <core-icon class="share-icon" icon="io:post-facebook"></core-icon>
             <i18n-msg msgid="facebook-share">Facebook</i18n-msg>
           </a>
         </paper-item>
         <paper-item class="share-url" noink on-tap="{{linkSelect}}">
           <core-icon class="share-icon" icon="link"></core-icon>
-          <input id="urlInput" value="{{plainURL}}" on-tap="{{linkSelect}}" readonly>
+          <input id="urlInput" value="{{copiedURLShare}}" on-tap="{{linkSelect}}" readonly>
         </paper-item>
       </core-menu>
 
@@ -636,9 +636,14 @@ Dialog to share the user's custom experiment/song
           reflect: true
         }
       },
+
       linkSelect: function() {
         this.$.urlInput.selectionStart = 0;
         this.$.urlInput.selectionEnd = this.$.urlInput.value.length;
+      },
+
+      encodeURI: function(uri) {
+        return encodeURIComponent(uri);
       },
 
       shareOff: function() {
@@ -884,7 +889,7 @@ Main parent container for all of the fab elements.
       <core-tooltip label="Share Song" class="experiment-share-tooltip" position="left" noarrow="true" show?="{{showTooltips}}" large>
         <experiment-share-fab src="../images/share-experiment.png" mini open?="{{miniFabs}}" on-tap="{{onShareClick}}"></experiment-share-fab>
       </core-tooltip>
-      <experiment-share-dialog active?="{{shareVisible}}" url="{{shareURL}}" plainURL="{{unencodedURL}}"></experiment-share-dialog>
+      <experiment-share-dialog active?="{{shareVisible}}" gplusShare="{{gplusShare}}" twitterShare="{{twitterShare}}" facebookShare="{{facebookShare}}" copiedURLShare="{{copiedURLShare}}"></experiment-share-dialog>
 
       <core-tooltip label="Reset to Default" class="experiment-reset-tooltip" position="left" noarrow="true" show?="{{showTooltips}}" large>
         <experiment-reset-fab src="../images/reset-experiment.png" on-tap="{{resetExperiment}}" mini open?="{{miniFabs}}"></experiment-reset-fab>
@@ -1074,9 +1079,17 @@ Main parent container for all of the fab elements.
         this.miniFabs = true;
         this.showTooltips = true;
         this.app.pause();
-        this.app.serialize().then(function(url) {
-          this.unencodedURL = url;
-          this.shareURL = encodeURIComponent(url);
+
+        Promise.all([
+          this.app.serialize('gplus'),
+          this.app.serialize('twitter'),
+          this.app.serialize('facebook'),
+          this.app.serialize('copiedURL')
+        ]).then(function(results) {
+          this.gplusShare = results[0];
+          this.twitterShare = results[1];
+          this.facebookShare = results[2];
+          this.copiedURLShare = results[3];
         }.bind(this));
       },
 
