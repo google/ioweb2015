@@ -110,6 +110,7 @@ IOWA.Util = IOWA.Util || (function() {
     isIE: isIE,
     isIOS: isIOS,
     isSafari: isSafari,
+    supportsHTMLImports: 'import' in document.createElement('link'),
     smoothScroll: smoothScroll,
     getStaticBaseURL: getStaticBaseURL,
     resizeRipple: resizeRipple
