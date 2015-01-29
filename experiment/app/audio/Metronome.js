@@ -27,8 +27,8 @@ module.exports = (function() {
       var timerID = null;
       var interval = 100;
 
-      var intervalFunc = 'function' === typeof setInterval ? setInterval : this['setInterval'];
-      var clearIntervalFunc = 'function' === typeof clearInterval ? clearInterval : this['clearInterval'];
+      var intervalFunc = self['setInterval'];
+      var clearIntervalFunc = self['clearInterval'];
 
       function ticker() {
         postMessage('tick');

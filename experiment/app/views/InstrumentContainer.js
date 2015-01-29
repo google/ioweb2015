@@ -5,20 +5,23 @@ var backImage = require('url?limit=10000!app/images/back-arrow.png');
 var RecordButton = require('app/views/RecordButton');
 var zIndexes = require('app/util/zIndexes');
 var currentViewportDetails = require('app/util/currentViewportDetails');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
   'use strict';
 
   const MAX_CONTENT_WIDTH = 1024;
   const CONTENT_ASPECT_RATIO_HORIZONTAL = 2 / 1;
-  const CONTENT_ASPECT_RATIO_VERTICAL = 3 / 2;
+  const CONTENT_ASPECT_RATIO_VERTICAL = 2 / 3;
   const CONTENT_HORIZONTAL_BUFFER_DESKTOP = 64;
   const CONTENT_HORIZONTAL_BUFFER_MOBILE = 24;
   const CONTENT_VERTICAL_BUFFER_DESKTOP = 150;
   const CONTENT_VERTICAL_BUFFER_MOBILE = 32;
+  const CONTENT_CONTROLS_BUFFER = 70;
   const MOBILE_MAX = 767;
 
-  var isRetina = false;//window.devicePixelRatio > 1.5;
+  // Pixi.js has too many retina bugs to enable at this time.
+  var isRetina = false;
 
   /**
    * A container that wraps a sub instruments.
@@ -96,23 +99,6 @@ module.exports = (function() {
 
       stage.addChild(displayContainer);
 
-      // fixes for black graphic squares in 5th webGL container
-      var recordIconImage = recordButton.recordIcon;
-      var recordCircle = recordButton.circle;
-      var checkboxCircle = recordButton.checkmarkCircle;
-      var recordText = recordButton.textImages;
-      var recordNumbers = recordButton.numberImagePixiObjects;
-      renderer.updateTexture(backIcon.texture.baseTexture);
-      renderer.updateTexture(recordIconImage.texture.baseTexture);
-      renderer.updateTexture(recordCircle.texture.baseTexture);
-      renderer.updateTexture(checkboxCircle.texture.baseTexture);
-      for (let i = 0; i < recordText.length; i++) {
-        renderer.updateTexture(recordText[i].texture.baseTexture);
-      }
-      for (let i = 0; i < recordNumbers.length; i++) {
-        renderer.updateTexture(recordNumbers[i].texture.baseTexture);
-      }
-
       instrumentView.init(stage, pid, displayContainerCenter);
 
       // If Debug
@@ -125,6 +111,25 @@ module.exports = (function() {
       addContractedEventListeners();
 
       isReady = true;
+
+      rAFTimeout(function() {
+        // fixes for black graphic squares in 5th webGL container
+        var recordIconImage = recordButton.recordIcon;
+        var recordCircle = recordButton.circle;
+        var checkboxCircle = recordButton.checkmarkCircle;
+        var recordText = recordButton.textImages;
+        var recordNumbers = recordButton.numberImagePixiObjects;
+        renderer.updateTexture(backIcon.texture.baseTexture);
+        renderer.updateTexture(recordIconImage.texture.baseTexture);
+        renderer.updateTexture(recordCircle.texture.baseTexture);
+        renderer.updateTexture(checkboxCircle.texture.baseTexture);
+        for (let i = 0; i < recordText.length; i++) {
+          renderer.updateTexture(recordText[i].texture.baseTexture);
+        }
+        for (let i = 0; i < recordNumbers.length; i++) {
+          renderer.updateTexture(recordNumbers[i].texture.baseTexture);
+        }
+      }, 50);
     }
 
     /**
@@ -413,9 +418,11 @@ module.exports = (function() {
         y: getDocumentScrollTop()
       });
 
+      var targetY = (window.innerHeight / 2) + getMarginOffset();
+
       var moveCenter = animate.to(displayContainerCenter, duration, {
         x: window.innerWidth / 2,
-        y: window.innerHeight / 2
+        y: targetY
       });
 
       var [optimalWidth, optimalHeight] = optimalBounds(window.innerWidth, window.innerHeight);
@@ -443,6 +450,25 @@ module.exports = (function() {
     }
 
     /**
+     * Calculate the margins of the instrument box.
+     * @return {number}
+     */
+    function getMarginOffset() {
+      var isFirst = pid === 0;
+
+      if (isExpanded) {
+        return instrumentView.supportsPortrait ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
+      } else {
+        if (isMobile) {
+          return isFirst ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
+        } else {
+          var equalMargins = Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
+          return (hasTopMargin ? equalMargins : 0) - (hasBottomMargin ? equalMargins : 0);
+        }
+      }
+    }
+
+    /**
      * Contract this view.
      * @return {Promise}
      */
@@ -456,12 +482,7 @@ module.exports = (function() {
         y: elemRect.top
       });
 
-      var targetY = elemRect.height / 2;
-      if (!isMobile && hasTopMargin && !hasBottomMargin) {
-        targetY += Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
-      } else if (!isMobile && !hasTopMargin && hasBottomMargin) {
-        targetY -= Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
-      }
+      var targetY = (elemRect.height / 2) + getMarginOffset();
 
       var moveCenter = animate.to(displayContainerCenter, duration, {
         x: elemRect.width / 2,
@@ -499,6 +520,7 @@ module.exports = (function() {
      */
     function disable() {
       if (!isReady || isPaused) { return; }
+
       isPaused = true;
       instrumentView.disable();
     }
@@ -508,6 +530,7 @@ module.exports = (function() {
      */
     function enable() {
       if (!isReady || !isPaused) { return; }
+
       isPaused = false;
       instrumentView.enable();
     }
@@ -526,12 +549,28 @@ module.exports = (function() {
     }
 
     /**
+     * Given an aspect ratio, fit a rectangle inside a container.
+     * @param {number} ratio - The aspect ratio.
+     * @param {number} w - The container width.
+     * @param {number} h - The container height.
+     * @return {array<number>}
+     */
+    function fitBounds(ratio, w, h) {
+      var wNew = ratio / Math.max(ratio / w, 1 / h);
+      var hNew = 1 / Math.max(ratio / w, 1 / h);
+
+      return [wNew, hNew];
+    }
+
+    /**
      * Calculate a nice bounding box based on screen size.
      * @param {number} containerWidth - The width.
      * @param {number} containerHeight - The height.
      * @return {array<number>}
      */
     function optimalBounds(containerWidth, containerHeight) {
+      var isFirst = pid === 0;
+
       var optimalWidth;
       var optimalHeight;
 
@@ -542,12 +581,13 @@ module.exports = (function() {
           CONTENT_VERTICAL_BUFFER_MOBILE :
           CONTENT_VERTICAL_BUFFER_DESKTOP;
 
+      var isPortrait = isMobile && instrumentView.supportsPortrait && (containerHeight > containerWidth);
+
       if (isExpanded) {
-        if (isMobile) {
-          horizontalBuffer *= 4;
-          verticalBuffer *= 4;
-        } else {
-          verticalBuffer = horizontalBuffer;
+        verticalBuffer = CONTENT_CONTROLS_BUFFER;
+
+        if (isPortrait) {
+          horizontalBuffer *= 2;
         }
       }
 
@@ -555,23 +595,26 @@ module.exports = (function() {
       var relativeHeight;
 
       if (isMobile) {
-        relativeHeight = containerHeight - (verticalBuffer * 2);
+        let topBuffer = (isExpanded || isFirst) ? Math.max(CONTENT_CONTROLS_BUFFER, verticalBuffer) : verticalBuffer;
+        relativeHeight = containerHeight - (topBuffer * 2);
 
-        if (instrumentView.supportsPortrait) {
-          optimalWidth = relativeHeight * (1 / CONTENT_ASPECT_RATIO_VERTICAL);
-          optimalHeight = relativeHeight;
+        if (isPortrait) {
+          return fitBounds(CONTENT_ASPECT_RATIO_VERTICAL, relativeWidth, relativeHeight);
         } else {
-          optimalWidth = relativeWidth;
-          optimalHeight = relativeWidth / CONTENT_ASPECT_RATIO_HORIZONTAL;
+          return fitBounds(CONTENT_ASPECT_RATIO_HORIZONTAL, relativeWidth, relativeHeight);
         }
       } else {
         relativeHeight = containerHeight;
 
+        let topBuffer;
         if (hasTopMargin) {
-          relativeHeight -= verticalBuffer;
+          topBuffer = verticalBuffer;
         } else {
-          relativeHeight -= CONTENT_VERTICAL_BUFFER_MOBILE;
+          topBuffer = CONTENT_VERTICAL_BUFFER_MOBILE;
         }
+
+        topBuffer = (isExpanded || (isMobile && isFirst)) ? Math.max(CONTENT_CONTROLS_BUFFER, topBuffer) : topBuffer;
+        relativeHeight -= topBuffer;
 
         if (hasBottomMargin) {
           relativeHeight -= verticalBuffer;
@@ -580,15 +623,8 @@ module.exports = (function() {
         }
 
         var minWidth = Math.min(MAX_CONTENT_WIDTH, relativeWidth);
-        var minHeight = relativeHeight;
 
-        if ((minWidth / minHeight) > CONTENT_ASPECT_RATIO_HORIZONTAL) {
-          optimalWidth = relativeHeight * CONTENT_ASPECT_RATIO_HORIZONTAL;
-          optimalHeight = relativeHeight;
-        } else {
-          optimalWidth = minWidth;
-          optimalHeight = minWidth / CONTENT_ASPECT_RATIO_HORIZONTAL;
-        }
+        return fitBounds(CONTENT_ASPECT_RATIO_HORIZONTAL, minWidth, relativeHeight);
       }
 
       return [optimalWidth, optimalHeight];
@@ -642,7 +678,7 @@ module.exports = (function() {
         wrapperElement.style.width = window.innerWidth + 'px';
         wrapperElement.style.height = window.innerHeight + 'px';
 
-        displayContainerCenter.position.y = ~~(window.innerHeight / 2);
+        displayContainerCenter.position.y = ~~(window.innerHeight / 2) + getMarginOffset();
         displayContainerCenter.position.x = ~~(window.innerWidth / 2);
 
         let [optimalWidth, optimalHeight] = optimalBounds(window.innerWidth, window.innerHeight);
@@ -658,12 +694,7 @@ module.exports = (function() {
         displayContainer.hitArea = new PIXI.Rectangle(0, 0, w, h);
       } else {
         displayContainerCenter.position.y = Math.floor(elemRect.height / 2);
-
-        if (!isMobile && hasTopMargin && !hasBottomMargin) {
-          displayContainerCenter.position.y += Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
-        } else if (!isMobile && !hasTopMargin && hasBottomMargin) {
-          displayContainerCenter.position.y -= Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
-        }
+        displayContainerCenter.position.y += getMarginOffset();
 
         displayContainerCenter.position.x = Math.floor(elemRect.width / 2);
 

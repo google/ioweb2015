@@ -29,7 +29,7 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules|vendor|public/,
-        loader: '6to5-loader?runtime=true'
+        loader: '6to5-loader?optional=selfContained'
       },
       {
         test: /\.json$/,

@@ -333,10 +333,23 @@ limitations under the License.
 <script src="scripts/bootstrap.js"></script>
 <!-- endbuild -->
 <script>
-  if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
-    IOWA.Elements.Template.pages[{% .Slug %}] = {};
+(function() {
+
+  function afterImports() {
+    //'import' in document.createElement('link')
+    if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
+      IOWA.Elements.Template.pages[{% .Slug %}] = {};
+    }
+    IOWA.Elements.Template.pages[{% .Slug %}].title = {% template "title" .%};
   }
-  IOWA.Elements.Template.pages[{% .Slug %}].title = {% template "title" .%};
+
+  if (IOWA.Util.supportsHTMLImports) {
+    afterImports();
+  } else {
+    document.addEventListener('polymer-ready', afterImports);
+  }
+
+})();
 </script>
 
 </body>

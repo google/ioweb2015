@@ -1,5 +1,6 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var p2 = require('p2');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
   'use strict';
@@ -105,6 +106,12 @@ module.exports = (function() {
 
       world.emitImpactEvent = false;
 
+      world.narrowphase.enableFriction = false;
+      world.narrowphase.enableFrictionReduction = false;
+      world.defaultContactMaterial.friction = 0;
+
+      world.solver.tolerance = 0.02;
+
       displayContainerCenter.addChild(lineGraphicShadow);
       displayContainerCenter.addChild(lineGraphic);
 
@@ -132,7 +139,7 @@ module.exports = (function() {
         isplayingInteractionSound = true;
         audioManager.playSoundImmediately(sound, channel);
         onActivateCallback_(model.pid, sound);
-        window.setTimeout(resetIsPlayingInteractionSound, 400);
+        rAFTimeout(resetIsPlayingInteractionSound, 400);
       }
     }
 

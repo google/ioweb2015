@@ -1,12 +1,13 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var p2 = require('p2');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = function DropBallEntity() {
   'use strict';
 
   var stage;
+  var cachedTexture;
   var ball;
-  var ballContainer;
   var world;
   var ballBody;
   var displayContainerCenter;
@@ -41,25 +42,26 @@ module.exports = function DropBallEntity() {
 
     createSprites();
 
-    setTimeout(destroy, LIFETIME);
+    rAFTimeout(destroy, LIFETIME);
   }
 
   /**
    * Create the circle sprite for the ball.
    */
   function createSprites() {
-    ballContainer = new PIXI.DisplayObjectContainer();
-    ball = new PIXI.Graphics();
-    ball.beginFill(0xffffff, 0.8);
-    ball.drawCircle(0, 0, 10);
-    ball.endFill();
-    ball.radius = 10;
+    if (!cachedTexture) {
+      var textureGfx = new PIXI.Graphics();
+      textureGfx.clear();
+      textureGfx.beginFill(0xffffff, 0.8);
+      textureGfx.drawCircle(0, 0, 10);
+      textureGfx.endFill();
+      cachedTexture = textureGfx.generateTexture();
+    }
+    ball = new PIXI.Sprite(cachedTexture);
 
-    ballContainer.addChild(ball);
-
-    ballBody = addBody(ball, startX, startY, ball.radius, 20, 0.5);
+    ballBody = addBody(ball, startX, startY, 10, 20, 0.5);
     renderBodies();
-    displayContainerCenter.addChild(ballContainer);
+    displayContainerCenter.addChild(ball);
   }
 
   /**
@@ -111,7 +113,7 @@ module.exports = function DropBallEntity() {
   function destroy() {
     if (alive) {
       alive = false;
-      displayContainerCenter.removeChild(ballContainer);
+      displayContainerCenter.removeChild(ball);
       world.removeBody(ballBody);
 
       destroyCallback();
@@ -125,9 +127,8 @@ module.exports = function DropBallEntity() {
    */
   function renderBodies() {
     if (alive) {
-      ballContainer.position.y = ballBody.position[1];
-      ballContainer.position.x = ballBody.position[0];
-      ballContainer.rotation = ballBody.angle;
+      ball.position.y = ballBody.position[1];
+      ball.position.x = ballBody.position[0];
     }
   }
 

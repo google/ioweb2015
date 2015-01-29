@@ -42,7 +42,7 @@ module.exports = (function() {
    * Returns the default state is no serialized state is available.
    * @return {Object}
    */
-  function getDefault() {
+  function getDefault(audioManager) {
     return {
       'drums': [
         {
@@ -51,7 +51,7 @@ module.exports = (function() {
           'radius': 70,
           'color': 0xb387ff,
           'hovercolor': 0x976AFF,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 0
         },
         {
@@ -60,7 +60,7 @@ module.exports = (function() {
           'radius': 35,
           'color': 0x4527A0,
           'hovercolor': 0x603ACF,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 1
         },
         {
@@ -69,7 +69,7 @@ module.exports = (function() {
           'radius': 150,
           'color': 0xede7f6,
           'hovercolor': 0xFFFFFF,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 2
         },
         {
@@ -78,7 +78,7 @@ module.exports = (function() {
           'radius': 70,
           'color': 0xb387ff,
           'hovercolor': 0x976AFF,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 3
         },
         {
@@ -87,7 +87,7 @@ module.exports = (function() {
           'radius': 35,
           'color': 0x4527A0,
           'hovercolor': 0x603ACF,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 4
         },
         {
@@ -96,7 +96,7 @@ module.exports = (function() {
           'radius': 150,
           'color': 0xede7f6,
           'hovercolor': 0xFFFFFF,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 5
         }
       ],
@@ -120,162 +120,162 @@ module.exports = (function() {
       'recorded': [
         {
           'beat': 0,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 6
         },
         {
           'beat': 3,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 4,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 5
         },
         {
           'beat': 7,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 8,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 6
         },
         {
           'beat': 11,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 12,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 5
         },
         {
           'beat': 15,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 16,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 6
         },
         {
           'beat': 19,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 20,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 5
         },
         {
           'beat': 23,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 24,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 6
         },
         {
           'beat': 27,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 28,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 5
         },
         {
           'beat': 31,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 32,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 6
         },
         {
           'beat': 35,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 36,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 5
         },
         {
           'beat': 39,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 40,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 6
         },
         {
           'beat': 43,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 44,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 5
         },
         {
           'beat': 47,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 48,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 6
         },
         {
           'beat': 51,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 52,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 5
         },
         {
           'beat': 55,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 56,
-          'sound': 14,
+          'sound': audioManager.getSound('drumClap').guid,
           'pid': 6
         },
         {
           'beat': 59,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         },
         {
           'beat': 60,
-          'sound': 13,
+          'sound': audioManager.getSound('drumKick').guid,
           'pid': 5
         },
         {
           'beat': 63,
-          'sound': 15,
+          'sound': audioManager.getSound('drumSnare').guid,
           'pid': 4
         }
       ]

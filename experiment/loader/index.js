@@ -16,7 +16,9 @@ window.experiment = (function() {
     var claimsSupport = false;
     var canvas = document.createElement('canvas');
 
-    if ('supportsContext' in canvas) {
+    if ('probablySupportsContext' in canvas) {
+      claimsSupport = canvas.probablySupportsContext('webgl') || canvas.probablySupportsContext('experimental-webgl');
+    } else if ('supportsContext' in canvas) {
       claimsSupport = canvas.supportsContext('webgl') || canvas.supportsContext('experimental-webgl');
     } else {
       claimsSupport = !!window.WebGLRenderingContext;

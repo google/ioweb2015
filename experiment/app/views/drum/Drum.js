@@ -47,7 +47,7 @@ module.exports = (function() {
     hitCircleGfx.drawShape(shape);
     hitCircleGfx.endFill();
 
-    var hitTexture = hitCircleGfx.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
+    var hitTexture = hitCircleGfx.generateTexture();
     var hitCircleContainer = new PIXI.DisplayObjectContainer();
 
     var self = {

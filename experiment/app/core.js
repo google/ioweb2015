@@ -7,6 +7,7 @@ var audioSpriteCat = require('app/data/cataudiosprite.json');
 var audioLoopsDefault = require('app/data/loops.json');
 var audioLoopsCat = require('app/data/catloops.json');
 var {Promise} = require('es6-promise');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 /**
  * Main entry point into the experiment.
@@ -53,7 +54,7 @@ module.exports = function Experiment() {
     audioManager = new AudioManager();
     audioManager.init();
 
-    stateManager = new StateManager();
+    stateManager = new StateManager(audioManager);
 
     // Create the RootView, which controls all visuals in the experiment.
     rootView = new RootView(audioManager, stateManager);
@@ -96,10 +97,12 @@ module.exports = function Experiment() {
     // Start requestAnimationFrame
     rootView.start();
 
-    // Animate transition in.
-    setTimeout(function() {
-      rootView.animateIn(fromPos);
-    }, 50);
+    return new Promise(function(resolve, reject) {
+      // Animate transition in.
+      rAFTimeout(function() {
+        rootView.animateIn(fromPos).then(resolve, reject);
+      }, 50);
+    });
   }
 
   const SHORTENER_API_URL = 'https://www.googleapis.com/urlshortener/v1/url';
