@@ -3,12 +3,12 @@
     "cataudiosprite.mp3"
   ],
   "spritemap": {
-    "arp_synth_A": {
+    "arp_synth_A-sharp": {
       "start": 0,
       "end": 1.0971428571428572,
       "loop": false
     },
-    "arp_synth_B": {
+    "arp_synth_A-sharp2": {
       "start": 3,
       "end": 4.044897959183674,
       "loop": false
@@ -18,114 +18,129 @@
       "end": 7.14938775510204,
       "loop": false
     },
-    "arp_synth_D": {
+    "arp_synth_C2": {
       "start": 9,
-      "end": 10.097142857142858,
+      "end": 10.14938775510204,
       "loop": false
     },
-    "arp_synth_E": {
+    "arp_synth_C3": {
       "start": 12,
-      "end": 13.071020408163266,
+      "end": 13.14938775510204,
+      "loop": false
+    },
+    "arp_synth_D-sharp": {
+      "start": 15,
+      "end": 16.097142857142856,
+      "loop": false
+    },
+    "arp_synth_D-sharp2": {
+      "start": 18,
+      "end": 19.071020408163264,
       "loop": false
     },
     "arp_synth_F": {
-      "start": 15,
-      "end": 16.227755102040817,
+      "start": 21,
+      "end": 22.227755102040817,
+      "loop": false
+    },
+    "arp_synth_F2": {
+      "start": 24,
+      "end": 25.227755102040817,
       "loop": false
     },
     "arp_synth_G": {
-      "start": 18,
-      "end": 19.227755102040817,
+      "start": 27,
+      "end": 28.227755102040817,
       "loop": false
     },
     "arp_synth_G2": {
-      "start": 21,
-      "end": 22.12326530612245,
+      "start": 30,
+      "end": 31.12326530612245,
       "loop": false
     },
     "drumClap": {
-      "start": 24,
-      "end": 24.496326530612244,
+      "start": 33,
+      "end": 33.496326530612244,
       "loop": false
     },
     "drumKick": {
-      "start": 26,
-      "end": 26.99265306122449,
+      "start": 35,
+      "end": 35.99265306122449,
       "loop": false
     },
     "drumSnare": {
-      "start": 28,
-      "end": 28.99265306122449,
+      "start": 37,
+      "end": 37.99265306122449,
       "loop": false
     },
     "hexagon1": {
-      "start": 30,
-      "end": 33.34367346938775,
+      "start": 39,
+      "end": 42.34367346938775,
       "loop": false
     },
     "hexagon2": {
-      "start": 35,
-      "end": 38.70938775510204,
+      "start": 44,
+      "end": 47.70938775510204,
       "loop": false
     },
     "hexagon3": {
-      "start": 40,
-      "end": 43.944489795918365,
+      "start": 49,
+      "end": 52.944489795918365,
       "loop": false
     },
     "hexagon4": {
-      "start": 45,
-      "end": 48.369795918367345,
+      "start": 54,
+      "end": 57.369795918367345,
       "loop": false
     },
     "hexagon5": {
-      "start": 50,
-      "end": 53.369795918367345,
+      "start": 59,
+      "end": 62.369795918367345,
       "loop": false
     },
     "parallelogram_A-sharp-major": {
-      "start": 55,
-      "end": 56.04489795918367,
+      "start": 64,
+      "end": 65.04489795918367,
       "loop": false
     },
     "parallelogram_C-minor": {
-      "start": 58,
-      "end": 58.99265306122449,
+      "start": 67,
+      "end": 67.99265306122449,
       "loop": false
     },
     "parallelogram_D-sharp-major": {
-      "start": 60,
-      "end": 61.17551020408163,
+      "start": 69,
+      "end": 70.17551020408163,
       "loop": false
     },
     "parallelogram_G-minor": {
-      "start": 63,
-      "end": 64.01877551020408,
+      "start": 72,
+      "end": 73.01877551020408,
       "loop": false
     },
     "parallelogram_G-sharp-major": {
-      "start": 66,
-      "end": 67.01877551020408,
+      "start": 75,
+      "end": 76.01877551020408,
       "loop": false
     },
     "stringbass_A-sharp": {
-      "start": 69,
-      "end": 70.09714285714286,
+      "start": 78,
+      "end": 79.09714285714286,
       "loop": false
     },
     "stringbass_C2": {
-      "start": 72,
-      "end": 73.20163265306122,
+      "start": 81,
+      "end": 82.20163265306122,
       "loop": false
     },
     "stringbass_F": {
-      "start": 75,
-      "end": 76.09714285714286,
+      "start": 84,
+      "end": 85.09714285714286,
       "loop": false
     },
     "stringbass_G": {
-      "start": 78,
-      "end": 79.28,
+      "start": 87,
+      "end": 88.28,
       "loop": false
     }
   }

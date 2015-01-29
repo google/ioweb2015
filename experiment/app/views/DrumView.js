@@ -18,12 +18,19 @@ module.exports = (function() {
    */
   return function DrumView(audioManager) {
     var world = new p2.World({
-      gravity: [0, -900.78]
+      gravity: [0, -900.78],
+      broadphase: new p2.SAPBroadphase()
     });
 
     world.applySpringForces = false;
     world.applyDamping = false;
     world.emitImpactEvent = false;
+
+    world.narrowphase.enableFriction = false;
+    world.narrowphase.enableFrictionReduction = false;
+    world.defaultContactMaterial.friction = 0;
+
+    world.solver.tolerance = 0.02;
 
     var stage;
     var data;

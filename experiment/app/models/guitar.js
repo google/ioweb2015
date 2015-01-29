@@ -33,7 +33,7 @@ module.exports = (function() {
    * Returns the default state is no serialized state is available.
    * @return {Object}
    */
-  function getDefault() {
+  function getDefault(audioManager) {
     return {
       'rows': 3,
       'cols': 5,
@@ -62,157 +62,157 @@ module.exports = (function() {
       'recorded': [
         {
           'beat': 4,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 5,
-          'sound': 27,
+          'sound': audioManager.getSound('stringbass_C2').guid,
           'pid': 20
         },
         {
           'beat': 8,
-          'sound': 27,
+          'sound': audioManager.getSound('stringbass_C2').guid,
           'pid': 20
         },
         {
           'beat': 10,
-          'sound': 26,
+          'sound': audioManager.getSound('stringbass_A-sharp').guid,
           'pid': 7
         },
         {
           'beat': 13,
-          'sound': 29,
+          'sound': audioManager.getSound('stringbass_G').guid,
           'pid': 15
         },
         {
           'beat': 14,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 17,
-          'sound': 27,
+          'sound': audioManager.getSound('stringbass_C2').guid,
           'pid': 20
         },
         {
           'beat': 19,
-          'sound': 26,
+          'sound': audioManager.getSound('stringbass_A-sharp').guid,
           'pid': 7
         },
         {
           'beat': 21,
-          'sound': 29,
+          'sound': audioManager.getSound('stringbass_G').guid,
           'pid': 15
         },
         {
           'beat': 23,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 25,
-          'sound': 29,
+          'sound': audioManager.getSound('stringbass_G').guid,
           'pid': 15
         },
         {
           'beat': 26,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 27,
-          'sound': 26,
+          'sound': audioManager.getSound('stringbass_A-sharp').guid,
           'pid': 7
         },
         {
           'beat': 29,
-          'sound': 27,
+          'sound': audioManager.getSound('stringbass_C2').guid,
           'pid': 20
         },
         {
           'beat': 31,
-          'sound': 29,
+          'sound': audioManager.getSound('stringbass_G').guid,
           'pid': 15
         },
         {
           'beat': 33,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 36,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 37,
-          'sound': 26,
+          'sound': audioManager.getSound('stringbass_A-sharp').guid,
           'pid': 7
         },
         {
           'beat': 41,
-          'sound': 27,
+          'sound': audioManager.getSound('stringbass_C2').guid,
           'pid': 20
         },
         {
           'beat': 42,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 43,
-          'sound': 29,
+          'sound': audioManager.getSound('stringbass_G').guid,
           'pid': 15
         },
         {
           'beat': 45,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 48,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 49,
-          'sound': 26,
+          'sound': audioManager.getSound('stringbass_A-sharp').guid,
           'pid': 7
         },
         {
           'beat': 53,
-          'sound': 27,
+          'sound': audioManager.getSound('stringbass_C2').guid,
           'pid': 20
         },
         {
           'beat': 53,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 55,
-          'sound': 29,
+          'sound': audioManager.getSound('stringbass_G').guid,
           'pid': 15
         },
         {
           'beat': 58,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 58,
-          'sound': 29,
+          'sound': audioManager.getSound('stringbass_G').guid,
           'pid': 15
         },
         {
           'beat': 60,
-          'sound': 28,
+          'sound': audioManager.getSound('stringbass_F').guid,
           'pid': 0
         },
         {
           'beat': 62,
-          'sound': 26,
+          'sound': audioManager.getSound('stringbass_A-sharp').guid,
           'pid': 7
         }
       ]

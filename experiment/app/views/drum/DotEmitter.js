@@ -68,7 +68,6 @@ module.exports = function DotEmitter() {
   function onBeat(beatNumber) {
     if (beatNumber % beatModulo === 0) {
       var ball = dropBall();
-
       var ballBody = ball.getBody();
 
       var lastTarget = null;

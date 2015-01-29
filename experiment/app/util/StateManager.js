@@ -7,7 +7,7 @@ module.exports = (function() {
    * Central point for app-wide serializable state.
    * @constructor
    */
-  return function StateManager() {
+  return function StateManager(audioManager) {
     var instruments = [];
     var instrumentLookup = {};
     var MasterDataModel;
@@ -100,7 +100,7 @@ module.exports = (function() {
 
       for (let i = 0; i < instruments.length; i++) {
         let key = instruments[i].name;
-        dataModels[key] = instruments[i].model.getDefault();
+        dataModels[key] = instruments[i].model.getDefault(audioManager);
       }
 
       allData = MasterDataModel.loadFromJSON(dataModels);
