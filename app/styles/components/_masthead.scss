@@ -123,7 +123,7 @@ core-drawer-panel {
     flex: none !important;
 
     a {
-      flex: inherit;
+      flex: inherit; // Needed for IE11, in order to ensure that the <a> gets assigned a width.
       font-size: 13px;
       color: inherit;
     }
