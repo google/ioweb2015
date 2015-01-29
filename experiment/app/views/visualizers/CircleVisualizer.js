@@ -45,11 +45,21 @@ module.exports = (function() {
     var particleImages = {};
 
     function init() {
-      world = new p2.World();
+      world = new p2.World({
+        broadphase: new p2.SAPBroadphase()
+      });
+
       world.applySpringForces = false;
       world.applyDamping = false;
       world.applyGravity = false;
+      world.useWorldGravityAsFrictionGravity = false;
       world.emitImpactEvent = false;
+
+      world.narrowphase.enableFriction = false;
+      world.narrowphase.enableFrictionReduction = false;
+      world.defaultContactMaterial.friction = 0;
+
+      world.solver.tolerance = 0.02;
 
       for (let i = 0; i < PARTICLE_SIZES.length; i++) {
         let s = PARTICLE_SIZES[i];
@@ -178,21 +188,10 @@ module.exports = (function() {
       }
     }
 
-    var frameWait = 1;
-    var delay = frameWait;
-
     /**
      * On render, draw wave
      */
     function render(delta) {
-      delay--;
-
-      if (delay > 0) {
-        return;
-      }
-
-      delay = frameWait;
-
       getRun();
       tickChase();
       stepPhysics(delta);

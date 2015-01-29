@@ -106,6 +106,12 @@ module.exports = (function() {
 
       world.emitImpactEvent = false;
 
+      world.narrowphase.enableFriction = false;
+      world.narrowphase.enableFrictionReduction = false;
+      world.defaultContactMaterial.friction = 0;
+
+      world.solver.tolerance = 0.02;
+
       displayContainerCenter.addChild(lineGraphicShadow);
       displayContainerCenter.addChild(lineGraphic);
 

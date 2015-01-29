@@ -27,7 +27,6 @@ module.exports = (function() {
    * @constructor
    */
   return function Sliver(container, polygon, depth, colorSets, hasLeftShadow, hasRightShadow, highlight) {
-
     var shadowLength;
 
     shadowLength = 15;
@@ -121,7 +120,7 @@ module.exports = (function() {
 
       var dColors = distanceGradient.calcGradient(0, MAX_RADIUS + 1).colors;
       distanceGradients[degrees] = distanceGradients[degrees] || {};
-      distanceGradients[degrees][distance] = dColors;
+      distanceGradients[degrees][distance] = dColors.map(c => c.toInt());
 
       return dColors;
     }
@@ -138,7 +137,7 @@ module.exports = (function() {
       }
 
       var dColors = getDistanceGradientColors(degrees, distance);
-      color = dColors[MAX_RADIUS-distance].toInt();
+      color = dColors[MAX_RADIUS-distance];
     }
 
     /**
