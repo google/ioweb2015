@@ -114,11 +114,13 @@ This is a rainbow circle border that spins around the experiment-fab while the e
 @element experiment-loading-fab
 @blurb This is a rainbow circle border that spins around the experiment-fab while the experiment is loading.
 -->
-<polymer-element name="experiment-loading-circle" noscript>
+<polymer-element name="experiment-loading-circle">
   <template>
     <style>
       :host {
-        background: transparent url(../images/loading-circle.png) 0 0 no-repeat;
+        background-color: transparent;
+        background-position: 0 0;
+        background-repeat: no-repeat;
         background-size: 100%;
         color: inherit;
         display: block;
@@ -165,6 +167,13 @@ This is a rainbow circle border that spins around the experiment-fab while the e
       }
     </style>
   </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.style.backgroundImage = 'url("'+window.experiment.assets.loadingExpImg+'")';
+      }
+    });
+  </script>
 </polymer-element>
 
 <!--
@@ -223,7 +232,9 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       }
 
       .dialog-content {
-        background: transparent url(../images/headphones-on.png) 60% 60% no-repeat;
+        background-color: transparent;
+        background-position: 60% 60%;
+        background-repeat: no-repeat;
         background-size: 75%;
         position: absolute;
         left: 20px;
@@ -349,6 +360,10 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           value: false,
           reflect: true
         }
+      },
+
+      ready: function() {
+        this.$.dialogcontent.style.backgroundImage = 'url("'+window.experiment.assets.headphonesImg+'")';
       },
 
       onExperimentOff: function() {
@@ -864,7 +879,7 @@ Main parent container for all of the fab elements.
     <template if="{{mode == 'pre'}}">
 
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
-      <experiment-fab src="../images/experiment-fab-animation.gif" on-tap="{{onFabClick}}" mini?="{{mini}}"></experiment-fab>
+      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}"></experiment-fab>
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
@@ -876,26 +891,26 @@ Main parent container for all of the fab elements.
 
       <template if="{{playmode == 'playing'}}">
         <core-tooltip label="Pause / Options" class="experiment-options-tooltip" position="left" noarrow="true" large>
-          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="../images/pause-experiment.png" on-tap="{{playingFabClick}}" playing></experiment-fab>
+          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.pauseExpImg}}" on-tap="{{playingFabClick}}" playing></experiment-fab>
         </core-tooltip>
       </template>
       <template if="{{playmode == 'paused'}}">
         <core-tooltip label="Resume playing" class="experiment-options-tooltip" position="left" noarrow="true" show large>
-          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="../images/play-experiment.png" on-tap="{{pausedFabClick}}" paused></experiment-fab>
+          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.playExpImg}}" on-tap="{{pausedFabClick}}" paused></experiment-fab>
         </core-tooltip>
       </template>
 
       <core-tooltip label="Share Song" class="experiment-share-tooltip" position="left" noarrow="true" show?="{{showTooltips}}" large>
-        <experiment-share-fab src="../images/share-experiment.png" mini open?="{{miniFabs}}" on-tap="{{onShareClick}}"></experiment-share-fab>
+        <experiment-share-fab src="{{assets.shareExpImg}}" mini open?="{{miniFabs}}" on-tap="{{onShareClick}}"></experiment-share-fab>
       </core-tooltip>
       <experiment-share-dialog active?="{{shareVisible}}" gplusShare="{{gplusShare}}" twitterShare="{{twitterShare}}" facebookShare="{{facebookShare}}" copiedURLShare="{{copiedURLShare}}"></experiment-share-dialog>
 
       <core-tooltip label="Reset to Default" class="experiment-reset-tooltip" position="left" noarrow="true" show?="{{showTooltips}}" large>
-        <experiment-reset-fab src="../images/reset-experiment.png" on-tap="{{resetExperiment}}" mini open?="{{miniFabs}}"></experiment-reset-fab>
+        <experiment-reset-fab src="{{assets.resetExpImg}}" on-tap="{{resetExperiment}}" mini open?="{{miniFabs}}"></experiment-reset-fab>
       </core-tooltip>
 
       <core-tooltip label="Exit Experiment" class="experiment-exit-tooltip" position="left" noarrow="true" show?="{{showTooltips}}" large>
-        <experiment-exit-fab src="../images/exit-experiment.png" on-tap="{{exitExperiment}}" mini open?="{{miniFabs}}"></experiment-exit-fab>
+        <experiment-exit-fab src="{{assets.exitExpImg}}" on-tap="{{exitExperiment}}" mini open?="{{miniFabs}}"></experiment-exit-fab>
       </core-tooltip>
 
       <experiment-overlay active?="{{pauseOverlay}}" on-tap="{{pausedFabClick}}"></experiment-overlay>
@@ -942,6 +957,7 @@ Main parent container for all of the fab elements.
 
       ready: function() {
         this.bindEscape = this.onEscKeyUp.bind(this);
+        this.assets = window.experiment.assets;
       },
 
       attached: function() {
