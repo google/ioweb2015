@@ -7,6 +7,7 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -95,7 +96,8 @@ func checkWhitelist(h http.Handler) http.Handler {
 }
 
 // newContext returns a newly created context of the in-flight request r.
-func newContext(r *http.Request) context.Context {
+// and its response writer w.
+func newContext(r *http.Request, w io.Writer) context.Context {
 	ac := appengine.NewContext(r)
 	v := appengine.VersionID(ac)
 	if i := strings.Index(v, "."); i > 0 {
@@ -111,7 +113,8 @@ func newContext(r *http.Request) context.Context {
 		appEnv = "stage"
 	}
 	c := context.WithValue(context.Background(), ctxKeyEnv, appEnv)
-	return context.WithValue(c, ctxKeyGAEContext, ac)
+	c = context.WithValue(c, ctxKeyGAEContext, ac)
+	return context.WithValue(c, ctxKeyWriter, w)
 }
 
 // appengineContext extracts appengine.Context value from the context c

@@ -42,10 +42,11 @@ func handler(fn func(w http.ResponseWriter, r *http.Request)) http.Handler {
 // found under request base path.
 // 'home' template is assumed if request path ends with '/'.
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	c := newContext(r)
+	c := newContext(r, w)
 
 	r.ParseForm()
 	_, wantsPartial := r.Form["partial"]
+	_, experimentShare := r.Form["experiment"]
 
 	tplname := path.Base(r.URL.Path)
 	switch {
@@ -55,8 +56,12 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		tplname = tplname[:len(tplname)-5]
 	}
 
+	data := &templateData{Env: env(c), OgImage: ogImageDefault}
+	if experimentShare {
+		data.OgImage = ogImageExperiment
+	}
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	err := renderTemplate(w, env(c), tplname, wantsPartial)
+	err := renderTemplate(c, tplname, wantsPartial, data)
 
 	if err != nil {
 		log.Printf("renderTemplate: %v", err)
@@ -70,7 +75,7 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	_, refresh := r.Form["refresh"]
 
-	c := newContext(r)
+	c := newContext(r, w)
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
 	// respond with stubbed JSON entries in dev mode
