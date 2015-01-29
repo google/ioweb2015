@@ -614,8 +614,8 @@ Dialog to share the user's custom experiment/song
             <i18n-msg msgid="facebook-share">Facebook</i18n-msg>
           </a>
         </paper-item>
-        <paper-item class="share-url" noink on-tap="{{linkSelect}}">
-          <core-icon class="share-icon" icon="link"></core-icon>
+        <paper-item class="share-url" noink>
+          <core-icon class="share-icon" icon="link" on-tap="{{linkSelect}}"></core-icon>
           <input id="urlInput" value="{{copiedURLShare}}" on-tap="{{linkSelect}}" readonly>
         </paper-item>
       </core-menu>
@@ -638,8 +638,7 @@ Dialog to share the user's custom experiment/song
       },
 
       linkSelect: function() {
-        this.$.urlInput.selectionStart = 0;
-        this.$.urlInput.selectionEnd = this.$.urlInput.value.length;
+        this.$.urlInput.select();
       },
 
       encodeURI: function(uri) {
