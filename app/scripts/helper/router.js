@@ -212,7 +212,9 @@ IOWA.Router = (function() {
 
     setTimeout(function() {
       if (currentPageTransition === 'hero-card-transition') {
-        IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverIn());
+        IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverIn(), function() {
+          IOWA.Elements.Template.fire('page-transition-done');
+        });
       } else {
         IOWA.PageAnimation.play(IOWA.PageAnimation.pageSlideIn(), function() {
           // Fire event when the page transitions are final.
