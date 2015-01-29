@@ -262,7 +262,7 @@
   },
   "organizerguide": {
     "description": "Offsite page. Link to download the organizer's guide",
-    "message": "Organizer's Guide"
+    "message": "Organizer Guide"
   },
   "submitevent": {
     "description": "Offsite page. Link for developers to submit their own event",
