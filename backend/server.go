@@ -7,6 +7,7 @@ package main
 
 import (
 	"flag"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -58,9 +59,11 @@ func main() {
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
 
-// newContext returns a newly created context of the in-flight request r.
-func newContext(r *http.Request) context.Context {
-	return context.WithValue(context.Background(), ctxKeyEnv, appEnv)
+// newContext returns a newly created context of the in-flight request r
+// and its response writer w.
+func newContext(r *http.Request, w io.Writer) context.Context {
+	c := context.WithValue(context.Background(), ctxKeyEnv, appEnv)
+	return context.WithValue(c, ctxKeyWriter, w)
 }
 
 // catchAllHandler serves either static content from rootDir

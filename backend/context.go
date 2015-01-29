@@ -1,6 +1,10 @@
 package main
 
-import "golang.org/x/net/context"
+import (
+	"io"
+
+	"golang.org/x/net/context"
+)
 
 type ctxKey int
 
@@ -8,6 +12,7 @@ const (
 	// context.Context value keys
 	ctxKeyEnv ctxKey = iota
 	ctxKeyGAEContext
+	ctxKeyWriter
 )
 
 // env returns current app environment: "dev", "stage" or "prod".
@@ -19,4 +24,10 @@ func env(c context.Context) string {
 		e = "dev"
 	}
 	return e
+}
+
+// writer returns a response writer associated with the give context c.
+func writer(c context.Context) io.Writer {
+	w, _ := c.Value(ctxKeyWriter).(io.Writer)
+	return w
 }
