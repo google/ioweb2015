@@ -229,7 +229,7 @@ IOWA.Elements = (function() {
           url = 'https://www.facebook.com/sharer.php?u=' +
                 encodeURIComponent(location.href) +
                 '&t=' + encodeURIComponent(document.title);
-        break;
+          break;
 
         case 'gplus':
           height = 348;
@@ -237,7 +237,7 @@ IOWA.Elements = (function() {
           url = 'https://plus.google.com/share?url=' +
                 encodeURIComponent(location.href) +
                 '&hl=' + encodeURIComponent(document.documentElement.lang);
-        break;
+          break;
 
         case 'twitter':
           height = 253;
@@ -246,11 +246,11 @@ IOWA.Elements = (function() {
           url = 'https://twitter.com/share?text=' +
                 encodeURIComponent(el.textContent || 'Google I/O 2015') +
                 '&url=' + encodeURIComponent(location.href);
-        break;
+          break;
 
         default:
 
-        return;
+          return;
       }
 
       var options = 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=' +
