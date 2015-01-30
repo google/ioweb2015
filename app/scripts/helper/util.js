@@ -38,7 +38,7 @@ IOWA.Util = IOWA.Util || (function() {
    * @param {Element} el Element to scroll to.
    * @param {number=} opt_duration Optional duration for the animation to
    *     take. If not specified, the element is immediately scrolled to.
-   * @param {Function=} opt_callback Callback to execute at the end of the scroll.
+   * @param {function()=} opt_callback Callback to execute at the end of the scroll.
    */
   function smoothScroll(el, opt_duration, opt_callback) {
     var duration = opt_duration || 1;
@@ -60,14 +60,17 @@ IOWA.Util = IOWA.Util || (function() {
     var callback = function(timestamp) {
       if (timestamp < endTime) {
         requestAnimationFrame(callback);
-      } else if (opt_callback) {
-        opt_callback();
       }
 
       var point = smoothStep(startTime, endTime, timestamp);
       var scrollTop = Math.round(startTop + (destY * point));
 
       scrollContainer.scrollTop = scrollTop;
+
+      // All done scrolling.
+      if (el.getBoundingClientRect().top == 0 && opt_callback) {
+        opt_callback();
+      }
     };
 
     callback(startTime);

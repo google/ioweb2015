@@ -83,14 +83,12 @@
       var button = IOWA.Elements.Main.querySelector('.play__button__container');
       var navOverlay = document.querySelector('.navbar__overlay--video');
 
-      var reverse = opt_reverse || false;
-
       var ANIMATION_DURATION = 500;
 
       var animationOptions = {
         duration: ANIMATION_DURATION,
         fill: 'forwards',
-        direction: reverse ? 'reverse' : 'normal',
+        direction: opt_reverse ? 'reverse' : 'normal',
         easing: 'cubic-bezier(0.4,0,0.2,1)'
       };
 
@@ -119,10 +117,10 @@
         duration: ANIMATION_DURATION,
         fill: 'forwards',
         easing: 'cubic-bezier(0.4,0,0.2,1)',
-        direction: reverse ? 'reverse' : 'normal'
+        direction: opt_reverse ? 'reverse' : 'normal'
       });
 
-      if (reverse) {
+      if (opt_reverse) {
         // Fade out gallery and slide back in page sections at the same time.
         IOWA.PageAnimation.play(videoAnimation);
         IOWA.PageAnimation.play(cardAnimations, opt_callback);
