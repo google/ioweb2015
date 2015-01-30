@@ -57,11 +57,11 @@
   },
   "iodate": {
     "description": "The date of Google I/O",
-    "message": "Smarch xx - xx"
+    "message": "May 28 - 29"
   },
   "iomonth": {
     "description": "The month of the Google I/O event",
-    "message": "Smarch"
+    "message": "May"
   },
   "reg-begins": {
     "description": "When registration begins",
@@ -178,7 +178,7 @@
   },
   "share-text": {
     "description": "Social sharing pre-populated text.",
-    "message": "Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person Smarch xx-xx, 2015."
+    "message": "Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015."
   },
   "gplus-share": {
     "description": "Google plus share text",
