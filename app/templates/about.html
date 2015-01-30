@@ -85,7 +85,9 @@
   <template if="{{fullscreenVideoActive}}">
     <div class="fullvideo__container" fit hidden>
       <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch the I/O Recap Video" fit>
-      <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit autoplay="1"></google-youtube>
+      <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit autohide="1" controls="2"
+                      modestbranding="1" showinfo="0" iv_load_policy="3" rel="0" autoplay="1">
+      </google-youtube>
     </div>
   </template>
 
