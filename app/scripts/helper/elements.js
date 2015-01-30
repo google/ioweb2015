@@ -67,6 +67,7 @@ IOWA.Elements = (function() {
     template.pages = {};
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.fullscreenVideoActive = false;
+    template.pageTransitionDone = false;
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
@@ -265,9 +266,11 @@ IOWA.Elements = (function() {
 
     template.addEventListener('template-bound', updateElements);
     template.addEventListener('page-transition-done', function(e) {
+      this.pageTransitionDone = true;
       IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
     });
     template.addEventListener('page-transition-start', function(e) {
+      this.pageTransitionDone = false;
       IOWA.Elements.NavPaperTabs.style.pointerEvents = 'none';
     });
 
