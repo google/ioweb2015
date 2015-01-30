@@ -178,6 +178,36 @@ Creates a countdown timer to a specific date.
         this.timer.start();
       },
 
+      dateChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      dateAdjustmentChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      easeInTimeChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      easeOutTimeChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      waitTimeChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
       created: function() {
         this.thresholdInformation = {
           thresholdDays: false,
@@ -201,31 +231,6 @@ Creates a countdown timer to a specific date.
         IOWA.CountdownTimer.Colors.Background = this.bgColor;
       },
 
-      dateChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
-      dateAdjustmentChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
-      easeInTimeChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
-      easeOutTimeChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
-      waitTimeChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
       /**
        * Lifecycle event that creates the timer, configures it, and either
        * starts it (if `autoStart` === true) or draws the start value if not.
@@ -233,7 +238,6 @@ Creates a countdown timer to a specific date.
        * @private
        */
       attached: function() {
-
         // Create the timer and set it with whatever the current
         // values are. If the user updates any values then the
         // timer will get reconfigured.
@@ -320,11 +324,13 @@ Creates a countdown timer to a specific date.
        * @private
        */
       configureTimer_: function() {
+        if (!this.timer) return;
 
         var targetDate = Date.parse(this.date);
 
-        if (isNaN(targetDate))
+        if (isNaN(targetDate)) {
           targetDate = Date.now();
+        }
 
         targetDate = new Date(targetDate);
 
