@@ -68,7 +68,7 @@ IOWA.Util = IOWA.Util || (function() {
       scrollContainer.scrollTop = scrollTop;
 
       // All done scrolling.
-      if (el.getBoundingClientRect().top == 0 && opt_callback) {
+      if (el.getBoundingClientRect().top === 0 && opt_callback) {
         opt_callback();
       }
     };
