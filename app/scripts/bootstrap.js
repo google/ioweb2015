@@ -38,11 +38,7 @@
                 // Define a handler that will be used for the next io-toast tap, at which point it
                 // be automatically removed.
                 var tapHandler = function() {
-                  navigator.serviceWorker.getRegistration().then(function(registration) {
-                    return registration.unregister();
-                  }).then(function() {
-                    window.location.reload(true);
-                  });
+                  window.location.reload();
                 };
 
                 IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest content.',
