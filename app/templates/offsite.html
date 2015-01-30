@@ -65,7 +65,9 @@
         </paper-button>
       </div>
       <div class="attend__globe">
-        <webgl-globe></webgl-globe>
+        <template if="{{pageTransitionDone}}">
+          <webgl-globe></webgl-globe>
+        </template>
       </div>
     </section>
   </div>
