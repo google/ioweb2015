@@ -17,7 +17,7 @@
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
   </core-toolbar>
 
-  <io-gallery hidden?="{{!photoGalleryActive}}" fit></io-gallery>
+  <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}" fit></io-gallery>
 
   <div class="card__container slide-up">
     <div class="card js-experiment-visualizer">
@@ -71,7 +71,7 @@
       <div class="card" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="about-watch-2014-recap-video">
         <div flex class="card__photo card__photo--recap"></div>
         <div class="card-content">
-          <img src="images/play-video-button.png" class="play__button" alt="Play video">
+          <img src="images/play-video-button.png" class="play__button play__button--card" alt="Play video">
           <span class="anchor-like"><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
         </div>
       </div>
@@ -85,9 +85,9 @@
   <template if="{{fullscreenVideoActive}}">
     <div class="fullvideo__container" fit hidden>
       <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch the I/O Recap Video" fit>
-      <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit autohide="1" controls="2"
-                      modestbranding="1" showinfo="0" iv_load_policy="3" rel="0" autoplay="1">
-      </google-youtube>
+      <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
+                      autohide="1" controls="2" modestbranding="1" showinfo="0"
+                      iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
     </div>
   </template>
 
@@ -137,6 +137,11 @@
       ]);
 
       var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+
+      if (gallery.mobile) {
+        animation.children = animation.children.slice(2);
+      }
+
       var galleryAnimation = new Animation(gallery, [
         {opacity: 0}, {opacity: 1}
       ], {

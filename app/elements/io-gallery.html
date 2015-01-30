@@ -68,7 +68,16 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
        * @type Array
        * @default []
        */
-      photos: {value: null}
+      photos: {value: null},
+
+      /**
+       * True if on mobile.
+       *
+       * @property mobile
+       * @type bool
+       * @default false
+       */
+      mobile: {value: false, reflect: true}
     },
 
     created: function() {
