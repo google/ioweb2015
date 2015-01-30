@@ -234,7 +234,9 @@ module.exports = (function() {
      * Activate countdown
      */
     function onCountdownActivate() {
-      ignoreInteraction();
+      if ('function' === typeof instrumentView.startCountdown) {
+        instrumentView.startCountdown();
+      }
       backIconContainer.interactive = false;
       animate.to(backIconContainer, 0.33, {
         alpha: 0
@@ -246,7 +248,6 @@ module.exports = (function() {
      * Activate record button
      */
     function onRecordActivate() {
-      followInteraction();
       if ('function' === typeof instrumentView.startRecording) {
         instrumentView.startRecording();
       }
