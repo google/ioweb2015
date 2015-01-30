@@ -68,7 +68,7 @@ core-icon[icon="schedule"] {
   }
 
   .schedule-rows {
-    width: 300px;
+    width: 300px; // Needed for IE11, to ensure the flexed children have proper widths.
   }
 }
 
