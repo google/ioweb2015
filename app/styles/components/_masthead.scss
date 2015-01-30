@@ -91,6 +91,8 @@
 
 core-drawer-panel {
   [drawer] {
+    font-size: 14px;
+    font-weight: 500;
     background-color: $color-body;
   }
   [main] {
@@ -104,8 +106,10 @@ core-drawer-panel {
       margin-left: 0;
       margin-right: 0;
     }
+    paper-item {
+      font-size: inherit;
+    }
     a {
-      font-weight: inherit;
       color: inherit;
     }
   }
