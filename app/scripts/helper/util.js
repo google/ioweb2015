@@ -51,7 +51,9 @@ IOWA.Util = IOWA.Util || (function() {
     var destY = el.getBoundingClientRect().top;
 
     if (destY === 0) {
-      opt_callback && opt_callback();
+      if (opt_callback) {
+        opt_callback();
+      }
       return; // already at top of element.
     }
 
