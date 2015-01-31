@@ -170,7 +170,7 @@ This is a rainbow circle border that spins around the experiment-fab while the e
   <script>
     Polymer({
       ready: function() {
-        this.style.backgroundImage = 'url("'+window.experiment.assets.loadingExpImg+'")';
+        this.style.backgroundImage = 'url("' + window.experiment.assets.loadingExpImg + '")';
       }
     });
   </script>
@@ -299,7 +299,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       <div class="dialog-content" _style="background-image: {{dialogSupportedImage}}">
         <h4><i18n-msg msgid="experiment-ahead">Chrome Experiment ahead</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="headphones-on">The Experiment features Web Audio API. <br>You might want to grab headphones.</i18n-msg>
+          <i18n-msg msgid="headphones-on">The Experiment features Web Audio API. You might want to grab headphones.</i18n-msg>
         </p>
         <div class="button-container">
           <template if="{{!expLoaded}}">
@@ -372,8 +372,8 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       },
 
       ready: function() {
-        this.dialogSupportedImage = 'url("'+window.experiment.assets.headphonesImg+'")';
-        this.dialogUnsupportedImage = 'url("'+window.experiment.assets.unsupportedImg+'")';
+        this.dialogSupportedImage = 'url("' + window.experiment.assets.headphonesImg + '")';
+        this.dialogUnsupportedImage = 'url("' + window.experiment.assets.unsupportedImg + '")';
       },
 
       onExperimentOff: function() {
