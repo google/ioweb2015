@@ -10,6 +10,7 @@ window.experiment = (function() {
   var shareExpImg = require('url?limit=10000!loader/images/share-experiment.png');
   var loadingExpImg = require('url?limit=10000!loader/images/loading-circle.png');
   var headphonesImg = require('url?limit=200000!loader/images/headphones-on.jpg');
+  var unsupportedImg = require('url?limit=200000!loader/images/headphones-error.jpg');
   var {Promise} = require('es6-promise');
 
   var appSingleton;
@@ -114,7 +115,8 @@ window.experiment = (function() {
       resetExpImg,
       shareExpImg,
       loadingExpImg,
-      headphonesImg
+      headphonesImg,
+      unsupportedImg
     },
     load,
     canLoad,

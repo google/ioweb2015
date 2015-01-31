@@ -126,11 +126,11 @@
   },
   "headphones-on": {
     "description": "Hint to the user to put their headphones on.",
-    "message": "Headphones on"
+    "message": "The Experiment features Web Audio API. You might want to grab headphones."
   },
   "experiment-ahead": {
-    "description": "The experiment's loading message explaining it will use a particular API.",
-    "message": "Web Audio API experiment ahead"
+    "description": "The experiment's loading message.",
+    "message": "Chrome Experiment ahead"
   },
   "loading": {
     "description": "Indicates that the experiment is loading.",
@@ -146,11 +146,23 @@
   },
   "experiment-unsupported": {
     "description": "Message to be displayed if experiment tech supported.",
-    "message": "Unsupported"
+    "message": "The I/O experiment is not supported by your browser. Find supported browsers below."
+  },
+  "sorry": {
+    "description": "Header to be displayed if experiment tech supported.",
+    "message": "Sorry..."
+  },
+  "supports-webgl": {
+    "description": "Link to browsers that support WebGL.",
+    "message": "WebGL"
+  },
+  "supports-webaudio": {
+    "description": "Link to browsers that support Web Audio.",
+    "message": "Web Audio"
   },
   "experiment-failed": {
     "description": "If experiment fails to load, display this message.",
-    "message": "The experiment failed to load"
+    "message": "The experiment failed to load."
   },
   "close-dialog": {
     "description": "Close message for the dialog box.",
