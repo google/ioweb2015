@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-@import 'base/_breakpoints';
-@import 'base/_color';
-@import 'base/_shadow';
-@import 'base/_typography';
+$name: 'page-faq';
 
-@import 'base/_reset';
-@import 'base/_layout';
-@import 'base/_zindex';
+@import '../base/_layout';
+@import '../base/_color';
+@import '../base/_breakpoints';
 
-@import 'components/_app';
-@import 'components/_masthead';
-@import 'components/_card';
-@import 'components/_footer';
 
-@import 'pages/home';
-@import 'pages/schedule';
-@import 'pages/about';
-@import 'pages/onsite';
-@import 'pages/offsite';
-@import 'pages/registration';
-@import 'pages/faq';
+##{$name} {
+
+.page__section {
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: $mobileKeyline;
+}
+
+
+@media (min-width: $tablet-breakpoint-min) {
+  .page__section {
+    padding-bottom: $desktopKeyline;
+  }
+}
+
+}
