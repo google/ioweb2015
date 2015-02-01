@@ -55,8 +55,11 @@
 
   core-toolbar {
     .io-logo {
+      margin-top: $mobileKeyline / 2;
       margin-left: $mobileKeyline / 2;
-      display: none;
+      display: inline-block;
+      opacity: 0;
+      transition: opacity 300ms cubic-bezier(0,0,0.2,1);
     }
   }
 }
@@ -179,7 +182,7 @@ experiment-fab-container {
 
     core-toolbar {
       .io-logo {
-        display: inline-block;
+        opacity: 1;
       }
     }
   }

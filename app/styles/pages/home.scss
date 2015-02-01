@@ -28,7 +28,7 @@ $name: 'page-home';
 .masthead {
   core-toolbar {
     .io-logo {
-      display: none;
+      opacity: 0;
     }
   }
 }
