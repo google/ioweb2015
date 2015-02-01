@@ -5,7 +5,6 @@ var backImage = require('url?limit=10000!app/images/back-arrow.png');
 var RecordButton = require('app/views/RecordButton');
 var zIndexes = require('app/util/zIndexes');
 var currentViewportDetails = require('app/util/currentViewportDetails');
-var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
   'use strict';
@@ -112,7 +111,7 @@ module.exports = (function() {
 
       isReady = true;
 
-      rAFTimeout(function() {
+      setTimeout(function() {
         // fixes for black graphic squares in 5th webGL container
         var recordIconImage = recordButton.recordIcon;
         var recordCircle = recordButton.circle;
@@ -235,6 +234,9 @@ module.exports = (function() {
      * Activate countdown
      */
     function onCountdownActivate() {
+      if ('function' === typeof instrumentView.startCountdown) {
+        instrumentView.startCountdown();
+      }
       backIconContainer.interactive = false;
       animate.to(backIconContainer, 0.33, {
         alpha: 0

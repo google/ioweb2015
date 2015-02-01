@@ -2,6 +2,15 @@ window.experiment = (function() {
   'use strict';
 
   var assetPath = require('app/util/assetPath');
+  var animatedImg = require('url?limit=10000!loader/images/experiment-fab-animation.gif');
+  var exitExpImg = require('url?limit=10000!loader/images/exit-experiment.png');
+  var pauseExpImg = require('url?limit=10000!loader/images/pause-experiment.png');
+  var playExpImg = require('url?limit=10000!loader/images/play-experiment.png');
+  var resetExpImg = require('url?limit=10000!loader/images/reset-experiment.png');
+  var shareExpImg = require('url?limit=10000!loader/images/share-experiment.png');
+  var loadingExpImg = require('url?limit=10000!loader/images/loading-circle.png');
+  var headphonesImg = require('url?limit=200000!loader/images/headphones-on.jpg');
+  var unsupportedImg = require('url?limit=200000!loader/images/headphones-error.jpg');
   var {Promise} = require('es6-promise');
 
   var appSingleton;
@@ -98,6 +107,17 @@ window.experiment = (function() {
   }
 
   return {
+    assets: {
+      animatedImg,
+      exitExpImg,
+      pauseExpImg,
+      playExpImg,
+      resetExpImg,
+      shareExpImg,
+      loadingExpImg,
+      headphonesImg,
+      unsupportedImg
+    },
     load,
     canLoad,
     didFinishLoading,

@@ -46,6 +46,7 @@ module.exports = (function() {
 
     var isReady = false;
     var isRecording = false;
+    var isCountdown = false;
     var allData;
 
     var pidPool = [];
@@ -151,10 +152,18 @@ module.exports = (function() {
     }
 
     /**
+     * On countdown, don't allow dots to be clicked/drawn
+     */
+    function startCountdown() {
+      isCountdown = true;
+    }
+
+    /**
      * Start recording the guitar note.
      */
     function startRecording() {
       isRecording = true;
+      isCountdown = false;
       allData.recorded = [];
     }
 
@@ -301,7 +310,7 @@ module.exports = (function() {
      * @param {Object} dot - The clicked dot.
      */
     function activateDot(dot) {
-      if (isRecording) { return; }
+      if (isRecording || isCountdown) { return; }
       if (APPLICATION_STATE === 'collapsed') { return; }
 
       if (!isDrawing && !dot.getString() && !isUndrawing) {
@@ -587,6 +596,7 @@ module.exports = (function() {
       disable,
       render,
       resize,
+      startCountdown,
       startRecording,
       stopRecording,
       getData,
