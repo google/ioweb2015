@@ -150,7 +150,7 @@ h3, h4, h5, h6 {
 }
 
 .io-countdown {
-  margin: 60px 0 365px 0;
+  margin: 60px 0 360px 0;
 
   countdown-timer {
     width: 360px;
@@ -257,8 +257,8 @@ h3, h4, h5, h6 {
 @media (min-width: $tablet-breakpoint-min) {
   .page__section {
     @include keyline-32();
-    padding-top: 40px;
-    padding-bottom: 40px;
+    padding-top: $desktopKeyline;
+    padding-bottom: $desktopKeyline;
   }
   .page__section--attend {
     padding-top: 100px;
@@ -278,8 +278,16 @@ h3, h4, h5, h6 {
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
+  .page__section {
+    @include keyline-72();
+    padding-top: $largeKeyline;
+    padding-bottom: $largeKeyline;
+  }
+  .io-countdown {
+    margin: 60px 0 300px 0;
+  }
   .io__hash {
-    margin: 180px auto;
+    margin: 140px auto;
   }
 }
 

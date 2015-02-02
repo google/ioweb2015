@@ -84,7 +84,7 @@ google-youtube {
   .card__photo--stage {
     height: 900px;
     position: relative;
-    margin-top: -73px;
+    margin-top: -29px;
     margin-bottom: -226px;
   }
   .play__button__container {
@@ -95,7 +95,7 @@ google-youtube {
     padding-top: $marginTop;
 
     h2 {
-      max-width: 58%;
+      max-width: 68%;
       padding: 0 $desktopKeyline 0 $desktopKeyline;
     }
 
@@ -120,7 +120,7 @@ google-youtube {
    $marginTop: 180px;
 
   .card__photo--stage {
-    margin-top: -93px;
+    margin-top: -33px;
   }
   .page__section--attend {
     margin-top: -90px;
@@ -128,8 +128,13 @@ google-youtube {
     background-size: cover;
     background-position: 50% 140px;
 
+    h2 {
+      padding: 0 $largeKeyline 0 $largeKeyline;
+    }
+
     .action__links {
       top: $marginTop;
+      right: $largeKeyline;
     }
   }
 }
@@ -139,7 +144,7 @@ google-youtube {
     margin-top: -108px;
   }
   .card__photo--stage {
-    margin-top: -57px;
+    margin-top: -33px;
     margin-bottom: -176px;
   }
 }

@@ -18,8 +18,8 @@ $name: 'page-about';
 
 @import '../base/_color';
 @import '../base/_breakpoints';
+@import '../base/_layout';
 @import '../base/_typography';
-
 
 ##{$name} {
 
@@ -48,6 +48,8 @@ main {
   paper-button {
     position: absolute;
     bottom: 20%;
+    width: 100%;
+    margin: 0;
   }
 
   > div {
@@ -88,7 +90,7 @@ main {
 @media (min-width: $tablet-breakpoint-min) {
   .pics__section {
     height: 745px;
-    margin-top: -110px;
+    margin-top: -102px;
     margin-bottom: -50px;
 
     > div {
@@ -111,7 +113,7 @@ main {
 
 @media (min-width: $desktop-breakpoint-mid) {
   .pics__section {
-    margin-top: -134px;
+    margin-top: -110px;
   }
   #hashtag {
     margin-top: -319px;

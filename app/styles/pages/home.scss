@@ -68,7 +68,7 @@ $name: 'page-home';
 
 #join {
   h2 {
-    max-width: 300px;
+    max-width: 230px;
   }
 
   .join__social {
@@ -97,7 +97,7 @@ $name: 'page-home';
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  $overlayCardTop: 180px;
+  $overlayCardTop: 229px;
 
   .io__hash {
     margin: 80px auto;
@@ -112,7 +112,7 @@ $name: 'page-home';
 
   .home-photo {
     height: 745px;
-    margin-top: -147px;
+    margin-top: -103px;
   }
 
   #registration {
@@ -127,7 +127,7 @@ $name: 'page-home';
     }
   }
   .page__section--attend {
-    margin-bottom: -153px;
+    margin-bottom: -105px;
   }
   .attend__globe {
     height: 500px;
@@ -150,19 +150,30 @@ $name: 'page-home';
     margin-bottom: -248px;
   }
   .home-photo {
-    margin-top: -183px;
+    margin-top: -111px;
   }
   .page__section--attend {
-    margin-bottom: -201px;
+    padding-top: $largeKeyline + $desktopKeyline;
+  }
+  #join {
+    margin-top: -156px;
+
+    h2 {
+      max-width: 300px;
+    }
+
+    .join__social {
+      right: $largeKeyline;
+    }
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
   .home-photo {
-    margin-top: -135px;
+    margin-top: -111px;
   }
   .page__section--attend {
-    margin-bottom: -153px;
+    margin-bottom: -105px;
   }
 }
 

@@ -91,6 +91,8 @@
 
 core-drawer-panel {
   [drawer] {
+    font-size: 14px;
+    font-weight: 500;
     background-color: $color-body;
   }
   [main] {
@@ -104,8 +106,10 @@ core-drawer-panel {
       margin-left: 0;
       margin-right: 0;
     }
+    paper-item {
+      font-size: inherit;
+    }
     a {
-      font-weight: inherit;
       color: inherit;
     }
   }
@@ -145,10 +149,13 @@ core-drawer-panel {
 
 .masthead-title {
   color: $color-cyan-A700 !important;
+  line-height: 24px;
+  font-weight: 400;
 }
 
 .masthead-subtitle {
   color: $color-bluegrey-700;
+  font-weight: 400;
 }
 
 experiment-fab-container {
@@ -193,8 +200,12 @@ experiment-fab-container {
     padding: 0 0 170px 0;
   }
 
+  .masthead-title {
+    line-height: 28px;
+  }
+
   .masthead-subtitle {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
   }
 
   experiment-fab-container {
@@ -215,6 +226,16 @@ experiment-fab-container {
 @media (min-width: $desktop-breakpoint-mid) {
   .masthead-container {
     max-width: 896px;
+  }
+  .masthead-title {
+    font-weight: 300;
+    font-size: 32px;
+    line-height: 38px;
+  }
+  .masthead-subtitle {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
   }
 }
 
