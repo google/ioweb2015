@@ -64,8 +64,7 @@ IOWA.Elements = (function() {
     ioLogo.addEventListener('io-logo-animation-done', function() {
       var optionallyLaunchExperiment = function() {
         if (window.location.search.indexOf('experiment') > -1) {
-          var fab = document.querySelector('experiment-fab-container');
-          fab.onFabClick();
+          IOWA.Elements.FAB.onFabClick();
         }
       };
       IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender(),
