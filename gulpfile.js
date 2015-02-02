@@ -229,7 +229,7 @@ gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
     start();
     serverAddr = 'http://' + serverAddr;
     console.log('The site should now be available at: ' + serverAddr);
-    opn(serverAddr);
+    opn(serverAddr + URL_PREFIX);
     return;
   }
 
@@ -248,7 +248,7 @@ gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
   });
 
   run();
-  browserSync({notify: false, proxy: serverAddr});
+  browserSync({notify: false, proxy: serverAddr, open: URL_PREFIX});
 
   watch();
   gulp.watch([BACKEND_DIR + '/**/*.go'], function() {
@@ -391,13 +391,13 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
     serverAddr = 'http://' + serverAddr;
     console.log('The site should now be available at: ' + serverAddr);
     // give GAE server some time to start
-    setTimeout(opn.bind(null, serverAddr, null, null), 2000);
+    setTimeout(opn.bind(null, serverAddr + URL_PREFIX, null, null), 2000);
     return;
   }
 
   browserSync.emitter.on('service:exit', onExit);
   // give GAE server some time to start
-  setTimeout(browserSync.bind(null, {notify: false, proxy: serverAddr}), 2000);
+  setTimeout(browserSync.bind(null, {notify: false, proxy: serverAddr, open: URL_PREFIX}), 2000);
   watch();
 }
 
