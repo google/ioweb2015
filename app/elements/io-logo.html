@@ -173,7 +173,7 @@ with the attribute `iologodestination`.
      * @method start
      */
     start: function() {
-      var DURATION = 400;
+      var DURATION = 350;
 
       var animation = [
         {transform: 'scale(0)'},
@@ -183,24 +183,37 @@ with the attribute `iologodestination`.
       var sequence = new AnimationSequence([
         new Animation(this.$.o2, animation, {
           delay: this.START_DELAY,
-          endDelay: this.START_DELAY + this.SHOW_FOR,
+          // endDelay: this.START_DELAY + this.SHOW_FOR,
+           endDelay: this.SHOW_FOR,
           duration: DURATION,
           easing: 'cubic-bezier(0,0,0.21,1)',
           fill: 'forwards'
         }),
-        new Animation(this.$.o2, animation, {
-          duration: DURATION,
-          easing: 'ease-in-out',
-          fill: 'forwards',
-          direction: 'reverse'
-        })
+        // new Animation(this.$.o2, animation, {
+        //   duration: DURATION,
+        //   easing: 'ease-in-out',
+        //   fill: 'forwards',
+        //   direction: 'reverse'
+        // })
       ]);
 
       var player = document.timeline.play(sequence);
 
+      // TODO(ericbidelman): it should be possible to reverse the direction of
+      // the sequence but it doesn't work in current M40 stable. Does it Canary.
+      // Until then, reverse the animation manually at the correct time.
+      var iteration = 0;
       player.onfinish = function(e) {
-        player.cancel();
-        this.moveLogo();
+        iteration++;
+        if (iteration >= 2) {
+          player.cancel();
+          this.moveLogo();
+          return;
+        }
+
+        this.async(function() {
+          player.reverse();
+        }, null, this.SHOW_FOR);
       }.bind(this);
     },
 
