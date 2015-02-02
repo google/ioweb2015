@@ -36,7 +36,11 @@ $name: 'page-faq';
   }
 
   h3 {
-    margin-bottom: $mobileKeyline;
+    margin-bottom: $tabletKeyline;
+  }
+
+  h5 {
+    margin: $tabletKeyline 0 $mobileKeyline 0;
   }
 }
 
