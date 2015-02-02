@@ -972,12 +972,8 @@ Main parent container for all of the fab elements.
         this.boundOnScroll = this.onScroll.bind(this);
       },
 
-      onFabClick: function() {
-        this.launch();
-        window.history.replaceState({}, 'Experiment', '#experiment');
-      },
 
-      launch: function() {
+      onFabClick: function(event) {
         document.addEventListener('keyup', this.bindEscape);
 
         var DIALOG_HEIGHT = 480;

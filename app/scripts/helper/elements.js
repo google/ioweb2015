@@ -61,9 +61,9 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
 
-    ioLogo.addEventListener('finish', function() {
+    ioLogo.addEventListener('io-logo-animation-done', function() {
       var optionallyLaunchExperiment = function() {
-        if (window.location.hash.indexOf('experiment') > -1) {
+        if (window.location.search.indexOf('experiment') > -1) {
           var fab = document.querySelector('experiment-fab-container');
           fab.onFabClick();
         }
