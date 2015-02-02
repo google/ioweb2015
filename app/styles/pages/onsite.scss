@@ -44,19 +44,29 @@ $name: 'page-onsite';
   ul {
     padding: 0;
     list-style: none;
+
+    li {
+      margin-bottom: $mobileKeyline;
+    }
   }
   h4 {
     margin-bottom: $mobileKeyline;
   }
-  .sidebyside > * {
-    margin-bottom: $tabletKeyline;
+  .sidebyside {
+    > * {
+      margin-bottom: $tabletKeyline;
+    }
+
+    > :not(:last-child) {
+      margin-right: $largeKeyline;
+    }
   }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
   .onsite__pic {
     height: 745px;
-    margin-top: -93px;
+    margin-top: -53px;
   }
   #traveldetails {
     h2, h3 {
@@ -67,13 +77,13 @@ $name: 'page-onsite';
 
 @media (min-width: $desktop-breakpoint-mid) {
   .onsite__pic {
-    margin-top: -141px;
+    margin-top: -57px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
   .onsite__pic {
-    margin-top: -93px;
+    margin-top: -57px;
   }
 }
 

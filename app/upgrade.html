@@ -1,5 +1,5 @@
 <!--
-Copyright 2014 Google Inc. All rights reserved.
+Copyright 2015 Google Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -26,7 +26,7 @@ limitations under the License.
 
   <!-- Add to homescreen for Chrome on Android -->
   <meta name="mobile-web-app-capable" content="yes"> <!-- fallback for manifest.json -->
-  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
+  <link rel="icon" sizes="192x192" href="images/touch/homescreen192.png">
 
   <!-- Add to homescreen for Safari on iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,19 +34,15 @@ limitations under the License.
   <meta name="apple-mobile-web-app-title" content="Google I/O 2015">
 
   <!-- Homescreen icons. -->
-  <link rel="shortcut icon" href="favicon.ico">
-  <link rel="apple-touch-icon" href="images/touch/google-touch-icon-48x48.png">
-  <link rel="apple-touch-icon" sizes="57x57" href="images/touch/google-touch-icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="images/touch/google-touch-icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="76x76" href="images/touch/google-touch-icon-76x76.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="images/touch/google-touch-icon-114x114.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="images/touch/google-touch-icon-120x120.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="images/touch/google-touch-icon-144x144.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="images/touch/google-touch-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="images/touch/google-touch-icon-192x192.png">
+  <link rel="shortcut icon" href="images/touch/homescreen72-fav.png">
+  <link rel="apple-touch-icon" href="images/touch/homescreen48.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="images/touch/homescreen72.png">
+  <link rel="apple-touch-icon" sizes="96x96" href="images/touch/homescreen96.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="images/touch/homescreen144.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="images/touch/homescreen192.png">
 
   <!-- Tile icon for Win8 (144x144 + tile color) -->
-  <meta name="msapplication-TileImage" content="images/touch/google-touch-icon-144x144.png">
+  <meta name="msapplication-TileImage" content="images/touch/homescreen144.png">
   <meta name="msapplication-TileColor" content="#eceff1">
   <meta name="msapplication-tap-highlight" content="no">
 
@@ -88,7 +84,7 @@ limitations under the License.
 <script>
   window.ENV = location.host.match('localhost') ? 'dev' : 'prod';
 </script>
-<script src="scripts/helper/analytics.js"></script>
+<script src="scripts/analytics.js"></script>
 <script>
 document.addEventListener('click', function(e) {
   // Find the link that was clicked.

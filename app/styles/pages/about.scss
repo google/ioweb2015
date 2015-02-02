@@ -16,8 +16,10 @@
 
 $name: 'page-about';
 
+@import '../base/_color';
 @import '../base/_breakpoints';
-
+@import '../base/_layout';
+@import '../base/_typography';
 
 ##{$name} {
 
@@ -27,37 +29,74 @@ $name: 'page-about';
   }
 }
 
+main {
+  paper-button {
+    @include typo-button();
+    color: $color-cyan-A400;
+    white-space: nowrap;
+  }
+
+  core-icon {
+    margin-left: 10px;
+  }
+}
+
 .pics__section {
   height: 310px;
   padding: 0;
+
+  paper-button {
+    position: absolute;
+    bottom: 20%;
+    width: 100%;
+    margin: 0;
+  }
+
+  > div {
+    min-height: 310px;
+  }
+
+  .pics__section--under {
+    z-index: -1;
+    position: absolute;
+    left: 0;
+    width: 100%;
+
+    .photo__about {
+      background-image: url(../images/about/Image-04.jpg);
+    }
+  }
 }
 
 .photo__about {
-  background-image: url(../images/about/Image-01.jpg);
+  background-image: url(../images/about/Image-06.jpg);
   background-position: 50% 0;
   background-size: cover;
-  border: 0 solid white;
-  border-right-width: 3px;
 }
 
 .photo__about--top {
-  @extend .photo__about;
-  background-image: url(../images/about/Image-02.jpg);
-  border-right: 0;
-  border-bottom-width: 3px;
+  background-image: url(../images/about/Image-01.jpg);
+  background-position: 100% 0;
+  background-size: cover;
 }
 
 .photo__about--bottom {
-  @extend .photo__about;
-  background-image: url(../images/about/Image-03.jpg);
-  border-right: 0;
+  background-image: url(../images/about/Image-05.jpg);
+  background-position: 0 0;
+  background-size: cover;
+  position: relative;
 }
 
 @media (min-width: $tablet-breakpoint-min) {
   .pics__section {
     height: 745px;
-    margin-top: -110px;
+    margin-top: -102px;
     margin-bottom: -50px;
+
+    > div {
+      min-height: 745px;
+    }
+
   }
   #hashtag {
     margin-top: -295px;
@@ -67,14 +106,14 @@ $name: 'page-about';
 
 @media (min-width: $desktop-breakpoint-min) {
   #hashtag {
-    margin-top: -359px;
-    padding-top: 359px;
+    margin-top: -327px;
+    padding-top: 327px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
   .pics__section {
-    margin-top: -134px;
+    margin-top: -110px;
   }
   #hashtag {
     margin-top: -319px;
@@ -84,23 +123,30 @@ $name: 'page-about';
 
 @media (min-width: $desktop-breakpoint-max) {
   #hashtag {
-    margin-top: -283px;
+    margin-top: -247px;
+    padding-top: 248px;
   }
 }
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .photo__about {
-    background-image: url(../images/about/Image-01@2x.jpg);
+    background-image: url(../images/about/Image-06@2x.jpg);
   }
   .photo__about--top {
-    background-image: url(../images/about/Image-02@2x.jpg);
+    background-image: url(../images/about/Image-01@2x.jpg);
   }
   .photo__about--bottom {
-    background-image: url(../images/about/Image-03@2x.jpg);
+    background-image: url(../images/about/Image-05@2x.jpg);
   }
-  .card__photo--recap  {
+  .card__photo--recap {
     background-image: url(../images/home/recap-500@2x.jpg);
   }
+  .pics__section--under {
+    .photo__about {
+      background-image: url(../images/about/Image-04@2x.jpg) !important;
+    }
+  }
+
 }
 
 

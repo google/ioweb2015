@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Google Inc. All rights reserved.
+ * Copyright 2015 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,14 @@ IOWA.Elements = (function() {
   "use strict";
 
   var updateElements = function() {
-    var toast = document.getElementById('toast');
     var ioLogo = document.querySelector('io-logo');
+    ioLogo.addEventListener('io-logo-animation-done', function() {
+      IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender(), function() {
+        // Fire event when the page transitions are final.
+        IOWA.Elements.Template.fire('page-transition-done');
+      });
+    });
+
     var main = document.querySelector('.io-main');
 
     var drawer = document.querySelector('core-drawer-panel');
@@ -28,16 +34,18 @@ IOWA.Elements = (function() {
       this.closeDrawer();
     });
 
-    var ripple = document.querySelector('.masthead__ripple__content');
-    IOWA.Util.resizeRipple(ripple);
-
     var masthead = document.querySelector('.masthead');
-    var mastheadMeta = document.querySelector('.masthead-meta');
+    var mastheadMeta = masthead.querySelector('.masthead-meta');
+    var ioLogoLarge = masthead.querySelector('.io-logo.large');
+    var nav = masthead.querySelector('#navbar');
+    var navPaperTabs = nav.querySelector('paper-tabs');
+    var fab = masthead.querySelector('experiment-fab-container');
     var footer = document.querySelector('footer');
+    var toast = document.getElementById('toast');
     var i18n = document.createElement('i18n-msg');
 
-    var ioLogoLarge = masthead.querySelector('#io-logo-large');
-    var nav = masthead.querySelector('#navbar');
+    var ripple = masthead.querySelector('.masthead__ripple__content');
+    IOWA.Util.resizeRipple(ripple);
 
     IOWA.Elements.Drawer = drawer;
     IOWA.Elements.I18n = i18n;
@@ -45,7 +53,9 @@ IOWA.Elements = (function() {
     IOWA.Elements.MastheadMeta = mastheadMeta;
     IOWA.Elements.Main = main;
     IOWA.Elements.Nav = nav;
+    IOWA.Elements.NavPaperTabs = navPaperTabs;
     IOWA.Elements.Ripple = ripple;
+    IOWA.Elements.FAB = fab;
     IOWA.Elements.Toast = toast;
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
@@ -71,6 +81,7 @@ IOWA.Elements = (function() {
     template.pages = {};
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.fullscreenVideoActive = false;
+    template.pageTransitionDone = false;
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
@@ -80,36 +91,43 @@ IOWA.Elements = (function() {
 
     template.pages = {
       'schedule': {
-        mastheadBgClass: 'bg-cyan'
+        mastheadBgClass: 'bg-cyan',
+        hasBeenLoaded: false
       },
       'home': {
-        mastheadBgClass: 'bg-medium-grey'
+        mastheadBgClass: 'bg-medium-grey',
+        hasBeenLoaded: false
       },
       'about': {
-        mastheadBgClass: 'bg-dark-grey'
+        mastheadBgClass: 'bg-dark-grey',
+        hasBeenLoaded: false,
+        galleryOpen: false
       },
       'onsite': {
-        mastheadBgClass: 'bg-dark-grey'
+        mastheadBgClass: 'bg-dark-grey',
+        hasBeenLoaded: false
       },
       'offsite': {
-        mastheadBgClass: 'bg-cyan'
+        mastheadBgClass: 'bg-cyan',
+        hasBeenLoaded: false
       },
       'registration': {
-        mastheadBgClass: 'bg-cyan'
+        mastheadBgClass: 'bg-cyan',
+        hasBeenLoaded: false
       }
     };
-    template.mastheadBgClass = template.pages[template.selectedPage];
-    template.navBgClass = template.pages[template.selectedPage];
 
-    template.toggleOverlayNav = function() {
-      var nav = document.querySelector('.navbar--overlay');
+    template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
+    template.navBgClass = template.mastheadBgClass;
 
-      // If overlay bar is down, stop
-      if (nav.classList.contains('active')) {
-        this.cardVideoTakeover(this.currentCard, true);
-      }
-
+    template.toggleVideoOverlayNav = function() {
+      var nav = document.querySelector('.navbar__overlay--video');
       nav.classList.toggle('active');
+    };
+
+    template.closeVideoCard = function(e, detail, sender) {
+      this.cardVideoTakeover(this.currentCard, true);
+      this.toggleVideoOverlayNav();
     };
 
     /**
@@ -193,37 +211,23 @@ IOWA.Elements = (function() {
             this.fullscreenVideoActive = false; // remove from DOM.
             this.currentCard = null;
           } else {
-            var onStateChange = function(e) {
-              if (e.detail.data == 1) { // Playing state is video.state == 1.
-                thumbnail.classList.add('fadeout');
-
-                video.removeEventListener('google-youtube-state-change', onStateChange);
-              }
-            }.bind(this);
-
-            if (video.playsupported) {
-              video.play();
-              video.addEventListener('google-youtube-state-change', onStateChange);
-            } else {
-              // If video can't auto-play, fade out thumbnail and toggle navbar.
-              thumbnail.classList.add('fadeout');
-            }
-
-            this.toggleOverlayNav(); // Drop down back button control.
+            thumbnail.classList.add('fadeout');
+            this.toggleVideoOverlayNav(); // Drop down back button control.
           }
-
         }.bind(this);
-
       }.bind(this);
     };
 
     template.playVideo = function(e, detail, sender) {
       this.currentCard = sender;
-      this.fullscreenVideoActive = true; // Stamp the template's DOM.
-    };
+      this.fullscreenVideoActive = true; // Active the placeholder template.
 
-    template.videoReady = function(e, detail, sender) {
-      this.cardVideoTakeover(this.currentCard);
+      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+
+      // Wait one rAF for template to have stamped.
+      this.async(function() {
+        this.cardVideoTakeover(this.currentCard);
+      });
     };
 
     template.openShareWindow = function(e, detail, sender) {
@@ -240,7 +244,7 @@ IOWA.Elements = (function() {
           url = 'https://www.facebook.com/sharer.php?u=' +
                 encodeURIComponent(location.href) +
                 '&t=' + encodeURIComponent(document.title);
-        break;
+          break;
 
         case 'gplus':
           height = 348;
@@ -248,7 +252,7 @@ IOWA.Elements = (function() {
           url = 'https://plus.google.com/share?url=' +
                 encodeURIComponent(location.href) +
                 '&hl=' + encodeURIComponent(document.documentElement.lang);
-        break;
+          break;
 
         case 'twitter':
           height = 253;
@@ -257,11 +261,11 @@ IOWA.Elements = (function() {
           url = 'https://twitter.com/share?text=' +
                 encodeURIComponent(el.textContent || 'Google I/O 2015') +
                 '&url=' + encodeURIComponent(location.href);
-        break;
+          break;
 
         default:
 
-        return;
+          return;
       }
 
       var options = 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=' +
@@ -269,11 +273,24 @@ IOWA.Elements = (function() {
       window.open(url, 'share', options);
     };
 
+    template.backToTop = function(e, detail, sender) {
+      e.preventDefault();
+      IOWA.Util.smoothScroll(IOWA.Elements.Nav, 250);
+    };
+
     template.addEventListener('template-bound', updateElements);
+    template.addEventListener('page-transition-done', function(e) {
+      this.pageTransitionDone = true;
+      IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
+    });
+    template.addEventListener('page-transition-start', function(e) {
+      this.pageTransitionDone = false;
+      IOWA.Elements.NavPaperTabs.style.pointerEvents = 'none';
+    });
 
     IOWA.Elements.Template = template;
     IOWA.Elements.ScrollContainer = document.querySelector(
-        'core-drawer-panel > div[main]');
+        'core-drawer-panel [main]');
   };
 
   return {

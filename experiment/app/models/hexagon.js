@@ -23,38 +23,38 @@ module.exports = (function() {
    * Returns the default state is no serialized state is available.
    * @return {Object}
    */
-  function getDefault() {
+  function getDefault(audioManager) {
     return {
       'recorded': [
         {
           'beat': 1,
           'cube': [-1, 2, -1],
-          'sound': 17
+          'sound': audioManager.getSound('hexagon2').guid
         },
         {
           'beat': 16,
           'cube': [3, 0, -3],
-          'sound': 19
+          'sound': audioManager.getSound('hexagon4').guid
         },
         {
           'beat': 28,
           'cube': [1, 0, -1],
-          'sound': 19
+          'sound': audioManager.getSound('hexagon4').guid
         },
         {
           'beat': 36,
           'cube': [-1, 2, -1],
-          'sound': 17
+          'sound': audioManager.getSound('hexagon2').guid
         },
         {
           'beat': 52,
           'cube': [3, 0, -3],
-          'sound': 19
+          'sound': audioManager.getSound('hexagon4').guid
         },
         {
           'beat': 63,
           'cube': [0, -1, 1],
-          'sound': 18
+          'sound': audioManager.getSound('hexagon3').guid
         }
       ]
     };

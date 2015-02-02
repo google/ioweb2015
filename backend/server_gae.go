@@ -7,6 +7,7 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,6 +22,8 @@ import (
 var (
 	// rootDir is relative to basedir of app.yaml is (app root)
 	rootDir = "app"
+	// httpPrefix is the URL path prefix to serve the app from
+	httpPrefix = "/io2015"
 	// whitemap contains whitelisted email addresses or domains.
 	// whitelisted domains should be prefixed with "@", e.g. @example.org
 	whitemap map[string]bool
@@ -30,10 +33,16 @@ func init() {
 	cache = &gaeMemcache{}
 	initWhitelist()
 
-	http.HandleFunc("/", checkWhitelist(serveTemplate))
-	http.HandleFunc("/api/extended", serveIOExtEntries)
+	wrapHandler = checkWhitelist
+	handle("/", serveTemplate)
+	handle("/api/extended", serveIOExtEntries)
+	// setup root redirect if we're prefixed
+	if httpPrefix != "/" {
+		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
+	}
 }
 
+// initWhitelist initializes and populates whitemap from whitelist file.
 func initWhitelist() {
 	whitemap = make(map[string]bool)
 	f, err := os.Open(filepath.Join(rootDir, "..", "whitelist"))
@@ -59,8 +68,12 @@ func isWhitelisted(email string) bool {
 	return whitemap[email[i:]]
 }
 
-func checkWhitelist(h http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+// checkWhitelist checks whether the current user is allowed to access
+// handler h using isWhitelisted() func before handing over in-flight request.
+// It redirects to GAE login URL if no user found or responds with 403
+// (Forbidden) HTTP error code if the current user is not whitelisted.
+func checkWhitelist(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ac := appengine.NewContext(r)
 		u := user.Current(ac)
 		if u == nil {
@@ -78,12 +91,13 @@ func checkWhitelist(h http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "Access denied, sorry. Try with a different account.", http.StatusForbidden)
 			return
 		}
-		h(w, r)
-	}
+		h.ServeHTTP(w, r)
+	})
 }
 
 // newContext returns a newly created context of the in-flight request r.
-func newContext(r *http.Request) context.Context {
+// and its response writer w.
+func newContext(r *http.Request, w io.Writer) context.Context {
 	ac := appengine.NewContext(r)
 	v := appengine.VersionID(ac)
 	if i := strings.Index(v, "."); i > 0 {
@@ -99,7 +113,8 @@ func newContext(r *http.Request) context.Context {
 		appEnv = "stage"
 	}
 	c := context.WithValue(context.Background(), ctxKeyEnv, appEnv)
-	return context.WithValue(c, ctxKeyGAEContext, ac)
+	c = context.WithValue(c, ctxKeyGAEContext, ac)
+	return context.WithValue(c, ctxKeyWriter, w)
 }
 
 // appengineContext extracts appengine.Context value from the context c

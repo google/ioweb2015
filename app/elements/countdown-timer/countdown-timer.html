@@ -1,3 +1,16 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/core-scroll-threshold/core-scroll-threshold.html">
 <link rel="import" href="../../bower_components/i18n-msg/i18n-msg.html">
@@ -165,6 +178,36 @@ Creates a countdown timer to a specific date.
         this.timer.start();
       },
 
+      dateChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      dateAdjustmentChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      easeInTimeChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      easeOutTimeChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
+      waitTimeChanged: function() {
+        if (!this.timer) return;
+        this.configureTimer_();
+        this.timer.drawIfAnimationIsNotRunning();
+      },
+
       created: function() {
         this.thresholdInformation = {
           thresholdDays: false,
@@ -188,31 +231,6 @@ Creates a countdown timer to a specific date.
         IOWA.CountdownTimer.Colors.Background = this.bgColor;
       },
 
-      dateChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
-      dateAdjustmentChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
-      easeInTimeChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
-      easeOutTimeChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
-      waitTimeChanged: function() {
-        this.configureTimer_();
-        this.timer.drawIfAnimationIsNotRunning();
-      },
-
       /**
        * Lifecycle event that creates the timer, configures it, and either
        * starts it (if `autoStart` === true) or draws the start value if not.
@@ -220,7 +238,6 @@ Creates a countdown timer to a specific date.
        * @private
        */
       attached: function() {
-
         // Create the timer and set it with whatever the current
         // values are. If the user updates any values then the
         // timer will get reconfigured.
@@ -307,11 +324,13 @@ Creates a countdown timer to a specific date.
        * @private
        */
       configureTimer_: function() {
+        if (!this.timer) return;
 
         var targetDate = Date.parse(this.date);
 
-        if (isNaN(targetDate))
+        if (isNaN(targetDate)) {
           targetDate = Date.now();
+        }
 
         targetDate = new Date(targetDate);
 

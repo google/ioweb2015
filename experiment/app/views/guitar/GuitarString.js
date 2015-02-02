@@ -1,5 +1,6 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var p2 = require('p2');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
   'use strict';
@@ -79,7 +80,8 @@ module.exports = (function() {
       setSecondDot,
       getSecondDot,
       getPID: () => model.pid,
-      getModel: () => model
+      getModel: () => model,
+      tearDown: destroy
     };
 
     /**
@@ -103,6 +105,12 @@ module.exports = (function() {
       });
 
       world.emitImpactEvent = false;
+
+      world.narrowphase.enableFriction = false;
+      world.narrowphase.enableFrictionReduction = false;
+      world.defaultContactMaterial.friction = 0;
+
+      world.solver.tolerance = 0.02;
 
       displayContainerCenter.addChild(lineGraphicShadow);
       displayContainerCenter.addChild(lineGraphic);
@@ -131,14 +139,14 @@ module.exports = (function() {
         isplayingInteractionSound = true;
         audioManager.playSoundImmediately(sound, channel);
         onActivateCallback_(model.pid, sound);
-        window.setTimeout(resetisplayingInteractionSound, 400);
+        rAFTimeout(resetIsPlayingInteractionSound, 400);
       }
     }
 
     /**
      * Reset currently playing interaction sound.
      */
-    function resetisplayingInteractionSound() {
+    function resetIsPlayingInteractionSound() {
       isplayingInteractionSound = false;
     }
 
@@ -435,8 +443,8 @@ module.exports = (function() {
      * Destroy a string.
      */
     function destroy() {
-      world.removeBody(mouseColliderBody);
       removeEventListeners();
+      world.removeBody(mouseColliderBody);
       displayContainerCenter.removeChild(lineGraphicShadow);
       displayContainerCenter.removeChild(lineGraphic);
 
@@ -471,22 +479,6 @@ module.exports = (function() {
      * @param {number} delta - The delta.
      */
     function render(delta) {
-      renderBodies(delta);
-    }
-
-    /**
-     * Play the note associated with the string.
-     */
-    function playNote() {
-      capsuleBody.position[0] = points[1].x + 80;
-      capsuleBody.position[1] = points[1].y + 80;
-    }
-
-    /**
-     * Render bodies.
-     * @param {number} delta - The delta.
-     */
-    function renderBodies(delta) {
       if (!world) { return; }
 
       anchorPoint1.position.x = points[0].x;
@@ -496,6 +488,14 @@ module.exports = (function() {
 
       world.step(1 / 60, delta * 1000);
       renderStringBodies();
+    }
+
+    /**
+     * Play the note associated with the string.
+     */
+    function playNote() {
+      capsuleBody.position[0] = points[1].x + 80;
+      capsuleBody.position[1] = points[1].y + 80;
     }
 
     /**

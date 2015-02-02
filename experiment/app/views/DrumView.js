@@ -18,11 +18,19 @@ module.exports = (function() {
    */
   return function DrumView(audioManager) {
     var world = new p2.World({
-      gravity: [0, -900.78]
+      gravity: [0, -900.78],
+      broadphase: new p2.SAPBroadphase()
     });
+
     world.applySpringForces = false;
     world.applyDamping = false;
     world.emitImpactEvent = false;
+
+    world.narrowphase.enableFriction = false;
+    world.narrowphase.enableFrictionReduction = false;
+    world.defaultContactMaterial.friction = 0;
+
+    world.solver.tolerance = 0.02;
 
     var stage;
     var data;
@@ -30,16 +38,16 @@ module.exports = (function() {
     const DRUM_TAG = audioManager.addTag(VIEW_NAME);
     const CHANNEL = audioManager.channels.create(0.6);
 
-    var drums;
+    var drums = [];
     var drumLookup = {};
 
-    // textures
     var groundT;
 
     var dotEmitterObj = {};
 
-    // sprites
     var ground;
+    var foreground;
+    var background;
 
     var PIDINC = 0;
     var renderPause = false;
@@ -72,6 +80,12 @@ module.exports = (function() {
 
       groundT = new PIXI.DisplayObjectContainer();
       displayContainerCenter.addChild(groundT);
+
+      foreground = new PIXI.DisplayObjectContainer();
+      background = new PIXI.DisplayObjectContainer();
+
+      displayContainerCenter.addChild(background);
+      displayContainerCenter.addChild(foreground);
 
       ground = addBody(groundT, 0, -maxHeight, 4000, 10);
 
@@ -162,13 +176,25 @@ module.exports = (function() {
      * @param {Model} d - The drum data.
      */
     function loadData(d) {
+      if (currentTrack) {
+        audioManager.removeTrack(currentTrack);
+      }
+
+      for (let i = 0; i < drums.length; i++) {
+        drums[i].tearDown();
+
+        foreground.removeChild(drums[i].container);
+        background.removeChild(drums[i].hitCircleContainer);
+        delete drumLookup[drums[i].pid];
+      }
+
       data = d;
 
       currentTrack = audioManager.createRecordedTrack(
-          data.recorded,
-          CHANNEL,
-          DRUM_TAG
-          );
+        data.recorded,
+        CHANNEL,
+        DRUM_TAG
+      );
 
       audioManager.addTrack(currentTrack);
 
@@ -182,7 +208,8 @@ module.exports = (function() {
           recordSound(d);
         });
 
-        displayContainerCenter.addChild(drum.container);
+        foreground.addChild(drum.container);
+        background.addChild(drum.hitCircleContainer);
         drumLookup[drum.pid] = drum;
 
         return drum;
@@ -351,8 +378,10 @@ module.exports = (function() {
     function render(delta) {
       if (renderPause) { return; }
 
-      renderBodies(delta);
-      world.step(1 / 60);
+      if (APPLICATION_STATE === 'expand') {
+        renderBodies(delta);
+        world.step(1 / 60);
+      }
     }
 
     /**

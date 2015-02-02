@@ -17,6 +17,8 @@ var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var opn = require('opn');
+var merge = require('merge-stream');
+var glob = require('glob');
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -28,9 +30,8 @@ var DIST_EXPERIMENT_DIR = APP_DIR + '/experiment';
 
 var STATIC_VERSION = 1; // Cache busting static assets.
 var VERSION = argv.build || STATIC_VERSION;
-
-// TODO: update this URL to be correct for prod.
-var EXPERIMENT_STATIC_URL = '/experiment/';
+var URL_PREFIX = (argv.urlPrefix || '').replace(/\/+$/g, '') || '/io2015';
+var EXPERIMENT_STATIC_URL = URL_PREFIX + '/experiment/';
 
 // Clears files cached by gulp-cache (e.g. anything using $.cache).
 gulp.task('clear', function (done) {
@@ -59,51 +60,16 @@ gulp.task('sass', function() {
     .pipe($.size({title: 'styles'}));
 });
 
-// gulp.task('vulcanize-scenes', ['clean', 'sass', 'compile-scenes'], function() {
-//   return gulp.src([
-//       'scenes/*/*-scene*.html'
-//     ], {base: './'})
-//     // gulp-vulcanize doesn't currently handle multiple files in multiple
-//     // directories well right now, so vulcanize them one at a time
-//     .pipe($.foreach(function(stream, file) {
-//       var dest = path.dirname(path.relative(__dirname, file.path));
-//       return stream.pipe($.vulcanize({
-//         excludes: {
-//           // these are inlined in elements.html
-//           imports: [
-//             'jquery.html$',
-//             'modernizr.html$',
-//             'polymer.html$',
-//             'base-scene.html$',
-//             'i18n-msg.html$',
-//             'core-a11y-keys.html$',
-//             'core-shared-lib.html$',
-//             'google-maps-api.html$',
-//           ]
-//         },
-//         strip: !argv.pretty,
-//         csp: true,
-//         inline: true,
-//         dest: dest
-//       }))
-//       .pipe(i18n_replace({
-//         strict: !!argv.strict,
-//         path: '_messages',
-//       }))
-//       .pipe(gulp.dest(path.join(DIST_STATIC_DIR, dest)));
-//     }));
-// });
-
 // vulcanize main site elements separately.
 gulp.task('vulcanize-elements', ['sass'], function() {
   return gulp.src([
       APP_DIR + '/elements/elements.html'
-    ], {base: './'})
+    ])
     .pipe($.vulcanize({
       strip: !argv.pretty,
       csp: true,
       inline: true,
-      dest: 'elements/'
+      dest: APP_DIR + '/elements'
     }))
     // .pipe(i18n_replace({
     //   strict: !!argv.strict,
@@ -125,37 +91,31 @@ gulp.task('vulcanize-elements', ['sass'], function() {
 // });
 
 // copy needed assets (images, polymer elements, etc) to /dist directory
-// gulp.task('copy-assets', ['clean', 'vulcanize', 'i18n_index'], function() {
-gulp.task('copy-assets', ['copy-bower-dependencies'], function() {
-  return gulp.src([
+gulp.task('copy-assets', function() {
+  var assets = $.useref.assets();
+
+  var templateStream = gulp.src([APP_DIR + '/templates/*.html'], {base: './'})
+    .pipe(assets)
+    .pipe(assets.restore())
+    .pipe($.useref());
+
+  var otherAssetStream = gulp.src([
     APP_DIR + '/*.{html,txt,ico}',
     APP_DIR + '/manifest.json',
     APP_DIR + '/clear_cache.html',
     APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
     APP_DIR + '/elements/**/images/*',
-    APP_DIR + '/templates/*.html',
-    APP_DIR + '/sw.js', // Note: sw script needs to be in the root of the site.
-    DIST_EXPERIMENT_DIR + '/**/*',
-  ], {base: './'})
-  .pipe(gulp.dest(DIST_STATIC_DIR))
-  .pipe($.size({title: 'copy-assets'}));
-});
+    APP_DIR + '/elements/webgl-globe/shaders/*.{frag,vert}',
+    APP_DIR + '/elements/webgl-globe/textures/*.{jpg,png}',
+    APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js',
+    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
+    DIST_EXPERIMENT_DIR + '/**/*'
+  ], {base: './'});
 
-// Copy over third-party bower dependencies that we need to DIST_STATIC_DIR.
-// This will include some bower metadata-cruft, but since we won't actually
-// reference that cruft from anywhere, it presumably shouldn't incur overhead.
-gulp.task('copy-bower-dependencies', function() {
-  var bowerPackagesToCopy = [
-    'shed',
-    'webcomponentsjs'
-  ];
-  var directoryPaths = bowerPackagesToCopy.map(function(bowerPackageToCopy) {
-    return APP_DIR + '/bower_components/' + bowerPackageToCopy + '/**';
-  });
-
-  return gulp.src(directoryPaths, {base: './'})
-    .pipe(gulp.dest(DIST_STATIC_DIR));
+  return merge(templateStream, otherAssetStream)
+    .pipe(gulp.dest(DIST_STATIC_DIR))
+    .pipe($.size({title: 'copy-assets'}));
 });
 
 // Copy backend files.
@@ -166,16 +126,21 @@ gulp.task('copy-backend', function(cb) {
     BACKEND_DIR + '/*.pem',
     BACKEND_DIR + '/whitelist'
   ], {base: './'})
+  // server_gae.go
+  .pipe($.replace(/(httpPrefix = ")[^"]*/g, '$1' + URL_PREFIX))
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .on('end', function() {
-    var destLink = [DIST_STATIC_DIR, BACKEND_DIR, APP_DIR].join('/');
-    fs.symlink('../' + APP_DIR, destLink, cb);
+    var destBackend = [DIST_STATIC_DIR, BACKEND_DIR].join('/');
+    // ../app <= dist/backend/app
+    fs.symlinkSync('../' + APP_DIR, destBackend + '/' + APP_DIR);
+    // create dist/backend/app.yaml from backend/app.yaml.template
+    generateAppYaml(destBackend, URL_PREFIX, cb);
   });
 });
 
 // Lint JavaScript
 gulp.task('jshint', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
@@ -184,20 +149,47 @@ gulp.task('jshint', function() {
 
 // Check JS style
 gulp.task('jscs', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js', APP_DIR + '/sw.js'])
+  return gulp.src([APP_DIR + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jscs());
 });
 
 // Crush JS
-// TODO: /sw.js isn't being uglified. It needs to be copied into the top-level
-// directory of the site, which is currently being done in the copy-assets task.
-gulp.task('uglify', function() {
-  return gulp.src([APP_DIR + '/scripts/**/*.js'])
+gulp.task('concat-and-uglify-js', ['js'], function() {
+  // The ordering of the scripts in the gulp.src() array matter!
+  // This order needs to match the order in templates/layout_full.html
+  var siteScripts = [
+    'main.js',
+    'helper/util.js',
+    'helper/page-animation.js',
+    'helper/elements.js',
+    'helper/history.js',
+    'helper/router.js',
+    'helper/request.js',
+    'helper/picasa.js',
+    'bootstrap.js'
+  ].map(function(script) {
+    return APP_DIR + '/scripts/' + script;
+  });
+
+  var siteScriptStream = gulp.src(siteScripts)
     .pipe(reload({stream: true, once: true}))
-    .pipe($.uglify({preserveComments: 'some'}).on('error', function(){}))
+    .pipe($.concat('site-scripts.js'));
+
+  // analytics.js is loaded separately and shouldn't be concatenated.
+  var analyticsScriptStream = gulp.src([APP_DIR + '/scripts/analytics.js']);
+
+  var serviceWorkerScriptStream = gulp.src([
+    APP_DIR + '/bower_components/shed/dist/shed.js',
+    APP_DIR + '/scripts/shed/*.js'
+  ])
+    .pipe(reload({stream: true, once: true}))
+    .pipe($.concat('shed-scripts.js'));
+
+  return merge(siteScriptStream, analyticsScriptStream).add(serviceWorkerScriptStream)
+    .pipe($.uglify({preserveComments: 'some'}).on('error', function () {}))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/scripts'))
-    .pipe($.size({title: 'uglify'}));
+    .pipe($.size({title: 'concat-and-uglify-js'}));
 });
 
 // Optimize Images
@@ -227,11 +219,10 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // Start a standalone server (no GAE SDK needed) serving both front-end and backend,
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-
 gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
-  var startArgs = ['-d', APP_DIR, '-listen', serverAddr];
+  var startArgs = ['-d', APP_DIR, '-listen', serverAddr, '-prefix', URL_PREFIX];
   var start = spawn.bind(null, 'bin/server', startArgs, {cwd: BACKEND_DIR, stdio: 'inherit'});
 
   if (noWatch) {
@@ -268,45 +259,24 @@ gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['generate-service-worker-dev'], function() {
+gulp.task('serve:gae', ['generate-service-worker-dev'], function(callback) {
   var appEnv = process.env.APP_ENV || 'dev';
-  var restoreAppYaml = changeBackendGaeAppVersion('v-' + appEnv);
-
-  var noWatch = argv.watch === false;
-  var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
-  var args = ['preview', 'app', 'run', BACKEND_DIR, '--host', serverAddr];
-
-  var backend = spawn('gcloud', args, {stdio: 'inherit'});
-  if (noWatch) {
-    process.on('exit', restoreAppYaml);
-    serverAddr = 'http://' + serverAddr;
-    console.log('The site should now be available at: ' + serverAddr);
-    // give GAE server some time to start
-    setTimeout(opn.bind(null, serverAddr, null, null), 2000);
-    return;
-  }
-
-  browserSync.emitter.on('service:exit', restoreAppYaml);
-  // give GAE server some time to start
-  setTimeout(browserSync.bind(null, {notify: false, proxy: serverAddr}), 2000);
-  watch();
+  var watchFiles = argv.watch !== false;
+  var run = startGaeBackend.bind(null, BACKEND_DIR, appEnv, watchFiles, callback);
+  generateAppYaml(BACKEND_DIR, URL_PREFIX, run);
 });
 
 // Serve build with GAE dev appserver. This is how it would look in production.
 // There are no file watchers.
-gulp.task('serve:dist', ['default'], function() {
-  var distAppYamlPath = DIST_STATIC_DIR + '/' + BACKEND_APP_YAML;
+gulp.task('serve:dist', ['default'], function(callback) {
   var appEnv = process.env.APP_ENV || 'prod';
-  var restoreAppYaml = changeBackendGaeAppVersion('v-' + appEnv, distAppYamlPath);
-  process.on('exit', restoreAppYaml);
-
-  var args = ['preview', 'app', 'run', DIST_STATIC_DIR + '/' + BACKEND_DIR];
-  spawn('gcloud', args, {stdio: 'inherit'});
+  var backendDir = DIST_STATIC_DIR + '/' + BACKEND_DIR;
+  startGaeBackend(backendDir, appEnv, false, callback);
 });
 
 gulp.task('vulcanize', ['vulcanize-elements']);
 
-gulp.task('js', ['jshint', 'jscs', 'uglify']);
+gulp.task('js', ['jshint', 'jscs']);
 
 // Build experiment and place inside app.
 gulp.task('build-experiment', buildExperiment);
@@ -340,7 +310,7 @@ gulp.task('backend:test', function(cb) {
 
 gulp.task('default', ['clean'], function(cb) {
   runSequence('copy-experiment-to-site', 'sass', 'vulcanize',
-              ['js', 'images', 'copy-assets', 'copy-backend'],
+              ['concat-and-uglify-js', 'images', 'copy-assets', 'copy-backend'],
               'generate-service-worker-dist', cb);
 });
 
@@ -401,10 +371,50 @@ function testBackend() {
   return spawn('go', args, {cwd: BACKEND_DIR, stdio: 'inherit'});
 }
 
+// Start GAE-based backend server with backendDir as the app root directory.
+// Also, enable live-reload if watchFiles === true.
+// appEnv is either 'stage', 'prod' or anything else. The latter defaults to
+// dev env.
+function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
+  var restoreAppYaml = changeAppYamlVersion('v-' + appEnv, backendDir + '/app.yaml');
+  var onExit = function() {
+    restoreAppYaml();
+    callback();
+  };
+
+  var serverAddr = 'localhost:' + (watchFiles ? '8080' : '3000');
+  var args = ['preview', 'app', 'run', backendDir, '--host', serverAddr];
+
+  var backend = spawn('gcloud', args, {stdio: 'inherit'});
+  if (!watchFiles) {
+    process.on('exit', onExit);
+    serverAddr = 'http://' + serverAddr;
+    console.log('The site should now be available at: ' + serverAddr);
+    // give GAE server some time to start
+    setTimeout(opn.bind(null, serverAddr, null, null), 2000);
+    return;
+  }
+
+  browserSync.emitter.on('service:exit', onExit);
+  // give GAE server some time to start
+  setTimeout(browserSync.bind(null, {notify: false, proxy: serverAddr}), 2000);
+  watch();
+}
+
+// Create app.yaml from a template in dest directory.
+// prefix is the app root URL prefix. Defaults to '/io2015'.
+function generateAppYaml(dest, prefix, callback) {
+  gulp.src(BACKEND_DIR + '/app.yaml.template', {base: BACKEND_DIR})
+    .pipe($.replace(/\$PREFIX\$/g, prefix))
+    .pipe($.rename('app.yaml'))
+    .pipe(gulp.dest(dest))
+    .on('end', callback);
+}
+
 // Replace current app.yaml with the modified 'version' property.
 // appYamlPath arg is optional and defaults to BACKEND_APP_YAML.
 // Returns a function that restores original app.yaml content.
-function changeBackendGaeAppVersion(version, appYamlPath) {
+function changeAppYamlVersion(version, appYamlPath) {
   appYamlPath = appYamlPath || BACKEND_APP_YAML;
   var appYaml = fs.readFileSync(appYamlPath);
   fs.writeFileSync(appYamlPath, 'version: ' + version + '\n' + appYaml);
@@ -413,11 +423,13 @@ function changeBackendGaeAppVersion(version, appYamlPath) {
 
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
   del([APP_DIR + '/service-worker.js']);
+  var importScripts = glob.sync('scripts/shed/*.js', {cwd: APP_DIR});
+  importScripts.unshift('bower_components/shed/dist/shed.js');
 
   // Run with --fetch-dev to generate a service-worker.js that will handle fetch events.
   // By default, the generated service-worker.js will precache resources, but not actually serve
   // them. This is preferable for dev, since things like live reload will work as expected.
-  generateServiceWorker(APP_DIR, !!argv['fetch-dev'], function(error, serviceWorkerFileContents) {
+  generateServiceWorker(APP_DIR, !!argv['fetch-dev'], importScripts, function(error, serviceWorkerFileContents) {
     if (error) {
       return callback(error);
     }
@@ -433,8 +445,9 @@ gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
 gulp.task('generate-service-worker-dist', function(callback) {
   var distDir = DIST_STATIC_DIR + '/' + APP_DIR;
   del([distDir + '/service-worker.js']);
+  var importScripts = ['scripts/shed-scripts.js'];
 
-  generateServiceWorker(distDir, true, function(error, serviceWorkerFileContents) {
+  generateServiceWorker(distDir, true, importScripts, function(error, serviceWorkerFileContents) {
     if (error) {
       return callback(error);
     }

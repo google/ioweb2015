@@ -7,13 +7,25 @@
 {% end %}
 
 {% define "content" %}
+  <core-toolbar class="navbar__overlay navbar__overlay--gallery" fit>
+    <paper-icon-button icon="arrow-back" on-tap="{{closePhotoGallery}}" aria-label="Close gallery"></paper-icon-button>
+    <span flex><i18n-msg msgid="io-in-photos">I/O in Photos</i18n-msg></span>
+  </core-toolbar>
+
+  <core-toolbar class="navbar__overlay navbar__overlay--video" fit>
+    <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video"></paper-icon-button>
+    <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
+  </core-toolbar>
+
+  <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}" fit></io-gallery>
+
   <div class="card__container slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
-        <h2><i18n-msg msgid="about-io">Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</i18n-msg></h2>
+        <h3><i18n-msg msgid="about-io">Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</i18n-msg></h3>
       </div>
       <div class="card-content">
-        <a href="#" data-track-link="about-view-photos-from-past-io">
+        <a href="#" data-track-link="about-view-photos-card" on-click="{{togglePhotoGallery}}">
           <i18n-msg msgid="see-photos-2014">See photos from I/O 2014</i18n-msg>
         </a>
       </div>
@@ -21,30 +33,46 @@
   </div>
 
   <div class="slide-up-delay">
-    <section class="page__section pics__section js-experiment-instrument" layout horizontal>
-      <div class="photo__about" flex two></div>
-      <div layout vertical flex>
-        <div class="photo__about--top" layout vertical flex></div>
-        <div class="photo__about--bottom" layout vertical flex></div>
+    <section class="page__section pics__section js-experiment-instrument" layout vertical>
+      <div layout horizontal>
+        <div class="photo__about" flex two></div>
+        <div layout vertical flex>
+          <div class="photo__about--top" layout vertical flex></div>
+          <div class="photo__about--bottom" layout vertical flex>
+            <paper-button hidden?="{{isPhoneSize}}"
+                          data-track-link="about-view-photos-section"
+                          on-tap="{{togglePhotoGallery}}">
+              <i18n-msg msgid="see-more-photos">See more photos from past I/Os</i18n-msg>
+              <core-icon icon="io:photo-camera" aria-hidden="true"></core-icon>
+            </paper-button>
+          </div>
+        </div>
+      </div>
+      <div class="pics__section--under" layout horizontal>
+        <div layout vertical flex>
+          <div class="photo__about--top" layout vertical flex></div>
+          <div class="photo__about--bottom" layout vertical flex></div>
+        </div>
+        <div class="photo__about" flex two></div>
       </div>
     </section>
 
-    <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+    <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}" relative>
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
-          <h3><i18n-msg msgid="about-sundar">Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President, Products, Sundar Pichai.</i18n-msg></h3>
+          <h3><i18n-msg msgid="about-sundar">Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President of Products, Sundar Pichai.</i18n-msg></h3>
         </div>
         <div class="card-content">
-          <a href="https://www.google.com/events/io/schedule" target="_blank" data-track-link="about-see-keynote-and-sessions">
+          <a href="https://www.google.com/events/io/io14videos" target="_blank" data-track-link="about-see-keynote-and-sessions">
             <i18n-msg msgid="about-see-keynote">See the 2014 Keynote and sessions</i18n-msg>
           </a>
         </div>
       </div>
-      <div class="card" layout vertical auto-vertical flex on-tap="{{playVideo}}">
+      <div class="card" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="about-watch-2014-recap-video">
         <div flex class="card__photo card__photo--recap"></div>
         <div class="card-content">
-          <img src="images/play-video-button.png" class="play__button">
-          <a href="https://www.youtube.com/watch?v=ksvdvCDO7pA" data-track-link="about-watch-2014-recap-video"><core-icon icon="av:play-circle-fill"></core-icon> <i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></a>
+          <img src="images/play-video-button.png" class="play__button play__button--card" alt="Play video">
+          <span class="anchor-like"><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
         </div>
       </div>
     </div>
@@ -55,9 +83,140 @@
   </div>
 
   <template if="{{fullscreenVideoActive}}">
-    <div class="fullvideo__container" on-google-youtube-ready="{{videoReady}}" fit hidden>
-      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" fit>
-      <google-youtube videoid="ksvdvCDO7pA" chromeless height="100%" width="100%" fit></google-youtube>
+    <div class="fullvideo__container" fit hidden>
+      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch the I/O Recap Video" fit>
+      <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
+                      autohide="1" controls="2" modestbranding="1" showinfo="0"
+                      iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
     </div>
   </template>
+
+  <script>
+  (function() {
+
+    function runPhotoGalleryAnimation(opt_reverse, opt_callback) {
+      var topCard = IOWA.Elements.Main.querySelector('.card__container.slide-up');
+      var bottomCard = IOWA.Elements.Main.querySelector('.pics__section').nextElementSibling;
+      var bottomSection = IOWA.Elements.Main.querySelector('#hashtag');
+
+      var button = IOWA.Elements.Main.querySelector('.photo__about--bottom paper-button');
+      var navOverlay = document.querySelector('.navbar__overlay--gallery');
+
+      var reverse = opt_reverse || false;
+
+      var ANIMATION_DURATION = 500;
+
+      var animationOptions = {
+        duration: ANIMATION_DURATION,
+        fill: 'forwards',
+        direction: reverse ? 'reverse' : 'normal',
+        easing: 'cubic-bezier(0.4,0,0.2,1)'
+      };
+
+      var animation = new AnimationGroup([
+        new Animation(topCard, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(-100px)', opacity: 0}
+        ], animationOptions),
+        new Animation(bottomCard, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions),
+        new Animation(bottomSection, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions),
+        new Animation(navOverlay, [
+          {transform: 'translateY(-100%)'},
+          {transform: 'translateY(0)'}
+        ], animationOptions),
+        new Animation(button, [
+          {opacity: 1},
+          {opacity: 0}
+        ], animationOptions)
+      ]);
+
+      var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+
+      if (gallery.mobile) {
+        animation.children = animation.children.slice(2);
+      }
+
+      var galleryAnimation = new Animation(gallery, [
+        {opacity: 0}, {opacity: 1}
+      ], {
+        duration: ANIMATION_DURATION,
+        fill: 'forwards',
+        easing: 'cubic-bezier(0.4,0,0.2,1)',
+        direction: reverse ? 'reverse' : 'normal'
+      });
+
+      if (reverse) {
+        // Fade out gallery and slide back in page sections at the same time.
+        IOWA.PageAnimation.play(galleryAnimation);
+        IOWA.PageAnimation.play(animation, opt_callback);
+      } else {
+        // Slide out page sections, then fade in gallery.
+        IOWA.PageAnimation.play(animation, function() {
+          IOWA.PageAnimation.play(galleryAnimation, opt_callback);
+        });
+      }
+    }
+
+    // Page-specific JS that runs when this page is loaded for the first time.
+    function firstLoadSetup(page) {
+      if (page.hasBeenLoaded) {
+        return;
+      }
+
+      page.hasBeenLoaded = true;
+
+      IOWA.Elements.Template.closePhotoGallery = function(e, detail, sender) {
+
+        runPhotoGalleryAnimation(true, function() {
+          IOWA.Elements.Template.photoGalleryActive = false;
+        });
+
+        history.replaceState({}, null, location.pathname); // Remove #photos hash from URL.
+      };
+
+      IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
+        e && e.preventDefault();
+
+        var template = IOWA.Elements.Template;
+
+        if (!template.photoGalleryActive) {
+          // Smooth to gallery section.
+          // var destEl = IOWA.Elements.Main.querySelector('.pics__section');
+          // IOWA.Util.smoothScroll(destEl, 400);
+
+          IOWA.Picasa.fetchPhotos(0, function(photos) {
+            template.photoGalleryActive = true;
+
+            var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+            gallery.photos = photos;
+
+            runPhotoGalleryAnimation();
+          });
+
+        } else {
+          runPhotoGalleryAnimation(true); // reverse animation when gallery is open.
+          template.photoGalleryActive = false;
+        }
+      };
+    }
+
+    var thisPage = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+    firstLoadSetup(thisPage);
+
+    if (location.hash.substring(1) == 'photos') {
+      // TODO(ericbidelman): wait until page transition is done before scrolling to element.
+      // For now, arbitrary delay.
+      setTimeout(function() {
+        IOWA.Elements.Template.togglePhotoGallery();
+      }, 100);
+    }
+
+  })();
+  </script>
 {% end %}

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"html/template"
+	"net/http"
 	"reflect"
 	"regexp"
 	"testing"
@@ -12,29 +13,58 @@ func init() {
 	rootDir = "app"
 }
 
-func TestRenderFull(t *testing.T) {
-	var b bytes.Buffer
-	if err := renderTemplate(&b, "dev", "about", false); err != nil {
-		t.Fatalf("renderTemplate(dev, about, false): %v", err)
+func TestRenderTemplate(t *testing.T) {
+	table := []*struct {
+		urlpath string
+		partial bool
+	}{
+		{"/", false},
+		{"/", true},
+		{"/about", false},
+		{"/about", true},
 	}
-}
-
-func TestRenderPartial(t *testing.T) {
-	var b bytes.Buffer
-	if err := renderTemplate(&b, "dev", "about", true); err != nil {
-		t.Fatalf("renderTemplate(dev, about, true): %v", err)
+	for i, test := range table {
+		r, _ := http.NewRequest("GET", test.urlpath, nil)
+		var b bytes.Buffer
+		c := newContext(r, &b)
+		if err := renderTemplate(c, test.urlpath, test.partial, nil); err != nil {
+			t.Fatalf("%d: renderTemplate(%v, %q, %v): %v", i, c, test.urlpath, test.partial, err)
+		}
 	}
 }
 
 func TestRenderEnv(t *testing.T) {
+	e := appEnv
+	appEnv = "prod"
+	defer func() { appEnv = e }()
+
+	req, _ := http.NewRequest("GET", "/about", nil)
 	var b bytes.Buffer
-	if err := renderTemplate(&b, "prod", "home", false); err != nil {
-		t.Fatalf("renderTemplate(prod, home, false): %v", err)
+	c := newContext(req, &b)
+
+	if err := renderTemplate(c, "about", false, nil); err != nil {
+		t.Fatalf("renderTemplate(..., about, false): %v", err)
 	}
 
-	r := `window\.ENV\s+=\s+"prod";`
-	if matched, err := regexp.Match(r, b.Bytes()); !matched || err != nil {
-		t.Errorf("didn't match %s to: %s (%v)", r, b.String(), err)
+	rx := `window\.ENV\s+=\s+"prod";`
+	if matched, err := regexp.Match(rx, b.Bytes()); !matched || err != nil {
+		t.Errorf("didn't match %s to: %s (%v)", rx, b.String(), err)
+	}
+}
+
+func TestRenderOgImage(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/about", nil)
+	var b bytes.Buffer
+	c := newContext(req, &b)
+
+	data := &templateData{OgImage: ogImageExperiment}
+	if err := renderTemplate(c, "about", false, data); err != nil {
+		t.Fatalf("renderTemplate(..., about, false): %v", err)
+	}
+
+	rx := `<meta\sproperty="og:image"\scontent="images/` + data.OgImage + `">`
+	if matched, err := regexp.Match(rx, b.Bytes()); !matched || err != nil {
+		t.Errorf("didn't match %s to: %s (%v)", rx, b.String(), err)
 	}
 }
 

@@ -22,7 +22,9 @@ var HexagonView = require('app/views/HexagonView');
 
 var logoSrc = require('url?limit=10000!app/images/io_white.png');
 
-module.exports = function(audioManager, stateManager) {
+const MOBILE_MAX = 767;
+
+module.exports = function RootView(audioManager, stateManager) {
   'use strict';
 
   var instrumentElements;
@@ -47,6 +49,8 @@ module.exports = function(audioManager, stateManager) {
   var didEnterRecordingModeCallback;
   var didExitRecordingModeCallback;
 
+  var isMobile = false;
+
   var self = {
     init,
     start,
@@ -55,7 +59,8 @@ module.exports = function(audioManager, stateManager) {
     animateOut,
     cleanUp,
     didEnterRecordingMode,
-    didExitRecordingMode
+    didExitRecordingMode,
+    reloadData
   };
 
   var maskManager = new MaskManager('experiment-is-masked');
@@ -115,10 +120,7 @@ module.exports = function(audioManager, stateManager) {
     scrollElement.addEventListener('scroll', onWindowScrollStart);
     scrollElement.addEventListener('scroll', onWindowScrollStop);
 
-    for (let i = 0; i < instrumentViews.length; i++) {
-      let v = instrumentViews[i].getView();
-      v.loadData(stateManager.currentData()[v.name]);
-    }
+    loadData();
 
     viewportElement.appendChild(logoElement);
     viewportElement.appendChild(logoDialog);
@@ -128,6 +130,24 @@ module.exports = function(audioManager, stateManager) {
 
     logoClick();
     dialogClick();
+  }
+
+  /**
+   * Load the global state into each view.
+   */
+  function loadData() {
+    for (let i = 0; i < instrumentViews.length; i++) {
+      let v = instrumentViews[i].getView();
+      v.loadData(stateManager.currentData()[v.name]);
+    }
+  }
+
+  /**
+   * Reload the initial global state into each view.
+   */
+  function reloadData() {
+    stateManager.reloadFirstLoadData();
+    loadData();
   }
 
   /**
@@ -335,6 +355,8 @@ module.exports = function(audioManager, stateManager) {
     logoElement.classList.add('hidden');
     logoDialog.classList.remove('active');
 
+    view.enable();
+
     return Promise.all([
       hideOnScreenVisualizers(view),
       view.expandView()
@@ -349,8 +371,9 @@ module.exports = function(audioManager, stateManager) {
    * @return {Promise}
    */
   function closeView(view) {
-    enableAllInstancesInsideViewport();
     PIXI.AUTO_PREVENT_DEFAULT = false;
+
+    enableAllInstancesInsideViewport();
 
     if (didExitRecordingModeCallback) {
       didExitRecordingModeCallback();
@@ -494,6 +517,7 @@ module.exports = function(audioManager, stateManager) {
     var scrollElement = currentViewportDetails().scrollElement;
     scrollElement.addEventListener('scroll', killEvents);
     window.addEventListener('mousewheel', killEvents);
+    window.addEventListener('wheel', killEvents);
     window.addEventListener('touchmove', killEvents);
   }
 
@@ -504,6 +528,7 @@ module.exports = function(audioManager, stateManager) {
     var scrollElement = currentViewportDetails().scrollElement;
     scrollElement.removeEventListener('scroll', killEvents);
     window.removeEventListener('mousewheel', killEvents);
+    window.removeEventListener('wheel', killEvents);
     window.removeEventListener('touchmove', killEvents);
   }
 
@@ -513,6 +538,8 @@ module.exports = function(audioManager, stateManager) {
   function onWindowResizeUnThrottled() {
     var w = window.innerWidth;
     var h = window.innerHeight;
+
+    isMobile = w <= MOBILE_MAX;
 
     viewportElement.style.height = `${currentViewportDetails().height}px`;
 
@@ -533,7 +560,11 @@ module.exports = function(audioManager, stateManager) {
   function onWindowScrollStartUnDebounced() {
     if (isExpanded) { return; }
 
-    enableAllInstances();
+    if (isMobile) {
+      disableAllInstancesExcept(null);
+    } else {
+      enableAllInstances();
+    }
 
     instrumentViews.forEach(e => e.ignoreInteraction());
   }
@@ -544,7 +575,11 @@ module.exports = function(audioManager, stateManager) {
   function onWindowScrollStopUnDebounced() {
     if (isExpanded) { return; }
 
-    disableViewsOutsideViewport();
+    if (isMobile) {
+      enableAllInstancesInsideViewport();
+    } else {
+      disableViewsOutsideViewport();
+    }
 
     instrumentViews.forEach(e => e.followInteraction());
   }

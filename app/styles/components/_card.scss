@@ -25,12 +25,16 @@
 
   .card-content {
     padding: 0 $mobileKeyline;
-    position: relative;
   }
 
-  a {
+  a, .anchor-like {
     @include typo-button();
     white-space: nowrap;
+  }
+
+  .anchor-like {
+    color: $color-cyan-A700;
+    cursor: pointer;
   }
 
   h2, h3 {
@@ -51,13 +55,20 @@
     background-image: url(../images/home/recap-500.jpg);
     background-position: 50% 0 !important;
     cursor: pointer;
-    border-radius: inherit;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
     min-height: 200px;
   }
 }
 
 @media (max-width: $phone-breakpoint-max) {
   .card {
+    border-bottom: 1px solid $color-light-grey-border;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
     .card-content {
       padding: $tabletKeyline $mobileKeyline;
     }
@@ -65,10 +76,6 @@
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  .card {
-    min-height: 168px;
-  }
-
   .card__container {
     max-width: 704px;
     margin: 0 auto;
@@ -90,6 +97,7 @@
         border-bottom: 1px solid #eee;
       }
     }
+
   }
 }
 

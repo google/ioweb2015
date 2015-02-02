@@ -27,10 +27,26 @@ $icon-margin: 10px;
 
 .card__photo--stage {
   height: 310px;
-  background-image: url(../images/offsite/stage-750.jpg);
-  background-position: 0 50%;
+  background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url(../images/offsite/stage-887@2x.jpg);
+  background-position: 50% 50%;
   background-size: cover;
   background-repeat: no-repeat;
+
+  h5 {
+    color: white;
+    text-shadow: .5px .5px 1px rgba(0, 0, 0, 0.25);
+    position: relative;
+    top: $mobileKeyline;
+  }
+}
+
+google-youtube {
+  opacity: 0;
+}
+
+.play__button__container {
+  opacity: 0.8;
+  cursor: pointer;
 }
 
 .page__section--attend {
@@ -38,6 +54,13 @@ $icon-margin: 10px;
   color: #fff;
   @extend .bg-globe;
   background-position: 50% 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+
+  h2 {
+    padding: 0 $mobileKeyline 0 $mobileKeyline;
+  }
 
   .action__links {
     align-items: flex-start;
@@ -51,7 +74,7 @@ $icon-margin: 10px;
     }
   }
   .attend__globe {
-    min-height: 150px;
+    height: 150px;
   }
 }
 
@@ -61,7 +84,7 @@ $icon-margin: 10px;
   .card__photo--stage {
     height: 900px;
     position: relative;
-    margin-top: -73px;
+    margin-top: -29px;
     margin-bottom: -226px;
   }
   .play__button__container {
@@ -72,7 +95,8 @@ $icon-margin: 10px;
     padding-top: $marginTop;
 
     h2 {
-      max-width: 58%;
+      max-width: 68%;
+      padding: 0 $desktopKeyline 0 $desktopKeyline;
     }
 
     .action__links {
@@ -96,30 +120,32 @@ $icon-margin: 10px;
    $marginTop: 180px;
 
   .card__photo--stage {
-    margin-top: -93px;
+    margin-top: -33px;
   }
   .page__section--attend {
-    margin-top: -108px;
+    margin-top: -90px;
     padding-top: $marginTop;
     background-size: cover;
     background-position: 50% 140px;
 
+    h2 {
+      padding: 0 $largeKeyline 0 $largeKeyline;
+    }
+
     .action__links {
       top: $marginTop;
+      right: $largeKeyline;
     }
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
-  .card__photo--stage {
-    margin-top: -57px;
-    margin-bottom: -176px;
+  .page__section--attend {
+    margin-top: -108px;
   }
-}
-
-@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-  .card__photo--stage  {
-    background-image: url(../images/offsite/stage-750@2x.jpg);
+  .card__photo--stage {
+    margin-top: -33px;
+    margin-bottom: -176px;
   }
 }
 

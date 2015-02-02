@@ -7,6 +7,7 @@ var audioSpriteCat = require('app/data/cataudiosprite.json');
 var audioLoopsDefault = require('app/data/loops.json');
 var audioLoopsCat = require('app/data/catloops.json');
 var {Promise} = require('es6-promise');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 /**
  * Main entry point into the experiment.
@@ -31,7 +32,8 @@ module.exports = function Experiment() {
     pause,
     play,
     didEnterRecordingMode,
-    didExitRecordingMode
+    didExitRecordingMode,
+    reloadData
   };
 
   /**
@@ -52,7 +54,7 @@ module.exports = function Experiment() {
     audioManager = new AudioManager();
     audioManager.init();
 
-    stateManager = new StateManager();
+    stateManager = new StateManager(audioManager);
 
     // Create the RootView, which controls all visuals in the experiment.
     rootView = new RootView(audioManager, stateManager);
@@ -83,7 +85,7 @@ module.exports = function Experiment() {
    */
   function start(instrumentSelector = '.row', visualizerSelector = '.box', fromPos = [0,0]) {
     // Start sound engine.
-    audioManager.start();
+    audioManager.fadeIn(2.25, 0.75);
 
     // Find base elements and layout views.
     rootView.init(instrumentSelector, visualizerSelector);
@@ -95,10 +97,12 @@ module.exports = function Experiment() {
     // Start requestAnimationFrame
     rootView.start();
 
-    // Animate transition in.
-    setTimeout(function() {
-      rootView.animateIn(fromPos);
-    }, 50);
+    return new Promise(function(resolve, reject) {
+      // Animate transition in.
+      rAFTimeout(function() {
+        rootView.animateIn(fromPos).then(resolve, reject);
+      }, 50);
+    });
   }
 
   const SHORTENER_API_URL = 'https://www.googleapis.com/urlshortener/v1/url';
@@ -106,9 +110,22 @@ module.exports = function Experiment() {
 
   /**
    * Serialize the entire experiment to URL encoded data.
+   * @param {string=} extraParam - Additional URL params.
+   * @return {Promise}
    */
-  function serialize() {
-    var fullURL = window.location.origin + window.location.pathname + '?composition=' + stateManager.toURL();
+  function serialize(extraParams) {
+    extraParams = extraParams || '';
+
+    var fullURL = window.location.origin + window.location.pathname + '?experiment&composition=' + stateManager.toURL() + '&' + extraParams;
+    return shortenURL(fullURL);
+  }
+
+  /**
+   * Use Google's URL shortener to compress an URL for social.
+   * @param {string} fullURL - The full url.
+   * @return {Promise}
+   */
+  function shortenURL(fullURL) {
     var endpoint = `${SHORTENER_API_URL}?key=${SHORTENER_API_KEY}`;
 
     return new Promise(function(resolve, reject) {
@@ -141,13 +158,16 @@ module.exports = function Experiment() {
   /**
    * Shut down the experiment.
    * @param {array<number>} fromPos - The origin point of the transition in (FAB).
+   * @return {Promise}
    */
   function tearDown(fromPos = [0,0]) {
     // Stop sound engine.
-    audioManager.fadeOut(0.5);
+    audioManager.fadeOut(0.5).then(function() {
+      audioManager.tearDown();
+    });
 
     // Animate transition out.
-    rootView.animateOut(fromPos).then(function() {
+    return rootView.animateOut(fromPos).then(function() {
       // Remove DOM nodes.
       rootView.cleanUp();
     });
@@ -157,14 +177,14 @@ module.exports = function Experiment() {
    * Pause the experiment audio.
    */
   function pause() {
-    audioManager.stop();
+    audioManager.fadeOut(0.75);
   }
 
   /**
    * Play the experiment audio.
    */
   function play() {
-    audioManager.start();
+    audioManager.fadeIn(0.75);
   }
 
   /**
@@ -181,6 +201,13 @@ module.exports = function Experiment() {
    */
   function didExitRecordingMode(cb) {
     rootView.didExitRecordingMode(cb);
+  }
+
+  /**
+   * Reload the global state.
+   */
+  function reloadData() {
+    rootView.reloadData();
   }
 
   return self;

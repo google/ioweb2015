@@ -40,22 +40,29 @@ $name: 'page-registration';
     margin: 100px 0;
   }
   .page__section--countdown {
-    margin-top: -137px;
-    padding-top: 138px;
+    margin-top: -166px;
+    padding-top: 166px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-min) {
   .page__section--countdown {
-    margin-top: -165px; // adjustments for section is snug against previous.
-    padding-top: 165px;
+    margin-top: -166px; // adjustment so section is snug against the previous one.
+    padding-top: 166px;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid) {
+  .page__section--countdown {
+    margin-top: -178px; // adjustment so section is snug against the previous one.
+    padding-top: 178px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
   .page__section--countdown {
-    margin-top: -129px; // adjustments for section is snug against previous.
-    padding-top: 129px;
+    margin-top: -154px; // adjustment so section is snug against the previous one.
+    padding-top: 154px;
   }
 }
 

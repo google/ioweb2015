@@ -17,6 +17,7 @@ var tenNumber = require('url?limit=10000!app/images/10.png');
 var getReadyImage = require('url?limit=10000!app/images/get-ready.png');
 var recordingImage = require('url?limit=10000!app/images/recording.png');
 var recordingComplete = require('url?limit=10000!app/images/recording-complete.png');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
   'use strict';
@@ -33,10 +34,9 @@ module.exports = (function() {
   circleGraphics.drawCircle(0, 0, CIRCLE_RADIUS);
   circleGraphics.endFill();
 
-  var circleTexture = circleGraphics.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
+  var circleTexture = circleGraphics.generateTexture();
 
   return function RecordButton(audioManager) {
-
     var startBeat;
     var internalStartBeat;
     var prevWholeNumber;
@@ -54,7 +54,7 @@ module.exports = (function() {
 
     var container = new PIXI.DisplayObjectContainer();
 
-    container.interactive = true;
+    container.interactive = false;
     container.buttonMode = true;
 
     var circle = new PIXI.Sprite(circleTexture);
@@ -93,6 +93,8 @@ module.exports = (function() {
     checkmarkCircle.position.y = CIRCLE_RADIUS + 2;
     checkmarkCircle.anchor.set(0.5, 0.5);
     checkmarkCircle.alpha = 0;
+    checkmarkCircle.scale.x = 0;
+    checkmarkCircle.scale.y = 0;
 
     var readyText = retinaInlineSprite(getReadyImage);
     var recordingText = retinaInlineSprite(recordingImage);
@@ -130,6 +132,7 @@ module.exports = (function() {
       clearCircle,
       resetRecord,
       container,
+      onCountdownActivate,
       onRecordActivate,
       onRecordDeactivate,
       recordIcon,
@@ -165,6 +168,16 @@ module.exports = (function() {
       return beats * sequencer.beatLength();
     }
 
+    var onCountdownActivateCallback;
+
+    /**
+     * When countdown activated, pass the callback to the function.
+     * @param {function} cb - The callback to run.
+     */
+    function onCountdownActivate(cb) {
+      onCountdownActivateCallback = cb;
+    }
+
     /**
      * When activated, pass the callback to the function.
      * @param {function} cb - The callback to run.
@@ -187,8 +200,10 @@ module.exports = (function() {
      * Add event listeners.
      */
     function addEventListeners() {
+      container.interactive = true;
+
       container.click = container.tap = function() {
-        if(!isCountdown) {
+        if (!isCountdown) {
           startBeat = timeToFirstBeat();
           internalStartBeat = timeToFirstBeat();
           prevWholeNumber = timeToFirstBeat();
@@ -202,6 +217,7 @@ module.exports = (function() {
      * Remove event listeners.
      */
     function removeEventListeners() {
+      container.interactive = false;
       container.click = container.tap = null;
     }
 
@@ -242,9 +258,8 @@ module.exports = (function() {
         x: 0.7,
         y: 0.7
       }, {
-        x: 1,
-        y: 1,
-        ease: Elastic.easeIn
+        x: 1.1,
+        y: 1.1
       }).then(hideNumber.bind(null, numberImageGraphic));
     }
 
@@ -256,8 +271,7 @@ module.exports = (function() {
       animate.to(numberImageGraphic.scale, 0.15, {
         delay: 0.6,
         x: 0.5,
-        y: 0.5,
-        ease: Elastic.easeOut
+        y: 0.5
       });
 
       animate.to(numberImageGraphic, 0.2, {
@@ -270,6 +284,7 @@ module.exports = (function() {
      * Set up the countdown circle
      */
     function setupCountdown() {
+      onCountdownActivateCallback(self);
       isCountdown = true;
       startedCountingTime = 0;
       animate.fromTo(recordIcon.scale, 0.4, {
@@ -361,8 +376,8 @@ module.exports = (function() {
      */
     function resetRecord() {
       arcCircle.clear();
-      mintCircle.alpha = 0;
-      hideText(textImages[2], 2);
+      checkmarkCircle.alpha = 0;
+      hideText(textImages[2], 0);
       animate.fromTo(recordIcon.scale, 0.3, {
         x: 0,
         y: 0
@@ -383,8 +398,8 @@ module.exports = (function() {
     /**
      * Animate the countdown/record circle
      * @param {string} color - The color of the stroke.
-     * param {number} startedTime - The start time of the animation.
-     * param {number} duration - The duration of the recording.
+     * @param {number} startedTime - The start time of the animation.
+     * @param {number} duration - The duration of the recording.
      */
     function radialAnimation(color, startedTime, duration) {
       var targetRadians = (Math.PI * 2) * (startedTime / duration);
@@ -400,6 +415,9 @@ module.exports = (function() {
      */
     function finishedAnimation() {
       hideText(textImages[1], 0);
+      checkmarkCircle.alpha = 1;
+      mintCircle.alpha = 0;
+      showText(textImages[2]);
       animate.to(checkmarkCircle.scale, 0.25, {
         x: 1,
         y: 1
@@ -407,10 +425,11 @@ module.exports = (function() {
         delay: 2,
         x: 0,
         y: 0
-      })
-      );
-      showText(textImages[2]);
-      resetRecord();
+      }));
+
+      rAFTimeout(function(){
+        resetRecord();
+      }, 2100);
     }
 
     return self;

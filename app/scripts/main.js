@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Google Inc. All rights reserved.
+ * Copyright 2015 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,5 +27,16 @@
   //     I18nMsg.lang = document.documentElement.lang || 'en';
   //   });
   // }
+
+  // Pages that care to know when the page transitions are final should listen
+  // for the page-transition-done event. It's the responsibility of the subpage
+  // to  not add multiple listeners for this event on subsequent navigations.
+  // exports.addEventListener('page-transition-done', function(e) {
+  //   // TODO
+  // })
+
+  exports.addEventListener('resize', function() {
+    IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
+  });
 
 })(window);

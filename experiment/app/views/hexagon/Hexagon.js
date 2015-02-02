@@ -3,6 +3,7 @@ var { vec2 } = require('p2');
 var ColorGradient = require('toxiclibsjs/lib/toxi/color/ColorGradient');
 var TColor = require('toxiclibsjs/lib/toxi/color/TColor');
 var FloatRange = require('toxiclibsjs/lib/toxi/util/datatypes/FloatRange');
+var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
   'use strict';
@@ -20,6 +21,15 @@ module.exports = (function() {
 
   var cachedTexture;
 
+  var hexagonShadow;
+
+  /**
+   * Draw the shadow form of a Hexagon in canvas, once, and cache.
+   * @param {array<array<number>>} polygon - List of points.
+   * @param {number} radius - The hexagon radius.
+   * @param {number} amount - The shadow depth.
+   * @return {Element}
+   */
   function makeHexagonShadow(polygon, radius, amount) {
     var canvas = document.createElement('canvas');
     canvas.width = canvas.height = (radius + amount) * 2;
@@ -37,25 +47,27 @@ module.exports = (function() {
 
     ctx.shadowColor = '#000';
     ctx.shadowBlur = amount;
-    // ctx.shadowOffsetX = 15;
-    // ctx.shadowOffsetY = 15;
     ctx.closePath();
     ctx.fill();
 
     return canvas;
   }
 
-  var hexagonShadow;
-
+  /**
+   * A single hexagon.
+   * @constructor
+   * @param {number} radius - The radius.
+   */
   function Hexagon(radius) {
     var cube;
 
     var color = 0xe34f4c;
-    var currentColor = color;
+    var targetHeight = 0;
 
     var radRotation = (Math.PI * 2) / sides;
 
     var shape = makePolygon();
+    var isHovering = false;
 
     if (!cachedTexture) {
       var textureGfx = new PIXI.Graphics();
@@ -64,10 +76,9 @@ module.exports = (function() {
       textureGfx.beginFill(0xffffff);
       textureGfx.drawShape(shape);
       textureGfx.endFill();
-      cachedTexture = textureGfx.generateTexture(window.devicePixelRatio > 1.5 ? 2 : 1);
+      cachedTexture = textureGfx.generateTexture();
     }
 
-    // TODO: Maybe disable shadow on mobile?
     if (!hexagonShadow) {
       var shadowCanvas = makeHexagonShadow(shape.points, radius, 25);
       hexagonShadow = PIXI.Texture.fromCanvas(shadowCanvas);
@@ -78,6 +89,7 @@ module.exports = (function() {
     shadow.alpha = 0.8;
 
     var container = new PIXI.DisplayObjectContainer();
+    container.addChild(shadow);
 
     var background = new PIXI.Sprite(cachedTexture);
     background.anchor.x = background.anchor.y = 0.5;
@@ -85,15 +97,21 @@ module.exports = (function() {
 
     container.hitArea = shape;
 
-    var tweenData = { height: 0 };
-
-    render();
+    render(0);
 
     var onActivateCallback;
+
+    /**
+     * Attach a callback on activation.
+     * @param {function} cb - The callback.
+     */
     function onActivate(cb) {
       onActivateCallback = cb;
     }
 
+    /**
+     * Attach event listeners.
+     */
     function addEventListeners() {
       container.interactive = true;
       container.buttonMode = true;
@@ -102,15 +120,18 @@ module.exports = (function() {
         onActivateCallback(cube);
       };
 
-      container.mouseover = function(mouseData){
-        background.tint = 0xC44441;
-      }
+      container.mouseover = function() {
+        isHovering = true;
+      };
 
-      container.mouseout = function(mouseData){
-        background.tint = color;
-      }
+      container.mouseout = function(){
+        isHovering = false;
+      };
     }
 
+    /**
+     * Detach event listeners.
+     */
     function removeEventListeners() {
       container.interactive = false;
       container.buttonMode = false;
@@ -118,6 +139,10 @@ module.exports = (function() {
       container.click = container.tap  = null;
     }
 
+    /**
+     * Make a polygon for a hexagon.
+     * @return {PIXI.Polygon}
+     */
     function makePolygon() {
       var points = [];
       var vec = vec2.fromValues(radius, 0);
@@ -131,62 +156,75 @@ module.exports = (function() {
       return new PIXI.Polygon(points);
     }
 
-    function render() {
-      background.tint = currentColor;
-    }
+    /**
+     * Update the current color.
+     * @param {number} delta - Time since last frame.
+     */
+    function render(delta) {
+      targetHeight -= delta * 2;
 
-    function updateColor(c) {
-      currentColor = c;
-      render();
-    }
+      if (targetHeight < 0) { targetHeight = 0; }
 
-    var currentTween;
-    var tweenTo = { height: 0, onUpdate: onUpdate, ease: Expo.easeOut,
-      onComplete: function() {
-        currentTween = null;
-        container.removeChild(shadow);
-      },
-      onStart: function() {
-        shadow.alpha = 0;
-        container.addChildAt(shadow, 0);
-      }
-    };
-
-    function activate(delay) {
-      if (currentTween) {
-        currentTween.kill();
-        container.removeChild(shadow);
-      }
-
-      tweenData.height = 1;
-      tweenTo.delay = delay || 0;
-      container.parent.setChildIndex(container, container.parent.children.length-1);
-      currentTween = TweenMax.to(tweenData, 1.4, tweenTo);
-    }
-
-    function onUpdate() {
-      var idx = ~~(tweenData.height * shades) - 1;
+      var idx = ~~(targetHeight * shades) - 1;
       if (idx < 0) { idx = 0; }
-      updateColor(heightColors[idx].toInt());
-      shadow.alpha = tweenData.height * 0.8;
+
+      if (idx <= 0) {
+        if (isHovering) {
+          background.tint = 0xC44441;
+        } else {
+          background.tint = color;
+        }
+      } else {
+        background.tint = heightColors[idx].toInt();
+      }
+
+      shadow.alpha = targetHeight * 0.8;
     }
 
+    /**
+     * Activate a ripple, with optional delay.
+     * @param {number=0} delay - The delay.
+     */
+    function activate(delay) {
+      rAFTimeout(boostHeight, delay ? (delay * 1000) : 0);
+    }
+
+    /**
+     * Bump the current height.
+     */
+    function boostHeight() {
+      targetHeight += 1.0;
+
+      if (targetHeight > 1.0) { targetHeight = 1.0; }
+
+      if (container.parent) {
+        container.parent.setChildIndex(container, container.parent.children.length - 1);
+      }
+    }
+
+    /**
+     * Set the data model for this hexagon.
+     * @param {Cube} c - The cube.
+     */
     function setCube(c) {
       cube = c;
     }
 
     return {
       container,
-      updateColor,
       activate,
       setCube,
       onActivate,
       addEventListeners,
       removeEventListeners,
+      render,
       getCube: () => cube
     };
   }
 
+  /**
+   * Clear the cache on resize.
+   */
   Hexagon.clearTextureCache = function() {
     cachedTexture = null;
     hexagonShadow = null;

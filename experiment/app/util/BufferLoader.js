@@ -1,4 +1,4 @@
-var Promise = require('es6-promise').Promise;
+var {Promise} = require('es6-promise');
 
 module.exports = (function() {
   'use strict';

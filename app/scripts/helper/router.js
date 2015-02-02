@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Google Inc. All rights reserved.
+ * Copyright 2015 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,13 @@ IOWA.Router = (function() {
         card = currentEl;
       }
     }
-    IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverOut(
-        card, e.pageX, e.pageY, 300, rippleColor), function() {
-      IOWA.History.pushState({'path': el.pathname}, '', el.href);
-    });
+    IOWA.PageAnimation.play(
+      IOWA.PageAnimation.pageCardTakeoverOut(
+          card, e.pageX, e.pageY, 300, rippleColor),
+      function() {
+        IOWA.History.pushState({'path': el.pathname}, '', el.href);
+      }
+    );
   }
 
   /**
@@ -85,22 +88,24 @@ IOWA.Router = (function() {
   function handleAjaxLink(e, el) {
     e.preventDefault();
     e.stopPropagation();
+
+    var template = IOWA.Elements.Template;
+
     // We can get the full absolute path from the <a> element's pathname:
     // http://stackoverflow.com/questions/736513
     var pageName = parsePageNameFromAbsolutePath(el.pathname);
-    IOWA.Elements.Template.nextPage = pageName;
+    template.nextPage = pageName;
 
-    var currentPage = IOWA.Elements.Template.selectedPage;
-    var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
+    var page = template.selectedPage;
+    var bgClass = template.pages[pageName] &&
+                  template.pages[pageName].mastheadBgClass;
 
-    IOWA.Elements.Template.navBgClass = bgClass;
-    var isFadeRipple = (
-        IOWA.Elements.Template.pages[currentPage].mastheadBgClass ===
-        bgClass);
-    var rippleColor = isFadeRipple ?
-        '#fff': IOWA.Elements.Template.rippleColors[bgClass];
+    template.navBgClass = bgClass;
+    var isFadeRipple = template.pages[page].mastheadBgClass === bgClass;
+    var rippleColor = isFadeRipple ? '#fff' : template.rippleColors[bgClass];
 
-    if (currentPage !== pageName) {
+    if (page !== pageName) {
+      IOWA.Elements.Template.fire('page-transition-start');
       if (el.hasAttribute('data-anim-ripple')) {
         currentPageTransition = 'masthead-ripple-transition';
         playMastheadRippleTransition(e, el, rippleColor, isFadeRipple);
@@ -130,10 +135,13 @@ IOWA.Router = (function() {
       var el = e.path[i];
       if (el.localName === 'a' || el.localName === 'paper-button') {
         if (el.hasAttribute('data-track-link')) {
-          IOWA.Analytics.trackEvent('link', 'click', el.getAttribute('data-track-link'));
+          IOWA.Analytics.trackEvent(
+              'link', 'click', el.getAttribute('data-track-link'));
         }
         if (el.hasAttribute('data-ajax-link')) {
           handleAjaxLink(e, el);
+        } else {
+          currentPageTransition = 'no-transition';
         }
         return; // found first navigation element, quit here.
       }
@@ -183,25 +191,36 @@ IOWA.Router = (function() {
   function updatePageElements(pageName, currentPageTemplates, mastheadBgClass) {
     replaceTemplateContent(currentPageTemplates);
     document.body.id = 'page-' + pageName;
-    IOWA.Elements.Template.selectedPage = pageName;
-    document.title = (IOWA.Elements.Template.pages[pageName].title ||
-        'Google I/O 2015');
 
-    IOWA.Elements.Template.navBgClass = mastheadBgClass;
+    var template = IOWA.Elements.Template;
+    template.selectedPage = pageName;
+    document.title = (template.pages[pageName].title || 'Google I/O 2015');
+
+    // Prepare the page for a smooth masthead transition.
+    template.navBgClass = mastheadBgClass;
     // This cannot be updated via data binding, because the masthead
     // is visible before the binding happens.
     IOWA.Elements.Masthead.className = IOWA.Elements.Masthead.className.replace(
         MASTHEAD_BG_CLASS_REGEX, ' ' + mastheadBgClass + ' ');
+
     // Hide the masthead ripple before proceeding with page transition.
     IOWA.PageAnimation.play(
       IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
 
+    // Scroll to top of new page.
+    IOWA.Elements.ScrollContainer.scrollTop = 0;
+
     setTimeout(function() {
-      var animationIn = (
-          currentPageTransition === 'hero-card-transition') ?
-          IOWA.PageAnimation.pageCardTakeoverIn() :
-          IOWA.PageAnimation.pageSlideIn();
-      IOWA.PageAnimation.play(animationIn);
+      if (currentPageTransition === 'hero-card-transition') {
+        IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverIn(), function() {
+          IOWA.Elements.Template.fire('page-transition-done');
+        });
+      } else {
+        IOWA.PageAnimation.play(IOWA.PageAnimation.pageSlideIn(), function() {
+          // Fire event when the page transitions are final.
+          IOWA.Elements.Template.fire('page-transition-done');
+        });
+      }
       currentPageTransition = '';
     }, 100); // Wait for the... Good question. Maybe template binding?
     // TODO: BUG: Anyways, something to investigate. Web Animations
@@ -222,7 +241,7 @@ IOWA.Router = (function() {
       var animation = IOWA.PageAnimation.contentSlideOut();
       IOWA.PageAnimation.play(animation, updatePageElements.bind(
           null, pageName, currentPageTemplates, bgClass));
-    } else {
+    } else if (currentPageTransition !== 'no-transition') {
       updatePageElements(pageName, currentPageTemplates, bgClass);
     }
   }

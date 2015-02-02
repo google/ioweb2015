@@ -46,6 +46,7 @@ module.exports = (function() {
 
     var isReady = false;
     var isRecording = false;
+    var isCountdown = false;
     var allData;
 
     var pidPool = [];
@@ -111,6 +112,18 @@ module.exports = (function() {
      * @param {Model} initialData - The guitar data.
      */
     function loadData(initialData) {
+      if (currentTrack) {
+        audioManager.removeTrack(currentTrack);
+      }
+
+      for (let pid in guitarStrings) {
+        if (guitarStrings.hasOwnProperty(pid)) {
+          guitarStrings[pid].tearDown();
+          delete dots[pid];
+          addToPool(pid);
+        }
+      }
+
       if (initialData.strings.length <= 0) { return; }
 
       allData = initialData;
@@ -139,10 +152,18 @@ module.exports = (function() {
     }
 
     /**
+     * On countdown, don't allow dots to be clicked/drawn
+     */
+    function startCountdown() {
+      isCountdown = true;
+    }
+
+    /**
      * Start recording the guitar note.
      */
     function startRecording() {
       isRecording = true;
+      isCountdown = false;
       allData.recorded = [];
     }
 
@@ -244,6 +265,24 @@ module.exports = (function() {
      * Create the grid of dots in the guitar view.
      */
     function createDotGrid() {
+      for (let pid in dots) {
+        if (dots.hasOwnProperty(pid)) {
+          let {
+            gridDotMiddle,
+            gridDot,
+            gridDotUpper
+          } = dots[pid];
+
+          dots[pid].tearDown();
+
+          baseLayer.removeChild(gridDot);
+          topLayer.removeChild(gridDotUpper);
+          midLayer.removeChild(gridDotMiddle);
+
+          delete dots[pid];
+        }
+      }
+
       for (let i = 0; i < gridCount; i++) {
         let dot = new Dot(i);
 
@@ -271,7 +310,7 @@ module.exports = (function() {
      * @param {Object} dot - The clicked dot.
      */
     function activateDot(dot) {
-      if (isRecording) { return; }
+      if (isRecording || isCountdown) { return; }
       if (APPLICATION_STATE === 'collapsed') { return; }
 
       if (!isDrawing && !dot.getString() && !isUndrawing) {
@@ -510,16 +549,8 @@ module.exports = (function() {
      * @param {number} delta - The delta.
      */
     function render(delta) {
-      if (renderPause === false) {
-        renderBodies(delta);
-      }
-    }
+      if (renderPause) { return; }
 
-    /**
-     * Render the guitar strings on RAF.
-     * @param {number} delta - The delta.
-     */
-    function renderBodies(delta) {
       for (let pid in guitarStrings) {
         if (guitarStrings.hasOwnProperty(pid)) {
           guitarStrings[pid].render(delta);
@@ -565,6 +596,7 @@ module.exports = (function() {
       disable,
       render,
       resize,
+      startCountdown,
       startRecording,
       stopRecording,
       getData,

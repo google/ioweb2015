@@ -11,14 +11,16 @@ module.exports = (function() {
 
   const MAX_CONTENT_WIDTH = 1024;
   const CONTENT_ASPECT_RATIO_HORIZONTAL = 2 / 1;
-  const CONTENT_ASPECT_RATIO_VERTICAL = 3 / 2;
+  const CONTENT_ASPECT_RATIO_VERTICAL = 2 / 3;
   const CONTENT_HORIZONTAL_BUFFER_DESKTOP = 64;
   const CONTENT_HORIZONTAL_BUFFER_MOBILE = 24;
-  const CONTENT_VERTICAL_BUFFER_DESKTOP = 175;
+  const CONTENT_VERTICAL_BUFFER_DESKTOP = 150;
   const CONTENT_VERTICAL_BUFFER_MOBILE = 32;
+  const CONTENT_CONTROLS_BUFFER = 70;
   const MOBILE_MAX = 767;
 
-  var isRetina = false;//window.devicePixelRatio > 1.5;
+  // Pixi.js has too many retina bugs to enable at this time.
+  var isRetina = false;
 
   /**
    * A container that wraps a sub instruments.
@@ -38,6 +40,9 @@ module.exports = (function() {
     var wrapperElement;
 
     var elementToMimic = elementToMimic_;
+    var hasTopMargin = !elementToMimic.classList.contains('js-experiment-instrument--no-top-margin');
+    var hasBottomMargin = !elementToMimic.classList.contains('js-experiment-instrument--no-bottom-margin');
+
     var elemRect = { top: 0, left: 0, width: 0, height: 0 };
 
     var tweenData = { width: 0, height: 0, optimalWidth: 0, optimalHeight: 0 };
@@ -51,6 +56,8 @@ module.exports = (function() {
 
     var onActivateCallback_;
     var onBackCallback_;
+
+    var isMobile = false;
 
     var self = {
       init,
@@ -91,23 +98,6 @@ module.exports = (function() {
 
       stage.addChild(displayContainer);
 
-      // fixes for black graphic squares in 5th webGL container
-      var recordIconImage = recordButton.recordIcon;
-      var recordCircle = recordButton.circle;
-      var checkboxCircle = recordButton.checkmarkCircle;
-      var recordText = recordButton.textImages;
-      var recordNumbers = recordButton.numberImagePixiObjects;
-      renderer.updateTexture(backIcon.texture.baseTexture);
-      renderer.updateTexture(recordIconImage.texture.baseTexture);
-      renderer.updateTexture(recordCircle.texture.baseTexture);
-      renderer.updateTexture(checkboxCircle.texture.baseTexture);
-      for (let i = 0; i < recordText.length; i++) {
-        renderer.updateTexture(recordText[i].texture.baseTexture);
-      }
-      for (let i = 0; i < recordNumbers.length; i++) {
-        renderer.updateTexture(recordNumbers[i].texture.baseTexture);
-      }
-
       instrumentView.init(stage, pid, displayContainerCenter);
 
       // If Debug
@@ -120,6 +110,25 @@ module.exports = (function() {
       addContractedEventListeners();
 
       isReady = true;
+
+      setTimeout(function() {
+        // fixes for black graphic squares in 5th webGL container
+        var recordIconImage = recordButton.recordIcon;
+        var recordCircle = recordButton.circle;
+        var checkboxCircle = recordButton.checkmarkCircle;
+        var recordText = recordButton.textImages;
+        var recordNumbers = recordButton.numberImagePixiObjects;
+        renderer.updateTexture(backIcon.texture.baseTexture);
+        renderer.updateTexture(recordIconImage.texture.baseTexture);
+        renderer.updateTexture(recordCircle.texture.baseTexture);
+        renderer.updateTexture(checkboxCircle.texture.baseTexture);
+        for (let i = 0; i < recordText.length; i++) {
+          renderer.updateTexture(recordText[i].texture.baseTexture);
+        }
+        for (let i = 0; i < recordNumbers.length; i++) {
+          renderer.updateTexture(recordNumbers[i].texture.baseTexture);
+        }
+      }, 50);
     }
 
     /**
@@ -137,12 +146,13 @@ module.exports = (function() {
       backIconContainer.addChild(backIcon);
       backIconContainer.alpha = 0;
 
-      recordButton = new RecordButton(audioManager, 10, 4);
+      recordButton = new RecordButton(audioManager);
       recordButton.container.position.x = window.innerWidth - 62;
       recordButton.container.position.y = 56;
       recordButton.container.pivot.set(28,28);
       recordButton.container.scale.x = 0;
       recordButton.container.scale.y = 0;
+      recordButton.onCountdownActivate(onCountdownActivate);
       recordButton.onRecordActivate(onRecordActivate);
       recordButton.onRecordDeactivate(onRecordDeactivate);
 
@@ -172,10 +182,9 @@ module.exports = (function() {
 
     /**
      * Animate the controls in.
-     * @param {number} delay - Animation delay.
      * @return {Promise}
      */
-    function showControls(delay) {
+    function showControls() {
       stage.addChild(controls);
 
       backIconContainer.interactive = true;
@@ -188,9 +197,10 @@ module.exports = (function() {
         animate.to(backIconContainer, 0.1, {
           alpha: 1
         });
-        animate.to(recordButton.container.scale, 0.2, {
+        animate.to(recordButton.container.scale, 0.33, {
           x: 1,
-          y: 1
+          y: 1,
+          ease: Back.easeOut
         });
       });
     }
@@ -205,19 +215,33 @@ module.exports = (function() {
       backIconContainer.buttonMode = false;
       backIconContainer.click = null;
 
-      return animate.to(controls, 0.3, {
+      return animate.to(controls, 0.2, {
         y: -100,
         delay: delay
       }).then(function() {
         stage.addChild(controls);
-        animate.to(backIconContainer, 0.1, {
+        animate.set(backIconContainer, {
           alpha: 0
         });
-        animate.to(recordButton.container.scale, 0.2, {
+        animate.set(recordButton.container.scale, {
           x: 0,
           y: 0
         });
       });
+    }
+
+    /**
+     * Activate countdown
+     */
+    function onCountdownActivate() {
+      if ('function' === typeof instrumentView.startCountdown) {
+        instrumentView.startCountdown();
+      }
+      backIconContainer.interactive = false;
+      animate.to(backIconContainer, 0.33, {
+        alpha: 0
+      });
+      document.removeEventListener('keyup', onGlobalKeyUp);
     }
 
     /**
@@ -235,6 +259,11 @@ module.exports = (function() {
     function onRecordDeactivate() {
       if ('function' === typeof instrumentView.stopRecording) {
         instrumentView.stopRecording();
+        backIconContainer.interactive = true;
+        animate.to(backIconContainer, 0.33, {
+          alpha: 1
+        });
+        document.addEventListener('keyup', onGlobalKeyUp);
       }
 
       logRecorded();
@@ -391,9 +420,11 @@ module.exports = (function() {
         y: getDocumentScrollTop()
       });
 
+      var targetY = (window.innerHeight / 2) + getMarginOffset();
+
       var moveCenter = animate.to(displayContainerCenter, duration, {
         x: window.innerWidth / 2,
-        y: window.innerHeight / 2
+        y: targetY
       });
 
       var [optimalWidth, optimalHeight] = optimalBounds(window.innerWidth, window.innerHeight);
@@ -421,6 +452,25 @@ module.exports = (function() {
     }
 
     /**
+     * Calculate the margins of the instrument box.
+     * @return {number}
+     */
+    function getMarginOffset() {
+      var isFirst = pid === 0;
+
+      if (isExpanded) {
+        return instrumentView.supportsPortrait ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
+      } else {
+        if (isMobile) {
+          return isFirst ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
+        } else {
+          var equalMargins = Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
+          return (hasTopMargin ? equalMargins : 0) - (hasBottomMargin ? equalMargins : 0);
+        }
+      }
+    }
+
+    /**
      * Contract this view.
      * @return {Promise}
      */
@@ -434,9 +484,11 @@ module.exports = (function() {
         y: elemRect.top
       });
 
+      var targetY = (elemRect.height / 2) + getMarginOffset();
+
       var moveCenter = animate.to(displayContainerCenter, duration, {
         x: elemRect.width / 2,
-        y: elemRect.height / 2
+        y: targetY
       });
 
       var [optimalWidth, optimalHeight] = optimalBounds(elemRect.width, elemRect.height);
@@ -470,6 +522,7 @@ module.exports = (function() {
      */
     function disable() {
       if (!isReady || isPaused) { return; }
+
       isPaused = true;
       instrumentView.disable();
     }
@@ -479,6 +532,7 @@ module.exports = (function() {
      */
     function enable() {
       if (!isReady || !isPaused) { return; }
+
       isPaused = false;
       instrumentView.enable();
     }
@@ -497,16 +551,31 @@ module.exports = (function() {
     }
 
     /**
+     * Given an aspect ratio, fit a rectangle inside a container.
+     * @param {number} ratio - The aspect ratio.
+     * @param {number} w - The container width.
+     * @param {number} h - The container height.
+     * @return {array<number>}
+     */
+    function fitBounds(ratio, w, h) {
+      var wNew = ratio / Math.max(ratio / w, 1 / h);
+      var hNew = 1 / Math.max(ratio / w, 1 / h);
+
+      return [wNew, hNew];
+    }
+
+    /**
      * Calculate a nice bounding box based on screen size.
      * @param {number} containerWidth - The width.
      * @param {number} containerHeight - The height.
      * @return {array<number>}
      */
     function optimalBounds(containerWidth, containerHeight) {
+      var isFirst = pid === 0;
+
       var optimalWidth;
       var optimalHeight;
 
-      var isMobile = containerWidth <= MOBILE_MAX;
       var horizontalBuffer = isMobile ?
           CONTENT_HORIZONTAL_BUFFER_MOBILE :
           CONTENT_HORIZONTAL_BUFFER_DESKTOP;
@@ -514,28 +583,50 @@ module.exports = (function() {
           CONTENT_VERTICAL_BUFFER_MOBILE :
           CONTENT_VERTICAL_BUFFER_DESKTOP;
 
+      var isPortrait = isMobile && instrumentView.supportsPortrait && (containerHeight > containerWidth);
+
       if (isExpanded) {
-        if (isMobile) {
-          horizontalBuffer *= 4;
-          verticalBuffer *= 4;
-        } else {
-          verticalBuffer = horizontalBuffer;
+        verticalBuffer = CONTENT_CONTROLS_BUFFER;
+
+        if (isPortrait) {
+          horizontalBuffer *= 2;
         }
       }
 
       var relativeWidth = (containerWidth - (horizontalBuffer * 2));
-      var relativeHeight = (containerHeight - (verticalBuffer * 2));
+      var relativeHeight;
 
-      if (!isMobile) {
-        relativeWidth = Math.min(MAX_CONTENT_WIDTH, relativeWidth);
-      }
+      if (isMobile) {
+        let topBuffer = (isExpanded || isFirst) ? Math.max(CONTENT_CONTROLS_BUFFER, verticalBuffer) : verticalBuffer;
+        relativeHeight = containerHeight - (topBuffer * 2);
 
-      if (isMobile && instrumentView.supportsPortrait) {
-        optimalWidth = relativeHeight * (1 / CONTENT_ASPECT_RATIO_VERTICAL);
-        optimalHeight = relativeHeight;
+        if (isPortrait) {
+          return fitBounds(CONTENT_ASPECT_RATIO_VERTICAL, relativeWidth, relativeHeight);
+        } else {
+          return fitBounds(CONTENT_ASPECT_RATIO_HORIZONTAL, relativeWidth, relativeHeight);
+        }
       } else {
-        optimalWidth = relativeWidth;
-        optimalHeight = relativeWidth / CONTENT_ASPECT_RATIO_HORIZONTAL;
+        relativeHeight = containerHeight;
+
+        let topBuffer;
+        if (hasTopMargin) {
+          topBuffer = verticalBuffer;
+        } else {
+          topBuffer = CONTENT_VERTICAL_BUFFER_MOBILE;
+        }
+
+        topBuffer = (isExpanded || (isMobile && isFirst)) ? Math.max(CONTENT_CONTROLS_BUFFER, topBuffer) : topBuffer;
+        relativeHeight -= topBuffer;
+
+        if (hasBottomMargin) {
+          relativeHeight -= verticalBuffer;
+        } else {
+          relativeHeight -= CONTENT_VERTICAL_BUFFER_MOBILE;
+        }
+
+        var minWidth = Math.min(MAX_CONTENT_WIDTH, relativeWidth);
+
+        return fitBounds(CONTENT_ASPECT_RATIO_HORIZONTAL, minWidth, relativeHeight);
       }
 
       return [optimalWidth, optimalHeight];
@@ -568,6 +659,7 @@ module.exports = (function() {
      */
     function resize(w, h) {
       if (!isReady) { return; }
+      isMobile = window.innerWidth <= MOBILE_MAX;
 
       var { top, left, width, height } = elementToMimic.getBoundingClientRect();
       var { x, y } = currentViewportDetails();
@@ -588,7 +680,7 @@ module.exports = (function() {
         wrapperElement.style.width = window.innerWidth + 'px';
         wrapperElement.style.height = window.innerHeight + 'px';
 
-        displayContainerCenter.position.y = ~~(window.innerHeight / 2);
+        displayContainerCenter.position.y = ~~(window.innerHeight / 2) + getMarginOffset();
         displayContainerCenter.position.x = ~~(window.innerWidth / 2);
 
         let [optimalWidth, optimalHeight] = optimalBounds(window.innerWidth, window.innerHeight);
@@ -604,6 +696,8 @@ module.exports = (function() {
         displayContainer.hitArea = new PIXI.Rectangle(0, 0, w, h);
       } else {
         displayContainerCenter.position.y = Math.floor(elemRect.height / 2);
+        displayContainerCenter.position.y += getMarginOffset();
+
         displayContainerCenter.position.x = Math.floor(elemRect.width / 2);
 
         setPos(elemRect.left, elemRect.top);
@@ -650,8 +744,8 @@ module.exports = (function() {
     function render(delta) {
       if (!isReady || isPaused) { return; }
 
-      renderer.render(stage);
       instrumentView.render(delta);
+      renderer.render(stage);
 
       if (isExpanded) {
         recordButton.render(delta);

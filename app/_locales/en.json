@@ -1,4 +1,8 @@
 {
+  "refresh-site": {
+    "description": "Keep short. Dialog text that comes up when there's an update to the site and the user should refresh the page.",
+    "message": "Please tap or refresh the page for the latest content."
+  },
   "home": {
     "description": "Top navbar single-word link text. Please keep this short. Links back to the site's main page.",
     "message": "Home"
@@ -9,7 +13,7 @@
   },
   "about-sundar": {
     "description": "Description of what I/O is.",
-    "message": "Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President, Products, Sundar Pichai."
+    "message": "Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President of Products, Sundar Pichai."
   },
   "about-io": {
     "description": "Description of what I/O is.",
@@ -53,11 +57,19 @@
   },
   "iodate": {
     "description": "The date of Google I/O",
-    "message": "Smarch xx - xx"
+    "message": "May 28 - 29"
   },
   "iomonth": {
     "description": "The month of the Google I/O event",
-    "message": "Smarch"
+    "message": "May"
+  },
+  "reg-begins": {
+    "description": "When registration begins",
+    "message": "Registration begins March 10 at 9AM PST"
+  },
+  "io-description-card": {
+    "description": "Description of the event.",
+    "message": "I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between."
   },
   "learnmore": {
     "description": "Link text. Links to a page with the event's details.",
@@ -69,9 +81,9 @@
   },
   "registration-opens": {
     "description": "Subheader of the registration section",
-    "message": "Registration opens"
+    "message": "Registration begins"
   },
-  "registration-opens": {
+  "registration-agenda": {
     "description": "Link text. Please keep this short. Links to the event schedule page.",
     "message": "Check the agenda"
   },
@@ -114,11 +126,11 @@
   },
   "headphones-on": {
     "description": "Hint to the user to put their headphones on.",
-    "message": "Headphones on"
+    "message": "The Experiment features Web Audio API. You might want to grab headphones."
   },
   "experiment-ahead": {
-    "description": "The experiment's loading message explaining it will use a particular API.",
-    "message": "Web Audio API experiment ahead"
+    "description": "The experiment's loading message.",
+    "message": "Chrome Experiment ahead"
   },
   "loading": {
     "description": "Indicates that the experiment is loading.",
@@ -134,11 +146,23 @@
   },
   "experiment-unsupported": {
     "description": "Message to be displayed if experiment tech supported.",
-    "message": "Unsupported"
+    "message": "The I/O experiment is not supported by your browser. Find supported browsers below."
+  },
+  "sorry": {
+    "description": "Header to be displayed if experiment tech supported.",
+    "message": "Sorry..."
+  },
+  "supports-webgl": {
+    "description": "Link to browsers that support WebGL.",
+    "message": "WebGL"
+  },
+  "supports-webaudio": {
+    "description": "Link to browsers that support Web Audio.",
+    "message": "Web Audio"
   },
   "experiment-failed": {
     "description": "If experiment fails to load, display this message.",
-    "message": "The experiment failed to load"
+    "message": "The experiment failed to load."
   },
   "close-dialog": {
     "description": "Close message for the dialog box.",
@@ -166,7 +190,7 @@
   },
   "share-text": {
     "description": "Social sharing pre-populated text.",
-    "message": "Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person Smarch xx-xx, 2015."
+    "message": "Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015."
   },
   "gplus-share": {
     "description": "Google plus share text",
@@ -209,7 +233,7 @@
     "message": "Hours until registration begins"
   },
   "minutesuntilreg": {
-    "description": "Short label used on the home/registration page to signify minutues left until registration begins",
+    "description": "Short label used on the home/registration page to signify minutes left until registration begins",
     "message": "Minutes until registration begins"
   },
   "secondsuntilreg": {
@@ -250,7 +274,7 @@
   },
   "organizerguide": {
     "description": "Offsite page. Link to download the organizer's guide",
-    "message": "Organizer's Guide"
+    "message": "Organizer Guide"
   },
   "submitevent": {
     "description": "Offsite page. Link for developers to submit their own event",
@@ -263,6 +287,10 @@
   "see-photos-2014": {
     "description": "About page. Link for people to see photos from 2014",
     "message": "See photos from I/O 2014"
+  },
+  "see-more-photos": {
+    "description": "About page. Link to open photo gallery to see more photos from last year.",
+    "message": "See more photos from past I/Os"
   },
   "io-description": {
     "description": "Home page. Describes Google I/O.",

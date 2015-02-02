@@ -27,18 +27,9 @@ module.exports = (function() {
    * @constructor
    */
   return function Sliver(container, polygon, depth, colorSets, hasLeftShadow, hasRightShadow, highlight) {
-
     var shadowLength;
 
-    if (depth === 3) {
-      shadowLength = 15;
-    } else if (depth === 2) {
-      shadowLength = 30;
-    } else if (depth === 1) {
-      shadowLength = 45;
-    } else {
-      shadowLength = 0;
-    }
+    shadowLength = 15;
 
     const [
       COLOR_A,
@@ -127,7 +118,7 @@ module.exports = (function() {
       }
       distanceGradient.addColorAt(CENTER_RANGE.getAt(1.0), CENTER_COLOR);
 
-      var dColors = distanceGradient.calcGradient(0, MAX_RADIUS + 1).colors;
+      var dColors = distanceGradient.calcGradient(0, MAX_RADIUS + 1).colors.map(c => c.toInt());
       distanceGradients[degrees] = distanceGradients[degrees] || {};
       distanceGradients[degrees][distance] = dColors;
 
@@ -146,7 +137,7 @@ module.exports = (function() {
       }
 
       var dColors = getDistanceGradientColors(degrees, distance);
-      color = dColors[MAX_RADIUS-distance].toInt();
+      color = dColors[MAX_RADIUS-distance];
     }
 
     /**

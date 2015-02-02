@@ -44,6 +44,8 @@ module.exports = (function() {
     function playSound(soundName, time, duration, bpm, note, noteDef) {
       var sound = audioManager.getSound(soundName) || audioManager.getSoundLoop(soundName);
 
+      if (!sound) { return; }
+
       bpm = bpm || audioManager.getSequencer().noteDuration;
 
       audioManager.willPlayback(

@@ -4,13 +4,25 @@ import (
 	"bytes"
 	"encoding/json"
 	"html/template"
-	"io"
 	"log"
 	"path/filepath"
+
+	"golang.org/x/net/context"
 )
 
-// defaultTitle is the site pages default title.
-const defaultTitle = "Google I/O 2015"
+const (
+	// defaultTitle is the site pages default title.
+	defaultTitle = "Google I/O 2015"
+	// images for og:image meta tag
+	ogImageDefault    = "io15-color.png"
+	ogImageExperiment = "io15-experiment.png"
+)
+
+// templateData is the templates context
+type templateData struct {
+	Title, Slug, Env, OgImage string
+	Meta                      meta
+}
 
 // meta is a page meta info.
 type meta map[string]interface{}
@@ -23,7 +35,11 @@ var tmplFunc = template.FuncMap{
 // renderTemplate executes a template found in name.html file
 // using either layout_full.html or layout_partial.html as the root template.
 // env is the app current environment: "dev", "stage" or "prod".
-func renderTemplate(w io.Writer, env, name string, partial bool) error {
+func renderTemplate(c context.Context, name string, partial bool, data *templateData) error {
+	if name == "/" || name == "" {
+		name = "home"
+	}
+
 	var layout string
 	if partial {
 		layout = "layout_partial.html"
@@ -40,18 +56,19 @@ func renderTemplate(w io.Writer, env, name string, partial bool) error {
 	}
 
 	m := pageMeta(t)
-	data := struct {
-		Title string
-		Slug  string
-		Meta  meta
-		Env   string
-	}{
-		Title: pageTitle(m),
-		Slug:  name,
-		Meta:  m,
-		Env:   env,
+	if data == nil {
+		data = &templateData{}
 	}
-	return t.Execute(w, data)
+	if data.Env == "" {
+		data.Env = env(c)
+	}
+	data.Meta = m
+	data.Title = pageTitle(m)
+	data.Slug = name
+	if data.OgImage == "" {
+		data.OgImage = ogImageDefault
+	}
+	return t.Execute(writer(c), data)
 }
 
 // pageTitle extracts "title" property of the page meta and appends defaultTitle to it.

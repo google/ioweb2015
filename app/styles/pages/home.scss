@@ -28,7 +28,7 @@ $name: 'page-home';
 .masthead {
   core-toolbar {
     .io-logo {
-      display: none;
+      opacity: 0;
     }
   }
 }
@@ -50,9 +50,9 @@ $name: 'page-home';
   color: #fff;
   @extend .bg-globe;
 
-  .attend__cityname {
+  name-cycler {
     color: $color-cyan-A400;
-    height: 48px; // same as line height.
+    vertical-align: top;
   }
 
   .attend__globe {
@@ -67,6 +67,10 @@ $name: 'page-home';
 }
 
 #join {
+  h2 {
+    max-width: 230px;
+  }
+
   .join__social {
     a {
       margin-bottom: 15px;
@@ -85,6 +89,9 @@ $name: 'page-home';
 }
 
 @media (max-width: $phone-breakpoint-max) {
+  name-cycler {
+    min-width: 160px;
+  }
   .registration__card {
     .card {
       border-bottom: 1px solid $color-light-grey-border;
@@ -93,7 +100,7 @@ $name: 'page-home';
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  $overlayCardTop: 180px;
+  $overlayCardTop: 229px;
 
   .io__hash {
     margin: 80px auto;
@@ -108,7 +115,7 @@ $name: 'page-home';
 
   .home-photo {
     height: 745px;
-    margin-top: -146px;
+    margin-top: -103px;
   }
 
   #registration {
@@ -123,7 +130,7 @@ $name: 'page-home';
     }
   }
   .page__section--attend {
-    margin-bottom: -153px;
+    margin-bottom: -105px;
   }
   .attend__globe {
     height: 500px;
@@ -146,19 +153,30 @@ $name: 'page-home';
     margin-bottom: -248px;
   }
   .home-photo {
-    margin-top: -182px;
+    margin-top: -111px;
   }
   .page__section--attend {
-    margin-bottom: -201px;
+    padding-top: $largeKeyline + $desktopKeyline;
+  }
+  #join {
+    margin-top: -156px;
+
+    h2 {
+      max-width: 300px;
+    }
+
+    .join__social {
+      right: $largeKeyline;
+    }
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
   .home-photo {
-    margin-top: -134px;
+    margin-top: -111px;
   }
   .page__section--attend {
-    margin-bottom: -153px;
+    margin-bottom: -105px;
   }
 }
 

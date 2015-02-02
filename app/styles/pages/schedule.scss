@@ -23,6 +23,12 @@ $name: 'page-schedule';
 
 ##{$name} {
 
+.masthead-meta {
+  h1 {
+    margin-bottom: $desktopKeyline;
+  }
+}
+
 .masthead-container {
   paper-tabs {
     text-transform: uppercase;
@@ -59,6 +65,10 @@ core-icon[icon="schedule"] {
 @media (min-width: $tablet-breakpoint-min) {
   .page__section {
     padding-bottom: $desktopKeyline;
+  }
+
+  .schedule-rows {
+    width: 300px; // Needed for IE11, to ensure the flexed children have proper widths.
   }
 }
 
