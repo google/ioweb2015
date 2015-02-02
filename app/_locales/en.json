@@ -343,5 +343,9 @@
   "attendance-details": {
     "description": "Header label for attendance details links on faq page.",
     "message": "Attendance Details"
+  },
+  "faq-dates-loc": {
+    "description": "FAQ page header",
+    "message": "2015 dates &amp; location"
   }
 }
