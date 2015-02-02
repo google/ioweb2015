@@ -347,5 +347,45 @@
   "faq-dates-loc": {
     "description": "FAQ page header",
     "message": "2015 dates &amp; location"
+  },
+  "stay-informed": {
+    "description": "FAQ page link header",
+    "message": "Stay informed"
+  },
+  "livestream": {
+    "description": "FAQ page link header",
+    "message": "Live stream &amp; recordings"
+  },
+  "toc": {
+    "description": "FAQ page link header",
+    "message": "Terms &amp; Conditions"
+  },
+  "academic-tickets": {
+    "description": "FAQ page link header",
+    "message": "Academic tickets"
+  },
+  "press-tickets": {
+    "description": "FAQ page link header",
+    "message": "Press tickets"
+  },
+  "badges": {
+    "description": "FAQ page link header",
+    "message": "Badges"
+  },
+  "a11y": {
+    "description": "FAQ page link header",
+    "message": "Accessibility"
+  },
+  "a11y-accomodations": {
+    "description": "FAQ page link header",
+    "message": "Accessibility accommodations for attendees"
+  },
+  "conduct": {
+    "description": "FAQ page link header",
+    "message": "Conduct policy"
+  },
+  "child-care": {
+    "description": "FAQ page link header",
+    "message": "Child Care"
   }
 }
