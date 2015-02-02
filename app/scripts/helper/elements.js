@@ -21,9 +21,18 @@ IOWA.Elements = (function() {
   var updateElements = function() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function() {
+
+      var optionallyLaunchExperiment = function() {
+        if (window.location.search.indexOf('experiment') > -1) {
+          IOWA.Elements.FAB.onFabClick();
+        }
+      };
+
       IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender(), function() {
         // Fire event when the page transitions are final.
         IOWA.Elements.Template.fire('page-transition-done');
+
+        optionallyLaunchExperiment();
       });
     });
 
@@ -60,6 +69,10 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
+
+    window.addEventListener('resize', function() {
+      IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
+    });
   };
 
   var init = function() {
