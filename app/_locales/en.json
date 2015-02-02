@@ -335,5 +335,13 @@
   "upgrade-gotosite": {
     "description": "Link text for users to upgrade their browser if it is old.",
     "message": "Continue to I/O 2015"
+  },
+  "general": {
+    "description": "Header label for general information links on faq page.",
+    "message": "General"
+  },
+  "attendance-details": {
+    "description": "Header label for attendance details links on faq page.",
+    "message": "Attendance Details"
   }
 }

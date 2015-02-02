@@ -28,8 +28,32 @@ $name: 'page-faq';
   padding-left: 0;
   padding-right: 0;
   padding-bottom: $mobileKeyline;
+
+  a {
+    font-size: inherit;
+    font-weight: 400;
+    text-transform: none;
+  }
+
+  h3 {
+    margin-bottom: $mobileKeyline;
+  }
 }
 
+.card-content--top {
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    li {
+      line-height: 32px;
+    }
+  }
+  a {
+    font-size: 16px;
+  }
+}
 
 @media (min-width: $tablet-breakpoint-min) {
   .page__section {
