@@ -60,19 +60,6 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
-
-    ioLogo.addEventListener('io-logo-animation-done', function() {
-      var optionallyLaunchExperiment = function() {
-        if (window.location.search.indexOf('experiment') > -1) {
-          IOWA.Elements.FAB.onFabClick();
-        }
-      };
-      IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender(),
-          optionallyLaunchExperiment);
-    });
-    window.addEventListener('resize', function() {
-      IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
-    });
   };
 
   var init = function() {
