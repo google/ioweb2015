@@ -134,7 +134,7 @@ IOWA.Router = (function() {
     // Inject page if <a> has the data-ajax-link attribute.
     for (var i = 0; i < e.path.length; ++i) {
       var el = e.path[i];
-      if (el.localName === 'a' || el.localName === 'paper-button') {
+      if (el.localName === 'a') {
         var currentPage = IOWA.Elements.Template.selectedPage;
         var nextPage = parsePageNameFromAbsolutePath(el.pathname);
 
