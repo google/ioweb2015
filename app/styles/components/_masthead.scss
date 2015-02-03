@@ -228,6 +228,12 @@ experiment-fab-container {
   }
 }
 
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .masthead-container {
+    max-width: 582px;
+  }
+}
+
 @media (min-width: $desktop-breakpoint-mid) {
   .masthead-container {
     max-width: 896px;

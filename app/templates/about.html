@@ -19,7 +19,7 @@
 
   <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}" fit></io-gallery>
 
-  <div class="card__container slide-up">
+  <div class="card__container card__container--top slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
         <h3><i18n-msg msgid="about-io">Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</i18n-msg></h3>
@@ -35,7 +35,7 @@
   <div class="slide-up-delay">
     <section class="page__section pics__section js-experiment-instrument" layout vertical>
       <div layout horizontal>
-        <div class="photo__about" flex two></div>
+        <div class="photo__about" flex two?="{{isDesktopSize}}"></div>
         <div layout vertical flex>
           <div class="photo__about--top" layout vertical flex></div>
           <div class="photo__about--bottom" layout vertical flex>

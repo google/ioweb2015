@@ -75,6 +75,12 @@ $name: 'page-onsite';
   }
 }
 
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .onsite__pic {
+    margin-top: -77px;
+  }
+}
+
 @media (min-width: $desktop-breakpoint-mid) {
   .onsite__pic {
     margin-top: -57px;

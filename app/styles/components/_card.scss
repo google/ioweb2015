@@ -101,6 +101,12 @@
   }
 }
 
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .card__container--top {
+    max-width: 582px;
+  }
+}
+
 @media (min-width: $desktop-breakpoint-min) {
   .card {
     .card-content {
