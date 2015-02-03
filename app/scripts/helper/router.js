@@ -126,23 +126,38 @@ IOWA.Router = (function() {
    * @private
    */
   function navigate(e) {
-    // Allow user to open new tabs.
+    // Allow user to open page in a new tab.
     if (e.metaKey || e.ctrlKey) {
       return;
     }
+
     // Inject page if <a> has the data-ajax-link attribute.
     for (var i = 0; i < e.path.length; ++i) {
       var el = e.path[i];
       if (el.localName === 'a' || el.localName === 'paper-button') {
+        var currentPage = IOWA.Elements.Template.selectedPage;
+        var nextPage = parsePageNameFromAbsolutePath(el.pathname);
+
+        // Prevent navigations to the same page.
+        // Note, this prevents in-page anchors. Use IOWA.Util.smoothScroll.
+        if (currentPage === nextPage) {
+          e.preventDefault();
+          return;
+        }
+
+        // Record click event if link requests it.
         if (el.hasAttribute('data-track-link')) {
           IOWA.Analytics.trackEvent(
               'link', 'click', el.getAttribute('data-track-link'));
         }
+
+        // Do ajax page navigation if link requests it.
         if (el.hasAttribute('data-ajax-link')) {
           handleAjaxLink(e, el);
         } else {
           currentPageTransition = 'no-transition';
         }
+
         return; // found first navigation element, quit here.
       }
     }
@@ -286,7 +301,18 @@ IOWA.Router = (function() {
    * Initialized ajax-based routing on the page.
    */
   function init() {
-    window.addEventListener('popstate', renderCurrentPage);
+    window.addEventListener('popstate', function(e) {
+      var currentPage = IOWA.Elements.Template.selectedPage;
+      var nextPage = parsePageNameFromAbsolutePath(window.location.pathname);
+
+      // Ignore the navigation if it was a hash update, but on the same page.
+      if (e.state && e.state.fromHashChange && nextPage === currentPage) {
+        return;
+      }
+
+      renderCurrentPage();
+    });
+
     document.addEventListener('click', navigate);
   }
 
