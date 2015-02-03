@@ -422,7 +422,7 @@ function changeAppYamlVersion(version, appYamlPath) {
 }
 
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
-  del([APP_DIR + '/service-worker.js']);
+  del.sync([APP_DIR + '/service-worker.js']);
   var importScripts = glob.sync('scripts/shed/*.js', {cwd: APP_DIR});
   importScripts.unshift('bower_components/shed/dist/shed.js');
 
@@ -444,7 +444,7 @@ gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
 
 gulp.task('generate-service-worker-dist', function(callback) {
   var distDir = DIST_STATIC_DIR + '/' + APP_DIR;
-  del([distDir + '/service-worker.js']);
+  del.sync([distDir + '/service-worker.js']);
   var importScripts = ['scripts/shed-scripts.js'];
 
   generateServiceWorker(distDir, true, importScripts, function(error, serviceWorkerFileContents) {
@@ -458,4 +458,27 @@ gulp.task('generate-service-worker-dist', function(callback) {
       callback();
     });
   });
+});
+
+// Usage: gulp snapshots [--compareTo=branchOrCommit] [--pages=page1,page2,...]
+//                       [widths=width1,width2,...] [height=height]
+// The task performs a `git stash` prior to the checkout and then a `git stash pop` after the
+// completion, but on the off chance the task ends unexpectedly, you can manually switch back to
+// your current branch and run `git stash pop` to restore.
+gulp.task('snapshots', ['backend'], function(callback) {
+  var seleniumSnapshots = require('./gulp_scripts/selenium-snapshots');
+  // We don't want the service worker to served cached content when taking screenshots.
+  del.sync(APP_DIR + '/server-worker.js');
+
+  var branchOrCommit = argv.compareTo || 'master';
+  var pages = argv.pages ?
+    argv.pages.split(',') :
+    ['about', 'home', 'offsite', 'onsite', 'registration', 'schedule'];
+  var widths = argv.widths ?
+    // widths is coerced into a Number unless there's a comma, and only strings can be split().
+    (argv.widths.split ? argv.widths.split(',') : [argv.widths]) :
+    [400, 900, 1200];
+  var height = argv.height || 9999;
+  seleniumSnapshots(branchOrCommit, APP_DIR, 'http://localhost:9999' + URL_PREFIX + '/',
+    pages, widths, height, callback);
 });
