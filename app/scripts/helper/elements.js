@@ -89,6 +89,10 @@ IOWA.Elements = (function() {
     };
 
     template.pages = {
+      'faq': {
+        mastheadBgClass: 'bg-cyan',
+        hasBeenLoaded: false
+      },
       'schedule': {
         mastheadBgClass: 'bg-cyan',
         hasBeenLoaded: false

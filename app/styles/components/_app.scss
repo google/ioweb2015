@@ -16,15 +16,55 @@
 
 $hashWidth: 90px;
 
+html, body {
+  font-family: 'Helvetica', 'Arial', 'sans-serif';
+  @include typo-body();
+}
+
+.strong {
+  font-weight: bold;
+}
+
+li {
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin: 0 0 8px 0;
+}
+
 a {
   color: $color-cyan-A700;
+  font-weight: 500;
+  text-decoration: none;
 }
 
-h1, h2 {
+h1 {
   color: $color-heading;
+  @include typo-heading-1();
 }
-
-h3, h4, h5, h6 {
+h2 {
+  color: $color-heading;
+  @include typo-heading-2();
+}
+h3 {
+  color: $color-text;
+  @include typo-heading-3();
+}
+h4 {
+  color: $color-text;
+  @include typo-heading-4();
+}
+h5 {
+  color: $color-text;
+  @include typo-heading-5();
+}
+h6 {
   color: $color-text;
 }
 
@@ -288,6 +328,47 @@ h3, h4, h5, h6 {
   }
   .io__hash {
     margin: 140px auto;
+  }
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  h1 {
+    @include typo-heading-1();
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 56px;
+  }
+  // Rest of heading are same as mobile.
+}
+
+@media (min-width: $desktop-breakpoint-mid + 1) {
+  // h1 same as tablet.
+  h2 {
+    @include typo-heading-2();
+    font-size: 32px;
+    line-height: 48px;
+    font-weight: 300;
+  }
+
+  h3 {
+    @include typo-heading-3();
+    font-size: 24px;
+    line-height: 36px;
+    font-weight: 400;
+  }
+
+  h4 {
+    @include typo-heading-4();
+    font-size: 20px;
+    line-height: 32px;
+    font-weight: 400;
+  }
+
+  h5 {
+    @include typo-heading-5();
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
   }
 }
 
