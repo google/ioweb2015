@@ -663,19 +663,19 @@ Dialog to share the user's custom experiment/song
       },
 
       gplusTrack: function() {
-        IOWA.Analytics.trackEvent('experiment', 'G Plus share', label);
+        IOWA.Analytics.trackEvent('experiment', 'G Plus share');
       },
 
       twitterTrack: function() {
-        IOWA.Analytics.trackEvent('experiment', 'Twitter share', label);
+        IOWA.Analytics.trackEvent('experiment', 'Twitter share');
       },
 
       facebookTrack: function() {
-        IOWA.Analytics.trackEvent('experiment', 'Facebook share', label);
+        IOWA.Analytics.trackEvent('experiment', 'Facebook share');
       },
 
       linkCopy: function() {
-        IOWA.Analytics.trackEvent('experiment', 'Link copied', label);
+        IOWA.Analytics.trackEvent('experiment', 'Link copied');
       },
 
       linkSelect: function() {
@@ -818,7 +818,7 @@ Fab for exiting the experiment.
   </template>
   <script>
     Polymer({
-
+      // Constructor needed when extending an element.
     });
   </script>
 </polymer-element>
