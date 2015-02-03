@@ -105,6 +105,8 @@ core-drawer-panel {
     padding-bottom: $mobileKeyline;
   }
   .drawer-panel-content {
+    overflow: auto;
+
     core-menu {
       margin-left: 0;
       margin-right: 0;
