@@ -470,6 +470,8 @@ gulp.task('snapshots', ['backend'], function(callback) {
   // We don't want the service worker to served cached content when taking screenshots.
   del.sync(APP_DIR + '/server-worker.js');
 
+  watch();
+
   var branchOrCommit = argv.compareTo || 'master';
   var pages = argv.pages ?
     argv.pages.split(',') :
