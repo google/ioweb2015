@@ -248,7 +248,7 @@ gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
   });
 
   run();
-  browserSync({notify: false, proxy: serverAddr, open: URL_PREFIX});
+  browserSync({notify: false, proxy: serverAddr, startPath: URL_PREFIX});
 
   watch();
   gulp.watch([BACKEND_DIR + '/**/*.go'], function() {
@@ -397,7 +397,7 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
 
   browserSync.emitter.on('service:exit', onExit);
   // give GAE server some time to start
-  setTimeout(browserSync.bind(null, {notify: false, proxy: serverAddr, open: URL_PREFIX}), 2000);
+  setTimeout(browserSync.bind(null, {notify: false, proxy: serverAddr, startPath: URL_PREFIX}), 2000);
   watch();
 }
 
