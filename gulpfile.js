@@ -470,7 +470,11 @@ gulp.task('snapshots', ['backend'], function(callback) {
   // We don't want the service worker to served cached content when taking screenshots.
   del.sync(APP_DIR + '/server-worker.js');
 
-  watch();
+  var styleWatcher = gulp.watch([APP_DIR + '/{elements,styles}/**/*.{scss,css}'], ['sass']);
+  var callbackWrapper = function(error) {
+    styleWatcher.end();
+    callback(error);
+  };
 
   var branchOrCommit = argv.compareTo || 'master';
   var pages = argv.pages ?
@@ -482,5 +486,5 @@ gulp.task('snapshots', ['backend'], function(callback) {
     [400, 900, 1200];
   var height = argv.height || 9999;
   seleniumSnapshots(branchOrCommit, APP_DIR, 'http://localhost:9999' + URL_PREFIX + '/',
-    pages, widths, height, callback);
+    pages, widths, height, callbackWrapper);
 });
