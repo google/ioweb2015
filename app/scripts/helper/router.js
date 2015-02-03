@@ -139,6 +139,7 @@ IOWA.Router = (function() {
         var nextPage = parsePageNameFromAbsolutePath(el.pathname);
 
         // Prevent navigations to the same page.
+        // Note, this prevents in-page anchors. Use IOWA.Util.smoothScroll.
         if (currentPage === nextPage) {
           e.preventDefault();
           return;
