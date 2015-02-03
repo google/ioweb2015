@@ -51,7 +51,7 @@ function git(args) {
 
 function startServer(hostPort) {
   return new Promise(function(resolve, reject) {
-    // TODO: These directories shouldn't be hardcoded.
+    // TODO(jeffposnick): These directories shouldn't be hardcoded.
     // Ideally, there will be a refactored set of server tasks and I could just call those directly.
     var server = spawn(
       'bin/server',
