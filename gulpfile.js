@@ -476,7 +476,7 @@ gulp.task('snapshots', ['backend'], function(callback) {
     ['about', 'home', 'offsite', 'onsite', 'registration', 'schedule'];
   var widths = argv.widths ?
     // widths is coerced into a Number unless there's a comma, and only strings can be split().
-    (argv.widths.split ? argv.widths.split(',') : [argv.widths]) :
+    (argv.widths.split ? argv.widths.split(',').map(Number) : [argv.widths]) :
     [400, 900, 1200];
   var height = argv.height || 9999;
   seleniumSnapshots(branchOrCommit, APP_DIR, 'http://localhost:9999' + URL_PREFIX + '/',
