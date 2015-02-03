@@ -1,14 +1,33 @@
-# humanstxt.org/
-# The humans responsible & technology colophon
+# The humans responsible & technology colophon - humanstxt.org/
 
-# TEAM
+# TEAM (SITE)
 
-  <name> -- <role> -- <twitter>
+  Eric Bidelman (lead) - ebidel
+  Jeff Posnick - jeffposnick
+  Ewa Gasperowicz - devnook
+  Alex Vaghin - crhym3
+  Paul Lewis - aerotwist
+  Brendan Kenny - brendankenny
+
+# TEAM (Experiment)
+
+  Thomas Reynold - tdreyno
+  Alex Mahan - alexmahan
 
 # THANKS
 
-  <name>
+  Mat Scales - wibblymat
+  Matthew Gaunt - gauntface
+  Jake Archibald - jakearchibald
 
-# TECHNOLOGY COLOPHON
+# TECHNOLOGY
 
-  HTML5, CSS3
+  Polymer / web components - polymer-project.org
+  Service Worker
+  Web Animations API
+  Web Audio API
+  WebGL
+  HTML5 / CSS3
+  Go (backend)
+
+  Gulp / Bower / NPM
