@@ -23,34 +23,38 @@
   <div class="slide-up-delay">
     <section class="page__section page__section--countdown bg-light-grey js-experiment-instrument">
       <div class="io-countdown" layout vertical center>
-        <countdown-timer autostart
-                         bgcolor="#F5F5F5"
-                         date="Mar 10 2015 09:00:00 GMT-0700 (PDT)"
-                         dateadjustment="5" easeintime="500" waittime="300"
-                         easeouttime="400" thresholdInformation="{{thresholdInformation}}"></countdown-timer>
-        <template if="{{ thresholdInformation.thresholdDays }}">
-          <h4 class="countdown-label">
-            <i18n-msg msgid="daysuntilreg">Days until registration begins</i18n-msg>
-          </h4>
+
+        <template if="{{pageTransitionDone}}">
+          <countdown-timer autostart
+                           bgcolor="#F5F5F5"
+                           date="Mar 10 2015 09:00:00 GMT-0700 (PDT)"
+                           dateadjustment="5" easeintime="500" waittime="300"
+                           easeouttime="400" thresholdInformation="{{thresholdInformation}}"></countdown-timer>
+          <template if="{{ thresholdInformation.thresholdDays }}">
+            <h4 class="countdown-label">
+              <i18n-msg msgid="daysuntilreg">Days until registration begins</i18n-msg>
+            </h4>
+          </template>
+
+          <template if="{{ thresholdInformation.thresholdHours }}">
+            <h4 class="countdown-label">
+              <i18n-msg msgid="hoursuntilreg">Hours until registration begins</i18n-msg>
+            </h4>
+          </template>
+
+          <template if="{{ thresholdInformation.thresholdMinutes }}">
+            <h4 class="countdown-label">
+              <i18n-msg msgid="minutesuntilreg">Minutes until registration begins</i18n-msg>
+            </h4>
+          </template>
+
+          <template if="{{ thresholdInformation.thresholdSeconds }}">
+            <h4 class="countdown-label">
+              <i18n-msg msgid="secondsuntilreg">Seconds until registration begins</i18n-msg>
+            </h4>
+          </template>
         </template>
 
-        <template if="{{ thresholdInformation.thresholdHours }}">
-          <h4 class="countdown-label">
-            <i18n-msg msgid="hoursuntilreg">Hours until registration begins</i18n-msg>
-          </h4>
-        </template>
-
-        <template if="{{ thresholdInformation.thresholdMinutes }}">
-          <h4 class="countdown-label">
-            <i18n-msg msgid="minutesuntilreg">Minutes until registration begins</i18n-msg>
-          </h4>
-        </template>
-
-        <template if="{{ thresholdInformation.thresholdSeconds }}">
-          <h4 class="countdown-label">
-            <i18n-msg msgid="secondsuntilreg">Seconds until registration begins</i18n-msg>
-          </h4>
-        </template>
       </div>
     </section>
   </div>
