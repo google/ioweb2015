@@ -81,8 +81,12 @@
         template.togglePhotoGallery();
       }
       if (IOWA.Elements.Template.fullscreenVideoActive) {
-        template.closeVideoCard && template.closeVideoCard();
-        template.closeVideoSection && template.closeVideoSection();
+        if (template.closeVideoCard) {
+          template.closeVideoCard();
+        }
+        if (template.closeVideoSection) {
+          template.closeVideoSection();
+        }
       }
     }
   });
