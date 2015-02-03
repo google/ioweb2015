@@ -148,6 +148,12 @@ $name: 'page-home';
   }
 }
 
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .home-photo {
+    margin-top: -135px;
+  }
+}
+
 @media (min-width: $desktop-breakpoint-mid) {
   #registration {
     margin-bottom: -248px;

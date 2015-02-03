@@ -116,6 +116,12 @@ google-youtube {
   }
 }
 
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .card__photo--stage {
+    margin-top: -53px;
+  }
+}
+
 @media (min-width: $desktop-breakpoint-mid) {
    $marginTop: 180px;
 
