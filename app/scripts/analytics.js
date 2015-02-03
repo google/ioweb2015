@@ -101,7 +101,7 @@ IOWA.Analytics = (function(exports) {
     if (opt_maxTime !== null && time > opt_maxTime) {
       variable += ' - outliers';
     }
-    ga('send', 'timing', category, variable, time, opt_label, opt_obj);
+    ga('send', 'timing', category, variable, parseInt(time), opt_label, opt_obj);
   };
 
   /**
