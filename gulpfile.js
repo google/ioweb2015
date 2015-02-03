@@ -460,13 +460,13 @@ gulp.task('generate-service-worker-dist', function(callback) {
   });
 });
 
-// Usage: gulp snapshots [--compareTo=branchOrCommit] [--pages=page1,page2,...]
+// Usage: gulp screenshots [--compareTo=branchOrCommit] [--pages=page1,page2,...]
 //                       [widths=width1,width2,...] [height=height]
 // The task performs a `git stash` prior to the checkout and then a `git stash pop` after the
 // completion, but on the off chance the task ends unexpectedly, you can manually switch back to
 // your current branch and run `git stash pop` to restore.
-gulp.task('snapshots', ['backend'], function(callback) {
-  var seleniumSnapshots = require('./gulp_scripts/selenium-snapshots');
+gulp.task('screenshots', ['backend'], function(callback) {
+  var seleniumScreenshots = require('./gulp_scripts/selenium-screenshots');
   // We don't want the service worker to served cached content when taking screenshots.
   del.sync(APP_DIR + '/server-worker.js');
 
@@ -485,6 +485,6 @@ gulp.task('snapshots', ['backend'], function(callback) {
     (argv.widths.split ? argv.widths.split(',').map(Number) : [argv.widths]) :
     [400, 900, 1200];
   var height = argv.height || 9999;
-  seleniumSnapshots(branchOrCommit, APP_DIR, 'http://localhost:9999' + URL_PREFIX + '/',
+  seleniumScreenshots(branchOrCommit, APP_DIR, 'http://localhost:9999' + URL_PREFIX + '/',
     pages, widths, height, callbackWrapper);
 });
