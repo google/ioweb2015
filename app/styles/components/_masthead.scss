@@ -99,7 +99,8 @@ core-drawer-panel {
     background-color: $color-body;
   }
   [main] {
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: scroll;
   }
   core-toolbar .bottom {
     padding-bottom: $mobileKeyline;
