@@ -468,7 +468,7 @@ gulp.task('generate-service-worker-dist', function(callback) {
 gulp.task('screenshots', ['backend'], function(callback) {
   var seleniumScreenshots = require('./gulp_scripts/selenium-screenshots');
   // We don't want the service worker to served cached content when taking screenshots.
-  del.sync(APP_DIR + '/server-worker.js');
+  del.sync(APP_DIR + '/service-worker.js');
 
   var styleWatcher = gulp.watch([APP_DIR + '/{elements,styles}/**/*.{scss,css}'], ['sass']);
   var callbackWrapper = function(error) {
