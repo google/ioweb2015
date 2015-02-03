@@ -61,19 +61,33 @@ IOWA.Router = (function() {
    * Navigates to a new page via a hero card takeover transition.
    * @param {Event} e Event that triggered navigation.
    * @param {Element} el Element clicked.
-   * @param {string} rippleColor Color of the ripple on the card.
+   * @param {string} mastheadColor Color of the masthead.
+   * @param {string} rippleColor Color of the ripple.
    * @param {boolean} isFadeRipple If true, ripple will just glimpse and fade.
    * @private
    */
-  function playMastheadRippleTransition(e, el, rippleColor, isFadeRipple) {
-    var callback;
+  function playMastheadRippleTransition(
+      e, el, mastheadColor, rippleColor, isFadeRipple) {
+    var duration = isFadeRipple ? 300 : 600;
     var rippleAnim = IOWA.PageAnimation.ripple(
-          IOWA.Elements.Ripple, e.pageX, e.pageY, 400,
+          IOWA.Elements.Ripple, e.pageX, e.pageY, duration,
           rippleColor, isFadeRipple);
-    var animation = new AnimationGroup([
+    var animGroup = [
       rippleAnim,
-      IOWA.PageAnimation.contentSlideOut()
-    ]);
+      IOWA.PageAnimation.contentSlideOut(),
+    ];
+    if (!isFadeRipple) {
+      var mastheadAnim = new Animation(IOWA.Elements.Masthead, [
+          {backgroundColor: mastheadColor},
+          {backgroundColor: rippleColor}
+        ], {
+          duration: 300,
+          delay: 0,
+          fill: 'forwards'  // Makes ripple keep its state after animation.
+      });
+      animGroup.push(mastheadAnim);
+    }
+    var animation = new AnimationGroup(animGroup);
     IOWA.PageAnimation.play(animation, function() {
       IOWA.History.pushState({'path': el.pathname}, '', el.href);
     });
@@ -102,13 +116,14 @@ IOWA.Router = (function() {
 
     template.navBgClass = bgClass;
     var isFadeRipple = template.pages[page].mastheadBgClass === bgClass;
+    var mastheadColor = template.rippleColors[template.pages[page].mastheadBgClass];
     var rippleColor = isFadeRipple ? '#fff' : template.rippleColors[bgClass];
 
     if (page !== pageName) {
       IOWA.Elements.Template.fire('page-transition-start');
       if (el.hasAttribute('data-anim-ripple')) {
         currentPageTransition = 'masthead-ripple-transition';
-        playMastheadRippleTransition(e, el, rippleColor, isFadeRipple);
+        playMastheadRippleTransition(e, el, mastheadColor, rippleColor, isFadeRipple);
       } else if (el.hasAttribute('data-anim-card'))  {
         currentPageTransition = 'hero-card-transition';
         playHeroTransition(e, el, rippleColor);
