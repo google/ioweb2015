@@ -1,5 +1,6 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var animate = require('app/util/animate');
+var trackEvent = require('app/util/trackEvent');
 var {Promise} = require('es6-promise');
 var backImage = require('url?limit=10000!app/images/back-arrow.png');
 var RecordButton = require('app/views/RecordButton');
@@ -37,6 +38,7 @@ module.exports = (function() {
     var displayContainer;
     var displayContainerSub;
     var controls;
+    var expandedAt;
     var wrapperElement;
 
     var elementToMimic = elementToMimic_;
@@ -411,6 +413,9 @@ module.exports = (function() {
     function expandView() {
       isExpanded = true;
 
+      expandedAt = +(new Date());
+      trackEvent('sectionview', '' + instrumentView.name + ' entered');
+
       wrapperElement.style.zIndex = zIndexes.ACTIVE;
 
       var duration = 0.5;
@@ -476,6 +481,8 @@ module.exports = (function() {
      */
     function contractView() {
       isExpanded = false;
+
+      trackEvent('time-' + instrumentView.name, +(new Date()) - expandedAt);
 
       var duration = 0.5;
 

@@ -1,5 +1,6 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var reqAnimFrame = require('app/util/raf');
+var trackEvent = require('app/util/trackEvent');
 var { Promise } = require('es6-promise');
 var throttle = require('lodash.throttle');
 var debounce = require('lodash.debounce');
@@ -408,6 +409,7 @@ module.exports = function RootView(audioManager, stateManager) {
     document.getElementById('yesButton').addEventListener('click', function() {
       logoElement.parentNode.removeChild(logoElement);
       logoDialog.parentNode.removeChild(logoDialog);
+      trackEvent('close', 'from top left logo');
       experimentFab.exitExperiment();
     });
     document.getElementById('noButton').addEventListener('click', function() {
