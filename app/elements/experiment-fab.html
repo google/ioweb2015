@@ -830,7 +830,7 @@ Main parent container for all of the fab elements.
 @element experiment-fab-container
 @blurb Main parent container for all of the fab elements.
 -->
-<polymer-element name="experiment-fab-container" attributes="mini mode playmode fixed recordmode" aria-label="Try the Chrome experiment">
+<polymer-element name="experiment-fab-container" attributes="mini mode playmode fixed recordmode direction" aria-label="Try the Chrome experiment">
   <template>
     <style>
       :host {
@@ -876,28 +876,40 @@ Main parent container for all of the fab elements.
       .experiment-exit-tooltip {
         top: 230px;
       }
-      :host([mini]) .experiment-options-tooltip::shadow .core-tooltip {
-        top: 5px !important;
-      }
-      :host([mini]) .experiment-share-tooltip {
-        top: 85px;
-      }
-      :host([mini]) .experiment-reset-tooltip {
-        top: 150px;
-      }
-      :host([mini]) .experiment-exit-tooltip {
-        top: 215px;
-      }
       :host([mini]) experiment-share-fab,
       :host([mini]) experiment-reset-fab,
       :host([mini]) experiment-exit-fab {
         left: 0;
       }
-      :host([mini]) experiment-share-dialog {
+      :host([mini]) .experiment-options-tooltip::shadow .core-tooltip {
+        top: 5px !important;
+      }
+      :host([mini][direction="upwards"]) .experiment-share-tooltip {
+        top: -45px;
+      }
+      :host([mini][direction="upwards"]) .experiment-reset-tooltip {
+        top: -110px;
+      }
+      :host([mini][direction="upwards"]) .experiment-exit-tooltip {
+        top: -175px;
+      }
+      :host([mini][direction="upwards"]) experiment-share-dialog {
+        top: -65px;
+        right: 38px;
+      }
+      :host([mini][direction="downwards"]) .experiment-share-tooltip {
+        top: 85px;
+      }
+      :host([mini][direction="downwards"]) .experiment-reset-tooltip {
+        top: 150px;
+      }
+      :host([mini][direction="downwards"]) .experiment-exit-tooltip {
+        top: 215px;
+      }
+      :host([mini][direction="downwards"]) experiment-share-dialog {
         top: 65px;
         right: 38px;
       }
-
 
     </style>
     <template if="{{mode == 'pre'}}">
@@ -955,6 +967,10 @@ Main parent container for all of the fab elements.
           value: 'unfixed',
           reflect: true
         },
+        direction: {
+          value: 'upwards',
+          reflect: true
+        },
         mini: {
           reflect: true,
           value: false
@@ -993,11 +1009,17 @@ Main parent container for all of the fab elements.
         document.addEventListener('keyup', this.bindEscape);
 
         var DIALOG_HEIGHT = 480;
+        var VIEWPORT_HEIGHT = window.innerHeight;
         var fabPos = this.getBoundingClientRect();
         if (fabPos.top < DIALOG_HEIGHT) {
           this.dialogAnimateDirection = 'animate-down';
         } else {
           this.dialogAnimateDirection = 'animate-up';
+        }
+        if (fabPos.top > (VIEWPORT_HEIGHT / 2)) {
+          this.direction = 'upwards';
+        } else {
+          this.direction = 'downwards';
         }
 
         this.dialogVisible = true;
@@ -1131,6 +1153,14 @@ Main parent container for all of the fab elements.
       },
 
       playingFabClick: function(event) {
+        var VIEWPORT_HEIGHT = window.innerHeight;
+        var fabPos = this.getBoundingClientRect();
+        if (fabPos.top > (VIEWPORT_HEIGHT / 2)) {
+          this.direction = 'upwards';
+        } else {
+          this.direction = 'downwards';
+        }
+
         this.playmode = 'paused';
         this.pauseOverlay = true;
         this.miniFabs = true;
