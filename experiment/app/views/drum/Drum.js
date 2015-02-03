@@ -60,6 +60,8 @@ module.exports = (function() {
       addEventListeners,
       removeEventListeners,
       onActivate,
+      onDragStart,
+      onDragEnd,
       setPosition,
       showCollision,
       tearDown
@@ -76,10 +78,12 @@ module.exports = (function() {
       circle.interactive = true;
 
       container.mousedown = container.touchstart = function(data) {
+        if (onDragStartCallback_) {
+          if (!onDragStartCallback_(self)) { return; }
+        }
+
         interactionData = data;
         container.alpha = 0.8;
-
-        container.parent.setChildIndex( container , container.parent.children.length-1);
 
         animate.to(container.scale, 0.5, { x: 1.1, y: 1.1 });
         animate.to(shadow.position, 0.5, { x: 3, y: -12 });
@@ -88,6 +92,10 @@ module.exports = (function() {
 
       // set the events for when the mouse is released or a touch is released
       container.mouseup = container.mouseupoutside = container.touchend = container.touchendoutside = function() {
+        if (onDragEndCallback_) {
+          if (!onDragEndCallback_(self)) { return; }
+        }
+
         container.alpha = 1;
         isDragging = false;
         interactionData = null;
@@ -133,16 +141,36 @@ module.exports = (function() {
     function tearDown() {
       physicsWorld.removeBody(physicsBody);
       removeEventListeners();
-      onActivationCallback = null;
+      onActivationCallback_ = null;
+      onDragStartCallback_ = null;
+      onDragEndCallback_ = null;
     }
 
     /**
      * On activate callback.
      * @param {function} cb - The activation callback.
      */
-    var onActivationCallback;
+    var onActivationCallback_;
     function onActivate(cb) {
-      onActivationCallback = cb;
+      onActivationCallback_ = cb;
+    }
+
+    /**
+     * On drag start callback.
+     * @param {function} cb - The callback.
+     */
+    var onDragStartCallback_;
+    function onDragStart(cb) {
+      onDragStartCallback_ = cb;
+    }
+
+    /**
+     * On drag end callback.
+     * @param {function} cb - The callback.
+     */
+    var onDragEndCallback_;
+    function onDragEnd(cb) {
+      onDragEndCallback_ = cb;
     }
 
     /**
@@ -151,8 +179,8 @@ module.exports = (function() {
      */
     function activate(ball) {
       showCollision(0);
-      if (onActivationCallback) {
-        onActivationCallback(self, ball);
+      if (onActivationCallback_) {
+        onActivationCallback_(self, ball);
       }
     }
 
