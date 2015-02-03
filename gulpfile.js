@@ -476,10 +476,12 @@ gulp.task('screenshots', ['backend'], function(callback) {
     callback(error);
   };
 
+  var allPages = glob.sync(APP_DIR + '/templates/!(layout_).html').map(function(templateFile) {
+    return path.basename(templateFile).replace('.html', '');
+  });
+
   var branchOrCommit = argv.compareTo || 'master';
-  var pages = argv.pages ?
-    argv.pages.split(',') :
-    ['about', 'home', 'offsite', 'onsite', 'registration', 'schedule'];
+  var pages = argv.pages ? argv.pages.split(',') : allPages;
   var widths = argv.widths ?
     // widths is coerced into a Number unless there's a comma, and only strings can be split().
     (argv.widths.split ? argv.widths.split(',').map(Number) : [argv.widths]) :
