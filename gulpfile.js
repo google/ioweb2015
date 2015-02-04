@@ -180,7 +180,7 @@ gulp.task('concat-and-uglify-js', ['js'], function() {
   var analyticsScriptStream = gulp.src([APP_DIR + '/scripts/analytics.js']);
 
   var serviceWorkerScriptStream = gulp.src([
-    APP_DIR + '/bower_components/shed/dist/shed.js',
+    APP_DIR + '/bower_components/shed/shed.js',
     APP_DIR + '/scripts/shed/*.js'
   ])
     .pipe(reload({stream: true, once: true}))
@@ -424,7 +424,7 @@ function changeAppYamlVersion(version, appYamlPath) {
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
   del.sync([APP_DIR + '/service-worker.js']);
   var importScripts = glob.sync('scripts/shed/*.js', {cwd: APP_DIR});
-  importScripts.unshift('bower_components/shed/dist/shed.js');
+  importScripts.unshift('bower_components/shed/shed.js');
 
   // Run with --fetch-dev to generate a service-worker.js that will handle fetch events.
   // By default, the generated service-worker.js will precache resources, but not actually serve
