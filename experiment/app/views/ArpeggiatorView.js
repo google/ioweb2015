@@ -292,12 +292,14 @@ module.exports = (function() {
         hasLeftShadow = true;
       }
 
+      var colorIndex = NUMBER_OF_TRIANGLES - i - 1;
+
       var colorSet = [
-        COLORS_A.pop(),
-        COLORS_B.pop(),
-        COLORS_C.pop(),
-        COLORS_D.pop(),
-        CENTER_COLORS.pop()
+        COLORS_A[colorIndex],
+        COLORS_B[colorIndex],
+        COLORS_C[colorIndex],
+        COLORS_D[colorIndex],
+        CENTER_COLORS[colorIndex]
       ];
 
       return {
