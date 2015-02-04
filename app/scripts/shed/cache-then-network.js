@@ -16,10 +16,9 @@ function serveFromCacheOrNetwork(request) {
     return shed.networkFirst(request);
   }
 
-  // If 'X-Cache-Only' isn't set to anything, then don't do anything here.
-  // It will be handled like an ordinary request without service worker-specific logic.
+  return fetch(request);
 }
 
 // TODO: /temporary_api/ can be removed once /api/ is available.
-shed.router.get('(.+)temporary_api/(.+)', serveFromCacheOrNetwork);
-shed.router.get('(.+)api/(.+)', serveFromCacheOrNetwork);
+shed.router.get('/(.+)temporary_api/(.+)', serveFromCacheOrNetwork);
+shed.router.get('/(.+)api/(.+)', serveFromCacheOrNetwork);

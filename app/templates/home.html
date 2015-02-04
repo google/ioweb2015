@@ -141,29 +141,17 @@
         </a>
       </div>
       <div class="io__hash" aria-label="I/O hash tag"></div>
-      <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-        <div class="social-post">
-          <header>
-            <a href="https://twitter.com/googledevs">@googledevs</a>
-            <div>3hrs ago</div>
-          </header>
-          <div>Find relief for your bloated game woes in the recent Game On! DevByte on WebP from @duhroach http://goo.gl/0Paa9V</div>
+      <template if="{{socialPosts.length >= 3}}">
+        <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+          <template repeat="{{socialPost in socialPosts}}">
+            <social-post kind="{{socialPost.kind}}"
+                         url="{{socialPost.url}}"
+                         text="{{socialPost.text}}"
+                         when="{{socialPost.when}}">
+            </social-post>
+          </template>
         </div>
-        <div class="social-post">
-          <header>
-            <a href="https://twitter.com/googledevs">@googledevs</a>
-            <div>3hrs ago</div>
-          </header>
-          <div>Find relief for your bloated game woes in the recent Game On! DevByte on WebP from @duhroach http://goo.gl/0Paa9V</div>
-        </div>
-        <div class="social-post">
-          <header>
-            <a href="https://twitter.com/googledevs">@googledevs</a>
-            <div>3hrs ago</div>
-          </header>
-          <div>Find relief for your bloated game woes in the recent Game On! DevByte on WebP from @duhroach http://goo.gl/0Paa9V</div>
-        </div>
-      </div>
+      </template>
     </section>
   </div>
 
@@ -175,4 +163,36 @@
                       iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
     </div>
   </template>
+
+  <script>
+  (function() {
+
+    // Page-specific JS that runs when this page is loaded for the first time.
+    function initPage() {
+      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+
+      if (page.hasBeenLoaded) {
+        return;
+      }
+
+      function processSocialPosts(socialPosts) {
+        // Only show the first 3 posts.
+        IOWA.Elements.Template.socialPosts = socialPosts.slice(0, 3);
+      }
+
+      page.load = function() {
+        IOWA.Elements.Template.socialPosts = [];
+        // TODO (jeffposnick): Replace this with the real api/ endpoint once it's available!
+        IOWA.Request.cacheThenNetwork('temporary_api/social_feed.json',
+          processSocialPosts, processSocialPosts);
+      };
+
+      page.load(); // Run load callback on page load.
+      page.hasBeenLoaded = true;
+    }
+
+    initPage();
+
+  })();
+  </script>
 {% end %}

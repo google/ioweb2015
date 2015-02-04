@@ -1,3 +1,23 @@
+/**
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import 'base/_breakpoints';
+@import 'base/_color';
+@import 'base/_layout';
+
 core-drawer-panel::shadow {
   #drawer {
     z-index: 100; // TODO: stick in _zindex.scss
@@ -24,5 +44,33 @@ paper-tabs.white {
 footer {
   paper-dropdown-menu::shadow #label {
     color: inherit;
+  }
+}
+
+social-post::shadow {
+  a {
+    color: $color-cyan-A700;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  header {
+    color: $color-gray;
+  }
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  social-post::shadow {
+    header {
+      margin-bottom: $tabletKeyline;
+    }
+  }
+}
+
+// This doesn't need to be in _sd but it's cleaner to keep it next to the other logic
+// that deals with <social-post> styling.
+@media (max-width: $tablet-breakpoint-min) {
+  social-post {
+    margin-bottom: $tabletKeyline;
   }
 }

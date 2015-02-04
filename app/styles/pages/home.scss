@@ -80,12 +80,6 @@ $name: 'page-home';
       margin-left: 5px;
     }
   }
-  .social-post {
-    header {
-      color: $color-gray;
-      margin-bottom: $tabletKeyline;
-    }
-  }
 }
 
 @media (max-width: $phone-breakpoint-max) {
