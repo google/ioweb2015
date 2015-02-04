@@ -313,7 +313,10 @@ IOWA.Router = (function() {
       renderCurrentPage();
     });
 
-    document.addEventListener('click', navigate);
+    // On iOS, we don't have event bubbling to the document level.
+    // http://www.quirksmode.org/blog/archives/2010/09/click_event_del.html
+    var eventName = IOWA.Util.isIOS() ? 'touchstart' : 'click';
+    document.addEventListener(eventName, navigate);
   }
 
   return {
