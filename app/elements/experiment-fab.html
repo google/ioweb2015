@@ -1030,8 +1030,8 @@ Main parent container for all of the fab elements.
 
       attached: function() {
         this.boundOnScroll = this.onScroll.bind(this);
+        this.scrollFabPos = this.getBoundingClientRect();
       },
-
 
       onFabClick: function(event) {
         document.addEventListener('keyup', this.bindEscape);
@@ -1158,10 +1158,13 @@ Main parent container for all of the fab elements.
       },
 
       onScroll: function(event) {
-        var scrollFabPos = this.getBoundingClientRect();
-        if (scrollFabPos.top <= 30) {
+
+        if (IOWA.Elements.ScrollContainer.scrollTop >= (this.scrollFabPos.top - 30)) {
           this.fixed = 'fixed';
+        } else if (IOWA.Elements.ScrollContainer.scrollTop <= (this.scrollFabPos.top - 30)) {
+          this.fixed = 'unfixed';
         }
+
       },
 
       onOverlayClose: function(event) {
