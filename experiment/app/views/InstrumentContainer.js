@@ -23,6 +23,52 @@ module.exports = (function() {
   // Pixi.js has too many retina bugs to enable at this time.
   var isRetina = false;
 
+  var renderers;
+
+  /**
+   * WebGL can never clean up after old contexts, so we reuse ours in a pool.
+   */
+  function buildRendererPool() {
+    var antialias = true;
+    var resolution = 1;
+
+    if (isRetina) {
+      antialias = false;
+      resolution = 2;
+    }
+
+    if (window.navigator.userAgent.match(/Safari/) &&
+        window.navigator.userAgent.match(/Version\/8/)) {
+      antialias = false;
+    }
+
+    renderers = [];
+
+    for (let i = 0; i < 5; i++) {
+      renderers.push(new PIXI.WebGLRenderer(window.innerWidth, window.innerHeight, {
+        antialias: antialias,
+        transparent: false,
+        resolution: resolution
+      }));
+    }
+  }
+
+  /**
+   * Get a renderer from the pool.
+   * @return {PIXI.WebGLRenderer}
+   */
+  function getRenderer() {
+    return renderers.pop();
+  }
+
+  /**
+   * Return a renderer to the pool.
+   * @param {PIXI.WebGLRenderer} renderer - The no longer used renderer.
+   */
+  function returnRenderer(renderer) {
+    renderers.push(renderer);
+  }
+
   /**
    * A container that wraps a sub instruments.
    * @param {AudioManager} audioManager - The shared audioManager.
@@ -60,6 +106,10 @@ module.exports = (function() {
     var onBackCallback_;
 
     var isMobile = false;
+
+    if (!renderers) {
+      buildRendererPool();
+    }
 
     var self = {
       init,
@@ -302,25 +352,8 @@ module.exports = (function() {
       wrapperElement.classList.add('experiment-instrument--' + pid);
       viewportElement.appendChild(wrapperElement);
 
-      var antialias = true;
-      var resolution = 1;
-
-      if (isRetina) {
-        antialias = false;
-        resolution = 2;
-      }
-
-      if (window.navigator.userAgent.match(/Safari/) &&
-          window.navigator.userAgent.match(/Version\/8/)) {
-        antialias = false;
-      }
-
       // create a renderer passing in the options
-      renderer = new PIXI.WebGLRenderer(window.innerWidth, window.innerHeight, {
-        antialias: antialias,
-        transparent: false,
-        resolution: resolution
-      });
+      renderer = getRenderer();
 
       if (isRetina) {
         animate.set(renderer.view, { scaleX: 0.5, scaleY: 0.5 });
@@ -345,7 +378,8 @@ module.exports = (function() {
         instrumentView.cleanUp();
       }
 
-      renderer.destroy();
+      returnRenderer(renderer);
+      renderer = null;
     }
 
     /**
@@ -690,6 +724,7 @@ module.exports = (function() {
 
       var maxW = Math.max(w, elemRect.width);
       var maxH = Math.max(h, elemRect.height);
+
       renderer.resize(maxW, maxH);
 
       resizeControls(window.innerWidth);

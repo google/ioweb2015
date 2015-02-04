@@ -657,33 +657,38 @@ window.experiment.customDataz = function() {
   };
 };
 
-      if (experiment.canLoad()) {
-        experiment.load(15000).then(function(app) {
-          experiment.app = app;
+      function loadIt() {
+        if (experiment.canLoad()) {
+          experiment.load(15000).then(function(app) {
+            experiment.app = app;
 
-          console.log('Experiment Loaded Successfully.');
-          var startingLocation = document.querySelector('.fab');
-          var rect = startingLocation.getBoundingClientRect();
-          var top = rect.top + (rect.height / 2);
-          var left = rect.left + (rect.width / 2);
+            console.log('Experiment Loaded Successfully.');
+            var startingLocation = document.querySelector('.fab');
+            var rect = startingLocation.getBoundingClientRect();
+            var top = rect.top + (rect.height / 2);
+            var left = rect.left + (rect.width / 2);
 
-          app.didEnterRecordingMode(function() {
-            console.log('enter');
+            app.didEnterRecordingMode(function() {
+              console.log('enter');
+            });
+
+            app.didExitRecordingMode(function() {
+              console.log('exit');
+            });
+
+            setTimeout(function() {
+              app.start('.row', '.card', [left, top]);
+            }, 1500);
+          }, function() {
+            console.error('experiment loading failed');
           });
-
-          app.didExitRecordingMode(function() {
-            console.log('exit');
-          });
-
-          setTimeout(function() {
-            app.start('.row', '.card', [left, top]);
-          }, 1500);
-        }, function() {
-          console.error('experiment loading failed');
-        });
-      } else {
-        console.error('experiment tech deps not met');
+        } else {
+          console.error('experiment tech deps not met');
+        }
       }
+
+      loadIt();
+
     </script>
   </body>
 </html>

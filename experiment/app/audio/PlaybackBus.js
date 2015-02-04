@@ -19,7 +19,7 @@ module.exports = (function() {
    */
   return function PlaybackBus() {
     // Our event subscriber.
-    var eventEmitter = new EventEmitter();
+    var eventEmitter;
 
     // Since this will be happening a lot, we use an object pool.
     // This pool if for sound play events.
@@ -52,6 +52,8 @@ module.exports = (function() {
      * Start listening to beats.
      */
     function init() {
+      eventEmitter = new EventEmitter();
+
       // Listen to the sequencer's "upcoming beat" event.
       events.addListener('SCHEDULED_BEAT', scheduleRawBeat);
     }

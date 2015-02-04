@@ -239,10 +239,8 @@ module.exports = (function() {
      * @param {Drum} drum - The targeted drum.
      */
     function onDragStart(drum) {
-      console.log('start drag', drum.pid);
       if ('undefined' !== typeof currentlyDraggingDrum_) { return false; }
 
-      console.log('continue drag', drum.pid);
       currentlyDraggingDrum_ = drum.pid;
 
       return true;
@@ -253,10 +251,8 @@ module.exports = (function() {
      * @param {Drum} drum - The targeted drum.
      */
     function onDragEnd(drum) {
-      console.log('stop drag', drum.pid);
       if (currentlyDraggingDrum_ !== drum.pid) { return false; }
 
-      console.log('continue stop drag', drum.pid);
       currentlyDraggingDrum_ = undefined;
 
       return true;
