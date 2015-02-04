@@ -14,7 +14,7 @@ module.exports = (function Tags() {
    */
   function addTag(name) {
     if ('undefined' !== typeof tags[name]) {
-      throw `Tag already exists: ${name}`;
+      return tags[name];
     }
 
     if (tagIndex > 32) {
