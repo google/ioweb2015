@@ -100,7 +100,8 @@ module.exports = (function() {
       buildSlices();
 
       var circle = new PIXI.Circle(0, 0, circleRadius);
-      circleGraphic.beginFill(0xFFFFFF, 0.55);
+      circleGraphic.beginFill(0xFFFFFF);
+      circleGraphic.alpha = 0.55;
       circleGraphic.pivot.x = 0;
       circleGraphic.pivot.y = 0;
       circleGraphic.drawShape(circle);
@@ -169,6 +170,14 @@ module.exports = (function() {
       circleGraphic.buttonMode = true;
       circleGraphic.defaultCursor = '-webkit-grab';
 
+      circleGraphic.mouseover = function(){
+        circleGraphic.alpha = 0.75;
+      };
+
+      circleGraphic.mouseout = function(){
+        circleGraphic.alpha = 0.55;
+      };
+
       circleGraphic.mousedown = circleGraphic.touchstart = function() {
         isDragging = true;
         circleGraphic.defaultCursor = '-webkit-grabbing';
@@ -201,6 +210,8 @@ module.exports = (function() {
       circleGraphic.mousedown = circleGraphic.touchstart = null;
       circleGraphic.mouseup = circleGraphic.mouseupoutside = circleGraphic.touchend = circleGraphic.touchendoutside = null;
       circleGraphic.mousemove = circleGraphic.touchmove = null;
+      circleGraphic.mouseover = null;
+      circleGraphic.mouseout = null;
     }
 
     /**
