@@ -218,13 +218,20 @@ IOWA.Router = (function() {
    * @param {NodeList} currentPageTemplates Content templates to be rendered.
    * @private
    */
-  function updatePageElements(pageName, currentPageTemplates, mastheadBgClass) {
+  function updatePageElements(pageName, currentPageTemplates) {
     replaceTemplateContent(currentPageTemplates);
-    document.body.id = 'page-' + pageName;
-
     var template = IOWA.Elements.Template;
+    var previousPageMeta = template.pages[template.selectedPage];
     template.selectedPage = pageName;
-    document.title = (template.pages[pageName].title || 'Google I/O 2015');
+    var currentPageMeta = template.pages[pageName];
+    document.body.id = 'page-' + pageName;
+    document.title = currentPageMeta.title || 'Google I/O 2015';
+
+    var previousMastheadColor = (template.rippleColors[
+        previousPageMeta.mastheadBgClass]);
+    var currentMastheadColor = (template.rippleColors[
+        currentPageMeta.mastheadBgClass]);
+    var mastheadBgClass = template.pages[pageName].mastheadBgClass;
 
     // Prepare the page for a smooth masthead transition.
     template.navBgClass = mastheadBgClass;
@@ -232,7 +239,15 @@ IOWA.Router = (function() {
     // is visible before the binding happens.
     IOWA.Elements.Masthead.className = IOWA.Elements.Masthead.className.replace(
         MASTHEAD_BG_CLASS_REGEX, ' ' + mastheadBgClass + ' ');
-
+    var duration = currentPageTransition ? 0 : 300;
+    var mastheadAnim = new Animation(IOWA.Elements.Masthead, [
+          {backgroundColor: previousMastheadColor},
+          {backgroundColor: currentMastheadColor}
+        ], {
+          duration: duration,
+          fill: 'forwards'
+      });
+    IOWA.PageAnimation.play(mastheadAnim);
     // Hide the masthead ripple before proceeding with page transition.
     IOWA.PageAnimation.play(
       IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
@@ -266,13 +281,12 @@ IOWA.Router = (function() {
     // Prequery for content templates.
     var currentPageTemplates = document.querySelectorAll(
         '.js-ajax-' + pageName);
-    var bgClass = IOWA.Elements.Template.pages[pageName].mastheadBgClass;
     if (!currentPageTransition) {
       var animation = IOWA.PageAnimation.contentSlideOut();
       IOWA.PageAnimation.play(animation, updatePageElements.bind(
-          null, pageName, currentPageTemplates, bgClass));
+          null, pageName, currentPageTemplates));
     } else if (currentPageTransition !== 'no-transition') {
-      updatePageElements(pageName, currentPageTemplates, bgClass);
+      updatePageElements(pageName, currentPageTemplates);
     }
   }
 
