@@ -659,6 +659,8 @@ window.experiment.customDataz = function() {
 
       if (experiment.canLoad()) {
         experiment.load(15000).then(function(app) {
+          experiment.app = app;
+
           console.log('Experiment Loaded Successfully.');
           var startingLocation = document.querySelector('.fab');
           var rect = startingLocation.getBoundingClientRect();

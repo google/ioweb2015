@@ -58,10 +58,9 @@ module.exports = (function() {
    * @constructor
    * @param {number} radius - The radius.
    */
-  function Hexagon(radius) {
+  function Hexagon(radius, color, renderer) {
     var cube;
 
-    var color = 0xe34f4c;
     var targetHeight = 0;
 
     var radRotation = (Math.PI * 2) / sides;
@@ -77,11 +76,13 @@ module.exports = (function() {
       textureGfx.drawShape(shape);
       textureGfx.endFill();
       cachedTexture = textureGfx.generateTexture();
+      renderer.updateTexture(cachedTexture.baseTexture);
     }
 
     if (!hexagonShadow) {
       var shadowCanvas = makeHexagonShadow(shape.points, radius, 25);
       hexagonShadow = PIXI.Texture.fromCanvas(shadowCanvas);
+      renderer.updateTexture(hexagonShadow.baseTexture);
     }
 
     var shadow = new PIXI.Sprite(hexagonShadow);

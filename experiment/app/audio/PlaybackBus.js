@@ -48,8 +48,13 @@ module.exports = (function() {
 
     var currentDelta;
 
-    // Listen to the sequencer's "upcoming beat" event.
-    events.addListener('SCHEDULED_BEAT', scheduleRawBeat);
+    /**
+     * Start listening to beats.
+     */
+    function init() {
+      // Listen to the sequencer's "upcoming beat" event.
+      events.addListener('SCHEDULED_BEAT', scheduleRawBeat);
+    }
 
     /**
      * We update our internal information on each
@@ -124,9 +129,10 @@ module.exports = (function() {
     }
 
     return {
-      tick: tick,
-      schedule: schedule,
-      onPlayback: onPlayback
+      tick,
+      schedule,
+      onPlayback,
+      init
     };
   };
 })();

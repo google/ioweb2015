@@ -67,16 +67,20 @@ module.exports = (function() {
     var maxWidth = 1100;
     var maxHeight = 700;
 
+    var renderer;
+    DotEmitter.clearTextureCache();
+
     /**
      * Initialize the drum view.
      * @param {PIXI.Stage} stage_ - The PIXI stage of the view.
      * @param {number} pid_ - The pid of the note.
      * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The center point of the view.
      */
-    function init(stage_, pid_, displayContainerCenter_) {
+    function init(stage_, pid_, displayContainerCenter_, renderer_) {
       stage = stage_;
       pid = pid_;
       displayContainerCenter = displayContainerCenter_;
+      renderer = renderer_;
 
       groundT = new PIXI.DisplayObjectContainer();
       displayContainerCenter.addChild(groundT);
@@ -157,10 +161,10 @@ module.exports = (function() {
       isRecording = false;
 
       currentTrack = audioManager.createRecordedTrack(
-          data.recorded,
-          CHANNEL,
-          DRUM_TAG
-          );
+        data.recorded,
+        CHANNEL,
+        DRUM_TAG
+      );
     }
 
     /**
@@ -202,7 +206,7 @@ module.exports = (function() {
       drumDefs.sort((a, b) => a.radius - b.radius);
 
       drums = drumDefs.map(function(drumDef) {
-        var drum = new Drum(drumDef, drumDef.color, drumDef.hovercolor, drumDef.sound, world);
+        var drum = new Drum(drumDef, drumDef.color, drumDef.hovercolor, drumDef.sound, world, renderer);
 
         drum.setPosition(drumDef.x, drumDef.y);
 
@@ -222,7 +226,7 @@ module.exports = (function() {
       });
 
       emitters = data.emitters.map(function(emitterDef) {
-        var e = new DotEmitter(audioManager);
+        var e = new DotEmitter(renderer);
         e.init(stage, displayContainerCenter, world, emitterDef.x, emitterDef.y, dotEmitterObj, getNextPID, emitterDef.beatModulo, audioManager);
         return e;
       });

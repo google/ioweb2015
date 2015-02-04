@@ -27,16 +27,9 @@ module.exports = (function() {
   const BOUNDS_PADDING = 5;
   const CIRCLE_RADIUS = 28;
 
-  var circleGraphics = new PIXI.Graphics();
+  var circleTexture;
 
-  circleGraphics.boundsPadding = 2;
-  circleGraphics.beginFill(WHITE, 1);
-  circleGraphics.drawCircle(0, 0, CIRCLE_RADIUS);
-  circleGraphics.endFill();
-
-  var circleTexture = circleGraphics.generateTexture();
-
-  return function RecordButton(audioManager) {
+  function RecordButton(audioManager) {
     var startBeat;
     var internalStartBeat;
     var prevWholeNumber;
@@ -56,6 +49,16 @@ module.exports = (function() {
 
     container.interactive = false;
     container.buttonMode = true;
+
+    if (!circleTexture) {
+      var circleGraphics = new PIXI.Graphics();
+      circleGraphics.boundsPadding = 2;
+      circleGraphics.beginFill(WHITE, 1);
+      circleGraphics.drawCircle(0, 0, CIRCLE_RADIUS);
+      circleGraphics.endFill();
+
+      circleTexture = circleGraphics.generateTexture();
+    }
 
     var circle = new PIXI.Sprite(circleTexture);
 
@@ -434,6 +437,14 @@ module.exports = (function() {
 
     return self;
 
+  }
+
+  /**
+   * Clear the cache on resize.
+   */
+  RecordButton.clearTextureCache = function() {
+    circleTexture = null;
   };
 
+  return RecordButton;
 })();

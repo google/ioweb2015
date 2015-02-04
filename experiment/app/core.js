@@ -8,6 +8,7 @@ var audioLoopsDefault = require('app/data/loops.json');
 var audioLoopsCat = require('app/data/catloops.json');
 var {Promise} = require('es6-promise');
 var rAFTimeout = require('app/util/rAFTimeout');
+var events = require('app/util/events');
 
 /**
  * Main entry point into the experiment.
@@ -81,6 +82,7 @@ module.exports = function Experiment() {
    * @param {array<number>} fromPos - The origin point of the transition in (FAB).
    */
   function start(instrumentSelector = '.row', visualizerSelector = '.box', fromPos = [0,0]) {
+    events.init();
     audioManager.init();
 
     stateManager = new StateManager(audioManager);

@@ -73,6 +73,7 @@ module.exports = (function() {
       followInteraction,
       onActivate,
       onBack,
+      cleanUp,
       getView: () => instrumentView,
       getElemRect: () => elemRect,
       getChannel: () => instrumentView && instrumentView.getChannel && instrumentView.getChannel(),
@@ -100,7 +101,7 @@ module.exports = (function() {
 
       stage.addChild(displayContainer);
 
-      instrumentView.init(stage, pid, displayContainerCenter);
+      instrumentView.init(stage, pid, displayContainerCenter, renderer);
 
       // If Debug
       // debugFrame = new PIXI.Graphics();
@@ -334,6 +335,17 @@ module.exports = (function() {
       wrapperElement.appendChild(renderer.view);
 
       stage.addChild(displayContainerCenter);
+    }
+
+    /**
+     * Clean on shutodwn.
+     */
+    function cleanUp() {
+      if ('function' === typeof instrumentView.cleanUp) {
+        instrumentView.cleanUp();
+      }
+
+      renderer.destroy();
     }
 
     /**

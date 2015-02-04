@@ -11,7 +11,7 @@ module.exports = (function() {
    * @param {number} pid - The ID for this dot.
    * @constructor
    */
-  return function Dot(pid) {
+  function Dot(pid, renderer) {
     var onActivateCallback_;
 
     var gridDotChild;
@@ -131,10 +131,13 @@ module.exports = (function() {
         dot.endFill();
 
         dotTextures[size] = dot.generateTexture();
+        renderer.updateTexture(dotTextures[size].baseTexture);
       }
 
       var dotContainer = new PIXI.DisplayObjectContainer();
+
       var s = new PIXI.Sprite(dotTextures[size]);
+
       s.tint = color;
       s.anchor.x = s.anchor.y = 0.5;
       dotContainer.addChild(s);
@@ -244,5 +247,11 @@ module.exports = (function() {
     }
 
     return self;
+  }
+
+  Dot.clearTextureCache = function() {
+    dotTextures = {};
   };
+
+  return Dot;
 })();

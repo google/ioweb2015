@@ -135,6 +135,8 @@ module.exports = (function() {
   Cube.getCube = getCube;
   Cube.deserializeModel = deserializeModel;
   Cube.loadFromJSON = loadFromJSON;
+  Cube.clearCache = () => cubeCache.length = 0;
+  Cube.getCache = () => cubeCache;
 
   return Cube;
 })();

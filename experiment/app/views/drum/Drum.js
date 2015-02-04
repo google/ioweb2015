@@ -15,7 +15,7 @@ module.exports = (function() {
    * @param {Object} physicsWorld - The physics for this drum.
    * @constructor
    */
-  return function Drum(model, color, hoverColor, soundName, physicsWorld) {
+  return function Drum(model, color, hoverColor, soundName, physicsWorld, renderer) {
     var pid = model.pid;
     var isDragging = false;
     var interactionData;
@@ -48,6 +48,8 @@ module.exports = (function() {
     hitCircleGfx.endFill();
 
     var hitTexture = hitCircleGfx.generateTexture();
+    renderer.updateTexture(hitTexture.baseTexture);
+
     var hitCircleContainer = new PIXI.DisplayObjectContainer();
 
     var self = {

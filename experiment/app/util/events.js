@@ -3,11 +3,24 @@ var { EventEmitter } = require('events');
 /**
  * Tiny wrapper for a singleton event stream.
  */
-var eventEmitter = new EventEmitter();
-eventEmitter.setMaxListeners(20);
+module.exports = (function() {
+  'use strict';
 
-module.exports = {
-  addListener: eventEmitter.addListener.bind(eventEmitter),
-  removeListener: eventEmitter.removeListener.bind(eventEmitter),
-  emit: eventEmitter.emit.bind(eventEmitter)
-};
+  var eventEmitter;
+
+  return {
+    addListener: function() {
+      eventEmitter.addListener.apply(eventEmitter, arguments);
+    },
+    removeListener: function() {
+      eventEmitter.removeListener.apply(eventEmitter, arguments);
+    },
+    emit: function() {
+      eventEmitter.emit.apply(eventEmitter, arguments);
+    },
+    init: function() {
+      eventEmitter = new EventEmitter();
+      eventEmitter.setMaxListeners(20);
+    }
+  };
+})();

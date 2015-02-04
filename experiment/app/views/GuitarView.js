@@ -52,6 +52,9 @@ module.exports = (function() {
     var pidPool = [];
 
     var gridCount;
+    var renderer;
+
+    Dot.clearTextureCache();
 
     /**
      * Add the note to the guitar note pool.
@@ -79,10 +82,11 @@ module.exports = (function() {
      * @param {number} pid_ - The ID of the view.
      * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The center point of the view.
      */
-    function init(stage_, pid_, displayContainerCenter_) {
+    function init(stage_, pid_, displayContainerCenter_, renderer_) {
       stage = stage_;
       pid = pid_;
       displayContainerCenter = displayContainerCenter_;
+      renderer = renderer_;
 
       displayContainerCenter.addChild(baseLayer);
       displayContainerCenter.addChild(midLayer);
@@ -284,7 +288,7 @@ module.exports = (function() {
       }
 
       for (let i = 0; i < gridCount; i++) {
-        let dot = new Dot(i);
+        let dot = new Dot(i, renderer);
 
         dot.onActivate(activateDot);
 
