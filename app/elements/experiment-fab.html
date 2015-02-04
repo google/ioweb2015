@@ -47,15 +47,23 @@ Main fab for entering/exit the experiment.
         transition: transform 300ms ease-in-out;
         transform: scale(1,1);
       }
+
       :host::shadow core-icon {
         height: 19px;
         width: 19px;
         top: 2px;
         left: 2px;
       }
+
       :host::shadow paper-ripple {
         color: #cfd8dc;
       }
+
+      :host(:hover)::shadow paper-shadow::shadow #shadow-bottom,
+      :host([onstate])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
+      }
+
       /* fix for repeating background image in safari */
       polyfill-rule {
         content: ':host::shadow core-icon div';
@@ -63,28 +71,37 @@ Main fab for entering/exit the experiment.
         width: 19px;
         height: 19px;
       }
+
       polyfill-rule {
         content: 'experiment-fab[playing] core-icon div';
         height: 17px;
         width: 12px;
       }
+
       polyfill-rule {
         content: 'experiment-fab[paused] core-icon div';
         height: 16px;
         width: 13px;
       }
+
       :host([playing])::shadow core-icon {
         height: 17px;
         width: 12px;
         left: 6px;
         top: 4px;
       }
+
       :host([paused])::shadow core-icon {
         height: 16px;
         width: 13px;
         left: 7px;
         top: 4px;
       }
+
+      :host([paused])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
+      }
+
       :host([recording]) {
         -webkit-transform: scale(0,0);
         transform: scale(0,0);
@@ -220,6 +237,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       }
 
       :host([active]) {
+        box-shadow: 0px 6px 10px 0px rgba(0,0,0,0.16),0px 6px 10px 0px rgba(0,0,0,0.23);
         -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
@@ -455,10 +473,10 @@ Fab for triggering the share dialog.
         top: -19px;
         left: 8px;
         -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 50% 100%;
+        -webkit-transform-origin: 50% 50%;
         -webkit-transition: all 100ms ease-out 0;
         transform: scale(0,0);
-        transform-origin: 50% 100%;
+        transform-origin: 50% 50%;
         transition: all 100ms ease-out 0;
         z-index: 2;
       }
@@ -483,6 +501,10 @@ Fab for triggering the share dialog.
         -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
+      :host([open])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
+      }
+
     </style>
     <shadow></shadow>
   </template>
@@ -719,10 +741,10 @@ Fab for resetting the experiment loop to default
         left: 8px;
         z-index: 2;
         -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 50% 100%;
+        -webkit-transform-origin: 50% 50%;
         -webkit-transition: all 100ms ease-out 50ms;
         transform: scale(0,0);
-        transform-origin: 50% 100%;
+        transform-origin: 50% 50%;
         transition: all 100ms ease-out 50ms;
       }
       :host::shadow core-icon {
@@ -745,6 +767,9 @@ Fab for resetting the experiment loop to default
         visibility: visible;
         -webkit-transform: scale(1,1);
         transform: scale(1,1);
+      }
+      :host([open])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
       }
     </style>
     <shadow></shadow>
@@ -783,10 +808,10 @@ Fab for exiting the experiment.
         left: 8px;
         z-index: 2;
         -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 50% 100%;
+        -webkit-transform-origin: 50% 50%;
         -webkit-transition: all 100ms ease-out 100ms;
         transform: scale(0,0);
-        transform-origin: 50% 100%;
+        transform-origin: 50% 50%;
         transition: all 100ms ease-out 100ms;
       }
       :host::shadow core-icon {
@@ -812,6 +837,9 @@ Fab for exiting the experiment.
         visibility: visible;
         -webkit-transform: scale(1,1);
         transform: scale(1,1);
+      }
+      :host([open])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
       }
     </style>
     <shadow></shadow>
@@ -915,7 +943,7 @@ Main parent container for all of the fab elements.
     <template if="{{mode == 'pre'}}">
 
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
-      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment"></experiment-fab>
+      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment" onstate?="{{dialogVisible}}"></experiment-fab>
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
