@@ -45,6 +45,12 @@ $name: 'page-registration';
   }
 }
 
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .page__section--countdown {
+    margin-top: -190px;
+  }
+}
+
 @media (min-width: $desktop-breakpoint-min) {
   .page__section--countdown {
     margin-top: -166px; // adjustment so section is snug against the previous one.

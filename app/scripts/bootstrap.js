@@ -64,6 +64,38 @@
     IOWA.Router.init();
   }
 
+  window.addEventListener('core-media-change', function(e) {
+    // Disable swipping on tablet/desktop.
+    if (e.target.id === 'mq-phone') {
+      var isPhoneSize = e.detail.matches;
+      IOWA.Elements.Drawer.querySelector('[drawer]').hidden = !isPhoneSize;
+      IOWA.Elements.Drawer.disableSwipe = !isPhoneSize;
+    }
+  });
+
+  window.addEventListener('keydown', function(e) {
+    // ESC closes any overlays.
+    if (e.keyCode === 27) {
+      var template = IOWA.Elements.Template;
+      if (template.photoGalleryActive) {
+        template.togglePhotoGallery();
+      }
+      if (IOWA.Elements.Template.fullscreenVideoActive) {
+        if (template.closeVideoCard) {
+          template.closeVideoCard();
+        }
+        if (template.closeVideoSection) {
+          template.closeVideoSection();
+        }
+      }
+    }
+  });
+
+  window.addEventListener('resize', function() {
+    IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
+    IOWA.Elements.Drawer.closeDrawer();
+  });
+
   if (IOWA.Util.supportsHTMLImports) {
     afterImports();
   } else {

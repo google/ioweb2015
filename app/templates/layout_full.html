@@ -46,10 +46,17 @@ limitations under the License.
   <meta name="msapplication-TileColor" content="#eceff1">
   <meta name="msapplication-tap-highlight" content="no">
 
+  <!-- G+ and Twitter sharing meta data -->
   <meta property="og:title" content="Google I/O 2015">
   <meta property="og:description" content="Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015.">
   <meta property="og:type" content="Event">
   <meta property="og:image" content="images/{% .OgImage %}">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@googledevs">
+  <meta name="twitter:title" content="Google I/O 2015">
+  <meta name="twitter:description" content="Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015.">
+  <meta name="twitter:image:src" content="images/{% .OgImage %}">
 
   <script type="application/ld+json">
     {
@@ -229,9 +236,12 @@ limitations under the License.
     <template is="auto-binding" id="t">
 
       <!-- Responsive handlers -->
-      <core-media-query query="(min-width:320px) and (max-width:767px)" queryMatches="{{isPhoneSize}}"></core-media-query>
-      <core-media-query query="(min-width:768px) and (max-width:944px)" queryMatches="{{isTabletSize}}"></core-media-query>
-      <core-media-query query="(min-width:945px)" queryMatches="{{isDesktopSize}}"></core-media-query>
+      <core-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"
+                        queryMatches="{{isPhoneSize}}"></core-media-query>
+      <core-media-query id="mq-tablet" query="(min-width:768px) and (max-width:944px)"
+                        queryMatches="{{isTabletSize}}"></core-media-query>
+      <core-media-query id="mq-desktop" query="(min-width:945px)"
+                        queryMatches="{{isDesktopSize}}"></core-media-query>
 
       <header class="masthead {% template "mastheadBgClass" .%} js-experiment-instrument js-experiment-instrument--no-top-margin" layout vertical>
         <div class="masthead__ripple">
@@ -278,7 +288,7 @@ limitations under the License.
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
-        <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}"></experiment-fab-container>
+        <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}"></experiment-fab-container>
       </header>
 
       <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}" >
@@ -301,16 +311,16 @@ limitations under the License.
           <div self-end flex><img src="images/google-logo.svg" alt="Google Logo"></div>
           <nav layout vertical end justified>
             <span><a href="faq" data-ajax-link data-track-link="footer-faq">FAQ</a></span>
-            <span><a href="https://www.google.com/events/io" target="_blank">I/O 2014</a></span>
+            <span><a href="https://www.google.com/events/io" target="_blank" data-track-link="footer-2014-site">I/O 2014</a></span>
             <paper-dropdown-menu label="Google Developers">
               <paper-dropdown valign="bottom" halign="right" class="dropdown">
-                <paper-item><a href="https://developers.google.com" target="_blank">developers.google.com</a></paper-item>
-                <paper-item><a href="https://plus.google.com/+GoogleDevelopers" target="_blank">+googledevelopers</a></paper-item>
-                <paper-item><a href="https://twitter.com/googledevs" target="_blank">@googledevs</a></paper-item>
-                <paper-item><a href="http://googledevelopers.blogspot.com/" target="_blank">Blog</a></paper-item>
+                <paper-item><a href="https://developers.google.com" target="_blank" data-track-link="footer-link-devsite">developers.google.com</a></paper-item>
+                <paper-item><a href="https://plus.google.com/+GoogleDevelopers" target="_blank" data-track-link="footer-link-gplus">+googledevelopers</a></paper-item>
+                <paper-item><a href="https://twitter.com/googledevs" target="_blank" data-track-link="footer-link-twitter">@googledevs</a></paper-item>
+                <paper-item><a href="http://googledevelopers.blogspot.com/" target="_blank" data-track-link="footer-link-blog">Blog</a></paper-item>
               </paper-dropdown>
             </paper-dropdown-menu>
-            <span><a href="https://plus.google.com/u/0/communities/105113874753230740413" target="_blank">I/O Community</a></span>
+            <span><a href="https://plus.google.com/u/0/communities/105113874753230740413" target="_blank" data-track-link="footer-community">I/O Community</a></span>
             <span><a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Terms</a></span>
             <span class="footer-share-links--bottom">
               <a href="https://plus.google.com/+GoogleDevelopers" target="_blank" class="share-icon"  data-track-link="footer-share-gplus" data-share-type="gplus" on-click="{{openShareWindow}}"><core-icon icon="io:post-gplus"></core-icon></a>

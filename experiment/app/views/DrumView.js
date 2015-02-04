@@ -198,7 +198,10 @@ module.exports = (function() {
 
       audioManager.addTrack(currentTrack);
 
-      drums = data.drums.map(function(drumDef) {
+      let drumDefs = data.drums.slice(0);
+      drumDefs.sort((a, b) => a.radius - b.radius);
+
+      drums = drumDefs.map(function(drumDef) {
         var drum = new Drum(drumDef, drumDef.color, drumDef.hovercolor, drumDef.sound, world);
 
         drum.setPosition(drumDef.x, drumDef.y);
@@ -207,6 +210,9 @@ module.exports = (function() {
           audioManager.playSoundOnNextBeat(d.soundName, CHANNEL);
           recordSound(d);
         });
+
+        drum.onDragStart(onDragStart);
+        drum.onDragEnd(onDragEnd);
 
         foreground.addChild(drum.container);
         background.addChild(drum.hitCircleContainer);
@@ -220,6 +226,36 @@ module.exports = (function() {
         e.init(stage, displayContainerCenter, world, emitterDef.x, emitterDef.y, dotEmitterObj, getNextPID, emitterDef.beatModulo, audioManager);
         return e;
       });
+    }
+
+    var currentlyDraggingDrum_;
+
+    /**
+     * When a drum begins dragging.
+     * @param {Drum} drum - The targeted drum.
+     */
+    function onDragStart(drum) {
+      console.log('start drag', drum.pid);
+      if ('undefined' !== typeof currentlyDraggingDrum_) { return false; }
+
+      console.log('continue drag', drum.pid);
+      currentlyDraggingDrum_ = drum.pid;
+
+      return true;
+    }
+
+    /**
+     * When a drum ends dragging.
+     * @param {Drum} drum - The targeted drum.
+     */
+    function onDragEnd(drum) {
+      console.log('stop drag', drum.pid);
+      if (currentlyDraggingDrum_ !== drum.pid) { return false; }
+
+      console.log('continue stop drag', drum.pid);
+      currentlyDraggingDrum_ = undefined;
+
+      return true;
     }
 
     /**

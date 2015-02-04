@@ -69,10 +69,6 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
-
-    window.addEventListener('resize', function() {
-      IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
-    });
   };
 
   var init = function() {
@@ -80,6 +76,7 @@ IOWA.Elements = (function() {
     template.pages = {};
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.fullscreenVideoActive = false;
+    template.photoGalleryActive = false;
     template.pageTransitionDone = false;
 
     template.rippleColors = {
@@ -89,6 +86,10 @@ IOWA.Elements = (function() {
     };
 
     template.pages = {
+      'faq': {
+        mastheadBgClass: 'bg-cyan',
+        hasBeenLoaded: false
+      },
       'schedule': {
         mastheadBgClass: 'bg-cyan',
         hasBeenLoaded: false

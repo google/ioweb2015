@@ -99,7 +99,8 @@ core-drawer-panel {
     background-color: $color-body;
   }
   [main] {
-    overflow: auto;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
   }
   core-toolbar .bottom {
     padding-bottom: $mobileKeyline;
@@ -225,6 +226,12 @@ experiment-fab-container {
     paper-icon-button {
       display: none;
     }
+  }
+}
+
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .masthead-container {
+    max-width: 582px;
   }
 }
 

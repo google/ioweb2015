@@ -259,6 +259,9 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           -webkit-transform-origin: 91% 64%;
           transform-origin: 91% 64%;
         }
+        .dialog-content {
+          background-size: 90%;
+        }
       }
 
       h4 {
@@ -272,6 +275,11 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
         color: #9E9E9E;
         font-size: 15px;
         font-weight: 500;
+      }
+
+      p a {
+        color: #64B5F6;
+        text-decoration: none;
       }
 
       .button-container {
@@ -323,19 +331,12 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       <div class="dialog-content" _style="background-image: {{dialogUnsupportedImage}}">
         <h4 class="sorry"><i18n-msg msgid="sorry">Sorry...</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="experiment-unsupported">The I/O experiment is not supported by your browser. Find supported browsers below.</i18n-msg>
+          <i18n-msg msgid="experiment-unsupported">The I/O experiment is not supported by your browser. You need <a href="//caniuse.com/#feat=webgl" target="_blank"><i18n-msg msgid="supports-webgl">WebGL</i18n-msg></a> and <a href="//caniuse.com/#feat=audio-api" target="_blank"><i18n-msg msgid="supports-webaudio">Web Audio</i18n-msg></a> support to run the experiment.
         </p>
         <div class="button-container">
-          <a href="//caniuse.com/#feat=webgl" target="_blank">
-            <paper-button class="experiment-button">
-              <i18n-msg msgid="supports-webgl">WebGL</i18n-msg>
-            </paper-button>
-          </a>
-          <a href="//caniuse.com/#feat=audio-api" target="_blank">
-            <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
-              <i18n-msg msgid="supports-webaudio">Web Audio</i18n-msg>
-            </paper-button>
-          </a>
+          <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
+            <i18n-msg msgid="close-dialog">Close</i18n-msg>
+          </paper-button>
         </div>
       </div>
     </template>
@@ -601,7 +602,7 @@ Dialog to share the user's custom experiment/song
         font-size: 16px;
         overflow: hidden;
         padding: 0;
-        width: 125px;
+        width: 100%;
       }
 
       .cancel {
@@ -621,26 +622,25 @@ Dialog to share the user's custom experiment/song
       </h4>
 
       <core-menu>
-        <paper-item>
+        <paper-item on-tap="{{gplusTrack}}">
           <a href="//plus.google.com/share?url={{gplusShare| encodeURI}}" target="_blank" layout horizontal center>
             <core-icon class="share-icon" icon="io:post-gplus"></core-icon>
             <i18n-msg msgid="gplus-share">Google+</i18n-msg>
           </a>
         </paper-item>
-        <paper-item>
+        <paper-item on-tap="{{twitterTrack}}">
           <a href="//twitter.com/intent/tweet?text=Make+music+with+instruments+inspired+by+material+design+for+Google+I/O.+Play,+record+and+share+at:&url={{twitterShare | encodeURI}}" target="_blank" layout horizontal center>
             <core-icon class="share-icon" icon="io:post-twitter"></core-icon>
             <i18n-msg msgid-"twitter-share">Twitter</i18n-msg>
           </a>
         </paper-item>
-        <paper-item>
+        <paper-item on-tap="{{facebookTrack}}">
           <a href="//www.facebook.com/sharer/sharer.php?u={{facebookShare | encodeURI}}" target="_blank" layout horizontal center>
             <core-icon class="share-icon" icon="io:post-facebook"></core-icon>
             <i18n-msg msgid="facebook-share">Facebook</i18n-msg>
           </a>
         </paper-item>
-        <paper-item class="share-url" noink>
-          <core-icon class="share-icon" icon="link" on-tap="{{linkSelect}}"></core-icon>
+        <paper-item on-tap="{{linkCopy}}" class="share-url" noink>
           <input id="urlInput" value="{{copiedURLShare}}" on-tap="{{linkSelect}}" readonly>
         </paper-item>
       </core-menu>
@@ -660,6 +660,22 @@ Dialog to share the user's custom experiment/song
           value: false,
           reflect: true
         }
+      },
+
+      gplusTrack: function() {
+        IOWA.Analytics.trackEvent('experiment', 'G Plus share');
+      },
+
+      twitterTrack: function() {
+        IOWA.Analytics.trackEvent('experiment', 'Twitter share');
+      },
+
+      facebookTrack: function() {
+        IOWA.Analytics.trackEvent('experiment', 'Facebook share');
+      },
+
+      linkCopy: function() {
+        IOWA.Analytics.trackEvent('experiment', 'Link copied');
       },
 
       linkSelect: function() {
@@ -814,7 +830,7 @@ Main parent container for all of the fab elements.
 @element experiment-fab-container
 @blurb Main parent container for all of the fab elements.
 -->
-<polymer-element name="experiment-fab-container" attributes="mini mode playmode fixed recordmode" aria-label="Try the Chrome experiment">
+<polymer-element name="experiment-fab-container" attributes="mini mode playmode fixed recordmode direction" aria-label="Try the Chrome experiment">
   <template>
     <style>
       :host {
@@ -860,34 +876,46 @@ Main parent container for all of the fab elements.
       .experiment-exit-tooltip {
         top: 230px;
       }
-      :host([mini]) .experiment-options-tooltip::shadow .core-tooltip {
-        top: 5px !important;
-      }
-      :host([mini]) .experiment-share-tooltip {
-        top: 85px;
-      }
-      :host([mini]) .experiment-reset-tooltip {
-        top: 150px;
-      }
-      :host([mini]) .experiment-exit-tooltip {
-        top: 215px;
-      }
       :host([mini]) experiment-share-fab,
       :host([mini]) experiment-reset-fab,
       :host([mini]) experiment-exit-fab {
         left: 0;
       }
-      :host([mini]) experiment-share-dialog {
+      :host([mini]) .experiment-options-tooltip::shadow .core-tooltip {
+        top: 5px !important;
+      }
+      :host([mini][direction="upwards"]) .experiment-share-tooltip {
+        top: -45px;
+      }
+      :host([mini][direction="upwards"]) .experiment-reset-tooltip {
+        top: -110px;
+      }
+      :host([mini][direction="upwards"]) .experiment-exit-tooltip {
+        top: -175px;
+      }
+      :host([mini][direction="upwards"]) experiment-share-dialog {
+        top: -65px;
+        right: 38px;
+      }
+      :host([mini][direction="downwards"]) .experiment-share-tooltip {
+        top: 85px;
+      }
+      :host([mini][direction="downwards"]) .experiment-reset-tooltip {
+        top: 150px;
+      }
+      :host([mini][direction="downwards"]) .experiment-exit-tooltip {
+        top: 215px;
+      }
+      :host([mini][direction="downwards"]) experiment-share-dialog {
         top: 65px;
         right: 38px;
       }
-
 
     </style>
     <template if="{{mode == 'pre'}}">
 
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
-      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}"></experiment-fab>
+      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment"></experiment-fab>
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
@@ -918,7 +946,7 @@ Main parent container for all of the fab elements.
       </core-tooltip>
 
       <core-tooltip label="Exit Experiment" class="experiment-exit-tooltip" position="left" noarrow="true" show?="{{showTooltips}}" large>
-        <experiment-exit-fab src="{{assets.exitExpImg}}" on-tap="{{exitExperiment}}" mini open?="{{miniFabs}}"></experiment-exit-fab>
+        <experiment-exit-fab src="{{assets.exitExpImg}}" on-tap="{{onExitClick}}" mini open?="{{miniFabs}}"></experiment-exit-fab>
       </core-tooltip>
 
       <experiment-overlay active?="{{pauseOverlay}}" on-tap="{{pausedFabClick}}"></experiment-overlay>
@@ -937,6 +965,10 @@ Main parent container for all of the fab elements.
         },
         fixed: {
           value: 'unfixed',
+          reflect: true
+        },
+        direction: {
+          value: 'upwards',
           reflect: true
         },
         mini: {
@@ -977,14 +1009,21 @@ Main parent container for all of the fab elements.
         document.addEventListener('keyup', this.bindEscape);
 
         var DIALOG_HEIGHT = 480;
+        var VIEWPORT_HEIGHT = window.innerHeight;
         var fabPos = this.getBoundingClientRect();
         if (fabPos.top < DIALOG_HEIGHT) {
           this.dialogAnimateDirection = 'animate-down';
         } else {
           this.dialogAnimateDirection = 'animate-up';
         }
+        if (fabPos.top > (VIEWPORT_HEIGHT / 2)) {
+          this.direction = 'upwards';
+        } else {
+          this.direction = 'downwards';
+        }
 
         this.dialogVisible = true;
+        IOWA.Analytics.trackEvent('experiment', 'activate', 'experiment fab clicked');
 
         if (experiment.canLoad()) {
           this.experimentSupported = true;
@@ -995,9 +1034,11 @@ Main parent container for all of the fab elements.
           }.bind(this), function() {
             this.experimentFailed = true;
             console.log('Experiment failed for some unknown reason');
+            IOWA.Analytics.trackEvent('experiment', 'error', 'failed to load');
           }.bind(this));
         } else {
           this.experimentSupported = false;
+          IOWA.Analytics.trackEvent('experiment', 'unsupported', 'experiment not supported');
         }
       },
 
@@ -1027,6 +1068,8 @@ Main parent container for all of the fab elements.
             IOWA.Elements.Masthead.style.visibility = 'hidden';
             IOWA.Elements.Main.style.visibility = 'hidden';
           });
+          IOWA.Analytics.trackEvent('experiment', 'start', 'experiment started');
+          this.startTime = +(new Date());
           IOWA.Elements.ScrollContainer.addEventListener('scroll', this.boundOnScroll);
 
           this.playmode = 'playing';
@@ -1048,11 +1091,19 @@ Main parent container for all of the fab elements.
 
       },
 
+      onExitClick: function(event) {
+        this.exitExperiment();
+        this.trackExitExperiment();
+      },
+
       exitExperiment: function(event) {
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
         IOWA.Elements.Masthead.style.visibility = '';
         IOWA.Elements.Main.style.visibility = '';
         IOWA.Elements.Footer.style.display = '';
+        if (this.startTime) {
+          IOWA.Analytics.trackEvent('experiment', 'time-total', +(new Date()) - this.startTime);
+        }
 
         var rect = this.getBoundingClientRect();
         var top = rect.top + (rect.height / 2);
@@ -1069,8 +1120,12 @@ Main parent container for all of the fab elements.
         this.pauseOverlay = false;
       },
 
+      trackExitExperiment: function(event) {
+        IOWA.Analytics.trackEvent('experiment', 'close', 'from main x');
+      },
+
       resetExperiment: function(event) {
-        console.log('This should reset the experiment');
+        IOWA.Analytics.trackEvent('experiment', 'refresh', 'experiment reset');
         this.app.reloadData();
       },
 
@@ -1089,6 +1144,7 @@ Main parent container for all of the fab elements.
       onShareClick: function(event) {
         this.shareVisible = true;
         this.showTooltips = false;
+        IOWA.Analytics.trackEvent('experiment', 'share', 'share fab clicked');
       },
 
       onShareCancel: function(event) {
@@ -1097,6 +1153,14 @@ Main parent container for all of the fab elements.
       },
 
       playingFabClick: function(event) {
+        var VIEWPORT_HEIGHT = window.innerHeight;
+        var fabPos = this.getBoundingClientRect();
+        if (fabPos.top > (VIEWPORT_HEIGHT / 2)) {
+          this.direction = 'upwards';
+        } else {
+          this.direction = 'downwards';
+        }
+
         this.playmode = 'paused';
         this.pauseOverlay = true;
         this.miniFabs = true;

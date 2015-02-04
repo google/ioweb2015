@@ -8,12 +8,12 @@
 {% end %}
 
 {% define "content" %}
-  <core-toolbar class="navbar__overlay navbar__overlay--video" fit>
+  <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video"></paper-icon-button>
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
   </core-toolbar>
 
-  <div class="card__container slide-up">
+  <div class="card__container card__container--top slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
         <h3><i18n-msg msgid="io-description">Google I/O is for developers—the creative coders who are building what's next. Together we'll explore the latest in tech, mobile &amp; beyond.</i18n-msg></h3>
@@ -100,7 +100,7 @@
         <div flex class="card__photo card__photo--recap"></div>
         <div class="card-content">
           <img src="images/play-video-button.png" class="play__button play__button--card" title="Play video" alt="Play video">
-          <span class="anchor-like"><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
+          <span class="anchor-like" role="link" tabindex="0"><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
         </div>
       </div>
     </div>
