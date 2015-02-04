@@ -171,8 +171,8 @@
         return;
       }
 
-      var onPageTransitionDone_ = function() {
-        IOWA.Elements.Template.togglePhotoGallery();
+      var onPageTransitionDone_ = function(e) {
+        IOWA.Elements.Template.togglePhotoGallery(e);
       };
 
       page.load = function() {
@@ -195,9 +195,11 @@
       };
 
       IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
-        if (sender.hasAttribute('data-track-link')) {
+        if (sender && sender.hasAttribute('data-track-link')) {
           IOWA.Analytics.trackEvent(
               'link', 'click', sender.getAttribute('data-track-link'));
+        } else {
+          IOWA.Analytics.trackEvent('link', 'click', 'about-photos-deeplink');
         }
 
         if (!IOWA.Elements.Template.photoGalleryActive) {

@@ -311,11 +311,10 @@ IOWA.Router = (function() {
   }
 
   function runPageHandler(funcName, pageName) {
-    var handler = IOWA.Elements.Template.pages[pageName][funcName];
-
-    // If page we're going to has a load handler, run it.
-    if (handler) {
-      handler();
+    var page = IOWA.Elements.Template.pages[pageName];
+    if (page && page[funcName]) {
+      // If page we're going to has a load handler, run it.
+      page[funcName]();
     }
   }
 
