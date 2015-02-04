@@ -25,9 +25,9 @@
         <h3><i18n-msg msgid="about-io">Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</i18n-msg></h3>
       </div>
       <div class="card-content">
-        <a href="#" data-track-link="about-view-photos-card" on-click="{{togglePhotoGallery}}">
+        <span class="anchor-like" role="link" tabindex="0" data-track-link="about-view-photos-card" on-tap="{{togglePhotoGallery}}">
           <i18n-msg msgid="see-photos-2014">See photos from I/O 2014</i18n-msg>
-        </a>
+        </span>
       </div>
     </div>
   </div>
@@ -164,12 +164,26 @@
     }
 
     // Page-specific JS that runs when this page is loaded for the first time.
-    function firstLoadSetup(page) {
+    function initPage() {
+      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+
       if (page.hasBeenLoaded) {
         return;
       }
 
-      page.hasBeenLoaded = true;
+      var onPageTransitionDone_ = function(e) {
+        IOWA.Elements.Template.togglePhotoGallery(e);
+      };
+
+      page.load = function() {
+        if (location.hash.substring(1) == 'photos') {
+          document.addEventListener('page-transition-done', onPageTransitionDone_);
+        }
+      };
+
+      page.unload = function() {
+        document.removeEventListener('page-transition-done', onPageTransitionDone_);
+      };
 
       IOWA.Elements.Template.closePhotoGallery = function(e, detail, sender) {
 
@@ -181,41 +195,45 @@
       };
 
       IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
-        e && e.preventDefault();
+        if (sender && sender.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'link', 'click', sender.getAttribute('data-track-link'));
+        } else {
+          IOWA.Analytics.trackEvent('link', 'click', 'about-photos-deeplink');
+        }
 
-        var template = IOWA.Elements.Template;
-
-        if (!template.photoGalleryActive) {
+        if (!IOWA.Elements.Template.photoGalleryActive) {
           // Smooth to gallery section.
           // var destEl = IOWA.Elements.Main.querySelector('.pics__section');
           // IOWA.Util.smoothScroll(destEl, 400);
 
-          IOWA.Picasa.fetchPhotos(0, function(photos) {
-            template.photoGalleryActive = true;
-
-            var gallery = IOWA.Elements.Main.querySelector('io-gallery');
-            gallery.photos = photos;
-
+          var galleryReady = function() {
+            IOWA.Elements.Template.photoGalleryActive = true;
             runPhotoGalleryAnimation();
-          });
+          };
+
+          var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+          // Use cached photos.
+          if (gallery.photos.length) {
+            galleryReady();
+          } else {
+            IOWA.Picasa.fetchPhotos(0, function(photos) {
+              gallery.photos = photos;
+              galleryReady();
+            });
+          }
 
         } else {
           runPhotoGalleryAnimation(true); // reverse animation when gallery is open.
-          template.photoGalleryActive = false;
+          IOWA.Elements.Template.photoGalleryActive = false;
         }
       };
+
+      page.load(); // Run load callback on page load.
+      page.hasBeenLoaded = true;
     }
 
-    var thisPage = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
-    firstLoadSetup(thisPage);
-
-    if (location.hash.substring(1) == 'photos') {
-      // TODO(ericbidelman): wait until page transition is done before scrolling to element.
-      // For now, arbitrary delay.
-      setTimeout(function() {
-        IOWA.Elements.Template.togglePhotoGallery();
-      }, 100);
-    }
+    initPage();
 
   })();
   </script>

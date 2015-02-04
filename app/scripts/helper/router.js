@@ -32,6 +32,13 @@ IOWA.Router = (function() {
   var currentPageTransition = null;
 
   /**
+   * True if the URL update was due to a user click. Used to differentiate a
+   * popstate event from a link click and a history pop.
+   * @type {boolean}
+   */
+  var navigationFromLinkClick = false;
+
+  /**
    * Navigates to a new page via a hero card takeover transition.
    * @param {Event} e Event that triggered navigation.
    * @param {Element} el Element clicked.
@@ -58,7 +65,7 @@ IOWA.Router = (function() {
   }
 
   /**
-   * Navigates to a new page via a hero card takeover transition.
+   * Navigates to a new page via a masthead nav item ripple transition.
    * @param {Event} e Event that triggered navigation.
    * @param {Element} el Element clicked.
    * @param {string} mastheadColor Color of the masthead.
@@ -146,6 +153,8 @@ IOWA.Router = (function() {
       return;
     }
 
+    navigationFromLinkClick = true;
+
     // Inject page if <a> has the data-ajax-link attribute.
     for (var i = 0; i < e.path.length; ++i) {
       var el = e.path[i];
@@ -168,6 +177,7 @@ IOWA.Router = (function() {
 
         // Do ajax page navigation if link requests it.
         if (el.hasAttribute('data-ajax-link')) {
+          runPageHandler('unload', currentPage);
           handleAjaxLink(e, el);
         } else {
           currentPageTransition = 'no-transition';
@@ -315,6 +325,9 @@ IOWA.Router = (function() {
    * @private
    */
   function injectPageContent(pageName, importContent) {
+
+    runPageHandler('load', pageName);
+
     // Add freshly fetched templates to DOM, if not yet present.
     var newTemplates = importContent.querySelectorAll('.js-ajax-template');
     for (var i = 0; i < newTemplates.length; i++) {
@@ -326,6 +339,14 @@ IOWA.Router = (function() {
     animatePageIn(pageName);
   }
 
+  function runPageHandler(funcName, pageName) {
+    var page = IOWA.Elements.Template.pages[pageName];
+    if (page && page[funcName]) {
+      // If page we're going to has a load handler, run it.
+      page[funcName]();
+    }
+  }
+
   /**
    * Initialized ajax-based routing on the page.
    */
@@ -333,6 +354,15 @@ IOWA.Router = (function() {
     window.addEventListener('popstate', function(e) {
       var currentPage = IOWA.Elements.Template.selectedPage;
       var nextPage = parsePageNameFromAbsolutePath(window.location.pathname);
+
+      // Note: popstate is fired when history.pushState() is called so we need
+      // to determine if the event was organic (browser back/forward button).
+      // If it was, currentPage has not been updated yet and is the previous page.
+      if (!navigationFromLinkClick) {
+        runPageHandler('unload', currentPage);
+      }
+
+      navigationFromLinkClick = false; // Reset
 
       // Ignore the navigation if it was a hash update, but on the same page.
       if (e.state && e.state.fromHashChange && nextPage === currentPage) {

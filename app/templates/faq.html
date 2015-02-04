@@ -184,12 +184,12 @@
   (function() {
 
     // Page-specific JS that runs when this page is loaded for the first time.
-    function firstLoadSetup(page) {
+    function initPage() {
+      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+
       if (page.hasBeenLoaded) {
         return;
       }
-
-      page.hasBeenLoaded = true;
 
       IOWA.Elements.Template.scrollToFaq = function(e, detail, sender) {
         e.preventDefault();
@@ -199,10 +199,11 @@
           IOWA.Util.smoothScroll(dest, 400);
         }
       };
+
+      page.hasBeenLoaded = true;
     }
 
-    var thisPage = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
-    firstLoadSetup(thisPage);
+    initPage();
 
   })();
   </script>
