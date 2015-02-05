@@ -144,6 +144,10 @@ h6 {
     color: inherit;
   }
 
+  h1 {
+    color: #fff;
+  }
+
   a {
     color: $color-cyan-A400;
   }
@@ -173,6 +177,16 @@ h6 {
   @include keyline-16();
   padding-top: $desktopKeyline;
   padding-bottom: $desktopKeyline;
+}
+
+.page__section--copy {
+  padding: 0 0 $mobileKeyline 0 !important;
+
+  a {
+    font-size: inherit !important;
+    font-weight: 400 !important;
+    text-transform: none !important;
+  }
 }
 
 .io__hash {
@@ -299,6 +313,9 @@ h6 {
     @include keyline-32();
     padding-top: $desktopKeyline;
     padding-bottom: $desktopKeyline;
+  }
+  .page__section--copy {
+    padding-bottom: $desktopKeyline !important;
   }
   .page__section--attend {
     padding-top: 100px;
