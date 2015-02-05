@@ -99,10 +99,17 @@ and look for `project = ...` line.
 
 The version also determines the app environment: dev, stage or prod.
 It is matched against "-stage" and "-prod" suffixes. Defaults to dev if none matched.
+
 For instance, to deploy a production version:
 
   ```
   gcloud preview app deploy dist/backend --version v1-prod
+  ```
+
+To deploy to production using the whitelist, use "-stage":
+
+  ```
+  gcloud preview app deploy dist/backend --version v1-stage
   ```
 
 ## Backend
