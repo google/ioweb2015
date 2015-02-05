@@ -198,6 +198,9 @@ module.exports = (function() {
             data.global.y - (myHeight / 2)
         );
       };
+
+      document.addEventListener('keydown', onArpKeyDown);
+      document.addEventListener('keyup', onArpKeyUp);
     }
 
     /**
@@ -212,6 +215,34 @@ module.exports = (function() {
       circleGraphic.mousemove = circleGraphic.touchmove = null;
       circleGraphic.mouseover = null;
       circleGraphic.mouseout = null;
+
+      document.removeEventListener('keydown', onArpKeyUp);
+      document.removeEventListener('keyup', onArpKeyUp);
+    }
+
+    const NUMBER_KEY_RANGE = [49, 52];
+
+    /**
+     * Keydown handler for arpeggiators.
+     * @param {event} evt - The keyup event.
+     */
+    function onArpKeyDown(evt) {
+      if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
+        var keyPos = (evt.keyCode) - NUMBER_KEY_RANGE[0];
+        var [newX, newY] = positionForQuadrant(keyPos);
+        updateCursor(newX, newY);
+        isDragging = true;
+      }
+    }
+
+    /**
+     * Keyup handler for arpeggiators.
+     * @param {event} evt - The keyup event.
+     */
+    function onArpKeyUp(evt) {
+      if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
+        isDragging = false;
+      }
     }
 
     /**
