@@ -53,7 +53,7 @@ func socialEntries(c context.Context, refresh bool) ([]*socEntry, error) {
 			Kind:   "tweet",
 			URL:    fmt.Sprintf(tweetURL, config.TwitterAccount, t.Id),
 			Text:   t.Text,
-			Author: t.User.ScreenName,
+			Author: "@" + t.User.ScreenName,
 			When:   time.Time(t.CreatedAt),
 		}
 		entries = append(entries, e)
