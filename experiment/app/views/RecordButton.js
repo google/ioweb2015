@@ -123,6 +123,8 @@ module.exports = (function() {
     var animationTextures = makeRecordSprite();
 
     var currentFrame = 0;
+    renderer.updateTexture(animationTextures[0].baseTexture);
+
     var arcCircle = new PIXI.Sprite(animationTextures[currentFrame]);
 
     arcCircle.position.x = 0.15 * arcCircle.width / 2;
