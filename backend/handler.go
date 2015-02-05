@@ -104,6 +104,41 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// serveSocial responds with 10 most recent tweets.
+// See socEntry struct for fields format.
+func serveSocial(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	_, refresh := r.Form["refresh"]
+
+	c := newContext(r, w)
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+
+	// respond with stubbed JSON entries in dev mode
+	if env(c) == "dev" {
+		f := filepath.Join(rootDir, "temporary_api", "social_feed.json")
+		http.ServeFile(w, r, f)
+		return
+	}
+
+	entries, err := socialEntries(c, refresh)
+	if err != nil {
+		log.Printf("socialEntries: %v", err)
+		writeJSONError(w, err)
+		return
+	}
+
+	body, err := json.Marshal(entries)
+	if err != nil {
+		log.Printf("json.Marshal: %v", err)
+		writeJSONError(w, err)
+		return
+	}
+
+	if _, err := w.Write(body); err != nil {
+		log.Printf("w.Write: %v", err)
+	}
+}
+
 // writeJSONError sets response code to 500 and writes an error message to w.
 func writeJSONError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
