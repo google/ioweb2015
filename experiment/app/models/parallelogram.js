@@ -62,15 +62,15 @@ module.exports = (function() {
       'recorded': [
         {
           'beat': 62,
-          'sound': 23,
+          'sound': audioManager.getSound('parallelogram_D-sharp-major').guid,
           'duration': 5.1,
-          'pid': audioManager.getSound('parallelogram_D-sharp-major').guid
+          'pid': 0
         },
         {
           'beat': 30,
-          'sound': 25,
+          'sound': audioManager.getSound('parallelogram_G-sharp-major').guid,
           'duration': 5.6,
-          'pid': audioManager.getSound('parallelogram_G-sharp-major').guid
+          'pid': 2
         }
       ]
     };
