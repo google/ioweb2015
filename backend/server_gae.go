@@ -8,14 +8,18 @@ package main
 import (
 	"bufio"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/jwt"
 
 	"appengine"
+	"appengine-go/src/appengine/urlfetch"
 	"appengine/user"
 )
 
@@ -31,11 +35,13 @@ var (
 
 func init() {
 	cache = &gaeMemcache{}
+	initConfig()
 	initWhitelist()
 
 	wrapHandler = checkWhitelist
 	handle("/", serveTemplate)
 	handle("/api/extended", serveIOExtEntries)
+	handle("/api/social", serveSocial)
 	// setup root redirect if we're prefixed
 	if httpPrefix != "/" {
 		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
@@ -75,6 +81,11 @@ func isWhitelisted(email string) bool {
 func checkWhitelist(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ac := appengine.NewContext(r)
+		if appengineEnv(ac) == "prod" {
+			h.ServeHTTP(w, r)
+			return
+		}
+
 		u := user.Current(ac)
 		if u == nil {
 			url, err := user.LoginURL(ac, r.URL.Path)
@@ -91,29 +102,34 @@ func checkWhitelist(h http.Handler) http.Handler {
 			http.Error(w, "Access denied, sorry. Try with a different account.", http.StatusForbidden)
 			return
 		}
+
 		h.ServeHTTP(w, r)
 	})
+}
+
+// appengineEnv returns environment string
+// which the backend is currently running in.
+func appengineEnv(ac appengine.Context) string {
+	v := appengine.VersionID(ac)
+	if i := strings.Index(v, "."); i > 0 {
+		v = v[:i]
+	}
+	switch {
+	default:
+		return "dev"
+	case strings.HasSuffix(v, "-stage"):
+		return "stage"
+	case strings.HasSuffix(v, "-prod"):
+		return "prod"
+	}
 }
 
 // newContext returns a newly created context of the in-flight request r.
 // and its response writer w.
 func newContext(r *http.Request, w io.Writer) context.Context {
 	ac := appengine.NewContext(r)
-	v := appengine.VersionID(ac)
-	if i := strings.Index(v, "."); i > 0 {
-		v = v[:i]
-	}
-	var appEnv string
-	switch {
-	default:
-		appEnv = "dev"
-	case strings.HasSuffix(v, "-prod"):
-		appEnv = "prod"
-	case strings.HasSuffix(v, "-stage"):
-		appEnv = "stage"
-	}
-	c := context.WithValue(context.Background(), ctxKeyEnv, appEnv)
-	c = context.WithValue(c, ctxKeyGAEContext, ac)
+	c := context.WithValue(context.Background(), ctxKeyGAEContext, ac)
+	c = context.WithValue(c, ctxKeyEnv, appengineEnv(ac))
 	return context.WithValue(c, ctxKeyWriter, w)
 }
 
@@ -125,4 +141,27 @@ func appengineContext(c context.Context) appengine.Context {
 		panic("never reached: no appengine.Context found")
 	}
 	return ac
+}
+
+// serviceCredentials returns a token source for the service account serviceAccountEmail.
+func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource, error) {
+	keypath := filepath.Join(rootDir, "..", "service-account.pem")
+	key, err := ioutil.ReadFile(keypath)
+	if err != nil {
+		return nil, err
+	}
+
+	cred := &jwt.Config{
+		Email:      serviceAccountEmail,
+		PrivateKey: key,
+		Scopes:     scopes,
+		TokenURL:   googleTokenURL,
+	}
+	return cred.TokenSource(appengineContext(c)), nil
+}
+
+// httpTransport returns a suitable HTTP transport for current backend hosting environment.
+// In this GAE-hosted version it uses appengine/urlfetch#Transport.
+func httpTransport(c context.Context) http.RoundTripper {
+	return &urlfetch.Transport{Context: appengineContext(c)}
 }

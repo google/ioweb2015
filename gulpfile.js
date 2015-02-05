@@ -19,6 +19,7 @@ var reload = browserSync.reload;
 var opn = require('opn');
 var merge = require('merge-stream');
 var glob = require('glob');
+var Promise = require('es6-promise').Promise;
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -75,6 +76,29 @@ gulp.task('vulcanize-elements', ['sass'], function() {
     //   strict: !!argv.strict,
     //   path: '_messages',
     // }))
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
+});
+
+// vulcanize extended form elements separately.
+gulp.task('vulcanize-extended-elements', ['sass'], function() {
+  return gulp.src([
+      APP_DIR + '/elements/io-extended-form.html'
+    ])
+    .pipe($.vulcanize({
+      strip: !argv.pretty,
+      csp: true,
+      inline: true,
+      dest: APP_DIR + '/elements',
+      excludes: {
+        imports: [ // These are registered in the main site vulcanized bundle.
+          'polymer.html$',
+          'core-icon.html$',
+          'core-iconset-svg.html$',
+          'core-shared-lib.html$',
+          'paper-button.html$'
+        ]
+      }
+    }))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
 });
 
@@ -274,7 +298,7 @@ gulp.task('serve:dist', ['default'], function(callback) {
   startGaeBackend(backendDir, appEnv, false, callback);
 });
 
-gulp.task('vulcanize', ['vulcanize-elements']);
+gulp.task('vulcanize', ['vulcanize-elements', 'vulcanize-extended-elements']);
 
 gulp.task('js', ['jshint', 'jscs']);
 
@@ -329,10 +353,28 @@ gulp.task('godeps', function() {
   spawn('go', ['get', '-d', './' + BACKEND_DIR + '/...'], {stdio: 'inherit'});
 });
 
-gulp.task('decrypt', function() {
-  var key = BACKEND_DIR + '/service-account.pem';
-  var args = ['aes-256-cbc', '-d', '-in', key + '.enc', '-out', key];
-  spawn('openssl', args, {stdio: 'inherit'});
+// decrypt service account key and server config.
+// use --pass cmd line arg to provide a pass phrase.
+gulp.task('decrypt', function(done) {
+  var files = [
+    BACKEND_DIR + '/service-account.pem',
+    BACKEND_DIR + '/config.yaml'
+  ];
+  var promises = files.map(function(f) {
+    return new Promise(function(resolve, reject) {
+      var args = ['aes-256-cbc', '-d', '-pass', 'pass:' + argv.pass, '-in', f + '.enc', '-out', f];
+      spawn('openssl', args, {stdio: 'inherit'}).on('close', function(code) {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(code);
+        }
+      });
+    });
+  });
+  Promise.all(promises).then(done.bind(null, null), function(code) {
+    done('Some commands exited with code: ' + code);
+  });
 });
 
 gulp.task('setup', function(cb) {
@@ -383,7 +425,7 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
   };
 
   var serverAddr = 'localhost:' + (watchFiles ? '8080' : '3000');
-  var args = ['preview', 'app', 'run', backendDir, '--host', serverAddr];
+  var args = ['preview', 'app', 'run', backendDir + "/app.yaml", '--host', serverAddr];
 
   var backend = spawn('gcloud', args, {stdio: 'inherit'});
   if (!watchFiles) {
