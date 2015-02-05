@@ -32,7 +32,7 @@ Main fab for entering/exit the experiment.
 @blurb Main fab for entering/exit the experiment.
 @extends paper-fab
 -->
-<polymer-element name="experiment-fab" extends="paper-fab">
+<polymer-element name="experiment-fab" extends="paper-fab" attributes="mode">
   <template>
     <style>
       :host {
@@ -42,9 +42,9 @@ Main fab for entering/exit the experiment.
         display: block;
         position: absolute;
         z-index: 2;
-        -webkit-transition: -webkit-transform 300ms ease-in-out;
+        -webkit-transition: all 300ms ease-in-out;
         -webkit-transform: scale(1,1);
-        transition: transform 300ms ease-in-out;
+        transition: all 300ms ease-in-out;
         transform: scale(1,1);
       }
 
@@ -115,6 +115,14 @@ Main fab for entering/exit the experiment.
         recording: {
           value: false,
           reflect: true
+        }
+      },
+      modeChanged: function() {
+        if (this.mode === 'active') {
+          console.log('going into active mode');
+        }
+        if (this.mode === 'pre') {
+          console.log('going into pre mode');
         }
       }
     });
@@ -951,7 +959,7 @@ Main parent container for all of the fab elements.
     <template if="{{mode == 'pre'}}">
 
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
-      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment" onstate?="{{dialogVisible}}"></experiment-fab>
+      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment" onstate?="{{dialogVisible}}" mode="{{mode}}"></experiment-fab>
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
@@ -963,12 +971,12 @@ Main parent container for all of the fab elements.
 
       <template if="{{playmode == 'playing'}}">
         <core-tooltip label="Pause / Options" class="experiment-options-tooltip" position="left" noarrow="true" large>
-          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.pauseExpImg}}" on-tap="{{playingFabClick}}" playing></experiment-fab>
+          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.pauseExpImg}}" on-tap="{{playingFabClick}}" playing mode="{{mode}}"></experiment-fab>
         </core-tooltip>
       </template>
       <template if="{{playmode == 'paused'}}">
         <core-tooltip label="Resume playing" class="experiment-options-tooltip" position="left" noarrow="true" show large>
-          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.playExpImg}}" on-tap="{{pausedFabClick}}" paused></experiment-fab>
+          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.playExpImg}}" on-tap="{{pausedFabClick}}" paused mode="{{mode}}"></experiment-fab>
         </core-tooltip>
       </template>
 
