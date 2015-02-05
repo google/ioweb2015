@@ -186,10 +186,17 @@ module.exports = function RootView(audioManager, stateManager) {
 
     disableScrolling();
 
+    for (let i = 0; i < instrumentViews.length; i++) {
+      instrumentViews[i].noClick();
+    }
+
     return maskManager.animateIn(x, y).then(function() {
       isPaused = false;
       enableScrolling();
       logoElement.classList.remove('hidden');
+      for (let i = 0; i < instrumentViews.length; i++) {
+        instrumentViews[i].allowClick();
+      }
     });
   }
 

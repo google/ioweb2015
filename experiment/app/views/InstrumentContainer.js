@@ -121,6 +121,8 @@ module.exports = (function() {
       contractView,
       ignoreInteraction,
       followInteraction,
+      noClick,
+      allowClick,
       onActivate,
       onBack,
       cleanUp,
@@ -703,6 +705,20 @@ module.exports = (function() {
       wrapperElement.style.width = elemRect.width + 'px';
       wrapperElement.style.height = elemRect.height + 'px';
       setPos(elemRect.left, elemRect.top);
+    }
+
+    /**
+     * Add pointer-events: none to the instrument wrapper element.
+     */
+    function noClick() {
+      wrapperElement.style.pointerEvents = 'none';
+    }
+
+    /**
+     * Allow pointer-events on the instrument wrapper element.
+     */
+    function allowClick() {
+      wrapperElement.style.pointerEvents = '';
     }
 
     /**
