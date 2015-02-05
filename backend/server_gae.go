@@ -8,14 +8,18 @@ package main
 import (
 	"bufio"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/jwt"
 
 	"appengine"
+	"appengine-go/src/appengine/urlfetch"
 	"appengine/user"
 )
 
@@ -31,11 +35,13 @@ var (
 
 func init() {
 	cache = &gaeMemcache{}
+	initConfig()
 	initWhitelist()
 
 	wrapHandler = checkWhitelist
 	handle("/", serveTemplate)
 	handle("/api/extended", serveIOExtEntries)
+	handle("/api/social", serveSocial)
 	// setup root redirect if we're prefixed
 	if httpPrefix != "/" {
 		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
@@ -125,4 +131,27 @@ func appengineContext(c context.Context) appengine.Context {
 		panic("never reached: no appengine.Context found")
 	}
 	return ac
+}
+
+// serviceCredentials returns a token source for the service account serviceAccountEmail.
+func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource, error) {
+	keypath := filepath.Join(rootDir, "..", "service-account.pem")
+	key, err := ioutil.ReadFile(keypath)
+	if err != nil {
+		return nil, err
+	}
+
+	cred := &jwt.Config{
+		Email:      serviceAccountEmail,
+		PrivateKey: key,
+		Scopes:     scopes,
+		TokenURL:   googleTokenURL,
+	}
+	return cred.TokenSource(appengineContext(c)), nil
+}
+
+// httpTransport returns a suitable HTTP transport for current backend hosting environment.
+// In this GAE-hosted version it uses appengine/urlfetch#Transport.
+func httpTransport(c context.Context) http.RoundTripper {
+	return &urlfetch.Transport{Context: appengineContext(c)}
 }

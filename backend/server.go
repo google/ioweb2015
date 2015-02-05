@@ -8,6 +8,7 @@ package main
 import (
 	"flag"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +16,8 @@ import (
 	"path/filepath"
 
 	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/jwt"
 )
 
 var (
@@ -48,22 +51,18 @@ func main() {
 		httpPrefix = "/" + httpPrefix
 	}
 
+	initConfig()
 	cache = newMemoryCache()
+
 	handle("/", catchAllHandler)
 	handle("/api/extended", serveIOExtEntries)
+	handle("/api/social", serveSocial)
 	// setup root redirect if we're prefixed
 	if httpPrefix != "/" {
 		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
 	}
 
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
-}
-
-// newContext returns a newly created context of the in-flight request r
-// and its response writer w.
-func newContext(r *http.Request, w io.Writer) context.Context {
-	c := context.WithValue(context.Background(), ctxKeyEnv, appEnv)
-	return context.WithValue(c, ctxKeyWriter, w)
 }
 
 // catchAllHandler serves either static content from rootDir
@@ -90,4 +89,34 @@ func logHandler(h http.Handler) http.Handler {
 		log.Printf("%s %s", r.Method, r.URL.Path)
 		h.ServeHTTP(w, r)
 	})
+}
+
+// newContext returns a newly created context of the in-flight request r
+// and its response writer w.
+func newContext(r *http.Request, w io.Writer) context.Context {
+	c := context.WithValue(context.Background(), ctxKeyEnv, appEnv)
+	return context.WithValue(c, ctxKeyWriter, w)
+}
+
+// serviceCredentials returns a token source for the service account serviceAccountEmail.
+func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource, error) {
+	keypath := filepath.Join(rootDir, "..", "service-account.pem")
+	key, err := ioutil.ReadFile(keypath)
+	if err != nil {
+		return nil, err
+	}
+
+	cred := &jwt.Config{
+		Email:      serviceAccountEmail,
+		PrivateKey: key,
+		Scopes:     scopes,
+		TokenURL:   googleTokenURL,
+	}
+	return cred.TokenSource(oauth2.NoContext), nil
+}
+
+// httpTransport returns a suitable HTTP transport for current backend hosting environment.
+// In this standalone version it simply returns http.DefaultTransport.
+func httpTransport(c context.Context) http.RoundTripper {
+	return http.DefaultTransport
 }

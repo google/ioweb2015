@@ -19,6 +19,7 @@ var reload = browserSync.reload;
 var opn = require('opn');
 var merge = require('merge-stream');
 var glob = require('glob');
+var Promise = require('es6-promise').Promise;
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -352,10 +353,28 @@ gulp.task('godeps', function() {
   spawn('go', ['get', '-d', './' + BACKEND_DIR + '/...'], {stdio: 'inherit'});
 });
 
-gulp.task('decrypt', function() {
-  var key = BACKEND_DIR + '/service-account.pem';
-  var args = ['aes-256-cbc', '-d', '-in', key + '.enc', '-out', key];
-  spawn('openssl', args, {stdio: 'inherit'});
+// decrypt service account key and server config.
+// use --pass cmd line arg to provide a pass phrase.
+gulp.task('decrypt', function(done) {
+  var files = [
+    BACKEND_DIR + '/service-account.pem',
+    BACKEND_DIR + '/config.yaml'
+  ];
+  var promises = files.map(function(f) {
+    return new Promise(function(resolve, reject) {
+      var args = ['aes-256-cbc', '-d', '-pass', 'pass:' + argv.pass, '-in', f + '.enc', '-out', f];
+      spawn('openssl', args, {stdio: 'inherit'}).on('close', function(code) {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(code);
+        }
+      });
+    });
+  });
+  Promise.all(promises).then(done.bind(null, null), function(code) {
+    done('Some commands exited with code: ' + code);
+  });
 });
 
 gulp.task('setup', function(cb) {
@@ -406,7 +425,7 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
   };
 
   var serverAddr = 'localhost:' + (watchFiles ? '8080' : '3000');
-  var args = ['preview', 'app', 'run', backendDir, '--host', serverAddr];
+  var args = ['preview', 'app', 'run', backendDir + "/app.yaml", '--host', serverAddr];
 
   var backend = spawn('gcloud', args, {stdio: 'inherit'});
   if (!watchFiles) {
