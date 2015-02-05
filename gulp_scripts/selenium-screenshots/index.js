@@ -26,7 +26,8 @@ function seleniumInstall() {
       } else {
         require('selenium-standalone').install({
           logger: util.log
-        }, resolve);
+        }, reject('The selenium-standalone driver was just installed. ' +
+                  'Please re-run this command so that it\'s picked up in your path.'));
       }
     });
   });
@@ -184,8 +185,7 @@ module.exports = function(branchOrCommit, serverRoot, url, pages, widths, height
 
   var chromeWebDriver = require('selenium-webdriver/chrome');
   var chromeDriverBinary = glob.sync('node_modules/selenium-standalone/.selenium/chromedriver/*chromedriver*')[0];
-  var driverService = new chromeWebDriver.ServiceBuilder(chromeDriverBinary).build();
-  var driver = new chromeWebDriver.Driver(null, driverService);
+  var driver;
 
   var parsedUrl = new URL(url);
   // Return a no-op promise that will be run if an exception is thrown before the server
@@ -193,19 +193,25 @@ module.exports = function(branchOrCommit, serverRoot, url, pages, widths, height
   var restorePromise = function() { return Promise.resolve() };
   var stopServerPromise = function() { return Promise.resolve() };
   var cleanup = function(error) {
-    if (error) {
-      util.log('Error:', error);
-    }
     return stopServerPromise()
       .then(restorePromise)
-      .then(function() {
-        driver.quit();
-        callback(error);
-      });
+      .then(
+        function() {
+          if (driver) {
+            driver.quit();
+          }
+          callback(error);
+        },
+        callback.bind(null, error)
+      );
   };
 
   seleniumInstall()
-    .then(git.bind(null, ['rev-parse', '--abbrev-ref', 'HEAD']))
+    .then(function() {
+      var driverService = new chromeWebDriver.ServiceBuilder(chromeDriverBinary).build();
+      driver = new chromeWebDriver.Driver(null, driverService);
+      return git(['rev-parse', '--abbrev-ref', 'HEAD']);
+    })
     .then(function(currentBranch) {
       // Set up a function which returns a promise which restores the current state.
       restorePromise = function() {
@@ -220,7 +226,9 @@ module.exports = function(branchOrCommit, serverRoot, url, pages, widths, height
       // Set up a function which returns a promise that stops the active server.
       stopServerPromise = stopServer.bind(null, server);
     })
-    .then(takeScreenshots.bind(null, driver, branchOrCommit, url, pages, widths, height))
+    .then(function() {
+      return takeScreenshots(driver, branchOrCommit, url, pages, widths, height);
+    })
     .then(function() {
       // Restore the git state then set restorePromise back to a function returning a no-op promise,
       // since it is run as part of the cleanup().
@@ -228,7 +236,9 @@ module.exports = function(branchOrCommit, serverRoot, url, pages, widths, height
         restorePromise = function() { return Promise.resolve() };
       });
     })
-    .then(takeScreenshots.bind(null, driver, 'current', url, pages, widths, height))
+    .then(function() {
+      return takeScreenshots(driver, 'current', url, pages, widths, height);
+    })
     .then(compareScreenshots)
     // Run cleanup regardless of whether there was an exception or not.
     .then(cleanup, cleanup);
