@@ -1039,6 +1039,7 @@ Main parent container for all of the fab elements.
       attached: function() {
         this.boundOnScroll = this.onScroll.bind(this);
         this.scrollFabPos = this.getBoundingClientRect();
+        this.viewport = document.querySelector('meta[name=viewport]');
       },
 
       onFabClick: function(event) {
@@ -1111,6 +1112,8 @@ Main parent container for all of the fab elements.
           this.playmode = 'playing';
           this.mode = 'active';
 
+          this.viewport.setAttribute('content', 'width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1, user-scalable=0');
+
         }, null, 300);
 
         this.app.didEnterRecordingMode(function() {
@@ -1154,6 +1157,8 @@ Main parent container for all of the fab elements.
         this.miniFabs = false;
         this.showTooltips = false;
         this.pauseOverlay = false;
+
+        this.viewport.setAttribute('content', 'width=device-width, minimum-scale=1.0, initial-scale=1');
       },
 
       trackExitExperiment: function(event) {
