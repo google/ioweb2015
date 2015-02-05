@@ -17,6 +17,7 @@ limitations under the License.
 Displays information about a social post, and linkifies certain URLs in the text.
 
     <social-post kind="tweet"
+                 author="googledevs"
                  url="https://twitter.com/googledevs/status/560575018925436931"
                  text="Today on #Polycasts with @rob_dodson... http://t.co/0z0gUsWB2G"
                  when="2015-01-28T23:07:54Z"
@@ -24,11 +25,11 @@ Displays information about a social post, and linkifies certain URLs in the text
 
 @element social-post
 -->
-<polymer-element name="social-post" attributes="kind url text when">
+<polymer-element name="social-post" attributes="kind author url text when">
   <template>
     <header>
       <a href="{{profileUrl}}" target="_blank">
-        <template if="{{kind == 'tweet'}}">@</template>{{displayName}}
+        <template if="{{kind == 'tweet'}}">@</template>{{author}}
       </a>
       <div>
         <a href="{{url}}" target="_blank">{{timeAgo}}</a>
@@ -47,6 +48,15 @@ Displays information about a social post, and linkifies certain URLs in the text
        * @default tweet
        */
       kind: 'tweet',
+
+      /**
+       * The username associated with the social post.
+       *
+       * @attribute author
+       * @type string
+       * @default ''
+       */
+      author: '',
 
       /**
        * The URL pointing back to the post hosted on the social network.
@@ -80,11 +90,9 @@ Displays information about a social post, and linkifies certain URLs in the text
     // All URLs shared via Twitter are shortened to the form http(s)://t.co/...
     twitterUrlRegex: /(https?:\/\/t\.co\/\w+)/,
 
-    urlChanged: function() {
+    authorChanged: function() {
       if (this.kind == 'tweet') {
-        // 'https://twitter.com/googledevs/status/534439091081723904'.split('/')[3] -> 'googledevs'
-        this.displayName = this.url.split('/')[3] || 'googledevs';
-        this.profileUrl = 'https://twitter.com/' + this.displayName;
+        this.profileUrl = 'https://twitter.com/' + this.author;
       }
     },
 

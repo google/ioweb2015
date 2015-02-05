@@ -145,6 +145,7 @@
         <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
           <template repeat="{{socialPost in socialPosts}}">
             <social-post kind="{{socialPost.kind}}"
+                         author="{{socialPost.author}}"
                          url="{{socialPost.url}}"
                          text="{{socialPost.text}}"
                          when="{{socialPost.when}}">

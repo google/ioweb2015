@@ -1,162 +1,189 @@
 [
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/560575018925436931",
     "text":"Today on #Polycasts <with> @rob_dodson, con\nnect your UI to data...\nautomagically! https://t.co/0z0gUsWB2G",
     "when":"2015-02-04T20:07:54Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/540602593253142528",
     "text":"<script>Check out the new episode of #HTTP203, where @aerotwist & @jaffathecake talk about the horrors of font downloading. http://example.com",
     "when":"2015-01-17T20:24:36Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/556142415455608833",
     "text":"We're hiring Developer Platform software engineers! Learn more http://t.co/HFamdj1ILV #GoogleDevelopers #AndroidDev",
     "when":"2015-01-16T17:34:19Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/554691094500233216",
     "text":"Check out the latest #HTTP203, where @aerotwist tells @jaffathecake about a few gotchas of building for the web! http://t.co/0drXRzjFhd",
     "when":"2015-01-12T17:27:17Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/547823240094425090",
     "text":"Check out the survey from last week’s ep of #Polycasts tell us what you’d like to see in season 2 Happy holidays! http://t.co/VUYe10gr0F",
     "when":"2014-12-24T18:36:53Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/545654359065763840",
     "text":"Ho ho ho! It’s a festive #HTTP203 roundup of 2014 with @aerotwist and @jaffathecake: https://t.co/IWlukiHUNy",
     "when":"2014-12-18T18:58:31Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/543539055875469312",
     "text":"Looks like @ToddKerpelman is working on videos for iOS devs. It's okay. You can watch on Nexus 6 #route85 #iOSdev https://t.co/VAj1fzmvgP",
     "when":"2014-12-12T22:53:04Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/543134779529375744",
     "text":"How I vid: Get my startup/app media attention by writing press releases http://t.co/Pjy4QenSMn",
     "when":"2014-12-11T20:06:37Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/540602593253142528",
     "text":"Check out the new episode of #HTTP203, where @aerotwist \u0026amp; @jaffathecake talk about the horrors of font downloading: http://t.co/Ex16RUTMkf",
     "when":"2014-12-04T20:24:36Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/539509571782311936",
     "text":"3, 2, 1 Code-in: Inviting teens to contribute to open source: http://t.co/8zmMDNTjPt",
     "when":"2014-12-01T20:01:20Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/539484280569622529",
     "text":"Get a heads up on what's new in the current release of @polymer v0.5.1 on this week's #Polycasts with @rob_dodson http://t.co/3ejD6zTvPQ",
     "when":"2014-12-01T18:20:50Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/537848904759652352",
     "text":"Catch interviews with Googlers from Devoxx 2014 covering material design, Android, Polymer, BigQuery + more http://t.co/PGGwBqNn9m",
     "when":"2014-11-27T06:02:26Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/535500939486953472",
     "text":"Check out a recent #GameOn #DevByte from @duhroach on the challenge of OpenGL Context Loss and how to fix it. http://t.co/owU5s4gxbX",
     "when":"2014-11-20T18:32:27Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/535116296287825920",
     "text":"Darin Fisher, VP Engineering of Chrome is now live at Chrome Dev Summit keynote https://t.co/rskw0W8L9L #ChromeDevSummit",
     "when":"2014-11-19T17:04:01Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/534781746256936960",
     "text":"Check out the new episode of HTTP 203, where @aerotwist \u0026amp; @jaffathecake talk about rendering performance on the web: https://t.co/HuuE11nb8D",
     "when":"2014-11-18T18:54:38Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/534439091081723904",
     "text":"Can't get enough of @polymer? Find an Polymer Polytechnic event near you in the month of November http://t.co/uFaUT5Nr21",
     "when":"2014-11-17T20:13:03Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/533335235195568128",
     "text":"Bring a whole new style of multi-screen social gaming experiences to the living room with #GoogleCast http://t.co/KTwkxU2Mg8",
     "when":"2014-11-14T19:06:43Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/530861015345668096",
     "text":"Watch all of the announcements \u0026amp; sessions from #GCPLive at https://t.co/G5poruhqq4",
     "when":"2014-11-07T23:15:03Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/530480210945523713",
     "text":"Local language captions now available for many @polymer videos. Look for subtitles/CC icon in bottom right of videos. http://t.co/Kz52shAcLT",
     "when":"2014-11-06T22:01:52Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/529703614348939264",
     "text":"Drive app engagement from @Google Search results: https://t.co/C4MuFsIMu5. Try the codelab: http://t.co/HTeSwvCCGm! #appindexing",
     "when":"2014-11-04T18:35:57Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/529406611257704448",
     "text":"Learn from Google \u0026amp; other industry peers as we share our knowledge on app development at this year’s #websummit http://t.co/9rFfJj1JjO",
     "when":"2014-11-03T22:55:46Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/527880215884623872",
     "text":"4 new episodes of Game On! now live, covering WebP, OpenGL Context Loss, Google Tag Manager, CRABBY #GameOn @duhroach http://t.co/N8IZZwKudj",
     "when":"2014-10-30T17:50:25Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/525316572462583808",
     "text":"Recap of the 2014 Google Cloud Platform Roadshows: http://t.co/Qzy07ck1Ik",
     "when":"2014-10-23T16:03:25Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/524290905302249475",
     "text":"Check out today's #Polycasts with @rob_dodson and lay the foundation for your next app using core-toolbar http://t.co/CG6LQtCjbV",
     "when":"2014-10-20T20:07:47Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/522144658726481920",
     "text":"Still time left to complete the Google developer survey. Help improve products, programs \u0026amp; raise money for edu orgs http://t.co/I1DBdc9ht0",
     "when":"2014-10-14T21:59:22Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/520287466117292032",
     "text":"Watch the second episode of HTTP: 203 a new show from @aerotwist and @jaffathecake on Web Development\n\nhttp://t.co/ZSToNeeqqM",
     "when":"2014-10-09T18:59:33Z"
   },
   {
     "kind":"tweet",
+    "author":"googledevs",
     "url":"https://twitter.com/googledevs/status/517733510711242753",
     "text":"Watch HTTP: 203 a new show from @aerotwist and @jaffathecake on Web Development\nhttp://t.co/d1xyO10lZ2",
     "when":"2014-10-02T17:51:02Z"
