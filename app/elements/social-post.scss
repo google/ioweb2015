@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-core-drawer-panel::shadow {
-  #drawer {
-    z-index: 100; // TODO: stick in _zindex.scss
-  }
-  #scrim {
-    z-index: 5;// TODO: stick in _zindex.scss
+@import '_elements';
+
+a {
+  color: $color-cyan-A700;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+header {
+  color: $color-gray;
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  header {
+    margin-bottom: $tabletKeyline;
   }
 }
 
-paper-tabs.white {
-  &::shadow #selectionBar {
-    background-color: #fff;
-  }
-  & paper-tab::shadow {
-    .tab-content {
-      opacity: 1 !important;
-    }
-    #ink {
-      color: rgba(255,255,255,0.5);
-    }
-  }
-}
-
-footer {
-  paper-dropdown-menu::shadow #label {
-    color: inherit;
+@media (max-width: $tablet-breakpoint-min) {
+  :host {
+    margin-bottom: $tabletKeyline;
   }
 }

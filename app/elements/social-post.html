@@ -27,10 +27,9 @@ Displays information about a social post, and linkifies certain URLs in the text
 -->
 <polymer-element name="social-post" attributes="kind author url text when">
   <template>
+    <link rel="stylesheet" href="social-post.css">
     <header>
-      <a href="{{profileUrl}}" target="_blank">
-        <template if="{{kind == 'tweet'}}">@</template>{{author}}
-      </a>
+      <a href="{{profileUrl}}" target="_blank">{{author}}</a>
       <div>
         <a href="{{url}}" target="_blank">{{timeAgo}}</a>
       </div>
@@ -92,7 +91,7 @@ Displays information about a social post, and linkifies certain URLs in the text
 
     authorChanged: function() {
       if (this.kind == 'tweet') {
-        this.profileUrl = 'https://twitter.com/' + this.author;
+        this.profileUrl = 'https://twitter.com/' + this.author.slice(1);
       }
     },
 
@@ -125,6 +124,7 @@ Displays information about a social post, and linkifies certain URLs in the text
       }
     },
 
+    // TODO: i18n of these strings.
     whenChanged: function() {
       // delta is the time difference in minutes.
       var delta = Math.floor((Date.now() - new Date(this.when)) / (60 * 1000));

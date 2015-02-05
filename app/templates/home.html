@@ -171,9 +171,33 @@
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+      // TODO (jeffposnick): Replace this with the real api/ endpoint once it's available!
+      var socialPostsEndpoint = 'temporary_api/social_feed.json';
+      var socialPostUpdateInterval = 30000; // 30 seconds
+      var updateSocialPostsTimeout;
 
       if (page.hasBeenLoaded) {
         return;
+      }
+
+      function updateSocialPosts() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', socialPostsEndpoint);
+        // The request will be intercepted by the service worker, which will use a network-first
+        // policy to ensure that the service worker cache is initially ignored.
+        // But if the device is offline, it will return the previously cached content.
+        xhr.setRequestHeader('X-Cache-Only', 'false');
+
+        xhr.onload = function() {
+          if (this.status < 400) {
+            processSocialPosts(JSON.parse(this.response));
+            // Schedule another automatic update if we got a successful response back.
+            updateSocialPostsTimeout = window.setTimeout(updateSocialPosts,
+              socialPostUpdateInterval);
+          }
+        };
+
+        xhr.send();
       }
 
       function processSocialPosts(socialPosts) {
@@ -182,10 +206,16 @@
       }
 
       page.load = function() {
-        IOWA.Elements.Template.socialPosts = [];
-        // TODO (jeffposnick): Replace this with the real api/ endpoint once it's available!
-        IOWA.Request.cacheThenNetwork('temporary_api/social_feed.json',
-          processSocialPosts, processSocialPosts);
+        IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
+        // Set a timeout to fetch new posts after 30 seconds.
+        updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
+      };
+
+      page.unload = function() {
+        if (updateSocialPostsTimeout) {
+          window.clearTimeout(updateSocialPostsTimeout);
+          updateSocialPostsTimeout = null;
+        }
       };
 
       page.load(); // Run load callback on page load.
