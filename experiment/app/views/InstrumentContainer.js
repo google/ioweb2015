@@ -143,10 +143,11 @@ module.exports = (function() {
       displayContainerCenter = new PIXI.DisplayObjectContainer();
       displayContainer = new PIXI.DisplayObjectContainer();
       displayContainerSub = new PIXI.DisplayObjectContainer();
-      controls = makeControls();
 
       instrumentView = new SubView(audioManager);
       createRenderer(instrumentView.backgroundColor);
+
+      controls = makeControls();
 
       displayContainer.addChild(displayContainerSub);
       displayContainerSub.addChild(displayContainerCenter);
@@ -165,25 +166,31 @@ module.exports = (function() {
       addContractedEventListeners();
 
       isReady = true;
+    }
 
-      setTimeout(function() {
-        // fixes for black graphic squares in 5th webGL container
-        var recordIconImage = recordButton.recordIcon;
-        var recordCircle = recordButton.circle;
-        var checkboxCircle = recordButton.checkmarkCircle;
-        var recordText = recordButton.textImages;
-        var recordNumbers = recordButton.numberImagePixiObjects;
-        renderer.updateTexture(backIcon.texture.baseTexture);
-        renderer.updateTexture(recordIconImage.texture.baseTexture);
-        renderer.updateTexture(recordCircle.texture.baseTexture);
-        renderer.updateTexture(checkboxCircle.texture.baseTexture);
-        for (let i = 0; i < recordText.length; i++) {
-          renderer.updateTexture(recordText[i].texture.baseTexture);
-        }
-        for (let i = 0; i < recordNumbers.length; i++) {
-          renderer.updateTexture(recordNumbers[i].texture.baseTexture);
-        }
-      }, 50);
+    /**
+     * Work around Pixi bugs with more than 5 WebGL context.
+     */
+    function updateRendererTextures() {
+      // fixes for black graphic squares in 5th webGL container
+      var recordIconImage = recordButton.recordIcon;
+      var recordCircle = recordButton.circle;
+      var checkboxCircle = recordButton.checkmarkCircle;
+      var recordText = recordButton.textImages;
+      var recordNumbers = recordButton.numberImagePixiObjects;
+
+      renderer.updateTexture(backIcon.texture.baseTexture);
+      renderer.updateTexture(recordIconImage.texture.baseTexture);
+      renderer.updateTexture(recordCircle.texture.baseTexture);
+      renderer.updateTexture(checkboxCircle.texture.baseTexture);
+
+      for (let i = 0; i < recordText.length; i++) {
+        renderer.updateTexture(recordText[i].texture.baseTexture);
+      }
+
+      for (let i = 0; i < recordNumbers.length; i++) {
+        renderer.updateTexture(recordNumbers[i].texture.baseTexture);
+      }
     }
 
     /**
@@ -201,7 +208,7 @@ module.exports = (function() {
       backIconContainer.addChild(backIcon);
       backIconContainer.alpha = 0;
 
-      recordButton = new RecordButton(audioManager);
+      recordButton = new RecordButton(audioManager, renderer);
       recordButton.container.position.x = window.innerWidth - 62;
       recordButton.container.position.y = 56;
       recordButton.container.pivot.set(28,28);
@@ -240,6 +247,8 @@ module.exports = (function() {
      * @return {Promise}
      */
     function showControls() {
+      updateRendererTextures();
+
       stage.addChild(controls);
 
       backIconContainer.interactive = true;
@@ -491,6 +500,7 @@ module.exports = (function() {
       });
 
       instrumentView.animationExpanded();
+
       removeContractedEventListeners();
       addExpandedEventListeners();
 
