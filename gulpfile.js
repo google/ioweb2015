@@ -78,6 +78,29 @@ gulp.task('vulcanize-elements', ['sass'], function() {
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
 });
 
+// vulcanize extended form elements separately.
+gulp.task('vulcanize-extended-elements', ['sass'], function() {
+  return gulp.src([
+      APP_DIR + '/elements/io-extended-form.html'
+    ])
+    .pipe($.vulcanize({
+      strip: !argv.pretty,
+      csp: true,
+      inline: true,
+      dest: APP_DIR + '/elements',
+      excludes: {
+        imports: [ // These are registered in the main site vulcanized bundle.
+          'polymer.html$',
+          'core-icon.html$',
+          'core-iconset-svg.html$',
+          'core-shared-lib.html$',
+          'paper-button.html$'
+        ]
+      }
+    }))
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
+});
+
 // gulp.task('i18n_index', function() {
 //   return gulp.src(['index.html', 'error.html', 'upgrade.html'])
 //     .pipe(argv.pretty ? $.gutil.noop() : $.replace(/window\.DEV ?= ?true.*/, ''))
@@ -110,6 +133,9 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/elements/webgl-globe/textures/*.{jpg,png}',
     APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js',
     APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
+    APP_DIR + '/elements/io-extended-form.html',
+    APP_DIR + '/bower_components/paper-input/**',
+    APP_DIR + '/bower_components/google-map/google-map.html',
     DIST_EXPERIMENT_DIR + '/**/*'
   ], {base: './'});
 
@@ -274,7 +300,7 @@ gulp.task('serve:dist', ['default'], function(callback) {
   startGaeBackend(backendDir, appEnv, false, callback);
 });
 
-gulp.task('vulcanize', ['vulcanize-elements']);
+gulp.task('vulcanize', ['vulcanize-elements', 'vulcanize-extended-elements']);
 
 gulp.task('js', ['jshint', 'jscs']);
 

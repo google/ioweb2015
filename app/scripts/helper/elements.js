@@ -90,6 +90,10 @@ IOWA.Elements = (function() {
         mastheadBgClass: 'bg-cyan',
         hasBeenLoaded: false
       },
+      'form': {
+        mastheadBgClass: 'bg-dark-grey',
+        hasBeenLoaded: false
+      },
       'schedule': {
         mastheadBgClass: 'bg-cyan',
         hasBeenLoaded: false
