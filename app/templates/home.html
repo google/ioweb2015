@@ -171,8 +171,7 @@
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
-      // TODO (jeffposnick): Replace this with the real api/ endpoint once it's available!
-      var socialPostsEndpoint = 'temporary_api/social_feed.json';
+      var socialPostsEndpoint = 'api/social';
       var socialPostUpdateInterval = 30000; // 30 seconds
       var updateSocialPostsTimeout;
 
