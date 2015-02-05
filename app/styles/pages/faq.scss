@@ -23,18 +23,7 @@ $name: 'page-faq';
 
 ##{$name} {
 
-.page__section {
-  padding-top: 0;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: $mobileKeyline;
-
-  a {
-    font-size: inherit;
-    font-weight: 400;
-    text-transform: none;
-  }
-
+.page__section--copy {
   h3 {
     margin-bottom: $tabletKeyline;
   }
@@ -56,12 +45,6 @@ $name: 'page-faq';
   }
   a {
     font-size: 16px;
-  }
-}
-
-@media (min-width: $tablet-breakpoint-min) {
-  .page__section {
-    padding-bottom: $desktopKeyline;
   }
 }
 

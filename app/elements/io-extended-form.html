@@ -1,0 +1,154 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../bower_components/google-map/google-map.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<!--
+Helper element for auto-completes places while showing a pin on a map.
+
+    <io-extended-form></io-extended-form>
+
+@element io-extended-form
+-->
+<polymer-element name="io-extended-form">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      google-map {
+        width: 100%;
+        height: 300px;
+      }
+      #autocomplete {
+        width: 400px;
+        max-width: 100%;
+        margin-bottom: 8px;
+      }
+      #submit-button {
+        margin: 16px 0 0 0;
+      }
+      google-map::shadow #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <paper-input id="autocomplete" label="Enter the address of your event"></paper-input>
+
+    <google-map id="map" map="{{map}}" latitude="{{result.latitude}}" longitude="{{result.longitude}}"
+                version="3.exp" libraries="places" zoom="14" on-google-map-ready="{{mapReady}}">
+      <google-map-marker latitude="{{result.latitude}}" longitude="{{result.longitude}}"
+                         draggable="true"></google-map-marker>
+    </google-map>
+
+    <paper-button id="submit-button" raised on-core-transitionend="{{openForm}}"
+                  disabled?="{{!result}}">Go to the registration form</paper-button>
+  </template>
+  <script>
+  Polymer({
+
+    /**
+     * The result of the Places API search.
+     *
+     * @attribute result
+     * @type object
+     * @default null
+     */
+
+    /**
+     * The full string address the user searched for.
+     *
+     * @attribute address
+     * @type string
+     * @default ''
+     */
+    address: '',
+
+    created: function() {
+      this.result = null;
+    },
+
+    domReady: function() {
+      this.async(function() {
+        this.$.map.resize(); // Resize map so it has size when it's fully in DOM and ready.
+      }, 100);
+    },
+
+    detached: function() {
+      // Cleanup after Maps.
+      var el = document.querySelector('.pac-container');
+      el.parentNode.removeChild(el);
+    },
+
+    mapReady: function() {
+      this.autocomplete = new google.maps.places.Autocomplete(
+          this.$.autocomplete, {types: ['geocode']});
+
+      google.maps.event.addListener(this.autocomplete, 'place_changed', function() {
+        var place = this.autocomplete.getPlace();
+
+        this.result = {
+          latitude: place.geometry.location.lat(),
+          longitude: place.geometry.location.lng()
+        };
+
+        for (var i = 0, comp; comp = place.address_components[i]; ++i) {
+          if (comp.types[0] === 'street_number') {
+            this.result.streetNumber = comp.long_name;
+          }
+          if (comp.types[0] === 'route') {
+            this.result.streetName = comp.long_name;
+          }
+          if (comp.types[0] === 'locality') {
+            this.result.city = comp.long_name;
+          }
+          if (comp.types[0] === 'administrative_area_level_1') {
+            this.result.state = comp.short_name;
+          }
+          if (comp.types[0] === 'country') {
+            this.result.country = comp.short_name;
+          }
+          if (comp.types[0] === 'postal_code') {
+            this.result.postalCode = comp.long_name;
+          }
+        }
+      }.bind(this));
+    },
+
+    /**
+     * Opens the pre-populated event form.
+     *
+     * @method openForm
+     */
+    openForm: function() {
+      if (!this.result) {
+        return;
+      }
+
+      var formURL = 'https://docs.google.com/forms/d/1rjMnxYvyGAmi3O4gfvYgqhEoolDSkeVdJY2w9MtVlmE/viewform' +
+                    '?entry.23917865=' + (this.result.country || '') +
+                    '&entry.652280183=' + (this.result.streetName || '') +
+                    '&entry.502610227=' + (this.result.streetNumber || '') +
+                    '&entry.272782401=' + (this.result.postalCode || '') +
+                    '&entry.789012978=' + (this.result.city || '') +
+                    '&entry.1458261258=' + (this.result.latitude || '') +
+                    '&entry.1058533728=' + (this.result.longitude || '');
+
+      var options = 'resizable=yes,scrollbars=yes,height=600,width=800';
+      window.open(formURL, 'form', options);;
+    }
+  });
+  </script>
+</polymer-element>

@@ -23,12 +23,6 @@ $name: 'page-about';
 
 ##{$name} {
 
-.masthead {
-  h1 {
-    color: #fff;
-  }
-}
-
 main {
   paper-button {
     @include typo-button();
