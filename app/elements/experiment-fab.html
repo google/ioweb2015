@@ -274,8 +274,8 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           right: 0;
           width: 100%;
           height: 100%;
-          -webkit-transform-origin: 91% 64%;
-          transform-origin: 91% 64%;
+          -webkit-transform-origin: 91% 64% !important;
+          transform-origin: 91% 64% !important;
         }
         .dialog-content {
           background-size: 90%;
@@ -922,7 +922,7 @@ Main parent container for all of the fab elements.
         top: -175px;
       }
       :host([mini][direction="upwards"]) experiment-share-dialog {
-        top: -65px;
+        top: -195px;
         right: 38px;
       }
       :host([mini][direction="downwards"]) .experiment-share-tooltip {
