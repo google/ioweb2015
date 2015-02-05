@@ -249,11 +249,16 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
         transform: translate(0,0);
       }
 
-      .dialog-content {
-        background-color: transparent;
+      :host([supported]) .dialog-content {
         background-position: 50% 60%;
-        background-repeat: no-repeat;
         background-size: 75%;
+      }
+
+      .dialog-content {
+        background-position: 60% 76%;
+        background-size: 70%;
+        background-color: transparent;
+        background-repeat: no-repeat;
         position: absolute;
         left: 20px;
         top: 20px;
@@ -277,7 +282,10 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           -webkit-transform-origin: 91% 64% !important;
           transform-origin: 91% 64% !important;
         }
-        .dialog-content {
+        :host .dialog-content {
+          background-size: 90%;
+        }
+        :host([supported]) .dialog-content {
           background-size: 90%;
         }
       }
