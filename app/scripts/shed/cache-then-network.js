@@ -10,16 +10,13 @@ function serveFromCacheOrNetwork(request) {
         });
       }
     });
-  }
-
-  if (request.headers.get('X-Cache-Only') == 'false') {
+  } else {
+    // If this is a request with either 'X-Cache-Only: false' or just a normal request without
+    // it set, then perform a HTTP fetch and cache the result.
     return shed.networkFirst(request);
   }
-
-  // If 'X-Cache-Only' isn't set to anything, then don't do anything here.
-  // It will be handled like an ordinary request without service worker-specific logic.
 }
 
 // TODO: /temporary_api/ can be removed once /api/ is available.
-shed.router.get('(.+)temporary_api/(.+)', serveFromCacheOrNetwork);
-shed.router.get('(.+)api/(.+)', serveFromCacheOrNetwork);
+shed.router.get('/(.+)temporary_api/(.+)', serveFromCacheOrNetwork);
+shed.router.get('/(.+)api/(.+)', serveFromCacheOrNetwork);
