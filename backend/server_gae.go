@@ -19,7 +19,7 @@ import (
 	"golang.org/x/oauth2/jwt"
 
 	"appengine"
-	"appengine-go/src/appengine/urlfetch"
+	"appengine/urlfetch"
 	"appengine/user"
 )
 
