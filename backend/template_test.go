@@ -68,6 +68,22 @@ func TestRenderOgImage(t *testing.T) {
 	}
 }
 
+func TestRenderOgDesc(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/about?experiment", nil)
+	var b bytes.Buffer
+	c := newContext(req, &b)
+
+	data := &templateData{OgDesc: ogDescExperiment}
+	if err := renderTemplate(c, "about", false, data); err != nil {
+		t.Fatalf("renderTemplate(..., about, false): %v", err)
+	}
+
+	rx := `<meta\sproperty="og:description"\scontent="` + ogDescExperiment + `">`
+	if matched, err := regexp.Match(rx, b.Bytes()); !matched || err != nil {
+		t.Errorf("didn't match %s to: %s (%v)", rx, b.String(), err)
+	}
+}
+
 func TestPageTitle(t *testing.T) {
 	table := []struct {
 		meta  meta
