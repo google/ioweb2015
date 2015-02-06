@@ -265,7 +265,9 @@ with the attribute `iologodestination`.
         {transform: 'translateY(' + (mastheadY + fabMetrics.height / 2) + 'px)'},
         {transform: 'translateY(0)'}
       ], {
-        duration: IOWA.Util.isSafari() ? 0 : 485, // More ground to cover, so slightly faster than the masthead.
+        // Safari can't run fab pull-up animation so make it 0 duration.
+        // For everything else, run animation slightly faster than the masthead (more ground to cover).
+        duration: IOWA.Util.isSafari() ? 0 : 485,
         easing: 'cubic-bezier(0,0,0.21,1)'
       });
 
