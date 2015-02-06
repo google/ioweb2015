@@ -56,8 +56,9 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		tplname = tplname[:len(tplname)-5]
 	}
 
-	data := &templateData{Env: env(c), OgImage: ogImageDefault}
+	data := &templateData{Env: env(c)}
 	if experimentShare {
+		data.Desc = descExperiment
 		data.OgImage = ogImageExperiment
 	}
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
