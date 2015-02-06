@@ -39,7 +39,12 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
   },
 
   addEventListeners_: function() {
-    window.addEventListener('resize', this.configureCanvas_.bind(this));
+    this.resizeHandler_ = this.configureCanvas_.bind(this);
+    window.addEventListener('resize', this.resizeHandler_);
+  },
+
+  removeListeners_: function() {
+    window.removeEventListener('resize', this.resizeHandler_);
   },
 
   measure_: function(value) {
@@ -844,5 +849,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
   init: function() {
     this.configureCanvas_();
+  },
+
+  destroy: function() {
+    this.removeListeners_();
   }
 };
