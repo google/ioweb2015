@@ -17,11 +17,11 @@
   },
   "about-io": {
     "description": "Description of what I/O is.",
-    "message": "Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech."
+    "message": "Google I/O is two days of inspirational talks, hands-on learning, and a chance to hear more about Google's latest developer products."
   },
-  "about-see-keynote": {
+  "about-see-sessions": {
     "description": "Link text see the list of 2014 keynote and video sessions.",
-    "message": "See the 2014 Keynote and sessions"
+    "message": "See the 2014 sessions"
   },
   "schedule": {
     "description": "Top navbar single-word link text. Please keep this short. Links to the event schedule page.",
