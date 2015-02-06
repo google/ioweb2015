@@ -265,7 +265,7 @@ with the attribute `iologodestination`.
         {transform: 'translateY(' + (mastheadY + fabMetrics.height / 2) + 'px)'},
         {transform: 'translateY(0)'}
       ], {
-        duration: 485, // More ground to cover, so slightly faster than the masthead.
+        duration: IOWA.Util.isSafari() ? 0 : 485, // More ground to cover, so slightly faster than the masthead.
         easing: 'cubic-bezier(0,0,0.21,1)'
       });
 
