@@ -81,6 +81,14 @@
       var videoContainer = document.querySelector('.fullvideo__container');
       var video = videoContainer.querySelector('.fullvideo__container google-youtube');
 
+      // Wait for cc module to load, then make the fontsize smaller.
+      // https://developers.google.com/youtube/iframe_api_reference#Events
+      var callback = function() {
+        video.player.setOption('captions', 'fontSize', -2);
+        video.player.removeEventListener('onApiChange', callback);
+      };
+      video.player.addEventListener('onApiChange', callback);
+
       var button = IOWA.Elements.Main.querySelector('.play__button__container');
       var navOverlay = document.querySelector('.navbar__overlay--video');
 

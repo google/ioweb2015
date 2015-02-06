@@ -29,11 +29,11 @@
   },
   "attend-onsite": {
     "description": "Top navbar sink text. Please keep this short. Links to the site's page for attendees.",
-    "message": "Attend onsite"
+    "message": "Attend Onsite"
   },
   "attend-offsite": {
     "description": "Top navbar sink text. Please keep this short. Links to the site's page for offsite participants.",
-    "message": "Attend offsite"
+    "message": "Attend Offsite"
   },
   "attend-from": {
     "description": "Beginning of 'Attend I/O from x or wherever you are heading",
