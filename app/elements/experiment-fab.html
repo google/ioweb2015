@@ -981,7 +981,7 @@ Main parent container for all of the fab elements.
     </style>
     <template if="{{mode == 'pre'}}">
 
-      <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
+      <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}" hidden?="{{loadingCircleHidden}}"></experiment-loading-circle>
       <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment" onstate?="{{dialogVisible}}" mode="{{mode}}"></experiment-fab>
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
@@ -1053,6 +1053,10 @@ Main parent container for all of the fab elements.
         recordmode: {
           value: 'notRecording',
           reflect: true
+        },
+        loadingCircleHidden: {
+          value: false,
+          reflect: true
         }
       },
 
@@ -1095,6 +1099,7 @@ Main parent container for all of the fab elements.
 
         if (experiment.canLoad()) {
           this.experimentSupported = true;
+          this.loadingCircleHidden = false;
           experiment.load(15000).then(function(app) {
             console.log('Experiment Loaded Successfully.');
             this.app = app;
@@ -1118,6 +1123,7 @@ Main parent container for all of the fab elements.
 
       experimentOff: function(event) {
         this.dialogVisible = false;
+        this.loadingCircleHidden = true;
         this.fixed == 'unfixed';
         document.removeEventListener('keyup', this.bindEscape);
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
