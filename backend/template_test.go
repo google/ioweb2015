@@ -73,12 +73,12 @@ func TestRenderOgDesc(t *testing.T) {
 	var b bytes.Buffer
 	c := newContext(req, &b)
 
-	data := &templateData{OgDesc: ogDescExperiment}
+	data := &templateData{Desc: descExperiment}
 	if err := renderTemplate(c, "about", false, data); err != nil {
 		t.Fatalf("renderTemplate(..., about, false): %v", err)
 	}
 
-	rx := `<meta\sproperty="og:description"\scontent="` + ogDescExperiment + `">`
+	rx := `<meta\sproperty="og:description"\scontent="` + descExperiment + `">`
 	if matched, err := regexp.Match(rx, b.Bytes()); !matched || err != nil {
 		t.Errorf("didn't match %s to: %s (%v)", rx, b.String(), err)
 	}

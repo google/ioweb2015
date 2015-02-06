@@ -15,7 +15,7 @@ limitations under the License.
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015.">
+  <meta name="description" content="{% .Desc %}">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1">
   <title>{% .Title %}</title>
 
@@ -48,14 +48,14 @@ limitations under the License.
 
   <!-- G+ and Twitter sharing meta data -->
   <meta property="og:title" content="{% .Title %}">
-  <meta property="og:description" content="{% .OgDesc %}">
+  <meta property="og:description" content="{% .Desc %}">
   <meta property="og:type" content="Event">
   <meta property="og:image" content="images/{% .OgImage %}">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@googledevs">
   <meta name="twitter:title" content="{% .Title %}">
-  <meta name="twitter:description" content="{% .OgDesc %}">
+  <meta name="twitter:description" content="{% .Desc %}">
   <meta name="twitter:image:src" content="images/{% .OgImage %}">
 
   <script type="application/ld+json">

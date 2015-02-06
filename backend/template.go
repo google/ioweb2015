@@ -13,22 +13,23 @@ import (
 const (
 	// defaultTitle is the site pages default title.
 	defaultTitle = "Google I/O 2015"
-	// images for og:image meta tag
-	ogImageDefault    = "io15-color.png"
-	ogImageExperiment = "io15-experiment.png"
-	// text for og:description tag
-	ogDescDefault = "Google I/O 2015 brings together developers for an immersive, " +
+	// descDefault is the default site description
+	descDefault = "Google I/O 2015 brings together developers for an immersive, " +
 		"two-day experience focused on exploring the next generation " +
 		"of technology, mobile and beyond. Join us online or in person " +
 		"May 28-29, 2015."
-	ogDescExperiment = "Make music with instruments inspired by material design " +
+	// descExperiment is used when users share an experiment link on social.
+	descExperiment = "Make music with instruments inspired by material design " +
 		"for Google I/O 2015. Play, record and share."
+	// images for og:image meta tag
+	ogImageDefault    = "io15-color.png"
+	ogImageExperiment = "io15-experiment.png"
 )
 
 // templateData is the templates context
 type templateData struct {
-	Title, Slug, Env, OgImage, OgDesc string
-	Meta                              meta
+	Title, Desc, Slug, Env, OgImage string
+	Meta                            meta
 }
 
 // meta is a page meta info.
@@ -72,11 +73,11 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	data.Meta = m
 	data.Title = pageTitle(m)
 	data.Slug = name
+	if data.Desc == "" {
+		data.Desc = descDefault
+	}
 	if data.OgImage == "" {
 		data.OgImage = ogImageDefault
-	}
-	if data.OgDesc == "" {
-		data.OgDesc = ogDescDefault
 	}
 	return t.Execute(writer(c), data)
 }

@@ -58,8 +58,8 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 
 	data := &templateData{Env: env(c)}
 	if experimentShare {
+		data.Desc = descExperiment
 		data.OgImage = ogImageExperiment
-		data.OgDesc = ogDescExperiment
 	}
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
 	err := renderTemplate(c, tplname, wantsPartial, data)
