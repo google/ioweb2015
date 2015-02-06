@@ -49,6 +49,13 @@ $name: 'page-home';
   position: relative;
   color: #fff;
   @extend .bg-globe;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+
+  h2 {
+    padding: 0 $mobileKeyline 0 $mobileKeyline;
+  }
 
   name-cycler {
     color: $color-cyan-A400;
@@ -163,6 +170,7 @@ $name: 'page-home';
 
     h2 {
       max-width: 300px;
+      padding: 0 $desktopKeyline 0 $desktopKeyline;
     }
 
     .join__social {

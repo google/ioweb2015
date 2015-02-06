@@ -113,7 +113,18 @@
         <i18n-msg msgid="attend-wherever">or wherever you may be</i18n-msg>
       </h2>
       <div class="attend__globe">
-
+        <template if="{{pageTransitionDone}}">
+          <globe-cycler items="[{'lat': 35.025699,'lng': 135.751147},
+                                {'lat': 18.793553,'lng': 98.972353},
+                                {'lat': 50.9535525,'lng':-114.5718054},
+                                {'lat': 42.3314, 'lng': -83.0458},
+                                {'lat': 41.1621, 'lng': -8.6220},
+                                {'lat': 43.6957891,'lng': 7.2701128},
+                                {'lat': -37.8136, 'lng': 144.9631},
+                                {'lat': 11.9916085,'lng': 8.532064},
+                                {'lat': -29.8833, 'lng': 31.0500},
+                                {'lat': -30.0331, 'lng': -51.2300}]" interval="1000"></globe-cycler>
+        </template>
       </div>
     </section>
 
