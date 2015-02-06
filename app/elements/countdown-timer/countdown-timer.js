@@ -45,6 +45,11 @@ IOWA.CountdownTimer.Element.prototype = {
     window.addEventListener('resize', this.drawIfAnimationIsNotRunning);
   },
 
+  destroy: function() {
+    window.removeEventListener('resize', this.drawIfAnimationIsNotRunning);
+    this.renderer_.destroy();
+  },
+
   update_: function() {
 
     if (!this.animationRunning_)
