@@ -96,32 +96,44 @@ Helper element for auto-completes places while showing a pin on a map.
       this.autocomplete = new google.maps.places.Autocomplete(
           this.$.autocomplete, {types: ['geocode']});
 
+      google.maps.event.addListener(this.$.map.map, 'dblclick', function(e) {
+        this.result = {};
+        this.result.latitude = e.latLng.lat();
+        this.result.longitude = e.latLng.lng();
+      }.bind(this));
+
       google.maps.event.addListener(this.autocomplete, 'place_changed', function() {
         var place = this.autocomplete.getPlace();
 
+        if (!place.address_components) {
+          return;
+        }
+
         this.result = {
-          latitude: place.geometry.location.lat(),
-          longitude: place.geometry.location.lng()
+          latitude: place.geometry ? place.geometry.location.lat() : null,
+          longitude: place.geometry ? place.geometry.location.lng() : null
         };
 
-        for (var i = 0, comp; comp = place.address_components[i]; ++i) {
-          if (comp.types[0] === 'street_number') {
-            this.result.streetNumber = comp.long_name;
-          }
-          if (comp.types[0] === 'route') {
-            this.result.streetName = comp.long_name;
-          }
-          if (comp.types[0] === 'locality') {
-            this.result.city = comp.long_name;
-          }
-          if (comp.types[0] === 'administrative_area_level_1') {
-            this.result.state = comp.short_name;
-          }
-          if (comp.types[0] === 'country') {
-            this.result.country = comp.short_name;
-          }
-          if (comp.types[0] === 'postal_code') {
-            this.result.postalCode = comp.long_name;
+        if (place.address_components) {
+          for (var i = 0, comp; comp = place.address_components[i]; ++i) {
+            if (comp.types[0] === 'street_number') {
+              this.result.streetNumber = comp.long_name;
+            }
+            if (comp.types[0] === 'route') {
+              this.result.streetName = comp.long_name;
+            }
+            if (comp.types[0] === 'locality') {
+              this.result.city = comp.long_name;
+            }
+            if (comp.types[0] === 'administrative_area_level_1') {
+              this.result.state = comp.short_name;
+            }
+            if (comp.types[0] === 'country') {
+              this.result.country = comp.short_name;
+            }
+            if (comp.types[0] === 'postal_code') {
+              this.result.postalCode = comp.long_name;
+            }
           }
         }
       }.bind(this));
@@ -146,8 +158,7 @@ Helper element for auto-completes places while showing a pin on a map.
                     '&entry.1458261258=' + (this.result.latitude || '') +
                     '&entry.1058533728=' + (this.result.longitude || '');
 
-      var options = 'resizable=yes,scrollbars=yes,height=600,width=800';
-      window.open(formURL, 'form', options);;
+      location.href = formURL;
     }
   });
   </script>
