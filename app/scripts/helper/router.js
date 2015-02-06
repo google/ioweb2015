@@ -162,17 +162,22 @@ IOWA.Router = (function() {
         var currentPage = IOWA.Elements.Template.selectedPage;
         var nextPage = parsePageNameFromAbsolutePath(el.pathname);
 
+        // First, record click event if link requests it.
+        if (el.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'link', 'click', el.getAttribute('data-track-link'));
+        }
+
+        // Ignore links that go offsite.
+        if (el.target) {
+          return;
+        }
+
         // Prevent navigations to the same page.
         // Note, this prevents in-page anchors. Use IOWA.Util.smoothScroll.
         if (currentPage === nextPage) {
           e.preventDefault();
           return;
-        }
-
-        // Record click event if link requests it.
-        if (el.hasAttribute('data-track-link')) {
-          IOWA.Analytics.trackEvent(
-              'link', 'click', el.getAttribute('data-track-link'));
         }
 
         // Do ajax page navigation if link requests it.
