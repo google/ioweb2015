@@ -28,8 +28,10 @@ IOWA.Picasa = (function() {
   var feedUrl = 'https://picasaweb.google.com/data/feed/api/user/' +
                 GDEVELOPER_USER_ID + '/albumid/' + ALBUM_ID +
                 '?alt=jsonc&kind=photo&hl=' + lang +
-                '&imgmax=' + viewPortWidth +
+                '&imgmax=' + Math.min(viewPortWidth * (devicePixelRatio || 1), 1440) +
                 '&max-results=5000&v=2';
+
+console.log(feedUrl)
 
   function fetch(opt_startIndex, callback) {
     var startIndex = opt_startIndex || 1;
