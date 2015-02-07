@@ -445,6 +445,7 @@ Semi-opaque overlay that shows when experiment dialog is opened.
         height: 100%;
         z-index: 1;
         opacity: 0;
+        overflow: hidden;
         visibility: hidden;
         transition: all 300ms ease-out;
       }
@@ -930,6 +931,19 @@ Main parent container for all of the fab elements.
       }
       .experiment-exit-tooltip {
         top: 230px;
+      }
+      :host([direction="upwards"]) .experiment-share-tooltip {
+        top: -45px;
+      }
+      :host([direction="upwards"]) .experiment-reset-tooltip {
+        top: -110px;
+      }
+      :host([direction="upwards"]) .experiment-exit-tooltip {
+        top: -175px;
+      }
+      :host([direction="upwards"]) experiment-share-dialog {
+        top: -195px;
+        right: 52px;
       }
       :host([mini]) experiment-share-fab,
       :host([mini]) experiment-reset-fab,
