@@ -21,7 +21,7 @@ module.exports = (function() {
   const CONTENT_CONTROLS_BUFFER = 70;
   const MOBILE_MAX = 767;
 
-  var isRetina = false;//window.devicePixelRatio > 1;
+  var isRetina = false;
 
   var canvasRenderers;
   var webGLRenderers;
@@ -37,8 +37,6 @@ module.exports = (function() {
         window.navigator.userAgent.match(/Version\/8/)) {
       antialias = false;
     }
-
-    antialias = false;
 
     canvasRenderers = [];
     webGLRenderers = [];
