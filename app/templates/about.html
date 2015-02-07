@@ -38,14 +38,7 @@
         <div class="photo__about" flex two?="{{isDesktopSize}}"></div>
         <div layout vertical flex>
           <div class="photo__about--top" layout vertical flex></div>
-          <div class="photo__about--bottom" layout vertical flex>
-            <paper-button hidden?="{{isPhoneSize}}"
-                          data-track-link="about-view-photos-section"
-                          on-tap="{{togglePhotoGallery}}">
-              <i18n-msg msgid="see-more-photos">See more photos from past I/Os</i18n-msg>
-              <core-icon icon="io:photo-camera" aria-hidden="true"></core-icon>
-            </paper-button>
-          </div>
+          <div class="photo__about--bottom" layout vertical flex></div>
         </div>
       </div>
       <div class="pics__section--under" layout horizontal>
@@ -99,7 +92,6 @@
       var bottomCard = IOWA.Elements.Main.querySelector('.pics__section').nextElementSibling;
       var bottomSection = IOWA.Elements.Main.querySelector('#hashtag');
 
-      var button = IOWA.Elements.Main.querySelector('.photo__about--bottom paper-button');
       var navOverlay = document.querySelector('.navbar__overlay--gallery');
 
       var reverse = opt_reverse || false;
@@ -129,10 +121,6 @@
         new Animation(navOverlay, [
           {transform: 'translateY(-100%)'},
           {transform: 'translateY(0)'}
-        ], animationOptions),
-        new Animation(button, [
-          {opacity: 1},
-          {opacity: 0}
         ], animationOptions)
       ]);
 
