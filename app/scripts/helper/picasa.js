@@ -31,8 +31,6 @@ IOWA.Picasa = (function() {
                 '&imgmax=' + Math.min(viewPortWidth * (devicePixelRatio || 1), 1440) +
                 '&max-results=5000&v=2';
 
-console.log(feedUrl)
-
   function fetch(opt_startIndex, callback) {
     var startIndex = opt_startIndex || 1;
 
