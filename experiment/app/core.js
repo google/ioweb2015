@@ -9,6 +9,7 @@ var audioLoopsCat = require('app/data/catloops.json');
 var {Promise} = require('es6-promise');
 var rAFTimeout = require('app/util/rAFTimeout');
 var events = require('app/util/events');
+var assetPath = require('app/util/assetPath');
 
 /**
  * Main entry point into the experiment.
@@ -37,7 +38,8 @@ module.exports = function Experiment() {
     play,
     didEnterRecordingMode,
     didExitRecordingMode,
-    reloadData
+    reloadData,
+    consoleDance
   };
 
   /**
@@ -115,6 +117,10 @@ module.exports = function Experiment() {
       // Animate transition in.
       rAFTimeout(function() {
         rootView.animateIn(fromPos).then(resolve, reject);
+
+        if (('undefined !== typeof console') && ('function !== typeof console.log')) {
+          console.log('Need a dance partner? Run `experiment.consoleDance()`');
+        }
       }, 50);
     });
   }
@@ -222,6 +228,84 @@ module.exports = function Experiment() {
    */
   function reloadData() {
     rootView.reloadData();
+  }
+
+  var isDanceRunning = false;
+  /**
+   * Start a dance party.
+   */
+  function consoleDance() {
+    if (isDanceRunning) { return; }
+    isDanceRunning = true;
+
+    var ROW_PIXELS = 10;
+    var COL_PIXELS = 5;
+
+    var video = document.createElement('video');
+    video.style.visibility = 'hidden';
+    document.body.appendChild(video);
+    video.setAttribute('autoplay', 'true');
+    video.setAttribute('loop', 'true');
+    video.addEventListener('loadeddata', onVideoLoaded, false);
+    video.src = assetPath('left-shark.mp4');
+
+    function onVideoLoaded() {
+      var width = video.clientWidth;
+      var height = video.clientHeight;
+
+      var backCanvas = document.createElement('canvas');
+      backCanvas.width = width;
+      backCanvas.height = height;
+      var backContext = backCanvas.getContext('2d');
+
+      setTimeout(draw, 20, video, width, height, backContext);
+    }
+
+
+    var DARK_TO_LIGHT = "@*!y;,-':` ".split('');
+    var NORMALISER = DARK_TO_LIGHT.length / 256;
+
+    function getChar(luminance) {
+      var index = Math.floor(luminance * NORMALISER);
+      return DARK_TO_LIGHT[index];
+    }
+
+    function drawToCanvas(sourceImageData) {
+      var sourcePixels = sourceImageData.data;
+      var numCols = sourceImageData.width;
+      var numRows = sourceImageData.height;
+
+      var rowStr = "\n\n\n\n\n\n\n ";
+
+      for (var row = 0; row < numRows; row += ROW_PIXELS) {
+        var rowOffset = row * numCols * 4;
+        for (var col = 0; col < numCols; col += COL_PIXELS) {
+          var offset = rowOffset + 4 * col;
+          var r = sourcePixels[offset];
+          var g = sourcePixels[offset + 1];
+          var b = sourcePixels[offset + 2];
+          var luminance = Math.ceil(0.299 * r + 0.587 * g + 0.114 * b);
+
+          var c = getChar(luminance);
+
+          if ((r === 255) && (g === 255) && (b === 255)) {
+            c = ' ';
+          }
+
+          rowStr += c;
+        }
+
+        rowStr += "\n ";
+      }
+
+        console.log('%c' + rowStr, 'font-family: monospace; line-height: 0px; font-size: 10px;');
+    }
+
+    function draw(video, width, height, backContext) {
+      backContext.drawImage(video, 0, 0, width, height);
+      drawToCanvas(backContext.getImageData(0, 0, width, height));
+      setTimeout(draw, 40, video, width, height, backContext);
+    }
   }
 
   return self;
