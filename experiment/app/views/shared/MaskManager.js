@@ -133,7 +133,7 @@ module.exports = (function() {
 
       return Promise.all([
         animate.to(data, total, { r1: radius, delay: 0, onUpdate: draw, ease: Circ.easeInOut }),
-        animate.to(data, total, { r2: radius, delay: 0 + smallGap, onUpdate: draw, ease: Circ.easeInOut }),
+        animate.to(data, total, { r2: radius, delay: smallGap, onUpdate: draw, ease: Circ.easeInOut }),
         animate.to(data, total, { r3: radius, delay: largeGap, onUpdate: draw, ease: Circ.easeInOut }),
         animate.to(data, total, { r4: radius, delay: largeGap + smallGap, onUpdate: draw, ease: Circ.easeInOut }),
         animate.to(data, lastDuration, { r5: radius, delay: lastStart, onUpdate: draw, ease: Circ.easeInOut })

@@ -84,6 +84,7 @@ module.exports = (function() {
      * and work around iOS audio limitations.
      */
     function init() {
+      playbackBus.init();
       sequencer = new Sequencer(self);
 
       removeVisibilityChangeListener = addVisibilityChangeListener(function() {

@@ -100,7 +100,8 @@ module.exports = (function() {
       buildSlices();
 
       var circle = new PIXI.Circle(0, 0, circleRadius);
-      circleGraphic.beginFill(0xFFFFFF, 0.55);
+      circleGraphic.beginFill(0xFFFFFF);
+      circleGraphic.alpha = 0.55;
       circleGraphic.pivot.x = 0;
       circleGraphic.pivot.y = 0;
       circleGraphic.drawShape(circle);
@@ -169,6 +170,14 @@ module.exports = (function() {
       circleGraphic.buttonMode = true;
       circleGraphic.defaultCursor = '-webkit-grab';
 
+      circleGraphic.mouseover = function(){
+        circleGraphic.alpha = 0.75;
+      };
+
+      circleGraphic.mouseout = function(){
+        circleGraphic.alpha = 0.55;
+      };
+
       circleGraphic.mousedown = circleGraphic.touchstart = function() {
         isDragging = true;
         circleGraphic.defaultCursor = '-webkit-grabbing';
@@ -185,10 +194,13 @@ module.exports = (function() {
         if (!isDragging) { return; }
 
         updateCursor(
-            data.global.x - (myWidth / 2),
-            data.global.y - (myHeight / 2)
+          data.global.x - (myWidth / 2),
+          data.global.y - (myHeight / 2)
         );
       };
+
+      document.addEventListener('keydown', onArpKeyDown);
+      document.addEventListener('keyup', onArpKeyUp);
     }
 
     /**
@@ -201,6 +213,36 @@ module.exports = (function() {
       circleGraphic.mousedown = circleGraphic.touchstart = null;
       circleGraphic.mouseup = circleGraphic.mouseupoutside = circleGraphic.touchend = circleGraphic.touchendoutside = null;
       circleGraphic.mousemove = circleGraphic.touchmove = null;
+      circleGraphic.mouseover = null;
+      circleGraphic.mouseout = null;
+
+      document.removeEventListener('keydown', onArpKeyUp);
+      document.removeEventListener('keyup', onArpKeyUp);
+    }
+
+    const NUMBER_KEY_RANGE = [49, 52];
+
+    /**
+     * Keydown handler for arpeggiators.
+     * @param {event} evt - The keyup event.
+     */
+    function onArpKeyDown(evt) {
+      if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
+        var keyPos = (evt.keyCode) - NUMBER_KEY_RANGE[0];
+        var [newX, newY] = positionForQuadrant(keyPos);
+        updateCursor(newX, newY);
+        isDragging = true;
+      }
+    }
+
+    /**
+     * Keyup handler for arpeggiators.
+     * @param {event} evt - The keyup event.
+     */
+    function onArpKeyUp(evt) {
+      if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
+        isDragging = false;
+      }
     }
 
     /**
@@ -281,12 +323,14 @@ module.exports = (function() {
         hasLeftShadow = true;
       }
 
+      var colorIndex = NUMBER_OF_TRIANGLES - i - 1;
+
       var colorSet = [
-        COLORS_A.pop(),
-        COLORS_B.pop(),
-        COLORS_C.pop(),
-        COLORS_D.pop(),
-        CENTER_COLORS.pop()
+        COLORS_A[colorIndex],
+        COLORS_B[colorIndex],
+        COLORS_C[colorIndex],
+        COLORS_D[colorIndex],
+        CENTER_COLORS[colorIndex]
       ];
 
       return {
@@ -318,7 +362,7 @@ module.exports = (function() {
      * @param {number} rotation - The current rotation point.
      */
     function makeTriangle(radians, rotation) {
-      var maxLength = Math.max(window.innerHeight, window.innerWidth);
+      var maxLength = Math.max(window.innerHeight * 1.2, window.innerWidth * 1.2);
       var bottomVec = vec2.fromValues(0, maxLength);
       vec2.rotate(bottomVec, bottomVec, rotation);
 

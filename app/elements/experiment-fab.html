@@ -32,7 +32,7 @@ Main fab for entering/exit the experiment.
 @blurb Main fab for entering/exit the experiment.
 @extends paper-fab
 -->
-<polymer-element name="experiment-fab" extends="paper-fab">
+<polymer-element name="experiment-fab" extends="paper-fab" attributes="mode">
   <template>
     <style>
       :host {
@@ -42,20 +42,28 @@ Main fab for entering/exit the experiment.
         display: block;
         position: absolute;
         z-index: 2;
-        -webkit-transition: -webkit-transform 300ms ease-in-out;
+        -webkit-transition: all 300ms ease-in-out;
         -webkit-transform: scale(1,1);
-        transition: transform 300ms ease-in-out;
+        transition: all 300ms ease-in-out;
         transform: scale(1,1);
       }
+
       :host::shadow core-icon {
         height: 19px;
         width: 19px;
         top: 2px;
         left: 2px;
       }
+
       :host::shadow paper-ripple {
         color: #cfd8dc;
       }
+
+      :host(:hover)::shadow paper-shadow::shadow #shadow-bottom,
+      :host([onstate])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
+      }
+
       /* fix for repeating background image in safari */
       polyfill-rule {
         content: ':host::shadow core-icon div';
@@ -63,28 +71,37 @@ Main fab for entering/exit the experiment.
         width: 19px;
         height: 19px;
       }
+
       polyfill-rule {
         content: 'experiment-fab[playing] core-icon div';
         height: 17px;
         width: 12px;
       }
+
       polyfill-rule {
         content: 'experiment-fab[paused] core-icon div';
         height: 16px;
         width: 13px;
       }
+
       :host([playing])::shadow core-icon {
         height: 17px;
         width: 12px;
         left: 6px;
         top: 4px;
       }
+
       :host([paused])::shadow core-icon {
         height: 16px;
         width: 13px;
         left: 7px;
         top: 4px;
       }
+
+      :host([paused])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
+      }
+
       :host([recording]) {
         -webkit-transform: scale(0,0);
         transform: scale(0,0);
@@ -220,6 +237,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       }
 
       :host([active]) {
+        box-shadow: 0px 6px 10px 0px rgba(0,0,0,0.16),0px 6px 10px 0px rgba(0,0,0,0.23);
         -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
@@ -231,11 +249,16 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
         transform: translate(0,0);
       }
 
-      .dialog-content {
-        background-color: transparent;
+      :host([supported]) .dialog-content {
         background-position: 50% 60%;
-        background-repeat: no-repeat;
         background-size: 75%;
+      }
+
+      .dialog-content {
+        background-position: 60% 76%;
+        background-size: 70%;
+        background-color: transparent;
+        background-repeat: no-repeat;
         position: absolute;
         left: 20px;
         top: 20px;
@@ -256,11 +279,20 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           right: 0;
           width: 100%;
           height: 100%;
-          -webkit-transform-origin: 91% 64%;
-          transform-origin: 91% 64%;
+          -webkit-transform-origin: 91% 64% !important;
+          transform-origin: 91% 64% !important;
         }
-        .dialog-content {
+        :host .dialog-content,
+        :host([supported]) .dialog-content {
           background-size: 90%;
+        }
+      }
+
+      @media screen and (max-width: 767px) and (orientation: landscape) {
+        :host .dialog-content,
+        :host([supported]) .dialog-content {
+          background-size: 170px auto;
+          background-position: 50% 70%;
         }
       }
 
@@ -331,7 +363,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       <div class="dialog-content" _style="background-image: {{dialogUnsupportedImage}}">
         <h4 class="sorry"><i18n-msg msgid="sorry">Sorry...</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="experiment-unsupported">The I/O experiment is not supported by your browser. You need <a href="//caniuse.com/#feat=webgl" target="_blank"><i18n-msg msgid="supports-webgl">WebGL</i18n-msg></a> and <a href="//caniuse.com/#feat=audio-api" target="_blank"><i18n-msg msgid="supports-webaudio">Web Audio</i18n-msg></a> support to run the experiment.
+          <i18n-msg msgid="experiment-unsupported">This Chrome Experiment requires <a href="//caniuse.com/#feat=webgl" target="_blank"><i18n-msg msgid="supports-webgl">WebGL</i18n-msg></a> and <a href="//caniuse.com/#feat=audio-api" target="_blank"><i18n-msg msgid="supports-webaudio">Web Audio</i18n-msg></a> support, which are not available in your current browser. Please change or upgrade your browser to run the experiment.
         </p>
         <div class="button-container">
           <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
@@ -413,6 +445,7 @@ Semi-opaque overlay that shows when experiment dialog is opened.
         height: 100%;
         z-index: 1;
         opacity: 0;
+        overflow: hidden;
         visibility: hidden;
         transition: all 300ms ease-out;
       }
@@ -455,10 +488,10 @@ Fab for triggering the share dialog.
         top: -19px;
         left: 8px;
         -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 50% 100%;
+        -webkit-transform-origin: 50% 50%;
         -webkit-transition: all 100ms ease-out 0;
         transform: scale(0,0);
-        transform-origin: 50% 100%;
+        transform-origin: 50% 50%;
         transition: all 100ms ease-out 0;
         z-index: 2;
       }
@@ -483,6 +516,10 @@ Fab for triggering the share dialog.
         -webkit-transform: scale(1,1);
         transform: scale(1,1);
       }
+      :host([open])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
+      }
+
     </style>
     <shadow></shadow>
   </template>
@@ -530,6 +567,19 @@ Dialog to share the user's custom experiment/song
       :host([active]) {
         -webkit-transform: scale(1,1) translate(-16px,5px);
         transform: scale(1,1) translate(-16px,5px);
+      }
+
+      @media screen and (max-width: 767px) and (orientation: landscape) {
+        :host {
+          -webkit-transform: scale(1,0) translate(0,0);
+          -webkit-transform-origin: 50% 100%;
+          transform: scale(1,0) translate(0,0);
+          transform-origin: 50% 100%;
+        }
+        :host([active]) {
+          -webkit-transform: scale(1,1) translate(0,0);
+          transform: scale(1,1) translate(0,0);
+        }
       }
 
       :host([active]) .dialog-content {
@@ -719,10 +769,10 @@ Fab for resetting the experiment loop to default
         left: 8px;
         z-index: 2;
         -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 50% 100%;
+        -webkit-transform-origin: 50% 50%;
         -webkit-transition: all 100ms ease-out 50ms;
         transform: scale(0,0);
-        transform-origin: 50% 100%;
+        transform-origin: 50% 50%;
         transition: all 100ms ease-out 50ms;
       }
       :host::shadow core-icon {
@@ -745,6 +795,9 @@ Fab for resetting the experiment loop to default
         visibility: visible;
         -webkit-transform: scale(1,1);
         transform: scale(1,1);
+      }
+      :host([open])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
       }
     </style>
     <shadow></shadow>
@@ -783,10 +836,10 @@ Fab for exiting the experiment.
         left: 8px;
         z-index: 2;
         -webkit-transform: scale(0,0);
-        -webkit-transform-origin: 50% 100%;
+        -webkit-transform-origin: 50% 50%;
         -webkit-transition: all 100ms ease-out 100ms;
         transform: scale(0,0);
-        transform-origin: 50% 100%;
+        transform-origin: 50% 50%;
         transition: all 100ms ease-out 100ms;
       }
       :host::shadow core-icon {
@@ -812,6 +865,9 @@ Fab for exiting the experiment.
         visibility: visible;
         -webkit-transform: scale(1,1);
         transform: scale(1,1);
+      }
+      :host([open])::shadow paper-shadow::shadow #shadow-bottom {
+        box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.37);
       }
     </style>
     <shadow></shadow>
@@ -876,6 +932,19 @@ Main parent container for all of the fab elements.
       .experiment-exit-tooltip {
         top: 230px;
       }
+      :host([direction="upwards"]) .experiment-share-tooltip {
+        top: -45px;
+      }
+      :host([direction="upwards"]) .experiment-reset-tooltip {
+        top: -110px;
+      }
+      :host([direction="upwards"]) .experiment-exit-tooltip {
+        top: -175px;
+      }
+      :host([direction="upwards"]) experiment-share-dialog {
+        top: -195px;
+        right: 52px;
+      }
       :host([mini]) experiment-share-fab,
       :host([mini]) experiment-reset-fab,
       :host([mini]) experiment-exit-fab {
@@ -894,7 +963,7 @@ Main parent container for all of the fab elements.
         top: -175px;
       }
       :host([mini][direction="upwards"]) experiment-share-dialog {
-        top: -65px;
+        top: -195px;
         right: 38px;
       }
       :host([mini][direction="downwards"]) .experiment-share-tooltip {
@@ -910,12 +979,24 @@ Main parent container for all of the fab elements.
         top: 65px;
         right: 38px;
       }
-
+      @media screen and (max-width: 767px) and (orientation: landscape) {
+        :host([mini][direction="upwards"]) experiment-share-dialog,
+        :host([mini][direction="downwards"]) experiment-share-dialog {
+          border-radius: 0;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1004;
+        }
+      }
     </style>
     <template if="{{mode == 'pre'}}">
 
-      <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}"></experiment-loading-circle>
-      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment"></experiment-fab>
+      <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}" hidden?="{{loadingCircleHidden}}"></experiment-loading-circle>
+      <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment" onstate?="{{dialogVisible}}" mode="{{mode}}"></experiment-fab>
 
       <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
@@ -927,12 +1008,12 @@ Main parent container for all of the fab elements.
 
       <template if="{{playmode == 'playing'}}">
         <core-tooltip label="Pause / Options" class="experiment-options-tooltip" position="left" noarrow="true" large>
-          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.pauseExpImg}}" on-tap="{{playingFabClick}}" playing></experiment-fab>
+          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.pauseExpImg}}" on-tap="{{playingFabClick}}" playing mode="{{mode}}"></experiment-fab>
         </core-tooltip>
       </template>
       <template if="{{playmode == 'paused'}}">
         <core-tooltip label="Resume playing" class="experiment-options-tooltip" position="left" noarrow="true" show large>
-          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.playExpImg}}" on-tap="{{pausedFabClick}}" paused></experiment-fab>
+          <experiment-fab mini?="{{mini}}" recording?="{{recording}}" src="{{assets.playExpImg}}" on-tap="{{pausedFabClick}}" paused mode="{{mode}}"></experiment-fab>
         </core-tooltip>
       </template>
 
@@ -986,6 +1067,10 @@ Main parent container for all of the fab elements.
         recordmode: {
           value: 'notRecording',
           reflect: true
+        },
+        loadingCircleHidden: {
+          value: false,
+          reflect: true
         }
       },
 
@@ -1002,8 +1087,9 @@ Main parent container for all of the fab elements.
 
       attached: function() {
         this.boundOnScroll = this.onScroll.bind(this);
+        this.scrollFabPos = this.getBoundingClientRect();
+        this.viewport = document.querySelector('meta[name=viewport]');
       },
-
 
       onFabClick: function(event) {
         document.addEventListener('keyup', this.bindEscape);
@@ -1027,6 +1113,7 @@ Main parent container for all of the fab elements.
 
         if (experiment.canLoad()) {
           this.experimentSupported = true;
+          this.loadingCircleHidden = false;
           experiment.load(15000).then(function(app) {
             console.log('Experiment Loaded Successfully.');
             this.app = app;
@@ -1050,6 +1137,7 @@ Main parent container for all of the fab elements.
 
       experimentOff: function(event) {
         this.dialogVisible = false;
+        this.loadingCircleHidden = true;
         this.fixed == 'unfixed';
         document.removeEventListener('keyup', this.bindEscape);
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
@@ -1074,6 +1162,8 @@ Main parent container for all of the fab elements.
 
           this.playmode = 'playing';
           this.mode = 'active';
+
+          this.viewport.setAttribute('content', 'width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1, user-scalable=0');
 
         }, null, 300);
 
@@ -1118,6 +1208,8 @@ Main parent container for all of the fab elements.
         this.miniFabs = false;
         this.showTooltips = false;
         this.pauseOverlay = false;
+
+        this.viewport.setAttribute('content', 'width=device-width, minimum-scale=1.0, initial-scale=1');
       },
 
       trackExitExperiment: function(event) {
@@ -1130,9 +1222,10 @@ Main parent container for all of the fab elements.
       },
 
       onScroll: function(event) {
-        var scrollFabPos = this.getBoundingClientRect();
-        if (scrollFabPos.top <= 30) {
+        if (IOWA.Elements.ScrollContainer.scrollTop >= (this.scrollFabPos.top - 30)) {
           this.fixed = 'fixed';
+        } else if (IOWA.Elements.ScrollContainer.scrollTop <= (this.scrollFabPos.top - 30)) {
+          this.fixed = 'unfixed';
         }
       },
 

@@ -95,6 +95,7 @@ module.exports = (function() {
       displayContainerCenter = displayContainerCenter_;
 
       lineGraphic = new PIXI.Graphics();
+
       lineGraphicShadow = new PIXI.Graphics();
 
       baseLayer = baseLayer_;

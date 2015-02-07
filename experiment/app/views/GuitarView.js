@@ -36,6 +36,7 @@ module.exports = (function() {
 
     var isDrawing = false;
     var isUndrawing = false;
+    var isDragging = false;
 
     var guitarStrings = {};
     var dots = {};
@@ -52,6 +53,9 @@ module.exports = (function() {
     var pidPool = [];
 
     var gridCount;
+    var renderer;
+
+    Dot.clearTextureCache();
 
     /**
      * Add the note to the guitar note pool.
@@ -79,10 +83,11 @@ module.exports = (function() {
      * @param {number} pid_ - The ID of the view.
      * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The center point of the view.
      */
-    function init(stage_, pid_, displayContainerCenter_) {
+    function init(stage_, pid_, displayContainerCenter_, renderer_) {
       stage = stage_;
       pid = pid_;
       displayContainerCenter = displayContainerCenter_;
+      renderer = renderer_;
 
       displayContainerCenter.addChild(baseLayer);
       displayContainerCenter.addChild(midLayer);
@@ -205,7 +210,7 @@ module.exports = (function() {
       var dotA = dots[data.pointA];
       var dotB = dots[data.pointB];
 
-      var guitarString = new GuitarString(audioManager, CHANNEL, new GuitarStringModel());
+      var guitarString = new GuitarString(audioManager, CHANNEL, new GuitarStringModel(), renderer);
       guitarString.init(data.pid, midLayer, baseLayer);
       guitarString.updateSpacing(xSpacing, ySpacing);
       guitarString.onActivate(addRecordedItem);
@@ -227,17 +232,36 @@ module.exports = (function() {
      */
     function addEventListeners() {
       stage.interactive = true;
-      stage.touchstart = function(data) {
+
+      var dragStartPosition;
+
+      stage.mousedown = stage.touchstart = function(data) {
         displayContainerCenter.data = data;
+        dragStartPosition = data.global.clone();
       };
+
       stage.mousemove = stage.touchmove = function(data) {
         if (!isDrawing && !isUndrawing) {
+          if (!isDragging && !isRecording && !isCountdown && dragStartPosition) {
+            var x = data.global.x - dragStartPosition.x;
+            var y = data.global.y - dragStartPosition.y;
+            var dist = Math.sqrt(x*x + y*y);
+            if (dist > 20) {
+              isDragging = true;
+            }
+          }
+
           for (var pid in guitarStrings) {
             if (guitarStrings.hasOwnProperty(pid)) {
               guitarStrings[pid].dragMouseCollisionCheck(data);
             }
           }
         }
+      };
+
+      stage.mouseup = stage.touchend = function() {
+        isDragging = false;
+        dragStartPosition = null;
       };
 
       for (let key in dots) {
@@ -252,7 +276,7 @@ module.exports = (function() {
      */
     function removeEventListeners() {
       stage.interactive = false;
-      stage.touchstart = stage.mousemove = stage.touchmove = null;
+      stage.mousedown = stage.touchstart = stage.mousemove = stage.touchmove = stage.mouseup = stage.touchend = null;
 
       for (let key in dots) {
         if (dots.hasOwnProperty(key)) {
@@ -284,7 +308,7 @@ module.exports = (function() {
       }
 
       for (let i = 0; i < gridCount; i++) {
-        let dot = new Dot(i);
+        let dot = new Dot(i, renderer);
 
         dot.onActivate(activateDot);
 
@@ -310,7 +334,7 @@ module.exports = (function() {
      * @param {Object} dot - The clicked dot.
      */
     function activateDot(dot) {
-      if (isRecording || isCountdown) { return; }
+      if (isDragging || isRecording || isCountdown) { return; }
       if (APPLICATION_STATE === 'collapsed') { return; }
 
       if (!isDrawing && !dot.getString() && !isUndrawing) {
@@ -605,7 +629,8 @@ module.exports = (function() {
       dataModel: GuitarDataModel,
       backgroundColor: 0x1564c0,
       getChannel: () => CHANNEL,
-      supportsPortrait: true
+      supportsPortrait: true,
+      requiresAntialiasing: true
     };
   };
 })();

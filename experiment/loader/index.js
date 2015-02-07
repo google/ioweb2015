@@ -56,17 +56,21 @@ window.experiment = (function() {
       rejector = reject;
     });
 
-    loadTimeout = setTimeout(function() {
-      if (rejector) {
-        rejector();
-      }
-    }, timeoutDuration);
+    if (appSingleton) {
+      resolver(appSingleton);
+    } else {
+      loadTimeout = setTimeout(function() {
+        if (rejector) {
+          rejector();
+        }
+      }, timeoutDuration);
 
-    var scr = document.createElement('script');
-    scr.setAttribute('async', 'true');
-    scr.type = 'text/javascript';
-    scr.src = assetPath('/js/experiment.js');
-    ((document.getElementsByTagName('head') || [null])[0] || document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
+      var scr = document.createElement('script');
+      scr.setAttribute('async', 'true');
+      scr.type = 'text/javascript';
+      scr.src = assetPath('/js/experiment.js');
+      ((document.getElementsByTagName('head') || [null])[0] || document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
+    }
 
     return loadPromise;
   }

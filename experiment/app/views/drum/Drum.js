@@ -2,6 +2,7 @@ var PIXI = require('pixi.js/bin/pixi.dev.js');
 var p2 = require('p2');
 var animate = require('app/util/animate');
 var {Promise} = require('es6-promise');
+var {generateTexture} = require('app/util/generateTexture');
 
 module.exports = (function() {
   'use strict';
@@ -15,7 +16,7 @@ module.exports = (function() {
    * @param {Object} physicsWorld - The physics for this drum.
    * @constructor
    */
-  return function Drum(model, color, hoverColor, soundName, physicsWorld) {
+  return function Drum(model, color, hoverColor, soundName, physicsWorld, renderer) {
     var pid = model.pid;
     var isDragging = false;
     var interactionData;
@@ -24,10 +25,16 @@ module.exports = (function() {
 
     var shape = new PIXI.Circle(0, 0, model.radius);
 
-    var circle = new PIXI.Graphics();
-    circle.beginFill(0xffffff);
-    circle.drawShape(shape);
-    circle.endFill();
+    var circleGraphic = new PIXI.Graphics();
+    circleGraphic.beginFill(0xffffff);
+    circleGraphic.drawShape(shape);
+    circleGraphic.endFill();
+
+    var circleTexture = generateTexture(circleGraphic);
+    renderer.updateTexture(circleTexture.baseTexture);
+
+    var circle = new PIXI.Sprite(circleTexture);
+    circle.position.x = circle.position.y = -model.radius;
     circle.tint = color;
 
     var shadow = new PIXI.Graphics();
@@ -47,7 +54,9 @@ module.exports = (function() {
     hitCircleGfx.drawShape(shape);
     hitCircleGfx.endFill();
 
-    var hitTexture = hitCircleGfx.generateTexture();
+    var hitTexture = generateTexture(hitCircleGfx);
+    renderer.updateTexture(hitTexture.baseTexture);
+
     var hitCircleContainer = new PIXI.DisplayObjectContainer();
 
     var self = {

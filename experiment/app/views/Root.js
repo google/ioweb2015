@@ -1,4 +1,6 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
+PIXI.dontSayHello = true;
+
 var reqAnimFrame = require('app/util/raf');
 var trackEvent = require('app/util/trackEvent');
 var { Promise } = require('es6-promise');
@@ -21,12 +23,22 @@ var GuitarView = require('app/views/GuitarView');
 var ArpeggiatorView = require('app/views/ArpeggiatorView');
 var HexagonView = require('app/views/HexagonView');
 
+var RecordButton = require('app/views/RecordButton');
+
 var logoSrc = require('url?limit=10000!app/images/io_white.png');
 
 const MOBILE_MAX = 767;
 
 module.exports = function RootView(audioManager, stateManager) {
   'use strict';
+
+  // Clean out Pixi caches.
+  PIXI.BaseTextureCache = {};
+  PIXI.BaseTextureCacheIdGenerator = 0;
+  PIXI.TextureCache = {};
+  PIXI.FrameCache = {};
+  PIXI.TextureCacheIdGenerator = 0;
+  PIXI.WebGLGraphics.graphicsDataPool.length = 0;
 
   var instrumentElements;
   var visualizerElements;
@@ -65,6 +77,8 @@ module.exports = function RootView(audioManager, stateManager) {
   };
 
   var maskManager = new MaskManager('experiment-is-masked');
+
+  RecordButton.clearTextureCache();
 
   /**
    * Initialize the view and start the central rAF loop.
@@ -172,10 +186,18 @@ module.exports = function RootView(audioManager, stateManager) {
 
     disableScrolling();
 
+    for (let i = 0; i < instrumentViews.length; i++) {
+      instrumentViews[i].noClick();
+    }
+
     return maskManager.animateIn(x, y).then(function() {
       isPaused = false;
       enableScrolling();
       logoElement.classList.remove('hidden');
+      enableAllInstancesInsideViewport();
+      for (let i = 0; i < instrumentViews.length; i++) {
+        instrumentViews[i].allowClick();
+      }
     });
   }
 
@@ -200,6 +222,13 @@ module.exports = function RootView(audioManager, stateManager) {
     viewportElement = null;
 
     containerElem.style.position = '';
+
+    for (let i = 0; i < instrumentViews.length; i++) {
+      instrumentViews[i].cleanUp();
+    }
+
+    PIXI.glContexts.length = 0;
+    PIXI.instances.length = 0;
   }
 
   /**

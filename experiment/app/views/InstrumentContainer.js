@@ -6,6 +6,7 @@ var backImage = require('url?limit=10000!app/images/back-arrow.png');
 var RecordButton = require('app/views/RecordButton');
 var zIndexes = require('app/util/zIndexes');
 var currentViewportDetails = require('app/util/currentViewportDetails');
+var {setHasAntialiasing} = require('app/util/generateTexture');
 
 module.exports = (function() {
   'use strict';
@@ -20,8 +21,85 @@ module.exports = (function() {
   const CONTENT_CONTROLS_BUFFER = 70;
   const MOBILE_MAX = 767;
 
-  // Pixi.js has too many retina bugs to enable at this time.
   var isRetina = false;
+
+  var canvasRenderers;
+  var webGLRenderers;
+  var hasAntialiasing;
+
+  /**
+   * WebGL can never clean up after old contexts, so we reuse ours in a pool.
+   */
+  function buildRendererPool() {
+    var antialias = true;
+
+    if (window.navigator.userAgent.match(/Safari/) &&
+        window.navigator.userAgent.match(/Version\/8/)) {
+      antialias = false;
+    }
+
+    canvasRenderers = [];
+    webGLRenderers = [];
+
+    for (let i = 0; i < 5; i++) {
+      let webGLRenderer = new PIXI.WebGLRenderer(window.innerWidth, window.innerHeight, {
+        antialias: antialias,
+        transparent: false,
+        resolution: 1
+      });
+
+      if ('undefined' === typeof hasAntialiasing) {
+        let requestedAntialiasing = webGLRenderer.gl.getContextAttributes().antialias;
+        let size = webGLRenderer.gl.getParameter(webGLRenderer.gl.SAMPLES);
+        hasAntialiasing = requestedAntialiasing && (size > 0);
+      }
+
+      webGLRenderers.push(webGLRenderer);
+    }
+
+    setHasAntialiasing(hasAntialiasing);
+
+    if (!hasAntialiasing) {
+      for (let i = 0; i < 5; i++) {
+        let canvasRenderer = new PIXI.CanvasRenderer(window.innerWidth, window.innerHeight, {
+          transparent: false,
+          resolution: isRetina ? 2 : 1
+        });
+
+        if (isRetina) {
+          canvasRenderer.view.style.width = `${canvasRenderer.width/2}px`;
+          canvasRenderer.view.style.height = `${canvasRenderer.height/2}px`;
+        }
+
+        canvasRenderer.updateTexture = function() {};
+        canvasRenderers.push(canvasRenderer);
+      }
+    }
+  }
+
+  /**
+   * Get a renderer from the pool.
+   * @return {PIXI.WebGLRenderer}
+   */
+  function getRenderer(type) {
+    if (type === PIXI.CanvasRenderer) {
+      return canvasRenderers.pop();
+    } else {
+      return webGLRenderers.pop();
+    }
+  }
+
+  /**
+   * Return a renderer to the pool.
+   * @param {PIXI.WebGLRenderer} renderer - The no longer used renderer.
+   */
+  function returnRenderer(renderer) {
+    if (renderer instanceof PIXI.CanvasRenderer) {
+      canvasRenderers.push(renderer);
+    } else {
+      webGLRenderers.push(renderer);
+    }
+  }
 
   /**
    * A container that wraps a sub instruments.
@@ -61,6 +139,10 @@ module.exports = (function() {
 
     var isMobile = false;
 
+    if (!webGLRenderers) {
+      buildRendererPool();
+    }
+
     var self = {
       init,
       enable,
@@ -71,8 +153,11 @@ module.exports = (function() {
       contractView,
       ignoreInteraction,
       followInteraction,
+      noClick,
+      allowClick,
       onActivate,
       onBack,
+      cleanUp,
       getView: () => instrumentView,
       getElemRect: () => elemRect,
       getChannel: () => instrumentView && instrumentView.getChannel && instrumentView.getChannel(),
@@ -90,17 +175,18 @@ module.exports = (function() {
       displayContainerCenter = new PIXI.DisplayObjectContainer();
       displayContainer = new PIXI.DisplayObjectContainer();
       displayContainerSub = new PIXI.DisplayObjectContainer();
-      controls = makeControls();
 
       instrumentView = new SubView(audioManager);
       createRenderer(instrumentView.backgroundColor);
+
+      controls = makeControls();
 
       displayContainer.addChild(displayContainerSub);
       displayContainerSub.addChild(displayContainerCenter);
 
       stage.addChild(displayContainer);
 
-      instrumentView.init(stage, pid, displayContainerCenter);
+      instrumentView.init(stage, pid, displayContainerCenter, renderer);
 
       // If Debug
       // debugFrame = new PIXI.Graphics();
@@ -112,25 +198,31 @@ module.exports = (function() {
       addContractedEventListeners();
 
       isReady = true;
+    }
 
-      setTimeout(function() {
-        // fixes for black graphic squares in 5th webGL container
-        var recordIconImage = recordButton.recordIcon;
-        var recordCircle = recordButton.circle;
-        var checkboxCircle = recordButton.checkmarkCircle;
-        var recordText = recordButton.textImages;
-        var recordNumbers = recordButton.numberImagePixiObjects;
-        renderer.updateTexture(backIcon.texture.baseTexture);
-        renderer.updateTexture(recordIconImage.texture.baseTexture);
-        renderer.updateTexture(recordCircle.texture.baseTexture);
-        renderer.updateTexture(checkboxCircle.texture.baseTexture);
-        for (let i = 0; i < recordText.length; i++) {
-          renderer.updateTexture(recordText[i].texture.baseTexture);
-        }
-        for (let i = 0; i < recordNumbers.length; i++) {
-          renderer.updateTexture(recordNumbers[i].texture.baseTexture);
-        }
-      }, 50);
+    /**
+     * Work around Pixi bugs with more than 5 WebGL context.
+     */
+    function updateRendererTextures() {
+      // fixes for black graphic squares in 5th webGL container
+      var recordIconImage = recordButton.recordIcon;
+      var recordCircle = recordButton.circle;
+      var checkboxCircle = recordButton.checkmarkCircle;
+      var recordText = recordButton.textImages;
+      var recordNumbers = recordButton.numberImagePixiObjects;
+
+      renderer.updateTexture(backIcon.texture.baseTexture);
+      renderer.updateTexture(recordIconImage.texture.baseTexture);
+      renderer.updateTexture(recordCircle.texture.baseTexture);
+      renderer.updateTexture(checkboxCircle.texture.baseTexture);
+
+      for (let i = 0; i < recordText.length; i++) {
+        renderer.updateTexture(recordText[i].texture.baseTexture);
+      }
+
+      for (let i = 0; i < recordNumbers.length; i++) {
+        renderer.updateTexture(recordNumbers[i].texture.baseTexture);
+      }
     }
 
     /**
@@ -148,7 +240,7 @@ module.exports = (function() {
       backIconContainer.addChild(backIcon);
       backIconContainer.alpha = 0;
 
-      recordButton = new RecordButton(audioManager);
+      recordButton = new RecordButton(audioManager, renderer);
       recordButton.container.position.x = window.innerWidth - 62;
       recordButton.container.position.y = 56;
       recordButton.container.pivot.set(28,28);
@@ -187,6 +279,8 @@ module.exports = (function() {
      * @return {Promise}
      */
     function showControls() {
+      updateRendererTextures();
+
       stage.addChild(controls);
 
       backIconContainer.interactive = true;
@@ -301,30 +395,10 @@ module.exports = (function() {
       wrapperElement.classList.add('experiment-instrument--' + pid);
       viewportElement.appendChild(wrapperElement);
 
-      var antialias = true;
-      var resolution = 1;
-
-      if (isRetina) {
-        antialias = false;
-        resolution = 2;
-      }
-
-      if (window.navigator.userAgent.match(/Safari/) &&
-          window.navigator.userAgent.match(/Version\/8/)) {
-        antialias = false;
-      }
-
-      // create a renderer passing in the options
-      renderer = new PIXI.WebGLRenderer(window.innerWidth, window.innerHeight, {
-        antialias: antialias,
-        transparent: false,
-        resolution: resolution
-      });
-
-      if (isRetina) {
-        animate.set(renderer.view, { scaleX: 0.5, scaleY: 0.5 });
-        renderer.view.style.transformOrigin = '0 0';
-        renderer.view.style.webkitTransformOrigin = '0 0';
+      if (hasAntialiasing) {
+        renderer = getRenderer(PIXI.WebGLRenderer);
+      } else {
+        renderer = getRenderer(instrumentView.requiresAntialiasing ? PIXI.CanvasRenderer : PIXI.WebGLRenderer);
       }
 
       stage = new PIXI.Stage(bgColor);
@@ -334,6 +408,18 @@ module.exports = (function() {
       wrapperElement.appendChild(renderer.view);
 
       stage.addChild(displayContainerCenter);
+    }
+
+    /**
+     * Clean on shutodwn.
+     */
+    function cleanUp() {
+      if ('function' === typeof instrumentView.cleanUp) {
+        instrumentView.cleanUp();
+      }
+
+      returnRenderer(renderer);
+      renderer = null;
     }
 
     /**
@@ -443,6 +529,7 @@ module.exports = (function() {
       });
 
       instrumentView.animationExpanded();
+
       removeContractedEventListeners();
       addExpandedEventListeners();
 
@@ -660,6 +747,20 @@ module.exports = (function() {
     }
 
     /**
+     * Add pointer-events: none to the instrument wrapper element.
+     */
+    function noClick() {
+      wrapperElement.style.pointerEvents = 'none';
+    }
+
+    /**
+     * Allow pointer-events on the instrument wrapper element.
+     */
+    function allowClick() {
+      wrapperElement.style.pointerEvents = '';
+    }
+
+    /**
      * On-resize of the window.
      * @param {number} w - The width.
      * @param {number} h - The height.
@@ -678,6 +779,7 @@ module.exports = (function() {
 
       var maxW = Math.max(w, elemRect.width);
       var maxH = Math.max(h, elemRect.height);
+
       renderer.resize(maxW, maxH);
 
       resizeControls(window.innerWidth);

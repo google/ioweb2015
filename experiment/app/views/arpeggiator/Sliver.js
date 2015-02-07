@@ -12,6 +12,7 @@ module.exports = (function() {
   const SAFE_ZONE = 1.0 - ARPEGGIATOR_COLORS.safeZone;
   const SHADOW_RANGE = new FloatRange(0.18, 0);
   const CENTER_RANGE = new FloatRange(0, MAX_RADIUS);
+  const SHADOW_LENGTH = 15;
 
   var distanceGradients = {};
 
@@ -27,10 +28,6 @@ module.exports = (function() {
    * @constructor
    */
   return function Sliver(container, polygon, depth, colorSets, hasLeftShadow, hasRightShadow, highlight) {
-    var shadowLength;
-
-    shadowLength = 15;
-
     const [
       COLOR_A,
       COLOR_B,
@@ -179,8 +176,8 @@ module.exports = (function() {
      * @param {Boolean} reverse = reverse or not?
      */
     function drawShadow(x1, y1, x2, y2, reverse) {
-      for (let i = 0; i < shadowLength; i++) {
-        renderShadow(i, x1, y1, x2, y2, reverse, SHADOW_RANGE.getAt(1 - i / (shadowLength-1)));
+      for (let i = 0; i < SHADOW_LENGTH; i++) {
+        renderShadow(i, x1, y1, x2, y2, reverse, SHADOW_RANGE.getAt(1 - i / (SHADOW_LENGTH-1)));
       }
     }
 
