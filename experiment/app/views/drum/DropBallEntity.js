@@ -1,6 +1,7 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var p2 = require('p2');
 var rAFTimeout = require('app/util/rAFTimeout');
+var {generateTexture} = require('app/util/generateTexture');
 
 module.exports = (function() {
   'use strict';
@@ -57,7 +58,7 @@ module.exports = (function() {
         textureGfx.beginFill(0xffffff, 0.8);
         textureGfx.drawCircle(0, 0, 10);
         textureGfx.endFill();
-        cachedTexture = textureGfx.generateTexture();
+        cachedTexture = generateTexture(textureGfx);
         renderer.updateTexture(cachedTexture.baseTexture);
       }
       ball = new PIXI.Sprite(cachedTexture);

@@ -101,7 +101,7 @@ module.exports = (function() {
       circleGraphics.drawCircle(0, 0, CIRCLE_RADIUS);
       circleGraphics.endFill();
 
-      circleTexture = circleGraphics.generateTexture();
+      circleTexture = circleGraphics.generateTexture(2);
       renderer.updateTexture(circleTexture.baseTexture);
     }
 

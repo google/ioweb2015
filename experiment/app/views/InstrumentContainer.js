@@ -6,6 +6,7 @@ var backImage = require('url?limit=10000!app/images/back-arrow.png');
 var RecordButton = require('app/views/RecordButton');
 var zIndexes = require('app/util/zIndexes');
 var currentViewportDetails = require('app/util/currentViewportDetails');
+var {setHasAntialiasing} = require('app/util/generateTexture');
 
 module.exports = (function() {
   'use strict';
@@ -20,36 +21,61 @@ module.exports = (function() {
   const CONTENT_CONTROLS_BUFFER = 70;
   const MOBILE_MAX = 767;
 
-  // Pixi.js has too many retina bugs to enable at this time.
-  var isRetina = false;
+  var isRetina = false;//window.devicePixelRatio > 1;
 
-  var renderers;
+  var canvasRenderers;
+  var webGLRenderers;
+  var hasAntialiasing;
 
   /**
    * WebGL can never clean up after old contexts, so we reuse ours in a pool.
    */
   function buildRendererPool() {
     var antialias = true;
-    var resolution = 1;
-
-    if (isRetina) {
-      antialias = false;
-      resolution = 2;
-    }
 
     if (window.navigator.userAgent.match(/Safari/) &&
         window.navigator.userAgent.match(/Version\/8/)) {
       antialias = false;
     }
 
-    renderers = [];
+    antialias = false;
+
+    canvasRenderers = [];
+    webGLRenderers = [];
 
     for (let i = 0; i < 5; i++) {
-      renderers.push(new PIXI.WebGLRenderer(window.innerWidth, window.innerHeight, {
+      let webGLRenderer = new PIXI.WebGLRenderer(window.innerWidth, window.innerHeight, {
         antialias: antialias,
         transparent: false,
-        resolution: resolution
-      }));
+        resolution: 1
+      });
+
+      if ('undefined' === typeof hasAntialiasing) {
+        let requestedAntialiasing = webGLRenderer.gl.getContextAttributes().antialias;
+        let size = webGLRenderer.gl.getParameter(webGLRenderer.gl.SAMPLES);
+        hasAntialiasing = requestedAntialiasing && (size > 0);
+      }
+
+      webGLRenderers.push(webGLRenderer);
+    }
+
+    setHasAntialiasing(hasAntialiasing);
+
+    if (!hasAntialiasing) {
+      for (let i = 0; i < 5; i++) {
+        let canvasRenderer = new PIXI.CanvasRenderer(window.innerWidth, window.innerHeight, {
+          transparent: false,
+          resolution: isRetina ? 2 : 1
+        });
+
+        if (isRetina) {
+          canvasRenderer.view.style.width = `${canvasRenderer.width/2}px`;
+          canvasRenderer.view.style.height = `${canvasRenderer.height/2}px`;
+        }
+
+        canvasRenderer.updateTexture = function() {};
+        canvasRenderers.push(canvasRenderer);
+      }
     }
   }
 
@@ -57,8 +83,12 @@ module.exports = (function() {
    * Get a renderer from the pool.
    * @return {PIXI.WebGLRenderer}
    */
-  function getRenderer() {
-    return renderers.pop();
+  function getRenderer(type) {
+    if (type === PIXI.CanvasRenderer) {
+      return canvasRenderers.pop();
+    } else {
+      return webGLRenderers.pop();
+    }
   }
 
   /**
@@ -66,7 +96,11 @@ module.exports = (function() {
    * @param {PIXI.WebGLRenderer} renderer - The no longer used renderer.
    */
   function returnRenderer(renderer) {
-    renderers.push(renderer);
+    if (renderer instanceof PIXI.CanvasRenderer) {
+      canvasRenderers.push(renderer);
+    } else {
+      webGLRenderers.push(renderer);
+    }
   }
 
   /**
@@ -107,7 +141,7 @@ module.exports = (function() {
 
     var isMobile = false;
 
-    if (!renderers) {
+    if (!webGLRenderers) {
       buildRendererPool();
     }
 
@@ -363,13 +397,10 @@ module.exports = (function() {
       wrapperElement.classList.add('experiment-instrument--' + pid);
       viewportElement.appendChild(wrapperElement);
 
-      // create a renderer passing in the options
-      renderer = getRenderer();
-
-      if (isRetina) {
-        animate.set(renderer.view, { scaleX: 0.5, scaleY: 0.5 });
-        renderer.view.style.transformOrigin = '0 0';
-        renderer.view.style.webkitTransformOrigin = '0 0';
+      if (hasAntialiasing) {
+        renderer = getRenderer(PIXI.WebGLRenderer);
+      } else {
+        renderer = getRenderer(instrumentView.requiresAntialiasing ? PIXI.CanvasRenderer : PIXI.WebGLRenderer);
       }
 
       stage = new PIXI.Stage(bgColor);

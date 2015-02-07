@@ -194,8 +194,8 @@ module.exports = (function() {
         if (!isDragging) { return; }
 
         updateCursor(
-            data.global.x - (myWidth / 2),
-            data.global.y - (myHeight / 2)
+          data.global.x - (myWidth / 2),
+          data.global.y - (myHeight / 2)
         );
       };
 
@@ -362,7 +362,7 @@ module.exports = (function() {
      * @param {number} rotation - The current rotation point.
      */
     function makeTriangle(radians, rotation) {
-      var maxLength = Math.max(window.innerHeight, window.innerWidth);
+      var maxLength = Math.max(window.innerHeight * 1.2, window.innerWidth * 1.2);
       var bottomVec = vec2.fromValues(0, maxLength);
       vec2.rotate(bottomVec, bottomVec, rotation);
 

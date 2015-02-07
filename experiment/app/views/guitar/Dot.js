@@ -1,5 +1,6 @@
 var PIXI = require('pixi.js/bin/pixi.dev.js');
 var animate = require('app/util/animate');
+var {generateTexture} = require('app/util/generateTexture');
 
 module.exports = (function() {
   'use strict';
@@ -130,7 +131,7 @@ module.exports = (function() {
         dot.drawCircle(0, 0, size);
         dot.endFill();
 
-        dotTextures[size] = dot.generateTexture();
+        dotTextures[size] = generateTexture(dot, 1);
         renderer.updateTexture(dotTextures[size].baseTexture);
       }
 

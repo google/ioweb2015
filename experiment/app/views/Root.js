@@ -194,6 +194,7 @@ module.exports = function RootView(audioManager, stateManager) {
       isPaused = false;
       enableScrolling();
       logoElement.classList.remove('hidden');
+      enableAllInstancesInsideViewport();
       for (let i = 0; i < instrumentViews.length; i++) {
         instrumentViews[i].allowClick();
       }

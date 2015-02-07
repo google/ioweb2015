@@ -65,7 +65,7 @@ module.exports = (function() {
     var currentTrack;
 
     var maxWidth = 1100;
-    var maxHeight = 700;
+    var maxHeight = 1000;
 
     var renderer;
     DotEmitter.clearTextureCache();
@@ -454,7 +454,8 @@ module.exports = (function() {
       dataModel: DrumsDataModel,
       getData: () => data,
       backgroundColor: 0x7c4dff,
-      getChannel: () => CHANNEL
+      getChannel: () => CHANNEL,
+      requiresAntialiasing: true
     };
   };
 })();
