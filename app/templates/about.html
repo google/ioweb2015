@@ -126,6 +126,7 @@
 
       var gallery = IOWA.Elements.Main.querySelector('io-gallery');
 
+      // Don't animate top/bottom cards offscreen on mobile.
       if (gallery.mobile) {
         animation.children = animation.children.slice(2);
       }
