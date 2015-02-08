@@ -17,11 +17,11 @@
   },
   "about-io": {
     "description": "Description of what I/O is.",
-    "message": "Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech."
+    "message": "Google I/O is two days of inspirational talks, hands-on learning, and a chance to hear more about Google's latest developer products."
   },
-  "about-see-keynote": {
+  "about-see-sessions": {
     "description": "Link text see the list of 2014 keynote and video sessions.",
-    "message": "See the 2014 Keynote and sessions"
+    "message": "See the 2014 sessions"
   },
   "schedule": {
     "description": "Top navbar single-word link text. Please keep this short. Links to the event schedule page.",
@@ -29,11 +29,11 @@
   },
   "attend-onsite": {
     "description": "Top navbar sink text. Please keep this short. Links to the site's page for attendees.",
-    "message": "Attend onsite"
+    "message": "Attend Onsite"
   },
   "attend-offsite": {
     "description": "Top navbar sink text. Please keep this short. Links to the site's page for offsite participants.",
-    "message": "Attend offsite"
+    "message": "Attend Offsite"
   },
   "attend-from": {
     "description": "Beginning of 'Attend I/O from x or wherever you are heading",
@@ -65,7 +65,13 @@
   },
   "reg-begins": {
     "description": "When registration begins",
-    "message": "Registration begins March 10 at 9AM PST"
+    "message": "Registration will begin <b>March 17 at 9:00AM PDT</b> and will remain open until <b>March 19 at 5:00PM PDT</b>."
+  },
+  "reg-dontworry": {
+    "message": "Don't worry, there's no rush. You'll have plenty of time to submit your registration application. Applicants will be selected at random to receive the opportunity to purchase one ticket. The order in which applications are received has no bearing on the outcome and remember, only one registration application per person is allowed."
+  },
+  "reg-googleaccount": {
+    "message": "Make sure you have a Google account. You'll need to sign into your Google account to begin the registration application process."
   },
   "io-description-card": {
     "description": "Description of the event.",
@@ -190,7 +196,7 @@
   },
   "share-text": {
     "description": "Social sharing pre-populated text.",
-    "message": "Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015."
+    "message": "Google I/O 2015 brings together developers to explore the next generation of tech and mobile. Join us online or in person May 28-29, 2015."
   },
   "gplus-share": {
     "description": "Google plus share text",
@@ -244,9 +250,9 @@
     "description": "Link text. Please keep short. Used on the schedule page.",
     "message": "Agenda"
   },
-  "howitworks": {
+  "tips-ready": {
     "description": "Heading text for the top card on the registration page.",
-    "message": "How it works"
+    "message": "Tips to get ready"
   },
   "livestream": {
     "description": "Heading text for the top card on the attend offsite page",

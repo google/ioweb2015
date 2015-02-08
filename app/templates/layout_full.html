@@ -15,7 +15,7 @@ limitations under the License.
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015.">
+  <meta name="description" content="{% .Desc %}">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1">
   <title>{% .Title %}</title>
 
@@ -47,15 +47,15 @@ limitations under the License.
   <meta name="msapplication-tap-highlight" content="no">
 
   <!-- G+ and Twitter sharing meta data -->
-  <meta property="og:title" content="Google I/O 2015">
-  <meta property="og:description" content="Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015.">
+  <meta property="og:title" content="{% .Title %}">
+  <meta property="og:description" content="{% .Desc %}">
   <meta property="og:type" content="Event">
   <meta property="og:image" content="images/{% .OgImage %}">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@googledevs">
-  <meta name="twitter:title" content="Google I/O 2015">
-  <meta name="twitter:description" content="Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015.">
+  <meta name="twitter:title" content="{% .Title %}">
+  <meta name="twitter:description" content="{% .Desc %}">
   <meta name="twitter:image:src" content="images/{% .OgImage %}">
 
   <script type="application/ld+json">
@@ -190,8 +190,8 @@ limitations under the License.
     <core-toolbar class="tall bg-cyan">
       <div class="top io-logo" flex></div>
       <div class="bottom">
-        <p class="typo-white"><i18n-msg msgid="iodate">May 28 - 29</i18-msg>, 2015</p>
-        <p>San Francisco, CA</p>
+        <div class="typo-white"><i18n-msg msgid="iodate">May 28 - 29</i18-msg>, 2015</div>
+        <div>San Francisco, CA</div>
       </div>
     </core-toolbar>
     <div class="drawer-panel-content" flex>
@@ -213,12 +213,12 @@ limitations under the License.
         </paper-item>
         <paper-item>
           <a href="onsite" data-ajax-link data-track-link="nav-drawer-onsite">
-            <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
+            <i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
           <a href="offsite" data-ajax-link data-track-link="nav-drawer-offsite">
-            <i18n-msg msgid="attend-offsite">Attend offsite</i18n-msg>
+            <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
           </a>
         </paper-item>
         <paper-item>
@@ -267,12 +267,12 @@ limitations under the License.
             </paper-tab>
             <paper-tab label="onsite" role="">
               <a href="onsite" data-ajax-link data-track-link="nav-onsite" data-anim-ripple layout horizontal center>
-                <i18n-msg msgid="attend-onsite">Attend onsite</i18n-msg>
+                <i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="offsite" role="">
               <a href="offsite" data-ajax-link data-track-link="nav-offsite" data-anim-ripple layout horizontal center>
-                <i18n-msg msgid="attend-offsite">Attend offsite</i18n-msg>
+                <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="registration" role="">
@@ -297,7 +297,7 @@ limitations under the License.
 
       <footer layout vertical>
 
-        <i18n-msg id="share-dialog-text" msgid="share-text" hidden>Google I/O 2015 brings together developers for an immersive, two-day experience focused on exploring the next generation of technology, mobile and beyond. Join us online or in person May 28-29, 2015.</i18n-msg>
+        <i18n-msg id="share-text" msgid="share-text" hidden>Google I/O 2015 brings together developers to explore the next generation of tech and mobile. Join us online or in person May 28-29, 2015.</i18n-msg>
 
         <div layout horizontal justified class="footer-top">
           <span class="footer-share-links--top">
@@ -347,6 +347,7 @@ limitations under the License.
 <script src="scripts/helper/router.js"></script>
 <script src="scripts/helper/request.js"></script>
 <script src="scripts/helper/picasa.js"></script>
+<script src="scripts/helper/service-worker-registration.js"></script>
 <script src="scripts/bootstrap.js"></script>
 <!-- endbuild -->
 <script>

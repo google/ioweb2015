@@ -8,6 +8,7 @@ var audioLoopsDefault = require('app/data/loops.json');
 var audioLoopsCat = require('app/data/catloops.json');
 var {Promise} = require('es6-promise');
 var rAFTimeout = require('app/util/rAFTimeout');
+var events = require('app/util/events');
 
 /**
  * Main entry point into the experiment.
@@ -19,6 +20,9 @@ module.exports = function Experiment() {
   var audioManager;
   var rootView;
   var stateManager;
+
+  var eventualDidEnterRecordingMode;
+  var eventualDidExitRecordingMode;
 
   var d = new Date();
   var isAprilFools = (d.getMonth() === 3) && (d.getDate() === 1);
@@ -52,12 +56,6 @@ module.exports = function Experiment() {
 
     // Create the AudioManager, which controls all sound in the experiment.
     audioManager = new AudioManager();
-    audioManager.init();
-
-    stateManager = new StateManager(audioManager);
-
-    // Create the RootView, which controls all visuals in the experiment.
-    rootView = new RootView(audioManager, stateManager);
 
     // Define the mapping of sound names to their location in the audio sprite.
     audioManager.defineSounds(audioSprite.spritemap, audioManager);
@@ -84,6 +82,22 @@ module.exports = function Experiment() {
    * @param {array<number>} fromPos - The origin point of the transition in (FAB).
    */
   function start(instrumentSelector = '.row', visualizerSelector = '.box', fromPos = [0,0]) {
+    events.init();
+    audioManager.init();
+
+    stateManager = new StateManager(audioManager);
+
+    // Create the RootView, which controls all visuals in the experiment.
+    rootView = new RootView(audioManager, stateManager);
+
+    if (eventualDidEnterRecordingMode) {
+      rootView.didEnterRecordingMode(eventualDidEnterRecordingMode);
+    }
+
+    if (eventualDidExitRecordingMode) {
+      rootView.didExitRecordingMode(eventualDidExitRecordingMode);
+    }
+
     // Start sound engine.
     audioManager.fadeIn(2.25, 0.75);
 
@@ -192,7 +206,7 @@ module.exports = function Experiment() {
    * @param {function} cb - The enter callback
    */
   function didEnterRecordingMode(cb) {
-    rootView.didEnterRecordingMode(cb);
+    eventualDidEnterRecordingMode = cb;
   }
 
   /**
@@ -200,7 +214,7 @@ module.exports = function Experiment() {
    * @param {function} cb - The exit callback
    */
   function didExitRecordingMode(cb) {
-    rootView.didExitRecordingMode(cb);
+    eventualDidExitRecordingMode = cb;
   }
 
   /**

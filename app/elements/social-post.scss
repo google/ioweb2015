@@ -22,8 +22,9 @@ a {
   text-decoration: none;
 }
 
-header {
-  color: $color-gray;
+.timestamp a {
+  color: $color-link-grey;
+  font-weight: 400;
 }
 
 @media (min-width: $tablet-breakpoint-min) {

@@ -22,7 +22,7 @@
   <div class="card__container card__container--top slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
-        <h3><i18n-msg msgid="about-io">Google I/O is an annual developer conference to learn, share and get inspired about the latest and greatest in tech.</i18n-msg></h3>
+        <h3><i18n-msg msgid="about-io">Google I/O is two days of inspirational talks, hands-on learning, and a chance to hear more about Google's latest developer products.</i18n-msg></h3>
       </div>
       <div class="card-content">
         <span class="anchor-like" role="link" tabindex="0" data-track-link="about-view-photos-card" on-tap="{{togglePhotoGallery}}">
@@ -38,14 +38,7 @@
         <div class="photo__about" flex two?="{{isDesktopSize}}"></div>
         <div layout vertical flex>
           <div class="photo__about--top" layout vertical flex></div>
-          <div class="photo__about--bottom" layout vertical flex>
-            <paper-button hidden?="{{isPhoneSize}}"
-                          data-track-link="about-view-photos-section"
-                          on-tap="{{togglePhotoGallery}}">
-              <i18n-msg msgid="see-more-photos">See more photos from past I/Os</i18n-msg>
-              <core-icon icon="io:photo-camera" aria-hidden="true"></core-icon>
-            </paper-button>
-          </div>
+          <div class="photo__about--bottom" layout vertical flex></div>
         </div>
       </div>
       <div class="pics__section--under" layout horizontal>
@@ -64,11 +57,11 @@
         </div>
         <div class="card-content">
           <a href="https://www.google.com/events/io/io14videos" target="_blank" data-track-link="about-see-keynote-and-sessions">
-            <i18n-msg msgid="about-see-keynote">See the 2014 Keynote and sessions</i18n-msg>
+            <i18n-msg msgid="about-see-sessions">See the 2014 sessions</i18n-msg>
           </a>
         </div>
       </div>
-      <div class="card" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="about-watch-2014-recap-video">
+      <div class="card js-experiment-visualizer" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="about-watch-2014-recap-video">
         <div flex class="card__photo card__photo--recap"></div>
         <div class="card-content">
           <img src="images/play-video-button.png" class="play__button play__button--card" alt="Play video">
@@ -99,7 +92,6 @@
       var bottomCard = IOWA.Elements.Main.querySelector('.pics__section').nextElementSibling;
       var bottomSection = IOWA.Elements.Main.querySelector('#hashtag');
 
-      var button = IOWA.Elements.Main.querySelector('.photo__about--bottom paper-button');
       var navOverlay = document.querySelector('.navbar__overlay--gallery');
 
       var reverse = opt_reverse || false;
@@ -129,10 +121,6 @@
         new Animation(navOverlay, [
           {transform: 'translateY(-100%)'},
           {transform: 'translateY(0)'}
-        ], animationOptions),
-        new Animation(button, [
-          {opacity: 1},
-          {opacity: 0}
         ], animationOptions)
       ]);
 

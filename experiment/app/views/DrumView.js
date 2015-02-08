@@ -65,7 +65,10 @@ module.exports = (function() {
     var currentTrack;
 
     var maxWidth = 1100;
-    var maxHeight = 700;
+    var maxHeight = 1000;
+
+    var renderer;
+    DotEmitter.clearTextureCache();
 
     /**
      * Initialize the drum view.
@@ -73,10 +76,11 @@ module.exports = (function() {
      * @param {number} pid_ - The pid of the note.
      * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The center point of the view.
      */
-    function init(stage_, pid_, displayContainerCenter_) {
+    function init(stage_, pid_, displayContainerCenter_, renderer_) {
       stage = stage_;
       pid = pid_;
       displayContainerCenter = displayContainerCenter_;
+      renderer = renderer_;
 
       groundT = new PIXI.DisplayObjectContainer();
       displayContainerCenter.addChild(groundT);
@@ -157,10 +161,10 @@ module.exports = (function() {
       isRecording = false;
 
       currentTrack = audioManager.createRecordedTrack(
-          data.recorded,
-          CHANNEL,
-          DRUM_TAG
-          );
+        data.recorded,
+        CHANNEL,
+        DRUM_TAG
+      );
     }
 
     /**
@@ -202,7 +206,7 @@ module.exports = (function() {
       drumDefs.sort((a, b) => a.radius - b.radius);
 
       drums = drumDefs.map(function(drumDef) {
-        var drum = new Drum(drumDef, drumDef.color, drumDef.hovercolor, drumDef.sound, world);
+        var drum = new Drum(drumDef, drumDef.color, drumDef.hovercolor, drumDef.sound, world, renderer);
 
         drum.setPosition(drumDef.x, drumDef.y);
 
@@ -222,7 +226,7 @@ module.exports = (function() {
       });
 
       emitters = data.emitters.map(function(emitterDef) {
-        var e = new DotEmitter(audioManager);
+        var e = new DotEmitter(renderer);
         e.init(stage, displayContainerCenter, world, emitterDef.x, emitterDef.y, dotEmitterObj, getNextPID, emitterDef.beatModulo, audioManager);
         return e;
       });
@@ -235,10 +239,8 @@ module.exports = (function() {
      * @param {Drum} drum - The targeted drum.
      */
     function onDragStart(drum) {
-      console.log('start drag', drum.pid);
       if ('undefined' !== typeof currentlyDraggingDrum_) { return false; }
 
-      console.log('continue drag', drum.pid);
       currentlyDraggingDrum_ = drum.pid;
 
       return true;
@@ -249,10 +251,8 @@ module.exports = (function() {
      * @param {Drum} drum - The targeted drum.
      */
     function onDragEnd(drum) {
-      console.log('stop drag', drum.pid);
       if (currentlyDraggingDrum_ !== drum.pid) { return false; }
 
-      console.log('continue stop drag', drum.pid);
       currentlyDraggingDrum_ = undefined;
 
       return true;
@@ -454,7 +454,8 @@ module.exports = (function() {
       dataModel: DrumsDataModel,
       getData: () => data,
       backgroundColor: 0x7c4dff,
-      getChannel: () => CHANNEL
+      getChannel: () => CHANNEL,
+      requiresAntialiasing: true
     };
   };
 })();

@@ -21,6 +21,7 @@ IOWA.Elements = (function() {
   var updateElements = function() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function() {
+      IOWA.ServiceWorkerRegistration.register();
 
       var optionallyLaunchExperiment = function() {
         if (window.location.search.indexOf('experiment') > -1) {
@@ -260,7 +261,7 @@ IOWA.Elements = (function() {
 
         case 'twitter':
           height = 253;
-          var el = document.getElementById('share-dialog-text');
+          var el = document.getElementById('share-text');
 
           url = 'https://twitter.com/share?text=' +
                 encodeURIComponent(el.textContent || 'Google I/O 2015') +

@@ -17,6 +17,7 @@ var tenNumber = require('url?limit=10000!app/images/10.png');
 var getReadyImage = require('url?limit=10000!app/images/get-ready.png');
 var recordingImage = require('url?limit=10000!app/images/recording.png');
 var recordingComplete = require('url?limit=10000!app/images/recording-complete.png');
+var recordSprite = require('url?limit=10000!app/images/record-sprite.png');
 var rAFTimeout = require('app/util/rAFTimeout');
 
 module.exports = (function() {
@@ -27,16 +28,52 @@ module.exports = (function() {
   const BOUNDS_PADDING = 5;
   const CIRCLE_RADIUS = 28;
 
-  var circleGraphics = new PIXI.Graphics();
+  var circleTexture;
 
-  circleGraphics.boundsPadding = 2;
-  circleGraphics.beginFill(WHITE, 1);
-  circleGraphics.drawCircle(0, 0, CIRCLE_RADIUS);
-  circleGraphics.endFill();
+  function makeRecordSprite() {
+    var width = 600;
+    var height = 1080;
 
-  var circleTexture = circleGraphics.generateTexture();
+    var rows = 18;
+    var cols = 10;
 
-  return function RecordButton(audioManager) {
+    var totalFrames = (rows * cols) - 5;
+
+    var texture = PIXI.Texture.fromImage(recordSprite).baseTexture;
+
+    var animationTextures = [];
+
+    var frameId = 0;
+
+    for (let i = 0; i < rows; i++) {
+      let frameHeight = ~~(height / rows);
+      let y = i * (frameHeight);
+
+      for (let j = 0; j < cols; j++) {
+        let frameWidth = ~~(width / cols);
+        let x = (j * (frameWidth));
+
+        let slice = {
+          x: x,
+          y: y,
+          width: frameWidth,
+          height: frameHeight
+        };
+
+        frameId++;
+
+        if (frameId > totalFrames) { break; }
+
+        let tempTexture = new PIXI.Texture(texture, slice);
+
+        animationTextures.push(tempTexture);
+      }
+    }
+
+    return animationTextures;
+  }
+
+  function RecordButton(audioManager, renderer) {
     var startBeat;
     var internalStartBeat;
     var prevWholeNumber;
@@ -57,6 +94,17 @@ module.exports = (function() {
     container.interactive = false;
     container.buttonMode = true;
 
+    if (!circleTexture) {
+      var circleGraphics = new PIXI.Graphics();
+      circleGraphics.boundsPadding = 2;
+      circleGraphics.beginFill(WHITE, 1);
+      circleGraphics.drawCircle(0, 0, CIRCLE_RADIUS);
+      circleGraphics.endFill();
+
+      circleTexture = circleGraphics.generateTexture(2);
+      renderer.updateTexture(circleTexture.baseTexture);
+    }
+
     var circle = new PIXI.Sprite(circleTexture);
 
     var shadow = new PIXI.Graphics();
@@ -72,9 +120,17 @@ module.exports = (function() {
     shadow.position.x = CIRCLE_RADIUS + 2;
     shadow.position.y = CIRCLE_RADIUS + 5;
 
-    var arcCircle = new PIXI.Graphics();
-    arcCircle.rotation = -Math.PI / 2;
-    arcCircle.position.y = 60;
+    var animationTextures = makeRecordSprite();
+
+    var currentFrame = 0;
+    renderer.updateTexture(animationTextures[0].baseTexture);
+
+    var arcCircle = new PIXI.Sprite(animationTextures[currentFrame]);
+
+    arcCircle.position.x = 0.15 * arcCircle.width / 2;
+    arcCircle.position.y = 0.15 * arcCircle.height / 2;
+    arcCircle.pivot.x = arcCircle.pivot.y = 0.5;
+    arcCircle.scale.x = arcCircle.scale.y = 0.85;
 
     var mintCircle = new PIXI.Graphics();
     mintCircle.lineStyle(10, 0xB7F7C9, 1);
@@ -368,14 +424,25 @@ module.exports = (function() {
      * Clear the recording circle
      */
     function clearCircle() {
-      arcCircle.clear();
+      setRecordCircleFrame(0);
     }
+
+    /**
+     * Animate the sprite sheet.
+     * @param {number} framePercentage - The new frame percentage.
+     */
+    function setRecordCircleFrame(framePercentage) {
+      currentFrame = Math.floor((animationTextures.length - 1) * framePercentage);
+      arcCircle.setTexture(animationTextures[currentFrame]);
+    }
+
 
     /**
      * Clear all recording circle tweens
      */
     function resetRecord() {
-      arcCircle.clear();
+      clearCircle();
+
       checkmarkCircle.alpha = 0;
       hideText(textImages[2], 0);
       animate.fromTo(recordIcon.scale, 0.3, {
@@ -402,12 +469,10 @@ module.exports = (function() {
      * @param {number} duration - The duration of the recording.
      */
     function radialAnimation(color, startedTime, duration) {
-      var targetRadians = (Math.PI * 2) * (startedTime / duration);
+      var targetRadians = (startedTime / duration);
 
-      clearCircle();
-      arcCircle.moveTo(54.75, 29.75);
-      arcCircle.lineStyle(10, color);
-      arcCircle.arc(CIRCLE_RADIUS + 2, CIRCLE_RADIUS + 2, CIRCLE_RADIUS - 8, 0, targetRadians, false);
+      arcCircle.tint = color;
+      setRecordCircleFrame(targetRadians);
     }
 
     /**
@@ -434,6 +499,14 @@ module.exports = (function() {
 
     return self;
 
+  }
+
+  /**
+   * Clear the cache on resize.
+   */
+  RecordButton.clearTextureCache = function() {
+    circleTexture = null;
   };
 
+  return RecordButton;
 })();

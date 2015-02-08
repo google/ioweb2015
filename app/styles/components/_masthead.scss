@@ -37,10 +37,6 @@
 
 .masthead {
   position: relative;
-  // min-height: 420px;
-  min-height: 360px;
-  height: 360px; // Needed due to https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview
-  // height: 66vh; // ~2/3 viewport height
   max-height: 550px;
 
   &.bg-medium-grey {
@@ -103,7 +99,8 @@ core-drawer-panel {
     -webkit-overflow-scrolling: touch;
   }
   core-toolbar .bottom {
-    padding-bottom: $mobileKeyline;
+    font-size: 14px;
+    line-height: 20px;
   }
   .drawer-panel-content {
     overflow: auto;
@@ -142,11 +139,13 @@ core-drawer-panel {
 }
 
 .masthead-container {
+  min-height: 268px;
+  height: 268px;
   width: 100%;
   max-width: $tablet-breakpoint-max;
   margin: 0 auto;
   position: relative;
-  padding: 32px 0;
+  padding: 14px 0 40px 0;
 
   .io-logo {
     display: none;
@@ -156,12 +155,14 @@ core-drawer-panel {
 .masthead-title {
   color: $color-cyan-A700 !important;
   line-height: 24px;
-  font-weight: 400;
 }
 
 .masthead-subtitle {
   color: $color-bluegrey-700;
-  font-weight: 400;
+  // font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
 }
 
 experiment-fab-container {
@@ -179,6 +180,9 @@ experiment-fab-container {
       width: 177px;
       height: 128px;
     }
+  }
+  .masthead-title {
+    font-size: 20px;
   }
 }
 
@@ -240,14 +244,8 @@ experiment-fab-container {
     max-width: 896px;
   }
   .masthead-title {
-    font-weight: 300;
     font-size: 32px;
     line-height: 38px;
-  }
-  .masthead-subtitle {
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 500;
   }
 }
 

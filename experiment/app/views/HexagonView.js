@@ -57,15 +57,21 @@ module.exports = (function() {
 
     var isListening = false;
 
+    var renderer;
+
+    // Reset texture cache.
+    Hexagon.clearTextureCache();
+
     /**
      * Initialize the view.
      * @param {Object} _ - Unused variable.
      * @param {number} pid_ - The ID of the view.
      * @param {PIXI.DisplayObjectContainer} displayContainerCenter_ - The center point of the view.
      */
-    function init(_, pid_, displayContainerCenter_) {
+    function init(_, pid_, displayContainerCenter_, renderer_) {
       pid = pid_;
       displayContainerCenter = displayContainerCenter_;
+      renderer = renderer_;
 
       events.addListener('BEAT', function(beatNum) {
         currentBeat = beatNum;
@@ -168,7 +174,7 @@ module.exports = (function() {
      * @return {Hexagon}
      */
     function drawCube(row, col) {
-      var hexagon = new Hexagon(radius, 0xffab91);
+      var hexagon = new Hexagon(radius, 0xe34f4c, renderer);
 
       var yOffset = smallRadius * 2 * row;
       if (col % 2 !== 0) { yOffset -= smallRadius; }
@@ -365,6 +371,13 @@ module.exports = (function() {
       renderPause = false;
     }
 
+    /**
+     * Cleanup data.
+     */
+    function cleanUp() {
+      hexagons.forEach(removeHexagon);
+    }
+
     return {
       init,
       animationCollapsed,
@@ -376,6 +389,7 @@ module.exports = (function() {
       startRecording,
       stopRecording,
       loadData,
+      cleanUp,
       name: VIEW_NAME,
       backgroundColor: 0xe34f4c,
       dataModel: HexagonDataModel,

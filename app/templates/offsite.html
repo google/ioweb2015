@@ -59,14 +59,14 @@
         <!-- <paper-button data-track-link="offsite-notify-me">
           <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
         </paper-button> -->
-        <paper-button data-track-link="offsite-view-2014-events">
-          <core-icon icon="io:place"></core-icon><i18n-msg msgid="viewlastyear">View 2014 events</i18n-msg>
+        <paper-button>
+          <a href="https://www.google.com/events/io/io-extended" target="_blank" data-track-link="offsite-view-2014-events"><core-icon icon="io:place"></core-icon><i18n-msg msgid="viewlastyear">View 2014 events</i18n-msg></a>
         </paper-button>
       </div>
       <div class="attend__globe">
-        <template if="{{pageTransitionDone}}">
+       <!--  <template if="{{pageTransitionDone}}">
           <webgl-globe></webgl-globe>
-        </template>
+        </template> -->
       </div>
     </section>
   </div>
@@ -80,6 +80,14 @@
 
       var videoContainer = document.querySelector('.fullvideo__container');
       var video = videoContainer.querySelector('.fullvideo__container google-youtube');
+
+      // Wait for cc module to load, then make the fontsize smaller.
+      // https://developers.google.com/youtube/iframe_api_reference#Events
+      var callback = function() {
+        video.player.setOption('captions', 'fontSize', -2);
+        video.player.removeEventListener('onApiChange', callback);
+      };
+      video.player.addEventListener('onApiChange', callback);
 
       var button = IOWA.Elements.Main.querySelector('.play__button__container');
       var navOverlay = document.querySelector('.navbar__overlay--video');

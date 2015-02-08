@@ -143,7 +143,7 @@ gulp.task('copy-assets', function() {
 });
 
 // Copy backend files.
-gulp.task('copy-backend', function(cb) {
+gulp.task('copy-backend', ['backend:config'], function(cb) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
     BACKEND_DIR + '/*.yaml',
@@ -191,6 +191,7 @@ gulp.task('concat-and-uglify-js', ['js'], function() {
     'helper/router.js',
     'helper/request.js',
     'helper/picasa.js',
+    'helper/service-worker-registration.js',
     'bootstrap.js'
   ].map(function(script) {
     return APP_DIR + '/scripts/' + script;
@@ -243,7 +244,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // Start a standalone server (no GAE SDK needed) serving both front-end and backend,
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
+gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var startArgs = ['-d', APP_DIR, '-listen', serverAddr, '-prefix', URL_PREFIX];
@@ -283,7 +284,7 @@ gulp.task('serve', ['backend', 'generate-service-worker-dev'], function() {
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['generate-service-worker-dev'], function(callback) {
+gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev'], function(callback) {
   var appEnv = process.env.APP_ENV || 'dev';
   var watchFiles = argv.watch !== false;
   var run = startGaeBackend.bind(null, BACKEND_DIR, appEnv, watchFiles, callback);
@@ -318,6 +319,9 @@ gulp.task('copy-experiment-to-site', ['build-experiment'], function(cb) {
 
 // Build self-sufficient backend server binary w/o GAE support.
 gulp.task('backend', buildBackend);
+
+// Create config.yaml if one doesn't exist. Needed to run the server.
+gulp.task('backend:config', generateConfigYaml);
 
 // Backend TDD: watch for changes and run tests in an infinite loop.
 gulp.task('backend:test', function(cb) {
@@ -461,6 +465,19 @@ function changeAppYamlVersion(version, appYamlPath) {
   var appYaml = fs.readFileSync(appYamlPath);
   fs.writeFileSync(appYamlPath, 'version: ' + version + '\n' + appYaml);
   return fs.writeFileSync.bind(fs, appYamlPath, appYaml, null);
+}
+
+// Create dest/config.yaml if it doesn't exist already using config.yaml.template.
+// Needed to start the server.
+function generateConfigYaml(callback) {
+  if (fs.existsSync(BACKEND_DIR + '/config.yaml')) {
+    callback();
+    return;
+  }
+  gulp.src(BACKEND_DIR + '/config.yaml.template', {base: BACKEND_DIR})
+    .pipe($.rename('config.yaml'))
+    .pipe(gulp.dest(BACKEND_DIR))
+    .on('end', callback);
 }
 
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {

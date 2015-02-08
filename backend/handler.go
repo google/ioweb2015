@@ -56,11 +56,13 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		tplname = tplname[:len(tplname)-5]
 	}
 
-	data := &templateData{Env: env(c), OgImage: ogImageDefault}
+	data := &templateData{Env: env(c)}
 	if experimentShare {
+		data.Desc = descExperiment
 		data.OgImage = ogImageExperiment
 	}
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=300")
 	err := renderTemplate(c, tplname, wantsPartial, data)
 
 	if err != nil {
@@ -76,6 +78,7 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 	_, refresh := r.Form["refresh"]
 
 	c := newContext(r, w)
+	w.Header().Set("Cache-Control", "public, max-age=60")
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
 	// respond with stubbed JSON entries in dev mode
@@ -111,6 +114,7 @@ func serveSocial(w http.ResponseWriter, r *http.Request) {
 	_, refresh := r.Form["refresh"]
 
 	c := newContext(r, w)
+	w.Header().Set("Cache-Control", "public, max-age=60")
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
 	// respond with stubbed JSON entries in dev mode
