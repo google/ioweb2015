@@ -71,6 +71,15 @@
 
     .card-content {
       padding: $tabletKeyline $mobileKeyline;
+
+      &:not(:only-child):first-child {
+        padding-bottom: 0;
+      }
+    }
+
+    h3 {
+      font-size: 16px;
+      line-height: 24px;
     }
   }
 }
