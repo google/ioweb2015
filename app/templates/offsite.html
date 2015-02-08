@@ -104,14 +104,6 @@
       };
 
       var cardAnimations = new AnimationGroup([
-        new Animation(topCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(-100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(bottomCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions),
         new Animation(navOverlay, [
           {transform: 'translateY(-100%)'},
           {transform: 'translateY(0)'}
@@ -122,9 +114,28 @@
         ], animationOptions)
       ]);
 
-      // Don't animate top/bottom cards offscreen on mobile.
-      if (IOWA.Elements.Template.isPhoneSize) {
-        cardAnimations.children = cardAnimations.children.slice(2);
+      // Animations for top/bottom cards.
+      var topBottomCardAnimations = [
+        new Animation(topCard, [
+          {transform: 'translateY(0)', opacity: 1},
+            {transform: 'translateY(-100px)', opacity: 0}
+          ], animationOptions),
+        new Animation(bottomCard, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions)
+      ];
+
+      // Only animate top/bottom cards offscreen if not on mobile.
+      if (!IOWA.Elements.Template.isPhoneSize) {
+        // If under polyfill, code around not having AnimationGroup.prepend().
+        if (!cardAnimations.append) {
+          cardAnimations.children.push(
+              topBottomCardAnimations[0], topBottomCardAnimations[1]);
+        } else {
+          cardAnimations.append(
+              topBottomCardAnimations[0], topBottomCardAnimations[1]);
+        }
       }
 
       var videoAnimation = new Animation(video, [
