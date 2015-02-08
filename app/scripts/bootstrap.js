@@ -15,50 +15,6 @@
  */
 
 (function() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js', {
-      scope: './'
-    }).then(function(registration) {
-      // Check to see if there's an updated version of service-worker.js with new files to cache:
-      // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-registration-update-method
-      // Note: registration.update() is not yet widely implemented.
-      if (typeof registration.update == 'function') {
-        registration.update();
-      }
-
-      registration.onupdatefound = function() {
-        // The updatefound event implies that registration.installing is set; see
-        // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-container-updatefound-event
-        var installingWorker = registration.installing;
-        installingWorker.onstatechange = function() {
-          // TODO: How do we handle i18n of these strings?
-          switch (installingWorker.state) {
-            case 'installed':
-              if (navigator.serviceWorker.controller) {
-                // Define a handler that will be used for the next io-toast tap, at which point it
-                // be automatically removed.
-                var tapHandler = function() {
-                  window.location.reload();
-                };
-
-                IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest content.',
-                  tapHandler);
-              } else {
-                IOWA.Elements.Toast.showMessage('Caching complete. This site is ready to work offline!');
-              }
-              break;
-
-            case 'redundant':
-              throw 'The installing service worker became redundant.';
-          }
-        };
-      };
-    }).catch(function(e) {
-      IOWA.Analytics.trackError('navigator.serviceWorker.register() error', e);
-      console.error('Service worker registration failed:', e);
-    });
-  }
-
   function afterImports() {
     IOWA.Elements.init();
     IOWA.Router.init();
