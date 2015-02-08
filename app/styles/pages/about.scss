@@ -91,9 +91,12 @@ main {
       min-height: 745px;
     }
 
+    .pics__section--under {
+      min-height: 640px; // FF
+    }
   }
   #hashtag {
-    margin-top: -295px;
+    margin-top: -327px;
     padding-top: 320px;
   }
 }
@@ -107,13 +110,17 @@ main {
 @media (min-width: $desktop-breakpoint-min) {
   #hashtag {
     margin-top: -327px;
-    padding-top: 327px;
+    padding-top: 320px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
   .pics__section {
     margin-top: -110px;
+
+    .pics__section--under {
+      min-height: 679px;
+    }
   }
   #hashtag {
     margin-top: -319px;
