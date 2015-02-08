@@ -21,6 +21,7 @@ IOWA.Elements = (function() {
   var updateElements = function() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function() {
+      IOWA.ServiceWorkerRegistration.register();
 
       var optionallyLaunchExperiment = function() {
         if (window.location.search.indexOf('experiment') > -1) {
