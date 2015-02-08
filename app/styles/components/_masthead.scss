@@ -99,7 +99,8 @@ core-drawer-panel {
     -webkit-overflow-scrolling: touch;
   }
   core-toolbar .bottom {
-    padding-bottom: $mobileKeyline;
+    font-size: 14px;
+    line-height: 20px;
   }
   .drawer-panel-content {
     overflow: auto;
