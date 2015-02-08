@@ -155,12 +155,14 @@ core-drawer-panel {
 .masthead-title {
   color: $color-cyan-A700 !important;
   line-height: 24px;
-  font-weight: 400;
 }
 
 .masthead-subtitle {
   color: $color-bluegrey-700;
-  font-weight: 400;
+  // font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
 }
 
 experiment-fab-container {
@@ -181,11 +183,6 @@ experiment-fab-container {
   }
   .masthead-title {
     font-size: 20px;
-  }
-  .masthead-subtitle {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 20px;
   }
 }
 
@@ -247,14 +244,8 @@ experiment-fab-container {
     max-width: 896px;
   }
   .masthead-title {
-    font-weight: 300;
     font-size: 32px;
     line-height: 38px;
-  }
-  .masthead-subtitle {
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 500;
   }
 }
 
