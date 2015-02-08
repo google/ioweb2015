@@ -31,8 +31,13 @@ $name: 'page-registration';
   }
 }
 
-.card-content h2 {
-  padding-bottom: $tabletKeyline;
+.card-content {
+  h2 {
+    padding-bottom: $tabletKeyline;
+  }
+  h3.card__title {
+    padding-bottom: 0;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {

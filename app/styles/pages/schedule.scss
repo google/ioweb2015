@@ -19,13 +19,16 @@ $name: 'page-schedule';
 @import '../base/_layout';
 @import '../base/_color';
 @import '../base/_breakpoints';
+@import '../base/_shadow';
 
 
 ##{$name} {
 
+$subnavPadding: 22px;
+
 .masthead-meta {
   h1 {
-    margin-bottom: $desktopKeyline;
+    margin-bottom: 9px;
   }
 }
 
@@ -33,6 +36,7 @@ $name: 'page-schedule';
   paper-tabs {
     text-transform: uppercase;
     width: 250px;
+    margin-bottom: -$subnavPadding;
   }
 
   paper-tab[disabled] {
@@ -48,6 +52,14 @@ $name: 'page-schedule';
   padding-bottom: $mobileKeyline;
 }
 
+.card-content  {
+  h4 {
+    font-size: 20px;
+    line-height: 32px;
+    font-weight: 400;
+  }
+}
+
 .schedule-rows > * {
   margin-bottom: $tabletKeyline;
 }
@@ -57,9 +69,26 @@ core-icon[icon="schedule"] {
 }
 
 .schedule-time {
+  font-size: 14px;
   color: $color-link-grey;
   margin-right: 80px;
   white-space: nowrap;
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  .page__section--top {
+    margin-top: $mobileKeyline;
+  }
+  .masthead-container {
+    padding-bottom: $subnavPadding;
+  }
+  .card__container {
+    @include shadow-z1();
+  }
+  .card-content:first-child {
+    padding: 16px;
+    border-bottom: 1px solid $color-light-grey-border;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
