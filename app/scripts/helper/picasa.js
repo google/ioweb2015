@@ -23,11 +23,13 @@ IOWA.Picasa = (function() {
   var GDEVELOPER_USER_ID = '111395306401981598462';
   var ALBUM_ID = '6029456067262589905';
   var lang = document.documentElement.lang;
+  var viewPortWidth = document.documentElement.clientWidth;
 
   var feedUrl = 'https://picasaweb.google.com/data/feed/api/user/' +
                 GDEVELOPER_USER_ID + '/albumid/' + ALBUM_ID +
                 '?alt=jsonc&kind=photo&hl=' + lang +
-                '&imgmax=1152&max-results=5000&v=2';
+                '&imgmax=' + Math.min(viewPortWidth * (window.devicePixelRatio || 1), 1440) +
+                '&max-results=5000&v=2';
 
   function fetch(opt_startIndex, callback) {
     var startIndex = opt_startIndex || 1;
