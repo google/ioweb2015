@@ -207,9 +207,39 @@ IOWA.Router = (function() {
       if (htmlImport && !htmlImport.import) {
         return;
       }
+
+      // FF doesn't execute the <script> inside the main content <template>
+      // (inside page partial import). Instead, the first time the partial is
+      // loaded, find any script tags in and make them runnable by appending them back to the template.
+      if (IOWA.Util.isFF()) {
+        var contentTemplate = document.querySelector(
+           '#template-' + pageName + '-content');
+        if (!contentTemplate) {
+          var containerTemplate = htmlImport.import.querySelector(
+              '[data-ajax-target-template="template-content-container"]');
+
+          var scripts = containerTemplate.content.querySelectorAll('script');
+          Array.prototype.forEach.call(scripts, function(node, i) {
+            replaceScriptTagWithRunnableScript(node);
+          });
+        }
+      }
+
       // Update content of the page.
       injectPageContent(pageName, htmlImport.import);
     });
+  }
+
+  /**
+   * Replaces in-page <script> tag in xhr'd body content with runnable script.
+   *
+   * @param {Node} node Container element to replace script content.
+   * @private
+   */
+  function replaceScriptTagWithRunnableScript(node) {
+    var script  = document.createElement('script');
+    script.text = node.innerHTML;
+    node.parentNode.replaceChild(script, node);
   }
 
   /**

@@ -91,6 +91,11 @@ IOWA.Util = IOWA.Util || (function() {
     return (/Trident/gi).test(userAgent);
   }
 
+  function isFF() {
+    var userAgent = navigator.userAgent;
+    return (/Firefox/gi).test(userAgent);
+  }
+
   /**
    * Returns the static base URL of the running app.
    * https://events.google.com/io2015/about -> https://events.google.com/io2015/
@@ -116,6 +121,7 @@ IOWA.Util = IOWA.Util || (function() {
   };
 
   return {
+    isFF: isFF,
     isIE: isIE,
     isIOS: isIOS,
     isSafari: isSafari,
