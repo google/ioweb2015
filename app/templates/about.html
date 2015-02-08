@@ -106,14 +106,6 @@
       };
 
       var animation = new AnimationGroup([
-        new Animation(topCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(-100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(bottomCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions),
         new Animation(bottomSection, [
           {transform: 'translateY(0)', opacity: 1},
           {transform: 'translateY(100px)', opacity: 0}
@@ -124,10 +116,28 @@
         ], animationOptions)
       ]);
 
+      // Top/bottom card animations
+      var cardAnimations = [
+        new Animation(topCard, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(-100px)', opacity: 0}
+        ], animationOptions),
+        new Animation(bottomCard, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions)
+      ];
+
       var gallery = IOWA.Elements.Main.querySelector('io-gallery');
 
-      if (gallery.mobile) {
-        animation.children = animation.children.slice(2);
+      // Only animate top/bottom cards offscreen if not on mobile.
+      if (!gallery.mobile) {
+        // If under polyfill, code around not having AnimationGroup.append().
+        if (!animation.append) {
+          animation.children.push(cardAnimations[0], cardAnimations[1]);
+        } else {
+          animation.append(cardAnimations[0], cardAnimations[1]);
+        }
       }
 
       var galleryAnimation = new Animation(gallery, [

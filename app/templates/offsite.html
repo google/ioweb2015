@@ -12,6 +12,15 @@
     <span flex><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></span>
   </core-toolbar>
 
+  <template if="{{fullscreenVideoActive}}">
+    <div class="fullvideo__container" fit>
+     <google-youtube videoid="A-bjrru5bLU" height="100%" width="100%" fit
+                     autohide="1" controls="2" modestbranding="1" showinfo="0"
+                     iv_load_policy="3" rel="0" autoplay="1"
+                     on-google-youtube-ready="{{onVideoReady}}"></google-youtube>
+    </div>
+  </template>
+
   <div class="card__container card__container--top slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
@@ -25,13 +34,6 @@
       <div class="play__button__container" on-tap="{{openSectionVideo}}" data-track-link="offsite-watch-extended-recap-video">
         <h5><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></h5>
       </div>
-      <template if="{{fullscreenVideoActive}}">
-        <div class="fullvideo__container" fit>
-         <google-youtube videoid="A-bjrru5bLU" height="100%" width="100%" fit
-                         autohide="1" controls="2" modestbranding="1" showinfo="0"
-                         iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
-        </div>
-      </template>
     </section>
 
     <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}" relative>
@@ -102,14 +104,6 @@
       };
 
       var cardAnimations = new AnimationGroup([
-        new Animation(topCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(-100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(bottomCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions),
         new Animation(navOverlay, [
           {transform: 'translateY(-100%)'},
           {transform: 'translateY(0)'}
@@ -119,6 +113,30 @@
           {opacity: 0}
         ], animationOptions)
       ]);
+
+      // Animations for top/bottom cards.
+      var topBottomCardAnimations = [
+        new Animation(topCard, [
+          {transform: 'translateY(0)', opacity: 1},
+            {transform: 'translateY(-100px)', opacity: 0}
+          ], animationOptions),
+        new Animation(bottomCard, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions)
+      ];
+
+      // Only animate top/bottom cards offscreen if not on mobile.
+      if (!IOWA.Elements.Template.isPhoneSize) {
+        // If under polyfill, code around not having AnimationGroup.append().
+        if (!cardAnimations.append) {
+          cardAnimations.children.push(
+              topBottomCardAnimations[0], topBottomCardAnimations[1]);
+        } else {
+          cardAnimations.append(
+              topBottomCardAnimations[0], topBottomCardAnimations[1]);
+        }
+      }
 
       var videoAnimation = new Animation(video, [
         {opacity: 0}, {opacity: 1}
@@ -149,6 +167,10 @@
         return;
       }
 
+      IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
+        runVideoSectionAnimation();
+      };
+
       IOWA.Elements.Template.closeVideoSection = function(e, detail, sender) {
         runVideoSectionAnimation(true, function() {
           IOWA.Elements.Template.fullscreenVideoActive = false;
@@ -158,15 +180,15 @@
       IOWA.Elements.Template.openSectionVideo = function(e, detail, sender) {
         IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
 
-        this.fullscreenVideoActive = true;
-        // TODO, wait for iframe to load.
-
-        // Wait 1 rAF for template to stamp.
-        this.async(function() {
-          IOWA.Util.smoothScroll(IOWA.Elements.Main.querySelector('.card__photo--stage'), 300, function() {
-            runVideoSectionAnimation();
-          });
-        });
+        // Only smooth scroll to content if not on mobile.
+        if (IOWA.Elements.Template.isPhoneSize) {
+          this.fullscreenVideoActive = true; // stamp template
+        } else {
+          var videoStage = IOWA.Elements.Main.querySelector('.card__photo--stage');
+          IOWA.Util.smoothScroll(videoStage, 300, function() {
+            this.fullscreenVideoActive = true; // stamp template
+          }.bind(this));
+        }
       };
 
       page.hasBeenLoaded = true;

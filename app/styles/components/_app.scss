@@ -307,6 +307,9 @@ h6 {
   .io-countdown {
     margin: $desktopKeyline auto;
   }
+  .navbar__overlay {
+    font-size: 16px;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
