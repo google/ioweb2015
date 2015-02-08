@@ -2,9 +2,19 @@ runtime: go
 api_version: go1
 threadsafe: yes
 
-#default_expiration: "0s"
+# cache all static assets for at most 1 day.
+default_expiration: 1d
 
 handlers:
+
+# shorter cache for some files that may change frequently,
+# including service worker
+- url: $PREFIX$/(.+(elements\.html|\.js|\.css))$
+  static_files: app/\1
+  upload: app/(.+(elements\.html|\.js|\.css))$
+  expiration: 10m
+  http_headers:
+    access-control-allow-origin: "*"
 
 - url: $PREFIX$/experiment
   static_dir: app/experiment
@@ -52,11 +62,9 @@ handlers:
   http_headers:
     access-control-allow-origin: "*"
 
-# all other static assets in app/ root dir,
-# including service worker
-- url: $PREFIX$/(.+\.(json|ico|txt|js|mp3))$
+- url: $PREFIX$/(.+\.(json|ico|txt|mp3))$
   static_files: app/\1
-  upload: app/(.+\.(json|ico|txt|js|mp3))$
+  upload: app/(.+\.(json|ico|txt|mp3))$
   http_headers:
     access-control-allow-origin: "*"
 
