@@ -132,7 +132,7 @@
 
       // Only animate top/bottom cards offscreen if not on mobile.
       if (!gallery.mobile) {
-        // If under polyfill, code around not having AnimationGroup.prepend().
+        // If under polyfill, code around not having AnimationGroup.append().
         if (!animation.append) {
           animation.children.push(cardAnimations[0], cardAnimations[1]);
         } else {
