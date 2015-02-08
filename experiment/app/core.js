@@ -118,7 +118,7 @@ module.exports = function Experiment() {
       rAFTimeout(function() {
         rootView.animateIn(fromPos).then(resolve, reject);
 
-        if (('undefined !== typeof console') && ('function !== typeof console.log')) {
+        if (('undefined' !== typeof console) && ('function' === typeof console.log)) {
           console.log('Need a dance partner? Run `experiment.consoleDance()`');
         }
       }, 50);
@@ -231,10 +231,12 @@ module.exports = function Experiment() {
   }
 
   var isDanceRunning = false;
+
   /**
    * Start a dance party.
    */
   function consoleDance() {
+    // jshint quotmark: false
     if (isDanceRunning) { return; }
     isDanceRunning = true;
 
@@ -260,7 +262,6 @@ module.exports = function Experiment() {
 
       setTimeout(draw, 20, video, width, height, backContext);
     }
-
 
     var DARK_TO_LIGHT = "@*!y;,-':` ".split('');
     var NORMALISER = DARK_TO_LIGHT.length / 256;
