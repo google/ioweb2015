@@ -25,3 +25,19 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 		t.Errorf("Content-Type: %q; want %q", w.Header().Get("Content-Type"), ctype)
 	}
 }
+
+func TestServeTemplate404(t *testing.T) {
+	r, _ := http.NewRequest("GET", "/a-thing-that-is-not-there", nil)
+	w := httptest.NewRecorder()
+	serveTemplate(w, r)
+	if w.Code != http.StatusNotFound {
+		t.Errorf("GET %s: %d; want %d", r.URL.String(), w.Code, http.StatusNotFound)
+	}
+	const ctype = "text/html;charset=utf-8"
+	if v := w.Header().Get("Content-Type"); v != ctype {
+		t.Errorf("Content-Type: %q; want %q", v, ctype)
+	}
+	if v := w.Header().Get("Cache-Control"); v != "" {
+		t.Errorf("don't want Cache-Control: %q", v)
+	}
+}
