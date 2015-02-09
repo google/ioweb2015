@@ -1,0 +1,375 @@
+{% safeHTML "<!--" %}
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% safeHTML "-->" %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="{% .Desc %}">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1">
+  <title>{% template "title" .%}</title>
+
+  <!-- See http://updates.html5rocks.com/2014/11/Support-for-installable-web-apps-with-webapp-manifest-in-chrome-38-for-Android -->
+  <link rel="manifest" href="manifest.json">
+  <!-- See http://updates.html5rocks.com/2014/11/Support-for-theme-color-in-Chrome-39-for-Android -->
+  <meta name="theme-color" content="#eceff1">
+
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes"> <!-- fallback for manifest.json -->
+  <link rel="icon" sizes="192x192" href="images/touch/homescreen192.png">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Google I/O 2015">
+
+  <!-- Homescreen icons. -->
+  <link rel="shortcut icon" href="images/touch/homescreen72-fav.png">
+  <link rel="apple-touch-icon" href="images/touch/homescreen48.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="images/touch/homescreen72.png">
+  <link rel="apple-touch-icon" sizes="96x96" href="images/touch/homescreen96.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="images/touch/homescreen144.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="images/touch/homescreen192.png">
+
+  <!-- Tile icon for Win8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/touch/homescreen144.png">
+  <meta name="msapplication-TileColor" content="#eceff1">
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <!-- G+ and Twitter sharing meta data -->
+  <meta property="og:title" content="{% .Title %}">
+  <meta property="og:description" content="{% .Desc %}">
+  <meta property="og:type" content="Event">
+  <meta property="og:image" content="images/{% .OgImage %}">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@googledevs">
+  <meta name="twitter:title" content="{% .Title %}">
+  <meta name="twitter:description" content="{% .Desc %}">
+  <meta name="twitter:image:src" content="images/{% .OgImage %}">
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Event",
+      "name": "Google I/O 2015",
+      "url": ".?utm_source=schema_org_event",
+      "image": "images/io15-color.png",
+      "location": {
+        "@type": "Place",
+        "name": "Moscone Center West",
+        "address": {
+          "@type" : "PostalAddress",
+          "streetAddress" : "747 Howard Street",
+          "addressLocality" : "San Francisco",
+          "addressRegion" : "CA",
+          "postalCode" : "94103",
+          "addressCountry" : "US"
+        }
+      },
+      "startDate": "2015-05-28T09:00",
+      "endDate": "2015-05-29T04:00"
+    }
+  </script>
+
+  <!-- Unsupported browser checks need to come before webcomponents.js is loaded,
+       otherwise unsupported browsers will error out and not record a pageview.
+       Analytics lib is also loaded up front for error reporting. -->
+  <script>
+    window.ENV = {% .Env %}; // Used in analytics.js
+  </script>
+  <script src="scripts/analytics.js"></script>
+  <script>
+  (function() {
+    "use strict";
+
+    // Setup error tracking before anything else runs.
+    window.onerror = function(message, file, lineNumber, columnNumber, error) {
+      // We don't want to trigger any errors inside window.onerror, so wrap in a try/catch.
+      try {
+        // Some browsers don't support error param yet.
+        if (error !== undefined) {
+          message = error.stack;
+        }
+
+        IOWA.Analytics.trackError(file + ':' + lineNumber, message);
+      } catch (e) {
+        // no-op
+      }
+    };
+
+    /**
+     * @param {string} param URL parameter to look for.
+     * @return {string|undefined} undefined if the URL parameter does not exist.
+     */
+    function getUrlParameter(param) {
+      if (!window.location.search) {
+        return;
+      }
+      var m = new RegExp(param + '=([^&]*)').exec(window.location.search.substring(1));
+      if (!m) {
+        return;
+      }
+      return decodeURIComponent(m[1]);
+    }
+
+    // If ?ignore_browser_check=true is in the URL, the user is coming back from
+    // "upgrade your browser" and we let them proceed.
+    var ignoreCheck = getUrlParameter('ignore_browser_check') == 'true';
+
+    // Check if browser is supported by web components polyfill.
+    // Feature detection isn't sufficient; webcomponentsjs attempts to polyfill
+    // missing features, but some browsers are known to not work under it.
+    // https://www.polymer-project.org/resources/compatibility.html
+    var supported = ignoreCheck || (function whatBrowserYouBe() {
+      var uaString = navigator.userAgent;
+
+      // Sorry IE < 10.
+      var msie = /MSIE +([\d\.]+)/.exec(uaString);
+      if (msie && msie[1]) {
+        if (msie[1] === '7.0') {
+          var tridentVersion = /Trident\/(\d.\d)/.exec(uaString);
+          if (tridentVersion && tridentVersion[1]) {
+            return parseInt(tridentVersion[1], 10) >= 6;
+          } else {
+            return false;
+          }
+        } else {
+          return parseInt(msie[1], 10) >= 10;
+        }
+      }
+      // Sorry older Android browser.
+      if (uaString.indexOf('Chrome') === -1 && uaString.indexOf('Android') !== -1) {
+        return !/^Google/.test(navigator.vendor);
+      }
+      // Sorry Opera < 15.
+      if (uaString.indexOf('Opera') !== -1) {
+        return false;
+      }
+      // Everyone else goes through.
+      return true;
+    })();
+
+    if (!supported) {
+      // Note: pageview is recorded when IOWA.Analytics is setup.
+      IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', null, null, function() {
+        window.location = 'upgrade';
+      });
+    }
+  })();
+  </script>
+
+  <!-- Page styles -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/main_sd.css" shim-shadowdom>
+
+  <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="import" href="elements/elements.html">
+</head>
+<body id="page-{% .Slug %}">
+
+<!-- Intro animation background is outside of Polymer to reduce perceived latency in polyfilled browsers. -->
+<div class="io-logo-container">
+  <io-logo width="312" height="165" page="{% .Slug %}" class="{% template "mastheadBgClass" .%}"></io-logo>
+  <div class="{% template "mastheadBgClass" .%}" iologobackground></div>
+</div>
+
+<core-drawer-panel forceNarrow>
+  <div drawer layout vertical>
+    <core-toolbar class="tall bg-cyan">
+      <div class="top io-logo" flex></div>
+      <div class="bottom">
+        <div class="typo-white"><i18n-msg msgid="iodate">May 28 - 29</i18-msg>, 2015</div>
+        <div>San Francisco, CA</div>
+      </div>
+    </core-toolbar>
+    <div class="drawer-panel-content" flex>
+      <core-menu id="drawer-menu" selected="{% .Slug %}" valueattr="label">
+        <paper-item label="home">
+          <a href="./" data-ajax-link data-track-link="nav-drawer-home">
+            <i18n-msg msgid="home">Home</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item label="about">
+          <a href="about" data-ajax-link data-track-link="nav-drawer-about">
+            <i18n-msg msgid="about">About</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item label="schedule">
+          <a href="schedule" data-ajax-link data-track-link="nav-drawer-schedule">
+            <i18n-msg msgid="schedule">Schedule</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item label="onsite">
+          <a href="onsite" data-ajax-link data-track-link="nav-drawer-onsite">
+            <i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item label="offsite">
+          <a href="offsite" data-ajax-link data-track-link="nav-drawer-offsite">
+            <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
+          </a>
+        </paper-item>
+        <paper-item label="registration">
+          <a href="registration" data-ajax-link data-track-link="nav-drawer-registration">
+            <i18n-msg msgid="registration">Registration</i18n-msg>
+          </a>
+        </paper-item>
+      </core-menu>
+    </div>
+  </div>
+  <div main>
+
+    <div id="content-container">
+
+    <template is="auto-binding" id="t">
+
+      <!-- Responsive handlers -->
+      <core-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"
+                        queryMatches="{{isPhoneSize}}"></core-media-query>
+      <core-media-query id="mq-tablet" query="(min-width:768px) and (max-width:944px)"
+                        queryMatches="{{isTabletSize}}"></core-media-query>
+      <core-media-query id="mq-desktop" query="(min-width:945px)"
+                        queryMatches="{{isDesktopSize}}"></core-media-query>
+
+      <header class="masthead {% template "mastheadBgClass" .%} js-experiment-instrument js-experiment-instrument--no-top-margin" layout vertical>
+        <div class="masthead__ripple">
+          <div class="masthead__ripple__content" id="masthead-ripple"></div>
+        </div>
+        <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
+          <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
+          <div flex disabled?="{{selectedPage === 'home'}}">
+            <a href="./" data-ajax-link data-track-link="nav-home" data-anim-ripple aria-label="Home">
+              <div class="io-logo"></div>
+            </a>
+          </div>
+          <paper-tabs class="white {{ navBgClass }}" valueattr="label" selected="{{selectedPage}}" role="navigation" link noink>
+            <paper-tab label="about" role="">
+              <a href="about" data-ajax-link data-track-link="nav-about" data-anim-ripple layout horizontal center>
+                <i18n-msg msgid="about">About</i18n-msg>
+              </a>
+            </paper-tab>
+            <paper-tab label="schedule" role="">
+              <a href="schedule" data-ajax-link data-track-link="nav-schedule" data-anim-ripple layout horizontal center>
+                <i18n-msg msgid="schedule">Schedule</i18n-msg>
+              </a>
+            </paper-tab>
+            <paper-tab label="onsite" role="">
+              <a href="onsite" data-ajax-link data-track-link="nav-onsite" data-anim-ripple layout horizontal center>
+                <i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg>
+              </a>
+            </paper-tab>
+            <paper-tab label="offsite" role="">
+              <a href="offsite" data-ajax-link data-track-link="nav-offsite" data-anim-ripple layout horizontal center>
+                <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
+              </a>
+            </paper-tab>
+            <paper-tab label="registration" role="">
+              <a href="registration" data-ajax-link data-track-link="nav-registration" data-anim-ripple layout horizontal center>
+                <i18n-msg msgid="registration">Registration</i18n-msg>
+              </a>
+            </paper-tab>
+          </paper-tabs>
+        </core-toolbar>
+        <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+          <div class="io-logo large" iologodestination></div>
+          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
+            <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
+          </div>
+        </div>
+        <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}"></experiment-fab-container>
+      </header>
+
+      <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}" >
+        <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
+      </main>
+
+      <footer layout vertical>
+
+        <i18n-msg id="share-text" msgid="share-text" hidden>Google I/O 2015 brings together developers to explore the next generation of tech and mobile. Join us online or in person May 28-29, 2015.</i18n-msg>
+
+        <div layout horizontal justified class="footer-top">
+          <span class="footer-share-links--top">
+            <a href="https://plus.google.com/+GoogleDevelopers" target="_blank" class="share-icon" data-track-link="footer-share-gplus" data-share-type="gplus" on-click="{{openShareWindow}}"><core-icon icon="io:post-gplus"></core-icon></a>
+            <a href="https://twitter.com/googledevs" target="_blank" class="share-icon" data-track-link="footer-share-twitter" data-share-type="twitter" on-click="{{openShareWindow}}"><core-icon icon="io:post-twitter"></core-icon></a>
+          </span>
+          <a href="#" class="footer-backtotop" on-click="{{backToTop}}">Back to the top <core-icon icon="expand-less"></core-icon></a>
+        </div>
+
+        <div class="footer-content" layout horizontal flex?="{{!isPhoneSize}}">
+          <div self-end flex><img src="images/google-logo.svg" alt="Google Logo"></div>
+          <nav layout vertical end justified>
+            <span><a href="faq" data-ajax-link data-track-link="footer-faq">FAQ</a></span>
+            <span><a href="https://www.google.com/events/io" target="_blank" data-track-link="footer-2014-site">I/O 2014</a></span>
+            <paper-dropdown-menu label="Google Developers">
+              <paper-dropdown valign="bottom" halign="right" class="dropdown">
+                <paper-item><a href="https://developers.google.com" target="_blank" data-track-link="footer-link-devsite">developers.google.com</a></paper-item>
+                <paper-item><a href="https://plus.google.com/+GoogleDevelopers" target="_blank" data-track-link="footer-link-gplus">+googledevelopers</a></paper-item>
+                <paper-item><a href="https://twitter.com/googledevs" target="_blank" data-track-link="footer-link-twitter">@googledevs</a></paper-item>
+                <paper-item><a href="http://googledevelopers.blogspot.com/" target="_blank" data-track-link="footer-link-blog">Blog</a></paper-item>
+              </paper-dropdown>
+            </paper-dropdown-menu>
+            <span><a href="https://plus.google.com/u/0/communities/105113874753230740413" target="_blank" data-track-link="footer-community">I/O Community</a></span>
+            <span><a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Terms</a></span>
+            <span class="footer-share-links--bottom">
+              <a href="https://plus.google.com/+GoogleDevelopers" target="_blank" class="share-icon"  data-track-link="footer-share-gplus" data-share-type="gplus" on-click="{{openShareWindow}}"><core-icon icon="io:post-gplus"></core-icon></a>
+              <a href="https://twitter.com/googledevs" target="_blank" class="share-icon" data-track-link="footer-share-twitter" data-share-type="twitter" on-click="{{openShareWindow}}"><core-icon icon="io:post-twitter"></core-icon></a>
+            </span>
+          </nav>
+        </div>
+      </footer>
+
+    </template>
+
+    </div>
+  </div>
+</core-drawer-panel>
+
+<io-toast id="toast" duration="9000"></io-toast>
+
+<!-- build:js scripts/site-scripts.js -->
+<script src="scripts/main.js"></script>
+<script src="scripts/helper/util.js"></script>
+<script src="scripts/helper/page-animation.js"></script>
+<script src="scripts/helper/elements.js"></script>
+<script src="scripts/helper/history.js"></script>
+<script src="scripts/helper/router.js"></script>
+<script src="scripts/helper/request.js"></script>
+<script src="scripts/helper/picasa.js"></script>
+<script src="scripts/helper/service-worker-registration.js"></script>
+<script src="scripts/bootstrap.js"></script>
+<!-- endbuild -->
+<script>
+(function() {
+
+  function afterImports() {
+    //'import' in document.createElement('link')
+    if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
+      IOWA.Elements.Template.pages[{% .Slug %}] = {};
+    }
+    IOWA.Elements.Template.pages[{% .Slug %}].title = "{% template "title" .%}";
+  }
+
+  if (IOWA.Util.supportsHTMLImports) {
+    afterImports();
+  } else {
+    document.addEventListener('polymer-ready', afterImports);
+  }
+
+})();
+</script>
+
+</body>
+</html>
+

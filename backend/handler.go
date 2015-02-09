@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -41,6 +42,7 @@ func handler(fn func(w http.ResponseWriter, r *http.Request)) http.Handler {
 // found under request base path.
 // 'home' template is assumed if request path ends with '/'.
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html;charset=utf-8")
 	c := newContext(r, w)
 
 	r.ParseForm()
@@ -60,13 +62,26 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		data.Desc = descExperiment
 		data.OgImage = ogImageExperiment
 	}
-	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	w.Header().Set("Cache-Control", "public, max-age=300")
-	err := renderTemplate(c, tplname, wantsPartial, data)
+	b, err := renderTemplate(c, tplname, wantsPartial, data)
+	if err == nil {
+		w.Header().Set("Cache-Control", "public, max-age=300")
+		w.Write(b)
+		return
+	}
 
-	if err != nil {
-		errorf(c, "renderTemplate: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	errorf(c, "renderTemplate(%q): %v", tplname, err)
+	switch err.(type) {
+	case *os.PathError:
+		w.WriteHeader(http.StatusNotFound)
+		tplname = "error_404"
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+		tplname = "error_500"
+	}
+	if b, err = renderTemplate(c, tplname, false, nil); err == nil {
+		w.Write(b)
+	} else {
+		errorf(c, "renderTemplate(%q): %v", tplname, err)
 	}
 }
 

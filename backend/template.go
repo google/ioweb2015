@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"path/filepath"
+	"strings"
 
 	"golang.org/x/net/context"
 )
@@ -42,33 +43,22 @@ var tmplFunc = template.FuncMap{
 // renderTemplate executes a template found in name.html file
 // using either layout_full.html or layout_partial.html as the root template.
 // env is the app current environment: "dev", "stage" or "prod".
-func renderTemplate(c context.Context, name string, partial bool, data *templateData) error {
+func renderTemplate(c context.Context, name string, partial bool, data *templateData) ([]byte, error) {
 	if name == "/" || name == "" {
 		name = "home"
 	}
-
-	var layout string
-	if partial {
-		layout = "layout_partial.html"
-	} else {
-		layout = "layout_full.html"
-	}
-
-	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(rootDir, "templates", layout),
-		filepath.Join(rootDir, "templates", name+".html"),
-	)
+	tpl, err := parseTemplate(name, partial)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	m := pageMeta(t)
 	if data == nil {
 		data = &templateData{}
 	}
 	if data.Env == "" {
 		data.Env = env(c)
 	}
+	m := pageMeta(tpl)
 	data.Meta = m
 	data.Title = pageTitle(m)
 	data.Slug = name
@@ -78,7 +68,30 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	if data.OgImage == "" {
 		data.OgImage = ogImageDefault
 	}
-	return t.Execute(writer(c), data)
+
+	var b bytes.Buffer
+	if err := tpl.Execute(&b, data); err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
+// parseTemplate creates a template identified by name, using appropriate layout.
+// HTTP error layout is used for name arg prefixed with "error_", e.g. "error_404".
+func parseTemplate(name string, partial bool) (*template.Template, error) {
+	var layout string
+	switch {
+	case strings.HasPrefix(name, "error_"):
+		layout = "layout_error.html"
+	case partial:
+		layout = "layout_partial.html"
+	default:
+		layout = "layout_full.html"
+	}
+	return template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
+		filepath.Join(rootDir, "templates", layout),
+		filepath.Join(rootDir, "templates", name+".html"),
+	)
 }
 
 // pageTitle extracts "title" property of the page meta and appends defaultTitle to it.
