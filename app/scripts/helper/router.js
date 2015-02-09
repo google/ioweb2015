@@ -104,33 +104,31 @@ IOWA.Router = (function() {
    * Navigates to a new page via ajax and page transitions.
    * @param {Event} e Event that triggered navigation.
    * @param {Element} el Element clicked.
+   * @param {String} currentPage Current page id.
+   * @param {String} nextPage Id of the page the user navigates to.
    * @private
    */
-  function handleAjaxLink(e, el) {
+  function handleAjaxLink(e, el, currentPage, nextPage) {
     e.preventDefault();
     e.stopPropagation();
 
     var template = IOWA.Elements.Template;
-
-    // We can get the full absolute path from the <a> element's pathname:
-    // http://stackoverflow.com/questions/736513
-    var pageName = parsePageNameFromAbsolutePath(el.pathname);
-    template.nextPage = pageName;
-
-    var page = template.selectedPage;
-    var bgClass = template.pages[pageName] &&
-                  template.pages[pageName].mastheadBgClass;
+    var bgClass = template.pages[nextPage] &&
+                  template.pages[nextPage].mastheadBgClass;
+    var prevBgClass = template.pages[currentPage].mastheadBgClass;
 
     template.navBgClass = bgClass;
-    var isFadeRipple = template.pages[page].mastheadBgClass === bgClass;
-    var mastheadColor = template.rippleColors[template.pages[page].mastheadBgClass];
+
+    var isFadeRipple = prevBgClass === bgClass;
+    var mastheadColor = template.rippleColors[prevBgClass];
     var rippleColor = isFadeRipple ? '#fff' : template.rippleColors[bgClass];
 
-    if (page !== pageName) {
+    if (currentPage !== nextPage) {
       IOWA.Elements.Template.fire('page-transition-start');
       if (el.hasAttribute('data-anim-ripple')) {
         currentPageTransition = 'masthead-ripple-transition';
-        playMastheadRippleTransition(e, el, mastheadColor, rippleColor, isFadeRipple);
+        playMastheadRippleTransition(
+            e, el, mastheadColor, rippleColor, isFadeRipple);
       } else if (el.hasAttribute('data-anim-card'))  {
         currentPageTransition = 'hero-card-transition';
         playHeroTransition(e, el, rippleColor);
@@ -159,7 +157,7 @@ IOWA.Router = (function() {
     for (var i = 0; i < e.path.length; ++i) {
       var el = e.path[i];
       if (el.localName === 'a') {
-        var currentPage = IOWA.Elements.Template.selectedPage;
+        var currentPage = parsePageNameFromAbsolutePath(location.pathname);
         var nextPage = parsePageNameFromAbsolutePath(el.pathname);
 
         // First, record click event if link requests it.
@@ -183,7 +181,7 @@ IOWA.Router = (function() {
         // Do ajax page navigation if link requests it.
         if (el.hasAttribute('data-ajax-link')) {
           runPageHandler('unload', currentPage);
-          handleAjaxLink(e, el);
+          handleAjaxLink(e, el, currentPage, nextPage);
         } else {
           currentPageTransition = 'no-transition';
         }
