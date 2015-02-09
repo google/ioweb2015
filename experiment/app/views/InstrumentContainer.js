@@ -548,8 +548,6 @@ module.exports = (function() {
      * @return {number}
      */
     function getMarginOffset() {
-      var isFirst = pid === 0;
-
       if (isExpanded) {
         return instrumentView.supportsPortrait ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
       } else {
