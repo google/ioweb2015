@@ -729,7 +729,8 @@ Dialog to share the user's custom experiment/song
       },
 
       linkSelect: function() {
-        this.$.urlInput.select();
+        this.$.urlInput.selectionStart = 0;
+        this.$.urlInput.selectionEnd = this.$.urlInput.value.length;
       },
 
       encodeURI: function(uri) {
