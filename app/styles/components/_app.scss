@@ -154,6 +154,7 @@ h6 {
 }
 
 .navbar__overlay {
+  position: fixed !important;  // iOS
   font-size: 20px;
   font-weight: 500;
   background: rgba(0,0,0,0.5);
