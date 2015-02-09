@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"html/template"
-	"log"
 	"path/filepath"
 
 	"golang.org/x/net/context"
@@ -95,18 +94,14 @@ func pageTitle(m meta) string {
 // pageMeta extracts page meta info by executing "meta" template.
 // The template is assumed to be a JSON object body (w/o {}).
 // Returns empty meta if template execution fails.
-func pageMeta(t *template.Template) (m meta) {
-	m = make(meta)
-
+func pageMeta(t *template.Template) meta {
+	m := make(meta)
 	b := new(bytes.Buffer)
 	b.WriteRune('{')
 	if err := t.ExecuteTemplate(b, "meta", nil); err != nil {
-		return
+		return m
 	}
 	b.WriteRune('}')
-
-	if err := json.Unmarshal(b.Bytes(), &m); err != nil {
-		log.Printf("pageMeta: %v", err)
-	}
-	return
+	json.Unmarshal(b.Bytes(), &m)
+	return m
 }

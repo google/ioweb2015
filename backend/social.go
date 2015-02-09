@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -61,9 +60,9 @@ func socialEntries(c context.Context, refresh bool) ([]*socEntry, error) {
 
 	data, err := json.Marshal(entries)
 	if err != nil {
-		log.Println(err)
+		errorf(c, "socialEntries: %v", err)
 	} else if err := cache.set(c, cacheKey, data, 10*time.Minute); err != nil {
-		log.Printf("cache.put(%q): %v", cacheKey, err)
+		errorf(c, "cache.put(%q): %v", cacheKey, err)
 	}
 
 	return entries, nil
@@ -87,7 +86,7 @@ func fetchTweets(c context.Context, account string, tc chan *tweetEntry) {
 	defer close(tc)
 	client, err := twitterClient(c)
 	if err != nil {
-		log.Println(err)
+		errorf(c, "fetchTweets: %v", err)
 		return
 	}
 
@@ -99,29 +98,29 @@ func fetchTweets(c context.Context, account string, tc chan *tweetEntry) {
 	url := twitterUserTimelineURL + "?" + params.Encode()
 	req, nil := http.NewRequest("GET", url, nil)
 	if nil != nil {
-		log.Printf("NewRequest(%q): %v", url, err)
+		errorf(c, "fetchTweets: NewRequest(%q): %v", url, err)
 		return
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println(err)
+		errorf(c, "%v", err)
 		return
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
+		errorf(c, "%v", err)
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
-		log.Printf("Twitter replied with %d: %v", resp.StatusCode, string(body))
+		errorf(c, "fetchTweets: Twitter replied with %d: %v", resp.StatusCode, string(body))
 		return
 	}
 
 	var tweets []*tweetEntry
 	if err := json.Unmarshal(body, &tweets); err != nil {
-		log.Println(err)
+		errorf(c, "fetchTweets: %v", err)
 	}
 
 	lenFilter := len(tweetTextFilter)

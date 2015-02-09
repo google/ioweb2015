@@ -165,3 +165,13 @@ func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource
 func httpTransport(c context.Context) http.RoundTripper {
 	return &urlfetch.Transport{Context: appengineContext(c)}
 }
+
+// logf logs an info message using appengine's context.
+func logf(c context.Context, format string, args ...interface{}) {
+	appengineContext(c).Infof(format, args...)
+}
+
+// errorf logs an error message using appengine's context.
+func errorf(c context.Context, format string, args ...interface{}) {
+	appengineContext(c).Errorf(format, args...)
+}
