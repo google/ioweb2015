@@ -83,6 +83,7 @@ module.exports = (function() {
 
     function tearDown() {
       window.removeEventListener('popstate', onHistoryChange);
+      pushState('#');
     }
 
     return self;

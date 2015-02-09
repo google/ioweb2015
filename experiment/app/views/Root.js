@@ -486,7 +486,9 @@ module.exports = function RootView(audioManager, stateManager, historyManager) {
       logoElement.parentNode.removeChild(logoElement);
       logoDialog.parentNode.removeChild(logoDialog);
       trackEvent('close', 'from top left logo');
-      experimentFab.exitExperiment();
+      if (experimentFab) {
+        experimentFab.exitExperiment();
+      }
     });
     document.getElementById('noButton').addEventListener('click', function() {
       logoDialog.classList.remove('active');
