@@ -29,7 +29,7 @@ var logoSrc = require('url?limit=10000!app/images/io_white.png');
 
 const MOBILE_MAX = 767;
 
-module.exports = function RootView(audioManager, stateManager) {
+module.exports = function RootView(audioManager, stateManager, historyManager) {
   'use strict';
 
   // Clean out Pixi caches.
@@ -51,6 +51,7 @@ module.exports = function RootView(audioManager, stateManager) {
   var isPaused = false;
   var pauseAfterFrame = false;
   var isExpanded = false;
+  var currentView;
 
   var onWindowResize = throttle(onWindowResizeUnThrottled, 200);
   var onWindowScrollStart = debounce(onWindowScrollStartUnDebounced, 250, { leading: true, trailing: false });
@@ -73,7 +74,10 @@ module.exports = function RootView(audioManager, stateManager) {
     cleanUp,
     didEnterRecordingMode,
     didExitRecordingMode,
-    reloadData
+    reloadData,
+    closeCurrentView,
+    openViewByPID,
+    isInstrumentExpanded: () => isExpanded
   };
 
   var maskManager = new MaskManager('experiment-is-masked');
@@ -370,8 +374,10 @@ module.exports = function RootView(audioManager, stateManager) {
    * @param {InstrumentContainer} view - The instrument view.
    * @return {Promise}
    */
-  function openView(view) {
+  function openView(view, skipHistory) {
     isExpanded = true;
+    currentView = view;
+
     PIXI.AUTO_PREVENT_DEFAULT = true;
 
     if (didEnterRecordingModeCallback) {
@@ -392,7 +398,43 @@ module.exports = function RootView(audioManager, stateManager) {
       view.expandView()
     ]).then(function() {
       disableAllInstancesExcept(view);
+
+      if (!skipHistory) {
+        historyManager.pushState('#editing-' + view.getPID());
+      }
     });
+  }
+
+  /**
+   * Expand a view by pid.
+   * @param {number} pid - The instrument pid.
+   * @return {Promise}
+   */
+  function openViewByPID(pid, skipHistory) {
+    if (isExpanded) { return; }
+
+    var foundView;
+
+    for (var i = 0; i < instrumentViews.length; i++) {
+      if (instrumentViews[i].getPID() === pid) {
+        foundView = instrumentViews[i];
+        break;
+      }
+    }
+
+    if (foundView) {
+      openView(foundView, skipHistory);
+    }
+  }
+
+  /**
+   * Close the currently active view.
+   * @return {Promise}
+   */
+  function closeCurrentView(skipHistory) {
+    if (!isExpanded || !currentView) { return; }
+
+    closeView(currentView, skipHistory);
   }
 
   /**
@@ -400,7 +442,7 @@ module.exports = function RootView(audioManager, stateManager) {
    * @param {InstrumentContainer} view - The instrument view.
    * @return {Promise}
    */
-  function closeView(view) {
+  function closeView(view, skipHistory) {
     PIXI.AUTO_PREVENT_DEFAULT = false;
 
     enableAllInstancesInsideViewport();
@@ -417,7 +459,12 @@ module.exports = function RootView(audioManager, stateManager) {
     ]).then(function() {
       enableScrolling();
       isExpanded = false;
+      currentView = null;
       audioManager.channels.unmuteAllExcept(view.getChannel());
+
+      if (!skipHistory) {
+        historyManager.goBack();
+      }
     });
   }
 

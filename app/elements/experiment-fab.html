@@ -1168,6 +1168,10 @@ Main parent container for all of the fab elements.
 
         }, null, 300);
 
+        this.app.didRequestExit(function() {
+          this.onExitClick();
+        }.bind(this));
+
         this.app.didEnterRecordingMode(function() {
           this.recording = true;
           this.miniFabs = false;

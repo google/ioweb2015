@@ -10,6 +10,7 @@ var {Promise} = require('es6-promise');
 var rAFTimeout = require('app/util/rAFTimeout');
 var events = require('app/util/events');
 var assetPath = require('app/util/assetPath');
+var HistoryManager = require('app/util/HistoryManager');
 
 /**
  * Main entry point into the experiment.
@@ -21,9 +22,11 @@ module.exports = function Experiment() {
   var audioManager;
   var rootView;
   var stateManager;
+  var historyManager = new HistoryManager();
 
   var eventualDidEnterRecordingMode;
   var eventualDidExitRecordingMode;
+  var eventualDidRequestExit;
 
   var d = new Date();
   var isAprilFools = (d.getMonth() === 3) && (d.getDate() === 1);
@@ -38,6 +41,7 @@ module.exports = function Experiment() {
     play,
     didEnterRecordingMode,
     didExitRecordingMode,
+    didRequestExit,
     reloadData,
     consoleDance
   };
@@ -86,11 +90,12 @@ module.exports = function Experiment() {
   function start(instrumentSelector = '.row', visualizerSelector = '.box', fromPos = [0,0]) {
     events.init();
     audioManager.init();
+    historyManager.init();
 
     stateManager = new StateManager(audioManager);
 
     // Create the RootView, which controls all visuals in the experiment.
-    rootView = new RootView(audioManager, stateManager);
+    rootView = new RootView(audioManager, stateManager, historyManager);
 
     if (eventualDidEnterRecordingMode) {
       rootView.didEnterRecordingMode(eventualDidEnterRecordingMode);
@@ -99,6 +104,22 @@ module.exports = function Experiment() {
     if (eventualDidExitRecordingMode) {
       rootView.didExitRecordingMode(eventualDidExitRecordingMode);
     }
+
+    historyManager.pushState('#playing');
+
+    historyManager.onOpenInstrument(function(pid) {
+      rootView.openViewByPID(pid, true);
+    });
+
+    historyManager.onReturnToRoot(function() {
+      rootView.closeCurrentView(true);
+    });
+
+    historyManager.onCloseExperiment(function() {
+      if ('function' === typeof eventualDidRequestExit) {
+        eventualDidRequestExit();
+      }
+    });
 
     // Start sound engine.
     audioManager.fadeIn(2.25, 0.75);
@@ -181,6 +202,8 @@ module.exports = function Experiment() {
    * @return {Promise}
    */
   function tearDown(fromPos = [0,0]) {
+    historyManager.tearDown();
+
     // Stop sound engine.
     audioManager.fadeOut(0.5).then(function() {
       audioManager.tearDown();
@@ -221,6 +244,14 @@ module.exports = function Experiment() {
    */
   function didExitRecordingMode(cb) {
     eventualDidExitRecordingMode = cb;
+  }
+
+  /**
+   * When to shut down.
+   * @param {function} cb - The exit callback
+   */
+  function didRequestExit(cb) {
+    eventualDidRequestExit = cb;
   }
 
   /**
