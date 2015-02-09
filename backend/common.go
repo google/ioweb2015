@@ -1,12 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"io"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"golang.org/x/net/context"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // config is a global backend config,
@@ -15,20 +15,22 @@ var config appConfig
 
 // appConfig defines the backend config file structure.
 type appConfig struct {
-	TwitterAccount string `yaml:"twitterAccount"`
-	TwitterKey     string `yaml:"twitterKey"`
-	TwitterSecret  string `yaml:"twitterSecret"`
+	Twitter struct {
+		Account string `json:"account"`
+		Key     string `json:"key"`
+		Secret  string `json:"secret"`
+	} `json:"twitter"`
 }
 
-// initConfig reads rootDir/../config.yaml into config var.
+// initConfig reads rootDir/../server.config into config var.
 func initConfig() {
-	file := filepath.Join(rootDir, "..", "config.yaml")
-	data, err := ioutil.ReadFile(file)
+	p := filepath.Join(rootDir, "..", "server.config")
+	file, err := os.Open(p)
 	if err != nil {
-		panic("initConfig: " + err.Error())
+		panic("initConfig: error locating " + p)
 	}
-	if err := yaml.Unmarshal(data, &config); err != nil {
-		panic("parse config: " + err.Error())
+	if err := json.NewDecoder(file).Decode(&config); err != nil {
+		panic("initConfig: " + err.Error())
 	}
 }
 

@@ -92,8 +92,8 @@ func serviceAccountClient(c context.Context, scopes ...string) (*http.Client, er
 // twitterClient creates a new HTTP client with oauth2Transport.
 func twitterClient(c context.Context) (*http.Client, error) {
 	cred := &twitterCredentials{
-		key:       config.TwitterKey,
-		secret:    config.TwitterSecret,
+		key:       config.Twitter.Key,
+		secret:    config.Twitter.Secret,
 		transport: httpTransport(c),
 		cache:     cache,
 	}

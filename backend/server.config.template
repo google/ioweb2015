@@ -1,0 +1,8 @@
+{
+  "twitter": {
+    "account": "googledevs",
+    "key": "an-app-key",
+    "secret": "very-secret"
+  }
+}
+
