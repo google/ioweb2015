@@ -132,13 +132,13 @@ google-youtube {
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
-   $marginTop: 180px;
+   $marginTop: 100px;
 
   .card__photo--stage {
     margin-top: -33px;
   }
   .page__section--attend {
-    margin-top: -90px;
+    margin-top: -36px;
     padding-top: $marginTop;
     background-size: cover;
     background-position: 50% 140px;
@@ -155,12 +155,18 @@ google-youtube {
 }
 
 @media (min-width: $desktop-breakpoint-max) {
+  $marginTop: 180px;
   .page__section--attend {
+    padding-top: $marginTop;
     margin-top: -108px;
+
+    .action__links {
+      top: $marginTop;
+    }
   }
   .card__photo--stage {
     margin-top: -33px;
-    margin-bottom: -176px;
+    margin-bottom: -154px;
   }
 }
 

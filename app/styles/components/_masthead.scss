@@ -132,7 +132,6 @@ core-drawer-panel {
 
     a {
       flex: inherit; // Needed for IE11, in order to ensure that the <a> gets assigned a width.
-      font-size: 13px;
       color: inherit;
     }
   }
@@ -145,7 +144,7 @@ core-drawer-panel {
   max-width: $tablet-breakpoint-max;
   margin: 0 auto;
   position: relative;
-  padding: 14px 0 40px 0;
+  padding: 10px 0 40px 0;
 
   .io-logo {
     display: none;
@@ -155,11 +154,11 @@ core-drawer-panel {
 .masthead-title {
   color: $color-cyan-A700 !important;
   line-height: 24px;
+  margin-bottom: 4px;
 }
 
 .masthead-subtitle {
   color: $color-bluegrey-700;
-  // font-weight: 400;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
