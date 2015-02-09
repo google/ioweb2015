@@ -339,7 +339,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       <div class="dialog-content" _style="background-image: {{dialogSupportedImage}}">
         <h4><i18n-msg msgid="experiment-ahead">Chrome Experiment ahead</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="headphones-on">The Experiment features Web Audio API. You might want to grab headphones.</i18n-msg>
+          <i18n-msg msgid="headphones-on">The Experiment features WebGL and Web Audio APIs. You might want to grab headphones.</i18n-msg>
         </p>
         <div class="button-container">
           <template if="{{!expLoaded}}">
@@ -363,7 +363,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       <div class="dialog-content" _style="background-image: {{dialogUnsupportedImage}}">
         <h4 class="sorry"><i18n-msg msgid="sorry">Sorry...</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="experiment-unsupported">This Chrome Experiment requires <a href="//caniuse.com/#feat=webgl" target="_blank"><i18n-msg msgid="supports-webgl">WebGL</i18n-msg></a> and <a href="//caniuse.com/#feat=audio-api" target="_blank"><i18n-msg msgid="supports-webaudio">Web Audio</i18n-msg></a> support, which are not available in your current browser. Please change or upgrade your browser to run the experiment.
+          <i18n-msg msgid="experiment-unsupported">This Chrome Experiment requires <a href="//caniuse.com/#feat=webgl" target="_blank"><i18n-msg msgid="supports-webgl">WebGL</i18n-msg></a> and <a href="//caniuse.com/#feat=audio-api" target="_blank"><i18n-msg msgid="supports-webaudio">Web Audio</i18n-msg></a> support, which aren&#8217;t available in your current browser. Please change or upgrade your browser to run the Experiment.
         </p>
         <div class="button-container">
           <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
@@ -377,7 +377,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       <div class="dialog-content" _style="background-image: {{dialogUnsupportedImage}}">
         <h4 class="sorry"><i18n-msg msgid="sorry">Sorry...</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="experiment-failed">The experiment failed to load. Perhaps you&#8217;re offline? Unfortunately, you need to be online to access the Web Audio experiment.</i18n-msg>
+          <i18n-msg msgid="experiment-failed">The Experiment failed to load. Perhaps you&#8217;re offline? Unfortunately, you need to be online to access the WebGL and Web Audio Experiment.</i18n-msg>
         </p>
         <div class="button-container">
           <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
@@ -1131,9 +1131,9 @@ Main parent container for all of the fab elements.
             IOWA.Analytics.trackEvent('experiment', 'error', 'failed to load');
           }.bind(this));
         } else {
+          console.log('Experiment is unsupported.');
           this.experimentSupported = false;
           this.experimentUnsupported = true;
-
           IOWA.Analytics.trackEvent('experiment', 'unsupported', 'experiment not supported');
         }
       },
