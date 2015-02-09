@@ -110,6 +110,10 @@ window.experiment = (function() {
     return appSingleton && appSingleton.didEnterRecordingMode(cb);
   }
 
+  function consoleDance() {
+    return appSingleton && appSingleton.consoleDance();
+  }
+
   return {
     assets: {
       animatedImg,
@@ -130,6 +134,7 @@ window.experiment = (function() {
     tearDown,
     serialize,
     pause,
-    play
+    play,
+    consoleDance
   };
 })();
