@@ -82,6 +82,7 @@ window.experiment = (function() {
     }
 
     appSingleton = app;
+
     if (resolver) {
       resolver(app);
     }

@@ -145,9 +145,12 @@ module.exports = function Experiment() {
     return new Promise(function(resolve, reject) {
       // Animate transition in.
       rAFTimeout(function() {
+        // jshint quotmark: false
         rootView.animateIn(fromPos).then(resolve, reject);
 
         if (('undefined' !== typeof console) && ('function' === typeof console.log)) {
+          console.log("Welcome to the 2015 I/O Experiment.");
+          console.log("If you're interested in how to programatically manipulate it, explore the README: https://gist.github.com/tdreyno/b6de4902c7e886f94b67");
           console.log('Need a dance partner? Run `experiment.consoleDance()`');
         }
       }, 50);
@@ -317,16 +320,16 @@ module.exports = function Experiment() {
 
       var rowStr = "\n\n\n\n\n\n\n ";
 
-      for (var row = 0; row < numRows; row += ROW_PIXELS) {
-        var rowOffset = row * numCols * 4;
-        for (var col = 0; col < numCols; col += COL_PIXELS) {
-          var offset = rowOffset + 4 * col;
-          var r = sourcePixels[offset];
-          var g = sourcePixels[offset + 1];
-          var b = sourcePixels[offset + 2];
-          var luminance = Math.ceil(0.299 * r + 0.587 * g + 0.114 * b);
+      for (let row = 0; row < numRows; row += ROW_PIXELS) {
+        let rowOffset = row * numCols * 4;
+        for (let col = 0; col < numCols; col += COL_PIXELS) {
+          let offset = rowOffset + 4 * col;
+          let r = sourcePixels[offset];
+          let g = sourcePixels[offset + 1];
+          let b = sourcePixels[offset + 2];
+          let luminance = Math.ceil(0.299 * r + 0.587 * g + 0.114 * b);
 
-          var c = getChar(luminance);
+          let c = getChar(luminance);
 
           if ((r === 255) && (g === 255) && (b === 255)) {
             c = ' ';
@@ -338,7 +341,7 @@ module.exports = function Experiment() {
         rowStr += "\n ";
       }
 
-        console.log('%c' + rowStr, 'font-family: monospace; line-height: 0px; font-size: 10px;');
+      console.log('%c' + rowStr, 'font-family: monospace; line-height: 0px; font-size: 10px;');
     }
 
     function draw(video, width, height, backContext) {
