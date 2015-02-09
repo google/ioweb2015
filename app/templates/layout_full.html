@@ -358,7 +358,7 @@ limitations under the License.
     if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
       IOWA.Elements.Template.pages[{% .Slug %}] = {};
     }
-    IOWA.Elements.Template.pages[{% .Slug %}].title = {% template "title" .%};
+    IOWA.Elements.Template.pages[{% .Slug %}].title = "{% template "title" .%}";
   }
 
   if (IOWA.Util.supportsHTMLImports) {
