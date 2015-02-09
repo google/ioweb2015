@@ -18,7 +18,7 @@ module.exports = (function() {
   const CONTENT_HORIZONTAL_BUFFER_MOBILE = 24;
   const CONTENT_VERTICAL_BUFFER_DESKTOP = 150;
   const CONTENT_VERTICAL_BUFFER_MOBILE = 32;
-  const CONTENT_CONTROLS_BUFFER = 70;
+  const CONTENT_CONTROLS_BUFFER = 80;
   const MOBILE_MAX = 767;
 
   var isRetina = false;
@@ -554,7 +554,7 @@ module.exports = (function() {
         return instrumentView.supportsPortrait ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
       } else {
         if (isMobile) {
-          return isFirst ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
+          return 0;
         } else {
           var equalMargins = Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
           return (hasTopMargin ? equalMargins : 0) - (hasBottomMargin ? equalMargins : 0);
@@ -677,7 +677,7 @@ module.exports = (function() {
           CONTENT_VERTICAL_BUFFER_MOBILE :
           CONTENT_VERTICAL_BUFFER_DESKTOP;
 
-      var isPortrait = isMobile && instrumentView.supportsPortrait && (containerHeight > containerWidth);
+      var isPortrait = isMobile && instrumentView.supportsPortrait && (window.innerHeight > window.innerWidth);
 
       if (isExpanded) {
         verticalBuffer = CONTENT_CONTROLS_BUFFER;
@@ -691,7 +691,12 @@ module.exports = (function() {
       var relativeHeight;
 
       if (isMobile) {
-        let topBuffer = (isExpanded || isFirst) ? Math.max(CONTENT_CONTROLS_BUFFER, verticalBuffer) : verticalBuffer;
+        let topBuffer = isExpanded ? Math.max(CONTENT_CONTROLS_BUFFER, verticalBuffer) : verticalBuffer;
+
+        if (isFirst && !isExpanded) {
+          topBuffer = 70;
+        }
+
         relativeHeight = containerHeight - (topBuffer * 2);
 
         if (isPortrait) {

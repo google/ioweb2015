@@ -182,8 +182,6 @@ module.exports = (function() {
       numberImagePixiObjects.push(numberImage);
     }
 
-    container.hitArea = circle;
-
     var self = {
       clearCircle,
       resetRecord,
@@ -257,6 +255,8 @@ module.exports = (function() {
      */
     function addEventListeners() {
       container.interactive = true;
+
+      container.hitArea = new PIXI.Rectangle(0, 0, circleTexture.width / 2, circleTexture.height / 2);
 
       container.click = container.tap = function() {
         if (!isCountdown) {
