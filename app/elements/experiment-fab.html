@@ -1121,14 +1121,13 @@ Main parent container for all of the fab elements.
           this.experimentSupported = true;
           this.loadingCircleHidden = false;
           experiment.load(15000).then(function(app) {
-            console.log('Experiment Loaded Successfully.');
+            console.log('Experiment loaded successfully.');
             this.app = app;
             this.experimentLoaded = true;
           }.bind(this), function() {
             this.experimentSupported = false;
             this.experimentFailed = true;
-            console.log('Experiment failed for some unknown reason');
-            console.log(this.experimentFailed);
+            console.log('Experiment failed for some unknown reason. Perhaps user is offline?');
             IOWA.Analytics.trackEvent('experiment', 'error', 'failed to load');
           }.bind(this));
         } else {
