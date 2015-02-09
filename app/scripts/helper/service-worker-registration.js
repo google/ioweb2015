@@ -53,7 +53,7 @@ IOWA.ServiceWorkerRegistration = (function() {
                     IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest content.',
                       tapHandler);
                   } else {
-                    IOWA.Elements.Toast.showMessage('Caching complete. This site is ready to work offline!');
+                    IOWA.Elements.Toast.showMessage('Caching complete! Future visits will work offline.');
                   }
                   break;
 
