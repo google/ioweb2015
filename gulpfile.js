@@ -147,6 +147,7 @@ gulp.task('copy-backend', ['backend:config'], function(cb) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
     BACKEND_DIR + '/*.yaml',
+    BACKEND_DIR + '/*.config',
     BACKEND_DIR + '/*.pem',
     BACKEND_DIR + '/whitelist'
   ], {base: './'})
@@ -320,8 +321,8 @@ gulp.task('copy-experiment-to-site', ['build-experiment'], function(cb) {
 // Build self-sufficient backend server binary w/o GAE support.
 gulp.task('backend', buildBackend);
 
-// Create config.yaml if one doesn't exist. Needed to run the server.
-gulp.task('backend:config', generateConfigYaml);
+// Create server config if one doesn't exist. Needed to run the server.
+gulp.task('backend:config', generateServerConfig);
 
 // Backend TDD: watch for changes and run tests in an infinite loop.
 gulp.task('backend:test', function(cb) {
@@ -362,7 +363,7 @@ gulp.task('godeps', function() {
 gulp.task('decrypt', function(done) {
   var files = [
     BACKEND_DIR + '/service-account.pem',
-    BACKEND_DIR + '/config.yaml'
+    BACKEND_DIR + '/server.config'
   ];
   var promises = files.map(function(f) {
     return new Promise(function(resolve, reject) {
@@ -429,7 +430,7 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
   };
 
   var serverAddr = 'localhost:' + (watchFiles ? '8080' : '3000');
-  var args = ['preview', 'app', 'run', backendDir + "/app.yaml", '--host', serverAddr];
+  var args = ['preview', 'app', 'run', backendDir, '--host', serverAddr];
 
   var backend = spawn('gcloud', args, {stdio: 'inherit'});
   if (!watchFiles) {
@@ -467,15 +468,15 @@ function changeAppYamlVersion(version, appYamlPath) {
   return fs.writeFileSync.bind(fs, appYamlPath, appYaml, null);
 }
 
-// Create dest/config.yaml if it doesn't exist already using config.yaml.template.
+// Create default server config if it doesn't exist already using the template.
 // Needed to start the server.
-function generateConfigYaml(callback) {
-  if (fs.existsSync(BACKEND_DIR + '/config.yaml')) {
+function generateServerConfig(callback) {
+  if (fs.existsSync(BACKEND_DIR + '/server.config')) {
     callback();
     return;
   }
-  gulp.src(BACKEND_DIR + '/config.yaml.template', {base: BACKEND_DIR})
-    .pipe($.rename('config.yaml'))
+  gulp.src(BACKEND_DIR + '/server.config.template', {base: BACKEND_DIR})
+    .pipe($.rename('server.config'))
     .pipe(gulp.dest(BACKEND_DIR))
     .on('end', callback);
 }
