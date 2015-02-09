@@ -188,11 +188,11 @@ gulp.task('concat-and-uglify-js', ['js'], function() {
     'helper/util.js',
     'helper/page-animation.js',
     'helper/elements.js',
+    'helper/service-worker-registration.js',
     'helper/history.js',
     'helper/router.js',
     'helper/request.js',
     'helper/picasa.js',
-    'helper/service-worker-registration.js',
     'bootstrap.js'
   ].map(function(script) {
     return APP_DIR + '/scripts/' + script;
