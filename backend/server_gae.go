@@ -44,7 +44,8 @@ func init() {
 	handle("/api/social", serveSocial)
 	// setup root redirect if we're prefixed
 	if httpPrefix != "/" {
-		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
+		redirect := http.HandlerFunc(redirectHandler)
+		http.Handle("/", wrapHandler(redirect))
 	}
 }
 

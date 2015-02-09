@@ -37,6 +37,17 @@ func handler(fn func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return h
 }
 
+// redirectHandler redirects from a /page path to /httpPrefix/page
+// It returns 404 Not Found error for any other requested asset.
+func redirectHandler(w http.ResponseWriter, r *http.Request) {
+	if ext := filepath.Ext(r.URL.Path); ext != "" {
+		code := http.StatusNotFound
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+	http.Redirect(w, r, path.Join(httpPrefix, r.URL.Path), http.StatusFound)
+}
+
 // serveTemplate responds with text/html content of the executed template
 // found under request base path.
 // 'home' template is assumed if request path ends with '/'.
