@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-$hashWidth: 90px;
+$hashWidth: 83px;
 
 html, body {
   font-family: 'Helvetica', 'Arial', 'sans-serif';
@@ -327,7 +327,7 @@ h6 {
   }
   .io__hash {
     margin: 80px auto;
-    margin-left: -$hashWidth;
+    margin-left: -$hashWidth !important;
     height: 160px;
   }
   .bg-globe {
