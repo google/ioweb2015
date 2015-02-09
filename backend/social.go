@@ -36,7 +36,7 @@ type socEntry struct {
 
 // socialEntries returns a list of the most recent social posts.
 func socialEntries(c context.Context, refresh bool) ([]*socEntry, error) {
-	cacheKey := "social-" + config.TwitterAccount
+	cacheKey := "social-" + config.Twitter.Account
 
 	if !refresh {
 		entries, err := socialEntriesFromCache(c, cacheKey)
@@ -47,11 +47,11 @@ func socialEntries(c context.Context, refresh bool) ([]*socEntry, error) {
 
 	entries := make([]*socEntry, 0)
 	tc := make(chan *tweetEntry)
-	go fetchTweets(c, config.TwitterAccount, tc)
+	go fetchTweets(c, config.Twitter.Account, tc)
 	for t := range tc {
 		e := &socEntry{
 			Kind:   "tweet",
-			URL:    fmt.Sprintf(tweetURL, config.TwitterAccount, t.Id),
+			URL:    fmt.Sprintf(tweetURL, config.Twitter.Account, t.Id),
 			Text:   t.Text,
 			Author: "@" + t.User.ScreenName,
 			When:   time.Time(t.CreatedAt),
@@ -92,7 +92,7 @@ func fetchTweets(c context.Context, account string, tc chan *tweetEntry) {
 	}
 
 	params := url.Values{
-		"screen_name": {config.TwitterAccount},
+		"screen_name": {config.Twitter.Account},
 		"count":       {"200"},
 		"include_rts": {"true"},
 	}

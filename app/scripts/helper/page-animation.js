@@ -211,6 +211,7 @@ IOWA.PageAnimation = (function() {
         (-rippleRect.top)  + 'px, 0)';
 
     card.style.transformOrigin = '0 0';
+    card.style.webkitTransformOrigin = '0 0';
     var cardTransition = new Animation(card, [
         {transform: 'translate3d(0, 0, 0) scale(1)'},
         {transform: [translate, scale].join(' ')}
