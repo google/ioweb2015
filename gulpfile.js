@@ -312,7 +312,7 @@ gulp.task('copy-experiment-to-site', ['build-experiment'], function(cb) {
   gulp.src([
     EXPERIMENT_DIR + '/public/js/*.*',
     EXPERIMENT_DIR + '/public/*.mp3',
-    EXPERIMENT_DIR + '/public/*.mp4',
+    EXPERIMENT_DIR + '/public/*.mp4'
   ], {base: EXPERIMENT_DIR + '/public/' })
   .pipe(gulp.dest(DIST_EXPERIMENT_DIR))
   .on('end', cb);
