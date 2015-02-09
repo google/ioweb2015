@@ -265,56 +265,61 @@ IOWA.Router = (function() {
    */
   function updatePageElements(pageName, currentPageTemplates) {
     replaceTemplateContent(currentPageTemplates);
+
     var template = IOWA.Elements.Template;
-    var previousPageMeta = template.pages[template.selectedPage];
+
+    // Update menu/drawer selected item.
     template.selectedPage = pageName;
+    IOWA.Elements.DrawerMenu.selected = pageName;
+
     var currentPageMeta = template.pages[pageName];
     document.body.id = 'page-' + pageName;
     document.title = currentPageMeta.title || 'Google I/O 2015';
 
-    var previousMastheadColor = (template.rippleColors[
-        previousPageMeta.mastheadBgClass]);
-    var currentMastheadColor = (template.rippleColors[
-        currentPageMeta.mastheadBgClass]);
-    var mastheadBgClass = template.pages[pageName].mastheadBgClass;
+    var previousPageMeta = template.pages[template.selectedPage];
+    var previousMastheadColor = template.rippleColors[previousPageMeta.mastheadBgClass];
+    var currentMastheadColor = template.rippleColors[currentPageMeta.mastheadBgClass];
 
     // Prepare the page for a smooth masthead transition.
+    var mastheadBgClass = currentPageMeta.mastheadBgClass;
     template.navBgClass = mastheadBgClass;
     // This cannot be updated via data binding, because the masthead
     // is visible before the binding happens.
     IOWA.Elements.Masthead.className = IOWA.Elements.Masthead.className.replace(
         MASTHEAD_BG_CLASS_REGEX, ' ' + mastheadBgClass + ' ');
-    var duration = currentPageTransition ? 0 : 300;
-    var mastheadAnim = new Animation(IOWA.Elements.Masthead, [
-          {backgroundColor: previousMastheadColor},
-          {backgroundColor: currentMastheadColor}
-        ], {
-          duration: duration,
-          fill: 'forwards'
-      });
-    IOWA.PageAnimation.play(mastheadAnim);
+
+    // Transition masthead color.
+    IOWA.PageAnimation.play(new Animation(IOWA.Elements.Masthead, [
+      {backgroundColor: previousMastheadColor},
+      {backgroundColor: currentMastheadColor}
+    ], {
+      duration: currentPageTransition ? 0 : 300,
+      fill: 'forwards'
+    }));
+
     // Hide the masthead ripple before proceeding with page transition.
     IOWA.PageAnimation.play(
-      IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
+        IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
 
     // Scroll to top of new page.
     IOWA.Elements.ScrollContainer.scrollTop = 0;
 
-    setTimeout(function() {
+    // Wait 1 rAF for DOM to settle.
+    IOWA.Elements.Template.async(function() {
+      var animationFunc;
       if (currentPageTransition === 'hero-card-transition') {
-        IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverIn(), function() {
-          IOWA.Elements.Template.fire('page-transition-done');
-        });
+        animationFunc = IOWA.PageAnimation.pageCardTakeoverIn;
       } else {
-        IOWA.PageAnimation.play(IOWA.PageAnimation.pageSlideIn(), function() {
-          // Fire event when the page transitions are final.
-          IOWA.Elements.Template.fire('page-transition-done');
-        });
+        animationFunc = IOWA.PageAnimation.pageSlideIn;
       }
+
+      IOWA.PageAnimation.play(animationFunc(), function() {
+        // Fire event when the page transitions are final.
+        IOWA.Elements.Template.fire('page-transition-done');
+      });
+
       currentPageTransition = '';
-    }, 100); // Wait for the... Good question. Maybe template binding?
-    // TODO: BUG: Anyways, something to investigate. Web Animations
-    // are not working properly without this delay (Chrome crashes).
+    });
   }
 
   /**
