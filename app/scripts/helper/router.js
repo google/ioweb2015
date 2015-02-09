@@ -116,6 +116,7 @@ IOWA.Router = (function() {
     // http://stackoverflow.com/questions/736513
     var pageName = parsePageNameFromAbsolutePath(el.pathname);
     template.nextPage = pageName;
+    document.title = template.pages[pageName].title || 'Google I/O 2015';
 
     var page = template.selectedPage;
     var bgClass = template.pages[pageName] &&

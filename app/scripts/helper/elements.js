@@ -91,36 +91,44 @@ IOWA.Elements = (function() {
     template.pages = {
       'faq': {
         mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'FAQ'
       },
       'form': {
         mastheadBgClass: 'bg-dark-grey',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: '2015 I/O Extended event'
       },
       'schedule': {
         mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Schedule'
       },
       'home': {
         mastheadBgClass: 'bg-medium-grey',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Google I/O'
       },
       'about': {
         mastheadBgClass: 'bg-dark-grey',
         hasBeenLoaded: false,
-        galleryOpen: false
+        galleryOpen: false,
+        title: 'About I/O'
       },
       'onsite': {
         mastheadBgClass: 'bg-dark-grey',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Attend onsite'
       },
       'offsite': {
         mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Attend offsite'
       },
       'registration': {
         mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Registration'
       }
     };
 
