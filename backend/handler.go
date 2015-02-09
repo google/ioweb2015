@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -66,7 +65,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	err := renderTemplate(c, tplname, wantsPartial, data)
 
 	if err != nil {
-		log.Printf("renderTemplate: %v", err)
+		errorf(c, "renderTemplate: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -90,20 +89,20 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 
 	entries, err := ioExtEntries(c, refresh)
 	if err != nil {
-		log.Printf("ioExtEntries: %v", err)
+		errorf(c, "ioExtEntries: %v", err)
 		writeJSONError(w, err)
 		return
 	}
 
 	body, err := json.Marshal(entries)
 	if err != nil {
-		log.Printf("json.Marshal: %v", err)
+		errorf(c, "json.Marshal: %v", err)
 		writeJSONError(w, err)
 		return
 	}
 
 	if _, err := w.Write(body); err != nil {
-		log.Printf("w.Write: %v", err)
+		errorf(c, "w.Write: %v", err)
 	}
 }
 
@@ -126,20 +125,20 @@ func serveSocial(w http.ResponseWriter, r *http.Request) {
 
 	entries, err := socialEntries(c, refresh)
 	if err != nil {
-		log.Printf("socialEntries: %v", err)
+		errorf(c, "socialEntries: %v", err)
 		writeJSONError(w, err)
 		return
 	}
 
 	body, err := json.Marshal(entries)
 	if err != nil {
-		log.Printf("json.Marshal: %v", err)
+		errorf(c, "json.Marshal: %v", err)
 		writeJSONError(w, err)
 		return
 	}
 
 	if _, err := w.Write(body); err != nil {
-		log.Printf("w.Write: %v", err)
+		errorf(c, "w.Write: %v", err)
 	}
 }
 

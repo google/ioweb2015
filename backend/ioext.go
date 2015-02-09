@@ -54,9 +54,9 @@ func ioExtEntries(c context.Context, refresh bool) ([]*extEntry, error) {
 
 	data, err := json.Marshal(entries)
 	if err != nil {
-		log.Println(err)
+		errorf(c, "ioExtEntries: %v", err)
 	} else if err := cache.set(c, cacheKeyIOExtended, data, 2*time.Hour); err != nil {
-		log.Printf("cache.put(%q): %v", cacheKeyIOExtended, err)
+		errorf(c, "ioExtEntries: cache.put(%q): %v", cacheKeyIOExtended, err)
 	}
 
 	return entries, nil
