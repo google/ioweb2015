@@ -1120,9 +1120,10 @@ Main parent container for all of the fab elements.
         if (experiment.canLoad()) {
           this.experimentSupported = true;
           this.loadingCircleHidden = false;
-          experiment.load(15000).then(function(app) {
+          experiment.load(30000).then(function(app) {
             console.log('Experiment loaded successfully.');
             this.app = app;
+            this.app.unlockOnMobile();
             this.experimentLoaded = true;
           }.bind(this), function() {
             this.experimentSupported = false;

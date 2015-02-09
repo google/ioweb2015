@@ -552,7 +552,7 @@ module.exports = (function() {
         return instrumentView.supportsPortrait ? (CONTENT_CONTROLS_BUFFER / 2) : 0;
       } else {
         if (isMobile) {
-          return 0;
+          return CONTENT_VERTICAL_BUFFER_MOBILE / 2;
         } else {
           var equalMargins = Math.floor(CONTENT_VERTICAL_BUFFER_DESKTOP / 3);
           return (hasTopMargin ? equalMargins : 0) - (hasBottomMargin ? equalMargins : 0);
@@ -692,10 +692,10 @@ module.exports = (function() {
         let topBuffer = isExpanded ? Math.max(CONTENT_CONTROLS_BUFFER, verticalBuffer) : verticalBuffer;
 
         if (isFirst && !isExpanded) {
-          topBuffer = 70;
+          relativeHeight = containerHeight - (70 + topBuffer);
+        } else {
+          relativeHeight = containerHeight - (topBuffer * 2);
         }
-
-        relativeHeight = containerHeight - (topBuffer * 2);
 
         if (isPortrait) {
           return fitBounds(CONTENT_ASPECT_RATIO_VERTICAL, relativeWidth, relativeHeight);

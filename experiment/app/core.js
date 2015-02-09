@@ -43,8 +43,16 @@ module.exports = function Experiment() {
     didExitRecordingMode,
     didRequestExit,
     reloadData,
-    consoleDance
+    consoleDance,
+    unlockOnMobile
   };
+
+  /**
+   * Pass audio activation down to context.
+   */
+  function unlockOnMobile() {
+    audioManager.unlockOnMobile();
+  }
 
   /**
    * Load the experiment data and audio files.
