@@ -8,10 +8,10 @@
 
 {% define "content" %}
   <div class="slide-up">
-    <section class="page__section page__section--copy" hidden?="{{isPhoneSize}}">
+    <section class="page__section page__section--copy">
       <div class="card__container">
         <div class="card js-experiment-visualizer">
-          <div class="card-content card-content--top" layout horizontal justified>
+          <div class="card-content card-content--top" layout horizontal vertical?="{{isPhoneSize}}" justified>
             <div>
               <h3><i18n-msg msgid="general">General</i18-msg></h3>
               <ul>
