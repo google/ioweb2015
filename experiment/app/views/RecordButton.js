@@ -122,9 +122,6 @@ module.exports = (function() {
 
     var animationTextures = makeRecordSprite();
 
-    var currentFrame = 0;
-    renderer.updateTexture(animationTextures[0].baseTexture);
-
     var arcCircle = new PIXI.Sprite(animationTextures[currentFrame]);
 
     arcCircle.position.x = 0.15 * arcCircle.width / 2;
@@ -156,6 +153,9 @@ module.exports = (function() {
     var recordingText = retinaInlineSprite(recordingImage);
     var recordingCompleteText = retinaInlineSprite(recordingComplete);
     var textImages = [readyText, recordingText, recordingCompleteText];
+
+    var currentFrame = 0;
+    renderer.updateTexture(animationTextures[0].baseTexture);
 
     for (let i = 0; i < textImages.length; i++) {
       let textImage = textImages[i];
