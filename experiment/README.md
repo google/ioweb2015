@@ -30,6 +30,12 @@ The file format looks like:
 
 Each instrument has its own data model. They all reference the beat number when the sound plays and the unique name of the sound to play. The beat number is a looping sequence of indexes 0-63. The list of sound names will be discussed later and can be overridden to use your own sounds.
 
+In the data model, sounds are referenced by ID rather than name. To get an ID for a given sound:
+
+```
+audioManager.getSound('arp1').guid
+```
+
 Which will be defined below:
 
 ## Arpeggiator
@@ -41,12 +47,12 @@ The quadrant parameter refers to which colored quarter of the instrument the dra
   "recorded": [
     {
       "beat": 0,
-      "sound": "arp1",
+      "sound": 10000,
       "quadrant": 0
     },
     {
       "beat": 10,
-      "sound": "arp2",
+      "sound": 10001,
       "quadrant": 1
     }
   ]
@@ -69,7 +75,7 @@ Recorded notes trigger an animation on a defined drum. The `pid` property refers
       "y": 262,
       "radius": 70,
       "color": 0xb387ff,
-      "sound": "drumKick",
+      "sound": 13,
       "pid": 0
     }
   ],
@@ -83,12 +89,12 @@ Recorded notes trigger an animation on a defined drum. The `pid` property refers
   "recorded": [
     {
       "beat": 0,
-      "sound": "drumKick",
+      "sound": 13,
       "pid": 0
     },
     {
       "beat": 10,
-      "sound": "drumClap",
+      "sound": 12,
       "pid": 1
     }
   ]
@@ -115,12 +121,12 @@ Recorded notes refence the `pid` of a string, so it can be animated on playback.
   "recorded": [
     {
       "beat": 0,
-      "sound": "stringbass_F",
+      "sound": 27,
       "pid": 0
     },
     {
       "beat": 10,
-      "sound": "stringbass_G",
+      "sound": 28,
       "pid": 1
     }
   ]
@@ -136,12 +142,12 @@ The hexagons a pretty simple, but to emit a "wave" from a specific hexagon, you 
   "recorded": [
     {
       "beat": 0,
-      "sound": "hexagon1",
+      "sound": 15,
       "cube": [0, 0, 0]
     },
     {
       "beat": 10,
-      "sound": "hexagon2",
+      "sound": 16,
       "cube": [-1, 2, -1]
     }
   ]
@@ -158,14 +164,15 @@ There is a required `duration` key as most of these sound files play for a very 
 {
   "parallelograms": [
     {
-      "sound": "parallelogram_C-minor",
-      "color": 0x4dd0e0
+      "sound": 21,
+      "color": 0x4dd0e0,
+      "hovercolor": 0x4dd0e0
     }
   ],
   "recorded": [
     {
       "beat": 62,
-      "sound": "parallelogram_C-minor",
+      "sound": 21,
       "duration": 5.1,
       "pid": 0
     }
@@ -225,6 +232,12 @@ The built-in sound names are:
 * stringbass_F
 * stringbass_G
 
+In the data model, sounds are referenced by ID rather than name. To get an ID for a given sound:
+
+```
+audioManager.getSound('arp1').guid
+```
+
 However, it is possible to load a different audio file and define new sound names.
 
 Using the `audiosprite` project from NPM, you can concatinate a directory of mp3 files into a single mp3. This then binds the file name of each mp3 to the output mp3 in a `.json` file. By either naming the mp3 files or renaming the keys in the `.json` file, you can setup new sound names to be used in the experiment. This is how we implement "Cat Mode". I'm not going to spoil it, but if you dig around you can see how to enable it.
@@ -250,7 +263,7 @@ npm install webpack -g
 npm install webpack-dev-server -g
 ```
 
-Dev server (http://localhost:8080/):
+Dev server (http://localhost:5555/):
 
 ```
 ./bin/watch
