@@ -359,7 +359,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       </div>
     </template>
 
-    <template if="{{!supported}}">
+    <template if="{{unsupported}}">
       <div class="dialog-content" _style="background-image: {{dialogUnsupportedImage}}">
         <h4 class="sorry"><i18n-msg msgid="sorry">Sorry...</i18n-msg></h4>
         <p>
@@ -373,10 +373,11 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       </div>
     </template>
 
-    <template if="{{experimentFailed}}">
+    <template if="{{failed}}">
       <div class="dialog-content" _style="background-image: {{dialogUnsupportedImage}}">
+        <h4 class="sorry"><i18n-msg msgid="sorry">Sorry...</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="experiment-failed">The experiment failed to load.</i18n-msg>
+          <i18n-msg msgid="experiment-failed">The experiment failed to load. Perhaps you&#8217;re offline? Unfortunately, you need to be online to access the Web Audio experiment.</i18n-msg>
         </p>
         <div class="button-container">
           <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
@@ -394,11 +395,15 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           value: false,
           reflect: true
         },
+        unsupported: {
+          value: false,
+          reflect: true
+        },
         expLoaded: {
           value: false,
           reflect: true
         },
-        experimentFailed: {
+        failed: {
           value: false,
           reflect: true
         }
@@ -999,7 +1004,7 @@ Main parent container for all of the fab elements.
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}" hidden?="{{loadingCircleHidden}}"></experiment-loading-circle>
       <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment" onstate?="{{dialogVisible}}" mode="{{mode}}"></experiment-fab>
 
-      <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
+      <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" unsupported="{{experimentUnsupported}}" failed="{{experimentFailed}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
       <experiment-overlay active?="{{dialogVisible}}" on-tap="{{onOverlayClose}}"></experiment-overlay>
 
@@ -1120,12 +1125,16 @@ Main parent container for all of the fab elements.
             this.app = app;
             this.experimentLoaded = true;
           }.bind(this), function() {
+            this.experimentSupported = false;
             this.experimentFailed = true;
             console.log('Experiment failed for some unknown reason');
+            console.log(this.experimentFailed);
             IOWA.Analytics.trackEvent('experiment', 'error', 'failed to load');
           }.bind(this));
         } else {
           this.experimentSupported = false;
+          this.experimentUnsupported = true;
+
           IOWA.Analytics.trackEvent('experiment', 'unsupported', 'experiment not supported');
         }
       },
