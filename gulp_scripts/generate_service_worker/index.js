@@ -36,6 +36,7 @@ module.exports = function(rootDir, handleFetch, importScripts, callback) {
       rootDir + '/scripts/**',
       rootDir + '/styles/**/*.css',
       rootDir + '/manifest.json',
+      rootDir + '/humans.txt',
       rootDir + '/favicon.ico'
     ],
     stripPrefix: rootDir + '/'
