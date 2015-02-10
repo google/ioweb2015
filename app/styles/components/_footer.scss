@@ -41,6 +41,10 @@ footer {
     border: none;
     font-weight: 500;
   }
+
+  paper-dropdown {
+    min-width: 200px; // Needed for IE.
+  }
 }
 
 .footer-content {
