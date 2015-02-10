@@ -217,6 +217,10 @@ h6 {
 
   h4 {
     @include typo-button();
+
+    a {
+      color: inherit;
+    }
   }
 }
 
