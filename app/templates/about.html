@@ -109,10 +109,6 @@
         new Animation(bottomSection, [
           {transform: 'translateY(0)', opacity: 1},
           {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(navOverlay, [
-          {transform: 'translateY(-100%)'},
-          {transform: 'translateY(0)'}
         ], animationOptions)
       ]);
 
@@ -153,11 +149,13 @@
         // Fade out gallery and slide back in page sections at the same time.
         IOWA.PageAnimation.play(galleryAnimation);
         IOWA.PageAnimation.play(animation, opt_callback);
+        navOverlay.classList.remove('active');
       } else {
         // Slide out page sections, then fade in gallery.
         IOWA.PageAnimation.play(animation, function() {
           IOWA.PageAnimation.play(galleryAnimation, opt_callback);
         });
+        navOverlay.classList.add('active');
       }
     }
 

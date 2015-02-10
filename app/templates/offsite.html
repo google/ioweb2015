@@ -104,10 +104,6 @@
       };
 
       var cardAnimations = new AnimationGroup([
-        new Animation(navOverlay, [
-          {transform: 'translateY(-100%)'},
-          {transform: 'translateY(0)'}
-        ], animationOptions),
         new Animation(button, [
           {opacity: 1},
           {opacity: 0}
@@ -151,11 +147,13 @@
         // Fade out gallery and slide back in page sections at the same time.
         IOWA.PageAnimation.play(videoAnimation);
         IOWA.PageAnimation.play(cardAnimations, opt_callback);
+        navOverlay.classList.remove('active');
       } else {
         // Slide out page sections, then fade in gallery.
         IOWA.PageAnimation.play(cardAnimations, function() {
           IOWA.PageAnimation.play(videoAnimation, opt_callback);
         });
+        navOverlay.classList.add('active');
       }
     }
 
