@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% safeHTML "-->" %}
 <!doctype html>
-<html lang="en">
+<html lang="en" itemscope itemtype="http://schema.org/Event">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -46,7 +46,12 @@ limitations under the License.
   <meta name="msapplication-TileColor" content="#eceff1">
   <meta name="msapplication-tap-highlight" content="no">
 
-  <!-- G+ and Facebook sharing meta data -->
+  <!-- G+ sharing meta data -->
+  <meta itemprop="name" content="{% .Title %}">
+  <meta itemprop="description" content="{% .Desc %}">
+  <meta itemprop="image" content="/io2015/images/{% .OgImage %}">
+
+  <!-- Facebook sharing meta data -->
   <meta property="og:title" content="{% .Title %}">
   <meta property="og:site_name" content="Google I/O 2015">
   <meta property="og:url" content="/io2015">
@@ -60,30 +65,6 @@ limitations under the License.
   <meta name="twitter:title" content="{% .Title %}">
   <meta name="twitter:description" content="{% .Desc %}">
   <meta name="twitter:image:src" content="/io2015/images/{% .OgImage %}">
-
-  <script type="application/ld+json">
-    {
-      "@context": "http://schema.org",
-      "@type": "Event",
-      "name": "Google I/O 2015",
-      "url": "/io2015?utm_source=schema_org_event",
-      "image": "/io2015/images/io15-color.png",
-      "location": {
-        "@type": "Place",
-        "name": "Moscone Center West",
-        "address": {
-          "@type" : "PostalAddress",
-          "streetAddress" : "747 Howard Street",
-          "addressLocality" : "San Francisco",
-          "addressRegion" : "CA",
-          "postalCode" : "94103",
-          "addressCountry" : "US"
-        }
-      },
-      "startDate": "2015-05-28T09:00",
-      "endDate": "2015-05-29T04:00"
-    }
-  </script>
 
   <!-- Unsupported browser checks need to come before webcomponents.js is loaded,
        otherwise unsupported browsers will error out and not record a pageview.
