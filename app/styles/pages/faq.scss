@@ -48,4 +48,14 @@ $name: 'page-faq';
   }
 }
 
+@media (max-width: $phone-breakpoint-max) {
+  .card-content--top > div {
+    margin-bottom: 24px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
 }
