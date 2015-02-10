@@ -98,6 +98,14 @@ Vertically cycles through a list of items, fading in the current selection.
     },
 
     attached: function() {
+      // Ignore auto on iOS and just pick a city at random.
+      // See https://github.com/GoogleChrome/ioweb2015/issues/547
+      if ((/(iPhone|iPad|iPod)/gi).test(navigator.platform)) {
+        var idx = Math.floor(Math.random() * this.$.selector.items.length);
+        this.$.selector.selectIndex(idx);
+        return;
+      }
+
       if (this.auto) {
         this.start();
       }
