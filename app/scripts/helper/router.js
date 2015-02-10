@@ -212,13 +212,12 @@ IOWA.Router = (function() {
       // FF doesn't execute the <script> inside the main content <template>
       // (inside page partial import). Instead, the first time the partial is
       // loaded, find any script tags in and make them runnable by appending them back to the template.
-      if (IOWA.Util.isFF()) {
+      if (IOWA.Util.isFF() || IOWA.Util.isIE()) {
         var contentTemplate = document.querySelector(
            '#template-' + pageName + '-content');
         if (!contentTemplate) {
           var containerTemplate = htmlImport.import.querySelector(
               '[data-ajax-target-template="template-content-container"]');
-
           var scripts = containerTemplate.content.querySelectorAll('script');
           Array.prototype.forEach.call(scripts, function(node, i) {
             replaceScriptTagWithRunnableScript(node);
@@ -238,9 +237,17 @@ IOWA.Router = (function() {
    * @private
    */
   function replaceScriptTagWithRunnableScript(node) {
-    var script  = document.createElement('script');
-    script.text = node.innerHTML;
-    node.parentNode.replaceChild(script, node);
+    var script = document.createElement('script');
+    script.text = node.text || node.textContent || node.innerHTML;
+
+    // IE execute the script appended in the middle of the DOM. Append it to
+    // body and remove.
+    if (IOWA.Util.isIE()) {
+      document.body.appendChild(script);
+      document.body.removeChild(script);
+    } else {
+      node.parentNode.replaceChild(script, node); // FF
+    }
   }
 
   /**

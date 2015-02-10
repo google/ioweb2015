@@ -202,7 +202,14 @@
       page.hasBeenLoaded = true;
     }
 
-    initPage();
+    // IE will be "loading" at this point. Other browsers will already be "complete".
+    if (document.readyState !== 'loading') {
+      initPage();
+    }
+
+    // Necessary for IE's lack of native <template>
+    // https://github.com/GoogleChrome/ioweb2015/issues/599
+    window._initPage = initPage;
 
   })();
   </script>

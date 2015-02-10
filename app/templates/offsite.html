@@ -49,7 +49,7 @@
           <div>We've got you covered with all the information you need to bring I/O to your neighborhood.</div>
         </div>
         <div class="card-content link-spacing">
-          <a href="//www.google.com/events/io/shared/googleio2014-Extended-Guide.pdf"
+          <a href="//docs.google.com/presentation/d/1rUwLzz3-Hgcs9eu1uph4En1FUCcpTQspw-xpK4Kaoms/pub?start=true&loop=false&delayms=30000"
              data-track-link="offsite-download-organizers-guide"><i18n-msg msgid="organizerguide">Organizer Guide</i18n-msg></a> <a href="form" data-ajax-link data-track-link="offsite-submit-event"><i18n-msg msgid="submitevent">Submit your event</i18n-msg></a>
         </div>
       </div>
@@ -194,7 +194,14 @@
       page.hasBeenLoaded = true;
     }
 
-    initPage();
+    // IE will be "loading" at this point. Other browsers will already be "complete".
+    if (document.readyState !== 'loading') {
+      initPage();
+    }
+
+    // Necessary for IE's lack of native <template>
+    // https://github.com/GoogleChrome/ioweb2015/issues/599
+    window._initPage = initPage;
 
   })();
   </script>
