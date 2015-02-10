@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -23,6 +24,61 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 	ctype := "application/json;charset=utf-8"
 	if w.Header().Get("Content-Type") != ctype {
 		t.Errorf("Content-Type: %q; want %q", w.Header().Get("Content-Type"), ctype)
+	}
+}
+
+func TestServeTemplate(t *testing.T) {
+	const ctype = "text/html;charset=utf-8"
+	table := []struct{ path, slug string }{
+		{"/", "home"},
+		{"/about", "about"},
+		{"/schedule", "schedule"},
+		{"/onsite", "onsite"},
+		{"/offsite", "offsite"},
+		{"/registration", "registration"},
+		{"/faq", "faq"},
+		{"/form", "form"},
+	}
+	for i, test := range table {
+		r, _ := http.NewRequest("GET", test.path, nil)
+		w := httptest.NewRecorder()
+		serveTemplate(w, r)
+
+		if w.Code != http.StatusOK {
+			t.Errorf("%d: GET %s = %d; want %d", i, test.path, w.Code, http.StatusOK)
+			continue
+		}
+		if v := w.Header().Get("Content-Type"); v != ctype {
+			t.Errorf("%d: Content-Type: %q; want %q", i, v, ctype)
+		}
+		if w.Header().Get("Cache-Control") == "" {
+			t.Errorf("%d: want cache-control header", i)
+		}
+
+		body := string(w.Body.String())
+		tag := `<body id="page-` + test.slug + `"`
+		if !strings.Contains(body, tag) {
+			t.Errorf("%d: %s does not contain %s", i, body, tag)
+		}
+	}
+}
+
+func TestServeTemplateRedirect(t *testing.T) {
+	table := []struct{ start, redirect string }{
+		{"/about/", "/about"},
+		{"/one/two/", "/one/two"},
+	}
+	for i, test := range table {
+		r, _ := http.NewRequest("GET", test.start, nil)
+		w := httptest.NewRecorder()
+		serveTemplate(w, r)
+
+		if w.Code != http.StatusFound {
+			t.Fatalf("%d: GET %s: %d; want %d", i, test.start, w.Code, http.StatusFound)
+		}
+		if loc := w.Header().Get("Location"); loc != test.redirect {
+			t.Errorf("Location: %q; want %q", i, loc, test.redirect)
+		}
 	}
 }
 
