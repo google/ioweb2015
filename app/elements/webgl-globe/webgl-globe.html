@@ -26,7 +26,7 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
-<polymer-element name="webgl-globe" attributes="location">
+<polymer-element name="webgl-globe" attributes="cameraDistance fov location transitionDuration">
   <template>
     <style>
       :host {
@@ -76,7 +76,59 @@ Makes a globe or whatever.
        * @default {lat: 0, lng: 0}
        */
 
-      theta: 0,
+      /**
+       * The distance from the camera to the center of the globe, in multiples
+       * of radiuses of the globe (e.g. a value of 2 would place the camera one
+       * radius above the surface of the globe).
+       *
+       * @attribute cameraDistance
+       * @type number
+       * @default 2
+       */
+      cameraDistance: 2,
+
+      /**
+       * The field of view angle for drawing the globe, in radians.
+       *
+       * @attribute fov
+       * @type number
+       * @default 0.39269908169872414
+       */
+      fov: Math.PI / 4,
+
+      /**
+       * The duration over which transitions between locations should occur.
+       *
+       * @attribute transitionDuration
+       * @type number
+       * @default 2000
+       */
+      transitionDuration: 2000,
+
+      /**
+       * The previous location focused on.
+       *
+       * @property previousLocation_
+       * @type object
+       * @default {lat: 0, lng: 0}
+       */
+
+      /**
+       * The current location being focuse on.
+       *
+       * @property currentLocation_
+       * @type object
+       * @default {lat: 0, lng: 0}
+       */
+
+      /**
+       * The timestamp of the start of the location transition.
+       *
+       * @property transitionStart_
+       * @type number
+       * @default 0
+       */
+      transitionStart_: 0,
 
       /**
        * Shader program to render globe.
@@ -184,6 +236,10 @@ Makes a globe or whatever.
       created: function() {
         this.projectionTransform = new Matrix4x4();
         this.location = {lat: 0, lng: 0};
+        this.oldLocation = {lat: 0, lng: 0};
+
+        this.previousLocation_ = {lat: 0, lng: 0};
+        this.currentLocation_ = {lat: 0, lng: 0};
 
         this.resizeCallback_ = this.canvasResized.bind(this);
       },
@@ -247,7 +303,7 @@ Makes a globe or whatever.
         this.globeCubemap = assets[1];
 
         this.animate = true;
-        this.update();
+        window.requestAnimationFrame(this.update.bind(this));
       },
 
       resize: function() {
@@ -260,15 +316,14 @@ Makes a globe or whatever.
         this.gl.viewport(0, 0, width * resolutionScale,
             height * resolutionScale);
 
+        var center = this.cameraDistance;
         this.projectionTransform.identity()
-          .perspective(Math.PI / 8.3, width / height, 1, 3)
-          .translate(-0.017, -0.688, -2);
+          .perspective(this.fov, width / height, center - 1, center + 1);
 
         this.resizeNeeded_ = false;
       },
 
-      // TODO(bckenny): can use lower res images on non-retina (for default
-      // zoom, at least)
+      // TODO(bckenny): move image loading out of startup flow
       loadTextures: function(gl) {
         var globeFaces = {
           'negative-x.jpg': gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -314,17 +369,22 @@ Makes a globe or whatever.
               gl.CLAMP_TO_EDGE);
           gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
 
-          // TODO(bckenny): extension prefixes
-          var filterExtension = gl.getExtension(
-              'EXT_texture_filter_anisotropic');
-
-          // set to maximum anisotropic filtering if it exists
+          // better texture filtering through extensions
+          var filterExtension =
+              gl.getExtension('EXT_texture_filter_anisotropic') ||
+              gl.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
+              gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
           if (filterExtension) {
+            // set to maximum anisotropic filtering if it exists
+            // NOTE(bckenny): some platforms report support while setting
+            // MAX_ANISOTROPY to 0. Override to the minimum of 2 (see spec) and
+            // leave it to the platform to clamp if needed.
             var maxAnisotropy = gl.getParameter(
-                filterExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+                filterExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT) || 2;
             gl.texParameterf(gl.TEXTURE_CUBE_MAP,
                 filterExtension.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
           }
+
           var textureEndTime = nowish();
           IOWA.Analytics.trackPerf('globe', 'cubemap creation',
               Math.ceil(textureEndTime - textureStartTime), null,
@@ -334,35 +394,86 @@ Makes a globe or whatever.
         });
       },
 
-      locationChanged: function() {
-
+      latLngDistance: function(p0, p1) {
+        var lat0 = p0.lat * Math.PI / 180;
+        var lat1 = p1.lat * Math.PI / 180;
+        var deltaLng = (p1.lng - p0.lng) * Math.PI / 180;
+        return Math.acos(Math.sin(lat0) * Math.sin(lat1) +
+            Math.cos(lat0) * Math.cos(lat1) * Math.cos(deltaLng));
       },
 
-      update: function() {
+      locationChanged: function() {
+        // TODO(bckenny): for now, assume transition to current location has
+        // been completed (so path is C0 but not C1).
+        this.previousLocation_.lat = this.currentLocation_.lat;
+        this.previousLocation_.lng = this.currentLocation_.lng;
+
+        // since we're lerping in latlng space, check if the other way is faster
+        if (Math.abs(this.previousLocation_.lng - this.location.lng > 180)) {
+          if (this.previousLocation_.lng < this.location.lng) {
+            this.previousLocation_.lng += 360;
+          } else {
+            this.previousLocation_.lng -= 360;
+          }
+        }
+
+        this.transitionStart_ = nowish();
+      },
+
+      /**
+        * Ease in and out function (with 0 first and second derivatives at ends)
+        * @param {number} t The animation parameter.
+        * @return {number} The transformed animation parameter.
+      */
+      ease: function(t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+      },
+
+      lerp: function(a, b, t) {
+        return a + t * (b - a);
+      },
+
+      interpolateLocation: function(timestamp) {
+        var elapsedTime = timestamp - this.transitionStart_;
+        var t = Math.min(1, elapsedTime / this.transitionDuration);
+        t = this.ease(t);
+
+        // TODO(bckenny): for now, just lerp in latlng space
+        this.currentLocation_.lat = this.lerp(this.previousLocation_.lat,
+            this.location.lat, t);
+        this.currentLocation_.lng = this.lerp(this.previousLocation_.lng,
+            this.location.lng, t);
+      },
+
+      update: function(timestamp) {
+        if (!this.animate) {
+          return;
+        }
         if (this.resizeNeeded_) {
           this.resize();
+        }
+        if (timestamp - this.transitionStart_ < this.transitionDuration) {
+          this.interpolateLocation(timestamp);
         }
 
         var gl = this.gl;
 
-        this.theta += Math.PI / 960;
-
-        var worldTransform = tmpTransform.identity()
-          .rotateX(-Math.PI / 16)
-          .rotateY(this.theta);
-
+        // TODO(bckenny): don't necessarily need to do these every frame
         this.globeProgram.use();
-
-        // attribute offsets
         gl.vertexAttribPointer(this.globeProgram.attributes.coord, 4, gl.FLOAT,
             false, 16, 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubemap);
+
+        // globe to eye space
+        var worldTransform = tmpTransform.identity()
+          .translate(0, 0, -this.cameraDistance)
+          .rotateX(this.currentLocation_.lat * Math.PI / 180)
+          .rotateY(-this.currentLocation_.lng * Math.PI / 180);
 
         // set uniforms
         this.globeProgram.uniforms.globeMatrix(worldTransform.m_);
         this.globeProgram.uniforms.viewMatrix(this.projectionTransform.m_);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubemap);
         this.globeProgram.uniforms.globeCubemap(0);
 
         gl.drawElements(gl.TRIANGLES, this.drawCount, gl.UNSIGNED_SHORT, 0);

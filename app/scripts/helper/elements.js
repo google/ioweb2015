@@ -15,7 +15,6 @@
  */
 
 IOWA.Elements = (function() {
-
   "use strict";
 
   var updateElements = function() {
@@ -70,6 +69,16 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
+  };
+
+  /**
+   * Transform an object into an array of its enumerable property names. Treats
+   * null or undefined as the empty object.
+   * @param {Object=} opt_obj
+   * @return {!Array<string>}
+   */
+  PolymerExpressions.prototype.keysFilter = function(opt_obj) {
+    return opt_obj ? Object.keys(opt_obj) : [];
   };
 
   var init = function() {
