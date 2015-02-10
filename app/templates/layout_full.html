@@ -46,25 +46,28 @@ limitations under the License.
   <meta name="msapplication-TileColor" content="#eceff1">
   <meta name="msapplication-tap-highlight" content="no">
 
-  <!-- G+ and Twitter sharing meta data -->
+  <!-- G+ and Facebook sharing meta data -->
   <meta property="og:title" content="{% .Title %}">
+  <meta property="og:site_name" content="Google I/O 2015">
+  <meta property="og:url" content="/io2015">
   <meta property="og:description" content="{% .Desc %}">
   <meta property="og:type" content="Event">
-  <meta property="og:image" content="images/{% .OgImage %}">
+  <meta property="og:image" content="/io2015/images/{% .OgImage %}">
 
+  <!-- Twitter meta data -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@googledevs">
   <meta name="twitter:title" content="{% .Title %}">
   <meta name="twitter:description" content="{% .Desc %}">
-  <meta name="twitter:image:src" content="images/{% .OgImage %}">
+  <meta name="twitter:image:src" content="/io2015/images/{% .OgImage %}">
 
   <script type="application/ld+json">
     {
       "@context": "http://schema.org",
       "@type": "Event",
       "name": "Google I/O 2015",
-      "url": ".?utm_source=schema_org_event",
-      "image": "images/io15-color.png",
+      "url": "/io2015?utm_source=schema_org_event",
+      "image": "/io2015/images/io15-color.png",
       "location": {
         "@type": "Place",
         "name": "Moscone Center West",
