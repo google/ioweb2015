@@ -21,8 +21,6 @@ IOWA.Elements = (function() {
   var updateElements = function() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function() {
-      IOWA.ServiceWorkerRegistration.register();
-
       var optionallyLaunchExperiment = function() {
         if (window.location.search.indexOf('experiment') > -1) {
           IOWA.Elements.FAB.onFabClick();
@@ -34,6 +32,7 @@ IOWA.Elements = (function() {
         IOWA.Elements.Template.fire('page-transition-done');
 
         optionallyLaunchExperiment();
+        IOWA.ServiceWorkerRegistration.register();
       });
     });
 
