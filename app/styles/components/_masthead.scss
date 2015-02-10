@@ -134,6 +134,10 @@ core-drawer-panel {
       flex: inherit; // Needed for IE11, in order to ensure that the <a> gets assigned a width.
       color: inherit;
     }
+
+    &.core-selected {
+      pointer-events: none;
+    }
   }
 }
 
