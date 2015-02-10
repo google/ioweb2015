@@ -83,9 +83,9 @@ module.exports = (function() {
    */
   function getRenderer(type) {
     if (type === PIXI.CanvasRenderer) {
-      return canvasRenderers.pop();
+      return canvasRenderers.shift();
     } else {
-      return webGLRenderers.pop();
+      return webGLRenderers.shift();
     }
   }
 
@@ -95,9 +95,9 @@ module.exports = (function() {
    */
   function returnRenderer(renderer) {
     if (renderer instanceof PIXI.CanvasRenderer) {
-      canvasRenderers.push(renderer);
+      canvasRenderers.unshift(renderer);
     } else {
-      webGLRenderers.push(renderer);
+      webGLRenderers.unshift(renderer);
     }
   }
 
