@@ -1,8 +1,8 @@
 cron:
 - description: refresh io extended entries
-  url: /api/extended?refresh
+  url: $PREFIX$/api/extended?refresh
   schedule: every 1 hours
 - description: refresh social entries
-  url: /api/social?refresh
+  url: $PREFIX$/api/social?refresh
   schedule: every 8 minutes
 

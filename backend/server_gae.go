@@ -75,6 +75,13 @@ func isWhitelisted(email string) bool {
 	return whitemap[email[i:]]
 }
 
+// allowPassthrough returns true if the request r can be handled w/o whitelist check.
+func allowPassthrough(ac appengine.Context, r *http.Request) bool {
+	return appengineEnv(ac) == "prod" ||
+		r.Header.Get("X-AppEngine-Cron") == "true" ||
+		r.Header.Get("X-AppEngine-TaskName") != ""
+}
+
 // checkWhitelist checks whether the current user is allowed to access
 // handler h using isWhitelisted() func before handing over in-flight request.
 // It redirects to GAE login URL if no user found or responds with 403
@@ -82,7 +89,7 @@ func isWhitelisted(email string) bool {
 func checkWhitelist(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ac := appengine.NewContext(r)
-		if appengineEnv(ac) == "prod" {
+		if allowPassthrough(ac, r) {
 			h.ServeHTTP(w, r)
 			return
 		}
