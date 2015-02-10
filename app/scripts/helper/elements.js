@@ -21,8 +21,6 @@ IOWA.Elements = (function() {
   var updateElements = function() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function() {
-      IOWA.ServiceWorkerRegistration.register();
-
       var optionallyLaunchExperiment = function() {
         if (window.location.search.indexOf('experiment') > -1) {
           IOWA.Elements.FAB.onFabClick();
@@ -34,6 +32,7 @@ IOWA.Elements = (function() {
         IOWA.Elements.Template.fire('page-transition-done');
 
         optionallyLaunchExperiment();
+        IOWA.ServiceWorkerRegistration.register();
       });
     });
 
@@ -273,9 +272,8 @@ IOWA.Elements = (function() {
           height = 253;
           var el = document.getElementById('share-text');
 
-          url = 'https://twitter.com/share?text=' +
-                encodeURIComponent(el.textContent || 'Google I/O 2015') +
-                '&url=' + encodeURIComponent(location.href);
+          url = 'https://twitter.com/intent/tweet?text=' +
+                encodeURIComponent(el.textContent || 'Google I/O 2015');
           break;
 
         default:

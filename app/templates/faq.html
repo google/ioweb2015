@@ -8,10 +8,10 @@
 
 {% define "content" %}
   <div class="slide-up">
-    <section class="page__section page__section--copy" hidden?="{{isPhoneSize}}">
+    <section class="page__section page__section--copy">
       <div class="card__container">
         <div class="card js-experiment-visualizer">
-          <div class="card-content card-content--top" layout horizontal justified>
+          <div class="card-content card-content--top" layout horizontal vertical?="{{isPhoneSize}}" justified>
             <div>
               <h3><i18n-msg msgid="general">General</i18-msg></h3>
               <ul>
@@ -37,7 +37,7 @@
                 <li><a href="#afterhours" on-click="{{scrollToFaq}}"><i18n-msg msgid="afterhours">After Hours</i18-msg></a></li>
                 <li><a href="#a11y" on-click="{{scrollToFaq}}"><i18n-msg msgid="a11y">Accessibility</i18-msg></a></li>
                 <li><a href="#conduct" on-click="{{scrollToFaq}}"><i18n-msg msgid="conduct">Conduct</i18-msg></a></li>
-                <li><a href="#childcare" on-click="{{scrollToFaq}}"><i18n-msg msgid="child-care">Child Care</i18-msg></a></li>
+                <!-- <li><a href="#childcare" on-click="{{scrollToFaq}}"><i18n-msg msgid="child-care">Child Care</i18-msg></a></li> -->
               </ul>
             </div>
           </div>
@@ -47,7 +47,7 @@
 
     <section class="page__section page__section--copy">
       <div class="card__container">
-        <div class="card js-experiment-visualizer">
+        <div class="card">
           <div class="card-content">
             <h3><i18n-msg msgid="general">General</i18-msg></h3>
 
@@ -69,7 +69,7 @@
 
     <section class="page__section page__section--copy">
       <div class="card__container">
-        <div class="card js-experiment-visualizer">
+        <div class="card">
           <div class="card-content">
             <h3><i18n-msg msgid="registration">Registration</i18-msg></h3>
 
@@ -136,7 +136,7 @@
 
     <section class="page__section page__section--copy">
       <div class="card__container">
-        <div class="card js-experiment-visualizer">
+        <div class="card">
           <div class="card-content">
             <h3>Attendance Details</h3>
 
@@ -170,8 +170,8 @@
             <h5>No soliciting</h5>
             <p>No solicitation or selling of items or services is allowed at Google I/O. Any attendee conducting these activities may be removed from the conference.</p>
 
-            <h5 id="childcare"><i18n-msg msgid="child-care">Child Care</i18-msg></h5>
-            <p>We will offer group child care at Moscone West to conference attendees at no charge. Children ages 6 months through 11 years are eligible. Please note that we have limited availability and may not be able to accommodate all requests.</p>
+            <!-- <h5 id="childcare"><i18n-msg msgid="child-care">Child Care</i18-msg></h5>
+            <p>We will offer group child care at Moscone West to conference attendees at no charge. Children ages 6 months through 11 years are eligible. Please note that we have limited availability and may not be able to accommodate all requests.</p> -->
           </div>
         </div>
       </div>
