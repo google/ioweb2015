@@ -160,7 +160,7 @@ gulp.task('copy-backend', ['backend:config'], function(cb) {
     // ../app <= dist/backend/app
     fs.symlinkSync('../' + APP_DIR, destBackend + '/' + APP_DIR);
     // create dist/backend/app.yaml from backend/app.yaml.template
-    generateAppYaml(destBackend, URL_PREFIX, cb);
+    generateGaeConfig(destBackend, URL_PREFIX, cb);
   });
 });
 
@@ -290,7 +290,7 @@ gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev'], functi
   var appEnv = process.env.APP_ENV || 'dev';
   var watchFiles = argv.watch !== false;
   var run = startGaeBackend.bind(null, BACKEND_DIR, appEnv, watchFiles, callback);
-  generateAppYaml(BACKEND_DIR, URL_PREFIX, run);
+  generateGaeConfig(BACKEND_DIR, URL_PREFIX, run);
 });
 
 // Serve build with GAE dev appserver. This is how it would look in production.
@@ -451,10 +451,14 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
 
 // Create app.yaml from a template in dest directory.
 // prefix is the app root URL prefix. Defaults to '/io2015'.
-function generateAppYaml(dest, prefix, callback) {
-  gulp.src(BACKEND_DIR + '/app.yaml.template', {base: BACKEND_DIR})
+function generateGaeConfig(dest, prefix, callback) {
+  var files = [
+    BACKEND_DIR + '/app.yaml.template',
+    BACKEND_DIR + '/cron.yaml.template'
+  ];
+  gulp.src(files, {base: BACKEND_DIR})
     .pipe($.replace(/\$PREFIX\$/g, prefix))
-    .pipe($.rename('app.yaml'))
+    .pipe($.rename({extname: ''}))
     .pipe(gulp.dest(dest))
     .on('end', callback);
 }
