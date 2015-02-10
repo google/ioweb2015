@@ -79,6 +79,7 @@ module.exports = (function() {
       getFirstDot,
       setSecondDot,
       getSecondDot,
+      activate,
       getPID: () => model.pid,
       getModel: () => model,
       tearDown: destroy
@@ -137,10 +138,7 @@ module.exports = (function() {
      */
     function onContact() {
       if (!isplayingInteractionSound && lastMouseX !== currentMouseX && lastMouseY !== currentMouseY && sound !== undefined) {
-        isplayingInteractionSound = true;
-        audioManager.playSoundImmediately(sound, channel);
-        onActivateCallback_(model.pid, sound);
-        rAFTimeout(resetIsPlayingInteractionSound, 150);
+        activate();
       }
     }
 
@@ -149,6 +147,16 @@ module.exports = (function() {
      */
     function resetIsPlayingInteractionSound() {
       isplayingInteractionSound = false;
+    }
+
+    /**
+     * Directly activate string.
+     */
+    function activate() {
+      isplayingInteractionSound = true;
+      audioManager.playSoundImmediately(sound, channel);
+      onActivateCallback_(model.pid, sound);
+      rAFTimeout(resetIsPlayingInteractionSound, 150);
     }
 
     /**

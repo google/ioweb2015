@@ -153,7 +153,6 @@ module.exports = (function() {
 
       document.addEventListener('keydown', onParallelogramsKeyDown);
       document.addEventListener('keyup', onParallelogramsKeyUp);
-
     }
 
     /**

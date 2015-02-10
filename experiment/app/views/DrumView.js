@@ -10,6 +10,7 @@ module.exports = (function() {
   'use strict';
 
   const VIEW_NAME = 'DrumView';
+  const NUMBER_KEY_RANGE = [49, 57];
 
   /**
    * Controls the Drum instrument view.
@@ -372,6 +373,8 @@ module.exports = (function() {
       events.addListener('BEAT', onBeat);
 
       drums.forEach(d => d.addEventListeners());
+
+      document.addEventListener('keyup', onDrumKeyUp);
     }
 
     /**
@@ -381,6 +384,22 @@ module.exports = (function() {
       events.removeListener('BEAT', onBeat);
 
       drums.forEach(d => d.removeEventListeners());
+
+      document.removeEventListener('keyup', onDrumKeyUp);
+    }
+
+    /**
+     * Keyup handler for guitar strings.
+     * @param {event} evt - The keyup event.
+     */
+    function onDrumKeyUp(evt) {
+      if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
+        var keyPos = evt.keyCode - NUMBER_KEY_RANGE[0];
+
+        if (drums[keyPos]) {
+          drums[keyPos].activate();
+        }
+      }
     }
 
     /**
