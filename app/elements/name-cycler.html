@@ -63,77 +63,92 @@ Vertically cycles through a list of items, fading in the current selection.
     </core-selector>
   </template>
   <script>
-  Polymer({
-
-    /**
-     * List of items to cycle
-     *
-     * @attribute items
-     * @type array
-     * @default []
-     */
-
-    publish: {
-      /**
-       * True if the items should start cycling automatically.
-       *
-       * @attribute auto
-       * @type bool
-       * @default true
-       */
-      auto: {value: true, reflect: true},
-
-      /**
-       * Time between cycling, in milliseconds.
-       *
-       * @attribute interval
-       * @type number
-       * @default 1000
-       */
-      interval: 1000,
-    },
-
-    created: function() {
-      this.items = [];
-    },
-
-    attached: function() {
-      if (this.auto) {
-        this.start();
-      }
-    },
-
-    detached: function() {
-      this.stop();
-    },
-
-    autoChanged: function() {
-      if (this.auto) {
-        this.start();
-      } else {
-        this.stop();
-      }
-    },
-
-    /**
-     * Starts the cycling animation.
-     *
-     * @method start
-     */
-    start: function() {
-      this.interval_ = setInterval(function() {
-        this.$.selector.selectNext(true);
-      }.bind(this), this.interval);
-    },
-
-    /**
-     * Stops the cycling animation.
-     *
-     * @method start
-     */
-    stop: function() {
-      clearInterval(this.interval_);
+  (function() {
+    function isOS() {
+      return (/(iPhone|iPad|iPod)/gi).test(navigator.platform);
     }
-  });
+
+    Polymer({
+
+      /**
+       * List of items to cycle
+       *
+       * @attribute items
+       * @type array
+       * @default []
+       */
+
+      publish: {
+        /**
+         * True if the items should start cycling automatically.
+         *
+         * @attribute auto
+         * @type bool
+         * @default true
+         */
+        auto: {value: true, reflect: true},
+
+        /**
+         * Time between cycling, in milliseconds.
+         *
+         * @attribute interval
+         * @type number
+         * @default 1000
+         */
+        interval: 1000,
+      },
+
+      created: function() {
+        this.items = [];
+      },
+
+      attached: function() {
+        // Ignore auto on iOS and just pick a city at random.
+        // See https://github.com/GoogleChrome/ioweb2015/issues/547
+        if (isOS()) {
+          var idx = Math.floor(Math.random() * this.$.selector.items.length);
+          this.$.selector.selectIndex(idx);
+          return;
+        }
+
+        if (this.auto) {
+          this.start();
+        }
+      },
+
+      detached: function() {
+        this.stop();
+      },
+
+      autoChanged: function() {
+        if (this.auto) {
+          this.start();
+        } else {
+          this.stop();
+        }
+      },
+
+      /**
+       * Starts the cycling animation.
+       *
+       * @method start
+       */
+      start: function() {
+        this.interval_ = setInterval(function() {
+          this.$.selector.selectNext(true);
+        }.bind(this), this.interval);
+      },
+
+      /**
+       * Stops the cycling animation.
+       *
+       * @method start
+       */
+      stop: function() {
+        clearInterval(this.interval_);
+      }
+    });
+
+  })();
   </script>
 </polymer-element>
