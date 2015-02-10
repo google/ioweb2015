@@ -418,7 +418,7 @@ IOWA.Router = (function() {
       }
       document.title = (IOWA.Elements.Template.pages[nextPage].title ||
           'Google I/O 2015');
-      IOWA.Analytics.trackPageView();
+      IOWA.Analytics.trackPageView(e.state.path);
       renderCurrentPage();
     });
 
