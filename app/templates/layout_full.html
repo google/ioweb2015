@@ -353,12 +353,23 @@ limitations under the License.
 <script>
 (function() {
 
+  // Necessary for IE's lack of native <template>
+  // https://github.com/GoogleChrome/ioweb2015/issues/599
+  function init() {
+    if (typeof window._initPage == 'function') {
+      window._initPage();
+      window._initPage = null;
+    }
+  }
+
   function afterImports() {
     //'import' in document.createElement('link')
     if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
       IOWA.Elements.Template.pages[{% .Slug %}] = {};
     }
     IOWA.Elements.Template.pages[{% .Slug %}].title = "{% template "title" .%}";
+
+    init();
   }
 
   if (IOWA.Util.supportsHTMLImports) {
