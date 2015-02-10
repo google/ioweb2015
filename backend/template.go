@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"golang.org/x/net/context"
 )
@@ -26,6 +27,21 @@ const (
 	ogImageExperiment = "io15-experiment.png"
 )
 
+var (
+	// tmplFunc is a map of functions available to all templates.
+	tmplFunc = template.FuncMap{
+		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
+	}
+	// tmplCache caches HTML templates parsed in parseTemplate()
+	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
+)
+
+// templateCache is in-memory cache for parsed templates
+type templateCache struct {
+	sync.Mutex
+	templates map[string]*template.Template
+}
+
 // templateData is the templates context
 type templateData struct {
 	Title, Desc, Slug, Env, OgImage string
@@ -35,18 +51,10 @@ type templateData struct {
 // meta is a page meta info.
 type meta map[string]interface{}
 
-// tmplFunc is a map of functions available to all templates.
-var tmplFunc = template.FuncMap{
-	"safeHTML": func(v string) template.HTML { return template.HTML(v) },
-}
-
 // renderTemplate executes a template found in name.html file
 // using either layout_full.html or layout_partial.html as the root template.
 // env is the app current environment: "dev", "stage" or "prod".
 func renderTemplate(c context.Context, name string, partial bool, data *templateData) ([]byte, error) {
-	if name == "/" || name == "" {
-		name = "home"
-	}
 	tpl, err := parseTemplate(name, partial)
 	if err != nil {
 		return nil, err
@@ -88,10 +96,23 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 	default:
 		layout = "layout_full.html"
 	}
-	return template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
+
+	key := name + layout
+	tmplCache.Lock()
+	defer tmplCache.Unlock()
+	if t, ok := tmplCache.templates[key]; ok {
+		return t, nil
+	}
+
+	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
 		filepath.Join(rootDir, "templates", layout),
 		filepath.Join(rootDir, "templates", name+".html"),
 	)
+	if err != nil {
+		return nil, err
+	}
+	tmplCache.templates[key] = t
+	return t, nil
 }
 
 // pageTitle extracts "title" property of the page meta and appends defaultTitle to it.
