@@ -2,7 +2,7 @@ window.experiment = (function() {
   'use strict';
 
   var assetPath = require('app/util/assetPath');
-  var animatedImg = require('url?limit=10000!loader/images/experiment-fab-animation.gif');
+  var animatedImg = require('url?limit=20000!loader/images/experiment-fab-animation.gif');
   var exitExpImg = require('url?limit=10000!loader/images/exit-experiment.png');
   var pauseExpImg = require('url?limit=10000!loader/images/pause-experiment.png');
   var playExpImg = require('url?limit=10000!loader/images/play-experiment.png');
