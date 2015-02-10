@@ -66,6 +66,7 @@ window.experiment = (function() {
       }, timeoutDuration);
 
       var scr = document.createElement('script');
+      scr.addEventListener('error', rejector);
       scr.setAttribute('async', 'true');
       scr.type = 'text/javascript';
       scr.src = assetPath('/js/experiment.js');
@@ -81,6 +82,7 @@ window.experiment = (function() {
     }
 
     appSingleton = app;
+
     if (resolver) {
       resolver(app);
     }

@@ -10,6 +10,7 @@ var {Promise} = require('es6-promise');
 var rAFTimeout = require('app/util/rAFTimeout');
 var events = require('app/util/events');
 var assetPath = require('app/util/assetPath');
+var HistoryManager = require('app/util/HistoryManager');
 
 /**
  * Main entry point into the experiment.
@@ -21,9 +22,11 @@ module.exports = function Experiment() {
   var audioManager;
   var rootView;
   var stateManager;
+  var historyManager = new HistoryManager();
 
   var eventualDidEnterRecordingMode;
   var eventualDidExitRecordingMode;
+  var eventualDidRequestExit;
 
   var d = new Date();
   var isAprilFools = (d.getMonth() === 3) && (d.getDate() === 1);
@@ -38,9 +41,18 @@ module.exports = function Experiment() {
     play,
     didEnterRecordingMode,
     didExitRecordingMode,
+    didRequestExit,
     reloadData,
-    consoleDance
+    consoleDance,
+    unlockOnMobile
   };
+
+  /**
+   * Pass audio activation down to context.
+   */
+  function unlockOnMobile() {
+    audioManager.unlockOnMobile();
+  }
 
   /**
    * Load the experiment data and audio files.
@@ -86,11 +98,12 @@ module.exports = function Experiment() {
   function start(instrumentSelector = '.row', visualizerSelector = '.box', fromPos = [0,0]) {
     events.init();
     audioManager.init();
+    historyManager.init();
 
     stateManager = new StateManager(audioManager);
 
     // Create the RootView, which controls all visuals in the experiment.
-    rootView = new RootView(audioManager, stateManager);
+    rootView = new RootView(audioManager, stateManager, historyManager);
 
     if (eventualDidEnterRecordingMode) {
       rootView.didEnterRecordingMode(eventualDidEnterRecordingMode);
@@ -99,6 +112,22 @@ module.exports = function Experiment() {
     if (eventualDidExitRecordingMode) {
       rootView.didExitRecordingMode(eventualDidExitRecordingMode);
     }
+
+    historyManager.pushState('#playing');
+
+    historyManager.onOpenInstrument(function(pid) {
+      rootView.openViewByPID(pid, true);
+    });
+
+    historyManager.onReturnToRoot(function() {
+      rootView.closeCurrentView(true);
+    });
+
+    historyManager.onCloseExperiment(function() {
+      if ('function' === typeof eventualDidRequestExit) {
+        eventualDidRequestExit();
+      }
+    });
 
     // Start sound engine.
     audioManager.fadeIn(2.25, 0.75);
@@ -116,9 +145,12 @@ module.exports = function Experiment() {
     return new Promise(function(resolve, reject) {
       // Animate transition in.
       rAFTimeout(function() {
+        // jshint quotmark: false
         rootView.animateIn(fromPos).then(resolve, reject);
 
         if (('undefined' !== typeof console) && ('function' === typeof console.log)) {
+          console.log("Welcome to the 2015 I/O Experiment.");
+          console.log("If you're interested in how to programatically manipulate it, explore the README: https://gist.github.com/tdreyno/b6de4902c7e886f94b67");
           console.log('Need a dance partner? Run `experiment.consoleDance()`');
         }
       }, 50);
@@ -181,6 +213,8 @@ module.exports = function Experiment() {
    * @return {Promise}
    */
   function tearDown(fromPos = [0,0]) {
+    historyManager.tearDown();
+
     // Stop sound engine.
     audioManager.fadeOut(0.5).then(function() {
       audioManager.tearDown();
@@ -221,6 +255,14 @@ module.exports = function Experiment() {
    */
   function didExitRecordingMode(cb) {
     eventualDidExitRecordingMode = cb;
+  }
+
+  /**
+   * When to shut down.
+   * @param {function} cb - The exit callback
+   */
+  function didRequestExit(cb) {
+    eventualDidRequestExit = cb;
   }
 
   /**
@@ -278,16 +320,16 @@ module.exports = function Experiment() {
 
       var rowStr = "\n\n\n\n\n\n\n ";
 
-      for (var row = 0; row < numRows; row += ROW_PIXELS) {
-        var rowOffset = row * numCols * 4;
-        for (var col = 0; col < numCols; col += COL_PIXELS) {
-          var offset = rowOffset + 4 * col;
-          var r = sourcePixels[offset];
-          var g = sourcePixels[offset + 1];
-          var b = sourcePixels[offset + 2];
-          var luminance = Math.ceil(0.299 * r + 0.587 * g + 0.114 * b);
+      for (let row = 0; row < numRows; row += ROW_PIXELS) {
+        let rowOffset = row * numCols * 4;
+        for (let col = 0; col < numCols; col += COL_PIXELS) {
+          let offset = rowOffset + 4 * col;
+          let r = sourcePixels[offset];
+          let g = sourcePixels[offset + 1];
+          let b = sourcePixels[offset + 2];
+          let luminance = Math.ceil(0.299 * r + 0.587 * g + 0.114 * b);
 
-          var c = getChar(luminance);
+          let c = getChar(luminance);
 
           if ((r === 255) && (g === 255) && (b === 255)) {
             c = ' ';
@@ -299,7 +341,7 @@ module.exports = function Experiment() {
         rowStr += "\n ";
       }
 
-        console.log('%c' + rowStr, 'font-family: monospace; line-height: 0px; font-size: 10px;');
+      console.log('%c' + rowStr, 'font-family: monospace; line-height: 0px; font-size: 10px;');
     }
 
     function draw(video, width, height, backContext) {

@@ -29,7 +29,7 @@ module.exports = (function() {
 
     var dots = [];
 
-    var state = 'unStrung'; // 'strung'
+    var state = 'unStrung';
 
     var spring1;
     var spring2;
@@ -41,7 +41,7 @@ module.exports = (function() {
     var anchorPoint2;
 
     var mouseColliderBody;
-    var mouseColliderGraphic;
+    // var mouseColliderGraphic;
     var mouseColliderBodyShape;
 
     var lineGraphic;
@@ -136,11 +136,11 @@ module.exports = (function() {
      * Play sound on contact with string.
      */
     function onContact() {
-      if (isplayingInteractionSound === false && lastMouseX !== currentMouseX &&  lastMouseY !== currentMouseY && sound !== undefined) {
+      if (!isplayingInteractionSound && lastMouseX !== currentMouseX && lastMouseY !== currentMouseY && sound !== undefined) {
         isplayingInteractionSound = true;
         audioManager.playSoundImmediately(sound, channel);
         onActivateCallback_(model.pid, sound);
-        rAFTimeout(resetIsPlayingInteractionSound, 400);
+        rAFTimeout(resetIsPlayingInteractionSound, 150);
       }
     }
 
@@ -157,8 +157,8 @@ module.exports = (function() {
      */
     function dragMouseCollisionCheck(data) {
       var newPosition = data.getLocalPosition(baseLayer);
-      mouseColliderGraphic.position.x = newPosition.x;
-      mouseColliderGraphic.position.y = newPosition.y;
+      // mouseColliderGraphic.position.x = newPosition.x;
+      // mouseColliderGraphic.position.y = newPosition.y;
       mouseColliderBody.position[0] = newPosition.x;
       mouseColliderBody.position[1] = newPosition.y;
       lastMouseX =  currentMouseX;
@@ -182,7 +182,7 @@ module.exports = (function() {
       mouseColliderBodyShape = new p2.Circle(1);
       mouseColliderBody = new p2.Body({
         mass: 1,
-        position: [80, 500],
+        position: [0, 0],
         velocity: [0, 0],
         force: [0, 0],
         type: 1,
@@ -191,15 +191,12 @@ module.exports = (function() {
 
       mouseColliderBody.addShape(mouseColliderBodyShape);
 
-      mouseColliderBody.position[0] = -1100;
       world.addBody(mouseColliderBody);
 
-      mouseColliderGraphic = new PIXI.Graphics();
-      mouseColliderGraphic.beginFill(0xff0000);
-      mouseColliderGraphic.drawCircle(20, 20, 0);
-      displayContainerCenter.addChild(mouseColliderGraphic);
-
-      mouseColliderGraphic.position.x = -1100;
+      // mouseColliderGraphic = new PIXI.Graphics();
+      // mouseColliderGraphic.beginFill(0xff0000);
+      // mouseColliderGraphic.drawCircle(0, 0, 2);
+      // displayContainerCenter.addChild(mouseColliderGraphic);
     }
 
     /**
@@ -220,6 +217,8 @@ module.exports = (function() {
       }
     }
 
+    // var capsuleGraphic;
+
     /**
      * Create springy physics for string interaction.
      */
@@ -235,6 +234,9 @@ module.exports = (function() {
         angularVelocity: 1,
         damping: 0.3
       });
+
+      // capsuleGraphic = new PIXI.Graphics();
+      // displayContainerCenter.addChild(capsuleGraphic);
 
       var plane = new p2.Body({
         position: [0, 0]
@@ -287,7 +289,7 @@ module.exports = (function() {
     function resizeStrung() {
       lineDistance = getlineDistance(anchorPoint1.position, anchorPoint2.position);
       capsuleBody.removeShape(capsuleShape);
-      capsuleShape = new p2.Capsule(Math.floor(lineDistance) - 180,50);
+      capsuleShape = new p2.Capsule(Math.floor(lineDistance) - 30, 20);
       capsuleBody.addShape(capsuleShape);
     }
 
@@ -322,6 +324,12 @@ module.exports = (function() {
       lineGraphicShadow.lineStyle(7, 0x000000, 0.1);
       lineGraphicShadow.moveTo(anchorPoint1.position.x, anchorPoint1.position.y);
       lineGraphicShadow.quadraticCurveTo(capsuleBody.position[0]+10, capsuleBody.position[1]+10, anchorPoint2.position.x, anchorPoint2.position.y);
+
+      // capsuleGraphic.clear();
+      // capsuleGraphic.beginFill(0xff0000);
+      // capsuleGraphic.drawCircle(0, 0, capsuleShape.radius);
+      // capsuleGraphic.position.x = capsuleBody.position[0];
+      // capsuleGraphic.position.y = capsuleBody.position[1];
     }
 
     /**
@@ -452,7 +460,7 @@ module.exports = (function() {
       displayContainerCenter.removeChild(anchorPoint2);
       displayContainerCenter.removeChild(anchorPoint1);
 
-      displayContainerCenter.removeChild(mouseColliderGraphic);
+      // displayContainerCenter.removeChild(mouseColliderGraphic);
 
       world = null;
     }
@@ -505,9 +513,6 @@ module.exports = (function() {
     function renderStringBodies() {
       spring2.setWorldAnchorB([anchorPoint1.position.x,anchorPoint1.position.y]);
       spring1.setWorldAnchorB([anchorPoint2.position.x,anchorPoint2.position.y]);
-
-      mouseColliderBody.position[0] = mouseColliderGraphic.position.x;
-      mouseColliderBody.position[1] = mouseColliderGraphic.position.y;
 
       lastMouseX = currentMouseX;
       currentMouseX = mouseColliderBody.position[0];

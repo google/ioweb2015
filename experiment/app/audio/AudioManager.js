@@ -73,6 +73,7 @@ module.exports = (function() {
       playSoundOnNextBeat,
       getSound,
       getSoundLoop,
+      unlockOnMobile,
       getSequencer: () => sequencer,
       addTag: (n) => Tags.addTag(n),
       getTag: (n) => Tags.getTag(n),
@@ -90,7 +91,9 @@ module.exports = (function() {
       removeVisibilityChangeListener = addVisibilityChangeListener(function() {
         fadeIn(2.25, 0.75);
       }, stop);
+    }
 
+    function unlockOnMobile() {
       unlockAudioOnMobile(audioContext);
     }
 
