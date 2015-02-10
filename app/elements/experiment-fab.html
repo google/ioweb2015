@@ -1119,6 +1119,7 @@ Main parent container for all of the fab elements.
         IOWA.Analytics.trackEvent('experiment', 'activate', 'experiment fab clicked');
 
         if (experiment.canLoad()) {
+          this.experimentFailed = false;
           this.experimentSupported = true;
           this.loadingCircleHidden = false;
           experiment.load(45000).then(function(app) {
