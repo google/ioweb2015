@@ -129,6 +129,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/clear_cache.html',
     APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
+    APP_DIR + '/styles/pages/error.css',
     APP_DIR + '/elements/**/images/*',
     APP_DIR + '/elements/webgl-globe/shaders/*.{frag,vert}',
     APP_DIR + '/elements/webgl-globe/textures/*.{jpg,png}',

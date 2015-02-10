@@ -393,5 +393,13 @@
   "child-care": {
     "description": "FAQ page link header",
     "message": "Child Care"
+  },
+  "sorry-404": {
+    "message": "Sorry. We couldn't find that page :(",
+    "description": "404 not found page message"
+  },
+  "sorry-500": {
+    "message": "Oops! Something went wrong on our end :(",
+    "description": "500 error page message"
   }
 }
