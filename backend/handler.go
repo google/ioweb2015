@@ -53,26 +53,29 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 // found under request base path.
 // 'home' template is assumed if request path ends with '/'.
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	c := newContext(r, w)
+	// redirect /page/ to /page unless it's homepage
+	if r.URL.Path != "/" && strings.HasSuffix(r.URL.Path, "/") {
+		http.Redirect(w, r, strings.TrimSuffix(r.URL.Path, "/"), http.StatusFound)
+		return
+	}
 
 	r.ParseForm()
 	_, wantsPartial := r.Form["partial"]
 	_, experimentShare := r.Form["experiment"]
 
-	tplname := path.Base(r.URL.Path)
-	switch {
-	case tplname == "." || tplname == "/":
+	tplname := strings.TrimPrefix(r.URL.Path, "/")
+	if tplname == "" {
 		tplname = "home"
-	case strings.HasSuffix(tplname, ".html"):
-		tplname = tplname[:len(tplname)-5]
 	}
 
+	c := newContext(r, w)
 	data := &templateData{Env: env(c)}
 	if experimentShare {
 		data.Desc = descExperiment
 		data.OgImage = ogImageExperiment
 	}
+
+	w.Header().Set("Content-Type", "text/html;charset=utf-8")
 	b, err := renderTemplate(c, tplname, wantsPartial, data)
 	if err == nil {
 		w.Header().Set("Cache-Control", "public, max-age=300")
