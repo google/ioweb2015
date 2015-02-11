@@ -50,12 +50,13 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // serveTemplate responds with text/html content of the executed template
-// found under request base path.
-// 'home' template is assumed if request path ends with '/'.
+// found under the request path. 'home' template is used if the request path is /.
+// It also redirects requests with a trailing / to the same path w/o it.
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	// redirect /page/ to /page unless it's homepage
 	if r.URL.Path != "/" && strings.HasSuffix(r.URL.Path, "/") {
-		http.Redirect(w, r, strings.TrimSuffix(r.URL.Path, "/"), http.StatusFound)
+		trimmed := path.Join(httpPrefix, strings.TrimSuffix(r.URL.Path, "/"))
+		http.Redirect(w, r, trimmed, http.StatusFound)
 		return
 	}
 
