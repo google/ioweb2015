@@ -129,6 +129,13 @@ IOWA.Router = (function() {
         currentPageTransition = 'masthead-ripple-transition';
         playMastheadRippleTransition(
             e, el, mastheadColor, rippleColor, isFadeRipple);
+      } else if (el.hasAttribute('data-anim-drawer'))  {
+        var handler = function(e) {
+          e.target.removeEventListener('core-transitionend', handler);
+          currentPageTransition = '';
+          IOWA.History.pushState({'path': el.pathname}, '', el.href);
+        };
+        el.parentNode.addEventListener('core-transitionend', handler);
       } else if (el.hasAttribute('data-anim-card'))  {
         currentPageTransition = 'hero-card-transition';
         playHeroTransition(e, el, rippleColor);
