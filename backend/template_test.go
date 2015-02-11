@@ -15,19 +15,19 @@ func init() {
 
 func TestRenderTemplate(t *testing.T) {
 	table := []*struct {
-		urlpath string
+		tmpl    string
 		partial bool
 	}{
-		{"/", false},
-		{"/", true},
-		{"/about", false},
-		{"/about", true},
+		{"home", false},
+		{"home", true},
+		{"about", false},
+		{"about", true},
 	}
 	for i, test := range table {
-		r, _ := http.NewRequest("GET", test.urlpath, nil)
+		r, _ := http.NewRequest("GET", "/dummy", nil)
 		c := newContext(r, new(bytes.Buffer))
-		if _, err := renderTemplate(c, test.urlpath, test.partial, nil); err != nil {
-			t.Fatalf("%d: renderTemplate(%v, %q, %v): %v", i, c, test.urlpath, test.partial, err)
+		if _, err := renderTemplate(c, test.tmpl, test.partial, nil); err != nil {
+			t.Fatalf("%d: renderTemplate(%v, %q, %v): %v", i, c, test.tmpl, test.partial, err)
 		}
 	}
 }
