@@ -2,23 +2,33 @@
 
 # TEAM (SITE)
 
-  Eric Bidelman (lead) - ebidel
-  Jeff Posnick - jeffposnick
-  Ewa Gasperowicz - devnook
-  Alex Vaghin - crhym3
-  Paul Lewis - aerotwist
-  Brendan Kenny - brendankenny
+  Eric Bidelman (lead dev) - ebidel
+  Jeff Posnick (dev) - jeffposnick
+  Ewa Gasperowicz (dev) - devnook
+  Alex Vaghin (dev) - crhym3
+  Paul Lewis (dev) - aerotwist
+  Brendan Kenny (dev) - brendankenny
+  Dan Schechter (design)
+  Chip Truex (design)
+  Evan Gütt (motion design)
 
 # TEAM (Experiment)
 
-  Thomas Reynold - tdreyno
-  Alex Mahan - alexmahan
+  Thomas Reynolds (dev) - tdreyno
+  Alex Mahan (dev) - alexmahan
+  Destin Young (dev) - ourvice
+  Dan Schechter (design)
+  Chip Truex (design)
+  Evan Gütt (sound & motion design)
+  Amie Pascal (production)
+  Bethany Larson (production)
 
 # THANKS
 
   Mat Scales - wibblymat
   Matthew Gaunt - gauntface
   Jake Archibald - jakearchibald
+  Mat Groves - GoodBoyDigital
 
 # TECHNOLOGY
 
@@ -26,7 +36,7 @@
   Service Worker
   Web Animations API
   Web Audio API
-  WebGL
+  WebGL (Pixi.js)
   HTML5 / CSS3
   Go (backend)
 
