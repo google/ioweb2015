@@ -92,7 +92,7 @@ google-youtube {
   .card__photo--stage {
     height: 900px;
     position: relative;
-    margin-top: -29px;
+    margin-top: -45px;
     margin-bottom: -226px;
   }
   .play__button__container {
@@ -127,7 +127,7 @@ google-youtube {
 
 @media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
   .card__photo--stage {
-    margin-top: -53px;
+    margin-top: -77px;
   }
 }
 
@@ -135,7 +135,7 @@ google-youtube {
    $marginTop: 100px;
 
   .card__photo--stage {
-    margin-top: -33px;
+    margin-top: -57px;
   }
   .page__section--attend {
     margin-top: -36px;
@@ -165,7 +165,7 @@ google-youtube {
     }
   }
   .card__photo--stage {
-    margin-top: -33px;
+    margin-top: -57px;
     margin-bottom: -154px;
   }
 }
