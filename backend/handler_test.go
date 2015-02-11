@@ -64,9 +64,13 @@ func TestServeTemplate(t *testing.T) {
 }
 
 func TestServeTemplateRedirect(t *testing.T) {
+	origHttpPrefix := httpPrefix
+	httpPrefix = "/myprefix"
+	defer func() { httpPrefix = origHttpPrefix }()
+
 	table := []struct{ start, redirect string }{
-		{"/about/", "/about"},
-		{"/one/two/", "/one/two"},
+		{"/about/", "/myprefix/about"},
+		{"/one/two/", "/myprefix/one/two"},
 	}
 	for i, test := range table {
 		r, _ := http.NewRequest("GET", test.start, nil)
@@ -77,7 +81,7 @@ func TestServeTemplateRedirect(t *testing.T) {
 			t.Fatalf("%d: GET %s: %d; want %d", i, test.start, w.Code, http.StatusFound)
 		}
 		if loc := w.Header().Get("Location"); loc != test.redirect {
-			t.Errorf("Location: %q; want %q", i, loc, test.redirect)
+			t.Errorf("%d: Location: %q; want %q", i, loc, test.redirect)
 		}
 	}
 }
