@@ -170,7 +170,7 @@ h6 {
 }
 
 .bg-globe {
-  background-image: url(../images/home/globe-1440.png);
+  background-image: url(../images/home/globe-1440.jpg);
   background-repeat: no-repeat;
   background-position: 50% 60px;
   background-size: 150%;
@@ -195,13 +195,13 @@ h6 {
 .io__hash {
   margin: 40px auto;
   height: 120px;
-  background: url(../images/io15-hash-on-white.png) no-repeat 50% 50%;
+  background: url(../images/io15-hash-on-white-solid.png) no-repeat 50% 50%;
   background-size: contain;
 }
 
 .bg-cyan {
   .io__hash {
-    background-image: url(../images/io15-hash-on-blue.png);
+    background-image: url(../images/io15-hash-on-blue-solid.png);
   }
 }
 
@@ -399,6 +399,6 @@ h6 {
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .bg-globe {
-    background-image: url(../images/home/globe-1440@2x.png);
+    background-image: url(../images/home/globe-1440@2x.jpg);
   }
 }
