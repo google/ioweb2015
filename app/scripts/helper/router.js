@@ -244,8 +244,8 @@ IOWA.Router = (function() {
     var script = document.createElement('script');
     script.text = node.text || node.textContent || node.innerHTML;
 
-    // IE execute the script appended in the middle of the DOM. Append it to
-    // body and remove.
+    // IE doesn't execute the script when it's appended to the middle
+    // of the DOM. Append it to body instead, then remove.
     if (IOWA.Util.isIE()) {
       document.body.appendChild(script);
       document.body.removeChild(script);
