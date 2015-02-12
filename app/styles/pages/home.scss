@@ -98,6 +98,20 @@ $name: 'page-home';
       border-bottom: 1px solid $color-light-grey-border;
     }
   }
+  .attend__globe {
+    height: 150px;
+
+    .globe-marker {
+      position: absolute;
+      width: 21px;
+      height: 36px;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      transform: translate3d(0, -100px, 0);
+      background-image: url(../images/home/marker.svg);
+    }
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
@@ -135,6 +149,17 @@ $name: 'page-home';
   }
   .attend__globe {
     height: 500px;
+
+    .globe-marker {
+      position: absolute;
+      width: 42px;
+      height: 72px;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      transform: translate3d(0, -286px, 0);
+      background-image: url(../images/home/marker.svg);
+    }
   }
   #join {
     position: relative;

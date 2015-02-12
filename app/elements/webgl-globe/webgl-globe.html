@@ -26,7 +26,7 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
-<polymer-element name="webgl-globe" attributes="cameraDistance fov location transitionDuration">
+<polymer-element name="webgl-globe" attributes="cameraDistance fov location locationTarget offsetY transitionDuration">
   <template>
     <style>
       :host {
@@ -77,6 +77,16 @@ Makes a globe or whatever.
        */
 
       /**
+       * The latitude and longitude of the point at which to put `location`.
+       * That is, the globe will be rotated such that `location` will be placed
+       * where `locationTarget` is found when no rotation has been applied.
+       *
+       * @attribute locationTarget
+       * @type object
+       * @default {lat: 0, lng: 0}
+       */
+
+      /**
        * The distance from the camera to the center of the globe, in multiples
        * of radiuses of the globe (e.g. a value of 2 would place the camera one
        * radius above the surface of the globe).
@@ -92,9 +102,21 @@ Makes a globe or whatever.
        *
        * @attribute fov
        * @type number
-       * @default 0.39269908169872414
+       * @default 1.0471975511965976
        */
-      fov: Math.PI / 4,
+      fov: Math.PI / 3,
+
+      /**
+       * An offset for the globe in the final Normalized Device Coordinates
+       * space, which is relative to the height of the canvas element. For
+       * example, an offset of 0.5 would move the entire scene up by 50% of the
+       * canvas's height.
+       *
+       * @attribute offsetY
+       * @type number
+       * @default 0
+       */
+      offsetY: 0,
 
       /**
        * The duration over which transitions between locations should occur.
@@ -236,7 +258,7 @@ Makes a globe or whatever.
       created: function() {
         this.projectionTransform = new Matrix4x4();
         this.location = {lat: 0, lng: 0};
-        this.oldLocation = {lat: 0, lng: 0};
+        this.locationTarget = {lat: 0, lng: 0};
 
         this.previousLocation_ = {lat: 0, lng: 0};
         this.currentLocation_ = {lat: 0, lng: 0};
@@ -303,7 +325,7 @@ Makes a globe or whatever.
         this.globeCubemap = assets[1];
 
         this.animate = true;
-        window.requestAnimationFrame(this.update.bind(this));
+        this.async(this.update);
       },
 
       resize: function() {
@@ -318,6 +340,7 @@ Makes a globe or whatever.
 
         var center = this.cameraDistance;
         this.projectionTransform.identity()
+          .translate(0, this.offsetY, 0)
           .perspective(this.fov, width / height, center - 1, center + 1);
 
         this.resizeNeeded_ = false;
@@ -372,8 +395,8 @@ Makes a globe or whatever.
           // better texture filtering through extensions
           var filterExtension =
               gl.getExtension('EXT_texture_filter_anisotropic') ||
-              gl.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
-              gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
+              gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
+              gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
           if (filterExtension) {
             // set to maximum anisotropic filtering if it exists
             // NOTE(bckenny): some platforms report support while setting
@@ -420,11 +443,6 @@ Makes a globe or whatever.
         this.transitionStart_ = nowish();
       },
 
-      /**
-        * Ease in and out function (with 0 first and second derivatives at ends)
-        * @param {number} t The animation parameter.
-        * @return {number} The transformed animation parameter.
-      */
       ease: function(t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
       },
@@ -453,6 +471,7 @@ Makes a globe or whatever.
           this.resize();
         }
         if (timestamp - this.transitionStart_ < this.transitionDuration) {
+          // TODO(bckenny): set animate = false when this is finished?
           this.interpolateLocation(timestamp);
         }
 
@@ -466,10 +485,12 @@ Makes a globe or whatever.
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubemap);
 
         // globe to eye space
+        var rotX = this.currentLocation_.lat - this.locationTarget.lat;
+        var rotY = -this.currentLocation_.lng + this.locationTarget.lng;
         var worldTransform = tmpTransform.identity()
           .translate(0, 0, -this.cameraDistance)
-          .rotateX(this.currentLocation_.lat * Math.PI / 180)
-          .rotateY(-this.currentLocation_.lng * Math.PI / 180);
+          .rotateX(rotX * Math.PI / 180)
+          .rotateY(rotY * Math.PI / 180);
 
         // set uniforms
         this.globeProgram.uniforms.globeMatrix(worldTransform.m_);

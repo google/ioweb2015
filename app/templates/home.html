@@ -108,14 +108,19 @@
     <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey">
       <h2>
         <i18n-msg msgid="attend-from">Attend I/O from</i18n-msg>
-        <name-cycler items="{{cycleLocations | keysFilter}}" interval="2000" selectedModel="{{cycledName}}"></name-cycler>
+        <name-cycler items="{{cycleLocations | keysFilter}}" selectedModel="{{cycledName}}"></name-cycler>
         <br>
         <i18n-msg msgid="attend-wherever">or wherever you may be</i18n-msg>
       </h2>
       <div class="attend__globe">
         <template if="{{pageTransitionDone}}">
-          <webgl-globe location="{{cycleLocations[cycledName]}}" transitionDuration="2000"></webgl-globe>
+          <webgl-globe location="{{cycleLocations[cycledName]}}"
+                       locationTarget="{'lat': 36.15, 'lng': 0}"
+                       fov="0.3927"
+                       offsetY="-0.625"
+                       transitionDuration="4000"></webgl-globe>
         </template>
+        <div class="globe-marker"></div>
       </div>
     </section>
 
@@ -223,6 +228,16 @@
         IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
         // Set a timeout to fetch new posts after 30 seconds.
         updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
+
+        /**
+         * Transform an object into an array of its enumerable property names. Treats
+         * null or undefined as the empty object.
+         * @param {Object=} opt_obj
+         * @return {!Array<string>}
+         */
+        PolymerExpressions.prototype.keysFilter = function(opt_obj) {
+          return opt_obj ? Object.keys(opt_obj) : [];
+        };
       };
 
       page.unload = function() {
