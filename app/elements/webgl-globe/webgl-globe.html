@@ -132,7 +132,7 @@ Makes a globe or whatever.
       offsetY: 0,
 
       /**
-       * The duration over which transitions between locations should occur.
+       * The duration (ms) over which transitions between locations occur.
        *
        * @attribute transitionDuration
        * @type number
@@ -288,13 +288,18 @@ Makes a globe or whatever.
       },
 
       attached: function() {
-        // start loading assets right away, but hold off on WebGL initialization
+        // Start loading assets, but hold off on WebGL initialization.
         this.loadingTextures_ = this.loadTextures_();
         this.loadingShaders_ = this.loadShaders_();
 
         if (this.active) {
           this.async(this.init_);
         }
+      },
+
+      detached: function() {
+        this.animate = false;
+        window.removeEventListener('resize', this.resizeCallback_);
       },
 
       activeChanged: function() {
@@ -315,7 +320,7 @@ Makes a globe or whatever.
 
         var gl = this.gl = this.$.canvas.getContext('webgl');
         if (!gl) {
-          // attempt with experimental
+          // Attempt with experimental-webgl.
           gl = this.gl = this.$.canvas.getContext('experimental-webgl');
 
           if (!gl) {
@@ -412,7 +417,7 @@ Makes a globe or whatever.
       },
 
       loadTextures_: function() {
-        // cube map GLenum constants from WebGL spec
+        // Cubemap GLenum constants from WebGL spec.
         var globeFaces = {
           'negative-x.jpg': 0x8516,
           'negative-y.jpg': 0x8518,
@@ -422,7 +427,7 @@ Makes a globe or whatever.
           'positive-z.jpg': 0x8519
         };
 
-        // load six face images and associate them with their face GLenum value
+        // Load six face images and associate them with their face GLenum value.
         return Promise.all(
           Object.keys(globeFaces).map(function(faceName) {
             return new Promise(function(resolve, reject) {
@@ -443,7 +448,7 @@ Makes a globe or whatever.
       initCubeMap_: function(faceData) {
         var gl = this.gl;
 
-        // create cubemap texture from six loaded images
+        // Ceate cubemap texture from six loaded images.
         var textureStartTime = nowish();
         var textureId = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureId);
@@ -461,13 +466,13 @@ Makes a globe or whatever.
             gl.CLAMP_TO_EDGE);
         gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
 
-        // better texture filtering through extensions
+        // Better texture filtering through extensions.
         var filterExtension =
             gl.getExtension('EXT_texture_filter_anisotropic') ||
             gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
             gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
         if (filterExtension) {
-          // set to maximum anisotropic filtering if it exists
+          // Set to maximum anisotropic filtering if it exists.
           // NOTE(bckenny): some platforms report support while setting
           // MAX_ANISOTROPY to 0. Override to the minimum of 2 (see spec) and
           // leave it to the platform to clamp if needed.
@@ -499,7 +504,7 @@ Makes a globe or whatever.
         this.previousLocation_.lat = this.currentLocation_.lat;
         this.previousLocation_.lng = this.currentLocation_.lng;
 
-        // since we're lerping in latlng space, check if the other way is faster
+        // Since we're lerping in latlng space, check if other way is faster.
         if (Math.abs(this.previousLocation_.lng - this.location.lng) > 180) {
           if (this.previousLocation_.lng < this.location.lng) {
             this.previousLocation_.lng += 360;
@@ -524,7 +529,7 @@ Makes a globe or whatever.
         var t = Math.max(0, Math.min(1, elapsedTime / this.transitionDuration));
         t = this.ease_(t);
 
-        // TODO(bckenny): for now, just lerp in latlng space
+        // TODO(bckenny): for now, just lerp in latlng space.
         this.currentLocation_.lat = this.lerp_(this.previousLocation_.lat,
             this.location.lat, t);
         this.currentLocation_.lng = this.lerp_(this.previousLocation_.lng,
@@ -545,7 +550,7 @@ Makes a globe or whatever.
 
         var gl = this.gl;
 
-        // TODO(bckenny): don't necessarily need to do these every frame
+        // TODO(bckenny): don't necessarily need to do these every frame.
         this.globeProgram.use();
         gl.vertexAttribPointer(this.globeProgram.attributes.coord, 4, gl.FLOAT,
             false, 16, 0);
@@ -560,7 +565,7 @@ Makes a globe or whatever.
           .rotateX(rotX * Math.PI / 180)
           .rotateY(rotY * Math.PI / 180);
 
-        // set uniforms
+        // Set uniforms on shader program.
         this.globeProgram.uniforms.globeMatrix(worldTransform.m_);
         this.globeProgram.uniforms.viewMatrix(this.projectionTransform_.m_);
         this.globeProgram.uniforms.globeCubemap(0);
@@ -570,11 +575,6 @@ Makes a globe or whatever.
         if (this.animate) {
           window.requestAnimationFrame(this.update_.bind(this));
         }
-      },
-
-      detached: function() {
-        this.animate = false;
-        window.removeEventListener('resize', this.resizeCallback_);
       }
     });
   })();

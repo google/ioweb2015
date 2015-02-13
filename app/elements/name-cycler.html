@@ -144,10 +144,10 @@ finally stopping when reaching a randomly selected item.
        * @method start
        */
       start: function() {
-        // randomly pick a stopping point
+        // Randomly pick a stopping point.
         var endIndex = Math.floor(Math.random() * this.items.length);
 
-        // start just after endIndex to get the full cycle
+        // Start just after endIndex to get the full cycle!
         this.$.selector.selected = (endIndex + 1) % this.items.length;
 
         this.interval_ = setInterval(function() {

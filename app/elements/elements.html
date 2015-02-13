@@ -4,7 +4,8 @@
 <script>
 /**
  * Transform an object into an array of its enumerable property names. Treats
- * null or undefined as the empty object.
+ * null or undefined as the empty object. Defined after polymer.html so
+ * PolymerExpressions exists, but before importing any elements that may use it.
  * @param {Object=} opt_obj
  * @return {!Array<string>}
  */
