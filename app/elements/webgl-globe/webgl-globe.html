@@ -277,11 +277,9 @@ Makes a globe or whatever.
       },
 
       created: function() {
-        this.projectionTransform_ = new Matrix4x4();
-
-        // TODO(bckenny): why can't this be in created?
         this.location = {lat: 0, lng: 0};
 
+        this.projectionTransform_ = new Matrix4x4();
         this.locationTarget = {lat: 0, lng: 0};
         this.previousLocation_ = {lat: 0, lng: 0};
         this.currentLocation_ = {lat: 0, lng: 0};
