@@ -30,6 +30,7 @@ var DIST_EXPERIMENT_DIR = APP_DIR + '/experiment';
 
 var STATIC_VERSION = 1; // Cache busting static assets.
 var VERSION = argv.build || STATIC_VERSION;
+var PROD_ORIGIN = 'https://events.google.com';
 var URL_PREFIX = (argv.urlPrefix || '').replace(/\/+$/g, '') || '/io2015';
 var EXPERIMENT_STATIC_URL = URL_PREFIX + '/experiment/';
 
@@ -343,7 +344,7 @@ gulp.task('backend:test', function(cb) {
 gulp.task('default', ['clean'], function(cb) {
   runSequence('copy-experiment-to-site', 'sass', 'vulcanize',
               ['concat-and-uglify-js', 'images', 'copy-assets', 'copy-backend'],
-              'generate-service-worker-dist', cb);
+              'generate-service-worker-dist', 'sitemap', cb);
 });
 
 gulp.task('bower', function(cb) {
@@ -547,4 +548,24 @@ gulp.task('screenshots', ['backend'], function(callback) {
   var height = argv.height || 9999;
   seleniumScreenshots(branchOrCommit, APP_DIR, 'http://localhost:9999' + URL_PREFIX + '/',
     pages, widths, height, callbackWrapper);
+});
+
+gulp.task('sitemap', function() {
+  gulp.src(APP_DIR + '/templates/!(layout_|error).html', {read: false})
+    .pipe($.rename(function(path) {
+      if (path.basename === 'home') {
+        path.basename = '/'
+      }
+      path.extname = ''
+    }))
+    .pipe($.sitemap({
+      siteUrl: PROD_ORIGIN + URL_PREFIX,
+      changefreq: 'weekly',
+      spacing: '  ',
+      mappings: [{
+        pages: [''], // homepage should be more frequent
+        changefreq: 'daily'
+      }]
+    }))
+    .pipe(gulp.dest(APP_DIR));
 });
