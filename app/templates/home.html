@@ -1,4 +1,4 @@
-{% define "title" %}"Google I/O 2015"{% end %}
+{% define "title" %}Google I/O 2015{% end %}
 
 {% define "mastheadBgClass" %}bg-medium-grey{% end %}
 
@@ -45,35 +45,33 @@
       </paper-button> -->
 
       <div class="io-countdown" layout vertical center>
-        <a href="registration" data-ajax-link>
-          <countdown-timer bgcolor="#00BCD4"
-                           date="Mar 17 2015 09:00:00 GMT-0700 (PDT)"
-                           dateadjustment="5" easeintime="490" waittime="100"
-                           easeouttime="390" thresholdInformation="{{thresholdInformation}}">
-          </countdown-timer>
-        </a>
+        <countdown-timer bgcolor="#00BCD4"
+                         date="Mar 17 2015 09:00:00 GMT-0700 (PDT)"
+                         dateadjustment="5" easeintime="490" waittime="100"
+                         easeouttime="390" thresholdInformation="{{thresholdInformation}}">
+        </countdown-timer>
 
         <template if="{{ thresholdInformation.thresholdDays }}">
           <h4 class="countdown-label">
-            <i18n-msg msgid="daysuntilreg">Days until registration begins</i18n-msg>
+            <a href="registration" data-ajax-link><i18n-msg msgid="daysuntilreg">Days until registration begins</i18n-msg></a>
           </h4>
         </template>
 
         <template if="{{ thresholdInformation.thresholdHours }}">
           <h4 class="countdown-label">
-            <i18n-msg msgid="hoursuntilreg">Hours until registration begins</i18n-msg>
+            <a href="registration" data-ajax-link><i18n-msg msgid="hoursuntilreg">Hours until registration begins</i18n-msg></a>
           </h4>
         </template>
 
         <template if="{{ thresholdInformation.thresholdMinutes }}">
           <h4 class="countdown-label">
-            <i18n-msg msgid="minutesuntilreg">Minutes until registration begins</i18n-msg>
+            <a href="registration" data-ajax-link><i18n-msg msgid="minutesuntilreg">Minutes until registration begins</i18n-msg></a>
           </h4>
         </template>
 
         <template if="{{ thresholdInformation.thresholdSeconds }}">
           <h4 class="countdown-label">
-            <i18n-msg msgid="secondsuntilreg">Seconds until registration begins</i18n-msg>
+            <a href="registration" data-ajax-link><i18n-msg msgid="secondsuntilreg">Seconds until registration begins</i18n-msg></a>
           </h4>
         </template>
       </div>
@@ -130,7 +128,7 @@
         </div>
         <div class="card-content">
           <a href="offsite" data-ajax-link data-track-link="home-join-from-your-location">
-            <i18n-msg msgid="join-from-offsite">Join from your location<i18n-msg>
+            <i18n-msg msgid="join-from-offsite">Join from your location</i18n-msg>
           </a>
         </div>
       </div>
@@ -227,7 +225,14 @@
       page.hasBeenLoaded = true;
     }
 
-    initPage();
+    // IE will be "loading" at this point. Other browsers will already be "complete".
+    if (document.readyState !== 'loading') {
+      initPage();
+    }
+
+    // Necessary for IE's lack of native <template>
+    // https://github.com/GoogleChrome/ioweb2015/issues/599
+    window._initPage = initPage;
 
   })();
   </script>

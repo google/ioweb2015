@@ -49,8 +49,8 @@ Main fab for entering/exit the experiment.
       }
 
       :host::shadow core-icon {
-        height: 19px;
-        width: 19px;
+        height: 20px;
+        width: 20px;
         top: 2px;
         left: 2px;
       }
@@ -291,13 +291,13 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       @media screen and (max-width: 767px) and (orientation: landscape) {
         :host .dialog-content,
         :host([supported]) .dialog-content {
-          background-size: 170px auto;
-          background-position: 50% 70%;
+          background-size: 160px auto;
+          background-position: 50% 74%;
         }
       }
 
       h4 {
-        color: #424242;
+        color: #424242 !important;
         font-size: 24px;
         font-weight: 400;
         margin: 0;
@@ -307,6 +307,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
         color: #9E9E9E;
         font-size: 15px;
         font-weight: 500;
+        margin: 10px 0;
       }
 
       p a {
@@ -339,7 +340,7 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       <div class="dialog-content" _style="background-image: {{dialogSupportedImage}}">
         <h4><i18n-msg msgid="experiment-ahead">Chrome Experiment ahead</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="headphones-on">The Experiment features Web Audio API. You might want to grab headphones.</i18n-msg>
+          <i18n-msg msgid="headphones-on">The Experiment features WebGL and Web Audio APIs. You might want to grab headphones.</i18n-msg>
         </p>
         <div class="button-container">
           <template if="{{!expLoaded}}">
@@ -359,11 +360,11 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       </div>
     </template>
 
-    <template if="{{!supported}}">
+    <template if="{{unsupported}}">
       <div class="dialog-content" _style="background-image: {{dialogUnsupportedImage}}">
         <h4 class="sorry"><i18n-msg msgid="sorry">Sorry...</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="experiment-unsupported">This Chrome Experiment requires <a href="//caniuse.com/#feat=webgl" target="_blank"><i18n-msg msgid="supports-webgl">WebGL</i18n-msg></a> and <a href="//caniuse.com/#feat=audio-api" target="_blank"><i18n-msg msgid="supports-webaudio">Web Audio</i18n-msg></a> support, which are not available in your current browser. Please change or upgrade your browser to run the experiment.
+          <i18n-msg msgid="experiment-unsupported">This Chrome Experiment requires <a href="http://caniuse.com/#feat=webgl" target="_blank"><i18n-msg msgid="supports-webgl">WebGL</i18n-msg></a> and <a href="http://caniuse.com/#feat=audio-api" target="_blank"><i18n-msg msgid="supports-webaudio">Web Audio</i18n-msg></a> support, which aren&#8217;t available in your current browser. Please change or upgrade your browser to run the Experiment.
         </p>
         <div class="button-container">
           <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
@@ -373,10 +374,11 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
       </div>
     </template>
 
-    <template if="{{experimentFailed}}">
+    <template if="{{failed}}">
       <div class="dialog-content" _style="background-image: {{dialogUnsupportedImage}}">
+        <h4 class="sorry"><i18n-msg msgid="sorry">Sorry...</i18n-msg></h4>
         <p>
-          <i18n-msg msgid="experiment-failed">The experiment failed to load.</i18n-msg>
+          <i18n-msg msgid="experiment-failed">The Experiment failed to load. Perhaps you&#8217;re offline? Unfortunately, you need to be online to access the WebGL and Web Audio Experiment.</i18n-msg>
         </p>
         <div class="button-container">
           <paper-button class="experiment-button" on-tap="{{onExperimentOff}}">
@@ -394,11 +396,15 @@ Dialog that animates in when experiment fab is clicked. If experiment is support
           value: false,
           reflect: true
         },
+        unsupported: {
+          value: false,
+          reflect: true
+        },
         expLoaded: {
           value: false,
           reflect: true
         },
-        experimentFailed: {
+        failed: {
           value: false,
           reflect: true
         }
@@ -729,7 +735,8 @@ Dialog to share the user's custom experiment/song
       },
 
       linkSelect: function() {
-        this.$.urlInput.select();
+        this.$.urlInput.selectionStart = 0;
+        this.$.urlInput.selectionEnd = this.$.urlInput.value.length;
       },
 
       encodeURI: function(uri) {
@@ -998,7 +1005,7 @@ Main parent container for all of the fab elements.
       <experiment-loading-circle loading?="{{experimentSupported}}" expLoaded?="{{experimentLoaded}}" hidden?="{{loadingCircleHidden}}"></experiment-loading-circle>
       <experiment-fab src="{{assets.animatedImg}}" on-tap="{{onFabClick}}" mini?="{{mini}}" aria-label="Try the Chrome experiment" onstate?="{{dialogVisible}}" mode="{{mode}}"></experiment-fab>
 
-      <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
+      <experiment-loading-dialog active?="{{dialogVisible}}" supported="{{experimentSupported}}" unsupported="{{experimentUnsupported}}" failed="{{experimentFailed}}" expLoaded="{{experimentLoaded}}" mobile?="{{isPhoneSize}}" class="{{dialogAnimateDirection}}"></experiment-loading-dialog>
 
       <experiment-overlay active?="{{dialogVisible}}" on-tap="{{onOverlayClose}}"></experiment-overlay>
 
@@ -1112,19 +1119,25 @@ Main parent container for all of the fab elements.
         IOWA.Analytics.trackEvent('experiment', 'activate', 'experiment fab clicked');
 
         if (experiment.canLoad()) {
+          this.experimentFailed = false;
           this.experimentSupported = true;
           this.loadingCircleHidden = false;
-          experiment.load(15000).then(function(app) {
-            console.log('Experiment Loaded Successfully.');
+          experiment.load(45000).then(function(app) {
+            console.log('Experiment loaded successfully.');
             this.app = app;
+            this.app.unlockOnMobile();
             this.experimentLoaded = true;
           }.bind(this), function() {
+            this.experimentSupported = false;
             this.experimentFailed = true;
-            console.log('Experiment failed for some unknown reason');
+            console.log('Experiment failed for some unknown reason. Perhaps user is offline?');
             IOWA.Analytics.trackEvent('experiment', 'error', 'failed to load');
           }.bind(this));
         } else {
+          console.log('Experiment is unsupported.');
+          this.experimentFailed = false;
           this.experimentSupported = false;
+          this.experimentUnsupported = true;
           IOWA.Analytics.trackEvent('experiment', 'unsupported', 'experiment not supported');
         }
       },
@@ -1166,6 +1179,10 @@ Main parent container for all of the fab elements.
           this.viewport.setAttribute('content', 'width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1, user-scalable=0');
 
         }, null, 300);
+
+        this.app.didRequestExit(function() {
+          this.onExitClick();
+        }.bind(this));
 
         this.app.didEnterRecordingMode(function() {
           this.recording = true;

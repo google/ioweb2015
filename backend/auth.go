@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -48,15 +47,15 @@ func (t *twitterCredentials) Token() (*oauth2.Token, error) {
 	hc := &http.Client{Transport: t.transport}
 	resp, err := hc.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("twitterCredentials: %v", err)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("twitterCredentials: %v", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Twitter auth replied with: %d", resp.StatusCode)
+		return nil, fmt.Errorf("twitterCredentials: got %d status", resp.StatusCode)
 	}
 
 	token := &struct {
@@ -66,7 +65,7 @@ func (t *twitterCredentials) Token() (*oauth2.Token, error) {
 		return nil, err
 	}
 	if token.AccessToken == "" {
-		return nil, errors.New("Got empty token from Twitter auth")
+		return nil, errors.New("twitterCredentials: empty access token")
 	}
 	return &oauth2.Token{AccessToken: token.AccessToken}, nil
 }
@@ -92,8 +91,8 @@ func serviceAccountClient(c context.Context, scopes ...string) (*http.Client, er
 // twitterClient creates a new HTTP client with oauth2Transport.
 func twitterClient(c context.Context) (*http.Client, error) {
 	cred := &twitterCredentials{
-		key:       config.TwitterKey,
-		secret:    config.TwitterSecret,
+		key:       config.Twitter.Key,
+		secret:    config.Twitter.Secret,
 		transport: httpTransport(c),
 		cache:     cache,
 	}

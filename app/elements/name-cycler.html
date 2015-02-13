@@ -64,95 +64,109 @@ finally stopping when reaching a randomly selected item.
     </core-selector>
   </template>
   <script>
-  Polymer({
+  (function() {
+    function isOS() {
+      return (/(iPhone|iPad|iPod)/gi).test(navigator.platform);
+    }
 
-    /**
-     * List of items to cycle
-     *
-     * @attribute items
-     * @type array
-     * @default []
-     */
-
-    publish: {
-      /**
-       * True if the items should start cycling automatically.
-       *
-       * @attribute auto
-       * @type bool
-       * @default true
-       */
-      auto: {value: true, reflect: true},
+    Polymer({
 
       /**
-       * Time between cycling, in milliseconds.
+       * List of items to cycle
        *
-       * @attribute interval
-       * @type number
-       * @default 4000
+       * @attribute items
+       * @type array
+       * @default []
        */
-      interval: 4000,
 
-      /**
-       * Returns the model associated with the selected item.
-       *
-       * @attribute selectedModel
-       * @type string
-       * @default null
-       */
-      selectedModel: null
-    },
+      publish: {
+        /**
+         * True if the items should start cycling automatically.
+         *
+         * @attribute auto
+         * @type bool
+         * @default true
+         */
+        auto: {value: true, reflect: true},
 
-    created: function() {
-      this.items = [];
-    },
+        /**
+         * Time between cycling, in milliseconds.
+         *
+         * @attribute interval
+         * @type number
+         * @default 4000
+         */
+        interval: 4000,
 
-    attached: function() {
-      if (this.auto) {
-        this.start();
-      }
-    },
+        /**
+         * Returns the model associated with the selected item.
+         *
+         * @attribute selectedModel
+         * @type string
+         * @default null
+         */
+        selectedModel: null
+      },
 
-    detached: function() {
-      this.stop();
-    },
+      created: function() {
+        this.items = [];
+      },
 
-    autoChanged: function() {
-      if (this.auto) {
-        this.start();
-      } else {
+      attached: function() {
+        // Ignore auto on iOS and just pick a city at random.
+        // See https://github.com/GoogleChrome/ioweb2015/issues/547
+        if (isOS()) {
+          var idx = Math.floor(Math.random() * this.$.selector.items.length);
+          this.$.selector.selectIndex(idx);
+          return;
+        }
+
+        if (this.auto) {
+          this.start();
+        }
+      },
+
+      detached: function() {
         this.stop();
-      }
-    },
+      },
 
-    /**
-     * Starts the cycling animation.
-     *
-     * @method start
-     */
-    start: function() {
-      // randomly pick a stopping point
-      var endIndex = Math.floor(Math.random() * this.items.length);
-
-      // start just after endIndex to get the full cycle
-      this.$.selector.selected = (endIndex + 1) % this.items.length;
-
-      this.interval_ = setInterval(function() {
-        if (this.$.selector.selectedIndex === endIndex) {
+      autoChanged: function() {
+        if (this.auto) {
+          this.start();
+        } else {
           this.stop();
         }
-        this.$.selector.selectNext(true);
-      }.bind(this), this.interval);
-    },
+      },
 
-    /**
-     * Stops the cycling animation.
-     *
-     * @method start
-     */
-    stop: function() {
-      clearInterval(this.interval_);
-    }
-  });
+      /**
+       * Starts the cycling animation.
+       *
+       * @method start
+       */
+      start: function() {
+        // randomly pick a stopping point
+        var endIndex = Math.floor(Math.random() * this.items.length);
+
+        // start just after endIndex to get the full cycle
+        this.$.selector.selected = (endIndex + 1) % this.items.length;
+
+        this.interval_ = setInterval(function() {
+          if (this.$.selector.selectedIndex === endIndex) {
+            this.stop();
+          }
+          this.$.selector.selectNext(true);
+        }.bind(this), this.interval);
+      },
+
+      /**
+       * Stops the cycling animation.
+       *
+       * @method start
+       */
+      stop: function() {
+        clearInterval(this.interval_);
+      }
+    });
+  })();
   </script>
 </polymer-element>

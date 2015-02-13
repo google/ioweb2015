@@ -15,20 +15,19 @@ func init() {
 
 func TestRenderTemplate(t *testing.T) {
 	table := []*struct {
-		urlpath string
+		tmpl    string
 		partial bool
 	}{
-		{"/", false},
-		{"/", true},
-		{"/about", false},
-		{"/about", true},
+		{"home", false},
+		{"home", true},
+		{"about", false},
+		{"about", true},
 	}
 	for i, test := range table {
-		r, _ := http.NewRequest("GET", test.urlpath, nil)
-		var b bytes.Buffer
-		c := newContext(r, &b)
-		if err := renderTemplate(c, test.urlpath, test.partial, nil); err != nil {
-			t.Fatalf("%d: renderTemplate(%v, %q, %v): %v", i, c, test.urlpath, test.partial, err)
+		r, _ := http.NewRequest("GET", "/dummy", nil)
+		c := newContext(r, new(bytes.Buffer))
+		if _, err := renderTemplate(c, test.tmpl, test.partial, nil); err != nil {
+			t.Fatalf("%d: renderTemplate(%v, %q, %v): %v", i, c, test.tmpl, test.partial, err)
 		}
 	}
 }
@@ -39,48 +38,48 @@ func TestRenderEnv(t *testing.T) {
 	defer func() { appEnv = e }()
 
 	req, _ := http.NewRequest("GET", "/about", nil)
-	var b bytes.Buffer
-	c := newContext(req, &b)
+	c := newContext(req, new(bytes.Buffer))
 
-	if err := renderTemplate(c, "about", false, nil); err != nil {
+	out, err := renderTemplate(c, "about", false, nil)
+	if err != nil {
 		t.Fatalf("renderTemplate(..., about, false): %v", err)
 	}
 
 	rx := `window\.ENV\s+=\s+"prod";`
-	if matched, err := regexp.Match(rx, b.Bytes()); !matched || err != nil {
-		t.Errorf("didn't match %s to: %s (%v)", rx, b.String(), err)
+	if matched, err := regexp.Match(rx, out); !matched || err != nil {
+		t.Errorf("didn't match %s to: %s (%v)", rx, string(out), err)
 	}
 }
 
 func TestRenderOgImage(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/about", nil)
-	var b bytes.Buffer
-	c := newContext(req, &b)
+	c := newContext(req, new(bytes.Buffer))
 
 	data := &templateData{OgImage: ogImageExperiment}
-	if err := renderTemplate(c, "about", false, data); err != nil {
+	out, err := renderTemplate(c, "about", false, data)
+	if err != nil {
 		t.Fatalf("renderTemplate(..., about, false): %v", err)
 	}
 
-	rx := `<meta\sproperty="og:image"\scontent="images/` + data.OgImage + `">`
-	if matched, err := regexp.Match(rx, b.Bytes()); !matched || err != nil {
-		t.Errorf("didn't match %s to: %s (%v)", rx, b.String(), err)
+	rx := `<meta\sproperty="og:image"\scontent="/io2015/images/` + data.OgImage + `">`
+	if matched, err := regexp.Match(rx, out); !matched || err != nil {
+		t.Errorf("didn't match %s to: %s (%v)", rx, string(out), err)
 	}
 }
 
 func TestRenderOgDesc(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/about?experiment", nil)
-	var b bytes.Buffer
-	c := newContext(req, &b)
+	c := newContext(req, new(bytes.Buffer))
 
 	data := &templateData{Desc: descExperiment}
-	if err := renderTemplate(c, "about", false, data); err != nil {
+	out, err := renderTemplate(c, "about", false, data)
+	if err != nil {
 		t.Fatalf("renderTemplate(..., about, false): %v", err)
 	}
 
 	rx := `<meta\sproperty="og:description"\scontent="` + descExperiment + `">`
-	if matched, err := regexp.Match(rx, b.Bytes()); !matched || err != nil {
-		t.Errorf("didn't match %s to: %s (%v)", rx, b.String(), err)
+	if matched, err := regexp.Match(rx, out); !matched || err != nil {
+		t.Errorf("didn't match %s to: %s (%v)", rx, string(out), err)
 	}
 }
 

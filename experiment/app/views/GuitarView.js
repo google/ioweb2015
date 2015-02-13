@@ -10,6 +10,7 @@ module.exports = (function() {
   'use strict';
 
   const VIEW_NAME = 'GuitarView';
+  const NUMBER_KEY_RANGE = [49, 57];
 
   /**
    * Controls the Guitar instrument view.
@@ -269,6 +270,8 @@ module.exports = (function() {
           dots[key].addEventListeners();
         }
       }
+
+      document.addEventListener('keyup', onGuitarKeyUp);
     }
 
     /**
@@ -281,6 +284,25 @@ module.exports = (function() {
       for (let key in dots) {
         if (dots.hasOwnProperty(key)) {
           dots[key].removeEventListeners();
+        }
+      }
+
+      document.removeEventListener('keyup', onGuitarKeyUp);
+    }
+
+    /**
+     * Keyup handler for guitar strings.
+     * @param {event} evt - The keyup event.
+     */
+    function onGuitarKeyUp(evt) {
+      if ((evt.keyCode >= NUMBER_KEY_RANGE[0]) && (evt.keyCode <= NUMBER_KEY_RANGE[1])) {
+        var keyPos = evt.keyCode - NUMBER_KEY_RANGE[0];
+
+        var guitarStringKey = Object.keys(guitarStrings)[keyPos];
+
+        if (guitarStrings[guitarStringKey]) {
+          guitarStrings[guitarStringKey].activate();
+          guitarStrings[guitarStringKey].playNote();
         }
       }
     }

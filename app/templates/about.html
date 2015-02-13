@@ -1,4 +1,4 @@
-{% define "title" %}"About I/O"{% end %}
+{% define "title" %}About I/O{% end %}
 
 {% define "mastheadBgClass" %}bg-dark-grey{% end %}
 
@@ -106,6 +106,14 @@
       };
 
       var animation = new AnimationGroup([
+        new Animation(bottomSection, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions)
+      ]);
+
+      // Top/bottom card animations
+      var cardAnimations = [
         new Animation(topCard, [
           {transform: 'translateY(0)', opacity: 1},
           {transform: 'translateY(-100px)', opacity: 0}
@@ -113,21 +121,19 @@
         new Animation(bottomCard, [
           {transform: 'translateY(0)', opacity: 1},
           {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(bottomSection, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(navOverlay, [
-          {transform: 'translateY(-100%)'},
-          {transform: 'translateY(0)'}
         ], animationOptions)
-      ]);
+      ];
 
       var gallery = IOWA.Elements.Main.querySelector('io-gallery');
 
-      if (gallery.mobile) {
-        animation.children = animation.children.slice(2);
+      // Only animate top/bottom cards offscreen if not on mobile.
+      if (!gallery.mobile) {
+        // If under polyfill, code around not having AnimationGroup.append().
+        if (!animation.append) {
+          animation.children.push(cardAnimations[0], cardAnimations[1]);
+        } else {
+          animation.append(cardAnimations[0], cardAnimations[1]);
+        }
       }
 
       var galleryAnimation = new Animation(gallery, [
@@ -143,11 +149,13 @@
         // Fade out gallery and slide back in page sections at the same time.
         IOWA.PageAnimation.play(galleryAnimation);
         IOWA.PageAnimation.play(animation, opt_callback);
+        navOverlay.classList.remove('active');
       } else {
         // Slide out page sections, then fade in gallery.
         IOWA.PageAnimation.play(animation, function() {
           IOWA.PageAnimation.play(galleryAnimation, opt_callback);
         });
+        navOverlay.classList.add('active');
       }
     }
 
@@ -221,7 +229,14 @@
       page.hasBeenLoaded = true;
     }
 
-    initPage();
+    // IE will be "loading" at this point. Other browsers will already be "complete".
+    if (document.readyState !== 'loading') {
+      initPage();
+    }
+
+    // Necessary for IE's lack of native <template>
+    // https://github.com/GoogleChrome/ioweb2015/issues/599
+    window._initPage = initPage;
 
   })();
   </script>

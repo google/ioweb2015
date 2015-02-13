@@ -1,4 +1,4 @@
-{% define "title" %}"Attend Offsite"{% end %}
+{% define "title" %}Attend Offsite{% end %}
 
 {% define "mastheadBgClass" %}bg-cyan{% end %}
 
@@ -12,11 +12,20 @@
     <span flex><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></span>
   </core-toolbar>
 
+  <template if="{{fullscreenVideoActive}}">
+    <div class="fullvideo__container" fit>
+     <google-youtube videoid="A-bjrru5bLU" height="100%" width="100%" fit
+                     autohide="1" controls="2" modestbranding="1" showinfo="0"
+                     iv_load_policy="3" rel="0" autoplay="1"
+                     on-google-youtube-ready="{{onVideoReady}}"></google-youtube>
+    </div>
+  </template>
+
   <div class="card__container card__container--top slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
-        <h3 class="card__title"><i18n-msg msgid="livestream">Live stream</i18n-msg></h3>
-        <div><i18n-msg msgid="watch-keynote-and-sessions">Watch the keynote and select sessions in real-time, from your laptop or mobile device.</i18n-msg></div>
+        <!-- <h3 class="card__title"><i18n-msg msgid="livestream">Live stream</i18n-msg></h3> -->
+        <h3><i18n-msg msgid="watch-keynote-and-sessions">I/O 2015 will be streamed live. Watch the keynote and select sessions in real time, from your laptop or mobile device. Join an I/O Extended event to watch with other developers and make a party of it.</i18n-msg></h3>
       </div>
     </div>
   </div>
@@ -25,30 +34,23 @@
       <div class="play__button__container" on-tap="{{openSectionVideo}}" data-track-link="offsite-watch-extended-recap-video">
         <h5><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></h5>
       </div>
-      <template if="{{fullscreenVideoActive}}">
-        <div class="fullvideo__container" fit>
-         <google-youtube videoid="A-bjrru5bLU" height="100%" width="100%" fit
-                         autohide="1" controls="2" modestbranding="1" showinfo="0"
-                         iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
-        </div>
-      </template>
     </section>
 
     <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}" relative>
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
           <h3 class="card__title"><i18n-msg msgid="ioextendevents">I/O Extended events</i18n-msg></h3>
-          <h4><i18n-msg msgid="ioextendevents-details">I/O Extended events may include live streamed sessions, local developer demos, hackathons and more. These events are brought to you by our Google Developer Groups, Student Ambassadors, and local developers.</i18n-msg></h4>
+          <div><i18n-msg msgid="ioextendevents-details">I/O Extended events may include live streamed sessions, local developer demos, hackathons and more. These events are brought to you by our Google Developer Groups, Student Ambassadors, and local developers.</i18n-msg></div>
         </div>
       </div>
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
           <h3 class="card__title"><i18n-msg msgid="hostioextend">Host an I/O Extended event</i18n-msg></h3>
-          <h4>We've got you covered with all the information you need to bring I/O to your neighborhood.</h4>
+          <div>We've got you covered with all the information you need to bring I/O to your neighborhood.</div>
         </div>
         <div class="card-content link-spacing">
-          <a href="//www.google.com/events/io/shared/googleio2014-Extended-Guide.pdf"
-             data-track-link="offsite-download-organizers-guide"><core-icon icon="file-download" aria-label="Download"></core-icon> <i18n-msg msgid="organizerguide">Organizer Guide</i18n-msg></a> <a href="form" data-ajax-link data-track-link="offsite-submit-event"><i18n-msg msgid="submitevent">Submit your event</i18n-msg></a>
+          <a href="//docs.google.com/presentation/d/1rUwLzz3-Hgcs9eu1uph4En1FUCcpTQspw-xpK4Kaoms/pub?start=true&loop=false&delayms=30000"
+             data-track-link="offsite-download-organizers-guide" target="_blank"><i18n-msg msgid="organizerguide">Organizer Guide</i18n-msg></a> <a href="form" data-ajax-link data-track-link="offsite-submit-event"><i18n-msg msgid="submitevent">Submit your event</i18n-msg></a>
         </div>
       </div>
     </div>
@@ -102,23 +104,35 @@
       };
 
       var cardAnimations = new AnimationGroup([
-        new Animation(topCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(-100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(bottomCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(navOverlay, [
-          {transform: 'translateY(-100%)'},
-          {transform: 'translateY(0)'}
-        ], animationOptions),
         new Animation(button, [
           {opacity: 1},
           {opacity: 0}
         ], animationOptions)
       ]);
+
+      // Animations for top/bottom cards.
+      var topBottomCardAnimations = [
+        new Animation(topCard, [
+          {transform: 'translateY(0)', opacity: 1},
+            {transform: 'translateY(-100px)', opacity: 0}
+          ], animationOptions),
+        new Animation(bottomCard, [
+          {transform: 'translateY(0)', opacity: 1},
+          {transform: 'translateY(100px)', opacity: 0}
+        ], animationOptions)
+      ];
+
+      // Only animate top/bottom cards offscreen if not on mobile.
+      if (!IOWA.Elements.Template.isPhoneSize) {
+        // If under polyfill, code around not having AnimationGroup.append().
+        if (!cardAnimations.append) {
+          cardAnimations.children.push(
+              topBottomCardAnimations[0], topBottomCardAnimations[1]);
+        } else {
+          cardAnimations.append(
+              topBottomCardAnimations[0], topBottomCardAnimations[1]);
+        }
+      }
 
       var videoAnimation = new Animation(video, [
         {opacity: 0}, {opacity: 1}
@@ -133,11 +147,13 @@
         // Fade out gallery and slide back in page sections at the same time.
         IOWA.PageAnimation.play(videoAnimation);
         IOWA.PageAnimation.play(cardAnimations, opt_callback);
+        navOverlay.classList.remove('active');
       } else {
         // Slide out page sections, then fade in gallery.
         IOWA.PageAnimation.play(cardAnimations, function() {
           IOWA.PageAnimation.play(videoAnimation, opt_callback);
         });
+        navOverlay.classList.add('active');
       }
     }
 
@@ -149,6 +165,10 @@
         return;
       }
 
+      IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
+        runVideoSectionAnimation();
+      };
+
       IOWA.Elements.Template.closeVideoSection = function(e, detail, sender) {
         runVideoSectionAnimation(true, function() {
           IOWA.Elements.Template.fullscreenVideoActive = false;
@@ -158,21 +178,28 @@
       IOWA.Elements.Template.openSectionVideo = function(e, detail, sender) {
         IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
 
-        this.fullscreenVideoActive = true;
-        // TODO, wait for iframe to load.
-
-        // Wait 1 rAF for template to stamp.
-        this.async(function() {
-          IOWA.Util.smoothScroll(IOWA.Elements.Main.querySelector('.card__photo--stage'), 300, function() {
-            runVideoSectionAnimation();
-          });
-        });
+        // Only smooth scroll to content if not on mobile.
+        if (IOWA.Elements.Template.isPhoneSize) {
+          this.fullscreenVideoActive = true; // stamp template
+        } else {
+          var videoStage = IOWA.Elements.Main.querySelector('.card__photo--stage');
+          IOWA.Util.smoothScroll(videoStage, 300, function() {
+            this.fullscreenVideoActive = true; // stamp template
+          }.bind(this));
+        }
       };
 
       page.hasBeenLoaded = true;
     }
 
-    initPage();
+    // IE will be "loading" at this point. Other browsers will already be "complete".
+    if (document.readyState !== 'loading') {
+      initPage();
+    }
+
+    // Necessary for IE's lack of native <template>
+    // https://github.com/GoogleChrome/ioweb2015/issues/599
+    window._initPage = initPage;
 
   })();
   </script>

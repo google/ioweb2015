@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"html/template"
-	"log"
 	"path/filepath"
+	"strings"
+	"sync"
 
 	"golang.org/x/net/context"
 )
@@ -26,6 +27,21 @@ const (
 	ogImageExperiment = "io15-experiment.png"
 )
 
+var (
+	// tmplFunc is a map of functions available to all templates.
+	tmplFunc = template.FuncMap{
+		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
+	}
+	// tmplCache caches HTML templates parsed in parseTemplate()
+	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
+)
+
+// templateCache is in-memory cache for parsed templates
+type templateCache struct {
+	sync.Mutex
+	templates map[string]*template.Template
+}
+
 // templateData is the templates context
 type templateData struct {
 	Title, Desc, Slug, Env, OgImage string
@@ -35,41 +51,22 @@ type templateData struct {
 // meta is a page meta info.
 type meta map[string]interface{}
 
-// tmplFunc is a map of functions available to all templates.
-var tmplFunc = template.FuncMap{
-	"safeHTML": func(v string) template.HTML { return template.HTML(v) },
-}
-
 // renderTemplate executes a template found in name.html file
 // using either layout_full.html or layout_partial.html as the root template.
 // env is the app current environment: "dev", "stage" or "prod".
-func renderTemplate(c context.Context, name string, partial bool, data *templateData) error {
-	if name == "/" || name == "" {
-		name = "home"
-	}
-
-	var layout string
-	if partial {
-		layout = "layout_partial.html"
-	} else {
-		layout = "layout_full.html"
-	}
-
-	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(rootDir, "templates", layout),
-		filepath.Join(rootDir, "templates", name+".html"),
-	)
+func renderTemplate(c context.Context, name string, partial bool, data *templateData) ([]byte, error) {
+	tpl, err := parseTemplate(name, partial)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	m := pageMeta(t)
 	if data == nil {
 		data = &templateData{}
 	}
 	if data.Env == "" {
 		data.Env = env(c)
 	}
+	m := pageMeta(tpl)
 	data.Meta = m
 	data.Title = pageTitle(m)
 	data.Slug = name
@@ -79,7 +76,43 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	if data.OgImage == "" {
 		data.OgImage = ogImageDefault
 	}
-	return t.Execute(writer(c), data)
+
+	var b bytes.Buffer
+	if err := tpl.Execute(&b, data); err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
+// parseTemplate creates a template identified by name, using appropriate layout.
+// HTTP error layout is used for name arg prefixed with "error_", e.g. "error_404".
+func parseTemplate(name string, partial bool) (*template.Template, error) {
+	var layout string
+	switch {
+	case strings.HasPrefix(name, "error_"):
+		layout = "layout_error.html"
+	case partial:
+		layout = "layout_partial.html"
+	default:
+		layout = "layout_full.html"
+	}
+
+	key := name + layout
+	tmplCache.Lock()
+	defer tmplCache.Unlock()
+	if t, ok := tmplCache.templates[key]; ok {
+		return t, nil
+	}
+
+	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
+		filepath.Join(rootDir, "templates", layout),
+		filepath.Join(rootDir, "templates", name+".html"),
+	)
+	if err != nil {
+		return nil, err
+	}
+	tmplCache.templates[key] = t
+	return t, nil
 }
 
 // pageTitle extracts "title" property of the page meta and appends defaultTitle to it.
@@ -95,18 +128,14 @@ func pageTitle(m meta) string {
 // pageMeta extracts page meta info by executing "meta" template.
 // The template is assumed to be a JSON object body (w/o {}).
 // Returns empty meta if template execution fails.
-func pageMeta(t *template.Template) (m meta) {
-	m = make(meta)
-
+func pageMeta(t *template.Template) meta {
+	m := make(meta)
 	b := new(bytes.Buffer)
 	b.WriteRune('{')
 	if err := t.ExecuteTemplate(b, "meta", nil); err != nil {
-		return
+		return m
 	}
 	b.WriteRune('}')
-
-	if err := json.Unmarshal(b.Bytes(), &m); err != nil {
-		log.Printf("pageMeta: %v", err)
-	}
-	return
+	json.Unmarshal(b.Bytes(), &m)
+	return m
 }

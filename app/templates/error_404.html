@@ -1,0 +1,51 @@
+{% define "title" %}404 Not Found{% end %}
+
+{% define "mastheadBgClass" %}bg-cyan{% end %}
+
+{% define "content" %}
+
+<section class="page__section" layout horizontal center-center>
+  <countdown-timer bgcolor="#00BCD4" autostart
+                   dateadjustment="3" easeintime="490" waittime="100" easeouttime="390">
+  </countdown-timer>
+</section>
+
+<div class="card__container">
+  <div class="card">
+    <div class="card-content">
+      <h2><i18n-msg msgid="sorry-404">Sorry. We couldn't find that page :(</i18n-msg></h2>
+    </div>
+    <div class="card-content">
+      <a href="./" data-track-link="500-continue-to-site">
+        <i18n-msg msgid="upgrade-gotosite">Continue to the I/O 2015 website</i18n-msg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+
+  function addDays(date, days) {
+    var result = new Date(date);
+    // The +1 is b/c the timer renders fractions of days based on an end date.
+    // Not adding it produces 403.95 days. We need 404.95 to render correctly.
+    result.setDate(date.getDate() + 1 + days);
+    return result;
+  }
+
+  // Page-specific JS that runs when this page is loaded for the first time.
+  function initPage() {
+    var today = new Date();
+    var daysInFuture500 = addDays(today, 404);
+
+    var countdown = document.querySelector('countdown-timer');
+    countdown.date = daysInFuture500;
+  }
+
+  initPage();
+
+})();
+</script>
+
+{% end %}

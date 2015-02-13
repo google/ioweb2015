@@ -55,6 +55,9 @@ $name: 'page-onsite';
       margin-right: $largeKeyline;
     }
   }
+  core-icon {
+    margin-right: 5px;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {

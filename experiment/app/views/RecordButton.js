@@ -123,8 +123,6 @@ module.exports = (function() {
     var animationTextures = makeRecordSprite();
 
     var currentFrame = 0;
-    renderer.updateTexture(animationTextures[0].baseTexture);
-
     var arcCircle = new PIXI.Sprite(animationTextures[currentFrame]);
 
     arcCircle.position.x = 0.15 * arcCircle.width / 2;
@@ -157,6 +155,8 @@ module.exports = (function() {
     var recordingCompleteText = retinaInlineSprite(recordingComplete);
     var textImages = [readyText, recordingText, recordingCompleteText];
 
+    renderer.updateTexture(animationTextures[0].baseTexture);
+
     for (let i = 0; i < textImages.length; i++) {
       let textImage = textImages[i];
       textImage.position.x = -205;
@@ -181,8 +181,6 @@ module.exports = (function() {
       container.addChild(numberImage);
       numberImagePixiObjects.push(numberImage);
     }
-
-    container.hitArea = circle;
 
     var self = {
       clearCircle,
@@ -257,6 +255,8 @@ module.exports = (function() {
      */
     function addEventListeners() {
       container.interactive = true;
+
+      container.hitArea = new PIXI.Rectangle(0, 0, circleTexture.width / 2, circleTexture.height / 2);
 
       container.click = container.tap = function() {
         if (!isCountdown) {

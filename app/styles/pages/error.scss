@@ -14,47 +14,56 @@
  * limitations under the License.
  */
 
-$name: 'page-faq';
 
-@import '../base/_layout';
+$name: 'page-error_404';
+
 @import '../base/_color';
 @import '../base/_breakpoints';
 
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $color-cyan-500;
+  overflow: auto;
+}
 
 ##{$name} {
 
-.page__section--copy {
-  h3 {
-    margin-bottom: $tabletKeyline;
-  }
-
-  h5 {
-    margin: $tabletKeyline 0 $mobileKeyline 0;
-  }
-}
-
-.card-content--top {
-  ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-
-    li {
-      line-height: 32px;
-    }
-  }
-  a {
-    font-size: 16px;
-  }
+countdown-timer {
+  width: 400px;
 }
 
 @media (max-width: $phone-breakpoint-max) {
-  .card-content--top > div {
-    margin-bottom: 24px;
+  .page__section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 
-    &:last-child {
-      margin-bottom: 0;
-    }
+}
+
+$name: 'page-error_500';
+
+@import '../base/_color';
+@import '../base/_breakpoints';
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $color-cyan-500;
+  overflow: auto;
+}
+
+##{$name} {
+
+countdown-timer {
+  width: 400px;
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  .page__section {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 

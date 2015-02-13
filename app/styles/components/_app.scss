@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-$hashWidth: 90px;
+$hashWidth: 83px;
 
 html, body {
   font-family: 'Helvetica', 'Arial', 'sans-serif';
@@ -154,6 +154,7 @@ h6 {
 }
 
 .navbar__overlay {
+  position: fixed !important;  // iOS
   font-size: 20px;
   font-weight: 500;
   background: rgba(0,0,0,0.5);
@@ -169,7 +170,7 @@ h6 {
 }
 
 .bg-globe {
-  /* background-image: url(../images/home/globe-1440.png);
+  background-image: url(../images/home/globe-1440.jpg);
   background-repeat: no-repeat;
   background-position: 50% 60px;
   background-size: 150%; */
@@ -194,13 +195,13 @@ h6 {
 .io__hash {
   margin: 40px auto;
   height: 120px;
-  background: url(../images/io15-hash-on-white.png) no-repeat 50% 50%;
+  background: url(../images/io15-hash-on-white-solid.png) no-repeat 50% 50%;
   background-size: contain;
 }
 
 .bg-cyan {
   .io__hash {
-    background-image: url(../images/io15-hash-on-blue.png);
+    background-image: url(../images/io15-hash-on-blue-solid.png);
   }
 }
 
@@ -209,13 +210,16 @@ h6 {
   margin: 60px 0 360px 0;
 
   countdown-timer {
-    width: 360px;
     height: 180px;
     max-width: 100%;
   }
 
   h4 {
     @include typo-button();
+
+    a {
+      color: inherit;
+    }
   }
 }
 
@@ -307,6 +311,9 @@ h6 {
   .io-countdown {
     margin: $desktopKeyline auto;
   }
+  .navbar__overlay {
+    font-size: 16px;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
@@ -327,7 +334,7 @@ h6 {
   }
   .io__hash {
     margin: 80px auto;
-    margin-left: -$hashWidth;
+    margin-left: -$hashWidth !important;
     height: 160px;
   }
   .bg-globe {
@@ -392,6 +399,6 @@ h6 {
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .bg-globe {
-    /* background-image: url(../images/home/globe-1440@2x.png); */
+    background-image: url(../images/home/globe-1440@2x.jpg);
   }
 }

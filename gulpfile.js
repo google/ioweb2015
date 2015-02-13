@@ -129,6 +129,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/clear_cache.html',
     APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
+    APP_DIR + '/styles/pages/error.css',
     APP_DIR + '/elements/**/images/*',
     APP_DIR + '/elements/webgl-globe/shaders/*.{frag,vert}',
     APP_DIR + '/elements/webgl-globe/textures/*.{jpg,png}',
@@ -147,6 +148,7 @@ gulp.task('copy-backend', ['backend:config'], function(cb) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
     BACKEND_DIR + '/*.yaml',
+    BACKEND_DIR + '/*.config',
     BACKEND_DIR + '/*.pem',
     BACKEND_DIR + '/whitelist'
   ], {base: './'})
@@ -158,7 +160,7 @@ gulp.task('copy-backend', ['backend:config'], function(cb) {
     // ../app <= dist/backend/app
     fs.symlinkSync('../' + APP_DIR, destBackend + '/' + APP_DIR);
     // create dist/backend/app.yaml from backend/app.yaml.template
-    generateAppYaml(destBackend, URL_PREFIX, cb);
+    generateGaeConfig(destBackend, URL_PREFIX, cb);
   });
 });
 
@@ -187,11 +189,11 @@ gulp.task('concat-and-uglify-js', ['js'], function() {
     'helper/util.js',
     'helper/page-animation.js',
     'helper/elements.js',
+    'helper/service-worker-registration.js',
     'helper/history.js',
     'helper/router.js',
     'helper/request.js',
     'helper/picasa.js',
-    'helper/service-worker-registration.js',
     'bootstrap.js'
   ].map(function(script) {
     return APP_DIR + '/scripts/' + script;
@@ -288,7 +290,7 @@ gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev'], functi
   var appEnv = process.env.APP_ENV || 'dev';
   var watchFiles = argv.watch !== false;
   var run = startGaeBackend.bind(null, BACKEND_DIR, appEnv, watchFiles, callback);
-  generateAppYaml(BACKEND_DIR, URL_PREFIX, run);
+  generateGaeConfig(BACKEND_DIR, URL_PREFIX, run);
 });
 
 // Serve build with GAE dev appserver. This is how it would look in production.
@@ -310,8 +312,8 @@ gulp.task('build-experiment', buildExperiment);
 gulp.task('copy-experiment-to-site', ['build-experiment'], function(cb) {
   gulp.src([
     EXPERIMENT_DIR + '/public/js/*.*',
-    EXPERIMENT_DIR + '/public/cataudiosprite.mp3',
-    EXPERIMENT_DIR + '/public/normalaudiosprite.mp3',
+    EXPERIMENT_DIR + '/public/*.mp3',
+    EXPERIMENT_DIR + '/public/*.mp4'
   ], {base: EXPERIMENT_DIR + '/public/' })
   .pipe(gulp.dest(DIST_EXPERIMENT_DIR))
   .on('end', cb);
@@ -320,8 +322,8 @@ gulp.task('copy-experiment-to-site', ['build-experiment'], function(cb) {
 // Build self-sufficient backend server binary w/o GAE support.
 gulp.task('backend', buildBackend);
 
-// Create config.yaml if one doesn't exist. Needed to run the server.
-gulp.task('backend:config', generateConfigYaml);
+// Create server config if one doesn't exist. Needed to run the server.
+gulp.task('backend:config', generateServerConfig);
 
 // Backend TDD: watch for changes and run tests in an infinite loop.
 gulp.task('backend:test', function(cb) {
@@ -362,7 +364,7 @@ gulp.task('godeps', function() {
 gulp.task('decrypt', function(done) {
   var files = [
     BACKEND_DIR + '/service-account.pem',
-    BACKEND_DIR + '/config.yaml'
+    BACKEND_DIR + '/server.config'
   ];
   var promises = files.map(function(f) {
     return new Promise(function(resolve, reject) {
@@ -429,7 +431,7 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
   };
 
   var serverAddr = 'localhost:' + (watchFiles ? '8080' : '3000');
-  var args = ['preview', 'app', 'run', backendDir + "/app.yaml", '--host', serverAddr];
+  var args = ['preview', 'app', 'run', backendDir, '--host', serverAddr];
 
   var backend = spawn('gcloud', args, {stdio: 'inherit'});
   if (!watchFiles) {
@@ -449,10 +451,14 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
 
 // Create app.yaml from a template in dest directory.
 // prefix is the app root URL prefix. Defaults to '/io2015'.
-function generateAppYaml(dest, prefix, callback) {
-  gulp.src(BACKEND_DIR + '/app.yaml.template', {base: BACKEND_DIR})
+function generateGaeConfig(dest, prefix, callback) {
+  var files = [
+    BACKEND_DIR + '/app.yaml.template',
+    BACKEND_DIR + '/cron.yaml.template'
+  ];
+  gulp.src(files, {base: BACKEND_DIR})
     .pipe($.replace(/\$PREFIX\$/g, prefix))
-    .pipe($.rename('app.yaml'))
+    .pipe($.rename({extname: ''}))
     .pipe(gulp.dest(dest))
     .on('end', callback);
 }
@@ -467,15 +473,15 @@ function changeAppYamlVersion(version, appYamlPath) {
   return fs.writeFileSync.bind(fs, appYamlPath, appYaml, null);
 }
 
-// Create dest/config.yaml if it doesn't exist already using config.yaml.template.
+// Create default server config if it doesn't exist already using the template.
 // Needed to start the server.
-function generateConfigYaml(callback) {
-  if (fs.existsSync(BACKEND_DIR + '/config.yaml')) {
+function generateServerConfig(callback) {
+  if (fs.existsSync(BACKEND_DIR + '/server.config')) {
     callback();
     return;
   }
-  gulp.src(BACKEND_DIR + '/config.yaml.template', {base: BACKEND_DIR})
-    .pipe($.rename('config.yaml'))
+  gulp.src(BACKEND_DIR + '/server.config.template', {base: BACKEND_DIR})
+    .pipe($.rename('server.config'))
     .pipe(gulp.dest(BACKEND_DIR))
     .on('end', callback);
 }

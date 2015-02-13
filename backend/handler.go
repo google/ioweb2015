@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -38,36 +38,65 @@ func handler(fn func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return h
 }
 
+// redirectHandler redirects from a /page path to /httpPrefix/page
+// It returns 404 Not Found error for any other requested asset.
+func redirectHandler(w http.ResponseWriter, r *http.Request) {
+	if ext := filepath.Ext(r.URL.Path); ext != "" {
+		code := http.StatusNotFound
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+	http.Redirect(w, r, path.Join(httpPrefix, r.URL.Path), http.StatusFound)
+}
+
 // serveTemplate responds with text/html content of the executed template
-// found under request base path.
-// 'home' template is assumed if request path ends with '/'.
+// found under the request path. 'home' template is used if the request path is /.
+// It also redirects requests with a trailing / to the same path w/o it.
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	c := newContext(r, w)
+	// redirect /page/ to /page unless it's homepage
+	if r.URL.Path != "/" && strings.HasSuffix(r.URL.Path, "/") {
+		trimmed := path.Join(httpPrefix, strings.TrimSuffix(r.URL.Path, "/"))
+		http.Redirect(w, r, trimmed, http.StatusFound)
+		return
+	}
 
 	r.ParseForm()
 	_, wantsPartial := r.Form["partial"]
 	_, experimentShare := r.Form["experiment"]
 
-	tplname := path.Base(r.URL.Path)
-	switch {
-	case tplname == "." || tplname == "/":
+	tplname := strings.TrimPrefix(r.URL.Path, "/")
+	if tplname == "" {
 		tplname = "home"
-	case strings.HasSuffix(tplname, ".html"):
-		tplname = tplname[:len(tplname)-5]
 	}
 
+	c := newContext(r, w)
 	data := &templateData{Env: env(c)}
 	if experimentShare {
 		data.Desc = descExperiment
 		data.OgImage = ogImageExperiment
 	}
-	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	w.Header().Set("Cache-Control", "public, max-age=300")
-	err := renderTemplate(c, tplname, wantsPartial, data)
 
-	if err != nil {
-		log.Printf("renderTemplate: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	w.Header().Set("Content-Type", "text/html;charset=utf-8")
+	b, err := renderTemplate(c, tplname, wantsPartial, data)
+	if err == nil {
+		w.Header().Set("Cache-Control", "public, max-age=300")
+		w.Write(b)
+		return
+	}
+
+	errorf(c, "renderTemplate(%q): %v", tplname, err)
+	switch err.(type) {
+	case *os.PathError:
+		w.WriteHeader(http.StatusNotFound)
+		tplname = "error_404"
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+		tplname = "error_500"
+	}
+	if b, err = renderTemplate(c, tplname, false, nil); err == nil {
+		w.Write(b)
+	} else {
+		errorf(c, "renderTemplate(%q): %v", tplname, err)
 	}
 }
 
@@ -90,20 +119,20 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 
 	entries, err := ioExtEntries(c, refresh)
 	if err != nil {
-		log.Printf("ioExtEntries: %v", err)
+		errorf(c, "ioExtEntries: %v", err)
 		writeJSONError(w, err)
 		return
 	}
 
 	body, err := json.Marshal(entries)
 	if err != nil {
-		log.Printf("json.Marshal: %v", err)
+		errorf(c, "json.Marshal: %v", err)
 		writeJSONError(w, err)
 		return
 	}
 
 	if _, err := w.Write(body); err != nil {
-		log.Printf("w.Write: %v", err)
+		errorf(c, "w.Write: %v", err)
 	}
 }
 
@@ -126,20 +155,20 @@ func serveSocial(w http.ResponseWriter, r *http.Request) {
 
 	entries, err := socialEntries(c, refresh)
 	if err != nil {
-		log.Printf("socialEntries: %v", err)
+		errorf(c, "socialEntries: %v", err)
 		writeJSONError(w, err)
 		return
 	}
 
 	body, err := json.Marshal(entries)
 	if err != nil {
-		log.Printf("json.Marshal: %v", err)
+		errorf(c, "json.Marshal: %v", err)
 		writeJSONError(w, err)
 		return
 	}
 
 	if _, err := w.Write(body); err != nil {
-		log.Printf("w.Write: %v", err)
+		errorf(c, "w.Write: %v", err)
 	}
 }
 

@@ -196,7 +196,7 @@
   },
   "share-text": {
     "description": "Social sharing pre-populated text.",
-    "message": "Google I/O 2015 brings together developers to explore the next generation of tech and mobile. Join us online or in person May 28-29, 2015."
+    "message": "#io15 brings together devs to explore the next generation of tech and mobile. Join us online or in person May 28-29: https://goo.gl/ZAXVLf"
   },
   "gplus-share": {
     "description": "Google plus share text",
@@ -312,7 +312,7 @@
   },
   "watch-keynote-and-sessions": {
     "description": "Offsite page. Invites users to watch the keynote and session videos.",
-    "message": "Watch the keynote and select sessions in real-time, from your laptop or mobile device."
+    "message": "I/O 2015 will be streamed live. Watch the keynote and select sessions in real time, from your laptop or mobile device. Join an I/O Extended event to watch with other developers and make a party of it."
   },
   "badge-pickup": {
     "description": "Schedule page. Users can pick up their badges.",
@@ -393,5 +393,13 @@
   "child-care": {
     "description": "FAQ page link header",
     "message": "Child Care"
+  },
+  "sorry-404": {
+    "message": "Sorry. We couldn't find that page :(",
+    "description": "404 not found page message"
+  },
+  "sorry-500": {
+    "message": "Oops! Something went wrong on our end :(",
+    "description": "500 error page message"
   }
 }

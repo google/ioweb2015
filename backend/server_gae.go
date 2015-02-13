@@ -44,7 +44,8 @@ func init() {
 	handle("/api/social", serveSocial)
 	// setup root redirect if we're prefixed
 	if httpPrefix != "/" {
-		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
+		redirect := http.HandlerFunc(redirectHandler)
+		http.Handle("/", wrapHandler(redirect))
 	}
 }
 
@@ -74,6 +75,13 @@ func isWhitelisted(email string) bool {
 	return whitemap[email[i:]]
 }
 
+// allowPassthrough returns true if the request r can be handled w/o whitelist check.
+func allowPassthrough(ac appengine.Context, r *http.Request) bool {
+	return appengineEnv(ac) == "prod" ||
+		r.Header.Get("X-AppEngine-Cron") == "true" ||
+		r.Header.Get("X-AppEngine-TaskName") != ""
+}
+
 // checkWhitelist checks whether the current user is allowed to access
 // handler h using isWhitelisted() func before handing over in-flight request.
 // It redirects to GAE login URL if no user found or responds with 403
@@ -81,7 +89,7 @@ func isWhitelisted(email string) bool {
 func checkWhitelist(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ac := appengine.NewContext(r)
-		if appengineEnv(ac) == "prod" {
+		if allowPassthrough(ac, r) {
 			h.ServeHTTP(w, r)
 			return
 		}
@@ -164,4 +172,14 @@ func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource
 // In this GAE-hosted version it uses appengine/urlfetch#Transport.
 func httpTransport(c context.Context) http.RoundTripper {
 	return &urlfetch.Transport{Context: appengineContext(c)}
+}
+
+// logf logs an info message using appengine's context.
+func logf(c context.Context, format string, args ...interface{}) {
+	appengineContext(c).Infof(format, args...)
+}
+
+// errorf logs an error message using appengine's context.
+func errorf(c context.Context, format string, args ...interface{}) {
+	appengineContext(c).Errorf(format, args...)
 }

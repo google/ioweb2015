@@ -104,33 +104,38 @@ IOWA.Router = (function() {
    * Navigates to a new page via ajax and page transitions.
    * @param {Event} e Event that triggered navigation.
    * @param {Element} el Element clicked.
+   * @param {String} currentPage Current page id.
+   * @param {String} nextPage Id of the page the user navigates to.
    * @private
    */
-  function handleAjaxLink(e, el) {
+  function handleAjaxLink(e, el, currentPage, nextPage) {
     e.preventDefault();
     e.stopPropagation();
 
     var template = IOWA.Elements.Template;
-
-    // We can get the full absolute path from the <a> element's pathname:
-    // http://stackoverflow.com/questions/736513
-    var pageName = parsePageNameFromAbsolutePath(el.pathname);
-    template.nextPage = pageName;
-
-    var page = template.selectedPage;
-    var bgClass = template.pages[pageName] &&
-                  template.pages[pageName].mastheadBgClass;
+    var bgClass = template.pages[nextPage] &&
+                  template.pages[nextPage].mastheadBgClass;
+    var prevBgClass = template.pages[currentPage].mastheadBgClass;
 
     template.navBgClass = bgClass;
-    var isFadeRipple = template.pages[page].mastheadBgClass === bgClass;
-    var mastheadColor = template.rippleColors[template.pages[page].mastheadBgClass];
+
+    var isFadeRipple = prevBgClass === bgClass;
+    var mastheadColor = template.rippleColors[prevBgClass];
     var rippleColor = isFadeRipple ? '#fff' : template.rippleColors[bgClass];
 
-    if (page !== pageName) {
+    if (currentPage !== nextPage) {
       IOWA.Elements.Template.fire('page-transition-start');
       if (el.hasAttribute('data-anim-ripple')) {
         currentPageTransition = 'masthead-ripple-transition';
-        playMastheadRippleTransition(e, el, mastheadColor, rippleColor, isFadeRipple);
+        playMastheadRippleTransition(
+            e, el, mastheadColor, rippleColor, isFadeRipple);
+      } else if (el.hasAttribute('data-anim-drawer'))  {
+        var handler = function(e) {
+          e.target.removeEventListener('core-transitionend', handler);
+          currentPageTransition = '';
+          IOWA.History.pushState({'path': el.pathname}, '', el.href);
+        };
+        el.parentNode.addEventListener('core-transitionend', handler);
       } else if (el.hasAttribute('data-anim-card'))  {
         currentPageTransition = 'hero-card-transition';
         playHeroTransition(e, el, rippleColor);
@@ -159,7 +164,7 @@ IOWA.Router = (function() {
     for (var i = 0; i < e.path.length; ++i) {
       var el = e.path[i];
       if (el.localName === 'a') {
-        var currentPage = IOWA.Elements.Template.selectedPage;
+        var currentPage = parsePageNameFromAbsolutePath(location.pathname);
         var nextPage = parsePageNameFromAbsolutePath(el.pathname);
 
         // First, record click event if link requests it.
@@ -183,7 +188,7 @@ IOWA.Router = (function() {
         // Do ajax page navigation if link requests it.
         if (el.hasAttribute('data-ajax-link')) {
           runPageHandler('unload', currentPage);
-          handleAjaxLink(e, el);
+          handleAjaxLink(e, el, currentPage, nextPage);
         } else {
           currentPageTransition = 'no-transition';
         }
@@ -211,13 +216,12 @@ IOWA.Router = (function() {
       // FF doesn't execute the <script> inside the main content <template>
       // (inside page partial import). Instead, the first time the partial is
       // loaded, find any script tags in and make them runnable by appending them back to the template.
-      if (IOWA.Util.isFF()) {
+      if (IOWA.Util.isFF() || IOWA.Util.isIE()) {
         var contentTemplate = document.querySelector(
            '#template-' + pageName + '-content');
         if (!contentTemplate) {
           var containerTemplate = htmlImport.import.querySelector(
               '[data-ajax-target-template="template-content-container"]');
-
           var scripts = containerTemplate.content.querySelectorAll('script');
           Array.prototype.forEach.call(scripts, function(node, i) {
             replaceScriptTagWithRunnableScript(node);
@@ -237,9 +241,17 @@ IOWA.Router = (function() {
    * @private
    */
   function replaceScriptTagWithRunnableScript(node) {
-    var script  = document.createElement('script');
-    script.text = node.innerHTML;
-    node.parentNode.replaceChild(script, node);
+    var script = document.createElement('script');
+    script.text = node.text || node.textContent || node.innerHTML;
+
+    // IE doesn't execute the script when it's appended to the middle
+    // of the DOM. Append it to body instead, then remove.
+    if (IOWA.Util.isIE()) {
+      document.body.appendChild(script);
+      document.body.removeChild(script);
+    } else {
+      node.parentNode.replaceChild(script, node); // FF
+    }
   }
 
   /**
@@ -265,56 +277,61 @@ IOWA.Router = (function() {
    */
   function updatePageElements(pageName, currentPageTemplates) {
     replaceTemplateContent(currentPageTemplates);
+
     var template = IOWA.Elements.Template;
-    var previousPageMeta = template.pages[template.selectedPage];
+
+    // Update menu/drawer selected item.
     template.selectedPage = pageName;
+    IOWA.Elements.DrawerMenu.selected = pageName;
+
     var currentPageMeta = template.pages[pageName];
     document.body.id = 'page-' + pageName;
     document.title = currentPageMeta.title || 'Google I/O 2015';
 
-    var previousMastheadColor = (template.rippleColors[
-        previousPageMeta.mastheadBgClass]);
-    var currentMastheadColor = (template.rippleColors[
-        currentPageMeta.mastheadBgClass]);
-    var mastheadBgClass = template.pages[pageName].mastheadBgClass;
+    var previousPageMeta = template.pages[template.selectedPage];
+    var previousMastheadColor = template.rippleColors[previousPageMeta.mastheadBgClass];
+    var currentMastheadColor = template.rippleColors[currentPageMeta.mastheadBgClass];
 
     // Prepare the page for a smooth masthead transition.
+    var mastheadBgClass = currentPageMeta.mastheadBgClass;
     template.navBgClass = mastheadBgClass;
     // This cannot be updated via data binding, because the masthead
     // is visible before the binding happens.
     IOWA.Elements.Masthead.className = IOWA.Elements.Masthead.className.replace(
         MASTHEAD_BG_CLASS_REGEX, ' ' + mastheadBgClass + ' ');
-    var duration = currentPageTransition ? 0 : 300;
-    var mastheadAnim = new Animation(IOWA.Elements.Masthead, [
-          {backgroundColor: previousMastheadColor},
-          {backgroundColor: currentMastheadColor}
-        ], {
-          duration: duration,
-          fill: 'forwards'
-      });
-    IOWA.PageAnimation.play(mastheadAnim);
+
+    // Transition masthead color.
+    IOWA.PageAnimation.play(new Animation(IOWA.Elements.Masthead, [
+      {backgroundColor: previousMastheadColor},
+      {backgroundColor: currentMastheadColor}
+    ], {
+      duration: currentPageTransition ? 0 : 300,
+      fill: 'forwards'
+    }));
+
     // Hide the masthead ripple before proceeding with page transition.
     IOWA.PageAnimation.play(
-      IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
+        IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
 
     // Scroll to top of new page.
     IOWA.Elements.ScrollContainer.scrollTop = 0;
 
-    setTimeout(function() {
+    // Wait 1 rAF for DOM to settle.
+    IOWA.Elements.Template.async(function() {
+      var animationFunc;
       if (currentPageTransition === 'hero-card-transition') {
-        IOWA.PageAnimation.play(IOWA.PageAnimation.pageCardTakeoverIn(), function() {
-          IOWA.Elements.Template.fire('page-transition-done');
-        });
+        animationFunc = IOWA.PageAnimation.pageCardTakeoverIn;
       } else {
-        IOWA.PageAnimation.play(IOWA.PageAnimation.pageSlideIn(), function() {
-          // Fire event when the page transitions are final.
-          IOWA.Elements.Template.fire('page-transition-done');
-        });
+        animationFunc = IOWA.PageAnimation.pageSlideIn;
       }
+
+      IOWA.PageAnimation.play(animationFunc(), function() {
+        // Fire event when the page transitions are final.
+        IOWA.Elements.Template.fire('page-transition-done');
+      });
+
       currentPageTransition = '';
-    }, 100); // Wait for the... Good question. Maybe template binding?
-    // TODO: BUG: Anyways, something to investigate. Web Animations
-    // are not working properly without this delay (Chrome crashes).
+    });
   }
 
   /**
@@ -403,7 +420,9 @@ IOWA.Router = (function() {
       if (e.state && e.state.fromHashChange && nextPage === currentPage) {
         return;
       }
-
+      document.title = (IOWA.Elements.Template.pages[nextPage].title ||
+          'Google I/O 2015');
+      IOWA.Analytics.trackPageView(e.state && e.state.path);
       renderCurrentPage();
     });
 

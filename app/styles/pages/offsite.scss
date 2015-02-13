@@ -92,7 +92,7 @@ google-youtube {
   .card__photo--stage {
     height: 900px;
     position: relative;
-    margin-top: -29px;
+    margin-top: -45px;
     margin-bottom: -226px;
   }
   .play__button__container {
@@ -127,18 +127,18 @@ google-youtube {
 
 @media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
   .card__photo--stage {
-    margin-top: -53px;
+    margin-top: -77px;
   }
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
-   $marginTop: 180px;
+   $marginTop: 100px;
 
   .card__photo--stage {
-    margin-top: -33px;
+    margin-top: -57px;
   }
   .page__section--attend {
-    margin-top: -90px;
+    margin-top: -36px;
     padding-top: $marginTop;
     background-size: cover;
     background-position: 50% 140px;
@@ -155,12 +155,18 @@ google-youtube {
 }
 
 @media (min-width: $desktop-breakpoint-max) {
+  $marginTop: 180px;
   .page__section--attend {
+    padding-top: $marginTop;
     margin-top: -108px;
+
+    .action__links {
+      top: $marginTop;
+    }
   }
   .card__photo--stage {
-    margin-top: -33px;
-    margin-bottom: -176px;
+    margin-top: -57px;
+    margin-bottom: -154px;
   }
 }
 

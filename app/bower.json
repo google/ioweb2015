@@ -36,7 +36,7 @@
     "core-toolbar": "Polymer/core-toolbar#^0.5.4",
     "core-tooltip": "Polymer/core-tooltip#^0.5.4",
     "google-apis": "GoogleWebComponents/google-apis#^0.4.3",
-    "google-youtube": "GoogleWebComponents/google-youtube#^1.0.3",
+    "google-youtube": "GoogleWebComponents/google-youtube#^1.0.4",
     "google-map": "GoogleWebComponents/google-map#^0.4.1",
     "i18n-msg": "ebidel/i18n-msg#^0.0.2",
     "paper-button": "Polymer/paper-button#^0.5.4",

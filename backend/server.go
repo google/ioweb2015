@@ -59,10 +59,15 @@ func main() {
 	handle("/api/social", serveSocial)
 	// setup root redirect if we're prefixed
 	if httpPrefix != "/" {
-		http.Handle("/", http.RedirectHandler(httpPrefix, http.StatusFound))
+		redirect := http.HandlerFunc(redirectHandler)
+		http.Handle("/", wrapHandler(redirect))
 	}
 
-	log.Fatal(http.ListenAndServe(listenAddr, nil))
+	if err := http.ListenAndServe(listenAddr, nil); err != nil {
+		// don't need context here
+		errorf(nil, "%v", err)
+		os.Exit(1)
+	}
 }
 
 // catchAllHandler serves either static content from rootDir
@@ -86,7 +91,8 @@ func catchAllHandler(w http.ResponseWriter, r *http.Request) {
 // logHandler logs each request before handing it over to the handler h.
 func logHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s", r.Method, r.URL.Path)
+		// don't need context in standalone server
+		logf(nil, "%s %s", r.Method, r.URL.Path)
 		h.ServeHTTP(w, r)
 	})
 }
@@ -119,4 +125,14 @@ func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource
 // In this standalone version it simply returns http.DefaultTransport.
 func httpTransport(c context.Context) http.RoundTripper {
 	return http.DefaultTransport
+}
+
+// logf logs an info message using Go's standard log package.
+func logf(_ context.Context, format string, args ...interface{}) {
+	log.Printf(format, args...)
+}
+
+// errorf logs an error message using Go's standard log package.
+func errorf(_ context.Context, format string, args ...interface{}) {
+	log.Printf("ERROR: "+format, args...)
 }

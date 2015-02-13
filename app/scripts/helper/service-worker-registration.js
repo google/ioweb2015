@@ -53,7 +53,7 @@ IOWA.ServiceWorkerRegistration = (function() {
                     IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest content.',
                       tapHandler);
                   } else {
-                    IOWA.Elements.Toast.showMessage('Caching complete. This site is ready to work offline!');
+                    IOWA.Elements.Toast.showMessage('Caching complete! Future visits will work offline.');
                   }
                   break;
 
@@ -69,6 +69,15 @@ IOWA.ServiceWorkerRegistration = (function() {
       }
     }
   };
+
+  // If we're already controlled by a service worker, then register as early as possible to get
+  // updates about a new service worker installation. This makes it more likely that we'll be able
+  // to detect when there's new content available and display the toast.
+  // TODO (jeffposnick): There is still a potential race condition if the browser has already
+  // detected the updated Service Worker before this code runs.
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    register();
+  }
 
   return {
     register: register

@@ -17,7 +17,8 @@ app/experiment
 # backend stuff, keys
 backend/bin
 backend/app.yaml
-backend/config.yaml
+backend/cron.yaml
+backend/*.config
 *.pem
 
 # Other generated/common stuff.

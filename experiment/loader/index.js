@@ -2,7 +2,7 @@ window.experiment = (function() {
   'use strict';
 
   var assetPath = require('app/util/assetPath');
-  var animatedImg = require('url?limit=10000!loader/images/experiment-fab-animation.gif');
+  var animatedImg = require('url?limit=20000!loader/images/experiment-fab-animation.gif');
   var exitExpImg = require('url?limit=10000!loader/images/exit-experiment.png');
   var pauseExpImg = require('url?limit=10000!loader/images/pause-experiment.png');
   var playExpImg = require('url?limit=10000!loader/images/play-experiment.png');
@@ -66,6 +66,7 @@ window.experiment = (function() {
       }, timeoutDuration);
 
       var scr = document.createElement('script');
+      scr.addEventListener('error', rejector);
       scr.setAttribute('async', 'true');
       scr.type = 'text/javascript';
       scr.src = assetPath('/js/experiment.js');
@@ -81,6 +82,7 @@ window.experiment = (function() {
     }
 
     appSingleton = app;
+
     if (resolver) {
       resolver(app);
     }
@@ -110,6 +112,10 @@ window.experiment = (function() {
     return appSingleton && appSingleton.didEnterRecordingMode(cb);
   }
 
+  function consoleDance() {
+    return appSingleton && appSingleton.consoleDance();
+  }
+
   return {
     assets: {
       animatedImg,
@@ -130,6 +136,7 @@ window.experiment = (function() {
     tearDown,
     serialize,
     pause,
-    play
+    play,
+    consoleDance
   };
 })();

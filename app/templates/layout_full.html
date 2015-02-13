@@ -11,13 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% safeHTML "-->" %}
 <!doctype html>
-<html lang="en">
+<html lang="en" itemscope itemtype="http://schema.org/Event">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="description" content="{% .Desc %}">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1">
-  <title>{% .Title %}</title>
+  <meta name="google-site-verification" content="AdXcVeRpEoy56o6g9c0lls3IiAATCVtB45HWJFwZmsM" />
+  <title>{% template "title" .%}</title>
 
   <!-- See http://updates.html5rocks.com/2014/11/Support-for-installable-web-apps-with-webapp-manifest-in-chrome-38-for-Android -->
   <link rel="manifest" href="manifest.json">
@@ -46,41 +47,29 @@ limitations under the License.
   <meta name="msapplication-TileColor" content="#eceff1">
   <meta name="msapplication-tap-highlight" content="no">
 
-  <!-- G+ and Twitter sharing meta data -->
+  <!-- G+ sharing meta data -->
+  <meta itemprop="name" content="{% .Title %}">
+  <meta itemprop="description" content="{% .Desc %}">
+  <meta itemprop="image" content="/io2015/images/{% .OgImage %}">
+  <!-- May 28 9am PDT through May 29 5pm PDT -->
+  <meta itemprop="startDate" content="2015-05-28T16:00:00Z">
+  <meta itemprop="endDate" content="2015-05-30T00:00:00Z">
+
+  <!-- Facebook sharing meta data -->
   <meta property="og:title" content="{% .Title %}">
+  <meta property="og:site_name" content="Google I/O 2015">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/io2015">
   <meta property="og:description" content="{% .Desc %}">
   <meta property="og:type" content="Event">
-  <meta property="og:image" content="images/{% .OgImage %}">
+  <meta property="og:image" content="/io2015/images/{% .OgImage %}">
 
+  <!-- Twitter meta data -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@googledevs">
   <meta name="twitter:title" content="{% .Title %}">
   <meta name="twitter:description" content="{% .Desc %}">
-  <meta name="twitter:image:src" content="images/{% .OgImage %}">
-
-  <script type="application/ld+json">
-    {
-      "@context": "http://schema.org",
-      "@type": "Event",
-      "name": "Google I/O 2015",
-      "url": ".?utm_source=schema_org_event",
-      "image": "images/io15-color.png",
-      "location": {
-        "@type": "Place",
-        "name": "Moscone Center West",
-        "address": {
-          "@type" : "PostalAddress",
-          "streetAddress" : "747 Howard Street",
-          "addressLocality" : "San Francisco",
-          "addressRegion" : "CA",
-          "postalCode" : "94103",
-          "addressCountry" : "US"
-        }
-      },
-      "startDate": "2015-05-28T09:00",
-      "endDate": "2015-05-29T04:00"
-    }
-  </script>
+  <meta name="twitter:image:src" content="/io2015/images/{% .OgImage %}">
 
   <!-- Unsupported browser checks need to come before webcomponents.js is loaded,
        otherwise unsupported browsers will error out and not record a pageview.
@@ -195,34 +184,34 @@ limitations under the License.
       </div>
     </core-toolbar>
     <div class="drawer-panel-content" flex>
-      <core-menu>
-        <paper-item>
-          <a href="./" data-ajax-link data-track-link="nav-drawer-home">
+      <core-menu id="drawer-menu" selected="{% .Slug %}" valueattr="label">
+        <paper-item label="home">
+          <a href="./" data-ajax-link data-anim-drawer data-track-link="nav-drawer-home">
             <i18n-msg msgid="home">Home</i18n-msg>
           </a>
         </paper-item>
-        <paper-item>
-          <a href="about" data-ajax-link data-track-link="nav-drawer-about">
+        <paper-item label="about">
+          <a href="about" data-ajax-link data-anim-drawer data-track-link="nav-drawer-about">
             <i18n-msg msgid="about">About</i18n-msg>
           </a>
         </paper-item>
-        <paper-item>
-          <a href="schedule" data-ajax-link data-track-link="nav-drawer-schedule">
+        <paper-item label="schedule">
+          <a href="schedule" data-ajax-link data-anim-drawer data-track-link="nav-drawer-schedule">
             <i18n-msg msgid="schedule">Schedule</i18n-msg>
           </a>
         </paper-item>
-        <paper-item>
-          <a href="onsite" data-ajax-link data-track-link="nav-drawer-onsite">
+        <paper-item label="onsite">
+          <a href="onsite" data-ajax-link data-anim-drawer data-track-link="nav-drawer-onsite">
             <i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg>
           </a>
         </paper-item>
-        <paper-item>
-          <a href="offsite" data-ajax-link data-track-link="nav-drawer-offsite">
+        <paper-item label="offsite">
+          <a href="offsite" data-ajax-link data-anim-drawer data-track-link="nav-drawer-offsite">
             <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
           </a>
         </paper-item>
-        <paper-item>
-          <a href="registration" data-ajax-link data-track-link="nav-drawer-registration">
+        <paper-item label="registration">
+          <a href="registration" data-ajax-link  data-anim-drawer data-track-link="nav-drawer-registration">
             <i18n-msg msgid="registration">Registration</i18n-msg>
           </a>
         </paper-item>
@@ -297,7 +286,7 @@ limitations under the License.
 
       <footer layout vertical>
 
-        <i18n-msg id="share-text" msgid="share-text" hidden>Google I/O 2015 brings together developers to explore the next generation of tech and mobile. Join us online or in person May 28-29, 2015.</i18n-msg>
+        <i18n-msg id="share-text" msgid="share-text" hidden>#io15 brings together devs to explore the next generation of tech and mobile. Join us online or in person May 28-29: https://goo.gl/ZAXVLf</i18n-msg>
 
         <div layout horizontal justified class="footer-top">
           <span class="footer-share-links--top">
@@ -343,22 +332,33 @@ limitations under the License.
 <script src="scripts/helper/util.js"></script>
 <script src="scripts/helper/page-animation.js"></script>
 <script src="scripts/helper/elements.js"></script>
+<script src="scripts/helper/service-worker-registration.js"></script>
 <script src="scripts/helper/history.js"></script>
 <script src="scripts/helper/router.js"></script>
 <script src="scripts/helper/request.js"></script>
 <script src="scripts/helper/picasa.js"></script>
-<script src="scripts/helper/service-worker-registration.js"></script>
 <script src="scripts/bootstrap.js"></script>
 <!-- endbuild -->
 <script>
 (function() {
+
+  // Necessary for IE's lack of native <template>
+  // https://github.com/GoogleChrome/ioweb2015/issues/599
+  function init() {
+    if (typeof window._initPage == 'function') {
+      window._initPage();
+      window._initPage = null;
+    }
+  }
 
   function afterImports() {
     //'import' in document.createElement('link')
     if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
       IOWA.Elements.Template.pages[{% .Slug %}] = {};
     }
-    IOWA.Elements.Template.pages[{% .Slug %}].title = {% template "title" .%};
+    IOWA.Elements.Template.pages[{% .Slug %}].title = "{% template "title" .%}";
+
+    init();
   }
 
   if (IOWA.Util.supportsHTMLImports) {

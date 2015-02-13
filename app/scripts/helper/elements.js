@@ -20,8 +20,6 @@ IOWA.Elements = (function() {
   var updateElements = function() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function() {
-      IOWA.ServiceWorkerRegistration.register();
-
       var optionallyLaunchExperiment = function() {
         if (window.location.search.indexOf('experiment') > -1) {
           IOWA.Elements.FAB.onFabClick();
@@ -33,6 +31,7 @@ IOWA.Elements = (function() {
         IOWA.Elements.Template.fire('page-transition-done');
 
         optionallyLaunchExperiment();
+        IOWA.ServiceWorkerRegistration.register();
       });
     });
 
@@ -48,6 +47,7 @@ IOWA.Elements = (function() {
     var ioLogoLarge = masthead.querySelector('.io-logo.large');
     var nav = masthead.querySelector('#navbar');
     var navPaperTabs = nav.querySelector('paper-tabs');
+    var drawerMenu = document.getElementById('drawer-menu');
     var fab = masthead.querySelector('experiment-fab-container');
     var footer = document.querySelector('footer');
     var toast = document.getElementById('toast');
@@ -62,6 +62,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.MastheadMeta = mastheadMeta;
     IOWA.Elements.Main = main;
     IOWA.Elements.Nav = nav;
+    IOWA.Elements.DrawerMenu = drawerMenu;
     IOWA.Elements.NavPaperTabs = navPaperTabs;
     IOWA.Elements.Ripple = ripple;
     IOWA.Elements.FAB = fab;
@@ -88,36 +89,44 @@ IOWA.Elements = (function() {
     template.pages = {
       'faq': {
         mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'FAQ'
       },
       'form': {
         mastheadBgClass: 'bg-dark-grey',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: '2015 I/O Extended event'
       },
       'schedule': {
         mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Schedule'
       },
       'home': {
         mastheadBgClass: 'bg-medium-grey',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Google I/O'
       },
       'about': {
         mastheadBgClass: 'bg-dark-grey',
         hasBeenLoaded: false,
-        galleryOpen: false
+        galleryOpen: false,
+        title: 'About I/O'
       },
       'onsite': {
         mastheadBgClass: 'bg-dark-grey',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Attend onsite'
       },
       'offsite': {
         mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Attend offsite'
       },
       'registration': {
         mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false
+        hasBeenLoaded: false,
+        title: 'Registration'
       }
     };
 
@@ -275,9 +284,8 @@ IOWA.Elements = (function() {
           height = 253;
           var el = document.getElementById('share-text');
 
-          url = 'https://twitter.com/share?text=' +
-                encodeURIComponent(el.textContent || 'Google I/O 2015') +
-                '&url=' + encodeURIComponent(location.href);
+          url = 'https://twitter.com/intent/tweet?text=' +
+                encodeURIComponent(el.textContent || 'Google I/O 2015');
           break;
 
         default:
