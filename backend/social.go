@@ -16,12 +16,8 @@ const (
 	// socialCacheTimeout is how long until social entries are expired.
 	socialCacheTimeout = 10 * time.Minute
 
-	// tweetTextFilter is used to filter out unrelated tweets.
-	tweetTextFilter = "#io15"
-	// tweetURL A single tweet URL format.
+	// tweetURL is a single tweet URL format.
 	tweetURL = "https://twitter.com/%s/status/%v"
-	// twitterUserTimelineURL is the Twitter API endpoint.
-	twitterUserTimelineURL = "https://api.twitter.com/1.1/statuses/user_timeline.json"
 )
 
 // socEntry is an item of the response from /api/social.
@@ -95,7 +91,7 @@ func fetchTweets(c context.Context, account string, tc chan *tweetEntry) {
 		"count":       {"200"},
 		"include_rts": {"true"},
 	}
-	url := twitterUserTimelineURL + "?" + params.Encode()
+	url := config.Twitter.TimelineURL + "?" + params.Encode()
 	req, nil := http.NewRequest("GET", url, nil)
 	if nil != nil {
 		errorf(c, "fetchTweets: NewRequest(%q): %v", url, err)
@@ -123,9 +119,9 @@ func fetchTweets(c context.Context, account string, tc chan *tweetEntry) {
 		errorf(c, "fetchTweets: %v", err)
 	}
 
-	lenFilter := len(tweetTextFilter)
+	lenFilter := len(config.Twitter.Filter)
 	for _, t := range tweets {
-		i := strings.Index(t.Text, tweetTextFilter)
+		i := strings.Index(t.Text, config.Twitter.Filter)
 		if i < 0 {
 			continue
 		}

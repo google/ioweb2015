@@ -1,8 +1,29 @@
 {
+  "env": "dev",
+  "dir": "app",
+  "addr": "127.0.0.1:8080",
+  "prefix": "/io2015",
+  "ioExtFeedUrl": "https://spreadsheets.google.com/feeds/list/SHEET/WORKSHEET/private/full",
+  "google": {
+    "tokenUrl": "https://accounts.google.com/o/oauth2/token",
+    "serviceAccount": {
+      "private_key_id": "ignored",
+      "private_key": "-----BEGIN PRIVATE KEY----- content -----END PRIVATE KEY-----\n",
+      "client_email": "example@developer.gserviceaccount.com",
+      "client_id": "example.apps.googleusercontent.com",
+      "type": "service_account"
+    }
+  },
   "twitter": {
     "account": "googledevs",
+    "filter": "#io15",
     "key": "an-app-key",
-    "secret": "very-secret"
-  }
+    "secret": "very-secret",
+    "tokenUrl": "https://api.twitter.com/oauth2/token",
+    "timelineUrl": "https://api.twitter.com/1.1/statuses/user_timeline.json"
+  },
+  "whitelist": [
+    "@google.com"
+  ]
 }
 

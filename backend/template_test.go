@@ -9,10 +9,6 @@ import (
 	"testing"
 )
 
-func init() {
-	rootDir = "app"
-}
-
 func TestRenderTemplate(t *testing.T) {
 	table := []*struct {
 		tmpl    string
@@ -33,10 +29,8 @@ func TestRenderTemplate(t *testing.T) {
 }
 
 func TestRenderEnv(t *testing.T) {
-	e := appEnv
-	appEnv = "prod"
-	defer func() { appEnv = e }()
-
+	revert := overrideEnv("prod")
+	defer revert()
 	req, _ := http.NewRequest("GET", "/about", nil)
 	c := newContext(req, new(bytes.Buffer))
 

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"log"
 	"math"
 	"time"
@@ -11,16 +10,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-const (
-	// scopeSpreadsheetFeeds is OAuth Google Spreadsheet Feeds scope
-	scopeSpreadsheetFeeds = "https://spreadsheets.google.com/feeds"
-	// sheetListFeed is the GData Spreadsheet List Feed URL format v3.0
-	sheetListFeed = "https://spreadsheets.google.com/feeds/list/%s/private/full"
-	// ioExtSheet is a sheet_key/worksheet_id of I/O extended Google Sheet.
-	ioExtSheet = "1C5_yRUvHCwZEWiNZl1fjdM9-t9HFw0MpNDRyIseji5I/od6"
-	// cacheKeyIOExtended is a cache key for the feed entries
-	cacheKeyIOExtended = "ioExtXMLFeed"
-)
+const spreadsheetAuthScope = "https://spreadsheets.google.com/feeds"
 
 // extFeed is the root element of a Google Sheet feed.
 type extFeed struct {
@@ -40,14 +30,15 @@ type extEntry struct {
 // ioExtEntries fetches I/O Extended items either from cache or a spreadsheet.
 // Cache can be invalidated by providing refresh = true.
 func ioExtEntries(c context.Context, refresh bool) ([]*extEntry, error) {
+	feedURL := config.IoExtFeedURL
 	if !refresh {
-		entries, err := ioExtEntriesFromCache(c, cacheKeyIOExtended)
+		entries, err := ioExtEntriesFromCache(c, feedURL)
 		if err == nil {
 			return entries, nil
 		}
 	}
 
-	entries, err := fetchIOExtEntries(c, ioExtSheet)
+	entries, err := fetchIOExtEntries(c, feedURL)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +46,8 @@ func ioExtEntries(c context.Context, refresh bool) ([]*extEntry, error) {
 	data, err := json.Marshal(entries)
 	if err != nil {
 		errorf(c, "ioExtEntries: %v", err)
-	} else if err := cache.set(c, cacheKeyIOExtended, data, 2*time.Hour); err != nil {
-		errorf(c, "ioExtEntries: cache.put(%q): %v", cacheKeyIOExtended, err)
+	} else if err := cache.set(c, feedURL, data, 2*time.Hour); err != nil {
+		errorf(c, "ioExtEntries: cache.put(%q): %v", feedURL, err)
 	}
 
 	return entries, nil
@@ -75,14 +66,13 @@ func ioExtEntriesFromCache(c context.Context, key string) ([]*extEntry, error) {
 }
 
 // ioExtEntriesFromCache is the same as ioExtEntries but uses only Spreadsheet API, no cache.
-// sheet argument must be in "sheet_key/worksheet_id" format.
-func fetchIOExtEntries(c context.Context, sheet string) ([]*extEntry, error) {
-	hc, err := serviceAccountClient(c, scopeSpreadsheetFeeds)
+// url arg is a Spreadsheet List Feed url.
+func fetchIOExtEntries(c context.Context, url string) ([]*extEntry, error) {
+	hc, err := serviceAccountClient(c, spreadsheetAuthScope)
 	if err != nil {
 		return nil, err
 	}
 
-	url := fmt.Sprintf(sheetListFeed, sheet)
 	resp, err := hc.Get(url)
 	if err != nil {
 		return nil, err

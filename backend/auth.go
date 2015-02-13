@@ -14,16 +14,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const (
-	// serviceAccountEmail is the identity of the backend app.
-	serviceAccountEmail = "835117351912-gntnm0o6adtmk2j65tn9btku18a33ai3@developer.gserviceaccount.com"
-
-	// googleTokenURL is a Google OAuth2 endpoint for both Bearer and JWT tokens.
-	googleTokenURL = "https://accounts.google.com/o/oauth2/token"
-	// twitterTokenURL is a Twitter endpoint for App Authentication (OAuth2).
-	twitterTokenURL = "https://api.twitter.com/oauth2/token"
-)
-
 // twitterCredentials implements oauth2.TokenSource for Twitter App authentication.
 type twitterCredentials struct {
 	key, secret string
@@ -40,7 +30,7 @@ func (t *twitterCredentials) Token() (*oauth2.Token, error) {
 	basic = base64.StdEncoding.EncodeToString([]byte(basic))
 
 	params := url.Values{"grant_type": {"client_credentials"}}
-	req, _ := http.NewRequest("POST", twitterTokenURL, strings.NewReader(params.Encode()))
+	req, _ := http.NewRequest("POST", config.Twitter.TokenURL, strings.NewReader(params.Encode()))
 	req.Header.Set("Authorization", "Basic "+basic)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -70,12 +60,15 @@ func (t *twitterCredentials) Token() (*oauth2.Token, error) {
 	return &oauth2.Token{AccessToken: token.AccessToken}, nil
 }
 
-// oauth2Transport returns an HTTP transport suitable for making OAuth2-ed requests.
-func oauth2Transport(c context.Context, s oauth2.TokenSource) http.RoundTripper {
-	return &oauth2.Transport{
-		Source: s,
-		Base:   httpTransport(c),
+// twitterClient creates a new HTTP client with oauth2Transport.
+func twitterClient(c context.Context) (*http.Client, error) {
+	cred := &twitterCredentials{
+		key:       config.Twitter.Key,
+		secret:    config.Twitter.Secret,
+		transport: httpTransport(c),
+		cache:     cache,
 	}
+	return &http.Client{Transport: oauth2Transport(c, cred)}, nil
 }
 
 // serviceAccountClient creates a new HTTP client with an access token
@@ -88,13 +81,10 @@ func serviceAccountClient(c context.Context, scopes ...string) (*http.Client, er
 	return &http.Client{Transport: oauth2Transport(c, cred)}, nil
 }
 
-// twitterClient creates a new HTTP client with oauth2Transport.
-func twitterClient(c context.Context) (*http.Client, error) {
-	cred := &twitterCredentials{
-		key:       config.Twitter.Key,
-		secret:    config.Twitter.Secret,
-		transport: httpTransport(c),
-		cache:     cache,
+// oauth2Transport returns an HTTP transport suitable for making OAuth2-ed requests.
+func oauth2Transport(c context.Context, s oauth2.TokenSource) http.RoundTripper {
+	return &oauth2.Transport{
+		Source: s,
+		Base:   httpTransport(c),
 	}
-	return &http.Client{Transport: oauth2Transport(c, cred)}, nil
 }

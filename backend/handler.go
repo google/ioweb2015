@@ -3,12 +3,29 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/net/context"
 )
+
+// ctxKey is a custom type for context.Context values.
+type ctxKey int
+
+const (
+	ctxKeyWriter ctxKey = iota
+	ctxKeyGAEContext
+)
+
+// writer returns a response writer associated with the give context c.
+func writer(c context.Context) io.Writer {
+	w, _ := c.Value(ctxKeyWriter).(io.Writer)
+	return w
+}
 
 // wrapHandler is the last in a handler chain call,
 // which wraps all app handlers.
@@ -18,7 +35,7 @@ var wrapHandler func(http.Handler) http.Handler
 // handle registers a handle function fn for the pattern prefixed
 // with httpPrefix.
 func handle(pattern string, fn func(w http.ResponseWriter, r *http.Request)) {
-	p := path.Join(httpPrefix, pattern)
+	p := path.Join(config.Prefix, pattern)
 	if pattern[len(pattern)-1] == '/' {
 		p += "/"
 	}
@@ -29,8 +46,8 @@ func handle(pattern string, fn func(w http.ResponseWriter, r *http.Request)) {
 // and wrapped with wrapHandler.
 func handler(fn func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	var h http.Handler = http.HandlerFunc(fn)
-	if httpPrefix != "/" {
-		h = http.StripPrefix(httpPrefix, h)
+	if config.Prefix != "/" {
+		h = http.StripPrefix(config.Prefix, h)
 	}
 	if wrapHandler != nil {
 		h = wrapHandler(h)
@@ -46,7 +63,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(code), code)
 		return
 	}
-	http.Redirect(w, r, path.Join(httpPrefix, r.URL.Path), http.StatusFound)
+	http.Redirect(w, r, path.Join(config.Prefix, r.URL.Path), http.StatusFound)
 }
 
 // serveTemplate responds with text/html content of the executed template
@@ -55,11 +72,12 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	// redirect /page/ to /page unless it's homepage
 	if r.URL.Path != "/" && strings.HasSuffix(r.URL.Path, "/") {
-		trimmed := path.Join(httpPrefix, strings.TrimSuffix(r.URL.Path, "/"))
+		trimmed := path.Join(config.Prefix, strings.TrimSuffix(r.URL.Path, "/"))
 		http.Redirect(w, r, trimmed, http.StatusFound)
 		return
 	}
 
+	c := newContext(r, w)
 	r.ParseForm()
 	_, wantsPartial := r.Form["partial"]
 	_, experimentShare := r.Form["experiment"]
@@ -69,8 +87,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		tplname = "home"
 	}
 
-	c := newContext(r, w)
-	data := &templateData{Env: env(c)}
+	data := &templateData{}
 	if experimentShare {
 		data.Desc = descExperiment
 		data.OgImage = ogImageExperiment
@@ -111,8 +128,8 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
 	// respond with stubbed JSON entries in dev mode
-	if env(c) == "dev" {
-		f := filepath.Join(rootDir, "temporary_api", "ioext_feed.json")
+	if isDev() {
+		f := filepath.Join(config.Dir, "temporary_api", "ioext_feed.json")
 		http.ServeFile(w, r, f)
 		return
 	}
@@ -147,8 +164,8 @@ func serveSocial(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
 	// respond with stubbed JSON entries in dev mode
-	if env(c) == "dev" {
-		f := filepath.Join(rootDir, "temporary_api", "social_feed.json")
+	if isDev() {
+		f := filepath.Join(config.Dir, "temporary_api", "social_feed.json")
 		http.ServeFile(w, r, f)
 		return
 	}
