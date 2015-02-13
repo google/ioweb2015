@@ -1,5 +1,8 @@
 {
   "name": "Google I/O 2015",
+  "short_name": "I/O 2015",
+  "start_url": "./?utm_source=web_app_manifest",
+  "display": "standalone",
   "icons": [{
     "src": "images/touch/homescreen48.png",
     "sizes": "48x48",
@@ -26,6 +29,10 @@
     "type": "image/png",
     "density": "4"
   }],
-  "start_url": "./?utm_source=web_app_manifest",
-  "display": "standalone"
+  "chrome_related_applications": [{
+    "platform": "web"
+  }, {
+    "platform": "android",
+    "location": "https://play.google.com/store/apps/details?id=com.google.samples.apps.iosched"
+  }]
 }
