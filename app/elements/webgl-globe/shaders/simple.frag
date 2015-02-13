@@ -13,10 +13,5 @@ void main() {
   vec3 normal = normalize(globeCoord);
   float light = max(0., dot(normal, normalize(sunDirection))) + .3;
 
-  // vec3 zeroZero = vec3(0., 0., 1.);
-  // float cosAngle = dot(sunDir, normalize(globeCoord));
-  // float cutoff = 1. - step(0.99995, cosAngle);
-  // color = mix(vec3(.7, .1, .7), color * light, cutoff);
-
   gl_FragColor = vec4(color * light, 1.);
 }
