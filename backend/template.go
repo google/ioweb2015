@@ -44,8 +44,8 @@ type templateCache struct {
 
 // templateData is the templates context
 type templateData struct {
-	Title, Desc, Slug, Env, OgImage string
-	Meta                            meta
+	Title, Desc, Slug, Canonical, Env, OgImage string
+	Meta                                       meta
 }
 
 // meta is a page meta info.
@@ -70,6 +70,10 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	data.Meta = m
 	data.Title = pageTitle(m)
 	data.Slug = name
+	data.Canonical = data.Slug
+	if data.Canonical == "home" {
+		data.Canonical = "./"
+	}
 	if data.Desc == "" {
 		data.Desc = descDefault
 	}
