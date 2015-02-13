@@ -8,12 +8,6 @@ import (
 )
 
 func TestServeIOExtEntriesStub(t *testing.T) {
-	origEnv := appEnv
-	appEnv = "dev"
-	defer func() { appEnv = origEnv }()
-
-	cache = newMemoryCache()
-
 	r, _ := http.NewRequest("GET", "/api/extended", nil)
 	w := httptest.NewRecorder()
 	serveIOExtEntries(w, r)
@@ -64,13 +58,9 @@ func TestServeTemplate(t *testing.T) {
 }
 
 func TestServeTemplateRedirect(t *testing.T) {
-	origHttpPrefix := httpPrefix
-	httpPrefix = "/myprefix"
-	defer func() { httpPrefix = origHttpPrefix }()
-
 	table := []struct{ start, redirect string }{
-		{"/about/", "/myprefix/about"},
-		{"/one/two/", "/myprefix/one/two"},
+		{"/about/", "/about"},
+		{"/one/two/", "/one/two"},
 	}
 	for i, test := range table {
 		r, _ := http.NewRequest("GET", test.start, nil)
@@ -80,8 +70,9 @@ func TestServeTemplateRedirect(t *testing.T) {
 		if w.Code != http.StatusFound {
 			t.Fatalf("%d: GET %s: %d; want %d", i, test.start, w.Code, http.StatusFound)
 		}
-		if loc := w.Header().Get("Location"); loc != test.redirect {
-			t.Errorf("%d: Location: %q; want %q", i, loc, test.redirect)
+		redirect := config.Prefix + test.redirect
+		if loc := w.Header().Get("Location"); loc != redirect {
+			t.Errorf("%d: Location: %q; want %q", i, loc, redirect)
 		}
 	}
 }

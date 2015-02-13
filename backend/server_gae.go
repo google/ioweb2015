@@ -6,12 +6,10 @@
 package main
 
 import (
-	"bufio"
+	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"os"
-	"path/filepath"
+	"sort"
 	"strings"
 
 	"golang.org/x/net/context"
@@ -23,61 +21,41 @@ import (
 	"appengine/user"
 )
 
-var (
-	// rootDir is relative to basedir of app.yaml is (app root)
-	rootDir = "app"
-	// httpPrefix is the URL path prefix to serve the app from
-	httpPrefix = "/io2015"
-	// whitemap contains whitelisted email addresses or domains.
-	// whitelisted domains should be prefixed with "@", e.g. @example.org
-	whitemap map[string]bool
-)
-
 func init() {
 	cache = &gaeMemcache{}
-	initConfig()
-	initWhitelist()
+	initConfig("server.config", "", "", "", "")
 
 	wrapHandler = checkWhitelist
 	handle("/", serveTemplate)
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
 	// setup root redirect if we're prefixed
-	if httpPrefix != "/" {
+	if config.Prefix != "/" {
 		redirect := http.HandlerFunc(redirectHandler)
 		http.Handle("/", wrapHandler(redirect))
 	}
 }
 
-// initWhitelist initializes and populates whitemap from whitelist file.
-func initWhitelist() {
-	whitemap = make(map[string]bool)
-	f, err := os.Open(filepath.Join(rootDir, "..", "whitelist"))
-	if err != nil {
-		panic(err)
-	}
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		whitemap[scanner.Text()] = true
-	}
-	if err := scanner.Err(); err != nil {
-		panic(err)
-	}
-}
-
-// isWhitelisted returns a value of the whitemap for the key
-// of either email or its domain.
+// isWhitelisted returns true if either email or its domain
+// is in the config.Whitelist.
 func isWhitelisted(email string) bool {
-	if v, ok := whitemap[email]; ok {
-		return v
+	i := sort.SearchStrings(config.Whitelist, email)
+	if i < len(config.Whitelist) && config.Whitelist[i] == email {
+		return true
 	}
-	i := strings.Index(email, "@")
-	return whitemap[email[i:]]
+	// no more checks can be done if this is a @domain
+	// or an invalid email address.
+	i = strings.Index(email, "@")
+	if i <= 0 {
+		return false
+	}
+	// check the @domain of this email
+	return isWhitelisted(email[i:])
 }
 
 // allowPassthrough returns true if the request r can be handled w/o whitelist check.
 func allowPassthrough(ac appengine.Context, r *http.Request) bool {
-	return appengineEnv(ac) == "prod" ||
+	return isProd() ||
 		r.Header.Get("X-AppEngine-Cron") == "true" ||
 		r.Header.Get("X-AppEngine-TaskName") != ""
 }
@@ -115,29 +93,11 @@ func checkWhitelist(h http.Handler) http.Handler {
 	})
 }
 
-// appengineEnv returns environment string
-// which the backend is currently running in.
-func appengineEnv(ac appengine.Context) string {
-	v := appengine.VersionID(ac)
-	if i := strings.Index(v, "."); i > 0 {
-		v = v[:i]
-	}
-	switch {
-	default:
-		return "dev"
-	case strings.HasSuffix(v, "-stage"):
-		return "stage"
-	case strings.HasSuffix(v, "-prod"):
-		return "prod"
-	}
-}
-
 // newContext returns a newly created context of the in-flight request r.
 // and its response writer w.
 func newContext(r *http.Request, w io.Writer) context.Context {
 	ac := appengine.NewContext(r)
 	c := context.WithValue(context.Background(), ctxKeyGAEContext, ac)
-	c = context.WithValue(c, ctxKeyEnv, appengineEnv(ac))
 	return context.WithValue(c, ctxKeyWriter, w)
 }
 
@@ -153,17 +113,14 @@ func appengineContext(c context.Context) appengine.Context {
 
 // serviceCredentials returns a token source for the service account serviceAccountEmail.
 func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource, error) {
-	keypath := filepath.Join(rootDir, "..", "service-account.pem")
-	key, err := ioutil.ReadFile(keypath)
-	if err != nil {
-		return nil, err
+	if config.Google.ServiceAccount.Key == "" || config.Google.ServiceAccount.Email == "" {
+		return nil, errors.New("serviceCredentials: key or email is empty")
 	}
-
 	cred := &jwt.Config{
-		Email:      serviceAccountEmail,
-		PrivateKey: key,
+		Email:      config.Google.ServiceAccount.Email,
+		PrivateKey: []byte(config.Google.ServiceAccount.Key),
 		Scopes:     scopes,
-		TokenURL:   googleTokenURL,
+		TokenURL:   config.Google.TokenURL,
 	}
 	return cred.TokenSource(appengineContext(c)), nil
 }

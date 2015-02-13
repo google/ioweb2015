@@ -6,9 +6,9 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -21,49 +21,30 @@ import (
 )
 
 var (
-	rootDir    = "app"
-	listenAddr = "127.0.0.1:8080"
-	// URL path prefix to serve from
-	httpPrefix = "/io2015"
-	// app environment: "dev", "stage" or "prod"
-	// don't refer to this directly, use env(c) func instead.
-	appEnv string
+	flagConfig = flag.String("c", "server.config", "backend config file path")
+	flagEnv    = flag.String("env", "", "app environment: dev, stage or prod")
+	flagDir    = flag.String("dir", "", "app root dir")
+	flagAddr   = flag.String("addr", "", "address to listen on for standalone server")
+	flagPrefix = flag.String("prefix", "", "URL path prefix to serve from")
 )
-
-// init runs before main.
-func init() {
-	appEnv = os.Getenv("APP_ENV")
-	if appEnv == "" {
-		appEnv = "dev"
-	}
-	flag.StringVar(&rootDir, "d", rootDir, "app root dir")
-	flag.StringVar(&listenAddr, "listen", listenAddr, "address to listen on")
-	flag.StringVar(&httpPrefix, "prefix", httpPrefix, "URL path prefix to serve from")
-	flag.StringVar(&appEnv, "env", appEnv, "app environment: dev, stage or prod")
-
-	wrapHandler = logHandler
-}
 
 // main is the entry point of the standalone server.
 func main() {
 	flag.Parse()
-	if httpPrefix == "" || httpPrefix[0] != '/' {
-		httpPrefix = "/" + httpPrefix
-	}
-
-	initConfig()
+	initConfig(*flagConfig, *flagEnv, *flagDir, *flagAddr, *flagPrefix)
 	cache = newMemoryCache()
 
+	wrapHandler = logHandler
 	handle("/", catchAllHandler)
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
 	// setup root redirect if we're prefixed
-	if httpPrefix != "/" {
+	if config.Prefix != "/" {
 		redirect := http.HandlerFunc(redirectHandler)
 		http.Handle("/", wrapHandler(redirect))
 	}
 
-	if err := http.ListenAndServe(listenAddr, nil); err != nil {
+	if err := http.ListenAndServe(config.Addr, nil); err != nil {
 		// don't need context here
 		errorf(nil, "%v", err)
 		os.Exit(1)
@@ -78,7 +59,7 @@ func catchAllHandler(w http.ResponseWriter, r *http.Request) {
 	if p == "/" {
 		p += "index"
 	}
-	p = filepath.Join(rootDir, filepath.FromSlash(p))
+	p = filepath.Join(config.Dir, filepath.FromSlash(p))
 
 	if _, err := os.Stat(p); os.IsNotExist(err) {
 		serveTemplate(w, r)
@@ -100,23 +81,19 @@ func logHandler(h http.Handler) http.Handler {
 // newContext returns a newly created context of the in-flight request r
 // and its response writer w.
 func newContext(r *http.Request, w io.Writer) context.Context {
-	c := context.WithValue(context.Background(), ctxKeyEnv, appEnv)
-	return context.WithValue(c, ctxKeyWriter, w)
+	return context.WithValue(context.Background(), ctxKeyWriter, w)
 }
 
 // serviceCredentials returns a token source for the service account serviceAccountEmail.
 func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource, error) {
-	keypath := filepath.Join(rootDir, "..", "service-account.pem")
-	key, err := ioutil.ReadFile(keypath)
-	if err != nil {
-		return nil, err
+	if config.Google.ServiceAccount.Key == "" || config.Google.ServiceAccount.Email == "" {
+		return nil, errors.New("serviceCredentials: key or email is empty")
 	}
-
 	cred := &jwt.Config{
-		Email:      serviceAccountEmail,
-		PrivateKey: key,
+		Email:      config.Google.ServiceAccount.Email,
+		PrivateKey: []byte(config.Google.ServiceAccount.Key),
 		Scopes:     scopes,
-		TokenURL:   googleTokenURL,
+		TokenURL:   config.Google.TokenURL,
 	}
 	return cred.TokenSource(oauth2.NoContext), nil
 }

@@ -56,7 +56,7 @@ function startServer(hostPort) {
     // Ideally, there will be a refactored set of server tasks and I could just call those directly.
     var server = spawn(
       'bin/server',
-      ['-d', 'app', '-listen', hostPort],
+      ['-addr', hostPort],
       {cwd: 'backend', stdio: 'ignore'}
     ).on('error', reject);
 

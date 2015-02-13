@@ -64,7 +64,7 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 		data = &templateData{}
 	}
 	if data.Env == "" {
-		data.Env = env(c)
+		data.Env = config.Env
 	}
 	m := pageMeta(tpl)
 	data.Meta = m
@@ -105,8 +105,8 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 	}
 
 	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(rootDir, "templates", layout),
-		filepath.Join(rootDir, "templates", name+".html"),
+		filepath.Join(config.Dir, "templates", layout),
+		filepath.Join(config.Dir, "templates", name+".html"),
 	)
 	if err != nil {
 		return nil, err

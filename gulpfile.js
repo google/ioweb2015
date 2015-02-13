@@ -19,7 +19,6 @@ var reload = browserSync.reload;
 var opn = require('opn');
 var merge = require('merge-stream');
 var glob = require('glob');
-var Promise = require('es6-promise').Promise;
 
 var APP_DIR = 'app';
 var BACKEND_DIR = 'backend';
@@ -148,17 +147,15 @@ gulp.task('copy-backend', ['backend:config'], function(cb) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
     BACKEND_DIR + '/*.yaml',
-    BACKEND_DIR + '/*.config',
-    BACKEND_DIR + '/*.pem',
-    BACKEND_DIR + '/whitelist'
+    BACKEND_DIR + '/*.config'
   ], {base: './'})
-  // server_gae.go
-  .pipe($.replace(/(httpPrefix = ")[^"]*/g, '$1' + URL_PREFIX))
   .pipe(gulp.dest(DIST_STATIC_DIR))
   .on('end', function() {
     var destBackend = [DIST_STATIC_DIR, BACKEND_DIR].join('/');
     // ../app <= dist/backend/app
     fs.symlinkSync('../' + APP_DIR, destBackend + '/' + APP_DIR);
+    // make sure we have the right app env and prefix
+    updateServerConfig(destBackend, argv.env || 'prod', URL_PREFIX)
     // create dist/backend/app.yaml from backend/app.yaml.template
     generateGaeConfig(destBackend, URL_PREFIX, cb);
   });
@@ -246,11 +243,16 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // Start a standalone server (no GAE SDK needed) serving both front-end and backend,
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
+// App environment is 'dev' by default. Change with '--env=prod'.
 gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
-  var startArgs = ['-d', APP_DIR, '-listen', serverAddr, '-prefix', URL_PREFIX];
-  var start = spawn.bind(null, 'bin/server', startArgs, {cwd: BACKEND_DIR, stdio: 'inherit'});
+  var start = spawn.bind(null, 'bin/server',
+    ['-addr', serverAddr],
+    {cwd: BACKEND_DIR, stdio: 'inherit'}
+  );
+
+  updateServerConfig(BACKEND_DIR, argv.env || 'dev', URL_PREFIX);
 
   if (noWatch) {
     start();
@@ -287,18 +289,18 @@ gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev'],
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev'], function(callback) {
-  var appEnv = process.env.APP_ENV || 'dev';
   var watchFiles = argv.watch !== false;
-  var run = startGaeBackend.bind(null, BACKEND_DIR, appEnv, watchFiles, callback);
-  generateGaeConfig(BACKEND_DIR, URL_PREFIX, run);
+  updateServerConfig(BACKEND_DIR, argv.env || 'dev', URL_PREFIX);
+  generateGaeConfig(BACKEND_DIR, URL_PREFIX, function() {
+    startGaeBackend(BACKEND_DIR, watchFiles, callback)
+  });
 });
 
 // Serve build with GAE dev appserver. This is how it would look in production.
 // There are no file watchers.
 gulp.task('serve:dist', ['default'], function(callback) {
-  var appEnv = process.env.APP_ENV || 'prod';
   var backendDir = DIST_STATIC_DIR + '/' + BACKEND_DIR;
-  startGaeBackend(backendDir, appEnv, false, callback);
+  startGaeBackend(backendDir, false, callback);
 });
 
 gulp.task('vulcanize', ['vulcanize-elements', 'vulcanize-extended-elements']);
@@ -359,28 +361,26 @@ gulp.task('godeps', function() {
   spawn('go', ['get', '-d', './' + BACKEND_DIR + '/...'], {stdio: 'inherit'});
 });
 
-// decrypt service account key and server config.
+// decrypt backend/server.config.enc into backend/server.config.
 // use --pass cmd line arg to provide a pass phrase.
-gulp.task('decrypt', function(done) {
-  var files = [
-    BACKEND_DIR + '/service-account.pem',
-    BACKEND_DIR + '/server.config'
-  ];
-  var promises = files.map(function(f) {
-    return new Promise(function(resolve, reject) {
-      var args = ['aes-256-cbc', '-d', '-pass', 'pass:' + argv.pass, '-in', f + '.enc', '-out', f];
-      spawn('openssl', args, {stdio: 'inherit'}).on('close', function(code) {
-        if (code === 0) {
-          resolve();
-        } else {
-          reject(code);
-        }
-      });
-    });
-  });
-  Promise.all(promises).then(done.bind(null, null), function(code) {
-    done('Some commands exited with code: ' + code);
-  });
+gulp.task('decrypt', function() {
+  var file = BACKEND_DIR + '/server.config';
+  var args = ['aes-256-cbc', '-d', '-in', file + '.enc', '-out', file];
+  if (argv.pass) {
+    args.push('-pass', 'pass:' + argv.pass);
+  }
+  return spawn('openssl', args, {stdio: 'inherit'});
+});
+
+// encrypt backend/server.config into backend/server.config.enc.
+// use --pass cmd line arg to provide a pass phrase.
+gulp.task('encrypt', function() {
+  var file = BACKEND_DIR + '/server.config';
+  var args = ['aes-256-cbc', '-in', file, '-out', file + '.enc'];
+  if (argv.pass) {
+    args.push('-pass', 'pass:' + argv.pass);
+  }
+  return spawn('openssl', args, {stdio: 'inherit'});
 });
 
 gulp.task('setup', function(cb) {
@@ -423,19 +423,12 @@ function testBackend() {
 // Also, enable live-reload if watchFiles === true.
 // appEnv is either 'stage', 'prod' or anything else. The latter defaults to
 // dev env.
-function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
-  var restoreAppYaml = changeAppYamlVersion('v-' + appEnv, backendDir + '/app.yaml');
-  var onExit = function() {
-    restoreAppYaml();
-    callback();
-  };
-
+function startGaeBackend(backendDir, watchFiles, callback) {
   var serverAddr = 'localhost:' + (watchFiles ? '8080' : '3000');
   var args = ['preview', 'app', 'run', backendDir, '--host', serverAddr];
 
   var backend = spawn('gcloud', args, {stdio: 'inherit'});
   if (!watchFiles) {
-    process.on('exit', onExit);
     serverAddr = 'http://' + serverAddr;
     console.log('The site should now be available at: ' + serverAddr);
     // give GAE server some time to start
@@ -443,7 +436,6 @@ function startGaeBackend(backendDir, appEnv, watchFiles, callback) {
     return;
   }
 
-  browserSync.emitter.on('service:exit', onExit);
   // give GAE server some time to start
   setTimeout(browserSync.bind(null, {notify: false, proxy: serverAddr, startPath: URL_PREFIX}), 2000);
   watch();
@@ -463,16 +455,6 @@ function generateGaeConfig(dest, prefix, callback) {
     .on('end', callback);
 }
 
-// Replace current app.yaml with the modified 'version' property.
-// appYamlPath arg is optional and defaults to BACKEND_APP_YAML.
-// Returns a function that restores original app.yaml content.
-function changeAppYamlVersion(version, appYamlPath) {
-  appYamlPath = appYamlPath || BACKEND_APP_YAML;
-  var appYaml = fs.readFileSync(appYamlPath);
-  fs.writeFileSync(appYamlPath, 'version: ' + version + '\n' + appYaml);
-  return fs.writeFileSync.bind(fs, appYamlPath, appYaml, null);
-}
-
 // Create default server config if it doesn't exist already using the template.
 // Needed to start the server.
 function generateServerConfig(callback) {
@@ -484,6 +466,15 @@ function generateServerConfig(callback) {
     .pipe($.rename('server.config'))
     .pipe(gulp.dest(BACKEND_DIR))
     .on('end', callback);
+}
+
+// Update existing server.config in backendDir with provided env and prefix.
+function updateServerConfig(backendDir, env, prefix) {
+  var file = backendDir + '/server.config';
+  var cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
+  cfg.env = env;
+  cfg.prefix = prefix;
+  fs.writeFileSync(file, JSON.stringify(cfg, null, 2));
 }
 
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
