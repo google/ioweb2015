@@ -23,15 +23,17 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 
 func TestServeTemplate(t *testing.T) {
 	const ctype = "text/html;charset=utf-8"
-	table := []struct{ path, slug string }{
-		{"/", "home"},
-		{"/about", "about"},
-		{"/schedule", "schedule"},
-		{"/onsite", "onsite"},
-		{"/offsite", "offsite"},
-		{"/registration", "registration"},
-		{"/faq", "faq"},
-		{"/form", "form"},
+	table := []struct{ path, slug, canonical string }{
+		{"/", "home", "./"},
+		{"/home?experiment", "home", "./"},
+		{"/about", "about", "about"},
+		{"/about?experiment", "about", "about"},
+		{"/schedule", "schedule", "schedule"},
+		{"/onsite", "onsite", "onsite"},
+		{"/offsite", "offsite", "offsite"},
+		{"/registration", "registration", "registration"},
+		{"/faq", "faq", "faq"},
+		{"/form", "form", "form"},
 	}
 	for i, test := range table {
 		r, _ := http.NewRequest("GET", test.path, nil)
@@ -50,7 +52,12 @@ func TestServeTemplate(t *testing.T) {
 		}
 
 		body := string(w.Body.String())
+
 		tag := `<body id="page-` + test.slug + `"`
+		if !strings.Contains(body, tag) {
+			t.Errorf("%d: %s does not contain %s", i, body, tag)
+		}
+		tag = `<link rel="canonical" href="` + test.canonical + `"`
 		if !strings.Contains(body, tag) {
 			t.Errorf("%d: %s does not contain %s", i, body, tag)
 		}
