@@ -55,7 +55,7 @@ type appConfig struct {
 
 // initConfig reads server config file into the config global var.
 // Args provided to this func take precedence over config file values.
-func initConfig(configPath, env, dir, addr, prefix string) {
+func initConfig(configPath, addr string) {
 	file, err := os.Open(configPath)
 	if err != nil {
 		panic("initConfig: error locating " + configPath)
@@ -64,17 +64,8 @@ func initConfig(configPath, env, dir, addr, prefix string) {
 	if err := json.NewDecoder(file).Decode(&config); err != nil {
 		panic("initConfig: " + err.Error())
 	}
-	if env != "" {
-		config.Env = env
-	}
-	if dir != "" {
-		config.Dir = dir
-	}
 	if addr != "" {
 		config.Addr = addr
-	}
-	if prefix != "" {
-		config.Prefix = prefix
 	}
 	if config.Prefix == "" || config.Prefix[0] != '/' {
 		config.Prefix = "/" + config.Prefix

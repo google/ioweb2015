@@ -22,16 +22,13 @@ import (
 
 var (
 	flagConfig = flag.String("c", "server.config", "backend config file path")
-	flagEnv    = flag.String("env", "", "app environment: dev, stage or prod")
-	flagDir    = flag.String("dir", "", "app root dir")
 	flagAddr   = flag.String("addr", "", "address to listen on for standalone server")
-	flagPrefix = flag.String("prefix", "", "URL path prefix to serve from")
 )
 
 // main is the entry point of the standalone server.
 func main() {
 	flag.Parse()
-	initConfig(*flagConfig, *flagEnv, *flagDir, *flagAddr, *flagPrefix)
+	initConfig(*flagConfig, *flagAddr)
 	cache = newMemoryCache()
 
 	wrapHandler = logHandler

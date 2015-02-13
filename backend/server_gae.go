@@ -23,7 +23,7 @@ import (
 
 func init() {
 	cache = &gaeMemcache{}
-	initConfig("server.config", "", "", "", "")
+	initConfig("server.config", "")
 
 	wrapHandler = checkWhitelist
 	handle("/", serveTemplate)
