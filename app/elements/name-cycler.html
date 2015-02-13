@@ -15,13 +15,14 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-selector/core-selector.html">
 
 <!--
-Vertically cycles through a list of items, fading in the current selection.
+Vertically cycles through a list of items, fading in the current selection, then
+finally stopping when reaching a randomly selected item.
 
     <name-cycler items="['Kyoto', 'Chiang Mai']" interval="1000"></name-cycler>
 
 @element name-cycler
 -->
-<polymer-element name="name-cycler" attributes="interval items auto">
+<polymer-element name="name-cycler" attributes="interval items auto selectedModel">
   <template>
     <style>
       :host {
@@ -56,7 +57,7 @@ Vertically cycles through a list of items, fading in the current selection.
         z-index: 101; /* Higher than next element to transition. */
       }
     </style>
-    <core-selector id="selector">
+    <core-selector id="selector" selectedModel="{{selectedModel}}">
       <template repeat="{{items}}">
         <div>{{}}</div>
       </template>
@@ -93,9 +94,18 @@ Vertically cycles through a list of items, fading in the current selection.
          *
          * @attribute interval
          * @type number
-         * @default 1000
+         * @default 4000
          */
-        interval: 1000,
+        interval: 4000,
+
+        /**
+         * Returns the model associated with the selected item.
+         *
+         * @attribute selectedModel
+         * @type string
+         * @default null
+         */
+        selectedModel: null
       },
 
       created: function() {
@@ -134,7 +144,17 @@ Vertically cycles through a list of items, fading in the current selection.
        * @method start
        */
       start: function() {
+        // Randomly pick a stopping point.
+        var endIndex = Math.floor(Math.random() * this.items.length);
+
+        // Start just after endIndex to get the full cycle!
+        this.$.selector.selected = (endIndex + 1) % this.items.length;
+
         this.interval_ = setInterval(function() {
+          if (this.$.selector.selectedIndex === endIndex) {
+            this.stop();
+            return;
+          }
           this.$.selector.selectNext(true);
         }.bind(this), this.interval);
       },
@@ -148,7 +168,6 @@ Vertically cycles through a list of items, fading in the current selection.
         clearInterval(this.interval_);
       }
     });
-
   })();
   </script>
 </polymer-element>

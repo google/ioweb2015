@@ -15,7 +15,6 @@
  */
 
 IOWA.Elements = (function() {
-
   "use strict";
 
   var updateElements = function() {
@@ -129,6 +128,19 @@ IOWA.Elements = (function() {
         hasBeenLoaded: false,
         title: 'Registration'
       }
+    };
+
+    template.cycleLocations = {
+      'Kyoto': {lat: 35.025699, lng: 135.751147},
+      'Kano': {lat: 11.9916085, lng: 8.532064},
+      'Porto Alegre': {lat: -30.0331,  lng: -51.2300},
+      'Detroit': {lat: 42.3314,  lng: -83.0458},
+      'Chiang Mai': {lat: 18.793553, lng: 98.972353},
+      'Porto': {lat: 41.1621,  lng: -8.6220},
+      'Calgary': {lat: 50.9535525, lng:-114.5718054},
+      'Durban': {lat: -29.8833,  lng: 31.0500},
+      'Melbourne': {lat: -37.8136,  lng: 144.9631},
+      'Nice': {lat: 43.6957891, lng: 7.2701128}
     };
 
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;

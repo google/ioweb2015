@@ -61,6 +61,10 @@
   }
 }
 
+.card--force-compositing {
+  transform: translateZ(0);
+}
+
 @media (max-width: $phone-breakpoint-max) {
   .card {
     border-bottom: 1px solid $color-light-grey-border;

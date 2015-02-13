@@ -106,17 +106,23 @@
     <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey">
       <h2>
         <i18n-msg msgid="attend-from">Attend I/O from</i18n-msg>
-        <name-cycler items="['Kyoto', 'Chiang Mai', 'Calgary', 'Detroit', 'Porto', 'Nice', 'Melbourne', 'Kano', 'Durban', 'Porto Alegre']"></name-cycler>
+        <name-cycler items="{{cycleLocations | keysFilter}}" selectedModel="{{cycledName}}"></name-cycler>
         <br>
         <i18n-msg msgid="attend-wherever">or wherever you may be</i18n-msg>
       </h2>
       <div class="attend__globe">
-
+        <!-- <webgl-globe location="{{cycleLocations[cycledName]}}"
+                     locationTarget="{'lat': 36.15, 'lng': 0}"
+                     fov="0.3927"
+                     offsetY="-0.625"
+                     transitionDuration="4000"
+                     active?="{{pageTransitionDone}}"></webgl-globe>
+        <div class="globe-marker"></div> -->
       </div>
     </section>
 
     <div class="card__container">
-      <div class="card js-experiment-visualizer">
+      <div class="card card--force-compositing js-experiment-visualizer">
         <div class="card-content">
           <h3><i18n-msg msgid="io-extended-invitation">If you aren't able to join us for I/O in person this year, you can still make an event out of it. Host or find an I/O Extended event near you and watch the live stream in the company of other developers.</i18n-msg></h3>
         </div>
