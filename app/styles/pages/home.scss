@@ -152,12 +152,12 @@ $name: 'page-home';
 
     .globe-marker {
       position: absolute;
-      width: 42px;
-      height: 72px;
+      width: 28px;
+      height: 48px;
       left: 0;
       right: 0;
       margin: 0 auto;
-      transform: translate3d(0, -286px, 0);
+      transform: translate3d(0, -262px, 0);
       background-image: url(../images/home/marker.svg);
     }
   }

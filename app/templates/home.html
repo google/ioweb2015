@@ -113,19 +113,18 @@
         <i18n-msg msgid="attend-wherever">or wherever you may be</i18n-msg>
       </h2>
       <div class="attend__globe">
-        <template if="{{pageTransitionDone}}">
-          <webgl-globe location="{{cycleLocations[cycledName]}}"
-                       locationTarget="{'lat': 36.15, 'lng': 0}"
-                       fov="0.3927"
-                       offsetY="-0.625"
-                       transitionDuration="4000"></webgl-globe>
-        </template>
+        <webgl-globe location="{{cycleLocations[cycledName]}}"
+                     locationTarget="{'lat': 36.15, 'lng': 0}"
+                     fov="0.3927"
+                     offsetY="-0.625"
+                     transitionDuration="4000"
+                     active?="{{pageTransitionDone}}"></webgl-globe>
         <div class="globe-marker"></div>
       </div>
     </section>
 
     <div class="card__container">
-      <div class="card js-experiment-visualizer">
+      <div class="card card--force-compositing js-experiment-visualizer">
         <div class="card-content">
           <h3><i18n-msg msgid="io-extended-invitation">If you aren't able to join us for I/O in person this year, you can still make an event out of it. Host or find an I/O Extended event near you and watch the live stream in the company of other developers.</i18n-msg></h3>
         </div>
@@ -186,19 +185,6 @@
         return;
       }
 
-      IOWA.Elements.Template.cycleLocations = {
-        'Kyoto': {lat: 35.025699, lng: 135.751147},
-        'Chiang Mai': {lat: 18.793553, lng: 98.972353},
-        'Calgary': {lat: 50.9535525, lng:-114.5718054},
-        'Detroit': {lat: 42.3314,  lng: -83.0458},
-        'Porto': {lat: 41.1621,  lng: -8.6220},
-        'Nice': {lat: 43.6957891, lng: 7.2701128},
-        'Melbourne': {lat: -37.8136,  lng: 144.9631},
-        'Kano': {lat: 11.9916085, lng: 8.532064},
-        'Durban': {lat: -29.8833,  lng: 31.0500},
-        'Porto Alegre': {lat: -30.0331,  lng: -51.2300}
-      };
-
       function updateSocialPosts() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', socialPostsEndpoint);
@@ -228,16 +214,6 @@
         IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
         // Set a timeout to fetch new posts after 30 seconds.
         updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
-
-        /**
-         * Transform an object into an array of its enumerable property names. Treats
-         * null or undefined as the empty object.
-         * @param {Object=} opt_obj
-         * @return {!Array<string>}
-         */
-        PolymerExpressions.prototype.keysFilter = function(opt_obj) {
-          return opt_obj ? Object.keys(opt_obj) : [];
-        };
       };
 
       page.unload = function() {

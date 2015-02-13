@@ -26,7 +26,7 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
-<polymer-element name="webgl-globe" attributes="cameraDistance fov location locationTarget offsetY transitionDuration">
+<polymer-element name="webgl-globe" attributes="active cameraDistance fov location locationTarget offsetY transitionDuration">
   <template>
     <style>
       :host {
@@ -68,6 +68,19 @@ Makes a globe or whatever.
     ES6Promise.polyfill();
 
     Polymer({
+      /**
+       * Whether the globe should be rendered in the page. The first time this
+       * attribute goes from false to true, the WebGL context and assets are
+       * initialized and drawn to the screen. Any subsequent times it goes to
+       * false and then back to true, the WebGL assets are retained and only
+       * rendering is affected.
+       *
+       * @attribute active
+       * @type bool
+       * @default false
+       */
+      active: false,
+
       /**
        * The latitude and longitude of the location to focus on.
        *
@@ -128,6 +141,15 @@ Makes a globe or whatever.
       transitionDuration: 2000,
 
       /**
+       * Whether WebGL rendering has been activated before.
+       *
+       * @property activated_
+       * @type bool
+       * @default false
+       */
+      activated_: false,
+
+      /**
        * The previous location focused on.
        *
        * @property previousLocation_
@@ -182,11 +204,11 @@ Makes a globe or whatever.
       /**
        * World to Normalized Device Coordinates transform.
        *
-       * @property projectionTransform
+       * @property projectionTransform_
        * @type Matrix4x4
        * @default null
        */
-      projectionTransform: null,
+      projectionTransform_: null,
 
       /**
        * WebGL context.
@@ -197,7 +219,6 @@ Makes a globe or whatever.
        */
       gl: null,
 
-      // TODO(bckenny): publish as an attribute
       /**
        * Whether to actively animate the globe.
        *
@@ -256,19 +277,44 @@ Makes a globe or whatever.
       },
 
       created: function() {
-        this.projectionTransform = new Matrix4x4();
-        this.location = {lat: 0, lng: 0};
-        this.locationTarget = {lat: 0, lng: 0};
+        this.projectionTransform_ = new Matrix4x4();
 
+        // TODO(bckenny): why can't this be in created?
+        this.location = {lat: 0, lng: 0};
+
+        this.locationTarget = {lat: 0, lng: 0};
         this.previousLocation_ = {lat: 0, lng: 0};
         this.currentLocation_ = {lat: 0, lng: 0};
 
         this.resizeCallback_ = this.canvasResized.bind(this);
       },
 
-      // TODO(bckenny): perf analytics for everything here
-
       attached: function() {
+        // start loading assets right away, but hold off on WebGL initialization
+        this.loadingTextures_ = this.loadTextures_();
+        this.loadingShaders_ = this.loadShaders_();
+
+        if (this.active) {
+          this.async(this.init_);
+        }
+      },
+
+      activeChanged: function() {
+        if (this.active) {
+          if (!this.activated_) {
+            this.init_();
+          } else {
+            this.animate = true;
+            this.async(this.update_);
+          }
+        } else {
+          this.animate = false;
+        }
+      },
+
+      init_: function() {
+        this.activated_ = true;
+
         var gl = this.gl = this.$.canvas.getContext('webgl');
         if (!gl) {
           // attempt with experimental
@@ -282,18 +328,6 @@ Makes a globe or whatever.
         }
 
         window.addEventListener('resize', this.resizeCallback_);
-
-        // TODO(bckenny): no reason not to inline these
-        var vertUrl = this.resolvePath('shaders/simple.vert');
-        var fragUrl = this.resolvePath('shaders/simple.frag');
-        Promise.all([
-          ShaderProgram.fromXhr(gl, vertUrl, fragUrl),
-          this.loadTextures(gl)
-        ]).then(this.init.bind(this))
-          .catch(function(reason) {
-            // TODO(bckenny): give up
-            IOWA.Analytics.trackError('globe initialization', reason);
-          });
 
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
@@ -315,20 +349,29 @@ Makes a globe or whatever.
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, globeIndices, gl.STATIC_DRAW);
 
         this.drawCount = globeIndices.length;
+
+        Promise.all([
+          this.loadingShaders_,
+          this.loadingTextures_.then(this.initCubeMap_.bind(this))
+        ])
+          .then(function assetsLoaded(assets) {
+            this.globeProgram = new ShaderProgram(this.gl, assets[0][0],
+                assets[0][1]);
+            this.globeProgram.use();
+            this.gl.enableVertexAttribArray(this.globeProgram.attributes.coord);
+
+            this.globeCubemap = assets[1];
+
+            this.animate = true;
+            this.async(this.update_);
+          }.bind(this))
+          .catch(function(reason) {
+            // TODO(bckenny): give up
+            IOWA.Analytics.trackError('globe initialization', reason);
+          });
       },
 
-      init: function(assets) {
-        this.globeProgram = assets[0];
-        this.globeProgram.use();
-        this.gl.enableVertexAttribArray(this.globeProgram.attributes.coord);
-
-        this.globeCubemap = assets[1];
-
-        this.animate = true;
-        this.async(this.update);
-      },
-
-      resize: function() {
+      resize_: function() {
         var canvas = this.$.canvas;
         var resolutionScale = window.devicePixelRatio > 1 ? 2 : 1;
         var width = canvas.offsetWidth;
@@ -339,25 +382,49 @@ Makes a globe or whatever.
             height * resolutionScale);
 
         var center = this.cameraDistance;
-        this.projectionTransform.identity()
+        this.projectionTransform_.identity()
           .translate(0, this.offsetY, 0)
           .perspective(this.fov, width / height, center - 1, center + 1);
 
         this.resizeNeeded_ = false;
       },
 
-      // TODO(bckenny): move image loading out of startup flow
-      loadTextures: function(gl) {
+      loadShaders_: function() {
+        return Promise.all([
+          'shaders/simple.vert',
+          'shaders/simple.frag'
+        ].map(function(shaderUrl) {
+          var resolvedUrl = this.resolvePath(shaderUrl);
+          return new Promise(function(resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', resolvedUrl);
+            xhr.onload = function(e) {
+              if (this.status === 200) {
+                resolve(this.response);
+              } else {
+                reject(this.statusText);
+              }
+            };
+            xhr.onerror = function(e) {
+              reject(this.statusText);
+            };
+            xhr.send();
+          });
+        }, this));
+      },
+
+      loadTextures_: function() {
+        // cube map GLenum constants from WebGL spec
         var globeFaces = {
-          'negative-x.jpg': gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-          'negative-y.jpg': gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-          'negative-z.jpg': gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-          'positive-x.jpg': gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-          'positive-y.jpg': gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-          'positive-z.jpg': gl.TEXTURE_CUBE_MAP_POSITIVE_Z
+          'negative-x.jpg': 0x8516,
+          'negative-y.jpg': 0x8518,
+          'negative-z.jpg': 0x851A,
+          'positive-x.jpg': 0x8515,
+          'positive-y.jpg': 0x8517,
+          'positive-z.jpg': 0x8519
         };
 
-        // load six face image and initialize once all are loaded
+        // load six face images and associate them with their face GLenum value
         return Promise.all(
           Object.keys(globeFaces).map(function(faceName) {
             return new Promise(function(resolve, reject) {
@@ -372,52 +439,55 @@ Makes a globe or whatever.
               textureImage.src = this.resolvePath('textures/' + faceName);
             }.bind(this));
           }, this)
-
-        ).then(function(faceData) {
-          // create cubemap texture from six loaded images
-          var textureStartTime = nowish();
-          var textureId = gl.createTexture();
-          gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureId);
-          for (var i = 0; i < faceData.length; i++) {
-            gl.texImage2D(faceData[i].target, 0, gl.RGB, gl.RGB,
-                gl.UNSIGNED_BYTE, faceData[i].texture);
-          }
-          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER,
-              gl.LINEAR);
-          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER,
-              gl.LINEAR_MIPMAP_LINEAR);
-          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S,
-              gl.CLAMP_TO_EDGE);
-          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T,
-              gl.CLAMP_TO_EDGE);
-          gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
-
-          // better texture filtering through extensions
-          var filterExtension =
-              gl.getExtension('EXT_texture_filter_anisotropic') ||
-              gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
-              gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
-          if (filterExtension) {
-            // set to maximum anisotropic filtering if it exists
-            // NOTE(bckenny): some platforms report support while setting
-            // MAX_ANISOTROPY to 0. Override to the minimum of 2 (see spec) and
-            // leave it to the platform to clamp if needed.
-            var maxAnisotropy = gl.getParameter(
-                filterExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT) || 2;
-            gl.texParameterf(gl.TEXTURE_CUBE_MAP,
-                filterExtension.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
-          }
-
-          var textureEndTime = nowish();
-          IOWA.Analytics.trackPerf('globe', 'cubemap creation',
-              Math.ceil(textureEndTime - textureStartTime), null,
-              this.MAX_PERF_TIMEOUT_);
-
-          return textureId;
-        });
+        );
       },
 
-      latLngDistance: function(p0, p1) {
+      initCubeMap_: function(faceData) {
+        var gl = this.gl;
+
+        // create cubemap texture from six loaded images
+        var textureStartTime = nowish();
+        var textureId = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureId);
+        for (var i = 0; i < faceData.length; i++) {
+          gl.texImage2D(faceData[i].target, 0, gl.RGB, gl.RGB,
+              gl.UNSIGNED_BYTE, faceData[i].texture);
+        }
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER,
+            gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER,
+            gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S,
+            gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T,
+            gl.CLAMP_TO_EDGE);
+        gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+
+        // better texture filtering through extensions
+        var filterExtension =
+            gl.getExtension('EXT_texture_filter_anisotropic') ||
+            gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
+            gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
+        if (filterExtension) {
+          // set to maximum anisotropic filtering if it exists
+          // NOTE(bckenny): some platforms report support while setting
+          // MAX_ANISOTROPY to 0. Override to the minimum of 2 (see spec) and
+          // leave it to the platform to clamp if needed.
+          var maxAnisotropy = gl.getParameter(
+              filterExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT) || 2;
+          gl.texParameterf(gl.TEXTURE_CUBE_MAP,
+              filterExtension.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+        }
+
+        var textureEndTime = nowish();
+        IOWA.Analytics.trackPerf('globe', 'cubemap creation',
+            Math.ceil(textureEndTime - textureStartTime), null,
+            this.MAX_PERF_TIMEOUT_);
+
+        return textureId;
+      },
+
+      latLngDistance_: function(p0, p1) {
         var lat0 = p0.lat * Math.PI / 180;
         var lat1 = p1.lat * Math.PI / 180;
         var deltaLng = (p1.lng - p0.lng) * Math.PI / 180;
@@ -432,7 +502,7 @@ Makes a globe or whatever.
         this.previousLocation_.lng = this.currentLocation_.lng;
 
         // since we're lerping in latlng space, check if the other way is faster
-        if (Math.abs(this.previousLocation_.lng - this.location.lng > 180)) {
+        if (Math.abs(this.previousLocation_.lng - this.location.lng) > 180) {
           if (this.previousLocation_.lng < this.location.lng) {
             this.previousLocation_.lng += 360;
           } else {
@@ -443,36 +513,36 @@ Makes a globe or whatever.
         this.transitionStart_ = nowish();
       },
 
-      ease: function(t) {
+      ease_: function(t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
       },
 
-      lerp: function(a, b, t) {
+      lerp_: function(a, b, t) {
         return a + t * (b - a);
       },
 
-      interpolateLocation: function(timestamp) {
+      interpolateLocation_: function(timestamp) {
         var elapsedTime = timestamp - this.transitionStart_;
-        var t = Math.min(1, elapsedTime / this.transitionDuration);
-        t = this.ease(t);
+        var t = Math.max(0, Math.min(1, elapsedTime / this.transitionDuration));
+        t = this.ease_(t);
 
         // TODO(bckenny): for now, just lerp in latlng space
-        this.currentLocation_.lat = this.lerp(this.previousLocation_.lat,
+        this.currentLocation_.lat = this.lerp_(this.previousLocation_.lat,
             this.location.lat, t);
-        this.currentLocation_.lng = this.lerp(this.previousLocation_.lng,
+        this.currentLocation_.lng = this.lerp_(this.previousLocation_.lng,
             this.location.lng, t);
       },
 
-      update: function(timestamp) {
+      update_: function(timestamp) {
         if (!this.animate) {
           return;
         }
         if (this.resizeNeeded_) {
-          this.resize();
+          this.resize_();
         }
         if (timestamp - this.transitionStart_ < this.transitionDuration) {
           // TODO(bckenny): set animate = false when this is finished?
-          this.interpolateLocation(timestamp);
+          this.interpolateLocation_(timestamp);
         }
 
         var gl = this.gl;
@@ -494,13 +564,13 @@ Makes a globe or whatever.
 
         // set uniforms
         this.globeProgram.uniforms.globeMatrix(worldTransform.m_);
-        this.globeProgram.uniforms.viewMatrix(this.projectionTransform.m_);
+        this.globeProgram.uniforms.viewMatrix(this.projectionTransform_.m_);
         this.globeProgram.uniforms.globeCubemap(0);
 
         gl.drawElements(gl.TRIANGLES, this.drawCount, gl.UNSIGNED_SHORT, 0);
 
         if (this.animate) {
-          window.requestAnimationFrame(this.update.bind(this));
+          window.requestAnimationFrame(this.update_.bind(this));
         }
       },
 
