@@ -14,6 +14,10 @@ handlers:
   http_headers:
     Access-Control-Allow-Origin: "*"
 
+- url: $PREFIX$/sitemap\.xml$
+  static_files: app/sitemap.xml
+  upload: app/sitemap\.xml$
+
 # shorter cache for some files that may change frequently,
 # including service worker
 - url: $PREFIX$/(.+(elements\.html|\.js|\.css))$
