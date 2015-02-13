@@ -555,9 +555,9 @@ gulp.task('sitemap', function() {
   gulp.src(APP_DIR + '/templates/!(layout_|error).html', {read: false})
     .pipe($.rename(function(path) {
       if (path.basename === 'home') {
-        path.basename = '/'
+        path.basename = '/' // homepage is served from root.
       }
-      path.extname = ''
+      path.extname = '' // remove .html from URLs.
     }))
     .pipe($.sitemap({
       siteUrl: PROD_ORIGIN + URL_PREFIX,
