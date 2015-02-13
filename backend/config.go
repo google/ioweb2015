@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"sort"
+	"strings"
 )
 
 // config is a global backend config,
@@ -71,4 +72,21 @@ func initConfig(configPath, addr string) {
 		config.Prefix = "/" + config.Prefix
 	}
 	sort.Strings(config.Whitelist)
+}
+
+// isWhitelisted returns true if either email or its domain
+// is in the config.Whitelist.
+func isWhitelisted(email string) bool {
+	i := sort.SearchStrings(config.Whitelist, email)
+	if i < len(config.Whitelist) && config.Whitelist[i] == email {
+		return true
+	}
+	// no more checks can be done if this is a @domain
+	// or an invalid email address.
+	i = strings.Index(email, "@")
+	if i <= 0 {
+		return false
+	}
+	// check the @domain of this email
+	return isWhitelisted(email[i:])
 }

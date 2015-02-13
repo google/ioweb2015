@@ -9,8 +9,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"sort"
-	"strings"
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -34,23 +32,6 @@ func init() {
 		redirect := http.HandlerFunc(redirectHandler)
 		http.Handle("/", wrapHandler(redirect))
 	}
-}
-
-// isWhitelisted returns true if either email or its domain
-// is in the config.Whitelist.
-func isWhitelisted(email string) bool {
-	i := sort.SearchStrings(config.Whitelist, email)
-	if i < len(config.Whitelist) && config.Whitelist[i] == email {
-		return true
-	}
-	// no more checks can be done if this is a @domain
-	// or an invalid email address.
-	i = strings.Index(email, "@")
-	if i <= 0 {
-		return false
-	}
-	// check the @domain of this email
-	return isWhitelisted(email[i:])
 }
 
 // allowPassthrough returns true if the request r can be handled w/o whitelist check.
