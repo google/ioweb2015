@@ -363,24 +363,26 @@ gulp.task('godeps', function() {
 
 // decrypt backend/server.config.enc into backend/server.config.
 // use --pass cmd line arg to provide a pass phrase.
-gulp.task('decrypt', function() {
+gulp.task('decrypt', function(done) {
   var file = BACKEND_DIR + '/server.config';
   var args = ['aes-256-cbc', '-d', '-in', file + '.enc', '-out', file];
   if (argv.pass) {
     args.push('-pass', 'pass:' + argv.pass);
   }
-  return spawn('openssl', args, {stdio: 'inherit'});
+  spawn('openssl', args, {stdio: 'inherit'}).
+  on('exit', done);
 });
 
 // encrypt backend/server.config into backend/server.config.enc.
 // use --pass cmd line arg to provide a pass phrase.
-gulp.task('encrypt', function() {
+gulp.task('encrypt', function(done) {
   var file = BACKEND_DIR + '/server.config';
   var args = ['aes-256-cbc', '-in', file, '-out', file + '.enc'];
   if (argv.pass) {
     args.push('-pass', 'pass:' + argv.pass);
   }
-  return spawn('openssl', args, {stdio: 'inherit'});
+  spawn('openssl', args, {stdio: 'inherit'}).
+  on('exit', done);
 });
 
 gulp.task('setup', function(cb) {
