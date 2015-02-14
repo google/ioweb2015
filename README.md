@@ -42,7 +42,7 @@ by providing `--env` argument to the gulp task:
   # set app environment to production:
   gulp serve --env prod
   # or run as if we were in staging:
-  stage gulp serve --env stage
+  gulp serve --env stage
   ```
 
 Not that this does not change the way the backend code is compiled
