@@ -189,13 +189,15 @@ $name: 'page-home';
   }
   .page__section--attend {
     padding-top: $largeKeyline + $desktopKeyline;
+    h2 {
+      padding: 0 $largeKeyline 0 $largeKeyline;
+    }
   }
   #join {
     margin-top: -156px;
 
     h2 {
       max-width: 300px;
-      padding: 0 $desktopKeyline 0 $desktopKeyline;
     }
 
     .join__social {
