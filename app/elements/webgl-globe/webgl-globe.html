@@ -26,7 +26,7 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
-<polymer-element name="webgl-globe" attributes="active cameraDistance fov location locationTarget offsetY transitionDuration">
+<polymer-element name="webgl-globe" attributes="active autoInit cameraDistance fov location locationTarget offsetY transitionDuration">
   <template>
     <style>
       :host {
@@ -71,15 +71,26 @@ Makes a globe or whatever.
       /**
        * Whether the globe should be rendered in the page. The first time this
        * attribute goes from false to true, the WebGL context and assets are
-       * initialized and drawn to the screen. Any subsequent times it goes to
-       * false and then back to true, the WebGL assets are retained and only
-       * rendering is affected.
+       * initialized (overriding `autoInit`) and drawn to the screen. Any
+       * subsequent times it is set to false and then back to true, the WebGL
+       * assets are retained and only rendering is affected.
        *
        * @attribute active
        * @type bool
        * @default false
        */
       active: false,
+
+      /**
+       * Whether the WebGL context and assets should be initialized. Setting
+       * this to `true` while `active` is still `false` allows the globe to be
+       * ready to draw immediately when `active` is set to `true`.
+       *
+       * @attribute autoInit
+       * @type bool
+       * @default false
+       */
+      autoInit: false,
 
       /**
        * The latitude and longitude of the location to focus on.
@@ -222,11 +233,21 @@ Makes a globe or whatever.
       /**
        * Whether to actively animate the globe.
        *
-       * @property animate
+       * @property animate_
        * @type boolean
        * @default false
        */
-      animate: false,
+      animate_: false,
+
+      /**
+       * A requestAnimationFrame call has been made to redraw the globe on the
+       * next frame.
+       *
+       * @property updateScheduled_
+       * @type bool
+       * @default false
+       */
+      updateScheduled_: false,
 
       /**
        * Number of primitives to draw to render the globe.
@@ -292,13 +313,13 @@ Makes a globe or whatever.
         this.loadingTextures_ = this.loadTextures_();
         this.loadingShaders_ = this.loadShaders_();
 
-        if (this.active) {
+        if (this.autoInit || this.active) {
           this.async(this.init_);
         }
       },
 
       detached: function() {
-        this.animate = false;
+        this.animate_ = false;
         window.removeEventListener('resize', this.resizeCallback_);
       },
 
@@ -307,15 +328,24 @@ Makes a globe or whatever.
           if (!this.activated_) {
             this.init_();
           } else {
-            this.animate = true;
-            this.async(this.update_);
+            this.animate_ = true;
+            this.async(this.scheduleUpdate_);
           }
         } else {
-          this.animate = false;
+          this.animate_ = false;
+        }
+      },
+
+      autoInitChanged: function() {
+        if (this.autoInit && !this.activated_) {
+          this.init_();
         }
       },
 
       init_: function() {
+        if (this.activated_) {
+          return;
+        }
         this.activated_ = true;
 
         var gl = this.gl = this.$.canvas.getContext('webgl');
@@ -365,8 +395,7 @@ Makes a globe or whatever.
 
             this.globeCubemap = assets[1];
 
-            this.animate = true;
-            this.async(this.update_);
+            this.async(this.scheduleUpdate_);
           }.bind(this))
           .catch(function(reason) {
             // TODO(bckenny): give up
@@ -536,15 +565,23 @@ Makes a globe or whatever.
             this.location.lng, t);
       },
 
+      scheduleUpdate_: function() {
+        if (this.animate_ && !this.updateScheduled_) {
+          this.updateScheduled_ = true;
+          window.requestAnimationFrame(this.update_.bind(this));
+        }
+      },
+
       update_: function(timestamp) {
-        if (!this.animate) {
+        this.updateScheduled_ = false;
+        if (!this.animate_) {
           return;
         }
         if (this.resizeNeeded_) {
           this.resize_();
         }
         if (timestamp - this.transitionStart_ < this.transitionDuration) {
-          // TODO(bckenny): set animate = false when this is finished?
+          // TODO(bckenny): set animate_ = false when this is finished?
           this.interpolateLocation_(timestamp);
         }
 
@@ -572,9 +609,7 @@ Makes a globe or whatever.
 
         gl.drawElements(gl.TRIANGLES, this.drawCount, gl.UNSIGNED_SHORT, 0);
 
-        if (this.animate) {
-          window.requestAnimationFrame(this.update_.bind(this));
-        }
+        this.scheduleUpdate_();
       }
     });
   })();
