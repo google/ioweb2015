@@ -1,0 +1,137 @@
+{% define "title" %}Live Blogging Gadget{% end %}
+
+{% define "mastheadBgClass" %}bg-dark-grey{% end %}
+
+{% define "masthead" %}
+  <h1><i18n-msg msgid="live-blogging">Live Blogging Gadget</i18n-msg></h1>
+{% end %}
+
+{% define "content" %}
+
+<section class="card__container card__container--top slide-up">
+  <div class="card js-experiment-visualizer">
+    <div class="card-content">
+      <h3>Personalize the live blogging gadget to your website and embed the Google+ conversation from the event for your audience.</h3>
+    </div>
+    <div class="card-content">
+      <a href="#" data-ajax-link data-anim-card data-track-link="gadget-faq">
+        <i18n-msg msgid="live-faq">Live blogging FAQ</i18n-msg>
+      </a>
+    </div>
+    <div class="ripple">
+      <div class="ripple__content"></div>
+    </div>
+  </div>
+</section>
+
+<div class="slide-up-delay">
+
+  <!-- todo move up -->
+  <link rel="stylesheet" href="styles/pages/gadget.css">
+
+  <section class="page__section--copy card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+    <!-- <iframe src="embed"></iframe> -->
+    <io-gadget videoid="8OJ7ih8EE7s" iframeCode="{{embedIframeCode}}"></io-gadget>
+  </section>
+
+  <section class="page__section--copy">
+    <div class="card__container">
+      <div class="card js-experiment-visualizer">
+        <div class="card-content">
+          <h3>Customize Gadget</h3>
+        </div>
+        <div class="card-content">
+          <h4 class="card__title">Select content</h4>
+          <div class="customize__section">
+            <paper-radio-group selected="0">
+              <paper-radio-button label="Live Stream and Social Feed"></paper-radio-button>
+              <paper-radio-button label="Live Stream only"></paper-radio-button>
+              <paper-radio-button label="Social Feed only"></paper-radio-button>
+            </paper-radio-group>
+          </div>
+          <h4 class="card__title">Select live stream size</h4>
+          <div class="customize__section">
+            <paper-radio-group selected="small" on-core-change="{{onWidgetSize}}">
+              <paper-radio-button name="small" label="Small"></paper-radio-button>
+              <paper-radio-button name="medium" label="Medium"></paper-radio-button>
+              <paper-radio-button name="large" label="Large"></paper-radio-button>
+              <paper-radio-button name="xlarge" label="Extra large"></paper-radio-button>
+              <paper-radio-button name="custom" label="Custom"></paper-radio-button>
+            </paper-radio-group>
+            <div class="size__inputs">
+              <paper-input label="Width (px)" floatingLabel disabled></paper-input>
+              <paper-input label="Height (px)" floatingLabel disabled></paper-input>
+            </div>
+          </div>
+          <h4 class="card__title">Get the code</h4>
+          <h5>Embed code</h5>
+          <div class="customize__section">
+            <paper-input-decorator label="Embed code snippet">
+              <paper-autogrow-textarea>
+                <textarea readonly on-focus="{{selectCodeSnippet}}">{{embedIframeCode}}</textarea>
+              </paper-autogrow-textarea>
+            </paper-input-decorator>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function() {
+
+  // Page-specific JS that runs when this page is loaded for the first time.
+  function initPage() {
+    var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+
+    if (page.hasBeenLoaded) {
+      return;
+    }
+
+    // page.load = function() {
+    //   IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
+    //   // Set a timeout to fetch new posts after 30 seconds.
+    //   updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
+    // };
+
+    // page.unload = function() {
+    //   if (updateSocialPostsTimeout) {
+    //     window.clearTimeout(updateSocialPostsTimeout);
+    //     updateSocialPostsTimeout = null;
+    //   }
+    // };
+
+    IOWA.Elements.Template.onWidgetSize = function(e, detail, sender) {
+      if (!e.target.checked) {
+        return; // ignore event from radio button that was unchecked.
+      }
+      var disabled = sender.selected !== 'custom';
+      var container = sender.parentElement.querySelector('.size__inputs');
+      [].forEach.call(container.children, function(el) {
+        el.disabled = disabled;
+      });
+    };
+
+    IOWA.Elements.Template.selectCodeSnippet = function(e, detail, sender) {
+      sender.select();
+    };
+
+    // page.load(); // Run load callback on page load.
+    page.hasBeenLoaded = true;
+  }
+
+  // IE will be "loading" at this point. Other browsers will already be "complete".
+  if (document.readyState !== 'loading') {
+    initPage();
+  }
+
+  // Necessary for IE's lack of native <template>
+  // https://github.com/GoogleChrome/ioweb2015/issues/599
+  window._initPage = initPage;
+
+})();
+</script>
+
+{% end %}
