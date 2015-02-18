@@ -3,8 +3,7 @@ package main
 import (
 	"encoding/json"
 	"encoding/xml"
-	"log"
-	"math"
+	"strconv"
 	"time"
 
 	"golang.org/x/net/context"
@@ -21,10 +20,12 @@ type extFeed struct {
 // extEntry represents a single entiry of a Google Sheet form
 // for I/O extended registration.
 type extEntry struct {
-	Name string  `json:"name" xml:"http://schemas.google.com/spreadsheets/2006/extended eventname"`
-	Link string  `json:"link" xml:"http://schemas.google.com/spreadsheets/2006/extended googleeventlink"`
-	Lat  float64 `json:"lat" xml:"http://schemas.google.com/spreadsheets/2006/extended latitude"`
-	Lng  float64 `json:"lng" xml:"http://schemas.google.com/spreadsheets/2006/extended longitude"`
+	Name   string  `json:"name" xml:"http://schemas.google.com/spreadsheets/2006/extended eventname"`
+	Link   string  `json:"link" xml:"http://schemas.google.com/spreadsheets/2006/extended googleeventlink"`
+	Lat    float64 `json:"lat"`
+	Lng    float64 `json:"lng"`
+	XMLLat string  `json:"-" xml:"http://schemas.google.com/spreadsheets/2006/extended latitude"`
+	XMLLng string  `json:"-" xml:"http://schemas.google.com/spreadsheets/2006/extended longitude"`
 }
 
 // ioExtEntries fetches I/O Extended items either from cache or a spreadsheet.
@@ -86,10 +87,21 @@ func fetchIOExtEntries(c context.Context, url string) ([]*extEntry, error) {
 
 	entries := make([]*extEntry, 0, len(feed.Entries))
 	for _, e := range feed.Entries {
-		if e.Name == "" || e.Link == "" || (math.Abs(e.Lat) < 1e-6 && math.Abs(e.Lng) < 1e-6) {
-			log.Printf("fetchIOExtEntries: skipping %#v", e)
+		lat, err := strconv.ParseFloat(e.XMLLat, 64)
+		if err != nil {
+			errorf(c, "fetchIOExtEntries: strconv(XMLLat): %v; item: %#v", err, e)
 			continue
 		}
+		lng, err := strconv.ParseFloat(e.XMLLng, 64)
+		if err != nil {
+			errorf(c, "fetchIOExtEntries: strconv(XMLLng): %v; item: %#v", err, e)
+			continue
+		}
+		if e.Name == "" || e.Link == "" {
+			logf(c, "fetchIOExtEntries: skipping %#v", e)
+			continue
+		}
+		e.Lat, e.Lng = lat, lng
 		entries = append(entries, e)
 	}
 	return entries, nil
