@@ -74,7 +74,7 @@ IOWA.Elements = (function() {
 
   var init = function() {
     var template = document.getElementById('t');
-    template.pages = {};
+    template.pages = window.PAGES;
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.fullscreenVideoActive = false;
     template.photoGalleryActive = false;
@@ -85,50 +85,6 @@ IOWA.Elements = (function() {
       'bg-cyan': '#00BCD4',
       'bg-medium-grey': '#CFD8DC',
       'bg-dark-grey': '#455A64'
-    };
-
-    template.pages = {
-      'faq': {
-        mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false,
-        title: 'FAQ'
-      },
-      'form': {
-        mastheadBgClass: 'bg-dark-grey',
-        hasBeenLoaded: false,
-        title: '2015 I/O Extended event'
-      },
-      'schedule': {
-        mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false,
-        title: 'Schedule'
-      },
-      'home': {
-        mastheadBgClass: 'bg-medium-grey',
-        hasBeenLoaded: false,
-        title: 'Google I/O'
-      },
-      'about': {
-        mastheadBgClass: 'bg-dark-grey',
-        hasBeenLoaded: false,
-        galleryOpen: false,
-        title: 'About I/O'
-      },
-      'onsite': {
-        mastheadBgClass: 'bg-dark-grey',
-        hasBeenLoaded: false,
-        title: 'Attend onsite'
-      },
-      'offsite': {
-        mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false,
-        title: 'Attend offsite'
-      },
-      'registration': {
-        mastheadBgClass: 'bg-cyan',
-        hasBeenLoaded: false,
-        title: 'Registration'
-      }
     };
 
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;

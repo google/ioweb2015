@@ -93,11 +93,11 @@ func TestPageTitle(t *testing.T) {
 	}
 }
 
-func TestPageMeta(t *testing.T) {
-	const smeta = `{{define "meta"}}"title": "my title", "foo": "bar"{{end}}`
-	want := meta{"title": "my title", "foo": "bar"}
+func TestMetaFromTemplate(t *testing.T) {
+	const smeta = `{{define "title"}}my title{{end}}{{define "mastheadBgClass"}}blue{{end}}`
+	want := meta{"title": "my title", "mastheadBgClass": "blue", "hasBeenLoaded": false}
 	tmpl := template.Must(template.New("").Parse(smeta))
-	m := pageMeta(tmpl)
+	m := metaFromTemplate(tmpl)
 	if !reflect.DeepEqual(m, want) {
 		t.Errorf("pageMeta(%s) = %#v; want %#v", smeta, m, want)
 	}

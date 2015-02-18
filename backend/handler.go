@@ -89,8 +89,9 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 
 	data := &templateData{}
 	if experimentShare {
-		data.Desc = descExperiment
+		data.OgTitle = defaultTitle
 		data.OgImage = ogImageExperiment
+		data.Desc = descExperiment
 	}
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")

@@ -56,14 +56,14 @@ type appConfig struct {
 
 // initConfig reads server config file into the config global var.
 // Args provided to this func take precedence over config file values.
-func initConfig(configPath, addr string) {
+func initConfig(configPath, addr string) error {
 	file, err := os.Open(configPath)
 	if err != nil {
-		panic("initConfig: error locating " + configPath)
+		return err
 	}
 	defer file.Close()
 	if err := json.NewDecoder(file).Decode(&config); err != nil {
-		panic("initConfig: " + err.Error())
+		return err
 	}
 	if addr != "" {
 		config.Addr = addr
@@ -72,6 +72,7 @@ func initConfig(configPath, addr string) {
 		config.Prefix = "/" + config.Prefix
 	}
 	sort.Strings(config.Whitelist)
+	return nil
 }
 
 // isWhitelisted returns true if either email or its domain

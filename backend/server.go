@@ -28,9 +28,13 @@ var (
 // main is the entry point of the standalone server.
 func main() {
 	flag.Parse()
-	initConfig(*flagConfig, *flagAddr)
+	if err := initConfig(*flagConfig, *flagAddr); err != nil {
+		panic("initConfig: " + err.Error())
+	}
+	if err := initTemplates(); err != nil {
+		panic("initTemplates: " + err.Error())
+	}
 	cache = newMemoryCache()
-
 	wrapHandler = logHandler
 	handle("/", catchAllHandler)
 	handle("/api/extended", serveIOExtEntries)

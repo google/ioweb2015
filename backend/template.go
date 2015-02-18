@@ -2,8 +2,8 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"html/template"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -25,9 +25,20 @@ const (
 	// images for og:image meta tag
 	ogImageDefault    = "io15-color.png"
 	ogImageExperiment = "io15-experiment.png"
+
+	// templatesDir is the templates directory path relative to config.Dir.
+	templatesDir = "templates"
 )
 
 var (
+	muMeta sync.Mutex
+	// allPages is a map of all pages found in app/templates.
+	// It is guarded by muMeta.
+	allPages = make(map[string]meta)
+
+	// metaTemplates defines which templates go into a page meta as string values.
+	metaTemplates = []string{"title", "mastheadBgClass"}
+
 	// tmplFunc is a map of functions available to all templates.
 	tmplFunc = template.FuncMap{
 		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
@@ -44,12 +55,38 @@ type templateCache struct {
 
 // templateData is the templates context
 type templateData struct {
-	Title, Desc, Slug, Canonical, Env, OgImage string
-	Meta                                       meta
+	Title, Desc, OgTitle, OgImage string
+	Slug, Canonical, Env          string
+	Meta                          meta
+	Pages                         map[string]meta
 }
 
 // meta is a page meta info.
 type meta map[string]interface{}
+
+// initTemplates makes all needed initialization to render templates
+// It is to be called after initConfig().
+func initTemplates() error {
+	muMeta.Lock()
+	defer muMeta.Unlock()
+	var root = filepath.Join(config.Dir, templatesDir)
+	return filepath.Walk(root, func(p string, fi os.FileInfo, err error) error {
+		if err != nil || p == root || fi.IsDir() {
+			return nil
+		}
+		ext := filepath.Ext(p)
+		if ext != ".html" || strings.HasPrefix(fi.Name(), "layout_") {
+			return nil
+		}
+		name := p[len(root)+1 : len(p)-len(ext)]
+		t, err := parseTemplate(name, true)
+		if err != nil {
+			return err
+		}
+		allPages[name] = metaFromTemplate(t)
+		return nil
+	})
+}
 
 // renderTemplate executes a template found in name.html file
 // using either layout_full.html or layout_partial.html as the root template.
@@ -59,16 +96,15 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	if err != nil {
 		return nil, err
 	}
-
 	if data == nil {
 		data = &templateData{}
 	}
 	if data.Env == "" {
 		data.Env = config.Env
 	}
-	m := pageMeta(tpl)
-	data.Meta = m
-	data.Title = pageTitle(m)
+	data.Pages = allPages
+	data.Meta = pageMeta(name, tpl)
+	data.Title = pageTitle(data.Meta)
 	data.Slug = name
 	data.Canonical = data.Slug
 	if data.Canonical == "home" {
@@ -79,6 +115,9 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	}
 	if data.OgImage == "" {
 		data.OgImage = ogImageDefault
+	}
+	if data.OgTitle == "" {
+		data.OgTitle = data.Title
 	}
 
 	var b bytes.Buffer
@@ -109,8 +148,8 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 	}
 
 	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(config.Dir, "templates", layout),
-		filepath.Join(config.Dir, "templates", name+".html"),
+		filepath.Join(config.Dir, templatesDir, layout),
+		filepath.Join(config.Dir, templatesDir, name+".html"),
 	)
 	if err != nil {
 		return nil, err
@@ -129,17 +168,28 @@ func pageTitle(m meta) string {
 	return title + " - " + defaultTitle
 }
 
-// pageMeta extracts page meta info by executing "meta" template.
-// The template is assumed to be a JSON object body (w/o {}).
-// Returns empty meta if template execution fails.
-func pageMeta(t *template.Template) meta {
-	m := make(meta)
-	b := new(bytes.Buffer)
-	b.WriteRune('{')
-	if err := t.ExecuteTemplate(b, "meta", nil); err != nil {
+// pageMeta returns either a cached meta from allPages or uses metaFromTemplate().
+func pageMeta(name string, t *template.Template) meta {
+	muMeta.Lock()
+	defer muMeta.Unlock()
+	if m, ok := allPages[name]; ok {
 		return m
 	}
-	b.WriteRune('}')
-	json.Unmarshal(b.Bytes(), &m)
+	allPages[name] = metaFromTemplate(t)
+	return allPages[name]
+}
+
+// metaFromTemplate creates a meta map by executing metaTemplates.
+// It always returns a non-nil meta.
+func metaFromTemplate(t *template.Template) meta {
+	m := make(meta)
+	m["hasBeenLoaded"] = false
+	for _, n := range metaTemplates {
+		b := new(bytes.Buffer)
+		if err := t.ExecuteTemplate(b, n, nil); err != nil {
+			continue
+		}
+		m[n] = b.String()
+	}
 	return m
 }
