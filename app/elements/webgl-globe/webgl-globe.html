@@ -161,6 +161,15 @@ Makes a globe or whatever.
       activated_: false,
 
       /**
+       * Whether WebGL state has finished intializing.
+       *
+       * @property webglReady_
+       * @type bool
+       * @default false
+       */
+      webglReady_: false,
+
+      /**
        * The previous location focused on.
        *
        * @property previousLocation_
@@ -396,6 +405,7 @@ Makes a globe or whatever.
 
             this.globeCubemap = assets[1];
 
+            this.webglReady_ = true;
             this.async(this.scheduleUpdate_);
           }.bind(this))
           .catch(function(reason) {
@@ -567,7 +577,7 @@ Makes a globe or whatever.
       },
 
       scheduleUpdate_: function() {
-        if (this.animate_ && !this.updateScheduled_) {
+        if (this.animate_ && this.webglReady_ && !this.updateScheduled_) {
           this.updateScheduled_ = true;
           window.requestAnimationFrame(this.boundUpdate_);
         }
