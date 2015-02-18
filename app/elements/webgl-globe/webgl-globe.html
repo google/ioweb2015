@@ -306,6 +306,7 @@ Makes a globe or whatever.
         this.currentLocation_ = {lat: 0, lng: 0};
 
         this.resizeCallback_ = this.canvasResized.bind(this);
+        this.boundUpdate_ = this.update_.bind(this);
       },
 
       attached: function() {
@@ -568,7 +569,7 @@ Makes a globe or whatever.
       scheduleUpdate_: function() {
         if (this.animate_ && !this.updateScheduled_) {
           this.updateScheduled_ = true;
-          window.requestAnimationFrame(this.update_.bind(this));
+          window.requestAnimationFrame(this.boundUpdate_);
         }
       },
 
