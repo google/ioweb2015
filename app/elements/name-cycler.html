@@ -12,7 +12,6 @@ limitations under the License.
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/core-scroll-threshold/core-scroll-threshold.html">
 <link rel="import" href="../bower_components/core-selector/core-selector.html">
 
 <!--
@@ -23,7 +22,7 @@ finally stopping when reaching a randomly selected item.
 
 @element name-cycler
 -->
-<polymer-element name="name-cycler" attributes="interval items auto selectedModel scrollTarget">
+<polymer-element name="name-cycler" attributes="interval items auto selectedModel">
   <template>
     <style>
       :host {
@@ -58,13 +57,6 @@ finally stopping when reaching a randomly selected item.
         z-index: 101; /* Higher than next element to transition. */
       }
     </style>
-    <template if="{{scrollTarget}}">
-      <core-scroll-threshold
-        lowerTriggered="{{auto}}"
-        lowerThreshold="{{lowerThreshold}}"
-        scrollTarget="{{scrollTarget}}">
-      </core-scroll-threshold>
-    </template>
     <core-selector id="selector" selectedModel="{{selectedModel}}">
       <template repeat="{{items}}">
         <div>{{}}</div>
@@ -107,17 +99,6 @@ finally stopping when reaching a randomly selected item.
         interval: 4000,
 
         /**
-         * When set and `auto` is false, the scroll position of `scrollTarget`
-         * will be observed. When this `name-cyler` scrolls into view, the name
-         * cycling animation will begin.
-         *
-         * @attribute scrollTarget
-         * @type Element
-         * @default null
-         */
-        scrollTarget: null,
-
-        /**
          * Returns the model associated with the selected item.
          *
          * @attribute selectedModel
@@ -127,16 +108,6 @@ finally stopping when reaching a randomly selected item.
         selectedModel: null
       },
 
-      /**
-       * The pixel threshold in the parent scrollTarget at which to start
-       * animating.
-       *
-       * @property lowerThreshold
-       * @type number
-       * @default 1.7976931348623157e+308
-       */
-      lowerThreshold: Number.MAX_VALUE,
-
       created: function() {
         this.items = [];
       },
@@ -144,15 +115,6 @@ finally stopping when reaching a randomly selected item.
       attached: function() {
         if (this.auto) {
           this.start();
-        }
-      },
-
-      domReady: function() {
-        if (this.scrollTarget) {
-          var elementRect = this.getBoundingClientRect();
-          var thresholdValue = this.scrollTarget.scrollHeight -
-              Math.round(elementRect.bottom);
-          this.lowerThreshold = thresholdValue;
         }
       },
 

@@ -12,6 +12,7 @@ limitations under the License.
 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-scroll-threshold/core-scroll-threshold.html">
 
 <script src="../../bower_components/es6-promise-2.0.1.min/index.js"></script>
 <script src="webgl-globe-namespace.js"></script>
@@ -26,7 +27,7 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
-<polymer-element name="webgl-globe" attributes="active autoInit cameraDistance fov location locationTarget offsetY transitionDuration">
+<polymer-element name="webgl-globe" attributes="cameraDistance fov location locationTarget noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration">
   <template>
     <style>
       :host {
@@ -42,6 +43,13 @@ Makes a globe or whatever.
       }
     </style>
     <canvas id="canvas"></canvas>
+    <template if="{{scrollTarget}}">
+      <core-scroll-threshold id="globeThreshold"
+        lowerTriggered="{{scrollTriggered}}"
+        lowerThreshold="{{scrollThreshold_}}"
+        scrollTarget="{{scrollTarget}}">
+      </core-scroll-threshold>
+    </template>
   </template>
   <script>
   (function() {
@@ -69,28 +77,27 @@ Makes a globe or whatever.
 
     Polymer({
       /**
-       * Whether the globe should be rendered in the page. The first time this
-       * attribute goes from false to true, the WebGL context and assets are
-       * initialized (overriding `autoInit`) and drawn to the screen. Any
-       * subsequent times it is set to false and then back to true, the WebGL
-       * assets are retained and only rendering is affected.
+       * By default, the globe is immediately drawn and animated after
+       * initialization. If `noDraw` is set to true, however, rendering will not
+       * occur (or will cease, if it has already begun).
        *
-       * @attribute active
+       * @attribute noDraw
        * @type bool
        * @default false
        */
-      active: false,
+      noDraw: false,
 
       /**
-       * Whether the WebGL context and assets should be initialized. Setting
-       * this to `true` while `active` is still `false` allows the globe to be
-       * ready to draw immediately when `active` is set to `true`.
+       * By default, the element's canvas will be intialized to draw the globe
+       * and any assets needed for textures or geometry will be created. If
+       * `noInit` is set to true, however, initialization will not proceed until
+       * the attribute is set to false.
        *
-       * @attribute autoInit
+       * @attribute noInit
        * @type bool
        * @default false
        */
-      autoInit: false,
+      noInit: false,
 
       /**
        * The latitude and longitude of the location to focus on.
@@ -143,25 +150,56 @@ Makes a globe or whatever.
       offsetY: 0,
 
       /**
+       * When set, this element's scroll position will be observed for when this
+       * `webgl-globe` is visible (using `<core-scroll-threshold>`), at which
+       * point globe rendering will commence (subject to the value of `noDraw`).
+       *
+       * @attribute scrollTarget
+       * @type Element
+       * @default null
+       */
+      scrollTarget: null,
+
+      /**
+       * Read-only value returns true if a `scrollTarget` is specified and the
+       * globe has scrolled into view.
+       *
+       * @attribute scrollTriggered
+       * @type bool
+       * @default false
+       */
+      scrollTriggered: false,
+
+      /**
        * The duration (ms) over which transitions between locations occur.
        *
        * @attribute transitionDuration
        * @type number
-       * @default 2000
+       * @default 4000
        */
-      transitionDuration: 2000,
+      transitionDuration: 4000,
 
       /**
-       * Whether WebGL rendering has been activated before.
+       * The pixel threshold in the parent scrollTarget at which to start
+       * animating.
        *
-       * @property activated_
+       * @property scrollThreshold_
+       * @type number
+       * @default 1.7976931348623157e+308
+       */
+      scrollThreshold_: Number.MAX_VALUE,
+
+      /**
+       * Whether WebGL initialization has been started.
+       *
+       * @property webglStarted_
        * @type bool
        * @default false
        */
-      activated_: false,
+      webglStarted_: false,
 
       /**
-       * Whether WebGL state has finished intializing.
+       * Whether WebGL initialization has finished.
        *
        * @property webglReady_
        * @type bool
@@ -170,7 +208,7 @@ Makes a globe or whatever.
       webglReady_: false,
 
       /**
-       * The previous location focused on.
+       * The previous location focused on. Used for animating locations.
        *
        * @property previousLocation_
        * @type object
@@ -178,7 +216,7 @@ Makes a globe or whatever.
        */
 
       /**
-       * The current location being focuse on.
+       * The current location being focused on. Used for animating locations.
        *
        * @property currentLocation_
        * @type object
@@ -240,23 +278,24 @@ Makes a globe or whatever.
       gl: null,
 
       /**
-       * Whether to actively animate the globe.
+       * Internal state to shut off rendering of the globe when circumstances
+       * warrant it.
        *
        * @property animate_
        * @type boolean
-       * @default false
+       * @default true
        */
-      animate_: false,
+      animate_: true,
 
       /**
-       * A requestAnimationFrame call has been made to redraw the globe on the
-       * next frame.
+       * The requestAnimationFrame ID for the next requested frame, or 0 if no
+       * request is pending.
        *
-       * @property updateScheduled_
-       * @type bool
-       * @default false
+       * @property updateRequestId_
+       * @type number
+       * @default 0
        */
-      updateScheduled_: false,
+      updateRequestId_: 0,
 
       /**
        * Number of primitives to draw to render the globe.
@@ -319,44 +358,59 @@ Makes a globe or whatever.
       },
 
       attached: function() {
-        // Start loading assets, but hold off on WebGL initialization.
+        // Start loading assets even if WebGL initialization will be delayed.
         this.loadingTextures_ = this.loadTextures_();
         this.loadingShaders_ = this.loadShaders_();
 
-        if (this.autoInit || this.active) {
-          this.async(this.init_);
+        if (!this.noInit) {
+          this.async(this.initWebgl_);
+        }
+      },
+
+      domReady: function() {
+        if (this.scrollTarget) {
+          // Start animating when canvas is halfway on screen.
+          this.animate_ = false;
+          var elementRect = this.getBoundingClientRect();
+          this.scrollThreshold_ = this.scrollTarget.scrollHeight -
+              Math.round((elementRect.bottom + elementRect.top) / 2);
         }
       },
 
       detached: function() {
         this.animate_ = false;
+        window.cancelAnimationFrame(this.updateRequestId_);
+        this.updateRequestId_ = 0;
         window.removeEventListener('resize', this.resizeCallback_);
       },
 
-      activeChanged: function() {
-        if (this.active) {
-          if (!this.activated_) {
-            this.init_();
-          } else {
-            this.animate_ = true;
-            this.async(this.scheduleUpdate_);
-          }
+      noInitChanged: function() {
+        if (!this.noInit) {
+          this.initWebgl_();
+        }
+      },
+
+      noDrawChanged: function() {
+        if (this.noDraw) {
+          window.cancelAnimationFrame(this.updateRequestId_);
+          this.updateRequestId_ = 0;
         } else {
-          this.animate_ = false;
+          this.async(this.scheduleUpdate_);
         }
       },
 
-      autoInitChanged: function() {
-        if (this.autoInit && !this.activated_) {
-          this.init_();
+      scrollTriggeredChanged: function() {
+        if (this.scrollTriggered) {
+          this.animate_ = true;
+          this.async(this.scheduleUpdate_);
         }
       },
 
-      init_: function() {
-        if (this.activated_) {
+      initWebgl_: function() {
+        if (this.webglStarted_) {
           return;
         }
-        this.activated_ = true;
+        this.webglStarted_ = true;
 
         var gl = this.gl = this.$.canvas.getContext('webgl');
         if (!gl) {
@@ -393,6 +447,7 @@ Makes a globe or whatever.
 
         this.drawCount = globeIndices.length;
 
+        // After loading, initialize textures and shaders and begin render loop.
         Promise.all([
           this.loadingShaders_,
           this.loadingTextures_.then(this.initCubeMap_.bind(this))
@@ -412,24 +467,6 @@ Makes a globe or whatever.
             // TODO(bckenny): give up
             IOWA.Analytics.trackError('globe initialization', reason);
           });
-      },
-
-      resize_: function() {
-        var canvas = this.$.canvas;
-        var resolutionScale = window.devicePixelRatio > 1 ? 2 : 1;
-        var width = canvas.offsetWidth;
-        var height = canvas.offsetHeight;
-        canvas.width = width * resolutionScale;
-        canvas.height = height * resolutionScale;
-        this.gl.viewport(0, 0, width * resolutionScale,
-            height * resolutionScale);
-
-        var center = this.cameraDistance;
-        this.projectionTransform_.identity()
-          .translate(0, this.offsetY, 0)
-          .perspective(this.fov, width / height, center - 1, center + 1);
-
-        this.resizeNeeded_ = false;
       },
 
       loadShaders_: function() {
@@ -576,18 +613,33 @@ Makes a globe or whatever.
             this.location.lng, t);
       },
 
+      resize_: function() {
+        var canvas = this.$.canvas;
+        var resolutionScale = window.devicePixelRatio > 1 ? 2 : 1;
+        var width = canvas.offsetWidth;
+        var height = canvas.offsetHeight;
+        canvas.width = width * resolutionScale;
+        canvas.height = height * resolutionScale;
+        this.gl.viewport(0, 0, width * resolutionScale,
+            height * resolutionScale);
+
+        var center = this.cameraDistance;
+        this.projectionTransform_.identity()
+          .translate(0, this.offsetY, 0)
+          .perspective(this.fov, width / height, center - 1, center + 1);
+
+        this.resizeNeeded_ = false;
+      },
+
       scheduleUpdate_: function() {
-        if (this.animate_ && this.webglReady_ && !this.updateScheduled_) {
-          this.updateScheduled_ = true;
-          window.requestAnimationFrame(this.boundUpdate_);
+        if (this.animate_ && !this.noDraw && this.webglReady_ &&
+            this.updateRequestId_ === 0) {
+          this.updateRequestId_ =
+              window.requestAnimationFrame(this.boundUpdate_);
         }
       },
 
       update_: function(timestamp) {
-        this.updateScheduled_ = false;
-        if (!this.animate_) {
-          return;
-        }
         if (this.resizeNeeded_) {
           this.resize_();
         }
@@ -620,6 +672,7 @@ Makes a globe or whatever.
 
         gl.drawElements(gl.TRIANGLES, this.drawCount, gl.UNSIGNED_SHORT, 0);
 
+        this.updateRequestId_ = 0;
         this.scheduleUpdate_();
       }
     });

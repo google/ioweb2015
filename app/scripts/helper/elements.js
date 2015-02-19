@@ -316,7 +316,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.Template = template;
     IOWA.Elements.ScrollContainer = document.querySelector(
         'core-drawer-panel [main]');
-    template.scrollContainer = IOWA.Elements.ScrollContainer;
+    template.ScrollContainer = IOWA.Elements.ScrollContainer;
   };
 
   return {
