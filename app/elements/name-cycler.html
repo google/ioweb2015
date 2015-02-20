@@ -18,7 +18,7 @@ limitations under the License.
 Vertically cycles through a list of items, fading in the current selection, then
 finally stopping when reaching a randomly selected item.
 
-    <name-cycler items="['Kyoto', 'Chiang Mai']" interval="1000"></name-cycler>
+    <name-cycler items="['Kyoto', 'Chiang Mai']" interval="1000" auto></name-cycler>
 
 @element name-cycler
 -->
@@ -85,9 +85,9 @@ finally stopping when reaching a randomly selected item.
          *
          * @attribute auto
          * @type bool
-         * @default true
+         * @default false
          */
-        auto: {value: true, reflect: true},
+        auto: {value: false, reflect: true},
 
         /**
          * Time between cycling, in milliseconds.
@@ -113,14 +113,6 @@ finally stopping when reaching a randomly selected item.
       },
 
       attached: function() {
-        // Ignore auto on iOS and just pick a city at random.
-        // See https://github.com/GoogleChrome/ioweb2015/issues/547
-        if (isOS()) {
-          var idx = Math.floor(Math.random() * this.$.selector.items.length);
-          this.$.selector.selectIndex(idx);
-          return;
-        }
-
         if (this.auto) {
           this.start();
         }
@@ -146,6 +138,13 @@ finally stopping when reaching a randomly selected item.
       start: function() {
         // Randomly pick a stopping point.
         var endIndex = Math.floor(Math.random() * this.items.length);
+
+        // Ignore auto on iOS and just pick a city at random.
+        // See https://github.com/GoogleChrome/ioweb2015/issues/547
+        if (isOS()) {
+          this.$.selector.selectIndex(endIndex);
+          return;
+        }
 
         // Start just after endIndex to get the full cycle!
         this.$.selector.selected = (endIndex + 1) % this.items.length;

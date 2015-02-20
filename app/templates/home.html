@@ -106,18 +106,23 @@
     <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey">
       <h2>
         <i18n-msg msgid="attend-from">Attend I/O from</i18n-msg>
-        <name-cycler items="{{cycleLocations | keysFilter}}" selectedModel="{{cycledName}}"></name-cycler>
+        <name-cycler items="{{cycleLocations | keysFilter}}"
+                     selectedModel="{{cycledName}}"
+                     auto?="{{homeGlobeVisible}}"></name-cycler>
         <br>
         <i18n-msg msgid="attend-wherever">or wherever you may be</i18n-msg>
       </h2>
       <div class="attend__globe">
-        <!-- <webgl-globe location="{{cycleLocations[cycledName]}}"
+        <webgl-globe location="{{cycleLocations[cycledName]}}"
                      locationTarget="{'lat': 36.15, 'lng': 0}"
                      fov="0.3927"
                      offsetY="-0.625"
                      transitionDuration="4000"
-                     active?="{{pageTransitionDone}}"></webgl-globe>
-        <div class="globe-marker"></div> -->
+                     scrollTarget="{{ScrollContainer}}"
+                     scrollTriggered="{{homeGlobeVisible}}"
+                     noInit?="{{!pageTransitionDone}}"
+                     noDraw?="{{mode === 'active'}}"></webgl-globe>
+        <div class="globe-marker"></div>
       </div>
     </section>
 
