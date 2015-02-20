@@ -5,7 +5,7 @@ varying vec3 globeCoord;
 
 uniform samplerCube globeCubemap;
 
-const vec3 sunDirection = vec3(.3, .4, 1);
+uniform vec3 sunDirection;
 
 void main() {
   vec3 color = textureCube(globeCubemap, globeCoord).rgb;

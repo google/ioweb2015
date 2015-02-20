@@ -19,6 +19,7 @@ limitations under the License.
 <script src="matrix4x4.js"></script>
 <script src="shader-program.js"></script>
 <script src="geometry.js"></script>
+<script src="sol.js"></script>
 
 <!--
 Makes a globe or whatever.
@@ -58,6 +59,7 @@ Makes a globe or whatever.
     var Matrix4x4 = IOWA.WebglGlobe.Matrix4x4;
     var generateGeometry = IOWA.WebglGlobe.generateGeometry;
     var generateIndexArray = IOWA.WebglGlobe.generateIndexArray;
+    var getSolarPosition = IOWA.WebglGlobe.getSolarPosition;
 
     /**
      * Polyfilled performance.now. Only good for relative timing, not absolute.
@@ -71,6 +73,12 @@ Makes a globe or whatever.
      * @type {!Matrix4x4}
      */
     var tmpTransform = new Matrix4x4();
+
+    /**
+     * Temporary vec3 Float32Array for passing values into WebGL.
+     * @type {!Float32Array}
+     */
+    var tmpVec3 = new Float32Array(3);
 
     // Trigger es6-promise
     ES6Promise.polyfill();
@@ -665,10 +673,13 @@ Makes a globe or whatever.
           .rotateX(rotX * Math.PI / 180)
           .rotateY(rotY * Math.PI / 180);
 
+        var sunDirection = getSolarPosition(new Date(), tmpVec3);
+
         // Set uniforms on shader program.
         this.globeProgram.uniforms.globeMatrix(worldTransform.m_);
         this.globeProgram.uniforms.viewMatrix(this.projectionTransform_.m_);
         this.globeProgram.uniforms.globeCubemap(0);
+        this.globeProgram.uniforms.sunDirection(sunDirection);
 
         gl.drawElements(gl.TRIANGLES, this.drawCount, gl.UNSIGNED_SHORT, 0);
 
