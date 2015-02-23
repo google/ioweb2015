@@ -1,7 +1,7 @@
 precision mediump float;
 
-uniform samplerCube globeCubemap;
-uniform samplerCube nightCubemap;
+uniform samplerCube globeCubeMap;
+uniform samplerCube nightCubeMap;
 
 varying vec3 globeCoord;
 varying vec3 atmosphereGlow;
@@ -12,8 +12,8 @@ const vec3 lightsColor = vec3(.98, .93, .6) * .7;
 const vec3 nightGroundScale = vec3(.1, .1, .25);
 
 void main() {
-  vec3 groundColor = textureCube(globeCubemap, globeCoord).rgb;
-  vec3 extrasColor = textureCube(nightCubemap, globeCoord).rgb;
+  vec3 groundColor = textureCube(globeCubeMap, globeCoord).rgb;
+  vec3 extrasColor = textureCube(nightCubeMap, globeCoord).rgb;
 
   // Blending coefficient for when surface light is less than nightCrossover.
   float attenuation = dot(surfaceAttenuation, surfaceAttenuation);

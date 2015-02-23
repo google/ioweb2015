@@ -3,12 +3,12 @@ precision mediump float;
 varying vec3 spaceCoord;
 varying vec3 globeCoord;
 
-uniform samplerCube globeCubemap;
+uniform samplerCube globeCubeMap;
 
 uniform vec3 sunDirection;
 
 void main() {
-  vec3 color = textureCube(globeCubemap, globeCoord).rgb;
+  vec3 color = textureCube(globeCubeMap, globeCoord).rgb;
 
   vec3 normal = normalize(globeCoord);
   float light = max(0., dot(normal, normalize(sunDirection))) + .3;
