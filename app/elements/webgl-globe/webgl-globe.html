@@ -19,6 +19,7 @@ limitations under the License.
 <script src="matrix4x4.js"></script>
 <script src="shader-program.js"></script>
 <script src="geometry.js"></script>
+<script src="sol.js"></script>
 
 <!--
 Makes a globe or whatever.
@@ -58,6 +59,7 @@ Makes a globe or whatever.
     var Matrix4x4 = IOWA.WebglGlobe.Matrix4x4;
     var generateGeometry = IOWA.WebglGlobe.generateGeometry;
     var generateIndexArray = IOWA.WebglGlobe.generateIndexArray;
+    var getSolarPosition = IOWA.WebglGlobe.getSolarPosition;
 
     /**
      * Polyfilled performance.now. Only good for relative timing, not absolute.
@@ -70,7 +72,19 @@ Makes a globe or whatever.
      * Matrix used for ephemeral transformations.
      * @type {!Matrix4x4}
      */
-    var tmpTransform = new Matrix4x4();
+    var tmpTransform0 = new Matrix4x4();
+
+    /**
+     * Matrix used for ephemeral transformations.
+     * @type {!Matrix4x4}
+     */
+    var tmpTransform1 = new Matrix4x4();
+
+    /**
+     * Temporary vec3 Float32Array for passing values into WebGL.
+     * @type {!Float32Array}
+     */
+    var tmpVec3 = new Float32Array(3);
 
     // Trigger es6-promise
     ES6Promise.polyfill();
@@ -307,13 +321,22 @@ Makes a globe or whatever.
       drawCount: 0,
 
       /**
-       * The globe cubemap texture object.
+       * The globe cube map texture object.
        *
-       * @property globeCubemap
+       * @property globeCubeMap
        * @type WebGLTexture
        * @default null
        */
-      globeCubemap: null,
+      globeCubeMap: null,
+
+      /**
+       * A cube map texture object with extra information for e.g. night lights.
+       *
+       * @property nightCubeMap
+       * @type WebGLTexture
+       * @default null
+       */
+      nightCubeMap: null,
 
       /**
        * Timeout for outliers on perf analytics.
@@ -359,7 +382,8 @@ Makes a globe or whatever.
 
       attached: function() {
         // Start loading assets even if WebGL initialization will be delayed.
-        this.loadingTextures_ = this.loadTextures_();
+        this.loadingTextures_ = this.loadCubeMapTextures_('albedo', '.jpg');
+        this.loadingNightTextures_ = this.loadCubeMapTextures_('night', '.png');
         this.loadingShaders_ = this.loadShaders_();
 
         if (!this.noInit) {
@@ -450,7 +474,8 @@ Makes a globe or whatever.
         // After loading, initialize textures and shaders and begin render loop.
         Promise.all([
           this.loadingShaders_,
-          this.loadingTextures_.then(this.initCubeMap_.bind(this))
+          this.loadingTextures_.then(this.initCubeMap_.bind(this)),
+          this.loadingNightTextures_.then(this.initCubeMap_.bind(this))
         ])
           .then(function assetsLoaded(assets) {
             this.globeProgram = new ShaderProgram(this.gl, assets[0][0],
@@ -458,7 +483,8 @@ Makes a globe or whatever.
             this.globeProgram.use();
             this.gl.enableVertexAttribArray(this.globeProgram.attributes.coord);
 
-            this.globeCubemap = assets[1];
+            this.globeCubeMap = assets[1];
+            this.nightCubeMap = assets[2];
 
             this.webglReady_ = true;
             this.async(this.scheduleUpdate_);
@@ -471,8 +497,8 @@ Makes a globe or whatever.
 
       loadShaders_: function() {
         return Promise.all([
-          'shaders/simple.vert',
-          'shaders/simple.frag'
+          'shaders/globe.vert',
+          'shaders/globe.frag'
         ].map(function(shaderUrl) {
           var resolvedUrl = this.resolvePath(shaderUrl);
           return new Promise(function(resolve, reject) {
@@ -493,15 +519,15 @@ Makes a globe or whatever.
         }, this));
       },
 
-      loadTextures_: function() {
+      loadCubeMapTextures_: function(prefix, extname) {
         // Cubemap GLenum constants from WebGL spec.
         var globeFaces = {
-          'negative-x.jpg': 0x8516,
-          'negative-y.jpg': 0x8518,
-          'negative-z.jpg': 0x851A,
-          'positive-x.jpg': 0x8515,
-          'positive-y.jpg': 0x8517,
-          'positive-z.jpg': 0x8519
+          'negative-x': 0x8516,
+          'negative-y': 0x8518,
+          'negative-z': 0x851A,
+          'positive-x': 0x8515,
+          'positive-y': 0x8517,
+          'positive-z': 0x8519
         };
 
         // Load six face images and associate them with their face GLenum value.
@@ -516,7 +542,8 @@ Makes a globe or whatever.
                 });
               };
               textureImage.onerror = reject;
-              textureImage.src = this.resolvePath('textures/' + faceName);
+              var filename = prefix + '-' + faceName + extname;
+              textureImage.src = this.resolvePath('textures/' + filename);
             }.bind(this));
           }, this)
         );
@@ -525,7 +552,7 @@ Makes a globe or whatever.
       initCubeMap_: function(faceData) {
         var gl = this.gl;
 
-        // Ceate cubemap texture from six loaded images.
+        // Ceate cube map texture from six loaded images.
         var textureStartTime = nowish();
         var textureId = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureId);
@@ -625,7 +652,6 @@ Makes a globe or whatever.
 
         var center = this.cameraDistance;
         this.projectionTransform_.identity()
-          .translate(0, this.offsetY, 0)
           .perspective(this.fov, width / height, center - 1, center + 1);
 
         this.resizeNeeded_ = false;
@@ -655,20 +681,36 @@ Makes a globe or whatever.
         gl.vertexAttribPointer(this.globeProgram.attributes.coord, 4, gl.FLOAT,
             false, 16, 0);
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubemap);
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubeMap);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.nightCubeMap);
 
         // globe to eye space
         var rotX = this.currentLocation_.lat - this.locationTarget.lat;
         var rotY = -this.currentLocation_.lng + this.locationTarget.lng;
-        var worldTransform = tmpTransform.identity()
-          .translate(0, 0, -this.cameraDistance)
+        var worldTransform = tmpTransform0.identity()
+          .translate(0, this.offsetY, -this.cameraDistance)
           .rotateX(rotX * Math.PI / 180)
           .rotateY(rotY * Math.PI / 180);
 
+        var sunDirection = getSolarPosition(new Date(), tmpVec3);
+
         // Set uniforms on shader program.
-        this.globeProgram.uniforms.globeMatrix(worldTransform.m_);
-        this.globeProgram.uniforms.viewMatrix(this.projectionTransform_.m_);
-        this.globeProgram.uniforms.globeCubemap(0);
+        this.globeProgram.uniforms.globeCubeMap(0);
+        this.globeProgram.uniforms.nightCubeMap(1);
+        this.globeProgram.uniforms.sunDirection(sunDirection);
+
+        // Lighting is done in globe space, so figure out camera position there.
+        var inverseWorld = tmpTransform1.invertAffine(worldTransform);
+        var cameraPosition = tmpVec3;
+        cameraPosition[0] = inverseWorld.getElement(0, 3);
+        cameraPosition[1] = inverseWorld.getElement(1, 3);
+        cameraPosition[2] = inverseWorld.getElement(2, 3);
+        this.globeProgram.uniforms.cameraPos(cameraPosition);
+
+        // Since lighting is in canonical globe space, use a single MVPMatrix.
+        worldTransform.product(this.projectionTransform_, worldTransform);
+        this.globeProgram.uniforms.mvpMatrix(worldTransform.m_);
 
         gl.drawElements(gl.TRIANGLES, this.drawCount, gl.UNSIGNED_SHORT, 0);
 

@@ -19,6 +19,16 @@ IOWA.WebglGlobe.Matrix4x4 = function() {
 IOWA.WebglGlobe.ArrayLike;
 
 /**
+ * Get the matrix element at position row, column.
+ * @param {number} row
+ * @param {number} column
+ * @return {number}
+ */
+IOWA.WebglGlobe.Matrix4x4.prototype.getElement = function(row, column) {
+  return this.m_[column * 4 + row];
+};
+
+/**
  * Reset matrix to the identity transformation.
  * @return {!IOWA.WebglGlobe.Matrix4x4} This matrix.
  */
@@ -26,6 +36,48 @@ IOWA.WebglGlobe.Matrix4x4.prototype.identity = function() {
   for (var i = 0; i < this.m_.length; i++) {
     this.m_[i] = i % 5 ? 0 : 1;
   }
+
+  return this;
+};
+
+/**
+ * Invert src and place in this transform. Special case for when src is a purely
+ * affine transformation.
+ * @param {!Matrix4x4} src
+ * @return {!Matrix4x4}
+ */
+IOWA.WebglGlobe.Matrix4x4.prototype.invertAffine = function(src) {
+  var m = this.m_;
+  var s = src.m_;
+
+  m[0] = s[5]*s[10] - s[9]*s[6];
+  m[1] = -s[1]*s[10] + s[9]*s[2];
+  m[2] = s[1]*s[6] - s[5]*s[2];
+  m[3] = 0;
+  m[4] = -s[4]*s[10] + s[8]*s[6];
+  m[5] = s[0]*s[10] - s[8]*s[2];
+  m[6] = -s[0]*s[6] + s[2]*s[4];
+  m[7] = 0;
+  m[8] = s[4]*s[9] - s[5]*s[8];
+  m[9] = -s[0]*s[9] + s[1]*s[8];
+  m[10] = s[0]*s[5] - s[1]*s[4];
+  m[11] = 0;
+
+  var det = 1 / (s[0]*m[0] + s[1]*m[1] + s[2]*m[8]);
+  m[0] *= det;
+  m[1] *= det;
+  m[2] *= det;
+  m[4] *= det;
+  m[5] *= det;
+  m[6] *= det;
+  m[8] *= det;
+  m[9] *= det;
+  m[10] *= det;
+
+  m[12] = -s[12]*m[0] - s[13]*m[4] - s[14]*m[8];
+  m[13] = -s[12]*m[1] - s[13]*m[5] - s[14]*m[9];
+  m[14] = -s[12]*m[2] - s[13]*m[6] - s[14]*m[10];
+  m[15] = 1;
 
   return this;
 };
@@ -95,8 +147,8 @@ IOWA.WebglGlobe.Matrix4x4.prototype.perspective = function(fov, aspect, near, fa
  * @return {!IOWA.WebglGlobe.Matrix4x4}
  */
 IOWA.WebglGlobe.Matrix4x4.prototype.product = function(view, local) {
-  var v = view.m;
-  var l = local.m;
+  var v = view.m_;
+  var l = local.m_;
 
   var m0 = v[0]*l[0] + v[4]*l[1] + v[8]*l[2] + v[12]*l[3];
   var m1 = v[1]*l[0] + v[5]*l[1] + v[9]*l[2] + v[13]*l[3];
@@ -118,22 +170,22 @@ IOWA.WebglGlobe.Matrix4x4.prototype.product = function(view, local) {
   var m14 = v[2]*l[12] + v[6]*l[13] + v[10]*l[14] + v[14]*l[15];
   var m15 = v[3]*l[12] + v[7]*l[13] + v[11]*l[14] + v[15]*l[15];
 
-  this.m[0] = m0;
-  this.m[1] = m1;
-  this.m[2] = m2;
-  this.m[3] = m3;
-  this.m[4] = m4;
-  this.m[5] = m5;
-  this.m[6] = m6;
-  this.m[7] = m7;
-  this.m[8] = m8;
-  this.m[9] = m9;
-  this.m[10] = m10;
-  this.m[11] = m11;
-  this.m[12] = m12;
-  this.m[13] = m13;
-  this.m[14] = m14;
-  this.m[15] = m15;
+  this.m_[0] = m0;
+  this.m_[1] = m1;
+  this.m_[2] = m2;
+  this.m_[3] = m3;
+  this.m_[4] = m4;
+  this.m_[5] = m5;
+  this.m_[6] = m6;
+  this.m_[7] = m7;
+  this.m_[8] = m8;
+  this.m_[9] = m9;
+  this.m_[10] = m10;
+  this.m_[11] = m11;
+  this.m_[12] = m12;
+  this.m_[13] = m13;
+  this.m_[14] = m14;
+  this.m_[15] = m15;
 
   return this;
 };
