@@ -98,63 +98,50 @@
 
       var ANIMATION_DURATION = 500;
 
-      var animationOptions = {
+      var animationTiming = {
         duration: ANIMATION_DURATION,
         fill: 'forwards',
         direction: reverse ? 'reverse' : 'normal',
         easing: 'cubic-bezier(0.4,0,0.2,1)'
       };
 
-      var animation = new AnimationGroup([
-        new Animation(bottomSection, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions)
-      ]);
-
-      // Top/bottom card animations
-      var cardAnimations = [
-        new Animation(topCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(-100px)', opacity: 0}
-        ], animationOptions),
-        new Animation(bottomCard, [
-          {transform: 'translateY(0)', opacity: 1},
-          {transform: 'translateY(100px)', opacity: 0}
-        ], animationOptions)
-      ];
+      var animation = new Animation(bottomSection, [
+        {transform: 'translateY(0)', opacity: 1},
+        {transform: 'translateY(100px)', opacity: 0}
+      ], animationTiming);
 
       var gallery = IOWA.Elements.Main.querySelector('io-gallery');
 
       // Only animate top/bottom cards offscreen if not on mobile.
       if (!gallery.mobile) {
-        // If under polyfill, code around not having AnimationGroup.append().
-        if (!animation.append) {
-          animation.children.push(cardAnimations[0], cardAnimations[1]);
-        } else {
-          animation.append(cardAnimations[0], cardAnimations[1]);
-        }
+        animation = new AnimationGroup([
+          new Animation(topCard, [
+            {transform: 'translateY(0)', opacity: 1},
+            {transform: 'translateY(-100px)', opacity: 0}
+          ], animationTiming),
+          new Animation(bottomCard, [
+            {transform: 'translateY(0)', opacity: 1},
+            {transform: 'translateY(100px)', opacity: 0}
+          ], animationTiming),
+          animation
+        ]);
       }
 
       var galleryAnimation = new Animation(gallery, [
         {opacity: 0}, {opacity: 1}
-      ], {
-        duration: ANIMATION_DURATION,
-        fill: 'forwards',
-        easing: 'cubic-bezier(0.4,0,0.2,1)',
-        direction: reverse ? 'reverse' : 'normal'
-      });
+      ], animationTiming);
 
       if (reverse) {
         // Fade out gallery and slide back in page sections at the same time.
-        IOWA.PageAnimation.play(galleryAnimation);
-        IOWA.PageAnimation.play(animation, opt_callback);
+        IOWA.PageAnimation.play(new AnimationGroup([
+          animation, galleryAnimation
+        ]), opt_callback);
         navOverlay.classList.remove('active');
       } else {
         // Slide out page sections, then fade in gallery.
-        IOWA.PageAnimation.play(animation, function() {
-          IOWA.PageAnimation.play(galleryAnimation, opt_callback);
-        });
+        IOWA.PageAnimation.play(new AnimationSequence([
+          animation, galleryAnimation
+        ]), opt_callback);
         navOverlay.classList.add('active');
       }
     }
