@@ -22,7 +22,7 @@ finally stopping when reaching a randomly selected item.
 
 @element name-cycler
 -->
-<polymer-element name="name-cycler" attributes="interval items auto selectedModel">
+<polymer-element name="name-cycler" attributes="interval items auto selectedCity">
   <template>
     <style>
       :host {
@@ -57,8 +57,8 @@ finally stopping when reaching a randomly selected item.
         z-index: 101; /* Higher than next element to transition. */
       }
     </style>
-    <core-selector id="selector" selectedModel="{{selectedModel}}">
-      <template repeat="{{items}}">
+    <core-selector id="selector" selectedModel="{{selectedCity}}">
+      <template repeat="{{itemKeys}}">
         <div>{{}}</div>
       </template>
     </core-selector>
@@ -99,17 +99,29 @@ finally stopping when reaching a randomly selected item.
         interval: 4000,
 
         /**
-         * Returns the model associated with the selected item.
+         * Returns city name that is selected.
          *
-         * @attribute selectedModel
+         * @attribute selectedCity
          * @type string
          * @default null
          */
-        selectedModel: null
+        selectedCity: null
       },
 
       created: function() {
-        this.items = [];
+        this.items = {
+          'Kyoto': {lat: 35.025699, lng: 135.751147},
+          'Kano': {lat: 11.9916085, lng: 8.532064},
+          'Porto Alegre': {lat: -30.0331,  lng: -51.2300},
+          'Detroit': {lat: 42.3314,  lng: -83.0458},
+          'Chiang Mai': {lat: 18.793553, lng: 98.972353},
+          'Porto': {lat: 41.1621,  lng: -8.6220},
+          'Calgary': {lat: 50.9535525, lng:-114.5718054},
+          'Durban': {lat: -29.8833,  lng: 31.0500},
+          'Melbourne': {lat: -37.8136,  lng: 144.9631},
+          'Nice': {lat: 43.6957891, lng: 7.2701128}
+        };
+        this.itemKeys = Object.keys(this.items);
       },
 
       attached: function() {
@@ -136,20 +148,19 @@ finally stopping when reaching a randomly selected item.
        * @method start
        */
       start: function() {
-        // Randomly pick a stopping point.
-        var endIndex = Math.floor(Math.random() * this.items.length);
+        // Randomly pick a location.
+        var index = Math.floor(Math.random() * this.itemKeys.length);
 
         // Ignore auto on iOS and just pick a city at random.
         // See https://github.com/GoogleChrome/ioweb2015/issues/547
         if (isOS()) {
-          this.$.selector.selectIndex(endIndex);
+          this.$.selector.selectIndex(index);
           return;
         }
 
-        // Start just after endIndex to get the full cycle!
-        this.$.selector.selected = (endIndex + 1) % this.items.length;
+        this.$.selector.selected = index;
 
-        this.interval_ = setInterval(function() {
+        this.cycleInterval_ = setInterval(function() {
           this.$.selector.selectNext(true);
         }.bind(this), this.interval);
       },
@@ -160,7 +171,7 @@ finally stopping when reaching a randomly selected item.
        * @method start
        */
       stop: function() {
-        clearInterval(this.interval_);
+        clearInterval(this.cycleInterval_);
       }
     });
   })();

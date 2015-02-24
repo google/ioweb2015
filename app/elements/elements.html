@@ -1,19 +1,6 @@
 <!-- Shared by all pages -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
-<script>
-/**
- * Transform an object into an array of its enumerable property names. Treats
- * null or undefined as the empty object. Defined after polymer.html so
- * PolymerExpressions exists, but before importing any elements that may use it.
- * @param {Object=} opt_obj
- * @return {!Array<string>}
- */
-PolymerExpressions.prototype.keysFilter = function(opt_obj) {
-  return opt_obj ? Object.keys(opt_obj) : [];
-};
-</script>
-
 <link rel="import" href="../bower_components/core-drawer-panel/core-drawer-panel.html">
 <link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
 <link rel="import" href="../bower_components/core-menu/core-menu.html">

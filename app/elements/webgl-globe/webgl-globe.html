@@ -102,7 +102,7 @@ Makes a globe or whatever.
       noDraw: false,
 
       /**
-       * By default, the element's canvas will be intialized to draw the globe
+       * By default, the element's canvas will be initialized to draw the globe
        * and any assets needed for textures or geometry will be created. If
        * `noInit` is set to true, however, initialization will not proceed until
        * the attribute is set to false.
@@ -618,6 +618,11 @@ Makes a globe or whatever.
         }
 
         this.transitionStart_ = nowish();
+
+        // Tell everyone we've arrived at the pin location.
+        this.async(function() {
+          this.fire('pin-arrival');
+        }, null, this.transitionDuration);
       },
 
       ease_: function(t) {
