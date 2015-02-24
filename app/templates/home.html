@@ -123,7 +123,7 @@
                      scrollTriggered="{{homeGlobeVisible}}"
                      noInit?="{{!pageTransitionDone}}"
                      noDraw?="{{mode === 'active'}}"
-                     on-pin-arrival="{{onArrivedAtGlobePin}}"></webgl-globe>
+                     on-location-transitionend="{{onArrivedAtGlobePin}}"></webgl-globe>
         <core-icon icon="io:place" class="globe-marker"></core-icon>
       </div>
     </section>

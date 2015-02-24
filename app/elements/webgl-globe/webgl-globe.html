@@ -619,9 +619,9 @@ Makes a globe or whatever.
 
         this.transitionStart_ = nowish();
 
-        // Tell everyone we've arrived at the pin location.
+        // Tell everyone we've arrived at the new location.
         this.async(function() {
-          this.fire('pin-arrival');
+          this.fire('location-transitionend');
         }, null, this.transitionDuration);
       },
 
