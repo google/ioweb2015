@@ -48,7 +48,6 @@ $name: 'page-home';
 .page__section--attend {
   position: relative;
   color: #fff;
-  @extend .bg-globe;
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 0;
@@ -64,6 +63,13 @@ $name: 'page-home';
 
   .attend__globe {
     min-height: 150px;
+    opacity: 0;
+    transition: opacity 1500ms linear;
+    will-change: opacity;
+
+    &.show {
+      opacity: 1;
+    }
   }
 }
 
