@@ -177,7 +177,7 @@ with the attribute `iologodestination`.
 
       // This runs forward and then in reverse, so wait for half of SHOW_FOR on
       // each iteration by calculating its offset.
-      var offset = DURATION / (DURATION + this.SHOW_FOR/2);
+      var offset = DURATION / (DURATION + this.SHOW_FOR / 2);
       var animation = [
         {transform: 'scale(0)', easing: 'cubic-bezier(0,0,0.21,1)'},
         {transform: 'scale(1)', offset: offset},
@@ -186,9 +186,9 @@ with the attribute `iologodestination`.
 
       var player = this.$.o2.animate(animation, {
         delay: this.START_DELAY,
-        duration: DURATION + this.SHOW_FOR/2,
+        duration: DURATION + this.SHOW_FOR / 2,
         iterations: 2,
-        direction: 'alternate',
+        direction: 'alternate'
       });
 
       player.onfinish = this.moveLogo.bind(this);
