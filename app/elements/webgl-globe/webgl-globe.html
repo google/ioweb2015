@@ -436,10 +436,14 @@ Makes a globe or whatever.
         }
         this.webglStarted_ = true;
 
-        var gl = this.gl = this.$.canvas.getContext('webgl');
+        var contextOptions = {
+          depth: false
+        };
+        var canvas = this.$.canvas;
+        var gl = canvas.getContext('webgl', contextOptions);
         if (!gl) {
           // Attempt with experimental-webgl.
-          gl = this.gl = this.$.canvas.getContext('experimental-webgl');
+          gl = canvas.getContext('experimental-webgl', contextOptions);
 
           if (!gl) {
             IOWA.Analytics.trackEvent('globe', 'webgl unsupported');
@@ -447,6 +451,7 @@ Makes a globe or whatever.
             return;
           }
         }
+        this.gl = gl;
 
         window.addEventListener('resize', this.resizeCallback_);
 
@@ -482,9 +487,15 @@ Makes a globe or whatever.
                 assets[0][1]);
             this.globeProgram.use();
             this.gl.enableVertexAttribArray(this.globeProgram.attributes.coord);
+            gl.vertexAttribPointer(this.globeProgram.attributes.coord, 4,
+                gl.FLOAT, false, 16, 0);
 
             this.globeCubeMap = assets[1];
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubeMap);
             this.nightCubeMap = assets[2];
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.nightCubeMap);
 
             this.webglReady_ = true;
             this.async(this.scheduleUpdate_);
@@ -680,15 +691,6 @@ Makes a globe or whatever.
         }
 
         var gl = this.gl;
-
-        // TODO(bckenny): don't necessarily need to do these every frame.
-        this.globeProgram.use();
-        gl.vertexAttribPointer(this.globeProgram.attributes.coord, 4, gl.FLOAT,
-            false, 16, 0);
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubeMap);
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.nightCubeMap);
 
         // globe to eye space
         var rotX = this.currentLocation_.lat - this.locationTarget.lat;
