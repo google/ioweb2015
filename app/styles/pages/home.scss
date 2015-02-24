@@ -48,7 +48,6 @@ $name: 'page-home';
 .page__section--attend {
   position: relative;
   color: #fff;
-  @extend .bg-globe;
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 0;
@@ -64,6 +63,23 @@ $name: 'page-home';
 
   .attend__globe {
     min-height: 150px;
+    opacity: 0;
+    transition: opacity 1000ms linear;
+    will-change: opacity;
+
+    .globe-marker {
+      position: absolute;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      color: #eeff41;
+      transition: all 400ms cubic-bezier(0,0,0.2,1);
+      opacity: 1;
+    }
+
+    &.show {
+      opacity: 1;
+    }
   }
 }
 
@@ -102,14 +118,16 @@ $name: 'page-home';
     height: 150px;
 
     .globe-marker {
-      position: absolute;
-      width: 21px;
+      $transformY: 100px;
+      width: 36px;
       height: 36px;
-      left: 0;
-      right: 0;
-      margin: 0 auto;
-      transform: translate3d(0, -100px, 0);
-      background-image: url(../images/home/marker.svg);
+      transform: translate3d(0, -$transformY, 0);
+
+      &.up {
+        transform: translate3d(0, -$transformY - 25, 0);
+        opacity: 0;
+      }
+
     }
   }
 }
@@ -151,14 +169,15 @@ $name: 'page-home';
     height: 500px;
 
     .globe-marker {
-      position: absolute;
-      width: 28px;
+      $transformY: 262px;
+      width: 48px;
       height: 48px;
-      left: 0;
-      right: 0;
-      margin: 0 auto;
-      transform: translate3d(0, -262px, 0);
-      background-image: url(../images/home/marker.svg);
+      transform: translate3d(0, -$transformY, 0);
+
+      &.up {
+        transform: translate3d(0, -$transformY - 25, 0);
+        opacity: 0;
+      }
     }
   }
   #join {
