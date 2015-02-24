@@ -115,6 +115,7 @@
       // Only animate top/bottom cards offscreen if not on mobile.
       if (!gallery.mobile) {
         animation = new AnimationGroup([
+          animation,
           new Animation(topCard, [
             {transform: 'translateY(0)', opacity: 1},
             {transform: 'translateY(-100px)', opacity: 0}
@@ -122,8 +123,7 @@
           new Animation(bottomCard, [
             {transform: 'translateY(0)', opacity: 1},
             {transform: 'translateY(100px)', opacity: 0}
-          ], animationTiming),
-          animation
+          ], animationTiming)
         ]);
       }
 
