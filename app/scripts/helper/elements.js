@@ -133,6 +133,9 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
+    template.homeGlobeVisible = false;
+    template.selectedCity = null;
+
     template.toggleVideoOverlayNav = function() {
       var nav = document.querySelector('.navbar__overlay--video');
       nav.classList.toggle('active');
