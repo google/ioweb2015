@@ -1,0 +1,36 @@
+#!/bin/bash
+# fail on errors
+set -e
+
+# only do this if we're on master branch
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$BRANCH" == "HEAD" ]; then
+  BRANCH=$CI_BRANCH  # set by drone
+fi
+echo "Current branch is: $BRANCH"
+if [ "$BRANCH" != "master" ]; then
+  echo "Skip deploy."
+  exit 0;
+fi
+
+CWD=$(dirname $0)
+source $CWD/gcloud-install
+# install gcloud if missing and set GCLOUD_BIN
+install_or_update_gcloud
+
+# decrypt service account key used to deploy the app
+openssl aes-256-cbc -d \
+  -in $SRV_ACCT_PRIVATE_KEY.enc -out $SRV_ACCT_PRIVATE_KEY \
+  -k $SRV_ACCT_PASSPHRASE
+# configure gcloud to use a service account
+$GCLOUD_BIN auth activate-service-account $SRV_ACCOUNT \
+  --key-file $SRV_ACCT_PRIVATE_KEY
+
+# decrypt prod server config
+gulp decrypt --pass $CFG_PASSPHRASE
+# build prod version to deploy, default to "stage" app env
+gulp --env stage
+# deploy the app
+$GCLOUD_BIN preview app deploy dist/backend \
+  --project $PROJECT_ID $DEPLOY_ARGS
+
