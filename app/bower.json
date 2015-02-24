@@ -31,7 +31,7 @@
     "core-media-query": "Polymer/core-media-query#^0.5.5",
     "core-menu": "Polymer/core-menu#^0.5.5",
     "core-selector": "Polymer/core-selector#^0.5.5",
-    "core-scroll-threshold": "Polymer/core-scroll-threshold#^0.5.5",
+    "core-scroll-threshold": "Polymer/core-scroll-threshold#d637c0e3e29d6759fa3c844ada7a5466925c45c0",
     "core-toolbar": "Polymer/core-toolbar#^0.5.5",
     "core-tooltip": "Polymer/core-tooltip#^0.5.5",
     "google-apis": "GoogleWebComponents/google-apis#^0.4.3",
