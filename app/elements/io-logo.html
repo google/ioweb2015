@@ -110,9 +110,9 @@ with the attribute `iologodestination`.
      *
      * @property SHOW_FOR
      * @type number
-     * @default 100
+     * @default 450
      */
-    SHOW_FOR: 100,
+    SHOW_FOR: 450,
 
     /**
      * The number of milliseconds before the "O" starts to grow.
@@ -175,46 +175,23 @@ with the attribute `iologodestination`.
     start: function() {
       var DURATION = 350;
 
+      // This runs forward and then in reverse, so wait for half of SHOW_FOR on
+      // each iteration by calculating its offset.
+      var offset = DURATION / (DURATION + this.SHOW_FOR / 2);
       var animation = [
-        {transform: 'scale(0)'},
+        {transform: 'scale(0)', easing: 'cubic-bezier(0,0,0.21,1)'},
+        {transform: 'scale(1)', offset: offset},
         {transform: 'scale(1)'}
       ];
 
-      var sequence = new AnimationSequence([
-        new Animation(this.$.o2, animation, {
-          delay: this.START_DELAY,
-          // endDelay: this.START_DELAY + this.SHOW_FOR,
-           endDelay: this.SHOW_FOR,
-          duration: DURATION,
-          easing: 'cubic-bezier(0,0,0.21,1)',
-          fill: 'forwards'
-        }),
-        // new Animation(this.$.o2, animation, {
-        //   duration: DURATION,
-        //   easing: 'ease-in-out',
-        //   fill: 'forwards',
-        //   direction: 'reverse'
-        // })
-      ]);
+      var player = this.$.o2.animate(animation, {
+        delay: this.START_DELAY,
+        duration: DURATION + this.SHOW_FOR / 2,
+        iterations: 2,
+        direction: 'alternate'
+      });
 
-      var player = document.timeline.play(sequence);
-
-      // TODO(ericbidelman): it should be possible to reverse the direction of
-      // the sequence but it doesn't work in current M40 stable. Does it Canary.
-      // Until then, reverse the animation manually at the correct time.
-      var iteration = 0;
-      player.onfinish = function(e) {
-        iteration++;
-        if (iteration >= 2) {
-          player.cancel();
-          this.moveLogo();
-          return;
-        }
-
-        this.async(function() {
-          player.reverse();
-        }, null, this.SHOW_FOR);
-      }.bind(this);
+      player.onfinish = this.moveLogo.bind(this);
     },
 
     moveLogo: function() {
