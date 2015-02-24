@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Default SDK local dir name
+SDK_DIR=$HOME/google-cloud-sdk
+# Download URL of the Google Cloud SDK
+SDK_URL=https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+
+function install_or_update_gcloud {
+  set -e  # fail on errors
+
+  # don't ask any questions
+  export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+  export CLOUDSDK_PYTHON_SITEPACKAGES=1
+
+  if $(command -v gcloud >/dev/null 2>&1); then
+    GCLOUD_BIN=gcloud
+  else
+    GCLOUD_BIN=$SDK_DIR/bin/gcloud
+  fi
+
+  if ! $($GCLOUD_BIN --version >/dev/null 2>&1); then
+    mkdir -p $SDK_DIR
+    curl -o /tmp/gcloud.tar.gz $SDK_URL
+    tar xzf /tmp/gcloud.tar.gz --strip 1 -C $SDK_DIR
+    rm /tmp/gcloud.tar.gz
+    $SDK_DIR/install.sh
+    GCLOUD_BIN=$SDK_DIR/bin/gcloud
+  fi
+
+  $GCLOUD_BIN components update app -q
+}
+

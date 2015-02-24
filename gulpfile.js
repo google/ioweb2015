@@ -354,7 +354,7 @@ gulp.task('bower', function(cb) {
 });
 
 gulp.task('addgithooks', function() {
-  return gulp.src('.git-hooks/*')
+  return gulp.src('util/pre-commit')
     .pipe($.chmod(755))
     .pipe(gulp.dest('.git/hooks'));
 });

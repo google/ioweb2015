@@ -20,6 +20,8 @@ backend/app.yaml
 backend/cron.yaml
 backend/*.config
 *.pem
+*.p12
+util/drone-*.json
 
 # Other generated/common stuff.
 .tmp
