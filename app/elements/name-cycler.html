@@ -150,10 +150,6 @@ finally stopping when reaching a randomly selected item.
         this.$.selector.selected = (endIndex + 1) % this.items.length;
 
         this.interval_ = setInterval(function() {
-          if (this.$.selector.selectedIndex === endIndex) {
-            this.stop();
-            return;
-          }
           this.$.selector.selectNext(true);
         }.bind(this), this.interval);
       },
