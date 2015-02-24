@@ -255,7 +255,10 @@ IOWA.PageAnimation = (function() {
   /**
    * Plays an animation, animation group or animation sequence. Calls
    *     a callback when it finishes, if one was assigned.
-   * @param {TimedSequence} Animation of AnimationGroup or AnimationSequence.
+   * @param {AnimationNode} animation Animation or AnimationGroup or
+   *     AnimationSequence.
+   * @param {function()=} opt_callback Callback to execute at the end of the
+   *     animation.
    */
   function play(animation, callback) {
     var player = document.timeline.play(animation);
