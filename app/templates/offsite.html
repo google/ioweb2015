@@ -12,6 +12,11 @@
     <span flex><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></span>
   </core-toolbar>
 
+  <core-toolbar class="navbar__overlay navbar__overlay--extended" aria-hidden="{{!fullscreenVideoActive}}" fit>
+    <paper-icon-button icon="arrow-back" on-tap="{{closeExtendedMapSection}}" aria-label="Close globe"></paper-icon-button>
+    <span flex>2015 Extended event</span>
+  </core-toolbar>
+
   <template if="{{fullscreenVideoActive}}">
     <div class="fullvideo__container" fit>
      <google-youtube videoid="A-bjrru5bLU" height="100%" width="100%" fit
@@ -61,9 +66,16 @@
         <!-- <paper-button data-track-link="offsite-notify-me">
           <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
         </paper-button> -->
-        <paper-button>
-          <a href="https://www.google.com/events/io/io-extended" target="_blank" data-track-link="offsite-view-2014-events"><core-icon icon="io:place"></core-icon><i18n-msg msgid="viewlastyear">View 2014 events</i18n-msg></a>
+        <!-- <paper-button>
+          <a href="https://www.google.com/events/io/io-extended" target="_blank" data-track-link="offsite-view-2014-events"><core-icon icon="io:place"></core-icon><i18n-msg msgid="viewlastyear">View 2015 events</i18n-msg></a>
+        </paper-button> -->
+        <paper-button data-track-link="offsite-2015-globe-enable" on-tap="{{openExtendedMap}}">
+          <core-icon icon="io:place"></core-icon>View 2015 events
         </paper-button>
+        <div layout horizontal center>
+          <core-icon icon="io:search"></core-icon>
+          <paper-input id="autocomplete" label="Search for a location"></paper-input>
+        </div>
       </div>
       <div class="attend__globe">
        <!--  <template if="{{pageTransitionDone}}">
@@ -141,6 +153,32 @@
       }
     }
 
+    function runExtendedMapAnimation(opt_reverse, opt_callback) {
+      // var topCard = IOWA.Elements.Main.querySelector('.card__container.slide-up');
+      // var bottomCard = IOWA.Elements.Main.querySelector('.card__photo--stage').nextElementSibling;
+
+      // var videoContainer = document.querySelector('.fullvideo__container');
+      // var video = videoContainer.querySelector('.fullvideo__container google-youtube');
+
+      // // Wait for cc module to load, then make the fontsize smaller.
+      // // https://developers.google.com/youtube/iframe_api_reference#Events
+      // var callback = function() {
+      //   video.player.setOption('captions', 'fontSize', -2);
+      //   video.player.removeEventListener('onApiChange', callback);
+      // };
+      // video.player.addEventListener('onApiChange', callback);
+
+      // var button = IOWA.Elements.Main.querySelector('.play__button__container');
+      var navOverlay = document.querySelector('.navbar__overlay--extended');
+
+
+      if (opt_reverse) {
+        navOverlay.classList.remove('active');
+      } else {
+        navOverlay.classList.add('active');
+      }
+    }
+
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
@@ -152,6 +190,7 @@
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.fullscreenVideoActive = false;
+        IOWA.Elements.Template.extendedMapActive = false;
       };
 
       IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
@@ -176,6 +215,26 @@
             this.fullscreenVideoActive = true; // stamp template
           }.bind(this));
         }
+      };
+
+      IOWA.Elements.Template.closeExtendedMapSection = function(e, detail, sender) {
+        runExtendedMapAnimation(true, function() {
+          IOWA.Elements.Template.extendedMapActive = false;
+        });
+      };
+
+      IOWA.Elements.Template.openExtendedMap = function(e, detail, sender) {
+        if (sender && sender.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'link', 'click', sender.getAttribute('data-track-link'));
+        }
+
+        // Smooth to gallery section.
+        // var destEl = IOWA.Elements.Main.querySelector('.pics__section');
+        // IOWA.Util.smoothScroll(destEl, 400);
+
+        IOWA.Elements.Template.extendedMapActive = true;
+        runExtendedMapAnimation();
       };
 
       page.load(); // Run load callback on page load.
