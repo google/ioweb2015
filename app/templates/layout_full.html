@@ -240,15 +240,14 @@ limitations under the License.
         <div class="masthead__ripple">
           <div class="masthead__ripple__content" id="masthead-ripple"></div>
         </div>
-        <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}" role="navigation">
+        <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}">
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
           <div flex disabled?="{{selectedPage === 'home'}}">
-            <a href="./" data-ajax-link data-track-link="nav-home" data-anim-ripple aria-label="Home" aria-hidden="{{selectedPage === 'home'}}"
-            tabindex="{{selectedPage === 'home' ? -1 : 0}}">
+            <a href="./" data-ajax-link data-track-link="nav-home" data-anim-ripple aria-label="Home">
               <div class="io-logo"></div>
             </a>
           </div>
-          <paper-tabs class="white {{ navBgClass }}" valueattr="label" selected="{{selectedPage}}" link noink>
+          <paper-tabs class="white {{ navBgClass }}" valueattr="label" selected="{{selectedPage}}" role="navigation" link noink>
             <paper-tab label="about" role="">
               <a href="about" data-ajax-link data-track-link="nav-about" data-anim-ripple layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>
