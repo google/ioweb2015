@@ -7,7 +7,7 @@
 {% end %}
 
 {% define "content" %}
-  <core-toolbar class="navbar__overlay navbar__overlay--video"  aria-hidden="{{!fullscreenVideoActive}}" fit>
+  <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoSection}}" aria-label="Close video"></paper-icon-button>
     <span flex><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></span>
   </core-toolbar>
@@ -149,6 +149,11 @@
         return;
       }
 
+      page.load = function() {
+        // Reset template variables for when revisiting the page.
+        IOWA.Elements.Template.fullscreenVideoActive = false;
+      };
+
       IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
         runVideoSectionAnimation();
       };
@@ -173,6 +178,7 @@
         }
       };
 
+      page.load(); // Run load callback on page load.
       page.hasBeenLoaded = true;
     }
 
