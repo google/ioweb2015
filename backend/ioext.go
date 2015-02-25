@@ -22,6 +22,7 @@ type extFeed struct {
 type extEntry struct {
 	Name   string  `json:"name" xml:"http://schemas.google.com/spreadsheets/2006/extended eventname"`
 	Link   string  `json:"link" xml:"http://schemas.google.com/spreadsheets/2006/extended googleeventlink"`
+	City   string  `json:"city" xml:"http://schemas.google.com/spreadsheets/2006/extended city"`
 	Lat    float64 `json:"lat"`
 	Lng    float64 `json:"lng"`
 	XMLLat string  `json:"-" xml:"http://schemas.google.com/spreadsheets/2006/extended latitude"`
@@ -97,7 +98,7 @@ func fetchIOExtEntries(c context.Context, url string) ([]*extEntry, error) {
 			errorf(c, "fetchIOExtEntries: strconv(XMLLng): %v; item: %#v", err, e)
 			continue
 		}
-		if e.Name == "" || e.Link == "" {
+		if e.Name == "" || e.Link == "" || e.City == "" {
 			logf(c, "fetchIOExtEntries: skipping %#v", e)
 			continue
 		}
