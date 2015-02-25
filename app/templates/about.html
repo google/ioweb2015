@@ -159,6 +159,10 @@
       };
 
       page.load = function() {
+        // Reset template variables for when revisiting the page.
+        IOWA.Elements.Template.photoGalleryActive = false;
+        IOWA.Elements.Template.fullscreenVideoActive = false;
+
         if (location.hash.substring(1) == 'photos') {
           document.addEventListener('page-transition-done', onPageTransitionDone_);
         }
