@@ -89,7 +89,9 @@ Helper element for auto-completes places while showing a pin on a map.
     detached: function() {
       // Cleanup after Maps.
       var el = document.querySelector('.pac-container');
-      el.parentNode.removeChild(el);
+      if (el) {
+        el.parentNode.removeChild(el);
+      }
     },
 
     mapReady: function() {

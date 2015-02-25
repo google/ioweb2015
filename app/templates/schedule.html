@@ -12,27 +12,28 @@
 {% end %}
 
 {% define "content" %}
-  <div class="slide-up">
-    <section class="page__section page__section--top">
-      <div class="card__container card__container--top">
-        <div class="card js-experiment-visualizer" aria-label="Agenda">
-          <div class="card-content">
-            <h4><i18n-msg msgid="iomonth">May</i18-msg> 27, 2015</h4>
-          </div>
-          <div class="card-content">
-            <div layout horizontal>
-              <core-icon icon="schedule" aria-hidden="true"></core-icon>
-              <div class="schedule-rows">
-                <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                  <span class="schedule-time" auto-vertical flex>9:00 AM - 6:00 PM</span>
-                  <span auto-vertical flex two><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></span>
-                </div>
+  <section class="page__section page__section--top slide-up">
+    <div class="card__container card__container--top">
+      <div class="card js-experiment-visualizer" aria-label="Agenda">
+        <div class="card-content">
+          <h4><i18n-msg msgid="iomonth">May</i18-msg> 27, 2015</h4>
+        </div>
+        <div class="card-content">
+          <div layout horizontal>
+            <core-icon icon="schedule" aria-hidden="true"></core-icon>
+            <div class="schedule-rows">
+              <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                <span class="schedule-time" auto-vertical flex>9:00 AM - 6:00 PM</span>
+                <span auto-vertical flex two><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
+
+  <div class="slide-up-delay">
 
     <section class="page__section">
       <div class="card__container card__container--top">

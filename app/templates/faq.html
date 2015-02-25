@@ -7,43 +7,45 @@
 {% end %}
 
 {% define "content" %}
-  <div class="slide-up">
-    <section class="page__section page__section--copy">
-      <div class="card__container">
-        <div class="card js-experiment-visualizer">
-          <div class="card-content card-content--top" layout horizontal vertical?="{{isPhoneSize}}" justified>
-            <div>
-              <h3><i18n-msg msgid="general">General</i18-msg></h3>
-              <ul>
-                <li><a href="#dateloc" on-click="{{scrollToFaq}}"><i18n-msg msgid="faq-dates-loc">2015 dates &amp; location</i18-msg></a></li>
-                <li><a href="#badgepickup" on-click="{{scrollToFaq}}"><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></a></li>
-                <li><a href="#informed" on-click="{{scrollToFaq}}"><i18n-msg msgid="stay-informed">Stay informed</i18-msg></a></li>
-                <li><a href="#livestream" on-click="{{scrollToFaq}}"><i18n-msg msgid="livestream">Live stream &amp; recordings</i18-msg></a></li>
-              </ul>
-            </div>
-            <div>
-              <h3><i18n-msg msgid="registration">Registration</i18-msg></h3>
-              <ul>
-                <li><a href="#registration" on-click="{{scrollToFaq}}"><i18n-msg msgid="registration">Registration</i18-msg></a></li>
-                <li><a href="#toc" on-click="{{scrollToFaq}}"><i18n-msg msgid="toc">Terms &amp; Conditions</i18-msg></a></li>
-                <li><a href="#academic" on-click="{{scrollToFaq}}"><i18n-msg msgid="acamedic-tickets">Academic tickets</i18-msg></a></li>
-                <li><a href="#presstix" on-click="{{scrollToFaq}}"><i18n-msg msgid="press-tickets">Press tickets</i18-msg></a></li>
-              </ul>
-            </div>
-            <div>
-              <h3><i18n-msg msgid="attendance-details">Attendance Details</i18-msg></h3>
-              <ul>
-                <li><a href="#badges" on-click="{{scrollToFaq}}"><i18n-msg msgid="badges">Badges</i18-msg></a></li>
-                <li><a href="#afterhours" on-click="{{scrollToFaq}}"><i18n-msg msgid="afterhours">After Hours</i18-msg></a></li>
-                <li><a href="#a11y" on-click="{{scrollToFaq}}"><i18n-msg msgid="a11y">Accessibility</i18-msg></a></li>
-                <li><a href="#conduct" on-click="{{scrollToFaq}}"><i18n-msg msgid="conduct">Conduct</i18-msg></a></li>
-                <!-- <li><a href="#childcare" on-click="{{scrollToFaq}}"><i18n-msg msgid="child-care">Child Care</i18-msg></a></li> -->
-              </ul>
-            </div>
+
+  <section class="page__section page__section--copy slide-up">
+    <div class="card__container">
+      <div class="card js-experiment-visualizer">
+        <div class="card-content card-content--top" layout horizontal vertical?="{{isPhoneSize}}" justified>
+          <div>
+            <h3><i18n-msg msgid="general">General</i18-msg></h3>
+            <ul>
+              <li><a href="#dateloc" on-click="{{scrollToFaq}}"><i18n-msg msgid="faq-dates-loc">2015 dates &amp; location</i18-msg></a></li>
+              <li><a href="#badgepickup" on-click="{{scrollToFaq}}"><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></a></li>
+              <li><a href="#informed" on-click="{{scrollToFaq}}"><i18n-msg msgid="stay-informed">Stay informed</i18-msg></a></li>
+              <li><a href="#livestream" on-click="{{scrollToFaq}}"><i18n-msg msgid="livestream">Live stream &amp; recordings</i18-msg></a></li>
+            </ul>
+          </div>
+          <div>
+            <h3><i18n-msg msgid="registration">Registration</i18-msg></h3>
+            <ul>
+              <li><a href="#registration" on-click="{{scrollToFaq}}"><i18n-msg msgid="registration">Registration</i18-msg></a></li>
+              <li><a href="#toc" on-click="{{scrollToFaq}}"><i18n-msg msgid="toc">Terms &amp; Conditions</i18-msg></a></li>
+              <li><a href="#academic" on-click="{{scrollToFaq}}"><i18n-msg msgid="acamedic-tickets">Academic tickets</i18-msg></a></li>
+              <li><a href="#presstix" on-click="{{scrollToFaq}}"><i18n-msg msgid="press-tickets">Press tickets</i18-msg></a></li>
+            </ul>
+          </div>
+          <div>
+            <h3><i18n-msg msgid="attendance-details">Attendance Details</i18-msg></h3>
+            <ul>
+              <li><a href="#badges" on-click="{{scrollToFaq}}"><i18n-msg msgid="badges">Badges</i18-msg></a></li>
+              <li><a href="#afterhours" on-click="{{scrollToFaq}}"><i18n-msg msgid="afterhours">After Hours</i18-msg></a></li>
+              <li><a href="#a11y" on-click="{{scrollToFaq}}"><i18n-msg msgid="a11y">Accessibility</i18-msg></a></li>
+              <li><a href="#conduct" on-click="{{scrollToFaq}}"><i18n-msg msgid="conduct">Conduct</i18-msg></a></li>
+              <!-- <li><a href="#childcare" on-click="{{scrollToFaq}}"><i18n-msg msgid="child-care">Child Care</i18-msg></a></li> -->
+            </ul>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
+
+  <div class="slide-up-delay">
 
     <section class="page__section page__section--copy">
       <div class="card__container">
