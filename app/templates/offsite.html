@@ -190,11 +190,13 @@
       var navOverlay = document.querySelector('.navbar__overlay--extended');
 
       if (opt_reverse) {
+        // Fade in button, and bring back cards at same time.
         IOWA.PageAnimation.play(new AnimationGroup([
           animation, searchInputAnimation
         ]), opt_callback);
         navOverlay.classList.remove('active');
       } else {
+        // Dismiss cards offscreen, then fade in search input.
         IOWA.PageAnimation.play(new AnimationSequence([
           animation, searchInputAnimation
         ]), opt_callback);
@@ -247,7 +249,7 @@
       };
 
       IOWA.Elements.Template.openExtendedMap = function(e, detail, sender) {
-        // Smooth to globe section.
+        // Smooth scroll to globe section.
         var destEl = IOWA.Elements.Main.querySelector('.page__section--attend');
         IOWA.Util.smoothScroll(destEl, 400, function() {
           IOWA.Elements.Template.extendedMapActive = true;
