@@ -37,6 +37,26 @@ paper-tabs.white {
   }
 }
 
+#page-offsite {
+  paper-input::shadow paper-input-decorator {
+    &::shadow {
+      .label-text {
+        color: white;
+      }
+    }
+    // platform specific rules can't be combined. Yields invalids rules.
+    ::-webkit-input-placeholder {
+      color: white;
+    }
+    ::-moz-placeholder {
+      color: white;
+    }
+    ::-ms-input-placeholder {
+      color: white;
+    }
+  }
+}
+
 footer {
   paper-dropdown-menu::shadow #label {
     color: inherit;

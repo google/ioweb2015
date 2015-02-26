@@ -12,6 +12,11 @@
     <span flex><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></span>
   </core-toolbar>
 
+  <core-toolbar class="navbar__overlay navbar__overlay--extended" aria-hidden="{{!fullscreenVideoActive}}" fit>
+    <paper-icon-button icon="arrow-back" on-tap="{{closeExtendedMapSection}}" aria-label="Close extended map"></paper-icon-button>
+    <span flex>2015 Extended events</span>
+  </core-toolbar>
+
   <template if="{{fullscreenVideoActive}}">
     <div class="fullvideo__container" fit>
      <google-youtube videoid="A-bjrru5bLU" height="100%" width="100%" fit
@@ -61,9 +66,16 @@
         <!-- <paper-button data-track-link="offsite-notify-me">
           <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
         </paper-button> -->
-        <paper-button>
-          <a href="https://www.google.com/events/io/io-extended" target="_blank" data-track-link="offsite-view-2014-events"><core-icon icon="io:place"></core-icon><i18n-msg msgid="viewlastyear">View 2014 events</i18n-msg></a>
+        <!-- <paper-button>
+          <a href="https://www.google.com/events/io/io-extended" target="_blank" data-track-link="offsite-view-2014-events"><core-icon icon="io:place"></core-icon><i18n-msg msgid="viewlastyear">View 2015 events</i18n-msg></a>
+        </paper-button> -->
+        <paper-button class="view__events" on-tap="{{openExtendedMap}}">
+          <a href="#" data-track-link="offsite-view-2015-events"><core-icon icon="io:place"></core-icon>View 2015 events</a>
         </paper-button>
+        <div class="search__map" layout horizontal center self-center relative>
+          <core-icon icon="io:search"></core-icon>
+          <paper-input id="autocomplete" label="Search for a location"></paper-input>
+        </div>
       </div>
       <div class="attend__globe">
        <!--  <template if="{{pageTransitionDone}}">
@@ -75,6 +87,8 @@
 
   <script>
   (function() {
+
+    var ANIMATION_DURATION = 500;
 
     function runVideoSectionAnimation(opt_reverse, opt_callback) {
       var topCard = IOWA.Elements.Main.querySelector('.card__container.slide-up');
@@ -91,17 +105,14 @@
       };
       video.player.addEventListener('onApiChange', callback);
 
-      var button = IOWA.Elements.Main.querySelector('.play__button__container');
-      var navOverlay = document.querySelector('.navbar__overlay--video');
-
-      var ANIMATION_DURATION = 500;
-
       var animationTiming = {
         duration: ANIMATION_DURATION,
         fill: 'forwards',
         direction: opt_reverse ? 'reverse' : 'normal',
         easing: 'cubic-bezier(0.4,0,0.2,1)'
       };
+
+      var button = IOWA.Elements.Main.querySelector('.play__button__container');
 
       var animation = new Animation(button, [
         {opacity: 1}, {opacity: 0}
@@ -126,6 +137,8 @@
         {opacity: 0}, {opacity: 1}
       ], animationTiming);
 
+      var navOverlay = document.querySelector('.navbar__overlay--video');
+
       if (opt_reverse) {
         // Fade out gallery and slide back in page sections at the same time.
         IOWA.PageAnimation.play(new AnimationGroup([
@@ -136,6 +149,56 @@
         // Slide out page sections, then fade in gallery.
         IOWA.PageAnimation.play(new AnimationSequence([
           animation, videoAnimation
+        ]), opt_callback);
+        navOverlay.classList.add('active');
+      }
+    }
+
+    function runExtendedMapAnimation(opt_reverse, opt_callback) {
+      var bottomCard = IOWA.Elements.Main.querySelector('.card__photo--stage').nextElementSibling;
+      var viewButton = IOWA.Elements.Main.querySelector('.view__events');
+      var searchInput = IOWA.Elements.Main.querySelector('.search__map');
+
+      var animationTiming = {
+        duration: ANIMATION_DURATION,
+        fill: 'forwards',
+        direction: opt_reverse ? 'reverse' : 'normal',
+        easing: 'cubic-bezier(0.4,0,0.2,1)'
+      };
+
+      var animation = new Animation(viewButton, [
+        {opacity: 1, visibility: 'visible'},
+        {opacity: 0, visibility: 'hidden'}
+      ], animationTiming);
+
+      // Only animate card offscreen if not on mobile.
+      if (!IOWA.Elements.Template.isPhoneSize) {
+        animation = new AnimationGroup([
+          animation,
+          new Animation(bottomCard, [
+            {transform: 'translateY(0)', opacity: 1},
+            {transform: 'translateY(-100px)', opacity: 0}
+          ], animationTiming)
+        ]);
+      }
+
+      var searchInputAnimation = new Animation(searchInput, [
+        {opacity: 0, visibility: 'hidden'},
+        {opacity: 1, visibility: 'visible'}
+      ], animationTiming);
+
+      var navOverlay = document.querySelector('.navbar__overlay--extended');
+
+      if (opt_reverse) {
+        // Fade in button, and bring back cards at same time.
+        IOWA.PageAnimation.play(new AnimationGroup([
+          animation, searchInputAnimation
+        ]), opt_callback);
+        navOverlay.classList.remove('active');
+      } else {
+        // Dismiss cards offscreen, then fade in search input.
+        IOWA.PageAnimation.play(new AnimationSequence([
+          animation, searchInputAnimation
         ]), opt_callback);
         navOverlay.classList.add('active');
       }
@@ -152,6 +215,7 @@
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.fullscreenVideoActive = false;
+        IOWA.Elements.Template.extendedMapActive = false;
       };
 
       IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
@@ -176,6 +240,21 @@
             this.fullscreenVideoActive = true; // stamp template
           }.bind(this));
         }
+      };
+
+      IOWA.Elements.Template.closeExtendedMapSection = function(e, detail, sender) {
+        runExtendedMapAnimation(true, function() {
+          IOWA.Elements.Template.extendedMapActive = false;
+        });
+      };
+
+      IOWA.Elements.Template.openExtendedMap = function(e, detail, sender) {
+        // Smooth scroll to globe section.
+        var destEl = IOWA.Elements.Main.querySelector('.page__section--attend');
+        IOWA.Util.smoothScroll(destEl, 400, function() {
+          IOWA.Elements.Template.extendedMapActive = true;
+          runExtendedMapAnimation();
+        });
       };
 
       page.load(); // Run load callback on page load.

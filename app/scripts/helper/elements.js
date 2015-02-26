@@ -78,6 +78,7 @@ IOWA.Elements = (function() {
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.fullscreenVideoActive = false;
     template.photoGalleryActive = false;
+    template.extendedMapActive = false;
     template.pageTransitionDone = false;
 
     template.rippleColors = {

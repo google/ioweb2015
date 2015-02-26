@@ -74,6 +74,20 @@ google-youtube {
       margin-right: $icon-margin;
     }
   }
+  .search__map {
+    opacity: 0;
+    visibility: hidden;
+
+    core-icon {
+      position: absolute;
+      right: 0;
+      bottom: calc(50% - 30px/2 + 2px); // 30px is height of input container.
+      margin: 0;
+    }
+    paper-input {
+      width: 95vw;
+    }
+  }
   .attend__globe {
     height: 150px;
   }
@@ -117,6 +131,16 @@ google-youtube {
       core-icon {
         order: 1;
         margin-left: $icon-margin;
+      }
+
+      .search__map {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        paper-input {
+          width: 300px;
+        }
       }
     }
     .attend__globe {

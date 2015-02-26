@@ -18,6 +18,9 @@
   function afterImports() {
     IOWA.Elements.init();
     IOWA.Router.init();
+
+    CoreStyle.g.paperInput.labelColor = '#00E5FF';
+    CoreStyle.g.paperInput.focusedColor = '#00E5FF';
   }
 
   window.addEventListener('core-media-change', function(e) {
@@ -36,13 +39,16 @@
       if (template.photoGalleryActive) {
         template.togglePhotoGallery();
       }
-      if (IOWA.Elements.Template.fullscreenVideoActive) {
+      if (template.fullscreenVideoActive) {
         if (template.closeVideoCard) {
           template.closeVideoCard();
         }
         if (template.closeVideoSection) {
           template.closeVideoSection();
         }
+      }
+      if (template.extendedMapActive) {
+        template.closeExtendedMapSection();
       }
     }
   });
