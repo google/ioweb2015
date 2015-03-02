@@ -248,6 +248,19 @@ IOWA.Elements = (function() {
     template.backToTop = function(e, detail, sender) {
       e.preventDefault();
       IOWA.Util.smoothScroll(IOWA.Elements.Nav, 250);
+      this.focusNavigation();
+    };
+
+    template.focusNavigation = function() {
+      IOWA.Elements.NavPaperTabs.items[0].firstElementChild.focus();
+    };
+
+    // If the Home button was clicked, move focus to the About button
+    // after the Home button has faded out
+    template.manageHomeFocus = function(e, detail, sender) {
+      if (this.selectedPage == 'home') {
+        this.focusNavigation();
+      }
     };
 
     template.addEventListener('template-bound', updateElements);
