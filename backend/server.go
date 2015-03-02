@@ -31,9 +31,6 @@ func main() {
 	if err := initConfig(*flagConfig, *flagAddr); err != nil {
 		panic("initConfig: " + err.Error())
 	}
-	if err := initTemplates(); err != nil {
-		panic("initTemplates: " + err.Error())
-	}
 	cache = newMemoryCache()
 	wrapHandler = logHandler
 	handle("/", catchAllHandler)

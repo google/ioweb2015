@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"html/template"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -31,14 +30,6 @@ const (
 )
 
 var (
-	muMeta sync.Mutex
-	// allPages is a map of all pages found in app/templates.
-	// It is guarded by muMeta.
-	allPages = make(map[string]meta)
-
-	// metaTemplates defines which templates go into a page meta as string values.
-	metaTemplates = []string{"title", "mastheadBgClass"}
-
 	// tmplFunc is a map of functions available to all templates.
 	tmplFunc = template.FuncMap{
 		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
@@ -57,35 +48,6 @@ type templateCache struct {
 type templateData struct {
 	Title, Desc, OgTitle, OgImage string
 	Slug, Canonical, Env          string
-	Meta                          meta
-	Pages                         map[string]meta
-}
-
-// meta is a page meta info.
-type meta map[string]interface{}
-
-// initTemplates makes all needed initialization to render templates
-// It is to be called after initConfig().
-func initTemplates() error {
-	muMeta.Lock()
-	defer muMeta.Unlock()
-	var root = filepath.Join(config.Dir, templatesDir)
-	return filepath.Walk(root, func(p string, fi os.FileInfo, err error) error {
-		if err != nil || p == root || fi.IsDir() {
-			return nil
-		}
-		ext := filepath.Ext(p)
-		if ext != ".html" || strings.HasPrefix(fi.Name(), "layout_") {
-			return nil
-		}
-		name := p[len(root)+1 : len(p)-len(ext)]
-		t, err := parseTemplate(name, true)
-		if err != nil {
-			return err
-		}
-		allPages[name] = metaFromTemplate(t)
-		return nil
-	})
 }
 
 // renderTemplate executes a template found in name.html file
@@ -102,9 +64,7 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	if data.Env == "" {
 		data.Env = config.Env
 	}
-	data.Pages = allPages
-	data.Meta = pageMeta(name, tpl)
-	data.Title = pageTitle(data.Meta)
+	data.Title = pageTitle(tpl)
 	data.Slug = name
 	data.Canonical = data.Slug
 	if data.Canonical == "home" {
@@ -158,38 +118,11 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 	return t, nil
 }
 
-// pageTitle extracts "title" property of the page meta and appends defaultTitle to it.
-// It returns defaultTitle if meta does not contain "title" or it is of zero value.
-func pageTitle(m meta) string {
-	title, ok := m["title"].(string)
-	if !ok || title == "" {
+// pageTitle executes "title" template and returns its result or defaultTitle.
+func pageTitle(t *template.Template) string {
+	b := new(bytes.Buffer)
+	if err := t.ExecuteTemplate(b, "title", nil); err != nil || b.Len() == 0 {
 		return defaultTitle
 	}
-	return title + " - " + defaultTitle
-}
-
-// pageMeta returns either a cached meta from allPages or uses metaFromTemplate().
-func pageMeta(name string, t *template.Template) meta {
-	muMeta.Lock()
-	defer muMeta.Unlock()
-	if m, ok := allPages[name]; ok {
-		return m
-	}
-	allPages[name] = metaFromTemplate(t)
-	return allPages[name]
-}
-
-// metaFromTemplate creates a meta map by executing metaTemplates.
-// It always returns a non-nil meta.
-func metaFromTemplate(t *template.Template) meta {
-	m := make(meta)
-	m["hasBeenLoaded"] = false
-	for _, n := range metaTemplates {
-		b := new(bytes.Buffer)
-		if err := t.ExecuteTemplate(b, n, nil); err != nil {
-			continue
-		}
-		m[n] = b.String()
-	}
-	return m
+	return b.String()
 }

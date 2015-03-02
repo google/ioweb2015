@@ -74,7 +74,7 @@ IOWA.Elements = (function() {
 
   var init = function() {
     var template = document.getElementById('t');
-    template.pages = window.PAGES;
+    template.pages = IOWA.PAGES; // defined in auto-generated ../pages.js
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.fullscreenVideoActive = false;
     template.photoGalleryActive = false;

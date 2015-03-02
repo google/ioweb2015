@@ -23,9 +23,6 @@ func init() {
 	if err := initConfig("server.config", ""); err != nil {
 		panic("initConfig: " + err.Error())
 	}
-	if err := initTemplates(); err != nil {
-		panic("initTemplates: " + err.Error())
-	}
 	cache = &gaeMemcache{}
 	wrapHandler = checkWhitelist
 	handle("/", serveTemplate)

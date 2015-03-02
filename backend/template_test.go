@@ -2,9 +2,7 @@ package main
 
 import (
 	"bytes"
-	"html/template"
 	"net/http"
-	"reflect"
 	"regexp"
 	"testing"
 )
@@ -74,31 +72,5 @@ func TestRenderOgDesc(t *testing.T) {
 	rx := `<meta\sproperty="og:description"\scontent="` + descExperiment + `">`
 	if matched, err := regexp.Match(rx, out); !matched || err != nil {
 		t.Errorf("didn't match %s to: %s (%v)", rx, string(out), err)
-	}
-}
-
-func TestPageTitle(t *testing.T) {
-	table := []struct {
-		meta  meta
-		title string
-	}{
-		{meta{}, defaultTitle},
-		{meta{"title": "my-title"}, "my-title - " + defaultTitle},
-	}
-	for i, test := range table {
-		title := pageTitle(test.meta)
-		if title != test.title {
-			t.Errorf("%d: pageTitle(%v) = %q; want %q", i, test.meta, title, test.title)
-		}
-	}
-}
-
-func TestMetaFromTemplate(t *testing.T) {
-	const smeta = `{{define "title"}}my title{{end}}{{define "mastheadBgClass"}}blue{{end}}`
-	want := meta{"title": "my title", "mastheadBgClass": "blue", "hasBeenLoaded": false}
-	tmpl := template.Must(template.New("").Parse(smeta))
-	m := metaFromTemplate(tmpl)
-	if !reflect.DeepEqual(m, want) {
-		t.Errorf("pageMeta(%s) = %#v; want %#v", smeta, m, want)
 	}
 }
