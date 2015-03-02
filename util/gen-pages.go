@@ -1,3 +1,7 @@
+// This program generates a pages meta data needed by the frontend router.
+// It is done automatically by gulp tasks but you can also run it manually:
+// go run util/gen-pages.go > app/scripts/pages.js
+
 package main
 
 import (
