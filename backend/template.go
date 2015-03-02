@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"html/template"
 	"path/filepath"
 	"strings"
@@ -25,6 +24,9 @@ const (
 	// images for og:image meta tag
 	ogImageDefault    = "io15-color.png"
 	ogImageExperiment = "io15-experiment.png"
+
+	// templatesDir is the templates directory path relative to config.Dir.
+	templatesDir = "templates"
 )
 
 var (
@@ -44,12 +46,9 @@ type templateCache struct {
 
 // templateData is the templates context
 type templateData struct {
-	Title, Desc, Slug, Canonical, Env, OgImage string
-	Meta                                       meta
+	Title, Desc, OgTitle, OgImage string
+	Slug, Canonical, Env          string
 }
-
-// meta is a page meta info.
-type meta map[string]interface{}
 
 // renderTemplate executes a template found in name.html file
 // using either layout_full.html or layout_partial.html as the root template.
@@ -59,16 +58,13 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	if err != nil {
 		return nil, err
 	}
-
 	if data == nil {
 		data = &templateData{}
 	}
 	if data.Env == "" {
 		data.Env = config.Env
 	}
-	m := pageMeta(tpl)
-	data.Meta = m
-	data.Title = pageTitle(m)
+	data.Title = pageTitle(tpl)
 	data.Slug = name
 	data.Canonical = data.Slug
 	if data.Canonical == "home" {
@@ -79,6 +75,9 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	}
 	if data.OgImage == "" {
 		data.OgImage = ogImageDefault
+	}
+	if data.OgTitle == "" {
+		data.OgTitle = data.Title
 	}
 
 	var b bytes.Buffer
@@ -109,8 +108,8 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 	}
 
 	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(config.Dir, "templates", layout),
-		filepath.Join(config.Dir, "templates", name+".html"),
+		filepath.Join(config.Dir, templatesDir, layout),
+		filepath.Join(config.Dir, templatesDir, name+".html"),
 	)
 	if err != nil {
 		return nil, err
@@ -119,27 +118,11 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 	return t, nil
 }
 
-// pageTitle extracts "title" property of the page meta and appends defaultTitle to it.
-// It returns defaultTitle if meta does not contain "title" or it is of zero value.
-func pageTitle(m meta) string {
-	title, ok := m["title"].(string)
-	if !ok || title == "" {
+// pageTitle executes "title" template and returns its result or defaultTitle.
+func pageTitle(t *template.Template) string {
+	b := new(bytes.Buffer)
+	if err := t.ExecuteTemplate(b, "title", nil); err != nil || b.Len() == 0 {
 		return defaultTitle
 	}
-	return title + " - " + defaultTitle
-}
-
-// pageMeta extracts page meta info by executing "meta" template.
-// The template is assumed to be a JSON object body (w/o {}).
-// Returns empty meta if template execution fails.
-func pageMeta(t *template.Template) meta {
-	m := make(meta)
-	b := new(bytes.Buffer)
-	b.WriteRune('{')
-	if err := t.ExecuteTemplate(b, "meta", nil); err != nil {
-		return m
-	}
-	b.WriteRune('}')
-	json.Unmarshal(b.Bytes(), &m)
-	return m
+	return b.String()
 }

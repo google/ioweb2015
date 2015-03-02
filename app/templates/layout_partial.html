@@ -10,10 +10,3 @@
   {% template "content" .%}
 </template>
 
-<script>
-  if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
-    IOWA.Elements.Template.pages[{% .Slug %}] = {};
-  }
-  IOWA.Elements.Template.pages[{% .Slug %}].title = "{% template "title" .%}";
-</script>
-

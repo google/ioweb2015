@@ -18,7 +18,7 @@ limitations under the License.
   <meta name="description" content="{% .Desc %}">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1">
   <meta name="google-site-verification" content="AdXcVeRpEoy56o6g9c0lls3IiAATCVtB45HWJFwZmsM" />
-  <title>{% template "title" .%}</title>
+  <title>{% .Title %}</title>
 
   <!-- See http://updates.html5rocks.com/2014/11/Support-for-installable-web-apps-with-webapp-manifest-in-chrome-38-for-Android -->
   <link rel="manifest" href="manifest.json">
@@ -50,7 +50,7 @@ limitations under the License.
   <meta name="msapplication-tap-highlight" content="no">
 
   <!-- G+ sharing meta data -->
-  <meta itemprop="name" content="{% .Title %}">
+  <meta itemprop="name" content="{% .OgTitle %}">
   <meta itemprop="description" content="{% .Desc %}">
   <meta itemprop="image" content="/io2015/images/{% .OgImage %}">
   <!-- May 28 9am PDT through May 29 5pm PDT -->
@@ -58,7 +58,7 @@ limitations under the License.
   <meta itemprop="endDate" content="2015-05-29T23:59:59Z">
 
   <!-- Facebook sharing meta data -->
-  <meta property="og:title" content="{% .Title %}">
+  <meta property="og:title" content="{% .OgTitle %}">
   <meta property="og:site_name" content="Google I/O 2015">
   <meta property="og:type" content="website">
   <meta property="og:url" content="/io2015">
@@ -69,7 +69,7 @@ limitations under the License.
   <!-- Twitter meta data -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@googledevs">
-  <meta name="twitter:title" content="{% .Title %}">
+  <meta name="twitter:title" content="{% .OgTitle %}">
   <meta name="twitter:description" content="{% .Desc %}">
   <meta name="twitter:image:src" content="/io2015/images/{% .OgImage %}">
 
@@ -333,6 +333,7 @@ limitations under the License.
 
 <!-- build:js scripts/site-scripts.js -->
 <script src="scripts/main.js"></script>
+<script src="scripts/pages.js"></script>
 <script src="scripts/helper/util.js"></script>
 <script src="scripts/helper/page-animation.js"></script>
 <script src="scripts/helper/elements.js"></script>
@@ -355,20 +356,10 @@ limitations under the License.
     }
   }
 
-  function afterImports() {
-    //'import' in document.createElement('link')
-    if (!IOWA.Elements.Template.pages[{% .Slug %}]) {
-      IOWA.Elements.Template.pages[{% .Slug %}] = {};
-    }
-    IOWA.Elements.Template.pages[{% .Slug %}].title = "{% template "title" .%}";
-
-    init();
-  }
-
   if (IOWA.Util.supportsHTMLImports) {
-    afterImports();
+    init();
   } else {
-    document.addEventListener('polymer-ready', afterImports);
+    document.addEventListener('polymer-ready', init);
   }
 
 })();

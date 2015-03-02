@@ -180,11 +180,12 @@ gulp.task('jscs', function() {
 });
 
 // Crush JS
-gulp.task('concat-and-uglify-js', ['js'], function() {
+gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
   // The ordering of the scripts in the gulp.src() array matter!
   // This order needs to match the order in templates/layout_full.html
   var siteScripts = [
     'main.js',
+    'pages.js',
     'helper/util.js',
     'helper/page-animation.js',
     'helper/elements.js',
@@ -246,7 +247,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 // App environment is 'dev' by default. Change with '--env=prod'.
-gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev'], function() {
+gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 'generate-page-metadata'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var start = spawn.bind(null, 'bin/server',
@@ -290,7 +291,7 @@ gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev'],
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev'], function(callback) {
+gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev', 'generate-page-metadata'], function(callback) {
   var watchFiles = argv.watch !== false;
   updateServerConfig(BACKEND_DIR, argv.env || 'dev', URL_PREFIX);
   generateGaeConfig(BACKEND_DIR, URL_PREFIX, function() {
@@ -480,6 +481,13 @@ function updateServerConfig(backendDir, env, prefix) {
   cfg.prefix = prefix;
   fs.writeFileSync(file, JSON.stringify(cfg, null, 2));
 }
+
+// generate pages.js out of templates.
+gulp.task('generate-page-metadata', function(done) {
+  var pagesjs = fs.openSync(APP_DIR + '/scripts/pages.js', 'w');
+  var proc = spawn('go', ['run', 'util/gen-pages.go'], {stdio: ['ignore', pagesjs, process.stderr]});
+  proc.on('exit', done);
+});
 
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
   del.sync([APP_DIR + '/service-worker.js']);

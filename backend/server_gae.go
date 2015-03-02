@@ -20,9 +20,10 @@ import (
 )
 
 func init() {
+	if err := initConfig("server.config", ""); err != nil {
+		panic("initConfig: " + err.Error())
+	}
 	cache = &gaeMemcache{}
-	initConfig("server.config", "")
-
 	wrapHandler = checkWhitelist
 	handle("/", serveTemplate)
 	handle("/api/extended", serveIOExtEntries)
