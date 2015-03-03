@@ -690,6 +690,12 @@ Makes a globe or whatever.
         gl.enableVertexAttribArray(this.markerProgram_.attributes.coord);
         gl.enableVertexAttribArray(this.markerProgram_.attributes.uvCoord);
 
+        // Hack to keep WebGL happy: bind buffers to all enabled attributes.
+        gl.vertexAttribPointer(this.markerProgram_.attributes.coord, 4,
+            gl.FLOAT, false, 28, 0);
+        gl.vertexAttribPointer(this.markerProgram_.attributes.uvCoord, 2,
+            gl.FLOAT, false, 28, 16);
+
         this.markerDrawCount_ = spriteIndices.length;
       },
 
