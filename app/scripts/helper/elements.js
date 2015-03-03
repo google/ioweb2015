@@ -268,10 +268,40 @@ IOWA.Elements = (function() {
       }
     };
 
+    // Elements passed to this method will receive classes reflecting the focus
+    // and pressed states.
+    template.addFocusBehavior = function(selector) {
+      document.querySelectorAll(selector).array().forEach(function(el) {
+
+        el.addEventListener('mousedown', function(e) {
+          this.classList.add('pressed');
+        });
+
+        el.addEventListener('mouseup', function(e) {
+          this.classList.remove('pressed');
+        });
+
+        el.addEventListener('focus', function(e) {
+          // Only render the "focused" state if the element gains focus due to
+          // keyboard navigation.
+          if (!this.classList.contains('pressed')) {
+            this.classList.add('focused');
+          }
+        });
+
+        el.addEventListener('blur', function(e) {
+          this.classList.remove('focused');
+        });
+      });
+    };
+
     template.addEventListener('template-bound', updateElements);
     template.addEventListener('page-transition-done', function(e) {
       this.pageTransitionDone = true;
       IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
+
+      // Differentiate focus coming from mouse and keyboard
+      this.addFocusBehavior('paper-tabs a');
     });
     template.addEventListener('page-transition-start', function(e) {
       this.pageTransitionDone = false;
