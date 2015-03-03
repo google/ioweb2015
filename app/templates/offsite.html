@@ -61,6 +61,7 @@
     </div>
 
     <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument">
+      <google-maps-api on-api-load="{{initExtendedSearchBox}}" libraries="places"></google-maps-api>
       <h2>We're compiling a map of I/O Extended events in your area. Check back to find one close to you.</h2>
       <div class="action__links" layout vertical>
         <!-- <paper-button data-track-link="offsite-notify-me">
@@ -78,15 +79,15 @@
         </div>
       </div>
       <div class="attend__globe">
-        <webgl-globe markers="{{offsiteLocations}}"
+        <webgl-globe id="offsite-globe"
+                     markers="{{offsiteLocations}}"
                      locationTarget="{'lat': 36.5, 'lng': 0}"
                      fov="0.3927"
                      offsetY="-0.625"
                      transitionDuration="3000"
                      scrollTarget="{{ScrollContainer}}"
                      noInit?="{{!pageTransitionDone}}"
-                     noDraw?="{{mode === 'active'}}"
-                     on-location-transitionend="{{onArrivedAtGlobePin}}"></webgl-globe>
+                     noDraw?="{{mode === 'active'}}"></webgl-globe>
         <core-ajax auto?="{{pageTransitionDone && !offsiteLocations}}" url="api/extended"
                    handleAs="json" response="{{offsiteLocations}}"></core-ajax>
       </div>
@@ -263,6 +264,21 @@
           IOWA.Elements.Template.extendedMapActive = true;
           runExtendedMapAnimation();
         });
+      };
+
+      IOWA.Elements.Template.initExtendedSearchBox = function(e, detail, sender) {
+        // Add autocomplete to the extended search box when Maps API has loaded.
+        var autocomplete = new google.maps.places.Autocomplete(
+            document.querySelector('#autocomplete'), {types: ['geocode']});
+        var globe = document.querySelector('#offsite-globe');
+
+        google.maps.event.addListener(autocomplete, 'place_changed', function() {
+          var location = autocomplete.getPlace().geometry.location;
+          globe.location = {
+            lat: location.lat(),
+            lng: location.lng()
+          };
+        }.bind(this));
       };
 
       page.load(); // Run load callback on page load.
