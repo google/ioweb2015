@@ -23,6 +23,7 @@
     "tests"
   ],
   "dependencies": {
+    "core-ajax": "Polymer/core-ajax#^0.5.5",
     "core-drawer-panel": "Polymer/core-drawer-panel#^0.5.5",
     "core-icon": "Polymer/core-icon#^0.5.5",
     "core-iconset-svg": "Polymer/core-iconset-svg#^0.5.5",

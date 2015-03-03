@@ -78,9 +78,17 @@
         </div>
       </div>
       <div class="attend__globe">
-       <!--  <template if="{{pageTransitionDone}}">
-          <webgl-globe></webgl-globe>
-        </template> -->
+        <webgl-globe markers="{{offsiteLocations}}"
+                     locationTarget="{'lat': 36.5, 'lng': 0}"
+                     fov="0.3927"
+                     offsetY="-0.625"
+                     transitionDuration="3000"
+                     scrollTarget="{{ScrollContainer}}"
+                     noInit?="{{!pageTransitionDone}}"
+                     noDraw?="{{mode === 'active'}}"
+                     on-location-transitionend="{{onArrivedAtGlobePin}}"></webgl-globe>
+        <core-ajax auto?="{{pageTransitionDone && !offsiteLocations}}" url="api/extended"
+                   handleAs="json" response="{{offsiteLocations}}"></core-ajax>
       </div>
     </section>
   </div>

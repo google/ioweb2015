@@ -132,7 +132,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/styles/pages/upgrade.css',
     APP_DIR + '/styles/pages/error.css',
     APP_DIR + '/elements/**/images/*',
-    APP_DIR + '/elements/webgl-globe/shaders/globe.{frag,vert}',
+    APP_DIR + '/elements/webgl-globe/shaders/*.{frag,vert}',
     APP_DIR + '/elements/webgl-globe/textures/*.{jpg,png}',
     APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js',
     APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
