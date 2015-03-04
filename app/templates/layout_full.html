@@ -243,7 +243,7 @@ limitations under the License.
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}" role="navigation">
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
           <div flex disabled?="{{selectedPage === 'home'}}">
-            <a href="./" data-ajax-link data-track-link="nav-home" data-anim-ripple aria-label="Home" aria-hidden="{{selectedPage === 'home'}}"
+            <a class="io-logo-link" href="./" data-ajax-link data-track-link="nav-home" data-anim-ripple aria-label="Home" aria-hidden="{{selectedPage === 'home'}}"
             tabindex="{{selectedPage === 'home' ? -1 : 0}}">
               <div on-transitionend="{{manageHomeFocus}}" on-webkittransitionend="{{manageHomeFocus}}" class="io-logo"></div>
             </a>
