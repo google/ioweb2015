@@ -176,6 +176,17 @@ h6 {
   background-size: 150%;
 }
 
+.attend__globe {
+  min-height: 150px;
+  opacity: 0;
+  transition: opacity 1000ms linear;
+  will-change: opacity;
+
+  &.show {
+    opacity: 1;
+  }
+}
+
 .page__section {
   @include keyline-16();
   padding-top: $desktopKeyline;
@@ -307,12 +318,16 @@ h6 {
   }
 }
 
+
 @media (max-width: $phone-breakpoint-max) {
   .io-countdown {
     margin: $desktopKeyline auto;
   }
   .navbar__overlay {
     font-size: 16px;
+  }
+  .attend__globe {
+    height: 150px;
   }
 }
 
@@ -339,6 +354,9 @@ h6 {
   }
   .bg-globe {
     background-position: 50% 0;
+  }
+  .attend__globe {
+    height: 500px;
   }
 }
 
