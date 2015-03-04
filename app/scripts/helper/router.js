@@ -205,6 +205,8 @@ IOWA.Router = (function() {
    */
   function renderPage(pageName) {
     var importURL = pageName + '?partial';
+    
+    // TODO(ericbidelman): update call when github.com/Polymer/polymer/pull/1128 lands.
     Polymer.import([importURL], function() {
       // Don't proceed if import didn't load correctly.
       var htmlImport = document.querySelector(
