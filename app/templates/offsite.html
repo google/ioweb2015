@@ -269,7 +269,8 @@
       IOWA.Elements.Template.initExtendedSearchBox = function(e, detail, sender) {
         // Add autocomplete to the extended search box when Maps API has loaded.
         var autocomplete = new google.maps.places.Autocomplete(
-            document.querySelector('#autocomplete'), {types: ['geocode']});
+            document.querySelector('.page__section--attend #autocomplete'),
+            {types: ['geocode']});
         var globe = document.querySelector('#offsite-globe');
 
         google.maps.event.addListener(autocomplete, 'place_changed', function() {
