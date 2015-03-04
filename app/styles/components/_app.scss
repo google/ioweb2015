@@ -169,6 +169,13 @@ h6 {
   }
 }
 
+.bg-globe {
+  background-image: url(../images/home/globe-1440.jpg);
+  background-repeat: no-repeat;
+  background-position: 50% 60px;
+  background-size: 150%;
+}
+
 .attend__globe {
   min-height: 150px;
   opacity: 0;
@@ -345,6 +352,9 @@ h6 {
     margin-left: -$hashWidth !important;
     height: 160px;
   }
+  .bg-globe {
+    background-position: 50% 0;
+  }
   .attend__globe {
     height: 500px;
   }
@@ -402,5 +412,11 @@ h6 {
     font-size: 16px;
     line-height: 24px;
     font-weight: 500;
+  }
+}
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .bg-globe {
+    background-image: url(../images/home/globe-1440@2x.jpg);
   }
 }
