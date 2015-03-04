@@ -222,10 +222,6 @@
         return;
       }
 
-      var onPageTransitionDone_ = function(e) {
-        IOWA.Elements.Template.openExtendedMap(800);
-      };
-
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.offsiteGlobeVisible = false;
@@ -233,12 +229,13 @@
         IOWA.Elements.Template.extendedMapActive = false;
 
         if (location.hash.substring(1) === 'join') {
+          var onPageTransitionDone_ = function(e) {
+            IOWA.Elements.Template.openExtendedMap(800);
+            document.removeEventListener('page-transition-done', onPageTransitionDone_);
+          };
+
           document.addEventListener('page-transition-done', onPageTransitionDone_);
         }
-      };
-
-      page.unload = function() {
-        document.removeEventListener('page-transition-done', onPageTransitionDone_);
       };
 
       IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
