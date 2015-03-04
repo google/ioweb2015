@@ -78,7 +78,7 @@
           <paper-input id="autocomplete" label="Search for a location"></paper-input>
         </div>
       </div>
-      <div class="attend__globe">
+      <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}">
         <webgl-globe id="offsite-globe"
                      markers="{{offsiteLocations}}"
                      locationTarget="{'lat': 36.5, 'lng': 0}"
@@ -86,6 +86,7 @@
                      offsetY="-0.625"
                      transitionDuration="3000"
                      scrollTarget="{{ScrollContainer}}"
+                     scrollTriggered="{{offsiteGlobeVisible}}"
                      noInit?="{{!pageTransitionDone}}"
                      noDraw?="{{mode === 'active'}}"></webgl-globe>
         <core-ajax auto?="{{pageTransitionDone && !offsiteLocations}}" url="api/extended"
@@ -221,10 +222,23 @@
         return;
       }
 
+      var onPageTransitionDone_ = function(e) {
+        IOWA.Elements.Template.openExtendedMap(800);
+      };
+
       page.load = function() {
         // Reset template variables for when revisiting the page.
+        IOWA.Elements.Template.offsiteGlobeVisible = false;
         IOWA.Elements.Template.fullscreenVideoActive = false;
         IOWA.Elements.Template.extendedMapActive = false;
+
+        if (location.hash.substring(1) === 'join') {
+          document.addEventListener('page-transition-done', onPageTransitionDone_);
+        }
+      };
+
+      page.unload = function() {
+        document.removeEventListener('page-transition-done', onPageTransitionDone_);
       };
 
       IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
@@ -254,13 +268,16 @@
       IOWA.Elements.Template.closeExtendedMapSection = function(e, detail, sender) {
         runExtendedMapAnimation(true, function() {
           IOWA.Elements.Template.extendedMapActive = false;
+          history.replaceState({}, null, location.pathname); // Remove #join hash from URL.
         });
       };
 
       IOWA.Elements.Template.openExtendedMap = function(e, detail, sender) {
+        var scrollDuration = typeof e === 'number' ? e : 400;
+
         // Smooth scroll to globe section.
         var destEl = IOWA.Elements.Main.querySelector('.page__section--attend');
-        IOWA.Util.smoothScroll(destEl, 400, function() {
+        IOWA.Util.smoothScroll(destEl, scrollDuration, function() {
           IOWA.Elements.Template.extendedMapActive = true;
           runExtendedMapAnimation();
         });

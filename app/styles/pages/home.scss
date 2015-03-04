@@ -62,11 +62,6 @@ $name: 'page-home';
   }
 
   .attend__globe {
-    min-height: 150px;
-    opacity: 0;
-    transition: opacity 1000ms linear;
-    will-change: opacity;
-
     .globe-marker {
       position: absolute;
       left: 0;
@@ -74,10 +69,6 @@ $name: 'page-home';
       margin: 0 auto;
       color: #eeff41;
       transition: all 400ms cubic-bezier(0,0,0.2,1);
-      opacity: 1;
-    }
-
-    &.show {
       opacity: 1;
     }
   }
@@ -115,8 +106,6 @@ $name: 'page-home';
     }
   }
   .attend__globe {
-    height: 150px;
-
     .globe-marker {
       $transformY: 98px;
       width: 36px;
@@ -166,8 +155,6 @@ $name: 'page-home';
     margin-bottom: -105px;
   }
   .attend__globe {
-    height: 500px;
-
     .globe-marker {
       $transformY: 262px;
       width: 48px;
