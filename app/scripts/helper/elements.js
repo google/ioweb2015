@@ -93,6 +93,10 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
+    template.scrollLock = function(enable) {
+      document.body.classList.toggle('noscroll', enable);
+    };
+
     template.toggleVideoOverlayNav = function() {
       var nav = document.querySelector('.navbar__overlay--video');
       nav.classList.toggle('active');

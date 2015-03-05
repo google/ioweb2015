@@ -46,12 +46,16 @@ io-gallery {
   z-index: 7;
 }
 
-.navbar__overlay {
+.marker-results, .view__events {
   z-index: 8;
 }
 
+.navbar__overlay {
+  z-index: 9;
+}
+
 .io-logo-container {
-  z-index: 9; // highest
+  z-index: 10; // highest
 }
 
 experiment-fab-container[playmode="playing"],

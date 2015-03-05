@@ -417,6 +417,7 @@ IOWA.Router = (function() {
       }
 
       navigationFromLinkClick = false; // Reset
+      IOWA.Elements.Template.scrollLock(false); // Ensure main scroll container can scroll again.
 
       // Ignore the navigation if it was a hash update, but on the same page.
       if (e.state && e.state.fromHashChange && nextPage === currentPage) {

@@ -61,14 +61,26 @@
     </div>
 
     <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument">
-      <google-maps-api on-api-load="{{initExtendedSearchBox}}" libraries="places"></google-maps-api>
+
+      <div class="marker-results">
+        <div class="card marker-card">
+          <paper-icon-button icon="io:close" class="close-button" on-tap="{{closeMarkerCard}}"></paper-icon-button>
+          <template repeat="{{marker in offsiteMarkerResults}}">
+            <div class="card-content">
+              <h4 class="card__title">{{marker.name}}</h4>
+              <div layout horizontal center justified>
+                <span>{{marker.city}}</span>
+                <a href="{{marker.link}}" data-track-link="offsite-visit-eventpage" target="_blank">Event details</a>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
       <h2>Find an I/O Extended event near you</h2>
       <div class="action__links" layout vertical>
         <!-- <paper-button data-track-link="offsite-notify-me">
           <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
-        </paper-button> -->
-        <!-- <paper-button>
-          <a href="https://www.google.com/events/io/io-extended" target="_blank" data-track-link="offsite-view-2014-events"><core-icon icon="io:place"></core-icon><i18n-msg msgid="viewlastyear">View 2015 events</i18n-msg></a>
         </paper-button> -->
         <paper-button class="view__events" on-tap="{{openExtendedMap}}">
           <a href="#" data-track-link="offsite-view-2015-events"><core-icon icon="io:place"></core-icon>Find 2015 events</a>
@@ -78,7 +90,11 @@
           <paper-input id="autocomplete" label="Search for a location"></paper-input>
         </div>
       </div>
-      <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}">
+      <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}"
+           on-marker-click="{{onMarkerClick}}" relative>
+
+        <google-maps-api on-api-load="{{initExtendedSearchBox}}" libraries="places" hidden></google-maps-api>
+
         <webgl-globe id="offsite-globe"
                      markers="{{offsiteLocations}}"
                      locationTarget="{'lat': 36.5, 'lng': 0}"
@@ -89,8 +105,10 @@
                      scrollTriggered="{{offsiteGlobeVisible}}"
                      noInit?="{{!pageTransitionDone}}"
                      noDraw?="{{mode === 'active'}}"></webgl-globe>
-        <core-ajax auto?="{{pageTransitionDone && !offsiteLocations}}" url="api/extended"
-                   handleAs="json" response="{{offsiteLocations}}"></core-ajax>
+
+        <core-ajax url="api/extended" handleAs="json"
+                   auto?="{{pageTransitionDone && !offsiteLocations}}"
+                   response="{{offsiteLocations}}"></core-ajax>
       </div>
     </section>
   </div>
@@ -168,6 +186,7 @@
       var bottomCard = IOWA.Elements.Main.querySelector('.card__photo--stage').nextElementSibling;
       var viewButton = IOWA.Elements.Main.querySelector('.view__events');
       var searchInput = IOWA.Elements.Main.querySelector('.search__map');
+      var sectionTitle = IOWA.Elements.Main.querySelector('.page__section--attend h2');
 
       var animationTiming = {
         duration: ANIMATION_DURATION,
@@ -176,10 +195,16 @@
         easing: 'cubic-bezier(0.4,0,0.2,1)'
       };
 
-      var animation = new Animation(viewButton, [
-        {opacity: 1, visibility: 'visible'},
-        {opacity: 0, visibility: 'hidden'}
-      ], animationTiming);
+      var animation = new AnimationGroup([
+        new Animation(viewButton, [
+          {opacity: 1, visibility: 'visible'},
+          {opacity: 0, visibility: 'hidden'}
+        ], animationTiming),
+        new Animation(sectionTitle, [
+          {opacity: 1, visibility: 'visible'},
+          {opacity: 0, visibility: 'hidden'}
+        ], animationTiming)
+      ]);
 
       // Only animate card offscreen if not on mobile.
       if (!IOWA.Elements.Template.isPhoneSize) {
@@ -263,6 +288,9 @@
       };
 
       IOWA.Elements.Template.closeExtendedMapSection = function(e, detail, sender) {
+        this.scrollLock(false);
+        this.closeMarkerCard();
+
         runExtendedMapAnimation(true, function() {
           IOWA.Elements.Template.extendedMapActive = false;
           history.replaceState({}, null, location.pathname); // Remove #join hash from URL.
@@ -270,11 +298,13 @@
       };
 
       IOWA.Elements.Template.openExtendedMap = function(e, detail, sender) {
-        var scrollDuration = typeof e === 'number' ? e : 400;
+        var scrollDuration = (typeof e === 'number') ? e : 400;
 
         // Smooth scroll to globe section.
         var destEl = IOWA.Elements.Main.querySelector('.page__section--attend');
         IOWA.Util.smoothScroll(destEl, scrollDuration, function() {
+          IOWA.Elements.Template.scrollLock(true);
+
           IOWA.Elements.Template.extendedMapActive = true;
           runExtendedMapAnimation();
         });
@@ -288,12 +318,28 @@
         var globe = document.querySelector('#offsite-globe');
 
         google.maps.event.addListener(autocomplete, 'place_changed', function() {
-          var location = autocomplete.getPlace().geometry.location;
+          var place = autocomplete.getPlace();
+          if (!place) {
+            return;
+          }
+          var location = place.geometry.location;
           globe.location = {
             lat: location.lat(),
             lng: location.lng()
           };
+          // TODO(bckenny): call this.offsiteMarkerResults = globe.getRestultsWithinRadius(50);
         }.bind(this));
+      };
+
+      IOWA.Elements.Template.closeMarkerCard = function(e, detail, sender) {
+        IOWA.Elements.Main.querySelector('.marker-results').classList.remove('active');
+        document.querySelector('.page__section--attend #autocomplete').value = null;
+      };
+
+      IOWA.Elements.Template.onMarkerClick = function(e, detail, sender) {
+        e.stopPropagation();
+        // TODO(bckenny): call this.offsiteMarkerResults = globe.getRestultsWithinRadius(50);
+        IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
       };
 
       page.load(); // Run load callback on page load.
