@@ -66,6 +66,7 @@ google-youtube {
     align-items: flex-start;
 
     paper-button {
+      position: absolute;
       color: $color-cyan-A400;
     }
 
@@ -73,6 +74,8 @@ google-youtube {
       margin-right: $icon-margin;
     }
   }
+
+
   .search__map {
     opacity: 0;
     visibility: hidden;
@@ -86,6 +89,61 @@ google-youtube {
     paper-input {
       width: 95vw;
     }
+  }
+
+  .marker-results {
+    position: absolute;
+    width: 300px;
+    height: 50%;
+    margin-top: 12px;
+    pointer-events: none;
+    overflow: auto;
+    transition: all 300ms cubic-bezier(0,0,0.2,1);
+    will-change: opacity, transform;
+    transform: translateY(-25px);
+    opacity: 0;
+
+    &.active {
+      pointer-events: auto;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-content {
+      padding: $mobileKeyline;
+
+      .card__title {
+        padding-bottom: $mobileKeyline / 2;
+      }
+
+      h4 {
+        max-width: 92%;
+      }
+    }
+
+    a {
+      color: $color-cyan-A700;
+      text-transform: none;
+    }
+
+    .close-button {
+      position: absolute;
+      right: $mobileKeyline / 2;
+      top: $mobileKeyline / 2;
+      color: $color-gray;
+    }
+  }
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  .marker-results {
+    width: 100% !important;
+  }
+  .search__map {
+    position: absolute;
+    top: 0;
+    left: $mobileKeyline;
+    right: $mobileKeyline;
   }
 }
 
@@ -121,7 +179,7 @@ google-youtube {
     .action__links {
       position: absolute;
       top: $marginTop;
-      right: 32px;
+      right: $desktopKeyline;
       align-items: flex-end;
 
       core-icon {
@@ -129,15 +187,19 @@ google-youtube {
         margin-left: $icon-margin;
       }
 
-      .search__map {
-        position: absolute;
-        top: 0;
+      .view__events {
         right: 0;
+      }
 
+      .search__map {
         paper-input {
           width: 300px;
         }
       }
+    }
+
+    .marker-results {
+      left: $desktopKeyline;
     }
   }
 }
@@ -167,6 +229,10 @@ google-youtube {
     .action__links {
       top: $marginTop;
       right: $largeKeyline;
+    }
+
+    .marker-results {
+      left: $largeKeyline;
     }
   }
 }

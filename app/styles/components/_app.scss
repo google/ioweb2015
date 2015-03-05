@@ -21,6 +21,12 @@ html, body {
   @include typo-body();
 }
 
+.noscroll {
+  core-drawer-panel [main] {
+    overflow: hidden;
+  }
+}
+
 .strong {
   font-weight: bold;
 }

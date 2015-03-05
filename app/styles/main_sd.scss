@@ -39,6 +39,9 @@ paper-tabs.white {
 
 #page-offsite {
   paper-input::shadow paper-input-decorator {
+    #input {
+      width: 90%;
+    }
     &::shadow {
       .label-text {
         color: white;
@@ -56,6 +59,7 @@ paper-tabs.white {
     }
   }
 }
+
 
 footer {
   paper-dropdown-menu::shadow #label {
