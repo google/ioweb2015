@@ -60,6 +60,12 @@ $name: 'page-onsite';
   }
 }
 
+.lyft-logo {
+  > div {
+    background-size: 245% !important;
+  }
+}
+
 @media (min-width: $tablet-breakpoint-min) {
   .onsite__pic {
     height: 745px;
