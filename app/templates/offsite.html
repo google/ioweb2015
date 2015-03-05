@@ -65,7 +65,7 @@
       <div class="marker-results">
         <div class="card marker-card">
           <paper-icon-button icon="io:close" class="close-button" on-tap="{{closeMarkerCard}}"></paper-icon-button>
-          <template repeat="{{marker in offsiteMakerResults}}">
+          <template repeat="{{marker in offsiteMarkerResults}}">
             <div class="card-content">
               <h4 class="card__title">{{marker.name}}</h4>
               <div layout horizontal center justified>
@@ -327,7 +327,7 @@
             lat: location.lat(),
             lng: location.lng()
           };
-          // TODO(bckenny): call this.offsiteMakerResults = globe.getRestultsWithinRadius(50);
+          // TODO(bckenny): call this.offsiteMarkerResults = globe.getRestultsWithinRadius(50);
         }.bind(this));
       };
 
@@ -338,7 +338,7 @@
 
       IOWA.Elements.Template.onMarkerClick = function(e, detail, sender) {
         e.stopPropagation();
-        // TODO(bckenny): call this.offsiteMakerResults = globe.getRestultsWithinRadius(50);
+        // TODO(bckenny): call this.offsiteMarkerResults = globe.getRestultsWithinRadius(50);
         IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
       };
 
