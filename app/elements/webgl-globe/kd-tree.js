@@ -402,6 +402,63 @@ IOWA.WebglGlobe.KdTree.nearest_ = function(target, current, depth, candidate) {
 };
 
 /**
+ * Find the points within a specified distance from target location.
+ * @param {{x: number, y: number, z: number, sqDistance: number}} target
+ * @param {IOWA.WebglGlobe.KdNode} current The current root node of the search.
+ * @param {number} depth The current traversal depth within the tree.
+ * @param {!Array<{neighbor: ?IOWA.WebglGlobe.KdNode, sqDistance: number}>} neighbors
+ * @return {!Array<{neighbor: ?IOWA.WebglGlobe.KdNode, sqDistance: number}>}
+ * @private
+ */
+IOWA.WebglGlobe.KdTree.neighborhood_ = function(target, current, depth, neighbors) {
+  var xDiff = target.x - current.x;
+  var yDiff = target.y - current.y;
+  var zDiff = target.z - current.z;
+  xDiff *= xDiff;
+  yDiff *= yDiff;
+  zDiff *= zDiff;
+
+  // Test if current is wthin distance bounds.
+  var sqDistance = xDiff + yDiff + zDiff;
+  if (sqDistance < target.sqDistance) {
+    neighbors.push({
+      neighbor: current,
+      sqDistance: sqDistance
+    });
+  }
+
+  // Determine which side of split in current dimension that target is in.
+  var leftFirst;
+  var testSqDistance;
+  var dimension = depth % 3;
+  if (dimension === 0) {
+    leftFirst = target.x < current.x;
+    testSqDistance = xDiff;
+  } else if (dimension === 1) {
+    leftFirst = target.y < current.y;
+    testSqDistance = yDiff;
+  } else {
+    leftFirst = target.z < current.z;
+    testSqDistance = zDiff;
+  }
+
+  // Recurse to children, prioritizing the side of the split target is in.
+  var first = leftFirst ? current.left : current.right;
+  var second = leftFirst ? current.right : current.left;
+  if (first !== null) {
+    neighbors = IOWA.WebglGlobe.KdTree.neighborhood_(target, first, depth + 1,
+        neighbors);
+  }
+  // Don't visit the other side of the split if farther away than limit.
+  if (testSqDistance <= target.sqDistance && second !== null) {
+    neighbors = IOWA.WebglGlobe.KdTree.nearest_(target, second, depth + 1,
+        neighbors);
+  }
+
+  return neighbors;
+};
+
+/**
  * Finds the nearest neighbor to the specified coordinates and returns an object
  * with the index of that neighbor in the original point array along with the
  * distance from that neighbor to the target point. The distance is the chord
@@ -452,4 +509,39 @@ IOWA.WebglGlobe.KdTree.prototype.nearestNeighborByLatLng = function(lat, lng, op
   var z = Math.cos(radLng) * cosLat;
 
   return this.nearestNeighbor(x, y, z, opt_maxDistance);
+};
+
+/**
+ * Find all points within maxDistance radius of the target latitude and
+ * longitude. Returns an empty array if none are found.
+ * @param {number} lat
+ * @param {number} lng
+ * @param {numebr} maxDistance
+ * @return {!Array<{index: number, distance: number}>}
+ */
+IOWA.WebglGlobe.KdTree.prototype.nearestNeighborsByLatLng = function(lat, lng, maxDistance) {
+  var radLat = lat * (Math.PI / 180);
+  var radLng = lng * (Math.PI / 180);
+  var cosLat = Math.cos(radLat);
+
+  var searchPoint = {
+    x: Math.sin(radLng) * cosLat,
+    y: Math.sin(radLat),
+    z: Math.cos(radLng) * cosLat,
+    sqDistance: maxDistance * maxDistance
+  };
+
+  var neighbors = IOWA.WebglGlobe.KdTree.neighborhood_(searchPoint, this.root_,
+      0, []);
+  var results = [];
+  for (var i = 0; i < neighbors.length; i++) {
+    results[i] = {
+      index: neighbors[i].neighbor.index,
+      distance: Math.sqrt(neighbors[i].sqDistance)
+    };
+  }
+
+  results.sort(function(a, b) { return a.distance - b.distance; });
+
+  return results;
 };

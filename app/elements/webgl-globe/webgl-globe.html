@@ -1039,7 +1039,8 @@ Makes a globe or whatever.
           return null;
         }
 
-        var nearest = this.markerTree_.nearestNeighborByLatLng(latitude, longitude);
+        var nearest = this.markerTree_.nearestNeighborByLatLng(latitude,
+            longitude);
 
         // Calculate the approximate distance from input to point over surface
         // of a spherical Earth. Uses the equatorial radius.
@@ -1048,6 +1049,21 @@ Makes a globe or whatever.
         nearest.distance = approximateDistance;
 
         return nearest;
+      },
+
+      getMarkersWithinDistance: function(latitude, longitude, distanceKm) {
+        if (!this.markerTree_) {
+          return [];
+        }
+
+        var angularDistance = distanceKm / 6378;
+        var chordDistance = 2 * Math.sin(angularDistance / 2);
+
+        var neighbors = this.markerTree_.nearestNeighborsByLatLng(latitude,
+            longitude, chordDistance);
+
+        // TODO(bckenny): convert to distance over land?
+        return neighbors;
       }
     });
   })();
