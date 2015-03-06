@@ -434,3 +434,22 @@ IOWA.WebglGlobe.KdTree.prototype.nearestNeighbor = function(x, y, z, opt_maxDist
     distance: Math.sqrt(result.sqDistance)
   };
 };
+
+/**
+ * A convenience method to call `nearestNeighbor` but with latitude and
+ * longitude instead of a three-dimensional coordinate.
+ * @param {number} lat
+ * @param {number} lng
+ * @param {numebr=} opt_maxDistance
+ * @return {{index: number, distance: number}}
+ */
+IOWA.WebglGlobe.KdTree.prototype.nearestNeighborByLatLng = function(lat, lng, opt_maxDistance) {
+  var radLat = lat * (Math.PI / 180);
+  var radLng = lng * (Math.PI / 180);
+  var cosLat = Math.cos(radLat);
+  var x = Math.sin(radLng) * cosLat;
+  var y = Math.sin(radLat);
+  var z = Math.cos(radLng) * cosLat;
+
+  return this.nearestNeighbor(x, y, z, opt_maxDistance);
+};

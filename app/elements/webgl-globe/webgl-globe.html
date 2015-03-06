@@ -1029,6 +1029,18 @@ Makes a globe or whatever.
         clickRay[2] = cameraPosition[2] + t * globeRayZ;
 
         return clickRay;
+      },
+
+      getNearestMarker: function(latitude, longitude) {
+        var nearest = this.markerTree_.nearestNeighborByLatLng(latitude, longitude);
+
+        // Calculate the approximate distance from input to point over surface
+        // of a spherical Earth. Uses the equatorial radius.
+        var angularDistance = 2 * Math.asin(nearest.distance / 2);
+        var approximateDistance = angularDistance * 6378;
+        nearest.distance = approximateDistance;
+
+        return nearest;
       }
     });
   })();
