@@ -319,15 +319,19 @@
 
         google.maps.event.addListener(autocomplete, 'place_changed', function() {
           var place = autocomplete.getPlace();
-          if (!place) {
+          if (!place.geometry) {
             return;
           }
           var location = place.geometry.location;
+
+          // TODO(bckenny): expand to support a radius query
+          var nearestMarker = globe.getNearestMarker(location.lat(), location.lng());
+          var markerResult = this.offsiteLocations[nearestMarker.index];
+          this.offsiteMarkerResults = [markerResult];
           globe.location = {
-            lat: location.lat(),
-            lng: location.lng()
+            lat: markerResult.lat,
+            lng: markerResult.lng
           };
-          // TODO(bckenny): call this.offsiteMarkerResults = globe.getRestultsWithinRadius(50);
         }.bind(this));
       };
 
@@ -338,8 +342,26 @@
 
       IOWA.Elements.Template.onMarkerClick = function(e, detail, sender) {
         e.stopPropagation();
-        // TODO(bckenny): call this.offsiteMarkerResults = globe.getRestultsWithinRadius(50);
-        IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
+
+        // TODO(bckenny): expand to support a radius query
+        var centerLocation = this.offsiteLocations[e.detail.markerIndex];
+        this.offsiteMarkerResults = [centerLocation];
+
+        function focusLocation() {
+          IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
+          var globe = document.querySelector('#offsite-globe');
+          globe.location = {
+            lat: centerLocation.lat,
+            lng: centerLocation.lng
+          };
+        }
+
+        if (!IOWA.Elements.Template.extendedMapActive) {
+          this.openExtendedMap(200);
+          this.async(focusLocation, null, 400);
+        } else {
+          focusLocation();
+        }
       };
 
       page.load(); // Run load callback on page load.

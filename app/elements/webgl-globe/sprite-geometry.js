@@ -6,7 +6,8 @@
  * longitude specified by each object in the locations array. Each quad is
  * specified with four vertices, so `generateSpriteIndexArray` must be used to
  * generate an index array that can draw triangles from the generated array.
- * @param {!Array<{lat: number, lng: number}}
+ * @param {!Array<{lat: number, lng: number}} locations
+ * @param {number} spriteSize
  * @return {!Float32Array}
  */
 IOWA.WebglGlobe.generateSpriteGeometry = (function() {
@@ -25,20 +26,13 @@ IOWA.WebglGlobe.generateSpriteGeometry = (function() {
   ];
 
   /**
-   * Distance of sprite from center of sphere.
+   * Increase of sprite size to allow space for anti-aliasing in shader.
    * @const
    * @private {number}
    */
-  var SPRITE_RADIUS_ = 1;
+  var SPRITE_SCALE_CORRECTION_ = 1 / 0.75;
 
-  /**
-   * Local (horizontal and vertical) scale of sprite.
-   * @const
-   * @private {number}
-   */
-  var SPRITE_SCALE_ = 0.01;
-
-  return function generateSpriteGeometry(locations) {
+  return function generateSpriteGeometry(locations, spriteSize) {
     // 4 verts per sprite, 7 (scalar) attributes per vert, 4 bytes per attribute
     var verts = new ArrayBuffer(locations.length * 4 * 7 * 4);
 
@@ -55,8 +49,8 @@ IOWA.WebglGlobe.generateSpriteGeometry = (function() {
       transform.identity()
         .rotateY(loc.lng * Math.PI / 180)
         .rotateX(-loc.lat * Math.PI / 180)
-        .translate(0, 0, SPRITE_RADIUS_)
-        .scaleUniform(SPRITE_SCALE_);
+        .translate(0, 0, 1)
+        .scaleUniform(spriteSize * SPRITE_SCALE_CORRECTION_);
 
       for (var j = 0; j < QUAD_GEOMETRY_.length / 4; j++) {
         // Quad, moved to surface of the earth and rotated into place.
