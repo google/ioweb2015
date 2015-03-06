@@ -335,9 +335,10 @@
             this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i].index]);
           }
           globe.location = {
-            lat: this.offsiteMarkerResults[0].lat,
-            lng: this.offsiteMarkerResults[0].lng
+            lat: location.lat(),
+            lng: location.lng()
           };
+          IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
         }.bind(this));
       };
 
