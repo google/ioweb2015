@@ -63,7 +63,7 @@ IOWA.WebglGlobe.Matrix4x4.prototype.invertAffine = function(src) {
   m[10] = s[0]*s[5] - s[1]*s[4];
   m[11] = 0;
 
-  var det = 1 / (s[0]*m[0] + s[1]*m[1] + s[2]*m[8]);
+  var det = 1 / (s[0]*m[0] + s[1]*m[4] + s[2]*m[8]);
   m[0] *= det;
   m[1] *= det;
   m[2] *= det;
@@ -320,8 +320,8 @@ IOWA.WebglGlobe.Matrix4x4.prototype.scaleUniform = function(scale) {
 
 /**
  * Transforms the four-vector vec and places result in destVec. Returns destVec.
- * destVec and vec refer to the same vector object (so transformation is done in
- * place).
+ * destVec and vec can refer to the same vector object (so transformation is
+ * done in place).
  * @param {!IOWA.WebglGlobe.ArrayLike} destVec
  * @param {!IOWA.WebglGlobe.ArrayLike} vec
  * @return {!IOWA.WebglGlobe.ArrayLike} destVec
