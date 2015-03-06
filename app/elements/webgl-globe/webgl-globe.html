@@ -30,7 +30,7 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
-<polymer-element name="webgl-globe" on-tap={{handleTap}} attributes="cameraDistance fov location locationTarget markers noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration">
+<polymer-element name="webgl-globe" on-tap="{{handleTap}}" attributes="cameraDistance fov location locationTarget markers noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration">
   <template>
     <style>
       :host {
@@ -893,6 +893,8 @@ Makes a globe or whatever.
 
         this.renderGlobe_(worldTransform, cameraPosition, sunDirection);
 
+        // Render markers (if set) and handle mouse clicks on them.
+        var clickedMarkerIndex = -1;
         if (this.markerDrawCount_ > 0) {
           if (this.mouseClicked_) {
             this.mouseClicked_ = false;
@@ -904,9 +906,7 @@ Makes a globe or whatever.
               // Find the marker clicked on (if any).
               var nearest = this.markerTree_.nearestNeighbor(pickedPoint[0],
                   pickedPoint[1], pickedPoint[2], this.markerSize_);
-              if (nearest.index > -1) {
-                this.asyncFire('marker-click', {markerIndex: nearest.index});
-              }
+              clickedMarkerIndex = nearest.index;
             }
           }
 
@@ -917,6 +917,10 @@ Makes a globe or whatever.
 
         this.updateRequestId_ = 0;
         this.scheduleUpdate_();
+
+        if (clickedMarkerIndex > -1) {
+          this.fire('marker-click', {markerIndex: clickedMarkerIndex});
+        }
       },
 
       renderGlobe_: function(mvpTransform, cameraPosition, sunDirection) {
@@ -1031,6 +1035,10 @@ Makes a globe or whatever.
       },
 
       getNearestMarker: function(latitude, longitude) {
+        if (!this.markerTree_) {
+          return null;
+        }
+
         var nearest = this.markerTree_.nearestNeighborByLatLng(latitude, longitude);
 
         // Calculate the approximate distance from input to point over surface
