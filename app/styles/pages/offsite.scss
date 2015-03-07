@@ -66,7 +66,6 @@ google-youtube {
     align-items: flex-start;
 
     paper-button {
-      position: absolute;
       color: $color-cyan-A400;
     }
 
@@ -138,12 +137,16 @@ google-youtube {
 @media (max-width: $phone-breakpoint-max) {
   .marker-results {
     width: 100% !important;
+    margin-top: $tabletKeyline !important;
   }
   .search__map {
     position: absolute;
     top: 0;
     left: $mobileKeyline;
     right: $mobileKeyline;
+  }
+  .navbar__overlay--extended {
+    background-color: $color-bluegrey-700;
   }
 }
 
@@ -188,6 +191,7 @@ google-youtube {
       }
 
       .view__events {
+        position: absolute;
         right: 0;
       }
 
