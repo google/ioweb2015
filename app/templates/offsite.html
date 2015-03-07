@@ -339,6 +339,8 @@
             lng: location.lng()
           };
           IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
+
+          IOWA.Analytics.trackEvent('globe', 'place select', place.name);
         }.bind(this));
       };
 
@@ -375,6 +377,8 @@
         } else {
           focusLocation.call(this);
         }
+
+        IOWA.Analytics.trackEvent('globe', 'marker click');
       };
 
       page.load(); // Run load callback on page load.
