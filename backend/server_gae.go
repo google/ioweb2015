@@ -14,9 +14,10 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/jwt"
 
-	"appengine"
-	"appengine/urlfetch"
-	"appengine/user"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/urlfetch"
+	"google.golang.org/appengine/user"
 )
 
 func init() {
@@ -36,7 +37,7 @@ func init() {
 }
 
 // allowPassthrough returns true if the request r can be handled w/o whitelist check.
-func allowPassthrough(ac appengine.Context, r *http.Request) bool {
+func allowPassthrough(r *http.Request) bool {
 	return isProd() ||
 		r.Header.Get("X-AppEngine-Cron") == "true" ||
 		r.Header.Get("X-AppEngine-TaskName") != ""
@@ -48,17 +49,16 @@ func allowPassthrough(ac appengine.Context, r *http.Request) bool {
 // (Forbidden) HTTP error code if the current user is not whitelisted.
 func checkWhitelist(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ac := appengine.NewContext(r)
-		if allowPassthrough(ac, r) {
+		if allowPassthrough(r) {
 			h.ServeHTTP(w, r)
 			return
 		}
-
+		ac := appengine.NewContext(r)
 		u := user.Current(ac)
 		if u == nil {
 			url, err := user.LoginURL(ac, r.URL.Path)
 			if err != nil {
-				ac.Errorf("user.LoginURL(%q): %v", r.URL.Path, err)
+				errorf(ac, "user.LoginURL(%q): %v", r.URL.Path, err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -66,7 +66,7 @@ func checkWhitelist(h http.Handler) http.Handler {
 			return
 		}
 		if !isWhitelisted(u.Email) {
-			ac.Errorf("%s is not whitelisted", u.Email)
+			errorf(ac, "%s is not whitelisted", u.Email)
 			http.Error(w, "Access denied, sorry. Try with a different account.", http.StatusForbidden)
 			return
 		}
@@ -78,19 +78,8 @@ func checkWhitelist(h http.Handler) http.Handler {
 // newContext returns a newly created context of the in-flight request r.
 // and its response writer w.
 func newContext(r *http.Request, w io.Writer) context.Context {
-	ac := appengine.NewContext(r)
-	c := context.WithValue(context.Background(), ctxKeyGAEContext, ac)
+	c := appengine.NewContext(r)
 	return context.WithValue(c, ctxKeyWriter, w)
-}
-
-// appengineContext extracts appengine.Context value from the context c
-// associated with an in-flight request.
-func appengineContext(c context.Context) appengine.Context {
-	ac, ok := c.Value(ctxKeyGAEContext).(appengine.Context)
-	if !ok || ac == nil {
-		panic("never reached: no appengine.Context found")
-	}
-	return ac
 }
 
 // serviceCredentials returns a token source for the service account serviceAccountEmail.
@@ -104,21 +93,21 @@ func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource
 		Scopes:     scopes,
 		TokenURL:   config.Google.TokenURL,
 	}
-	return cred.TokenSource(appengineContext(c)), nil
+	return cred.TokenSource(c), nil
 }
 
 // httpTransport returns a suitable HTTP transport for current backend hosting environment.
 // In this GAE-hosted version it uses appengine/urlfetch#Transport.
 func httpTransport(c context.Context) http.RoundTripper {
-	return &urlfetch.Transport{Context: appengineContext(c)}
+	return &urlfetch.Transport{Context: c}
 }
 
 // logf logs an info message using appengine's context.
 func logf(c context.Context, format string, args ...interface{}) {
-	appengineContext(c).Infof(format, args...)
+	log.Infof(c, format, args...)
 }
 
 // errorf logs an error message using appengine's context.
 func errorf(c context.Context, format string, args ...interface{}) {
-	appengineContext(c).Errorf(format, args...)
+	log.Errorf(c, format, args...)
 }
