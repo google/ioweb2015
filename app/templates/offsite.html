@@ -64,12 +64,12 @@
 
       <div class="marker-results">
         <div class="card marker-card">
-          <paper-icon-button icon="io:close" class="close-button" on-tap="{{closeMarkerCard}}"></paper-icon-button>
+          <paper-icon-button icon="io:close" class="close-button" on-tap="{{resetExtendedSearch}}"></paper-icon-button>
           <template repeat="{{marker in offsiteMarkerResults}}">
             <div class="card-content">
               <h4 class="card__title">{{marker.name}}</h4>
               <div layout horizontal center justified>
-                <span>{{marker.city}}</span>
+                <span><a href="//www.google.com/maps/place/{{marker.lat}},{{marker.lng}}" target="_blank">{{marker.city}}</a></span>
                 <a href="{{marker.link}}" data-track-link="offsite-visit-eventpage" target="_blank">Event details</a>
               </div>
             </div>
@@ -77,8 +77,13 @@
         </div>
       </div>
 
-      <h2>Find an I/O Extended event near you</h2>
+      <h2 class="extended-title">Find an I/O Extended event near you</h2>
+
       <div class="action__links" layout vertical>
+        <template if="{{extendedMapActive && didExtendedSearch && !offsiteMarkerResults.length}}">
+          <h4>There are currently no events near that location. Try another search or check back later to find one that's closest to.</h4>
+        </template>
+
         <!-- <paper-button data-track-link="offsite-notify-me">
           <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
         </paper-button> -->
@@ -186,7 +191,7 @@
       var bottomCard = IOWA.Elements.Main.querySelector('.card__photo--stage').nextElementSibling;
       var viewButton = IOWA.Elements.Main.querySelector('.view__events');
       var searchInput = IOWA.Elements.Main.querySelector('.search__map');
-      var sectionTitle = IOWA.Elements.Main.querySelector('.page__section--attend h2');
+      var sectionTitle = IOWA.Elements.Main.querySelector('.extended-title');
 
       var animationTiming = {
         duration: ANIMATION_DURATION,
@@ -252,6 +257,8 @@
         IOWA.Elements.Template.offsiteGlobeVisible = false;
         IOWA.Elements.Template.fullscreenVideoActive = false;
         IOWA.Elements.Template.extendedMapActive = false;
+        IOWA.Elements.Template.didExtendedSearch = false;
+        IOWA.Elements.Template.offsiteMarkerResults= [];
 
         // Offsite event search radius in kilometers.
         IOWA.Elements.Template.offsiteSearchRadius = 80;
@@ -292,7 +299,7 @@
 
       IOWA.Elements.Template.closeExtendedMapSection = function(e, detail, sender) {
         this.scrollLock(false);
-        this.closeMarkerCard();
+        this.resetExtendedSearch();
 
         runExtendedMapAnimation(true, function() {
           IOWA.Elements.Template.extendedMapActive = false;
@@ -309,6 +316,7 @@
           IOWA.Elements.Template.scrollLock(true);
 
           IOWA.Elements.Template.extendedMapActive = true;
+          IOWA.Elements.Template.offsiteMarkerResults= [];
           runExtendedMapAnimation();
         });
       };
@@ -325,6 +333,7 @@
           if (!place.geometry) {
             return;
           }
+
           var location = place.geometry.location;
 
           // Find all offsite events within a search radius and put in card.
@@ -334,19 +343,24 @@
           for (var i = 0; i < nearestMarkers.length; i++) {
             this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i].index]);
           }
+
           globe.location = {
             lat: location.lat(),
             lng: location.lng()
           };
+
+          IOWA.Elements.Template.didExtendedSearch = true;
+
           IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
 
           IOWA.Analytics.trackEvent('globe', 'place select', place.name);
         }.bind(this));
       };
 
-      IOWA.Elements.Template.closeMarkerCard = function(e, detail, sender) {
+      IOWA.Elements.Template.resetExtendedSearch = function(e, detail, sender) {
         IOWA.Elements.Main.querySelector('.marker-results').classList.remove('active');
         document.querySelector('.page__section--attend #autocomplete').value = null;
+        IOWA.Elements.Template.didExtendedSearch = false;
       };
 
       IOWA.Elements.Template.onMarkerClick = function(e, detail, sender) {

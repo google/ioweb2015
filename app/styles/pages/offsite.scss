@@ -69,6 +69,11 @@ google-youtube {
       color: $color-cyan-A400;
     }
 
+    h4 {
+      position: absolute;
+      left: 0;
+    }
+
     core-icon {
       margin-right: $icon-margin;
     }
@@ -76,6 +81,9 @@ google-youtube {
 
 
   .search__map {
+    position: absolute;
+    top: 0;
+    right: 0;
     opacity: 0;
     visibility: hidden;
 
@@ -92,7 +100,7 @@ google-youtube {
 
   .marker-results {
     position: absolute;
-    width: 300px;
+    width: 350px;
     max-height: 50%;
     margin-top: 12px;
     pointer-events: none;
@@ -140,10 +148,15 @@ google-youtube {
     margin-top: $tabletKeyline !important;
   }
   .search__map {
-    position: absolute;
-    top: 0;
     left: $mobileKeyline;
-    right: $mobileKeyline;
+    right: $mobileKeyline !important;
+    top:  $mobileKeyline / 2 !important;
+  }
+  .action__links {
+    h4 {
+      top: 50px;
+      padding: $mobileKeyline;
+    }
   }
   .navbar__overlay--extended {
     background-color: $color-bluegrey-700;
@@ -182,12 +195,17 @@ google-youtube {
     .action__links {
       position: absolute;
       top: $marginTop;
+      left: $desktopKeyline;
       right: $desktopKeyline;
       align-items: flex-end;
 
       core-icon {
         order: 1;
         margin-left: $icon-margin;
+      }
+
+      h4 {
+        max-width: 60%;
       }
 
       .view__events {
@@ -232,6 +250,7 @@ google-youtube {
 
     .action__links {
       top: $marginTop;
+      left: $largeKeyline;
       right: $largeKeyline;
     }
 
