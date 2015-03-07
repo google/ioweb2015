@@ -361,7 +361,10 @@ gulp.task('addgithooks', function() {
 });
 
 gulp.task('godeps', function() {
-  spawn('go', ['get', '-d', './' + BACKEND_DIR + '/...'], {stdio: 'inherit'});
+  // additional argument is required because it is imported in files
+  // hidden by +appengine build tag and not visible to the standard "go get" command.
+  var args = ['get', '-d', './' + BACKEND_DIR + '/...', 'google.golang.org/appengine'];
+  spawn('go', args, {stdio: 'inherit'});
 });
 
 // decrypt backend/server.config.enc into backend/server.config.

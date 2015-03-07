@@ -4,10 +4,10 @@ git:
 script:
   - npm -q install
   - cd app && ../node_modules/bower/bin/bower install -q --allow-root && cd ..
+  - gulp godeps
   # ensure the build works
   - gulp
   # backend testing
-  - go get -d -v ./backend/...
   - gulp backend:test
   # deploy to appspot if this is master branch
   - util/auto-deploy
