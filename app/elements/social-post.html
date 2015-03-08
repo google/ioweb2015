@@ -25,11 +25,11 @@ Displays information about a social post, and linkifies certain URLs in the text
 
 @element social-post
 -->
-<polymer-element name="social-post" attributes="kind author url text when">
+<polymer-element name="social-post" attributes="kind author url text when hideAuthor">
   <template>
     <link rel="stylesheet" href="social-post.css">
     <header>
-      <a href="{{profileUrl}}" target="_blank">{{author}}</a>
+      <a href="{{profileUrl}}" target="_blank" hidden?="{{hideAuthor}}">{{author}}</a>
       <div class="timestamp">
         <a href="{{url}}" target="_blank">{{timeAgo}}</a>
       </div>
@@ -83,7 +83,16 @@ Displays information about a social post, and linkifies certain URLs in the text
        * @type string
        * @default ''
        */
-      when: ''
+      when: '',
+
+      /**
+       * If true, the post does not display the author's twitter handle.
+       *
+       * @attribute hideAuthor
+       * @type bool
+       * @default false
+       */
+      hideAuthor: false
     },
 
     // All URLs shared via Twitter are shortened to the form http(s)://t.co/...

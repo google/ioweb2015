@@ -25,17 +25,13 @@ $name: 'page-gadget';
 
 $rightMargin: 12px;
 
-.card__container {
-  padding-bottom: 32px;
-}
-
 iframe {
   border: 0;
   width: 100%;
   height: 340px;
 }
 
-.customize__section {
+.customize__area {
   margin-bottom: 24px;
 }
 
@@ -49,7 +45,36 @@ paper-input {
 }
 
 @media (min-width: $tablet-breakpoint-min) {
+  .page__section--gadgetpreview {
+    margin-top: -135px;
+    padding-top: 176px;
+    padding-bottom: 90px;
+  }
+  .page__section--customizer {
+    margin-top: -50px;
+    padding-bottom: $desktopKeyline;
+  }
+}
 
+@media (min-width: $tablet-breakpoint-mid) {
+  .card__container {
+    max-width: 74%;
+  }
+  .page__section--gadgetpreview {
+    $margin: 103px;
+    margin-top: -$margin;
+    padding-top: $margin + 40;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid) {
+  .page__section--gadgetpreview {
+    $marginTop: 111px;
+    $marginBottom: 50px;
+    margin-top: -$marginTop;
+    padding-top: $marginTop + $largeKeyline;
+    padding-bottom: $marginBottom + $largeKeyline;
+  }
 }
 
 }

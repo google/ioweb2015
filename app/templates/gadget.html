@@ -3,7 +3,7 @@
 {% define "mastheadBgClass" %}bg-dark-grey{% end %}
 
 {% define "masthead" %}
-  <h1><i18n-msg msgid="live-blogging">Live Blogging Gadget</i18n-msg></h1>
+  <h1><i18n-msg msgid="live-blogging">I/O Live Embed Widget</i18n-msg></h1>
 {% end %}
 
 {% define "content" %}
@@ -11,11 +11,11 @@
 <section class="card__container card__container--top slide-up">
   <div class="card js-experiment-visualizer">
     <div class="card-content">
-      <h3>Personalize the live blogging gadget to your website and embed the Google+ conversation from the event for your audience.</h3>
+      <h3>Personalize the I/O live embed widget for your website and share the Google+ conversation from the event with your audience.</h3>
     </div>
     <div class="card-content">
       <a href="#" data-ajax-link data-anim-card data-track-link="gadget-faq">
-        <i18n-msg msgid="live-faq">Live blogging FAQ</i18n-msg>
+        <i18n-msg msgid="live-faq">Read I/O Live Embed Widget FAQ</i18n-msg>
       </a>
     </div>
     <div class="ripple">
@@ -26,31 +26,34 @@
 
 <div class="slide-up-delay">
 
-  <!-- todo move up -->
+  <!-- TODO: move into main css -->
   <link rel="stylesheet" href="styles/pages/gadget.css">
 
-  <section class="page__section--copy card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-    <!-- <iframe src="embed"></iframe> -->
-    <io-gadget videoid="8OJ7ih8EE7s" iframeCode="{{embedIframeCode}}"></io-gadget>
+  <section class="page__section page__section--gadgetpreview bg-medium-grey">
+    <div class="card__container">
+      <!-- <iframe src="embed"></iframe> -->
+      <io-gadget videoid="8OJ7ih8EE7s" iframeCode="{{embedIframeCode}}"></io-gadget>
+    </div>
   </section>
 
-  <section class="page__section--copy">
+  <section class="page__section--customizer">
     <div class="card__container">
       <div class="card js-experiment-visualizer">
         <div class="card-content">
-          <h3>Customize Gadget</h3>
+          <h3>Customize your widget</h3>
         </div>
         <div class="card-content">
-          <h4 class="card__title">Select content</h4>
-          <div class="customize__section">
+          <h4 class="card__title">1. Select widget content</h4>
+          <div class="customize__area">
             <paper-radio-group selected="0">
               <paper-radio-button label="Live Stream and Social Feed"></paper-radio-button>
               <paper-radio-button label="Live Stream only"></paper-radio-button>
               <paper-radio-button label="Social Feed only"></paper-radio-button>
             </paper-radio-group>
           </div>
-          <h4 class="card__title">Select live stream size</h4>
-          <div class="customize__section">
+          <h4 class="card__title">2. Select live video size</h4>
+          <h5>(Minimum 300 px and maximum 1000 px)</h5>
+          <div class="customize__area">
             <paper-radio-group selected="small" on-core-change="{{onWidgetSize}}">
               <paper-radio-button name="small" label="Small"></paper-radio-button>
               <paper-radio-button name="medium" label="Medium"></paper-radio-button>
@@ -65,7 +68,7 @@
           </div>
           <h4 class="card__title">Get the code</h4>
           <h5>Embed code</h5>
-          <div class="customize__section">
+          <div class="customize__area">
             <paper-input-decorator label="Embed code snippet">
               <paper-autogrow-textarea>
                 <textarea readonly on-focus="{{selectCodeSnippet}}">{{embedIframeCode}}</textarea>

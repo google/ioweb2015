@@ -24,18 +24,23 @@
   display: block;
 }
 
-.card__container {
-  margin: 5px;
-  max-width: 100%;
-}
-
 .card {
+  box-shadow: none;
+  border-radius: 0;
+
+  a {
+    text-transform: none;
+  }
+
   .card__photo {
     background: url(../images/io15-color.png) no-repeat 50% 50%;
     background-size: contain;
     background-color: $color-cyan-500;
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
+    border-radius: inherit;
+  }
+
+  .card--video-meta {
+    border-right: 1px solid $color-light-grey-border;
   }
 }
 
@@ -45,9 +50,19 @@
 }
 
 #social-feed {
+  padding: 0 $tabletKeyline;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   min-height: 200px;
+}
+
+social-post {
+  padding: $tabletKeyline 0;
+  border-bottom: 1px solid $color-light-grey-border;
+
+  &::shadow header {
+    margin-bottom: $mobileKeyline / 2;
+  }
 }
 
 .video-title {

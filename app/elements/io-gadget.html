@@ -32,7 +32,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
     <core-media-query query="(min-width:320px) and (max-width:767px)"
                       queryMatches="{{isPhoneSize}}"></core-media-query>
 
-    <section class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+    <section class="card__container" layout horizontal vertical?="{{isPhoneSize}}">
       <div class="card card--livesream" layout vertical auto-vertical flex two>
         <div flex class="card__photo" relative>
           <img src="../images/play-video-button.png"
@@ -45,14 +45,15 @@ The `<io-gadget>` element renders a youtube video + social feed.
                       autoplay="0" on-google-youtube-ready="{{onReady}}"></google-youtube>
 
         </div>
-        <div class="card-content">
+        <div class="card-content card--video-meta">
           <h4 class="video-title">{{videoTitle}}&nbsp;</h4>
           <h5 class="video-author">Ellie Powers</h5>
         </div>
       </div>
       <div class="card" layout vertical auto-vertical flex>
         <div class="card-content">
-          <h3>Social Feed</h3>
+          <h3>I/O Social Feed</h3>
+          <div><a href="https://twitter.com/googledevs" target="_blank">@googledevs</a></div>
         </div>
         <div id="social-feed" class="card-content" flex>
           <div layout vertical>
@@ -61,7 +62,8 @@ The `<io-gadget>` element renders a youtube video + social feed.
                            author="{{socialPost.author}}"
                            url="{{socialPost.url}}"
                            text="{{socialPost.text}}"
-                           when="{{socialPost.when}}">
+                           when="{{socialPost.when}}"
+                           hideAuthor>
               </social-post>
             </template>
           </div>
