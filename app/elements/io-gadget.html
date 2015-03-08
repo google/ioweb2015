@@ -14,6 +14,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-media-query/core-media-query.html">
 <link rel="import" href="../bower_components/google-youtube/google-youtube.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
 <link rel="import" href="../bower_components/paper-dropdown/paper-dropdown.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="social-post.html">
@@ -53,11 +54,13 @@ The `<io-gadget>` element renders a youtube video + social feed.
             <h5 class="video-author">Ellie Powers</h5>
           </div>
           <div>
-            <paper-dropdown-menu label="Switch video">
+            <paper-dropdown-menu label="Switch video" on-core-select="{{onVideoSelect}}">
               <paper-dropdown valign="bottom" halign="right" class="dropdown">
-                <paper-item>Video 1</paper-item>
-                <paper-item>Video 2</paper-item>
-                <paper-item>Video 2</paper-item>
+                <core-menu class="menu">
+                  <paper-item>Video 1</paper-item>
+                  <paper-item>Video 2</paper-item>
+                  <paper-item>Video 2</paper-item>
+                </core-menu>
               </paper-dropdown>
             </paper-dropdown-menu>
           </div>
@@ -216,6 +219,12 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
       processSocialPosts: function(socialPosts) {
         this.socialPosts = socialPosts;
+      },
+
+      onVideoSelect: function(e, detail, sender) {
+        if (detail.isSelected) {
+          // TODO: change to detail.item selected video.
+        }
       }
 
     });

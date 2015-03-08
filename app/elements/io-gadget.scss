@@ -83,6 +83,10 @@ paper-dropdown-menu {
     @include typo-button();
     color: $color-cyan-A700;
   }
+
+  core-menu {
+    margin: 0;
+  }
 }
 
 .video-title {
