@@ -31,6 +31,12 @@ iframe {
   height: 340px;
 }
 
+.heading-info {
+  font-size: 12px;
+  color: $color-gray;
+  margin-left: $mobileKeyline;
+}
+
 .customize__area {
   margin-bottom: 24px;
 }
@@ -42,6 +48,7 @@ paper-radio-button {
 
 paper-input {
   margin-right: $rightMargin;
+  width: 100px;
 }
 
 @media (min-width: $tablet-breakpoint-min) {

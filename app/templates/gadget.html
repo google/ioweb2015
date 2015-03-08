@@ -42,17 +42,21 @@
         <div class="card-content">
           <h3>Customize your widget</h3>
         </div>
+
         <div class="card-content">
           <h4 class="card__title">1. Select widget content</h4>
           <div class="customize__area">
             <paper-radio-group selected="0">
-              <paper-radio-button label="Live Stream and Social Feed"></paper-radio-button>
-              <paper-radio-button label="Live Stream only"></paper-radio-button>
-              <paper-radio-button label="Social Feed only"></paper-radio-button>
+              <paper-radio-button label="Live video stream + Google Developers social feed"></paper-radio-button>
+              <paper-radio-button label="Live video stream only"></paper-radio-button>
+              <paper-radio-button label="Google Developers social feed only"></paper-radio-button>
             </paper-radio-group>
           </div>
-          <h4 class="card__title">2. Select live video size</h4>
-          <h5>(Minimum 300 px and maximum 1000 px)</h5>
+
+          <div class="card__title" layout horizontal end wrap>
+            <h4>2. Select live video size</h4>
+            <span class="heading-info">Minimum 300 px and maximum 1000 px</span>
+          </div>
           <div class="customize__area">
             <paper-radio-group selected="small" on-core-change="{{onWidgetSize}}">
               <paper-radio-button name="small" label="Small"></paper-radio-button>
@@ -61,16 +65,24 @@
               <paper-radio-button name="xlarge" label="Extra large"></paper-radio-button>
               <paper-radio-button name="custom" label="Custom"></paper-radio-button>
             </paper-radio-group>
-            <div class="size__inputs">
-              <paper-input label="Width (px)" floatingLabel disabled></paper-input>
-              <paper-input label="Height (px)" floatingLabel disabled></paper-input>
-            </div>
+            <span class="size__inputs">
+              <paper-input label="Width (px)" disabled></paper-input>
+              <paper-input label="Height (px)" disabled></paper-input>
+            </span>
           </div>
-          <h4 class="card__title">Get the code</h4>
-          <h5>Embed code</h5>
+
+          <div class="card__title" layout horizontal end wrap>
+            <h4>3. Select Google Developers social feed size</h4>
+            <span class="heading-info">Minimum 300 px and maximum 1000 px</span>
+          </div>
+          <div class="customize__area">
+            <paper-input label="Width (px)"></paper-input>
+          </div>
+
+          <h4>4. Embed this code into your site</h4>
           <div class="customize__area">
             <paper-input-decorator label="Embed code snippet">
-              <paper-autogrow-textarea>
+              <paper-autogrow-textarea rows="2">
                 <textarea readonly on-focus="{{selectCodeSnippet}}">{{embedIframeCode}}</textarea>
               </paper-autogrow-textarea>
             </paper-input-decorator>
