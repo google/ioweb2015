@@ -151,7 +151,11 @@
           @googledevs<core-icon icon="io:post-twitter"></core-icon>
         </a>
       </div>
-      <div class="io__hash" aria-label="I/O hash tag"></div>
+
+      <a href="//www.google.com/?#q=%23io15" target="_blank" data-track-link="about-hashtag-search">
+        <div class="io__hash" aria-label="I/O hash tag"></div>
+      </a>
+
       <template if="{{socialPosts.length >= 3}}">
         <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
           <template repeat="{{socialPost in socialPosts}}">

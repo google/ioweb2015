@@ -83,6 +83,7 @@ IOWA.Elements = (function() {
     template.offsiteGlobeVisible = false;
     template.homeGlobeVisible = false;
     template.selectedCity = null;
+    template.offsiteMarkerResults = [];
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
