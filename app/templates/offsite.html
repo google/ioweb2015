@@ -65,7 +65,7 @@
       <div class="marker-results">
         <div class="card marker-card">
           <paper-icon-button icon="io:close" class="close-button" on-tap="{{resetExtendedSearch}}"></paper-icon-button>
-          <template repeat="{{marker, i in offsiteMarkerResults}}">
+          <template repeat="{{marker in offsiteMarkerResults}}">
             <div class="card-content">
               <h4 class="card__title">{{marker.name}}</h4>
               <div layout horizontal center justified>
