@@ -380,6 +380,12 @@
       IOWA.Elements.Template.onMarkerClick = function(e, detail, sender) {
         e.stopPropagation();
 
+        // Remove "closest match" message to the first card.
+        var closest = IOWA.Elements.Main.querySelector('.marker-card--closest');
+        if (closest) {
+          closest.classList.remove('show');
+        }
+
         var centerLocation = this.offsiteLocations[e.detail.markerIndex];
 
         function focusLocation() {
