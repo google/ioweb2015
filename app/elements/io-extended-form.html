@@ -48,7 +48,7 @@ Helper element for auto-completes places while showing a pin on a map.
     <paper-input id="autocomplete" label="Enter the address of your event"></paper-input>
 
     <google-map id="map" map="{{map}}" latitude="{{result.latitude}}" longitude="{{result.longitude}}"
-                version="3.exp" libraries="places" zoom="14" on-google-map-ready="{{mapReady}}">
+                version="3.exp" clientId="google-io" libraries="places" zoom="14" on-google-map-ready="{{mapReady}}">
       <google-map-marker latitude="{{result.latitude}}" longitude="{{result.longitude}}"
                          draggable="true"></google-map-marker>
     </google-map>
