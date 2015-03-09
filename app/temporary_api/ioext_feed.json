@@ -1,422 +1,386 @@
 [
   {
-    "name": "I/O 2015 Marrakech",
-    "link": "https://plus.google.com/events/cmmkd5rsmvvsgabja2glo6btgnk",
-    "city": "Marrakech",
-    "lat": 31.6512458,
-    "lng": -8.012386601
+    "name":"I/O Extended 2015 - Aarhus",
+    "link":"https://plus.google.com/events/cl2u00c2kudh45fo9bgusu4s15k",
+    "lat":56.15304544,
+    "lng":10.19538084
   },
   {
-    "name": "Google I/O Extended 2015",
-    "link": "https://plus.google.com/events/c1jsbvrbc51thq2e3n00rei0lr4?authkey=CLnm5o2gzqSkCA&e=-RedirectToSandbox",
-    "city": "Minna",
-    "lat": 9.613889,
-    "lng": 6.556944
+    "name":"I/O Extended 2015 - Ado-Ekiti",
+    "link":"https://plus.google.com/b/110463793540880663642/events/clkfdnjbmloi4nss8n5a3jfbdcs",
+    "lat":7.621111,
+    "lng":5.221389
   },
   {
-    "name": "I/O Extended 2015 Sagada - Bontoc",
-    "link": "https://plus.google.com/b/111624169093759630469/app/basic/events/c9nrb7mk87k6nsi8flm5ahn006g",
-    "city": "Bontoc",
-    "lat": 17.087222,
-    "lng": -239.024442
+    "name":"I/O Extended 2015 - Ahmedabad",
+    "link":"https://plus.google.com/events/c649j2c3ali8r9q1s5rh58qu2vk",
+    "lat":23.022505,
+    "lng":-287.4286359
   },
   {
-    "name": "Google I/O'15 Extended - GDG Hangzhou",
-    "link": "https://plus.google.com/events/cpb5t9p35c3agc9qau0liej6m04",
-    "city": "Hangzhou",
-    "lat": 30.28051,
-    "lng": 120.094394
+    "name":"I/O Extended 2015 - Amman",
+    "link":"https://plus.google.com/events/ckdhkbie26mjg6321iequ5bo5go",
+    "lat":31.9565783,
+    "lng":35.9456951
   },
   {
-    "name": "Google I/O Extended - Macedonia",
-    "link": "https://plus.google.com/events/cu4ptt7popsol1m90auhud10m5g",
-    "city": "Skopje",
-    "lat": 41.9957933,
-    "lng": 21.4329027
+    "name":"I/O Extended 2015 - Amsterdam",
+    "link":"https://plus.google.com/u/0/events/c5pv82ob8ihivlof4bu81s5f64c?e=-RedirectToSandbox",
+    "lat":52.3722764,
+    "lng":4.8888985
   },
   {
-    "name": "Google I/O 2015 - yokneam",
-    "link": "https://plus.google.com/events/ca3kg7vnbfeo7391efl6b1lrro0?authkey=CIq5sKSs29XzVw",
-    "city": "Yokne'am Moshava",
-    "lat": 32.65776073,
-    "lng": 35.11550863
+    "name":"I/O Extended 2015 - Ann Arbor (GDG Event)",
+    "link":"https://plus.google.com/b/112215001458553713484/events/cefr1batnkgmaou4m9vsdhg6clo",
+    "lat":42.2821127,
+    "lng":-83.7498362
   },
   {
-    "name": "IO Extended Granada 2015",
-    "link": "https://plus.google.com/events/clj9rmg2s3odli3pddfahk44j70",
-    "city": "Granada",
-    "lat": 37.1967993,
-    "lng": -3.6243506
+    "name":"I/O Extended 2015 - Beijing (GDG Event)",
+    "link":"https://plus.google.com/events/cu16cmukutfc4m4idvb22219m7c",
+    "lat":39.984,
+    "lng":116.306783
   },
   {
-    "name": "Google I/O Extended Kigali",
-    "link": "https://plus.google.com/events/cqu51kviogu2pnl4j8951colh9s",
-    "city": "Kigali",
-    "lat": -1.958391338,
-    "lng": 30.06955459
+    "name":"I/O Extended 2015 - Berlitz Algiers",
+    "link":"https://plus.google.com/events/c0alhskmsstr56hcet4uo69baqc?e=-RedirectToSandbox",
+    "lat":36.73933053,
+    "lng":3.033968971
   },
   {
-    "name": "I/O EXTENDED 2015 GDG SLAU",
-    "link": "https://plus.google.com/b/104400328660167590151/events/c6udsb3a1md1662fp63qb11fh8c",
-    "city": "Kampala",
-    "lat": 0.30178,
-    "lng": 32.56167
+    "name":"I/O Extended 2015 - Bogotá",
+    "link":"https://plus.google.com/events/cd9ugrhrgpksd2an0vcc27pn7bk",
+    "lat":4.5981,
+    "lng":-74.07603
   },
   {
-    "name": "Google I/O 2015 EXTENDED Hefei",
-    "link": "https://plus.google.com/events/cf086ukv92c4i06fg938c6d1b4g",
-    "city": "Hefei",
-    "lat": 31.830272,
-    "lng": -242.864464
+    "name":"I/O Extended 2015 - Bontoc",
+    "link":"https://plus.google.com/events/c9nrb7mk87k6nsi8flm5ahn006g?e=-RedirectToSandbox",
+    "lat":17.087222,
+    "lng":-239.024442
   },
   {
-    "name": "Keynote Live, 2015 I/O Extended - Suzhou",
-    "link": "https://plus.google.com/events/c0rmlgqm0gq27gehn7jbmil01v0",
-    "city": "Suzhou Shi",
-    "lat": 31.275148,
-    "lng": -239.257925
+    "name":"I/O Extended 2015 - Bordj Bou Arreridj",
+    "link":"https://plus.google.com/u/0/b/118220926206626726295/events/c94k2juvnihqguiv4eka8tb0mro",
+    "lat":36.068467,
+    "lng":4.765518
   },
   {
-    "name": "Google I/O Extended 2015 Saint-Quentin",
-    "link": "https://plus.google.com/events/c7vcfinu1d722s3lesb82gkig78",
-    "city": "Saint-Quentin",
-    "lat": 49.8579746,
-    "lng": 3.2610762
+    "name":"I/O Extended 2015 - Brentwood",
+    "link":"https://plus.google.com/b/103388169671325157635/events/cnbpgf1tuh0g5acfq1q1m12aplk?authkey=CPC3jK279b-mVQ",
+    "lat":36.030686,
+    "lng":-86.776002
   },
   {
-    "name": "I/O 2015 Extended Bogotá",
-    "link": "https://plus.google.com/events/cd9ugrhrgpksd2an0vcc27pn7bk",
-    "city": "Bogotá",
-    "lat": 4.5981,
-    "lng": -74.07603
+    "name":"I/O Extended 2015 - Busitema",
+    "link":"https://plus.google.com/u/0/b/111838817416099422384/events/cp8sh133rhh6kijedg3qaqtltdg",
+    "lat":0.547058,
+    "lng":34.020155
   },
   {
-    "name": "Huntsville/Madison Google I/O Extended 2015",
-    "link": "https://plus.google.com/events/c391q66tilum6ruvc5p5mk7bjb4?authkey=CO301vfN_abldw",
-    "city": "Madison",
-    "lat": 34.704308,
-    "lng": -86.723243
+    "name":"I/O Extended 2015 - Cape Town",
+    "link":"https://plus.google.com/events/cdhbmllldehsriv1bkrlels4lhg",
+    "lat":-33.9248685,
+    "lng":18.4240553
   },
   {
-    "name": "Google IO Extended Shanghai",
-    "link": "https://plus.google.com/u/0/b/113435072768494915958/events/chgl6m4b3rh9pv194rn2tau6a38",
-    "city": "Shanghai",
-    "lat": 31.304849,
-    "lng": -238.48967
+    "name":"I/O Extended 2015 - Cape Town (GDG Event)",
+    "link":"https://plus.google.com/u/0/b/108309780217630451504/events/cqlm8speeh32melhm9r9dp81ccs",
+    "lat":-33.9269,
+    "lng":18.44582
   },
   {
-    "name": "I/O 2015 Extended Abidjan",
-    "link": "https://plus.google.com/events/cof2c30e7p364uv52ku0u5mji3c?authkey=CJGcs_iim92JzwE",
-    "city": "Abidjan",
-    "lat": 5.3364355,
-    "lng": -4.0059115
+    "name":"I/O Extended 2015 - Chlef",
+    "link":"https://plus.google.com/u/0/events/cnm767vsp9406vid8fd49urvqso",
+    "lat":36.15317133,
+    "lng":1.342720732
   },
   {
-    "name": "I/O Extended Event @ Hancock",
-    "link": "https://plus.google.com/events/ci75ter5b5nibpddt370r405pl8?authkey=CJSsmfvOq6vfLA",
-    "city": "Chicago",
-    "lat": 41.89877,
-    "lng": -87.622917
+    "name":"I/O Extended 2015 - Douala",
+    "link":"https://plus.google.com/events/cugvgb5tblpjvp4id5so3i4o9b8",
+    "lat":4.054230854,
+    "lng":9.698395394
   },
   {
-    "name": "Google I/O Extended Brasília ",
-    "link": "https://plus.google.com/events/cbmounfo35fkfncpvhn0nbb3vek?authkey=CNG16vqH7NTvmQE",
-    "city": "Brasília",
-    "lat": -15.88109491,
-    "lng": -47.62295712
+    "name":"I/O Extended 2015 - Dubai",
+    "link":"https://plus.google.com/events/c6lno9qdt3jd6q7spjr35fqahg0",
+    "lat":25.14512776,
+    "lng":55.22487746
   },
   {
-    "name": "I/O Extended 2015 Chestnut Hill",
-    "link": "https://plus.google.com/u/1/events/cgrs2n20s1qrtqb3am5hundpiq0?authkey=CLCxvY2Mxpr5jQE",
-    "city": "Chestnut Hill",
-    "lat": 42.3351,
-    "lng": 71.1704
+    "name":"I/O Extended 2015 - Düsseldorf",
+    "link":"https://plus.google.com/b/107373371386267684213/events/ce0gksqbf0ck94511sv5sv5hb0g",
+    "lat":51.2056466,
+    "lng":6.7607287
   },
   {
-    "name": "Google 2015 I/O Extended ZhuHai I/O大会珠海直播之夜",
-    "link": "https://plus.google.com/b/113382777332300419074/events/c7eenlu4d6a7tbr2h591po6h0m8",
-    "city": "珠海",
-    "lat": 22.21525336,
-    "lng": -246.4317795
+    "name":"I/O Extended 2015 - El Segundo",
+    "link":"https://plus.google.com/u/0/b/118252990442481680236/events/c9gg762d1lt3rp70c236e4h52m4",
+    "lat":33.9303214,
+    "lng":-118.3840534
   },
   {
-    "name": "Google I/O 2015 Extended Mombasa",
-    "link": "https://plus.google.com/b/105153400962376532068/events/c9mq38o9d2oj6afuv9q2t7iu6q0",
-    "city": "Mombasa",
-    "lat": -4.069279,
-    "lng": 39.672886
+    "name":"I/O Extended 2015 - Enugu",
+    "link":"https://plus.google.com/u/0/b/107982492044424122264/events/cf02vviutc32mimgg7qi1o3634g?authkey=CLWZ7fjvhvPWJw",
+    "lat":6.4507527,
+    "lng":7.4929762
   },
   {
-    "name": "I/O Extended 2015 Gurgaon",
-    "link": "https://plus.google.com/events/c13mqi74f117rpvflo3qj4ir47c",
-    "city": "Gurgaon",
-    "lat": 28.46060868,
-    "lng": -282.9508594
+    "name":"I/O Extended 2015 - Esch-sur-Alzette",
+    "link":"https://plus.google.com/events/cldmgdu2ja37isenm4r28g42n58",
+    "lat":49.50228468,
+    "lng":5.949143186
   },
   {
-    "name": "Google 2015 I/O Extended Uzhhorod",
-    "link": "https://plus.google.com/u/0/events/cl5it3s4e1np2h398mb8g66m040",
-    "city": "Uzhhorod",
-    "lat": 48.6208,
-    "lng": 22.287883
+    "name":"I/O Extended 2015 - Fribourg",
+    "link":"https://plus.google.com/events/cjstia1hapuicab40bnfcso8jnc",
+    "lat":46.79342198,
+    "lng":7.15917496
   },
   {
-    "name": "2015 I/O Extended Event Manchester",
-    "link": "https://plus.google.com/events/c34tp0hrhv5o56bpk58p7n5tqfs?authkey=CPP6tJL2u-ez3AE",
-    "city": "Manchester",
-    "lat": 53.4820641,
-    "lng": -2.2338286
+    "name":"I/O Extended 2015 - Granada (GDG Event)",
+    "link":"https://plus.google.com/events/clj9rmg2s3odli3pddfahk44j70",
+    "lat":37.1967993,
+    "lng":-3.6243506
   },
   {
-    "name": "GDG Uyo - Google I/O Extended 2015",
-    "link": "https://plus.google.com/events/c3jnb00id8u38lljirecfp81guc",
-    "city": "Uyo",
-    "lat": 7.938447,
-    "lng": 5.022306
+    "name":"I/O Extended 2015 - Gulu (GDG Event)",
+    "link":"https://plus.google.com/u/0/events/co0nfke8pnfiq43rjbormr3sqvs",
+    "lat":2.787632,
+    "lng":32.316413
   },
   {
-    "name": "Google I/O Extended Kota Kinabalu 2015",
-    "link": "https://plus.google.com/events/c2t2mn9t5t79fmihmgnip9n3qr4",
-    "city": "Kota Kinabalu",
-    "lat": 116.0418211,
-    "lng": 5.9786399
+    "name":"I/O Extended 2015 - Gurgaon",
+    "link":"https://plus.google.com/events/c13mqi74f117rpvflo3qj4ir47c",
+    "lat":28.46060868,
+    "lng":-282.9508594
   },
   {
-    "name": "I/O 15 extended Mukono",
-    "link": "https://plus.google.com/events/cqqsgcn2p9g4h8bfr3ur0davr50",
-    "city": "Mukono",
-    "lat": 0.3574899,
-    "lng": 32.7079261
+    "name":"I/O Extended 2015 - Hangzhou (GDG Event)",
+    "link":"https://plus.google.com/events/cpb5t9p35c3agc9qau0liej6m04",
+    "lat":30.28051,
+    "lng":120.094394
   },
   {
-    "name": "Google I/O 2015 Extended Fribourg",
-    "link": "https://plus.google.com/events/cjstia1hapuicab40bnfcso8jnc",
-    "city": "Fribourg",
-    "lat": 46.79342198,
-    "lng": 7.15917496
+    "name":"I/O Extended 2015 - Hefei",
+    "link":"https://plus.google.com/events/cf086ukv92c4i06fg938c6d1b4g",
+    "lat":31.830272,
+    "lng":-242.864464
   },
   {
-    "name": "Google I/O Extended Stockholm",
-    "link": "https://plus.google.com/u/1/b/116734714431109169952/events/c25tu2blv60inodhccd8mgv59b0?authkey=CPShpuWs0LTrIg",
-    "city": "Stockholm",
-    "lat": 59.3376986,
-    "lng": 18.0577339
+    "name":"I/O Extended 2015 - Hoffman Estates",
+    "link":"https://plus.google.com/events/c1e12ve74v890p9na6p01c6tmqs",
+    "lat":42.0777546,
+    "lng":-88.2149715
   },
   {
-    "name": "Google I/O Extended @Andela",
-    "link": "https://plus.google.com/events/chcod2pock6ci6dc089b02hk3q8",
-    "city": "Yaba",
-    "lat": 8.649284,
-    "lng": 6.797592
+    "name":"I/O Extended 2015 - Istanbul",
+    "link":"https://plus.google.com/b/100514812580249787371/events/cjk4litne2i5b797n777b1buguk",
+    "lat":41.10727794,
+    "lng":29.0277606
   },
   {
-    "name": "Google I/O 2015 Extended Aracaju",
-    "link": "https://plus.google.com/events/curiai98q6m206nqnf9vjd2bi0o?authkey=CNyrpPOE2v6_Jw",
-    "city": "Aracaju",
-    "lat": -10.9472468,
-    "lng": -37.0730823
+    "name":"I/O Extended 2015 - João Pessoa",
+    "link":"https://plus.google.com/u/0/b/107166165426891613168/events/ckl1j4bp8sk39c8h44jqmebc8fs",
+    "lat":-7.1871932,
+    "lng":-34.8015195
   },
   {
-    "name": "Google I/O Extended Ann Arbor",
-    "link": "https://plus.google.com/b/112215001458553713484/events/cefr1batnkgmaou4m9vsdhg6clo",
-    "city": "Ann Arbor",
-    "lat": 42.2821127,
-    "lng": -83.7498362
+    "name":"I/O Extended 2015 - Kampala (GDG Event)",
+    "link":"https://plus.google.com/b/104400328660167590151/events/c6udsb3a1md1662fp63qb11fh8c",
+    "lat":0.30178,
+    "lng":32.56167
   },
   {
-    "name": "Google I/O Extended Bordj Bou Arreridj",
-    "link": "https://plus.google.com/u/0/b/118220926206626726295/events/c94k2juvnihqguiv4eka8tb0mro",
-    "city": "Bordj Bou Arreridj",
-    "lat": 36.068467,
-    "lng": 4.765518
+    "name":"I/O Extended 2015 - Kano (GDG Event)",
+    "link":"https://plus.google.com/b/101561674681942684865/events/cafpe2ait9dlg0c6l9acu2pmcv4",
+    "lat":11.97266286,
+    "lng":8.426437489
   },
   {
-    "name": "Google I/O Benin",
-    "link": "https://plus.google.com/events/cf1q0t195paijs4f40cb2qtd718?authkey=CIa4mZ_3ktGwNA",
-    "city": "Benin City",
-    "lat": 6.316917524,
-    "lng": 5.613985016
+    "name":"I/O Extended 2015 - Kigali",
+    "link":"https://plus.google.com/events/cqu51kviogu2pnl4j8951colh9s",
+    "lat":-1.958391338,
+    "lng":30.06955459
   },
   {
-    "name": "ISRAEL'S I/O 2015",
-    "link": "https://plus.google.com/events/cj7115kmcomc6ca6g7cg23fq5d4",
-    "city": "Nazareth illit",
-    "lat": 32.69624785,
-    "lng": -324.6852953
+    "name":"I/O Extended 2015 - Kota Kinabalu (GDG Event)",
+    "link":"https://plus.google.com/events/c2t2mn9t5t79fmihmgnip9n3qr4",
+    "lat":5.978641,
+    "lng":116.076154
   },
   {
-    "name": "Google IO Extended Event Osogbo",
-    "link": "https://plus.google.com/events/culk52bbs4ssgutpfeaah7hp2ds?authkey=CIvRysHavMa0gAE",
-    "city": "Osogbo",
-    "lat": 7.766667,
-    "lng": 4.566667
+    "name":"I/O Extended 2015 - Macedonia",
+    "link":"https://plus.google.com/events/cu4ptt7popsol1m90auhud10m5g",
+    "lat":41.9957933,
+    "lng":21.4329027
   },
   {
-    "name": "Google I/O Extended Minsk - 2015 ",
-    "link": "https://plus.google.com/events/copjm85merd3k3s8u2ogeol4ghk?authkey=CPWmyavNrYCfsgE",
-    "city": "Minsk",
-    "lat": 53.930198,
-    "lng": 27.588364
+    "name":"I/O Extended 2015 - Malmö",
+    "link":"https://plus.google.com/events/caj0v3mp9srein4hjsp592cahns",
+    "lat":55.6125192,
+    "lng":12.9913276
   },
   {
-    "name": "Google IO 2015 Extended Kano",
-    "link": "https://plus.google.com/b/101561674681942684865/events/cafpe2ait9dlg0c6l9acu2pmcv4",
-    "city": "Kano",
-    "lat": 11.97266286,
-    "lng": 8.426437489
+    "name":"I/O Extended 2015 - Marrakech",
+    "link":"https://plus.google.com/events/cmmkd5rsmvvsgabja2glo6btgnk",
+    "lat":31.6512458,
+    "lng":-8.012386601
   },
   {
-    "name": "Google I/O 2015 Extended Enugu",
-    "link": "https://plus.google.com/u/0/b/107982492044424122264/events/cf02vviutc32mimgg7qi1o3634g?authkey=CLWZ7fjvhvPWJw",
-    "city": "Enugu",
-    "lat": 6.4507527,
-    "lng": 7.4929762
+    "name":"I/O Extended 2015 - Mbarara",
+    "link":"https://plus.google.com/b/110391140569788670287/events/cqfrp7qc2ke8hhj4ftifjf4hmc0?authkey=CIuE1PWAk4mfFQ",
+    "lat":-0.5966299851,
+    "lng":-329.3897612
   },
   {
-    "name": "Google I/O Extended Nyeri 2015",
-    "link": "https://plus.google.com/b/102852233334332438474/events/cg4b4874n5m8ss4i897obijplu8",
-    "city": "Nyeri",
-    "lat": -0.395305,
-    "lng": 36.962124
+    "name":"I/O Extended 2015 - Minna",
+    "link":"https://plus.google.com/events/c1jsbvrbc51thq2e3n00rei0lr4?authkey=CLnm5o2gzqSkCA\u0026e=-RedirectToSandbox",
+    "lat":9.613889,
+    "lng":6.556944
   },
   {
-    "name": "Google I/O Extended Cape Town",
-    "link": "https://plus.google.com/u/0/b/108309780217630451504/events/cqlm8speeh32melhm9r9dp81ccs",
-    "city": "Cape Town",
-    "lat": -33.9269,
-    "lng": 18.44582
+    "name":"I/O Extended 2015 - Mombasa (GDG Event)",
+    "link":"https://plus.google.com/b/105153400962376532068/events/c9mq38o9d2oj6afuv9q2t7iu6q0",
+    "lat":-4.069279,
+    "lng":39.672886
   },
   {
-    "name": "GDG Chlef I/O Extended 15",
-    "link": "https://plus.google.com/u/0/events/cnm767vsp9406vid8fd49urvqso",
-    "city": "Chlef",
-    "lat": 36.15317133,
-    "lng": 1.342720732
+    "name":"I/O Extended 2015 - Moscow",
+    "link":"https://plus.google.com/events/cptoqthcl2vhulq3ne7cv155djk",
+    "lat":55.75860256,
+    "lng":37.6109277
   },
   {
-    "name": "MESH Google I/O 2015 Extended @THINQTANQ",
-    "link": "https://plus.google.com/events/c1ouelk4ujveurb9soq1l8rrd9o?authkey=CMuh5syKlt6l4wE",
-    "city": "Plymouth",
-    "lat": 50.3693248,
-    "lng": -4.138902565
+    "name":"I/O Extended 2015 - Mukono (GDG Event)",
+    "link":"https://plus.google.com/events/cqqsgcn2p9g4h8bfr3ur0davr50",
+    "lat":0.3574899,
+    "lng":32.7079261
   },
   {
-    "name": "DevNights Google I/O 2015 Extended - Dubai",
-    "link": "https://plus.google.com/events/c6lno9qdt3jd6q7spjr35fqahg0",
-    "city": "Dubai",
-    "lat": 25.14512776,
-    "lng": 55.22487746
+    "name":"I/O Extended 2015 - Nazareth illit",
+    "link":"https://plus.google.com/events/cj7115kmcomc6ca6g7cg23fq5d4",
+    "lat":32.69624785,
+    "lng":-324.6852953
   },
   {
-    "name": "Extended I/O Ahmedabad",
-    "link": "https://plus.google.com/events/c649j2c3ali8r9q1s5rh58qu2vk",
-    "city": "Ahmedabad",
-    "lat": 23.022505,
-    "lng": -287.4286359
+    "name":"I/O Extended 2015 - Nyeri ",
+    "link":"https://plus.google.com/b/102852233334332438474/events/cg4b4874n5m8ss4i897obijplu8",
+    "lat":-0.395305,
+    "lng":36.962124
   },
   {
-    "name": "Google I/O Extended 2015 in Xiamen",
-    "link": "https://plus.google.com/events/cat760i85nqd1vedpbapeo6g6kg",
-    "city": "Xiamen",
-    "lat": 24.430058,
-    "lng": 118.113284
+    "name":"I/O Extended 2015 - Osogbo",
+    "link":"https://plus.google.com/events/culk52bbs4ssgutpfeaah7hp2ds?authkey=CIvRysHavMa0gAE",
+    "lat":7.766667,
+    "lng":4.566667
   },
   {
-    "name": "2015 I/O Extended @ Moscow",
-    "link": "https://plus.google.com/events/cptoqthcl2vhulq3ne7cv155djk",
-    "city": "Moscow",
-    "lat": 55.75860256,
-    "lng": 37.6109277
+    "name":"I/O Extended 2015 - Paris",
+    "link":"https://plus.google.com/events/ckg3r510lt2rsmevu3oq9h6q4fk?hl=fr",
+    "lat":48.8153291,
+    "lng":2.3631677
   },
   {
-    "name": "Google I/O Extends Istanbul",
-    "link": "https://plus.google.com/b/100514812580249787371/events/cjk4litne2i5b797n777b1buguk",
-    "city": "Istanbul",
-    "lat": 41.10727794,
-    "lng": 29.0277606
+    "name":"I/O Extended 2015 - Plymouth",
+    "link":"https://plus.google.com/events/c1ouelk4ujveurb9soq1l8rrd9o?authkey=CMuh5syKlt6l4wE",
+    "lat":50.3693248,
+    "lng":-4.138902565
   },
   {
-    "name": "Telnor I/O Extended 2015",
-    "link": "https://plus.google.com/u/1/events/cb8815r4h9injmqn34uge1l6tkg?authkey=CK_tqOew4M-nsQE",
-    "city": "Tijuana",
-    "lat": 32.5149469,
-    "lng": -117.0382471
+    "name":"I/O Extended 2015 - Portland",
+    "link":"https://plus.google.com/events/calv0mg7g6epfkop5pbtbcnm1qk",
+    "lat":45.513904,
+    "lng":-122.6799639
   },
   {
-    "name": "Google I/O Extended Washington DC",
-    "link": "https://plus.google.com/u/0/115769275436584798833/posts/DrdYWiFR9go?cfem=1&e=",
-    "city": "Washington",
-    "lat": 38.89827468,
-    "lng": -77.01051737
+    "name":"I/O Extended 2015 - Rennes",
+    "link":"https://plus.google.com/events/cb4b6tco66c10cbn7nobur6bdr8",
+    "lat":48.1038369,
+    "lng":-1.6884012
   },
   {
-    "name": "GOOGLE I/O 2015 Mbarara",
-    "link": "https://plus.google.com/b/110391140569788670287/events/cqfrp7qc2ke8hhj4ftifjf4hmc0?authkey=CIuE1PWAk4mfFQ",
-    "city": "Mbarara",
-    "lat": -0.5966299851,
-    "lng": -329.3897612
+    "name":"I/O Extended 2015 - San Pedro Garza García",
+    "link":"https://plus.google.com/u/0/b/108588524023852595620/events/c1imf1gdhp2qufrvpbunb4tcufk",
+    "lat":25.6573447,
+    "lng":-100.4017501
   },
   {
-    "name": "IO Extended La Rioja 2015",
-    "link": "https://plus.google.com/events/cul9vr4ncb7l19bi85nlrgst864",
-    "city": "Logroño",
-    "lat": 42.466423,
-    "lng": 2.450373
+    "name":"I/O Extended 2015 - Sfax (GDG Event)",
+    "link":"https://plus.google.com/b/110277621604181263838/events/ceri38fu1qhvqvi4d3cjbjbi3as",
+    "lat":34.72709,
+    "lng":10.719298
   },
   {
-    "name": "I/O Extended 2015 Douala",
-    "link": "https://plus.google.com/events/cugvgb5tblpjvp4id5so3i4o9b8",
-    "city": "Douala",
-    "lat": 4.054230854,
-    "lng": 9.698395394
+    "name":"I/O Extended 2015 - Shanghai",
+    "link":"https://plus.google.com/u/0/b/113435072768494915958/events/chgl6m4b3rh9pv194rn2tau6a38",
+    "lat":31.304849,
+    "lng":-238.48967
   },
   {
-    "name": "Google I/O Extended 2015 Jordan",
-    "link": "https://plus.google.com/events/ckdhkbie26mjg6321iequ5bo5go",
-    "city": "Amman",
-    "lat": 31.9565783,
-    "lng": 35.9456951
+    "name":"I/O Extended 2015 - Stockholm",
+    "link":"https://plus.google.com/u/1/b/116734714431109169952/events/c25tu2blv60inodhccd8mgv59b0?authkey=CPShpuWs0LTrIg",
+    "lat":59.3376986,
+    "lng":18.0577339
   },
   {
-    "name": "Google I/O 2015 Extended Luxembourg",
-    "link": "https://plus.google.com/events/cldmgdu2ja37isenm4r28g42n58",
-    "city": "Esch-sur-Alzette",
-    "lat": 49.50228468,
-    "lng": 5.949143186
+    "name":"I/O Extended 2015 - Strasbourg (GDG Event)",
+    "link":"https://plus.google.com/b/109793803204942162270/events/crv2bg58ojkn9cimhoc87b9nek0",
+    "lat":48.5839267,
+    "lng":7.7496404
   },
   {
-    "name": "I/O 2015 Extended Petra",
-    "link": "https://plus.google.com/events/cvufk6u8rihgv669nir039f01ds",
-    "city": "Amman",
-    "lat": 31.94849459,
-    "lng": 35.93599623
+    "name":"I/O Extended 2015 - Suzhou (GDG Event)",
+    "link":"https://plus.google.com/events/c0rmlgqm0gq27gehn7jbmil01v0",
+    "lat":31.275148,
+    "lng":-239.257925
   },
   {
-    "name": "eBay PDX Google I/O 2015 Live Stream",
-    "link": "https://plus.google.com/events/calv0mg7g6epfkop5pbtbcnm1qk",
-    "city": "Portland",
-    "lat": 45.513904,
-    "lng": -122.6799639
+    "name":"I/O Extended 2015 - Tema",
+    "link":"https://plus.google.com/b/103945034237886466649/events/clnavt2b1er50vecbcogf8n3cno",
+    "lat":5.670375,
+    "lng":-0.020706
   },
   {
-    "name": "Google I/O at El Cowork",
-    "link": "https://plus.google.com/u/0/b/108588524023852595620/events/c1imf1gdhp2qufrvpbunb4tcufk",
-    "city": "San Pedro Garza García",
-    "lat": 25.6573447,
-    "lng": -100.4017501
+    "name":"I/O Extended 2015 - Timișoara",
+    "link":"https://plus.google.com/events/c5n3mh1llecke443h9thqj5q4fc",
+    "lat":45.759722,
+    "lng":21.23
   },
   {
-    "name": "Google I/O Extended Tema",
-    "link": "https://plus.google.com/b/103945034237886466649/events/clnavt2b1er50vecbcogf8n3cno",
-    "city": "Tema",
-    "lat": 5.670375,
-    "lng": -0.020706
+    "name":"I/O Extended 2015 - Uyo (GDG Event)",
+    "link":"https://plus.google.com/events/c3jnb00id8u38lljirecfp81guc",
+    "lat":7.938447,
+    "lng":5.022306
   },
   {
-    "name": "Google I/O at Peakfijn HQ",
-    "link": "https://plus.google.com/u/0/events/c8jgk3b8qd8j1vojqaiq2998hhs?authkey=CLaqlKnFmdrpUw&e",
-    "city": "Amsterdam",
-    "lat": 52.3722764,
-    "lng": 4.8888985
+    "name":"I/O Extended 2015 - Uzhhorod",
+    "link":"https://plus.google.com/u/0/events/cl5it3s4e1np2h398mb8g66m040",
+    "lat":48.6208,
+    "lng":22.287883
+  },
+  {
+    "name":"I/O Extended 2015 - Verona",
+    "link":"https://plus.google.com/u/0/events/crf1kmdtum8h53vrfluds6ki5jc",
+    "lat":45.420444,
+    "lng":10.984644
+  },
+  {
+    "name":"I/O Extended 2015 - Washington DC",
+    "link":"https://plus.google.com/u/0/events/clkl3qddr207ebs51g7gm59313o?cfem=1\u0026e",
+    "lat":38.89827468,
+    "lng":-77.01051737
+  },
+  {
+    "name":"I/O Extended 2015 - Xiamen",
+    "link":"https://plus.google.com/events/cat760i85nqd1vedpbapeo6g6kg",
+    "lat":24.430058,
+    "lng":118.113284
+  },
+  {
+    "name":"I/O Extended 2015 - ZhuHai I/O大会珠海直播之夜",
+    "link":"https://plus.google.com/b/113382777332300419074/events/c7eenlu4d6a7tbr2h591po6h0m8",
+    "lat":22.21525336,
+    "lng":-246.4317795
   }
 ]
