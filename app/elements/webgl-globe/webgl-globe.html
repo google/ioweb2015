@@ -516,18 +516,6 @@ Makes a globe or whatever.
        */
       attractLoopCancelled_: false,
 
-      /**
-       * A modification of the duration (ms) over which transitions between
-       * locations should occur. Slows down the attract loop to 6x the normal
-       * trasition time.
-       * @property transitionTime_
-       * @type number
-       */
-      get transitionTime_() {
-        var multiplier = (this.attractLoop && !this.attractLoopCancelled_) ? 6 : 1;
-        return this.transitionDuration * multiplier;
-      },
-
       canvasResized: function() {
         this.resizeNeeded_ = true;
       },
@@ -836,6 +824,14 @@ Makes a globe or whatever.
             Math.cos(lat0) * Math.cos(lat1) * Math.cos(deltaLng));
       },
 
+      getTransitionTime_: function() {
+        // A modification of the duration (ms) over which transitions between
+        // locations should occur. Slows down the attract loop to 6x the normal
+        // trasition time.
+        var multiplier = (this.attractLoop && !this.attractLoopCancelled_) ? 6 : 1;
+        return this.transitionDuration * multiplier;
+      },
+
       locationChanged: function() {
         // If the location isn't being changed by the attract loop, cancel the
         // attract loop.
@@ -864,7 +860,7 @@ Makes a globe or whatever.
         // Tell everyone we've arrived at the new location.
         this.async(function() {
           this.fire('location-transitionend');
-        }, null, this.transitionTime_);
+        }, null, this.getTransitionTime_());
 
         this.scheduleUpdate_();
       },
@@ -879,7 +875,7 @@ Makes a globe or whatever.
 
       interpolateLocation_: function(timestamp) {
         var elapsedTime = timestamp - this.transitionStart_;
-        var t = Math.max(0, Math.min(1, elapsedTime / this.transitionTime_));
+        var t = Math.max(0, Math.min(1, elapsedTime / this.getTransitionTime_()));
         t = this.ease_(t);
 
         // TODO(bckenny): for now, just lerp in latlng space.
@@ -920,7 +916,7 @@ Makes a globe or whatever.
         if (this.resizeNeeded_) {
           this.resize_();
         }
-        if (timestamp - this.transitionStart_ < this.transitionTime_) {
+        if (timestamp - this.transitionStart_ < this.getTransitionTime_()) {
           // TODO(bckenny): set animate_ = false when this is finished?
           this.interpolateLocation_(timestamp);
         } else if (this.attractLoop) {
