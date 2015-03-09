@@ -98,7 +98,7 @@
       <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}"
            on-marker-click="{{onMarkerClick}}" relative>
 
-        <google-maps-api on-api-load="{{initExtendedSearchBox}}" libraries="places" hidden></google-maps-api>
+        <google-maps-api on-api-load="{{initExtendedSearchBox}}" clientId="google-io" libraries="places" hidden></google-maps-api>
 
         <webgl-globe id="offsite-globe"
                      markers="{{offsiteLocations}}"
