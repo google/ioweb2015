@@ -30,7 +30,7 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
-<polymer-element name="webgl-globe" on-tap="{{handleTap}}" attributes="cameraDistance fov location locationTarget markers noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration">
+<polymer-element name="webgl-globe" on-tap="{{handleTap}}" attributes="attractLoop cameraDistance fov location locationTarget markers noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration">
   <template>
     <style>
       :host {
@@ -135,6 +135,16 @@ Makes a globe or whatever.
        * @default false
        */
       noInit: false,
+
+      /**
+       * If true, puts the globe in an attract loop (automatically changing its
+       * own location) until location input comes externally.
+       *
+       * @attribute attractLoop
+       * @type bool
+       * @default false
+       */
+      attractLoop: false,
 
       /**
        * The latitude and longitude of the location to focus on.
@@ -490,6 +500,22 @@ Makes a globe or whatever.
        */
       lastClickY: -1,
 
+      /**
+       * True if the last location change was caused by the attract loop.
+       * @property attractLocationChange_
+       * @type bool
+       * @default false
+       */
+      attractLocationChange_: false,
+
+      /**
+       * True if the attract loop is active but has been cancelled.
+       * @property attractLoopCancelled_
+       * @type bool
+       * @default false
+       */
+      attractLoopCancelled_: false,
+
       canvasResized: function() {
         this.resizeNeeded_ = true;
       },
@@ -552,6 +578,9 @@ Makes a globe or whatever.
       scrollTriggeredChanged: function() {
         if (this.scrollTriggered) {
           this.animate_ = true;
+          if (this.attractLoop) {
+            this.iterateAttractLoop();
+          }
           this.async(this.scheduleUpdate_);
         }
       },
@@ -632,6 +661,9 @@ Makes a globe or whatever.
             this.webglReady_ = true;
             if (this.markers) {
               this.initMarkerGeometry_();
+            }
+            if (this.attractLoop) {
+              this.iterateAttractLoop();
             }
             this.async(this.scheduleUpdate_);
           }.bind(this))
@@ -793,6 +825,14 @@ Makes a globe or whatever.
       },
 
       locationChanged: function() {
+        // If the location isn't being changed by the attract loop, cancel the
+        // attract loop.
+        if (!this.attractLocationChange_) {
+          this.attractLoopCancelled_ = true;
+        } else {
+          this.attractLocationChange_ = false;
+        }
+
         // TODO(bckenny): for now, assume transition to current location has
         // been completed (so path is C0 but not C1).
         this.previousLocation_.lat = this.currentLocation_.lat;
@@ -813,6 +853,8 @@ Makes a globe or whatever.
         this.async(function() {
           this.fire('location-transitionend');
         }, null, this.transitionDuration);
+
+        this.scheduleUpdate_();
       },
 
       ease_: function(t) {
@@ -869,6 +911,8 @@ Makes a globe or whatever.
         if (timestamp - this.transitionStart_ < this.transitionDuration) {
           // TODO(bckenny): set animate_ = false when this is finished?
           this.interpolateLocation_(timestamp);
+        } else if (this.attractLoop) {
+          this.iterateAttractLoop();
         }
 
         // Globe to camera space.
@@ -960,6 +1004,47 @@ Makes a globe or whatever.
 
         gl.drawElements(gl.TRIANGLES, this.markerDrawCount_, gl.UNSIGNED_SHORT,
             0);
+      },
+
+      iterateAttractLoop: function() {
+        if (this.attractLoop && !this.attractLoopCancelled_) {
+          // For the first stop, find a nice position relative to the sun.
+          var longitude, latitude;
+          if (this.location.lng === 0 && this.location.lat === 0) {
+            var sun = getSolarPosition(new Date(), tmp3Vec0);
+            longitude = Math.atan2(sun[0], sun[2]) * 180 / Math.PI;
+            longitude += 75;
+            if (longitude > 180) {
+              longitude -= 360;
+            }
+
+            latitude = Math.asin(sun[1]);
+          } else {
+            // After the first stop, randomly pick a nearby point.
+            latitude = Math.random() * 120 - 60;
+            longitude = this.location.lng - 50;
+
+            // Clamp to reasonable latitudes and longitudes.
+            latitude = Math.max(-60, Math.min(60, latitude));
+            if (longitude < -180) {
+              longitude += 360;
+            }
+
+            // If markers are defined, find the nearest to the random point.
+            if (this.markers) {
+              var nearest = this.getNearestMarker(latitude, longitude);
+              var nearestMarker = this.markers[nearest.index];
+              latitude = nearestMarker.lat;
+              longitude = nearestMarker.lng;
+            }
+          }
+
+          this.attractLocationChange_ = true;
+          this.location = {
+            lat: latitude,
+            lng: longitude
+          };
+        }
       },
 
       handleTap: function(e) {
