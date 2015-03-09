@@ -72,9 +72,7 @@
                 <span><a href="//www.google.com/maps/place/{{marker.lat}},{{marker.lng}}" target="_blank">View in Google Maps</a></span>
                 <a href="{{marker.link}}" data-track-link="offsite-visit-eventpage" target="_blank">Event details</a>
               </div>
-              <template if="{{i == 0}}">
-                <div class="marker-card--closest">This is the closest match</div>
-              </template>
+              <div class="marker-card--closest">This is the closest event to your search.</div>
             </div>
           </template>
         </div>
@@ -355,7 +353,15 @@
 
           IOWA.Elements.Template.didExtendedSearch = true;
 
-          IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
+          // Wait a rAF so marker cards are stamped.
+          this.async(function() {
+            // Only add .show "closest match" message to the first card.
+            var closest = IOWA.Elements.Main.querySelector('.marker-card--closest');
+            if (closest) {
+              closest.classList.add('show');
+            }
+            IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
+          });
 
           IOWA.Analytics.trackEvent('globe', 'place select', place.name);
         }.bind(this));
@@ -363,6 +369,7 @@
 
       IOWA.Elements.Template.resetExtendedSearch = function(e, detail, sender) {
         IOWA.Elements.Main.querySelector('.marker-results').classList.remove('active');
+        IOWA.Elements.Main.querySelector('.marker-card--closest').classList.remove('show');
         document.querySelector('.page__section--attend #autocomplete').value = null;
         IOWA.Elements.Template.didExtendedSearch = false;
       };

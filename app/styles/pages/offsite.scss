@@ -146,6 +146,11 @@ google-youtube {
   font-size: 12px;
   color: $color-gray;
   margin-top: $mobileKeyline / 2;
+  display: none;
+
+  &.show {
+    display: block;
+  }
 }
 
 // Smaller than n6
