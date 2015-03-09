@@ -369,7 +369,10 @@
 
       IOWA.Elements.Template.resetExtendedSearch = function(e, detail, sender) {
         IOWA.Elements.Main.querySelector('.marker-results').classList.remove('active');
-        IOWA.Elements.Main.querySelector('.marker-card--closest').classList.remove('show');
+        var closest = IOWA.Elements.Main.querySelector('.marker-card--closest');
+        if (closest) {
+          closest.classList.remove('show');
+        }
         document.querySelector('.page__section--attend #autocomplete').value = null;
         IOWA.Elements.Template.didExtendedSearch = false;
       };
