@@ -412,7 +412,7 @@
           focusLocation.call(this);
         }
 
-        IOWA.Analytics.trackEvent('globe', 'marker click');
+        IOWA.Analytics.trackEvent('globe', 'marker click', centerLocation.name);
       };
 
       page.load(); // Run load callback on page load.
