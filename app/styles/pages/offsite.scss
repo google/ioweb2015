@@ -101,7 +101,6 @@ google-youtube {
   .marker-results {
     position: absolute;
     width: 350px;
-    max-height: 50%;
     margin-top: 12px;
     pointer-events: none;
     overflow: auto;
@@ -142,15 +141,32 @@ google-youtube {
   }
 }
 
+.marker-card--closest {
+  font-size: 12px;
+  color: $color-gray;
+  margin-top: $mobileKeyline / 2;
+  display: none;
+
+  &.show {
+    display: block;
+  }
+}
+
+// Smaller than n6
+@media (max-width: 400px) {
+  .search__map {
+    top: 42px !important;
+  }
+}
+
 @media (max-width: $phone-breakpoint-max) {
   .marker-results {
     width: 100% !important;
-    margin-top: $tabletKeyline !important;
+    margin-top: $desktopKeyline !important;
   }
   .search__map {
     left: $mobileKeyline;
     right: $mobileKeyline !important;
-    top:  $mobileKeyline / 2 !important;
   }
   .action__links {
     h4 {
@@ -221,6 +237,7 @@ google-youtube {
     }
 
     .marker-results {
+      max-height: 50%;
       left: $desktopKeyline;
     }
   }
