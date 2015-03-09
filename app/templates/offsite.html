@@ -380,7 +380,7 @@
       IOWA.Elements.Template.onMarkerClick = function(e, detail, sender) {
         e.stopPropagation();
 
-        // Remove "closest match" message to the first card.
+        // Remove "closest match" message from the first card.
         var closest = IOWA.Elements.Main.querySelector('.marker-card--closest');
         if (closest) {
           closest.classList.remove('show');
