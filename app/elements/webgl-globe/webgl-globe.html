@@ -1010,7 +1010,8 @@ Makes a globe or whatever.
         if (this.attractLoop && !this.attractLoopCancelled_) {
           // For the first stop, find a nice position relative to the sun.
           var longitude, latitude;
-          if (this.location.lng === 0 && this.location.lat === 0) {
+          var currentLoc = this.location;
+          if (currentLoc.lng === 0 && currentLoc.lat === 0) {
             var sun = getSolarPosition(new Date(), tmp3Vec0);
             longitude = Math.atan2(sun[0], sun[2]) * 180 / Math.PI;
             longitude += 75;
@@ -1020,22 +1021,30 @@ Makes a globe or whatever.
 
             latitude = Math.asin(sun[1]);
           } else {
-            // After the first stop, randomly pick a nearby point.
-            latitude = Math.random() * 120 - 60;
-            longitude = this.location.lng - 50;
+            // After the first stop, randomly pick a nearby point (or marker, if
+            // any). In the case of markers, try increasingly far random
+            // longitudes in case the same marker keeps being selected.
+            for (var i = 1; i < 5; i++) {
+              latitude = Math.random() * 120 - 60;
+              longitude = currentLoc.lng - i * 35;
 
-            // Clamp to reasonable latitudes and longitudes.
-            latitude = Math.max(-60, Math.min(60, latitude));
-            if (longitude < -180) {
-              longitude += 360;
-            }
+              // Clamp to reasonable latitudes and longitudes.
+              latitude = Math.max(-60, Math.min(60, latitude));
+              if (longitude < -180) {
+                longitude += 360;
+              }
 
-            // If markers are defined, find the nearest to the random point.
-            if (this.markers) {
-              var nearest = this.getNearestMarker(latitude, longitude);
-              var nearestMarker = this.markers[nearest.index];
-              latitude = nearestMarker.lat;
-              longitude = nearestMarker.lng;
+              // If markers are defined, find the nearest to the random point.
+              if (this.markers) {
+                var nearest = this.getNearestMarker(latitude, longitude);
+                var nearestMarker = this.markers[nearest.index];
+                latitude = nearestMarker.lat;
+                longitude = nearestMarker.lng;
+              }
+
+              if (latitude !== currentLoc.lat && longitude !== currentLoc.lng) {
+                break;
+              }
             }
           }
 
