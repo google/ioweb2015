@@ -50,7 +50,7 @@
     "selenium-standalone": "^3.2.0",
     "selenium-webdriver": "^2.44.0",
     "sprintf-js": "1.0.2",
-    "sw-precache": "^1.2.5",
+    "sw-precache": "^1.2.6",
     "through2": "0.6.3",
     "vinyl-map": "1.0.1",
     "yargs": "1.3.3"
