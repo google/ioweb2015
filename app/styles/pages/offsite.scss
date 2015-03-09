@@ -101,7 +101,6 @@ google-youtube {
   .marker-results {
     position: absolute;
     width: 350px;
-    max-height: 50%;
     margin-top: 12px;
     pointer-events: none;
     overflow: auto;
@@ -238,6 +237,7 @@ google-youtube {
     }
 
     .marker-results {
+      max-height: 50%;
       left: $desktopKeyline;
     }
   }
