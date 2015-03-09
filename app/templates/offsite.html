@@ -65,13 +65,16 @@
       <div class="marker-results">
         <div class="card marker-card">
           <paper-icon-button icon="io:close" class="close-button" on-tap="{{resetExtendedSearch}}"></paper-icon-button>
-          <template repeat="{{marker in offsiteMarkerResults}}">
+          <template repeat="{{marker, i in offsiteMarkerResults}}">
             <div class="card-content">
               <h4 class="card__title">{{marker.name}}</h4>
               <div layout horizontal center justified>
                 <span><a href="//www.google.com/maps/place/{{marker.lat}},{{marker.lng}}" target="_blank">View in Google Maps</a></span>
                 <a href="{{marker.link}}" data-track-link="offsite-visit-eventpage" target="_blank">Event details</a>
               </div>
+              <template if="{{i == 0}}">
+                <div class="marker-card--closest">This is the closest match</div>
+              </template>
             </div>
           </template>
         </div>
