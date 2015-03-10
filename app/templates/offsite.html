@@ -271,12 +271,12 @@
         IOWA.Elements.Template.offsiteSearchRadius = 80;
 
         if (location.hash.substring(1) === 'join') {
-          var onPageTransitionDone_ = function(e) {
+          var onGlobeReady_ = function(e) {
             IOWA.Elements.Template.openExtendedMap(800);
-            document.removeEventListener('page-transition-done', onPageTransitionDone_);
+            document.removeEventListener('globe-webgl-init', onGlobeReady_);
           };
 
-          document.addEventListener('page-transition-done', onPageTransitionDone_);
+          document.addEventListener('globe-webgl-init', onGlobeReady_);
         }
       };
 
