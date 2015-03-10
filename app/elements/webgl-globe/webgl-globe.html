@@ -30,6 +30,23 @@ Makes a globe or whatever.
 
 @element webgl-globe
 -->
+<!--
+Fired when the globe arrives at a new location.
+
+@event location-transitionend
+-->
+<!--
+Fired when when a location marker is clicked.
+
+@event marker-click
+-->
+<!--
+Fired when the globe's webgl context has been initialized or it failed to initialize.
+
+@event globe-webgl-init
+@param {Object} detail
+  @param {bool} detail.error True if webgl could not be initialized.
+-->
 <polymer-element name="webgl-globe" on-tap="{{handleTap}}" attributes="attractLoop cameraDistance fov location locationTarget markers noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration webglSupported">
   <template>
     <style>
