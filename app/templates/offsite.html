@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument">
+    <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument {{ {nowebgl: !webglSupported} | tokenList }}">
 
       <div class="marker-results">
         <div class="card marker-card">
@@ -88,7 +88,7 @@
         <!-- <paper-button data-track-link="offsite-notify-me">
           <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
         </paper-button> -->
-        <paper-button class="view__events" on-tap="{{openExtendedMap}}">
+        <paper-button class="view__events" on-tap="{{openExtendedMap}}" hidden?="{{!webglSupported}}">
           <a href="#" data-track-link="offsite-view-2015-events"><core-icon icon="io:place"></core-icon>Find 2015 events</a>
         </paper-button>
         <div class="search__map" layout horizontal center self-center relative>
@@ -111,7 +111,8 @@
                      scrollTarget="{{ScrollContainer}}"
                      scrollTriggered="{{offsiteGlobeVisible}}"
                      noInit?="{{!pageTransitionDone}}"
-                     noDraw?="{{mode === 'active'}}"></webgl-globe>
+                     noDraw?="{{mode === 'active'}}"
+                     webglSupported="{{webglSupported}}"></webgl-globe>
 
         <core-ajax url="api/extended" handleAs="json"
                    auto?="{{pageTransitionDone && !offsiteLocations}}"

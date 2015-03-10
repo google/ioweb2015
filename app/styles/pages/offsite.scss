@@ -52,7 +52,11 @@ google-youtube {
 .page__section--attend {
   position: relative;
   color: #fff;
-  background-position: 50% 140px;
+
+  &.nowebgl {
+    @extend .bg-globe;
+    background-position: 50% 140px;
+  }
 
   padding-left: 0;
   padding-right: 0;
@@ -79,6 +83,9 @@ google-youtube {
     }
   }
 
+  .attend__globe {
+    height: 150px;
+  }
 
   .search__map {
     position: absolute;
@@ -235,6 +242,10 @@ google-youtube {
           width: 300px;
         }
       }
+    }
+
+    .attend__globe {
+      height: 500px;
     }
 
     .marker-results {

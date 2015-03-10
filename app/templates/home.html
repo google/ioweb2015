@@ -103,7 +103,7 @@
       </div>
     </div>
 
-    <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey">
+    <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey {{ {nowebgl: !webglSupported} | tokenList }}">
       <h2>
         <i18n-msg msgid="attend-from">Attend I/O from</i18n-msg>
         <name-cycler items="{{cycleLocations}}"
@@ -123,7 +123,8 @@
                      scrollTriggered="{{homeGlobeVisible}}"
                      noInit?="{{!pageTransitionDone}}"
                      noDraw?="{{mode === 'active'}}"
-                     on-location-transitionend="{{onArrivedAtGlobePin}}"></webgl-globe>
+                     on-location-transitionend="{{onArrivedAtGlobePin}}"
+                     webglSupported="{{webglSupported}}"></webgl-globe>
         <core-icon icon="io:place" class="globe-marker up"></core-icon>
       </div>
     </section>
