@@ -1049,6 +1049,7 @@ Main parent container for all of the fab elements.
           reflect: true
         },
         playmode: {
+          value: null,
           reflect: true
         },
         fixed: {
@@ -1221,7 +1222,9 @@ Main parent container for all of the fab elements.
         }.bind(this));
 
         this.mode = 'pre';
-        this.playmode = 'playing';
+        this.playmode = null;
+        this.recording = false;
+        this.recordmode = 'notRecording';
         this.miniFabs = false;
         this.showTooltips = false;
         this.pauseOverlay = false;
