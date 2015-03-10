@@ -205,8 +205,8 @@
 
       var animation = new AnimationGroup([
         new Animation(viewButton, [
-          {opacity: 1, visibility: 'visible'},
-          {opacity: 0, visibility: 'hidden'}
+          {opacity: 1, visibility: 'visible', 'pointer-events': 'auto'},
+          {opacity: 0, visibility: 'hidden', 'pointer-events': 'none'}
         ], animationTiming),
         new Animation(sectionTitle, [
           {opacity: 1, visibility: 'visible'},
