@@ -78,7 +78,10 @@
         </div>
       </div>
 
-      <h2 class="extended-title">Find an I/O Extended event near you</h2>
+      <h2 class="extended-title" hidden?="{{!webglSupported}}">Find an I/O Extended event near you</h2>
+      <template if="{{!webglSupported}}">
+        <h2 class="extended-title">Searching for events is not supported in your browser :(</h2>
+      </template>
 
       <div class="action__links" layout vertical>
         <template if="{{extendedMapActive && didExtendedSearch && !offsiteMarkerResults.length}}">
@@ -91,7 +94,7 @@
         <paper-button class="view__events" on-tap="{{openExtendedMap}}" hidden?="{{!webglSupported}}">
           <a href="#" data-track-link="offsite-view-2015-events"><core-icon icon="io:place"></core-icon>Find 2015 events</a>
         </paper-button>
-        <div class="search__map" layout horizontal center self-center relative>
+        <div class="search__map" layout horizontal center self-center relative hidden?="{{!webglSupported}}">
           <core-icon icon="io:search"></core-icon>
           <paper-input id="autocomplete" label="Search for a location"></paper-input>
         </div>
@@ -317,6 +320,10 @@
         // Smooth scroll to globe section.
         var destEl = IOWA.Elements.Main.querySelector('.page__section--attend');
         IOWA.Util.smoothScroll(destEl, scrollDuration, function() {
+          if (!IOWA.Elements.Template.webglSupported) {
+            return;
+          }
+
           IOWA.Elements.Template.scrollLock(true);
 
           IOWA.Elements.Template.extendedMapActive = true;
