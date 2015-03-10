@@ -704,6 +704,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             // TODO(bckenny): give up
             IOWA.Analytics.trackError('globe initialization', reason);
             this.webglSupported = false;
+            this.fire('globe-webgl-init', {error: true});
           });
       },
 
