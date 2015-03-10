@@ -681,7 +681,7 @@ Makes a globe or whatever.
             }
             this.async(this.scheduleUpdate_);
 
-            this.fire('globe-webgl-init', {error: true});
+            this.fire('globe-webgl-init', {error: false});
           }.bind(this))
           .catch(function(reason) {
             // TODO(bckenny): give up
