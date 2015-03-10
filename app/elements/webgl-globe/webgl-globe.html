@@ -615,6 +615,8 @@ Makes a globe or whatever.
             IOWA.Analytics.trackEvent('globe', 'webgl unsupported');
             // TODO(bckenny): give up
             this.webglSupported = false;
+            this.fire('globe-webgl-init', {error: true});
+
             return;
           }
         }
@@ -678,6 +680,8 @@ Makes a globe or whatever.
               this.iterateAttractLoop();
             }
             this.async(this.scheduleUpdate_);
+
+            this.fire('globe-webgl-init', {error: true});
           }.bind(this))
           .catch(function(reason) {
             // TODO(bckenny): give up
