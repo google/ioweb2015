@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument {{ {no-webgl: !webglSupported} | tokenList }}">
+    <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument {{ {'no-webgl': !webglSupported} | tokenList }}">
 
       <div class="marker-results">
         <div class="card marker-card">
@@ -261,6 +261,7 @@
         IOWA.Elements.Template.fullscreenVideoActive = false;
         IOWA.Elements.Template.extendedMapActive = false;
         IOWA.Elements.Template.didExtendedSearch = false;
+        IOWA.Elements.Template.webglSupported = true;
         IOWA.Elements.Template.offsiteMarkerResults= [];
 
         // Offsite event search radius in kilometers.

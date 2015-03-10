@@ -103,7 +103,7 @@
       </div>
     </div>
 
-    <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey {{ {no-webgl: !webglSupported} | tokenList }}">
+    <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey {{ {'no-webgl': !webglSupported} | tokenList }}">
       <h2>
         <i18n-msg msgid="attend-from">Attend I/O from</i18n-msg>
         <name-cycler items="{{cycleLocations}}"
@@ -229,6 +229,7 @@
         IOWA.Elements.Template.homeGlobeVisible = false;
         IOWA.Elements.Template.selectedCity = null;
         IOWA.Elements.Template.fullscreenVideoActive = false;
+        IOWA.Elements.Template.webglSupported = true;
       };
 
       page.unload = function() {
