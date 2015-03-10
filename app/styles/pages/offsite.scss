@@ -53,7 +53,7 @@ google-youtube {
   position: relative;
   color: #fff;
 
-  &.nowebgl {
+  &.no-webgl {
     @extend .bg-globe;
     background-position: 50% 140px;
   }

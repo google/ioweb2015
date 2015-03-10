@@ -52,7 +52,7 @@ $name: 'page-home';
   padding-right: 0;
   padding-bottom: 0;
 
-  &.nowebgl {
+  &.no-webgl {
     @extend .bg-globe;
   }
 
