@@ -66,9 +66,7 @@ Makes a globe or whatever.
     var generateSpriteIndexArray = IOWA.WebglGlobe.generateSpriteIndexArray;
     var KdTree = IOWA.WebglGlobe.KdTree;
 
-    function isOS() {
-      return (/(iPhone|iPad|iPod)/gi).test(navigator.platform);
-    }
+    var IS_IOS = (/(iPhone|iPad|iPod)/gi).test(navigator.platform);
 
     /**
      * Polyfilled performance.now. Only good for relative timing, not absolute.
@@ -903,7 +901,7 @@ Makes a globe or whatever.
       resize_: function() {
         var canvas = this.$.canvas;
         // Force iOS to dPR 1: See github.com/GoogleChrome/ioweb2015/issues/751.
-        var resolutionScale = window.devicePixelRatio > 1 && !isOS() ? 2 : 1;
+        var resolutionScale = window.devicePixelRatio > 1 && !IS_IOS ? 2 : 1;
         var width = canvas.offsetWidth;
         var height = canvas.offsetHeight;
         canvas.width = width * resolutionScale;
