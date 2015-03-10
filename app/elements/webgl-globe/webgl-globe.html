@@ -234,6 +234,15 @@ Makes a globe or whatever.
       transitionDuration: 4000,
 
       /**
+       * Whether WebGL is supported and the globe rendering can be initialized
+       * in this browser.
+       * @attribute webglSupported
+       * @type bool
+       * @default true
+       */
+      webglSupported: 'WebGLRenderingContext' in window,
+
+      /**
        * The pixel threshold in the parent scrollTarget at which to start
        * animating.
        *
@@ -603,6 +612,7 @@ Makes a globe or whatever.
           if (!gl) {
             IOWA.Analytics.trackEvent('globe', 'webgl unsupported');
             // TODO(bckenny): give up
+            this.webglSupported = false;
             return;
           }
         }
@@ -670,6 +680,7 @@ Makes a globe or whatever.
           .catch(function(reason) {
             // TODO(bckenny): give up
             IOWA.Analytics.trackError('globe initialization', reason);
+            this.webglSupported = false;
           });
       },
 
