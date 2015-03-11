@@ -546,6 +546,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
       canvasResized: function() {
         this.resizeNeeded_ = true;
+        this.scheduleUpdate_();
       },
 
       created: function() {
