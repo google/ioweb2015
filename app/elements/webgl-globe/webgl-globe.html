@@ -667,8 +667,10 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         this.globeDrawCount = globeIndices.length;
 
         // A bug in OS X Intel GPU drivers limits some machines to 512x512
-        // cube map textures. If that's the case, start with blank textures and
-        // load a downgraded texture further down the pipeline.
+        // cube map textures. See
+        // https://github.com/GoogleChrome/ioweb2015/issues/754. If that's the
+        // case, start with blank (null) textures and load a downgraded texture
+        // further down the pipeline.
         var maxCubeSize = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
         var cubeMapDowngradeRequired = maxCubeSize < 1024;
         var processCubeMap = cubeMapDowngradeRequired ?
@@ -689,15 +691,18 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             this.globeCubeMap = assets[1];
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubeMap);
-            this.loadingTextures_ = null;
+
             this.nightCubeMap = assets[2];
             gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.nightCubeMap);
-            this.loadingNightTextures_ = null;
 
             this.markerProgram_ = new ShaderProgram(this.gl, assets[0][2],
                 assets[0][3]);
             this.markerProgram_.use();
+
+            // Free references to image-loading/XHR promises.
+            this.loadingNightTextures_ = null;
+            this.loadingTextures_ = null;
             this.loadingShaders_ = null;
 
             this.webglReady_ = true;
