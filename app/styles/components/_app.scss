@@ -236,6 +236,10 @@ h6 {
 
     a {
       color: inherit;
+
+      &:focus {
+        outline-color: white;
+      }
     }
   }
 }
