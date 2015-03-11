@@ -36,7 +36,7 @@ IOWA.Analytics = (function(exports) {
       // See https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#localhost
       opts.cookieDomain = 'none';
     } else {
-      opts.cookiePath = '/io2015';
+      opts.cookiePath = window.PREFIX || '/io2015';
     }
 
     ga('create', trackingCode, opts);

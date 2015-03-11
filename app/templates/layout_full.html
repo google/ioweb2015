@@ -52,7 +52,7 @@ limitations under the License.
   <!-- G+ sharing meta data -->
   <meta itemprop="name" content="{% .OgTitle %}">
   <meta itemprop="description" content="{% .Desc %}">
-  <meta itemprop="image" content="/io2015/images/{% .OgImage %}">
+  <meta itemprop="image" content="{% .Prefix %}/images/{% .OgImage %}">
   <!-- May 28 9am PDT through May 29 5pm PDT -->
   <meta itemprop="startDate" content="2015-05-28T16:00:00Z">
   <meta itemprop="endDate" content="2015-05-29T23:59:59Z">
@@ -61,23 +61,24 @@ limitations under the License.
   <meta property="og:title" content="{% .OgTitle %}">
   <meta property="og:site_name" content="Google I/O 2015">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="/io2015">
+  <meta property="og:url" content="{% .Prefix %}">
   <meta property="og:description" content="{% .Desc %}">
   <meta property="og:type" content="Event">
-  <meta property="og:image" content="/io2015/images/{% .OgImage %}">
+  <meta property="og:image" content="{% .Prefix %}/images/{% .OgImage %}">
 
   <!-- Twitter meta data -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@googledevs">
   <meta name="twitter:title" content="{% .OgTitle %}">
   <meta name="twitter:description" content="{% .Desc %}">
-  <meta name="twitter:image:src" content="/io2015/images/{% .OgImage %}">
+  <meta name="twitter:image:src" content="{% .Prefix %}/images/{% .OgImage %}">
 
   <!-- Unsupported browser checks need to come before webcomponents.js is loaded,
        otherwise unsupported browsers will error out and not record a pageview.
        Analytics lib is also loaded up front for error reporting. -->
   <script>
     window.ENV = {% .Env %}; // Used in analytics.js
+    window.PREFIX = {% .Prefix %};
   </script>
   <script src="scripts/analytics.js"></script>
   <script>
@@ -154,7 +155,7 @@ limitations under the License.
     if (!supported) {
       // Note: pageview is recorded when IOWA.Analytics is setup.
       IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', null, null, function() {
-        window.location = 'upgrade';
+        window.location = {% canonical "upgrade" %};
       });
     }
   })();
@@ -168,7 +169,7 @@ limitations under the License.
   <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="elements/elements.html">
 
-  <link rel="canonical" href="{% .Canonical %}">
+  <link rel="canonical" href="{% canonical .Slug %}">
 </head>
 <body id="page-{% .Slug %}">
 

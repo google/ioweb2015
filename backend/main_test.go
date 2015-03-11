@@ -18,3 +18,9 @@ func overrideEnv(env string) func() {
 	config.Env = env
 	return func() { config.Env = orig }
 }
+
+func overridePrefix(pref string) func() {
+	orig := config.Prefix
+	config.Prefix = pref
+	return func() { config.Prefix = orig }
+}

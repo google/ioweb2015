@@ -23,17 +23,19 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 
 func TestServeTemplate(t *testing.T) {
 	const ctype = "text/html;charset=utf-8"
+	revert := overridePrefix("/root")
+	defer revert()
 	table := []struct{ path, slug, canonical string }{
-		{"/", "home", "./"},
-		{"/home?experiment", "home", "./"},
-		{"/about", "about", "about"},
-		{"/about?experiment", "about", "about"},
-		{"/schedule", "schedule", "schedule"},
-		{"/onsite", "onsite", "onsite"},
-		{"/offsite", "offsite", "offsite"},
-		{"/registration", "registration", "registration"},
-		{"/faq", "faq", "faq"},
-		{"/form", "form", "form"},
+		{"/", "home", "/root"},
+		{"/home?experiment", "home", "/root"},
+		{"/about", "about", "/root/about"},
+		{"/about?experiment", "about", "/root/about"},
+		{"/schedule", "schedule", "/root/schedule"},
+		{"/onsite", "onsite", "/root/onsite"},
+		{"/offsite", "offsite", "/root/offsite"},
+		{"/registration", "registration", "/root/registration"},
+		{"/faq", "faq", "/root/faq"},
+		{"/form", "form", "/root/form"},
 	}
 	for i, test := range table {
 		r, _ := http.NewRequest("GET", test.path, nil)

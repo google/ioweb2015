@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"html/template"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -32,7 +33,8 @@ const (
 var (
 	// tmplFunc is a map of functions available to all templates.
 	tmplFunc = template.FuncMap{
-		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
+		"safeHTML":  func(v string) template.HTML { return template.HTML(v) },
+		"canonical": canonicalURL,
 	}
 	// tmplCache caches HTML templates parsed in parseTemplate()
 	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
@@ -46,8 +48,13 @@ type templateCache struct {
 
 // templateData is the templates context
 type templateData struct {
-	Title, Desc, OgTitle, OgImage string
-	Slug, Canonical, Env          string
+	Env     string
+	Prefix  string
+	Slug    string
+	Title   string
+	Desc    string
+	OgTitle string
+	OgImage string
 }
 
 // renderTemplate executes a template found in name.html file
@@ -66,10 +73,7 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	}
 	data.Title = pageTitle(tpl)
 	data.Slug = name
-	data.Canonical = data.Slug
-	if data.Canonical == "home" {
-		data.Canonical = "./"
-	}
+	data.Prefix = config.Prefix
 	if data.Desc == "" {
 		data.Desc = descDefault
 	}
@@ -94,6 +98,8 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 	switch {
 	case strings.HasPrefix(name, "error_"):
 		layout = "layout_error.html"
+	case name == "upgrade":
+		layout = "layout_bare.html"
 	case partial:
 		layout = "layout_partial.html"
 	default:
@@ -125,4 +131,13 @@ func pageTitle(t *template.Template) string {
 		return defaultTitle
 	}
 	return b.String()
+}
+
+// canonicalURL returns a canonical URL of path p.
+// Relative paths are based off of config.Prefix.
+func canonicalURL(p string) string {
+	if p == "home" || p == "/" || p == "" {
+		return config.Prefix + "/"
+	}
+	return path.Join(config.Prefix, p)
 }
