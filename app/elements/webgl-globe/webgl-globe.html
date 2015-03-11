@@ -563,8 +563,8 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
       attached: function() {
         // Start loading assets even if WebGL initialization will be delayed.
-        this.loadingTextures_ = this.loadCubeMapTextures_('albedo', '.jpg');
-        this.loadingNightTextures_ = this.loadCubeMapTextures_('night', '.png');
+        this.loadingTextures_ = this.loadCubeMapTextures_('albedo', 1024, '.jpg');
+        this.loadingNightTextures_ = this.loadCubeMapTextures_('night', 1024, '.png');
         this.loadingShaders_ = this.loadShaders_();
 
         if (!this.noInit) {
@@ -631,7 +631,6 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
           if (!gl) {
             IOWA.Analytics.trackEvent('globe', 'webgl unsupported');
-            // TODO(bckenny): give up
             this.webglSupported = false;
             this.fire('globe-webgl-init', {error: true});
 
@@ -667,11 +666,19 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
         this.globeDrawCount = globeIndices.length;
 
+        // A bug in OS X Intel GPU drivers limits some machines to 512x512
+        // cube map textures. If that's the case, start with blank textures and
+        // load a downgraded texture further down the pipeline.
+        var maxCubeSize = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
+        var cubeMapDowngradeRequired = maxCubeSize < 1024;
+        var processCubeMap = cubeMapDowngradeRequired ?
+            function() { return null; } : this.initCubeMap_.bind(this);
+
         // After loading, initialize textures and shaders and begin render loop.
         Promise.all([
           this.loadingShaders_,
-          this.loadingTextures_.then(this.initCubeMap_.bind(this)),
-          this.loadingNightTextures_.then(this.initCubeMap_.bind(this))
+          this.loadingTextures_.then(processCubeMap),
+          this.loadingNightTextures_.then(processCubeMap)
         ])
           .then(function assetsLoaded(assets) {
             this.globeProgram = new ShaderProgram(this.gl, assets[0][0],
@@ -682,13 +689,16 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             this.globeCubeMap = assets[1];
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.globeCubeMap);
+            this.loadingTextures_ = null;
             this.nightCubeMap = assets[2];
             gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.nightCubeMap);
+            this.loadingNightTextures_ = null;
 
             this.markerProgram_ = new ShaderProgram(this.gl, assets[0][2],
                 assets[0][3]);
             this.markerProgram_.use();
+            this.loadingShaders_ = null;
 
             this.webglReady_ = true;
             if (this.markers) {
@@ -700,9 +710,12 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             this.async(this.scheduleUpdate_);
 
             this.fire('globe-webgl-init', {error: false});
+
+            if (cubeMapDowngradeRequired) {
+              return this.adjustCubemapResolution_(512);
+            }
           }.bind(this))
           .catch(function(reason) {
-            // TODO(bckenny): give up
             IOWA.Analytics.trackError('globe initialization', reason);
             this.webglSupported = false;
             this.fire('globe-webgl-init', {error: true});
@@ -735,7 +748,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         }, this));
       },
 
-      loadCubeMapTextures_: function(prefix, extname) {
+      loadCubeMapTextures_: function(prefix, size, extname) {
         // Cubemap GLenum constants from WebGL spec.
         var globeFaces = {
           'negative-x': 0x8516,
@@ -758,7 +771,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
                 });
               };
               textureImage.onerror = reject;
-              var filename = prefix + '-' + faceName + extname;
+              var filename = prefix + '-' + size + '-' + faceName + extname;
               textureImage.src = this.resolvePath('textures/' + filename);
             }.bind(this));
           }, this)
@@ -808,6 +821,26 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             this.MAX_PERF_TIMEOUT_);
 
         return textureId;
+      },
+
+      adjustCubemapResolution_: function(requestedSize) {
+        // Load a cube map texture set of a different resolution.
+        return this.loadCubeMapTextures_('albedo', requestedSize, '.jpg')
+          .then(this.initCubeMap_.bind(this))
+          .then(function(newCubeMap) {
+            this.globeCubeMap = newCubeMap;
+            this.gl.activeTexture(this.gl.TEXTURE0);
+            this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.globeCubeMap);
+            this.gl.activeTexture(this.gl.TEXTURE1);
+
+            return this.loadCubeMapTextures_('night', requestedSize, '.png');
+          }.bind(this))
+          .then(this.initCubeMap_.bind(this))
+          .then(function(newNightCubeMap) {
+            this.nightCubeMap = newNightCubeMap;
+            this.gl.activeTexture(this.gl.TEXTURE1);
+            this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.nightCubeMap);
+          }.bind(this));
       },
 
       initMarkerGeometry_: function() {
