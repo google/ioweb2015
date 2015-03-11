@@ -26,8 +26,8 @@ func TestServeTemplate(t *testing.T) {
 	revert := overridePrefix("/root")
 	defer revert()
 	table := []struct{ path, slug, canonical string }{
-		{"/", "home", "/root"},
-		{"/home?experiment", "home", "/root"},
+		{"/", "home", "/root/"},
+		{"/home?experiment", "home", "/root/"},
 		{"/about", "about", "/root/about"},
 		{"/about?experiment", "about", "/root/about"},
 		{"/schedule", "schedule", "/root/schedule"},
