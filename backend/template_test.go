@@ -53,7 +53,7 @@ func TestRenderOgImage(t *testing.T) {
 		t.Fatalf("renderTemplate(..., about, false): %v", err)
 	}
 
-	rx := `<meta\sproperty="og:image"\scontent="/io2015/images/` + data.OgImage + `">`
+	rx := `<meta\sproperty="og:image"\scontent="` + config.Prefix + `/images/` + data.OgImage + `">`
 	if matched, err := regexp.Match(rx, out); !matched || err != nil {
 		t.Errorf("didn't match %s to: %s (%v)", rx, string(out), err)
 	}

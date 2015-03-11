@@ -59,12 +59,6 @@ handlers:
   http_headers:
     Access-Control-Allow-Origin: "*"
 
-- url: $PREFIX$/upgrade
-  static_files: app/upgrade.html
-  upload: app/upgrade.html
-  http_headers:
-    Access-Control-Allow-Origin: "*"
-
 - url: $PREFIX$/(.+\.html)$
   static_files: app/\1
   upload: app/.+\.html$

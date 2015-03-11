@@ -87,6 +87,7 @@ limitations under the License.
        Analytics lib is also loaded up front for error reporting. -->
   <script>
     window.ENV = {% .Env %}; // Used in analytics.js
+    window.PREFIX = {% .Prefix %};
   </script>
   <script src="scripts/analytics.js"></script>
   <script>
@@ -163,7 +164,7 @@ limitations under the License.
     if (!supported) {
       // Note: pageview is recorded when IOWA.Analytics is setup.
       IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', null, null, function() {
-        window.location = 'upgrade';
+        window.location = {% canonical "upgrade" %};
       });
     }
   })();
