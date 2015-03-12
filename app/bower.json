@@ -42,6 +42,7 @@
     "i18n-msg": "ebidel/i18n-msg#^0.0.2",
     "paper-button": "Polymer/paper-button#^0.5.5",
     "paper-icon-button": "Polymer/paper-icon-button#^0.5.5",
+    "paper-dialog": "Polymer/paper-dialog#^0.5.5",
     "paper-dropdown": "Polymer/paper-dropdown#^0.5.5",
     "paper-dropdown-menu": "Polymer/paper-dropdown-menu#^0.5.5",
     "paper-fab": "Polymer/paper-fab#^0.5.5",
