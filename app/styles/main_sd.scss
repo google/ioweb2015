@@ -60,6 +60,22 @@ paper-tabs.white {
   }
 }
 
+#page-gadget {
+  paper-slider::shadow {
+    #activeProgress,
+    #sliderKnobInner,
+    #sliderKnobInner::before,
+    #sliderBar::shadow #activeProgress {
+      background-color: #009688;
+    }
+    #sliderContainer.ring #sliderKnobInner {
+      &::before {
+        background-color: #009688;
+      }
+      border: none;
+    }
+  }
+}
 
 footer {
   paper-dropdown-menu::shadow #label {

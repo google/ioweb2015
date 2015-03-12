@@ -41,14 +41,18 @@ iframe {
   margin-bottom: 24px;
 }
 
+paper-slider {
+  line-height: 1;
+}
+
 paper-radio-button {
   padding: 0;
   margin-right: $rightMargin;
+  margin-bottom: $mobileKeyline;
 }
 
-paper-input {
+core-label {
   margin-right: $rightMargin;
-  width: 100px;
 }
 
 @media (min-width: $tablet-breakpoint-min) {
@@ -64,9 +68,6 @@ paper-input {
 }
 
 @media (min-width: $tablet-breakpoint-mid) {
-  .card__container {
-    max-width: 74%;
-  }
   .page__section--gadgetpreview {
     $margin: 103px;
     margin-top: -$margin;

@@ -21,7 +21,7 @@
 
 :host {
   overflow: hidden;
-  display: block;
+  display: inline-block;
 }
 
 .card {
@@ -54,7 +54,7 @@
   top: calc(50% - 56px/2);
 }
 
-#social-feed {
+#post-container {
   padding: 0 $tabletKeyline;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;

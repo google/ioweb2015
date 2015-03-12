@@ -26,13 +26,13 @@
 
 <div class="slide-up-delay">
 
-  <!-- TODO: move into main css -->
-  <link rel="stylesheet" href="styles/pages/gadget.css">
-
   <section class="page__section page__section--gadgetpreview bg-medium-grey">
-    <div class="card__container">
+    <div layout horizontal center-center>
       <!-- <iframe src="embed"></iframe> -->
-      <io-gadget videoid="8OJ7ih8EE7s" iframeCode="{{embedIframeCode}}"></io-gadget>
+      <io-gadget videoid="8OJ7ih8EE7s" iframeCode="{{embedIframeCode}}"
+                 noVideo?="{{selectedGadgetLayout === 'feed'}}"
+                 noFeed?="{{selectedGadgetLayout === 'video'}}"
+                 width="{{gadgetWidth}}" height="{{gadgetHeight}}"></io-gadget>
     </div>
   </section>
 
@@ -46,44 +46,31 @@
         <div class="card-content">
           <h4 class="card__title">1. Select widget content</h4>
           <div class="customize__area">
-            <paper-radio-group selected="0">
-              <paper-radio-button label="Live video stream + Google Developers social feed"></paper-radio-button>
-              <paper-radio-button label="Live video stream only"></paper-radio-button>
-              <paper-radio-button label="Google Developers social feed only"></paper-radio-button>
+            <paper-radio-group selected="{{selectedGadgetLayout}}">
+              <paper-radio-button name="both" label="Live video stream + Google Developers social feed"></paper-radio-button>
+              <paper-radio-button name="video" label="Live video stream only"></paper-radio-button>
+              <paper-radio-button name="feed" label="Google Developers social feed only"></paper-radio-button>
             </paper-radio-group>
           </div>
 
           <div class="card__title" layout horizontal end wrap>
-            <h4>2. Select live video size</h4>
-            <span class="heading-info">Minimum 300 px and maximum 1000 px</span>
+            <h4>2. Select gadget size</h4>
+            <span class="heading-info">Minimum 300px and maximum 1000px</span>
           </div>
           <div class="customize__area">
-            <paper-radio-group selected="small" on-core-change="{{onWidgetSize}}">
-              <paper-radio-button name="small" label="Small"></paper-radio-button>
-              <paper-radio-button name="medium" label="Medium"></paper-radio-button>
-              <paper-radio-button name="large" label="Large"></paper-radio-button>
-              <paper-radio-button name="xlarge" label="Extra large"></paper-radio-button>
-              <paper-radio-button name="custom" label="Custom"></paper-radio-button>
-            </paper-radio-group>
-            <span class="size__inputs">
-              <paper-input label="Width (px)" disabled></paper-input>
-              <paper-input label="Height (px)" disabled></paper-input>
-            </span>
-          </div>
-
-          <div class="card__title" layout horizontal end wrap>
-            <h4>3. Select Google Developers social feed size</h4>
-            <span class="heading-info">Minimum 300 px and maximum 1000 px</span>
-          </div>
-          <div class="customize__area">
-            <paper-input label="Width (px)"></paper-input>
+            <core-label layout inline horizontal center>
+              <paper-slider min="300" max="1000" value="800" editable pin immediateValue="{{gadgetWidth}}" for></paper-slider>Width (px)
+            </core-label>
+            <core-label layout inline horizontal center>
+              <paper-slider min="300" max="600" value="350" editable pin immediateValue="{{gadgetHeight}}" for></paper-slider>Height (px)
+            </core-label>
           </div>
 
           <h4>4. Embed this code into your site</h4>
           <div class="customize__area">
             <paper-input-decorator label="Embed code snippet">
               <paper-autogrow-textarea rows="2">
-                <textarea readonly on-focus="{{selectCodeSnippet}}">{{embedIframeCode}}</textarea>
+                <textarea readonly on-focus="{{selectGadgetCodeSnippet}}">{{embedIframeCode}}</textarea>
               </paper-autogrow-textarea>
             </paper-input-decorator>
           </div>
@@ -105,11 +92,15 @@
       return;
     }
 
-    // page.load = function() {
-    //   IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
-    //   // Set a timeout to fetch new posts after 30 seconds.
-    //   updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
-    // };
+    page.load = function() {
+      // IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
+      // // Set a timeout to fetch new posts after 30 seconds.
+      // updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
+
+     // Reset template variables for when revisiting the page.
+      IOWA.Elements.Template.selectedGadgetVideoSize = 'small';
+      IOWA.Elements.Template.selectedGadgetLayout = 'both';
+    };
 
     // page.unload = function() {
     //   if (updateSocialPostsTimeout) {
@@ -118,22 +109,11 @@
     //   }
     // };
 
-    IOWA.Elements.Template.onWidgetSize = function(e, detail, sender) {
-      if (!e.target.checked) {
-        return; // ignore event from radio button that was unchecked.
-      }
-      var disabled = sender.selected !== 'custom';
-      var container = sender.parentElement.querySelector('.size__inputs');
-      [].forEach.call(container.children, function(el) {
-        el.disabled = disabled;
-      });
-    };
-
-    IOWA.Elements.Template.selectCodeSnippet = function(e, detail, sender) {
+    IOWA.Elements.Template.selectGadgetCodeSnippet = function(e, detail, sender) {
       sender.select();
     };
 
-    // page.load(); // Run load callback on page load.
+    page.load(); // Run load callback on page load.
     page.hasBeenLoaded = true;
   }
 
