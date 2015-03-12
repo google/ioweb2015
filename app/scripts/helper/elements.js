@@ -70,6 +70,9 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
+
+    // Kickoff a11y helpers for elements
+    IOWA.A11y.init();
   };
 
   var init = function() {
@@ -268,9 +271,6 @@ IOWA.Elements = (function() {
     template.addEventListener('page-transition-done', function(e) {
       this.pageTransitionDone = true;
       IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
-
-      // Differentiate focus coming from mouse and keyboard
-      IOWA.A11y.addFocusStates('paper-tabs a');
     });
     template.addEventListener('page-transition-start', function(e) {
       this.pageTransitionDone = false;
