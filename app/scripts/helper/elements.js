@@ -253,46 +253,15 @@ IOWA.Elements = (function() {
     template.backToTop = function(e, detail, sender) {
       e.preventDefault();
       IOWA.Util.smoothScroll(IOWA.Elements.Nav, 250);
-      this.focusNavigation();
-    };
-
-    template.focusNavigation = function() {
-      IOWA.Elements.NavPaperTabs.items[0].firstElementChild.focus();
+      IOWA.A11y.focusNavigation();
     };
 
     // If the Home button was clicked, move focus to the About button
     // after the Home button has faded out
     template.manageHomeFocus = function(e, detail, sender) {
       if (this.selectedPage == 'home') {
-        this.focusNavigation();
+        IOWA.A11y.focusNavigation();
       }
-    };
-
-    // Elements passed to this method will receive classes reflecting the focus
-    // and pressed states.
-    template.addFocusBehavior = function(selector) {
-      document.querySelectorAll(selector).array().forEach(function(el) {
-
-        el.addEventListener('mousedown', function(e) {
-          this.classList.add('pressed');
-        });
-
-        el.addEventListener('mouseup', function(e) {
-          this.classList.remove('pressed');
-        });
-
-        el.addEventListener('focus', function(e) {
-          // Only render the "focused" state if the element gains focus due to
-          // keyboard navigation.
-          if (!this.classList.contains('pressed')) {
-            this.classList.add('focused');
-          }
-        });
-
-        el.addEventListener('blur', function(e) {
-          this.classList.remove('focused');
-        });
-      });
     };
 
     template.addEventListener('template-bound', updateElements);
@@ -301,7 +270,7 @@ IOWA.Elements = (function() {
       IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
 
       // Differentiate focus coming from mouse and keyboard
-      this.addFocusBehavior('paper-tabs a');
+      IOWA.A11y.addFocusStates('paper-tabs a');
     });
     template.addEventListener('page-transition-start', function(e) {
       this.pageTransitionDone = false;

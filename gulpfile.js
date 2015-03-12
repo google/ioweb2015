@@ -186,6 +186,7 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
   var siteScripts = [
     'main.js',
     'pages.js',
+    'helper/a11y.js',
     'helper/util.js',
     'helper/page-animation.js',
     'helper/elements.js',
