@@ -75,7 +75,6 @@ IOWA.Router = (function() {
    */
   function playMastheadRippleTransition(
       e, el, mastheadColor, rippleColor, isFadeRipple) {
-
     var x = e.touches ? e.touches[0].pageX : e.pageX;
     var y = e.touches ? e.touches[0].pageY : e.pageY;
     var duration = isFadeRipple ? 300 : 600;
@@ -156,8 +155,6 @@ IOWA.Router = (function() {
    * @private
    */
   function navigate(e) {
-    console.log(e)
-
     // Allow user to open page in a new tab.
     if (e.metaKey || e.ctrlKey) {
       return;
@@ -210,7 +207,6 @@ IOWA.Router = (function() {
    */
   function renderPage(pageName) {
     var importURL = pageName + '?partial';
-
     // TODO(ericbidelman): update call when github.com/Polymer/polymer/pull/1128 lands.
     Polymer.import([importURL], function() {
       // Don't proceed if import didn't load correctly.
