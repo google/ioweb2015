@@ -451,7 +451,7 @@ IOWA.WebglGlobe.KdTree.neighborhood_ = function(target, current, depth, neighbor
   }
   // Don't visit the other side of the split if farther away than limit.
   if (testSqDistance <= target.sqDistance && second !== null) {
-    neighbors = IOWA.WebglGlobe.KdTree.nearest_(target, second, depth + 1,
+    neighbors = IOWA.WebglGlobe.KdTree.neighborhood_(target, second, depth + 1,
         neighbors);
   }
 
