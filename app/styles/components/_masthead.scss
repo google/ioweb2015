@@ -163,12 +163,27 @@ core-drawer-panel {
     a {
       flex: inherit; // Needed for IE11, in order to ensure that the <a> gets assigned a width.
       color: inherit;
+
+      &:focus {
+        outline: none;
+      }
     }
 
     &.core-selected {
       pointer-events: none;
     }
   }
+}
+
+/* paper-tabs focus states for keyboard */
+.bg-dark-grey paper-tab .focused {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.bg-cyan paper-tab .focused,
+.bg-light-grey paper-tab .focused,
+.bg-medium-grey paper-tab .focused {
+  background: rgba(255, 255, 255, 0.36);
 }
 
 .masthead-container {

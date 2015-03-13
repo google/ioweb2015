@@ -70,6 +70,9 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
+
+    // Kickoff a11y helpers for elements
+    IOWA.A11y.init();
   };
 
   var init = function() {
@@ -253,18 +256,14 @@ IOWA.Elements = (function() {
     template.backToTop = function(e, detail, sender) {
       e.preventDefault();
       IOWA.Util.smoothScroll(IOWA.Elements.Nav, 250);
-      this.focusNavigation();
-    };
-
-    template.focusNavigation = function() {
-      IOWA.Elements.NavPaperTabs.items[0].firstElementChild.focus();
+      IOWA.A11y.focusNavigation();
     };
 
     // If the Home button was clicked, move focus to the About button
     // after the Home button has faded out
     template.manageHomeFocus = function(e, detail, sender) {
       if (this.selectedPage == 'home') {
-        this.focusNavigation();
+        IOWA.A11y.focusNavigation();
       }
     };
 
