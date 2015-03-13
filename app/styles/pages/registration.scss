@@ -45,37 +45,36 @@ $name: 'page-registration';
     margin: 100px 0;
   }
   .page__section--countdown {
-    margin-top: -286px;
-    padding-top: 286px;
+    margin-top: -102px;
+    padding-top: 102px;
   }
 }
 
-@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
-  .page__section--countdown {
-    margin-top: -310px;
-    padding-top: 310px;
-  }
-}
+// @media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+//   .page__section--countdown {
+//     // margin-top: -310px;
+//     // padding-top: 310px;
+//   }
+// }
 
 @media (min-width: $desktop-breakpoint-min) {
   .page__section--countdown {
-    margin-top: -286px; // adjustment so section is snug against the previous one.
-    padding-top: 286px;
+    margin-top: -74px;
+    padding-top: 74px;
   }
 }
 
-@media (min-width: $desktop-breakpoint-mid) {
-  .page__section--countdown {
-    margin-top: -278px; // adjustment so section is snug against the previous one.
-    padding-top: 278px;
-  }
-}
+// @media (min-width: $desktop-breakpoint-mid) {
+//   .page__section--countdown {
+//     // margin-top: -278px; // adjustment so section is snug against the previous one.
+//     // padding-top: 278px;
+//   }
+// }
 
-@media (min-width: $desktop-breakpoint-max) {
-  .page__section--countdown {
-    margin-top: -254px; // adjustment so section is snug against the previous one.
-    padding-top: 254px;
-  }
-}
-
+// @media (min-width: $desktop-breakpoint-max) {
+//   .page__section--countdown {
+//     // margin-top: -254px; // adjustment so section is snug against the previous one.
+//     // padding-top: 254px;
+//   }
+// }
 }

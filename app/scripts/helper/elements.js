@@ -87,6 +87,7 @@ IOWA.Elements = (function() {
     template.homeGlobeVisible = false;
     template.selectedCity = null;
     template.offsiteMarkerResults = [];
+    template.countdownEnded = false;
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
@@ -257,6 +258,12 @@ IOWA.Elements = (function() {
       e.preventDefault();
       IOWA.Util.smoothScroll(IOWA.Elements.Nav, 250);
       IOWA.A11y.focusNavigation();
+    };
+
+    template.onCountdownTimerThreshold = function(e, detail, sender) {
+      if (detail.label === 'Ended') {
+        this.countdownEnded = true;
+      }
     };
 
     // If the Home button was clicked, move focus to the About button
