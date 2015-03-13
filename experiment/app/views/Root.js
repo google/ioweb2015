@@ -64,6 +64,7 @@ module.exports = function RootView(audioManager, stateManager, historyManager) {
   var didExitRecordingModeCallback;
 
   var isMobile = false;
+  var isScrollingDisabled = false;
 
   var self = {
     init,
@@ -585,6 +586,8 @@ module.exports = function RootView(audioManager, stateManager, historyManager) {
    * @return {boolean}
    */
   function killEvents(e) {
+    if (!isScrollingDisabled) { return; }
+
     e.preventDefault();
     e.stopPropagation();
     return false;
@@ -594,6 +597,9 @@ module.exports = function RootView(audioManager, stateManager, historyManager) {
    * Disable scrolling.
    */
   function disableScrolling() {
+    if (isScrollingDisabled) { return; }
+    isScrollingDisabled = true;
+
     var scrollElement = currentViewportDetails().scrollElement;
     scrollElement.addEventListener('scroll', killEvents);
     window.addEventListener('mousewheel', killEvents);
@@ -605,6 +611,9 @@ module.exports = function RootView(audioManager, stateManager, historyManager) {
    * Enable scrolling.
    */
   function enableScrolling() {
+    if (!isScrollingDisabled) { return; }
+    isScrollingDisabled = false;
+
     var scrollElement = currentViewportDetails().scrollElement;
     scrollElement.removeEventListener('scroll', killEvents);
     window.removeEventListener('mousewheel', killEvents);

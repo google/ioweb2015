@@ -1049,6 +1049,7 @@ Main parent container for all of the fab elements.
           reflect: true
         },
         playmode: {
+          value: null,
           reflect: true
         },
         fixed: {
@@ -1088,6 +1089,7 @@ Main parent container for all of the fab elements.
       },
 
       ready: function() {
+        this.isExperimentOpen = false;
         this.bindEscape = this.onEscKeyUp.bind(this);
         this.assets = window.experiment.assets;
       },
@@ -1157,6 +1159,8 @@ Main parent container for all of the fab elements.
       },
 
       experimentOn: function(event) {
+        this.isExperimentOpen = true;
+
         IOWA.Elements.Footer.style.display = 'none';
         this.dialogVisible = false;
         document.removeEventListener('keyup', this.bindEscape);
@@ -1185,6 +1189,8 @@ Main parent container for all of the fab elements.
         }.bind(this));
 
         this.app.didEnterRecordingMode(function() {
+          if (!this.isExperimentOpen) { return; }
+
           this.recording = true;
           this.miniFabs = false;
           this.shareVisible = false;
@@ -1192,10 +1198,11 @@ Main parent container for all of the fab elements.
         }.bind(this));
 
         this.app.didExitRecordingMode(function() {
+          if (!this.isExperimentOpen) { return; }
+
           this.recording = false;
           this.recordmode = 'notRecording';
         }.bind(this));
-
       },
 
       onExitClick: function(event) {
@@ -1204,6 +1211,8 @@ Main parent container for all of the fab elements.
       },
 
       exitExperiment: function(event) {
+        this.isExperimentOpen = false;
+
         IOWA.Elements.ScrollContainer.removeEventListener('scroll', this.boundOnScroll);
         IOWA.Elements.Masthead.style.visibility = '';
         IOWA.Elements.Main.style.visibility = '';
@@ -1221,7 +1230,9 @@ Main parent container for all of the fab elements.
         }.bind(this));
 
         this.mode = 'pre';
-        this.playmode = 'playing';
+        this.playmode = null;
+        this.recording = false;
+        this.recordmode = 'notRecording';
         this.miniFabs = false;
         this.showTooltips = false;
         this.pauseOverlay = false;

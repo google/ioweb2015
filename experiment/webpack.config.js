@@ -29,7 +29,7 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules|vendor|public/,
-        loader: '6to5-loader?optional=selfContained'
+        loader: 'babel-loader?optional=runtime'
       },
       {
         test: /\.json$/,
@@ -47,7 +47,7 @@ module.exports = {
       __STATIC_BASE_EXPERIMENT__: '"' + (process.env.STATIC_BASE || '/') + '"',
     }),
     new webpack.ProvidePlugin({
-      to5Runtime: 'imports?global=>{}!exports-loader?global.to5Runtime!6to5/runtime'
+      to5Runtime: 'imports?global=>{}!exports-loader?global.to5Runtime!babel/runtime'
     }),
     new CompressionPlugin({
       asset: '{file}.gz',
