@@ -17,11 +17,12 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-menu/core-menu.html">
 <link rel="import" href="../bower_components/paper-dropdown/paper-dropdown.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="social-post.html">
 
 <!-- TODO: load these -->
 <!-- <script src="../scripts/helper/analytics.js"></script> -->
-<!-- <script src="../scripts/helper/request.js"></script> -->
+<script src="../scripts/helper/request.js"></script>
 
 <!--
 The `<io-gadget>` element renders a youtube video + social feed.
@@ -35,8 +36,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
     <core-media-query query="(min-width:320px) and (max-width:767px)"
                       queryMatches="{{isPhoneSize}}"></core-media-query>
 
-    <section layout horizontal vertical?="{{isPhoneSize}}"
-             _style="width:{{width}}px;height:{{height}}px;">
+    <section layout horizontal vertical?="{{isPhoneSize}}" fit>
 
       <template if="{{!noVideo}}">
         <div class="card card--livesream" layout vertical auto-vertical flex two>
@@ -46,9 +46,10 @@ The `<io-gadget>` element renders a youtube video + social feed.
                  title="Start watching" alt="Start watching">
 
             <google-youtube id="video" height="100%" width="100%" fit
-                        videoid="{{videoId}}" autohide="1" controls="2"
-                        modestbranding="1" showinfo="0" iv_load_policy="3" rel="0"
-                        autoplay="0" on-google-youtube-ready="{{onReady}}"></google-youtube>
+                            videoid="{{selectedVideoId}}" autohide="1"
+                            controls="2" modestbranding="1" showinfo="0"
+                            iv_load_policy="3" rel="0" autoplay="0"
+                            on-google-youtube-ready="{{onReady}}"></google-youtube>
 
           </div>
           <div class="card-content card--video-meta" layout horizontal center>
@@ -57,12 +58,12 @@ The `<io-gadget>` element renders a youtube video + social feed.
               <div class="video-author">Ellie Powers</div>
             </div>
             <div>
-              <paper-dropdown-menu label="Switch channel" on-core-select="{{onVideoSelect}}">
+              <paper-dropdown-menu label="Switch channel">
                 <paper-dropdown valign="bottom" halign="right" class="dropdown">
-                  <core-menu class="menu">
-                    <paper-item>Video 1</paper-item>
-                    <paper-item>Video 2</paper-item>
-                    <paper-item>Video 2</paper-item>
+                  <core-menu class="menu" valueattr="videoid" selected="{{selectedVideoId}}}">
+                    <template repeat="{{video,i in videoIds}}">
+                      <paper-item videoid="{{video}}">Video {{i + 1}}</paper-item>
+                    </template>
                   </core-menu>
                 </paper-dropdown>
               </paper-dropdown-menu>
@@ -99,47 +100,17 @@ The `<io-gadget>` element renders a youtube video + social feed.
   <script>
   (function() {
 
-    var MIN_WIDTH_ = 300;
-    var MIN_HEIGHT_ = 300;
-
     Polymer({
 
       publish: {
         /**
-         * Width (px) of the gadget.
+         * The selected YouTube video id to play.
          *
-         * @attribute width
-         * @type number
-         * @default 100
+         * @attribute videoIds
+         * @type array
+         * @default []
          */
-        width: {value: MIN_WIDTH_, reflect: true},
-
-        /**
-         * Height (px) of the gadget.
-         *
-         * @attribute height
-         * @type number
-         * @default 340
-         */
-        height: {value: MIN_HEIGHT_, reflect: true},
-
-        /**
-         * Youtube video id.
-         *
-         * @attribute videoId
-         * @type number
-         * @default null
-         */
-        videoId: null,
-
-        /**
-         * A generated iframe code snippet to embed the gadget.
-         *
-         * @attribute iframeCode
-         * @type string
-         * @default ''
-         */
-        iframeCode: {value: '', reflect: true},
+         videoIds: null,
 
         /**
          * If true, shows the social feed.
@@ -160,9 +131,14 @@ The `<io-gadget>` element renders a youtube video + social feed.
         noVideo: false
       },
 
-      observe: {
-        'width height': 'updateIframeCode'
-      },
+      /**
+       * The selected video from the list of videoIds
+       *
+       * @property selectedVideoId
+       * @type string
+       * @default null
+       */
+      selectedVideoId: null,
 
       /**
        * The title of the video, as returned by the YT API.
@@ -203,6 +179,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
       created: function() {
         this.socialPosts = [];
+        this.videoIds = [];
       },
 
       ready: function() {
@@ -213,20 +190,14 @@ The `<io-gadget>` element renders a youtube video + social feed.
          // Set a timeout to fetch new posts after 30 seconds.
         this.updateSocialPostsTimeout_ = window.setTimeout(
             this.updateSocialPosts.bind(this), this.socialPostUpdateInterval);
-
-        this.updateIframeCode();
-      },
-
-      updateIframeCode: function() {
-        // TODO: use this.$.video.player.getVideoEmbedCode() instead.
-        var url = 'https://www.youtube.com/embed/' + (this.videoId || '');
-        this.iframeCode = '<iframe src="' + url + '" style="width:' +
-                          this.width + 'px;height:' + this.height +
-                          'px" frameborder="0" allowfullscreen></iframe>';
       },
 
       onReady: function(e, detail, sender) {
         this.videoTitle = this.$.video.player.getVideoData().title;
+      },
+
+      videoIdsChanged: function() {
+        this.selectedVideoId = this.videoIds[0];
       },
 
       updateSocialPosts: function() {
@@ -252,12 +223,6 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
       processSocialPosts: function(socialPosts) {
         this.socialPosts = socialPosts;
-      },
-
-      onVideoSelect: function(e, detail, sender) {
-        if (detail.isSelected) {
-          // TODO: change to detail.item selected video.
-        }
       }
 
     });

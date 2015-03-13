@@ -36,17 +36,13 @@
 
   <section class="page__section page__section--gadgetpreview bg-medium-grey">
     <div layout horizontal center-center>
-      <!-- <iframe src="embed"></iframe> -->
-      <io-gadget videoid="8OJ7ih8EE7s" iframeCode="{{embedIframeCode}}"
-                 noVideo?="{{selectedGadgetLayout === 'feed'}}"
-                 noFeed?="{{selectedGadgetLayout === 'video'}}"
-                 width="{{gadgetWidth}}" height="{{gadgetHeight}}"></io-gadget>
+      <!-- dynamically populated with embed iframe preview -->
     </div>
   </section>
 
   <section class="page__section--customizer">
     <div class="card__container">
-      <div class="card js-experiment-visualizer">
+      <div class="card js-experiment-visualizer" on-core-change="{{updateIframeCode}}">
         <div class="card-content">
           <h3>Customize your widget</h3>
         </div>
@@ -72,7 +68,7 @@
             </core-label>
             <core-label layout inline horizontal center>
               Height (px)
-              <paper-slider min="300" max="600" value="350" editable pin immediateValue="{{gadgetHeight}}" for></paper-slider>
+              <paper-slider min="300" max="1000" value="350" editable pin immediateValue="{{gadgetHeight}}" for></paper-slider>
             </core-label>
           </div>
 
@@ -103,21 +99,26 @@
     }
 
     page.load = function() {
-      // IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
-      // // Set a timeout to fetch new posts after 30 seconds.
-      // updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
-
-     // Reset template variables for when revisiting the page.
+      // Reset template variables for when revisiting the page.
       IOWA.Elements.Template.selectedGadgetVideoSize = 'small';
       IOWA.Elements.Template.selectedGadgetLayout = 'both';
     };
 
-    // page.unload = function() {
-    //   if (updateSocialPostsTimeout) {
-    //     window.clearTimeout(updateSocialPostsTimeout);
-    //     updateSocialPostsTimeout = null;
-    //   }
-    // };
+    IOWA.Elements.Template.updateIframeCode = function() {
+      var url = IOWA.Util.getStaticBaseURL() + 'embed';
+      if (this.selectedGadgetLayout === 'video') {
+        url += '?noFeed';
+      } else if (this.selectedGadgetLayout === 'feed') {
+        url += '?noVideo';
+      }
+
+      this.embedIframeCode = '<iframe src="' + url + '" style="width:' +
+                             this.gadgetWidth + 'px;height:' +
+                             this.gadgetHeight +'px"' +
+                             ' frameborder="0" allowfullscreen></iframe>';
+      var container = document.querySelector('.page__section--gadgetpreview');
+      container.firstElementChild.innerHTML = this.embedIframeCode;
+    },
 
     IOWA.Elements.Template.selectGadgetCodeSnippet = function(e, detail, sender) {
       sender.select();

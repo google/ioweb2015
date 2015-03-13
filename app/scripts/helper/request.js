@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-IOWA.Request = (function() {
+window.IOWA = window.IOWA || {};
+
+IOWA.Request = IOWA.Request || (function() {
 
   "use strict";
 
