@@ -75,9 +75,11 @@ IOWA.Router = (function() {
    */
   function playMastheadRippleTransition(
       e, el, mastheadColor, rippleColor, isFadeRipple) {
+    var x = e.touches ? e.touches[0].pageX : e.pageX;
+    var y = e.touches ? e.touches[0].pageY : e.pageY;
     var duration = isFadeRipple ? 300 : 600;
     var rippleAnim = IOWA.PageAnimation.ripple(
-          IOWA.Elements.Ripple, e.pageX, e.pageY, duration,
+          IOWA.Elements.Ripple, x, y, duration,
           rippleColor, isFadeRipple);
     var animGroup = [
       rippleAnim,
@@ -205,7 +207,6 @@ IOWA.Router = (function() {
    */
   function renderPage(pageName) {
     var importURL = pageName + '?partial';
-    
     // TODO(ericbidelman): update call when github.com/Polymer/polymer/pull/1128 lands.
     Polymer.import([importURL], function() {
       // Don't proceed if import didn't load correctly.
@@ -431,7 +432,8 @@ IOWA.Router = (function() {
 
     // On iOS, we don't have event bubbling to the document level.
     // http://www.quirksmode.org/blog/archives/2010/09/click_event_del.html
-    var eventName = IOWA.Util.isIOS() ? 'touchstart' : 'click';
+    var eventName = IOWA.Util.isIOS() || IOWA.Util.isTouchScreen() ?
+        'touchstart' : 'click';
     document.addEventListener(eventName, navigate);
   }
 

@@ -96,6 +96,10 @@ IOWA.Util = IOWA.Util || (function() {
     return (/Firefox/gi).test(userAgent);
   }
 
+  function isTouchScreen() {
+    return ('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch;
+  }
+
   /**
    * Returns the static base URL of the running app.
    * https://events.google.com/io2015/about -> https://events.google.com/io2015/
@@ -125,6 +129,7 @@ IOWA.Util = IOWA.Util || (function() {
     isIE: isIE,
     isIOS: isIOS,
     isSafari: isSafari,
+    isTouchScreen: isTouchScreen,
     supportsHTMLImports: 'import' in document.createElement('link'),
     smoothScroll: smoothScroll,
     getStaticBaseURL: getStaticBaseURL,
