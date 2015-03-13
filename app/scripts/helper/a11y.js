@@ -20,10 +20,9 @@ IOWA.A11y = IOWA.A11y || (function() {
 
   "use strict";
 
-
   function init() {
     // Differentiate focus coming from mouse and keyboard
-    this.addFocusStates('paper-tabs a');
+    addFocusStates('paper-tabs a');
   }
 
   // Elements passed to this method will receive classes reflecting the focus
@@ -61,6 +60,6 @@ IOWA.A11y = IOWA.A11y || (function() {
     init: init,
     addFocusStates: addFocusStates,
     focusNavigation: focusNavigation
-  }
+  };
 
 })();
