@@ -44,7 +44,7 @@ Creates a countdown timer to a specific date.
 @status alpha
 -->
 <polymer-element name="countdown-timer"
-                 attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart thresholdInformation">
+                 attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart thresholdInformation ended">
   <template>
     <style>
       :host {
@@ -68,7 +68,7 @@ Creates a countdown timer to a specific date.
       lowerThreshold="{{ lowerThreshold }}">
     </core-scroll-threshold>
 
-    <template if="{{ thresholdDays }}">
+    <!-- <template if="{{ thresholdDays }}">
       <h4 class="countdown-label">
         <i18n-msg msgid="days">Days</i18n-msg>
         <content></content>
@@ -94,7 +94,7 @@ Creates a countdown timer to a specific date.
         <i18n-msg msgid="seconds">Seconds</i18n-msg>
         <content></content>
       </h4>
-    </template>
+    </template> -->
 
   </template>
   <script>
@@ -159,6 +159,17 @@ Creates a countdown timer to a specific date.
        * @default false
        */
       autoStart: false,
+
+      publish: {
+        /**
+         * If true, the countdown has reached the end.
+         *
+         * @attribute ended
+         * @type boolean
+         * @default false
+         */
+        ended: {value: false, reflect: true}
+      },
 
       /**
        * Stops the timer.
@@ -320,6 +331,11 @@ Creates a countdown timer to a specific date.
           case "Seconds":
             this.thresholdInformation.thresholdSeconds = true;
             break;
+        }
+
+        if (thresholdInformation.millisecondsToTarget === 0) {
+          this.ended = true;
+          thresholdInformation.ended = true;
         }
 
         this.fire('timerthreshold', thresholdInformation);

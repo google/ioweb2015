@@ -10,13 +10,20 @@
   <div class="card__container card__container--top slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
-        <h3 class="card__title"><i18n-msg msgid="reg-begins">Registration will begin <b>March 17 at 9:00AM PDT</b> and will remain open until <b>March 19 at 5:00PM PDT</b>.</i18n-msg></h3>
-        <!-- <a href="#" data-track-link="registration-set-reminder"><core-icon icon="io:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg></a> -->
+        <template if="{{!countdownEnded}}">
+          <h3 class="card__title">Registration is now open. It will remain open until <b>March 19 at 5:00 PM PDT</b>.</h3>
+        </template>
+        <template if="{{countdownEnded}}">
+         <h3 class="card__title">The registration window has closed. You can still join in the fun via I/O Extended and I/O Live.</h3>
+        </template>
       </div>
       <div class="card-content">
-        <h4 class="card__title"><i18n-msg msgid="tips-ready">Tips to get ready</i18n-msg></h4>
-        <p><i18n-msg msgid="reg-googleacount">Make sure you have a Google account. You'll need to sign into your Google account to begin the registration application process.</i18n-msg></p>
-        <p><i18n-msg msgid="reg-dontworry">Don't worry, there's no rush. You'll have plenty of time to submit your registration application. Applicants will be selected at random to receive the opportunity to purchase one ticket. The order in which applications are received has no bearing on the outcome and remember, only one registration application per person is allowed.</i18n-msg></p>
+        <template if="{{!countdownEnded}}">
+          <a href="apply" data-track-link="reg-start">Start Application</a>
+        </template>
+        <template if="{{countdownEnded}}">
+          <a href="offsite" data-track-link="reg-learnmore">Learn more</a>
+        </template>
       </div>
     </div>
   </div>
@@ -28,31 +35,30 @@
         <template if="{{pageTransitionDone}}">
           <countdown-timer autostart
                            bgcolor="#F5F5F5"
-                           date="Mar 17 2015 09:00:00 GMT-0700 (PDT)"
+                           date="Mar 19 2015 17:00:00 GMT-0700 (PDT)"
                            dateadjustment="5" easeintime="500" waittime="300"
-                           easeouttime="400" thresholdInformation="{{thresholdInformation}}"></countdown-timer>
-          <template if="{{ thresholdInformation.thresholdDays }}">
-            <h4 class="countdown-label">
-              <i18n-msg msgid="daysuntilreg">Days until registration begins</i18n-msg>
-            </h4>
+                           easeouttime="400" thresholdInformation="{{thresholdInformation}}"
+                           on-timerthreshold="{{onCountdownTimerThreshold}}"
+                           ended="{{countdownEnded}}"></countdown-timer>
+
+          <template if="{{thresholdInformation.thresholdDays}}">
+            <h4 class="countdown-label">Days until Registration ends</h4>
           </template>
 
-          <template if="{{ thresholdInformation.thresholdHours }}">
-            <h4 class="countdown-label">
-              <i18n-msg msgid="hoursuntilreg">Hours until registration begins</i18n-msg>
-            </h4>
+          <template if="{{thresholdInformation.thresholdHours}}">
+            <h4 class="countdown-label">Hours until Registration ends</h4>
           </template>
 
-          <template if="{{ thresholdInformation.thresholdMinutes }}">
-            <h4 class="countdown-label">
-              <i18n-msg msgid="minutesuntilreg">Minutes until registration begins</i18n-msg>
-            </h4>
+          <template if="{{thresholdInformation.thresholdMinutes}}">
+            <h4 class="countdown-label">Minutes until Registration ends</h4>
           </template>
 
-          <template if="{{ thresholdInformation.thresholdSeconds }}">
-            <h4 class="countdown-label">
-              <i18n-msg msgid="secondsuntilreg">Seconds until registration begins</i18n-msg>
-            </h4>
+          <template if="{{thresholdInformation.thresholdSeconds}}">
+            <h4 class="countdown-label">Seconds until Registration ends</h4>
+          </template>
+
+          <template if="{{countdownEnded}}">
+            <h4 class="countdown-label">Registration has ended</h4>
           </template>
         </template>
 
