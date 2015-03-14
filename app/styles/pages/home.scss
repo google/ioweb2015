@@ -78,6 +78,13 @@ $name: 'page-home';
   }
 }
 
+.card__photo--plan {
+  background-image: url(../images/home/moscone-500.jpg);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  min-height: 200px;
+}
+
 .registration__card {
   core-icon {
     margin-right: 15px;
@@ -126,7 +133,7 @@ $name: 'page-home';
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  $overlayCardTop: 229px;
+  $overlayCardTop: 153px;
 
   .io__hash {
     margin: 80px auto;
@@ -173,7 +180,7 @@ $name: 'page-home';
   }
   #join {
     position: relative;
-    margin-top: -144px;
+    margin-top: -112px;
     padding-top: $overlayCardTop;
 
     .join__social {
@@ -191,6 +198,8 @@ $name: 'page-home';
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
+  $overlayCardTop: 181px;
+
   #registration {
     margin-bottom: -248px;
   }
@@ -204,7 +213,8 @@ $name: 'page-home';
     }
   }
   #join {
-    margin-top: -156px;
+    margin-top: -120px;
+    padding-top: $overlayCardTop;
 
     h2 {
       max-width: 300px;
@@ -212,6 +222,7 @@ $name: 'page-home';
 
     .join__social {
       right: $largeKeyline;
+      top: $overlayCardTop;
     }
   }
 }
@@ -226,8 +237,8 @@ $name: 'page-home';
 }
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-  .card__photo--recap  {
-    background-image: url(../images/home/recap-500@2x.jpg);
+  .card__photo--plan  {
+    background-image: url(../images/home/moscone-500@2x.jpg);
   }
 }
 
