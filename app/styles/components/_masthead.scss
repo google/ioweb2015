@@ -198,6 +198,27 @@ core-drawer-panel {
   .io-logo {
     display: none;
   }
+
+  paper-tabs {
+    text-transform: uppercase;
+    width: 100%;
+  }
+  paper-tab[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  paper-dropdown-menu {
+    @include typo-button();
+    margin: 0;
+    padding: 0;
+    border: none;
+    core-menu {
+      margin: 0;
+    }
+    paper-item {
+      font-size: inherit;
+    }
+  }
 }
 
 .masthead-title {
@@ -228,6 +249,12 @@ experiment-fab-container {
       width: 177px;
       height: 128px;
     }
+
+    paper-tabs[scrollable] {
+      left: -64px;
+      position: relative;
+    }
+
   }
   .masthead-title {
     font-size: 20px;

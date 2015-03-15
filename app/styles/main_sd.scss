@@ -121,6 +121,15 @@ paper-tabs.white {
   }
 }
 
+#page-schedule {
+  paper-dropdown-menu::shadow {
+    #arrow {
+      color: inherit;
+    }
+  }
+}
+
+
 footer {
   paper-dropdown-menu::shadow #label {
     color: inherit;
