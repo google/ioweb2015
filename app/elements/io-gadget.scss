@@ -24,6 +24,22 @@
   display: block;
 }
 
+#livebanner {
+  background: url(../images/io15-color.png) no-repeat $mobileKeyline 50%;
+  background-size: 50px;
+  background-color: $color-cyan-500;
+  height: 64px;
+  padding: 0 $mobileKeyline;
+
+  h4 {
+    color: #fff;;
+  }
+}
+
+#gadget-content {
+  margin-top: 64px;
+}
+
 .card {
   box-shadow: none;
   border-radius: 0;

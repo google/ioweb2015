@@ -36,7 +36,11 @@ The `<io-gadget>` element renders a youtube video + social feed.
     <core-media-query query="(min-width:320px) and (max-width:767px)"
                       queryMatches="{{isPhoneSize}}"></core-media-query>
 
-    <section layout horizontal vertical?="{{isPhoneSize}}" fit>
+    <div id="livebanner" layout horizontal center end-justified>
+      <h4>I/O Live</h4>
+    </div>
+
+    <section id="gadget-content" layout horizontal vertical?="{{isPhoneSize}}" fit>
 
       <template if="{{!noVideo}}">
         <div class="card card--livesream" layout vertical auto-vertical flex two>
