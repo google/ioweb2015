@@ -23,10 +23,8 @@
            data-track-link="home-learn-more-about-io">
             <i18n-msg msgid="learnmore">Learn more about I/O</i18n-msg>
         </a>
-        <a href="about#photos" data-ajax-link data-anim-card
-           data-track-link="home-io-in-photos">
-          <i18n-msg msgid="io-in-photos">I/O in photos</i18n-msg>
-        </a>
+        <a href="#" data-ajax-link data-anim-card
+           data-track-link="home-set-reminder"><core-icon icon="io:notifications-none"></core-icon> Set a reminder</a>
       </div>
       <div class="ripple">
         <div class="ripple__content"></div>
@@ -98,16 +96,23 @@
           <h3><i18n-msg msgid="io-description-card">I/O is two days of hands-on interaction with the latest technologies, inspirational talks and a few surprises in between.</i18n-msg></h3>
         </div>
         <div class="card-content">
-          <a href="schedule" data-ajax-link data-track-link="home-check-agenda"><core-icon icon="event" aria-hidden="true"></core-icon> <i18n-msg msgid="registration-agenda">Check the agenda</i18n-msg></a>
+          <a href="schedule" data-ajax-link data-track-link="home-check-agenda"><core-icon icon="event" aria-hidden="true"></core-icon> Create your schedule</a>
         </div>
       </div>
-      <div class="card js-experiment-visualizer" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="home-watch-2014-recap-video">
+      <div class="card js-experiment-visualizer" auto-vertical flex>
+        <div flex class="card__photo card__photo--plan"></div>
+        <div class="card-content">
+          <a href="onsite" data-ajax-link data-track-link="home-plan-experience">Plan your I/O experience</a>
+        </div>
+      </div>
+
+     <!--  <div class="card js-experiment-visualizer" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="home-watch-2014-recap-video">
         <div flex class="card__photo card__photo--recap"></div>
         <div class="card-content">
           <img src="images/play-video-button.png" class="play__button play__button--card" title="Play video" alt="Play video">
           <span class="anchor-like" role="link" tabindex="0"><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey {{ {'no-webgl': !webglSupported} | tokenList }}">
@@ -139,7 +144,7 @@
     <div class="card__container">
       <div class="card card--force-compositing js-experiment-visualizer">
         <div class="card-content">
-          <h3><i18n-msg msgid="io-extended-invitation">If you aren't able to join us for I/O in person this year, you can still make an event out of it. Host or find an I/O Extended event near you and watch the live stream in the company of other developers.</i18n-msg></h3>
+          <h3>If you aren't able to join us for I/O in person this year, you can still make an event out of it. Watch the live stream with other developers near you.</h3>
         </div>
         <div class="card-content">
           <a href="offsite#join" data-ajax-link data-track-link="home-join-from-your-location">

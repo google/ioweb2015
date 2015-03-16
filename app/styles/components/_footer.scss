@@ -17,9 +17,6 @@
 footer {
   min-height: 200px;
   background: #fff;
-  @include keyline-16();
-  padding-top: $mobileKeyline;
-  padding-bottom: $mobileKeyline;
   color: $color-link-grey;
   font-size: 14px;
 
@@ -48,15 +45,32 @@ footer {
 }
 
 .footer-content {
+  @include keyline-16();
+  padding-top: $mobileKeyline;
+  padding-bottom: 0;
+
   img {
     vertical-align: bottom;
   }
+}
+
+.footer-content--middle {
+  padding-bottom: $mobileKeyline;
 }
 
 .share-icon {
   margin-right: 16px;
   &:last-child {
     margin-right: 0;
+  }
+}
+
+.footer-logos {
+  padding-bottom: $mobileKeyline;
+  border-top: 1px solid $color-light-grey-border;
+
+  img {
+    height: 32px;
   }
 }
 
@@ -71,16 +85,12 @@ footer {
   .footer-share-links--bottom {
     display: none;
   }
-  .masthead-container {
-    @include keyline-72l();
-  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  footer {
-    @include keyline-32();
-    padding-top: $desktopKeyline;
-    padding-bottom: $desktopKeyline;
+  .footer-content {
+    @include keyline-24();
+    padding-top: $tabletKeyline;
   }
   .footer-top {
     min-height: 110px; // Needed due to https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview
@@ -93,6 +103,10 @@ footer {
     nav {
       flex-direction: row !important;
     }
+  }
+  .footer-content--middle,
+  .footer-logos {
+    padding-bottom: $tabletKeyline;
   }
 }
 

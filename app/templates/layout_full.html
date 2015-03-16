@@ -275,6 +275,9 @@ limitations under the License.
                 <i18n-msg msgid="registration">Registration</i18n-msg>
               </a>
             </paper-tab>
+            <paper-tab label="signin" role="">
+              <a href="#" data-track-link="nav-signin" data-anim-ripple layout horizontal center>Sign-in</a>
+            </paper-tab>
           </paper-tabs>
         </core-toolbar>
         <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
@@ -294,7 +297,7 @@ limitations under the License.
 
         <i18n-msg id="share-text" msgid="share-text" hidden>#io15 brings together devs to explore the next generation of tech and mobile. Join us online or in person May 28-29: https://google.com/io</i18n-msg>
 
-        <div layout horizontal justified class="footer-top">
+        <div layout horizontal justified class="footer-top footer-content">
           <span class="footer-share-links--top">
             <a href="https://plus.google.com/+GoogleDevelopers" target="_blank" class="share-icon" data-track-link="footer-share-gplus" data-share-type="gplus" on-click="{{openShareWindow}}"><core-icon icon="io:post-gplus"></core-icon></a>
             <a href="https://twitter.com/googledevs" target="_blank" class="share-icon" data-track-link="footer-share-twitter" data-share-type="twitter" on-click="{{openShareWindow}}"><core-icon icon="io:post-twitter"></core-icon></a>
@@ -302,8 +305,8 @@ limitations under the License.
           <a href="#" class="footer-backtotop" on-click="{{backToTop}}">Back to the top <core-icon icon="expand-less"></core-icon></a>
         </div>
 
-        <div class="footer-content" layout horizontal flex?="{{!isPhoneSize}}">
-          <div self-end flex><img src="images/google-logo.svg" alt="Google Logo"></div>
+        <div class="footer-content footer-content--middle" layout horizontal>
+          <div flex></div>
           <nav layout vertical end justified>
             <span><a href="faq" data-ajax-link data-track-link="footer-faq">FAQ</a></span>
             <span><a href="https://www.google.com/events/io" target="_blank" data-track-link="footer-2014-site">I/O 2014</a></span>
@@ -322,6 +325,11 @@ limitations under the License.
               <a href="https://twitter.com/googledevs" target="_blank" class="share-icon" data-track-link="footer-share-twitter" data-share-type="twitter" on-click="{{openShareWindow}}"><core-icon icon="io:post-twitter"></core-icon></a>
             </span>
           </nav>
+        </div>
+
+        <div class="footer-content footer-logos" layout horizontal justified>
+          <div><img src="images/google-logo.svg" alt="Google Logo"></div>
+          <a href="https://play.google.com/store/apps/details?id=com.google.samples.apps.iosched" target="_blank" data-track-link="footer-iosched"><img src="images/google_play_45.png" alt="Get the Google I/O Android app on Google Play" title="Get the Google I/O Android app on Google Play"></a>
         </div>
       </footer>
 
