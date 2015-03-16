@@ -44,7 +44,7 @@ Creates a countdown timer to a specific date.
 @status alpha
 -->
 <polymer-element name="countdown-timer"
-                 attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart thresholdInformation ended">
+                 attributes="bgColor date dateAdjustment easeInTime waitTime easeOutTime autoStart thresholdInformation ended value">
   <template>
     <style>
       :host {
@@ -160,6 +160,15 @@ Creates a countdown timer to a specific date.
        */
       autoStart: false,
 
+      /**
+       * The current value of the countdown.
+       *
+       * @attribute value
+       * @type number
+       * @default null
+       */
+      value: null,
+
       publish: {
         /**
          * If true, the countdown has reached the end.
@@ -170,6 +179,20 @@ Creates a countdown timer to a specific date.
          */
         ended: {value: false, reflect: true}
       },
+
+      /**
+       * Fired when a new day/hour/seconds threshold is reached.
+       *
+       * @event timerthreshold
+       * @param {Object} thresholdInformation
+       */
+
+      /**
+       * Fired the current timer value has decremented.
+       *
+       * @event timertick
+       * @param {Object} currentValue
+       */
 
       /**
        * Stops the timer.
@@ -260,6 +283,7 @@ Creates a countdown timer to a specific date.
         this.configureTimer_();
         this.timer.setOnTimerThresholdReachedCallback(
           this.onTimerThresholdReached_.bind(this));
+        this.timer.setOnTimerTickCallback(this.onTimerTick.bind(this));
       },
 
       detached: function() {
@@ -339,6 +363,10 @@ Creates a countdown timer to a specific date.
         }
 
         this.fire('timerthreshold', thresholdInformation);
+      },
+
+      onTimerTick: function(currentValue) {
+        this.value = currentValue;
       },
 
       /**
