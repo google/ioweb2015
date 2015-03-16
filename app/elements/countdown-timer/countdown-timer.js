@@ -14,6 +14,7 @@ IOWA.CountdownTimer.Element = function(el) {
   this.easeOutTime_ = 0;
   this.mode_ = IOWA.CountdownTimer.Modes.Days;
   this.onThresholdReachedCallback_ = null;
+  this.onTimerTickCallback_ = null;
   this.lastThreshold_ = '';
   this.lastDrawnValue_ = Number.MAX_VALUE;
 
@@ -98,10 +99,12 @@ IOWA.CountdownTimer.Element.prototype = {
           animationDirection);
     }
 
-    if (animationValue === 0)
+    if (animationValue === 0) {
       this.continueAnimationIfNotAtFinalValue_();
-    else
+      this.onTimerTickCallback(this.currentDayValue);
+    } else {
       requestAnimationFrame(this.update_);
+    }
   },
 
   freezeRendererForUnchangingDigits_: function() {
@@ -284,6 +287,10 @@ IOWA.CountdownTimer.Element.prototype = {
     this.onThresholdReachedCallback = onThresholdReachedCallback;
   },
 
+  setOnTimerTickCallback: function(onTimerTickCallback) {
+    this.onTimerTickCallback = onTimerTickCallback;
+  },
+
   configure: function(options) {
 
     this.targetDate_ = options.targetDate.getTime();
@@ -349,6 +356,17 @@ IOWA.CountdownTimer.Element.prototype = {
 
   get onThresholdReachedCallback() {
     return this.onThresholdReachedCallback_;
+  },
+
+  set onTimerTickCallback(callback) {
+    if (typeof callback !== 'function')
+      return;
+
+    this.onTimerTickCallback_ = callback;
+  },
+
+  get onTimerTickCallback() {
+    return this.onTimerTickCallback_;
   }
 
 };
