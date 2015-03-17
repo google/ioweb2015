@@ -4,11 +4,25 @@
 
 {% define "masthead" %}
   <h1>Schedule</h1>
-  <paper-tabs class="white" selected="0">
-    <paper-tab><i18n-msg msgid="agenda">Agenda</i18n-msg></paper-tab>
-    <paper-tab disabled style="visibility:hidden"><i18n-msg msgid="day">Day</i18n-msg> 1</paper-tab>
-    <paper-tab disabled style="visibility:hidden"><i18n-msg msgid="day">Day</i18n-msg> 2</paper-tab>
-  </paper-tabs>
+  <div layout horizontal justified>
+    <paper-tabs class="white" selected="0" scrollable?="{{isPhoneSize}}">
+      <paper-tab><i18n-msg msgid="agenda">Agenda</i18n-msg></paper-tab>
+      <paper-tab><i18n-msg msgid="day">Day</i18n-msg> 1</paper-tab>
+      <paper-tab><i18n-msg msgid="day">Day</i18n-msg> 2</paper-tab>
+      <paper-tab>My schedule</paper-tab>
+    </paper-tabs>
+    <paper-dropdown-menu>
+      <paper-dropdown class="dropdown" halign="right">
+        <core-menu class="menu" selected="1">
+          <paper-item>pst</paper-item>
+          <paper-item>MST</paper-item>
+          <paper-item>CST</paper-item>
+          <paper-item>EST</paper-item>
+          <paper-item>GMT</paper-item>
+        </core-menu>
+      </paper-dropdown>
+    </paper-dropdown-menu>
+  </div>
 {% end %}
 
 {% define "content" %}

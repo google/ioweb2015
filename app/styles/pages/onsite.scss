@@ -16,11 +16,23 @@
 
 $name: 'page-onsite';
 
+@import '../base/_vars';
 @import '../base/_layout';
 @import '../base/_breakpoints';
 
 
 ##{$name} {
+
+.masthead-meta {
+  margin-bottom: -$subnavTabsPadding;
+  h1 {
+    margin-bottom: 9px;
+  }
+
+  paper-tabs {
+    max-width: 200px;
+  }
+}
 
 .onsite__pic {
   background: url(../images/onsite/Image-01.jpg) no-repeat 50% 0;
@@ -75,6 +87,12 @@ $name: 'page-onsite';
     h2, h3 {
       margin-bottom: $desktopKeyline;
     }
+  }
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  .masthead-container {
+    padding-bottom: $subnavTabsPadding;
   }
 }
 

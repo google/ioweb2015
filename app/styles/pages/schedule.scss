@@ -16,32 +16,28 @@
 
 $name: 'page-schedule';
 
+@import '../base/_vars';
 @import '../base/_layout';
 @import '../base/_color';
 @import '../base/_breakpoints';
 @import '../base/_shadow';
+@import '../base/_typography';
 
 
 ##{$name} {
 
-$subnavPadding: 22px;
-
 .masthead-meta {
+  margin-bottom: -$subnavTabsPadding;
   h1 {
     margin-bottom: 9px;
   }
-}
 
-.masthead-container {
   paper-tabs {
-    text-transform: uppercase;
-    width: 250px;
-    margin-bottom: -$subnavPadding;
+    max-width: 450px;
   }
 
-  paper-tab[disabled] {
-    opacity: 0.5;
-    pointer-events: none;
+  paper-dropdown-menu {
+    flex-shrink: 0;
   }
 }
 
@@ -80,7 +76,12 @@ core-icon[icon="schedule"] {
     margin-top: $mobileKeyline;
   }
   .masthead-container {
-    padding-bottom: $subnavPadding;
+    padding-bottom: $subnavTabsPadding;
+  }
+  .masthead-meta {
+    paper-dropdown-menu {
+      right: $mobileKeyline + 40px; // fab width + mobileKeyline
+    }
   }
   .card__container {
     @include shadow-z1();
@@ -95,7 +96,6 @@ core-icon[icon="schedule"] {
   .page__section {
     padding-bottom: $desktopKeyline;
   }
-
   .schedule-rows {
     width: 300px; // Needed for IE11, to ensure the flexed children have proper widths.
   }
