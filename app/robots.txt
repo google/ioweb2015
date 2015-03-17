@@ -2,5 +2,6 @@
 
 User-agent: *
 Disallow: /upgrade
+Disallow: /embed
 Disallow: /elements/elements.html
 Disallow: /templates/
