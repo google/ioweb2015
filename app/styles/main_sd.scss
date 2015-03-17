@@ -110,11 +110,11 @@ paper-tabs.white {
     #sliderKnobInner,
     #sliderKnobInner::before,
     #sliderBar::shadow #activeProgress {
-      background-color: #009688;
+      background-color: $color-form-controls;
     }
     #sliderContainer.ring #sliderKnobInner {
       &::before {
-        background-color: #009688;
+        background-color: $color-form-controls;
       }
       border: none;
     }
