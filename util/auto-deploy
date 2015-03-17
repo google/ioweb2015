@@ -2,13 +2,16 @@
 # fail on errors
 set -e
 
-# only do this if we're on master branch
+PROJECT_ID=io-webapp-staging
+BRANCH_REGEX="^(master|phase[1-9])$"
+
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [ "$BRANCH" == "HEAD" ]; then
   BRANCH=$CI_BRANCH  # set by drone
 fi
+
 echo "Current branch is: $BRANCH"
-if [ "$BRANCH" != "master" ]; then
+if [[ ! "$BRANCH" =~ $BRANCH_REGEX ]]; then
   echo "Skip deploy."
   exit 0;
 fi
@@ -28,9 +31,10 @@ $GCLOUD_BIN auth activate-service-account $SRV_ACCOUNT \
 
 # decrypt prod server config
 gulp decrypt --pass $CFG_PASSPHRASE
-# build prod version to deploy, default to "stage" app env
+# build prod version to deploy, with "stage" app env
 gulp --env stage
-# deploy the app
+# deploy the app to a version the original git push was made to
 $GCLOUD_BIN preview app deploy dist/backend \
-  --project $PROJECT_ID $DEPLOY_ARGS
+  --project $PROJECT_ID \
+  --version $BRANCH
 
