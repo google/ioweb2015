@@ -401,5 +401,13 @@
   "sorry-500": {
     "message": "Oops! Something went wrong on our end :(",
     "description": "500 error page message"
+  },
+  "live-blogging": {
+    "message": "Live blogging gadget page title",
+    "description": "Live Blogging Gadget"
+  },
+  "live-faq": {
+    "message": "Live blogging faq link",
+    "description": "Live blogging FAQ"
   }
 }

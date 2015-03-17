@@ -1,0 +1,82 @@
+/**
+ * Copyright 2015 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+$name: 'page-widget';
+
+@import '../base/_color';
+@import '../base/_breakpoints';
+@import '../base/_layout';
+
+##{$name} {
+
+$rightMargin: 12px;
+
+.heading-info {
+  font-size: 12px;
+  color: $color-gray;
+  margin-left: $mobileKeyline;
+}
+
+.customize__area {
+  margin-bottom: 24px;
+}
+
+paper-slider {
+  line-height: 1;
+}
+
+paper-radio-button {
+  padding: 0;
+  margin-right: $rightMargin;
+  margin-bottom: $mobileKeyline;
+}
+
+core-label {
+  margin-right: $rightMargin;
+}
+
+@media (min-width: $tablet-breakpoint-min) {
+  .page__section--gadgetpreview {
+    margin-top: -135px;
+    padding-top: 176px;
+    padding-bottom: 90px;
+  }
+  .page__section--customizer {
+    margin-top: -50px;
+    padding-bottom: $desktopKeyline;
+  }
+}
+
+@media (min-width: $tablet-breakpoint-mid) {
+  .page__section--gadgetpreview {
+    $margin: 103px;
+    margin-top: -$margin;
+    padding-top: $margin + 40;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid) {
+  .page__section--gadgetpreview {
+    $marginTop: 111px;
+    $marginBottom: 50px;
+    margin-top: -$marginTop;
+    padding-top: $marginTop + $largeKeyline;
+    padding-bottom: $marginBottom + $largeKeyline;
+  }
+}
+
+}

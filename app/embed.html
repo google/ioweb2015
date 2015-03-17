@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Google I/O 2015 Live Embed">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1">
+  <link rel="canonical" href="embed">
+  <title>Google I/O 2015 Live Embed</title>
+
+  <!-- Page styles -->
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/main_sd.css" shim-shadowdom>
+
+  <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="import" href="elements/io-gadget.html">
+
+</head>
+<body id="page-embed" fullbleed>
+
+<io-gadget videoIds="['8OJ7ih8EE7s','fqULJBBEVQE','yRbOSdAe_JU']"></io-gadget>
+
+<script>
+  window.ENV = location.hostname.match('localhost') ? 'dev' : 'prod;' // Used in analytics.js
+  window.PREFIX = '/io2015';
+</script>
+<script src="scripts/analytics.js"></script>
+<script>
+(function() {
+  "use strict";
+
+  document.addEventListener('polymer-ready', function() {
+    var gadget = document.querySelector('io-gadget');
+    gadget.noFeed = location.search.match('noFeed');
+    gadget.noVideo = location.search.match('noVideo');
+  });
+
+})();
+</script>
+</body>
+</html>

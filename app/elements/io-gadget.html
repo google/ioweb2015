@@ -1,0 +1,236 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-media-query/core-media-query.html">
+<link rel="import" href="../bower_components/google-youtube/google-youtube.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../bower_components/paper-dropdown/paper-dropdown.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="social-post.html">
+
+<!-- TODO: load these -->
+<!-- <script src="../scripts/helper/analytics.js"></script> -->
+<script src="../scripts/helper/request.js"></script>
+
+<!--
+The `<io-gadget>` element renders a youtube video + social feed.
+
+@element io-gadget
+-->
+<polymer-element name="io-gadget">
+  <template>
+    <link rel="stylesheet" href="io-gadget.css">
+
+    <core-media-query query="(min-width:320px) and (max-width:767px)"
+                      queryMatches="{{isPhoneSize}}"></core-media-query>
+
+    <div id="livebanner" layout horizontal center end-justified>
+      <h4>I/O Live</h4>
+    </div>
+
+    <section id="gadget-content" layout horizontal vertical?="{{isPhoneSize}}" fit>
+
+      <template if="{{!noVideo}}">
+        <div class="card card--livesream" layout vertical auto-vertical flex two>
+          <div flex class="card__photo" relative>
+            <img src="../images/play-video-button.png"
+                 class="play__button play__button--card"
+                 title="Start watching" alt="Start watching">
+
+            <google-youtube id="video" height="100%" width="100%" fit
+                            videoid="{{selectedVideoId}}" autohide="1"
+                            controls="2" modestbranding="1" showinfo="0"
+                            iv_load_policy="3" rel="0" autoplay="0"
+                            on-google-youtube-ready="{{onReady}}"></google-youtube>
+
+          </div>
+          <div class="card-content card--video-meta" layout horizontal center>
+            <div flex>
+              <div class="video-title">{{videoTitle}}&nbsp;</div>
+              <div class="video-author">Ellie Powers</div>
+            </div>
+            <div>
+              <paper-dropdown-menu label="Switch channel">
+                <paper-dropdown valign="bottom" halign="right" class="dropdown">
+                  <core-menu class="menu" valueattr="videoid" selected="{{selectedVideoId}}}">
+                    <template repeat="{{video,i in videoIds}}">
+                      <paper-item videoid="{{video}}">Video {{i + 1}}</paper-item>
+                    </template>
+                  </core-menu>
+                </paper-dropdown>
+              </paper-dropdown-menu>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template if="{{!noFeed}}">
+        <div id="social-feed" class="card" layout vertical auto-vertical flex>
+          <div class="card-content">
+            <h3>Google I/O Social Feed</h3>
+            <div><a href="https://twitter.com/googledevs" target="_blank">@googledevs</a></div>
+          </div>
+          <div id="post-container" class="card-content" flex>
+            <div layout vertical>
+              <template repeat="{{socialPost in socialPosts}}">
+                <social-post kind="{{socialPost.kind}}"
+                             author="{{socialPost.author}}"
+                             url="{{socialPost.url}}"
+                             text="{{socialPost.text}}"
+                             when="{{socialPost.when}}"
+                             hideAuthor>
+                </social-post>
+              </template>
+            </div>
+          </div>
+        </div>
+      </template>
+
+    </section>
+
+  </template>
+  <script>
+  (function() {
+
+    Polymer({
+
+      publish: {
+        /**
+         * The selected YouTube video id to play.
+         *
+         * @attribute videoIds
+         * @type array
+         * @default []
+         */
+         videoIds: null,
+
+        /**
+         * If true, shows the social feed.
+         *
+         * @attribute noFeed
+         * @type bool
+         * @default false
+         */
+        noFeed: false,
+
+        /**
+         * If true, displays the video stream.
+         *
+         * @attribute noVideo
+         * @type bool
+         * @default false
+         */
+        noVideo: false
+      },
+
+      /**
+       * The selected video from the list of videoIds
+       *
+       * @property selectedVideoId
+       * @type string
+       * @default null
+       */
+      selectedVideoId: null,
+
+      /**
+       * The title of the video, as returned by the YT API.
+       *
+       * @attribute videoTitle
+       * @type string
+       * @default ''
+       */
+      videoTitle: '',
+
+      /**
+       * API endpoint to retrieve social posts from.
+       *
+       * @property socialPostsEndpoint
+       * @type string
+       * @default 'api/social'
+       */
+      socialPostsEndpoint: 'api/social',
+
+      /**
+       * Interval (ms) to poll for posts.
+       *
+       * @property socialPostUpdateInterval
+       * @type number
+       * @default 30000
+       */
+      socialPostUpdateInterval: 30000,
+
+      updateSocialPostsTimeout_: null,
+
+      /**
+       * List of API results.
+       *
+       * @property socialPosts
+       * @type array
+       * @default []
+       */
+
+      created: function() {
+        this.socialPosts = [];
+        this.videoIds = [];
+      },
+
+      ready: function() {
+        IOWA.Request.cacheThenNetwork(
+            this.socialPostsEndpoint, this.processSocialPosts.bind(this),
+            this.processSocialPosts.bind(this));
+
+         // Set a timeout to fetch new posts after 30 seconds.
+        this.updateSocialPostsTimeout_ = window.setTimeout(
+            this.updateSocialPosts.bind(this), this.socialPostUpdateInterval);
+      },
+
+      onReady: function(e, detail, sender) {
+        this.videoTitle = this.$.video.player.getVideoData().title;
+      },
+
+      videoIdsChanged: function() {
+        this.selectedVideoId = this.videoIds[0];
+      },
+
+      updateSocialPosts: function() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', this.socialPostsEndpoint);
+        // The request will be intercepted by the service worker, which will use a network-first
+        // policy to ensure that the service worker cache is initially ignored.
+        // But if the device is offline, it will return the previously cached content.
+        xhr.setRequestHeader('X-Cache-Only', 'false');
+
+        xhr.onload = function() {
+          if (xhr.status < 400) {
+            this.processSocialPosts(JSON.parse(xhr.response));
+            // Schedule another automatic update if we got a successful response back.
+            this.updateSocialPostsTimeout_ = window.setTimeout(
+                this.updateSocialPosts.bind(this),
+                this.socialPostUpdateInterval);
+          }
+        }.bind(this);
+
+        xhr.send();
+      },
+
+      processSocialPosts: function(socialPosts) {
+        this.socialPosts = socialPosts;
+      }
+
+    });
+
+  })();
+  </script>
+</polymer-element>

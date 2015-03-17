@@ -1,0 +1,147 @@
+{% define "title" %}I/O Live Embed Widget{% end %}
+
+{% define "mastheadBgClass" %}bg-dark-grey{% end %}
+
+{% define "masthead" %}
+  <h1><i18n-msg msgid="live-blogging">I/O Live Embed Widget</i18n-msg></h1>
+{% end %}
+
+{% define "content" %}
+
+<paper-action-dialog id="gadgetfaq" backdrop transition="core-transition-center">
+  <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close dialog"></paper-icon-button>
+  <section>
+    <h1 class="card__title">I/O Live Embed Widget FAQ</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </section>
+</paper-action-dialog>
+
+<section class="card__container card__container--top slide-up">
+  <div class="card js-experiment-visualizer">
+    <div class="card-content">
+      <h3>Personalize the I/O live stream for your website and share the #io15 conversation from the event with your audience.</h3>
+    </div>
+    <div class="card-content">
+      <a href="#" data-ajax-link data-anim-card data-track-link="widget-faq" on-tap="{{toggleGadgetFaq}}">
+        <i18n-msg msgid="live-faq">Read I/O Live Embed Widget FAQ</i18n-msg>
+      </a>
+    </div>
+    <div class="ripple">
+      <div class="ripple__content"></div>
+    </div>
+  </div>
+</section>
+
+<div class="slide-up-delay">
+
+  <section class="page__section page__section--gadgetpreview bg-medium-grey">
+    <div layout horizontal center-center>
+      <!-- dynamically populated with embed iframe preview -->
+    </div>
+  </section>
+
+  <section class="page__section--customizer">
+    <div class="card__container">
+      <div class="card js-experiment-visualizer" on-core-change="{{updateIframeCode}}">
+        <div class="card-content">
+          <h3>Customize your widget</h3>
+        </div>
+
+        <div class="card-content">
+          <h4 class="card__title">1. Select widget content</h4>
+          <div class="customize__area">
+            <paper-radio-group selected="{{selectedGadgetLayout}}">
+              <paper-radio-button name="both" label="Live video stream + Google Developers social feed"></paper-radio-button>
+              <paper-radio-button name="video" label="Live video stream only"></paper-radio-button>
+              <paper-radio-button name="feed" label="Google Developers social feed only"></paper-radio-button>
+            </paper-radio-group>
+          </div>
+
+          <div class="card__title" layout horizontal end wrap>
+            <h4>2. Select widget size</h4>
+            <span class="heading-info">Minimum 300px and maximum 1000px</span>
+          </div>
+          <div class="customize__area">
+            <core-label layout inline horizontal center>
+              Width (px)
+              <paper-slider min="300" max="1000" value="875" editable pin immediateValue="{{gadgetWidth}}" for></paper-slider>
+            </core-label>
+            <core-label layout inline horizontal center>
+              Height (px)
+              <paper-slider min="300" max="1000" value="450" editable pin immediateValue="{{gadgetHeight}}" for></paper-slider>
+            </core-label>
+          </div>
+
+          <h4>3. Embed this code into your site</h4>
+          <div class="customize__area">
+            <paper-input-decorator label="Embed code snippet">
+              <paper-autogrow-textarea rows="2">
+                <textarea readonly on-focus="{{selectGadgetCodeSnippet}}">{{embedIframeCode}}</textarea>
+              </paper-autogrow-textarea>
+            </paper-input-decorator>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function() {
+
+  // Page-specific JS that runs when this page is loaded for the first time.
+  function initPage() {
+    var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+
+    if (page.hasBeenLoaded) {
+      return;
+    }
+
+    page.load = function() {
+      // Reset template variables for when revisiting the page.
+      IOWA.Elements.Template.selectedGadgetVideoSize = 'small';
+      IOWA.Elements.Template.selectedGadgetLayout = 'both';
+    };
+
+    IOWA.Elements.Template.updateIframeCode = function() {
+      var url = IOWA.Util.getStaticBaseURL() + 'embed';
+      if (this.selectedGadgetLayout === 'video') {
+        url += '?noFeed';
+      } else if (this.selectedGadgetLayout === 'feed') {
+        url += '?noVideo';
+      }
+
+      this.embedIframeCode = '<iframe src="' + url + '" style="width:' +
+                             this.gadgetWidth + 'px;height:' +
+                             this.gadgetHeight +'px"' +
+                             ' frameborder="0" allowfullscreen></iframe>';
+      var container = document.querySelector('.page__section--gadgetpreview');
+      container.firstElementChild.innerHTML = this.embedIframeCode;
+    },
+
+    IOWA.Elements.Template.selectGadgetCodeSnippet = function(e, detail, sender) {
+      sender.select();
+    };
+
+    IOWA.Elements.Template.toggleGadgetFaq = function(e, detail, sender) {
+      IOWA.Elements.Main.querySelector('#gadgetfaq').toggle();
+    };
+
+    page.load(); // Run load callback on page load.
+    page.hasBeenLoaded = true;
+  }
+
+  // IE will be "loading" at this point. Other browsers will already be "complete".
+  if (document.readyState !== 'loading') {
+    initPage();
+  }
+
+  // Necessary for IE's lack of native <template>
+  // https://github.com/GoogleChrome/ioweb2015/issues/599
+  window._initPage = initPage;
+
+})();
+</script>
+
+{% end %}

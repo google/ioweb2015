@@ -328,6 +328,9 @@ h6 {
   }
 }
 
+.core-overlay-backdrop {
+  opacity: 0.4 !important;
+}
 
 @media (max-width: $phone-breakpoint-max) {
   .io-countdown {
