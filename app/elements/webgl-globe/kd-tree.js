@@ -81,7 +81,7 @@ IOWA.WebglGlobe.KdTree = function(points) {
    * The actual kd tree, stored as a flat array. The tree is complete and cannot
    * have nodes added or deleted, so store_ can densely pack into array. Layout
    * of the nodes in the array: [..., pointsIndex, x, y, z, ...]. For a node at
-   * index i, its left child is at 2i + 1 and its right child is at 2i + 2.
+   * index i, its left child is at 2i + 4 and its right child is at 2i + 8.
    * @private {!Float64Array}
    */
   this.store_ = IOWA.WebglGlobe.KdTree.buildFlatStore_(root, 0,
