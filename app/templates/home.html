@@ -57,23 +57,24 @@
                          easeouttime="390"
                          thresholdInformation="{{thresholdInformation}}"
                          on-timerthreshold="{{onCountdownTimerThreshold}}"
-                         ended="{{countdownEnded}}">
+                         ended="{{countdownEnded}}"
+                         value="{{countdownValue}}">
         </countdown-timer>
 
         <template if="{{thresholdInformation.thresholdDays}}">
-          <h4 class="countdown-label"><a href="registration" data-ajax-link>Days until Registration ends</a></h4>
+          <h4 class="countdown-label"><a href="registration" data-ajax-link>Day<span hidden?="{{countdownValue === 1}}">s</span> until Registration ends</a></h4>
         </template>
 
         <template if="{{thresholdInformation.thresholdHours}}">
-          <h4 class="countdown-label"><a href="registration" data-ajax-link>Hours until Registration ends</a></h4>
+          <h4 class="countdown-label"><a href="registration" data-ajax-link>Hour<span hidden?="{{countdownValue === 1}}">s</span> until Registration ends</a></h4>
         </template>
 
         <template if="{{thresholdInformation.thresholdMinutes}}">
-          <h4 class="countdown-label"><a href="registration" data-ajax-link>Minutes until Registration ends</a></h4>
+          <h4 class="countdown-label"><a href="registration" data-ajax-link>Minute<span hidden?="{{countdownValue === 1}}">s</span> until Registration ends</a></h4>
         </template>
 
         <template if="{{thresholdInformation.thresholdSeconds}}">
-          <h4 class="countdown-label"><a href="registration" data-ajax-link>Seconds until Registration ends</a></h4>
+          <h4 class="countdown-label"><a href="registration" data-ajax-link>Second<span hidden?="{{countdownValue === 1}}">s</span> until Registration ends</a></h4>
         </template>
 
         <template if="{{countdownEnded}}">

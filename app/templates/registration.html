@@ -37,24 +37,26 @@
                            bgcolor="#F5F5F5"
                            date="Mar 19 2015 17:00:00 GMT-0700 (PDT)"
                            dateadjustment="5" easeintime="500" waittime="300"
-                           easeouttime="400" thresholdInformation="{{thresholdInformation}}"
+                           easeouttime="400" thresholdInformation="{{thresholdInfo}}"
                            on-timerthreshold="{{onCountdownTimerThreshold}}"
-                           ended="{{countdownEnded}}"></countdown-timer>
+                           ended="{{countdownEnded}}"
+                           value="{{countdownValue}}">
+          </countdown-timer>
 
-          <template if="{{thresholdInformation.thresholdDays}}">
-            <h4 class="countdown-label">Days until Registration ends</h4>
+          <template if="{{thresholdInfo.thresholdDays}}">
+            <h4 class="countdown-label">Day<span hidden?="{{countdownValue === 1}}">s</span> until Registration ends</h4>
           </template>
 
-          <template if="{{thresholdInformation.thresholdHours}}">
-            <h4 class="countdown-label">Hours until Registration ends</h4>
+          <template if="{{thresholdInfo.thresholdHours}}">
+            <h4 class="countdown-label">Hour<span hidden?="{{tcountdownValue === 1}}">s</span> until Registration ends</h4>
           </template>
 
-          <template if="{{thresholdInformation.thresholdMinutes}}">
-            <h4 class="countdown-label">Minutes until Registration ends</h4>
+          <template if="{{thresholdInfo.thresholdMinutes}}">
+            <h4 class="countdown-label">Minute<span hidden?="{{thrcountdownValue === 1}}">s</span> until Registration ends</h4>
           </template>
 
-          <template if="{{thresholdInformation.thresholdSeconds}}">
-            <h4 class="countdown-label">Seconds until Registration ends</h4>
+          <template if="{{thresholdInfo.thresholdSeconds}}">
+            <h4 class="countdown-label">Second<span hidden?="{{thrcountdownValue === 1}}">s</span> until Registration ends</h4>
           </template>
 
           <template if="{{countdownEnded}}">
