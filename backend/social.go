@@ -57,7 +57,7 @@ func socialEntries(c context.Context, refresh bool) ([]*socEntry, error) {
 	data, err := json.Marshal(entries)
 	if err != nil {
 		errorf(c, "socialEntries: %v", err)
-	} else if err := cache.set(c, cacheKey, data, 10*time.Minute); err != nil {
+	} else if err := cache.set(c, cacheKey, data, socialCacheTimeout); err != nil {
 		errorf(c, "cache.put(%q): %v", cacheKey, err)
 	}
 
@@ -125,7 +125,7 @@ func fetchTweets(c context.Context, account string, tc chan *tweetEntry) {
 		if i < 0 {
 			continue
 		}
-		if i+lenFilter == len(t.Text)-1 || t.Text[i+lenFilter+1] == ' ' {
+		if i+lenFilter == len(t.Text)-1 || t.Text[i+lenFilter] == ' ' {
 			tc <- t
 		}
 	}
