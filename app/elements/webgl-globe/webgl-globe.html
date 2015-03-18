@@ -709,9 +709,6 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             if (this.markers) {
               this.initMarkerGeometry_();
             }
-            if (this.attractLoop) {
-              this.iterateAttractLoop();
-            }
             this.async(this.scheduleUpdate_);
 
             this.fire('globe-webgl-init', {error: false});
