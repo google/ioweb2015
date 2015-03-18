@@ -986,18 +986,6 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             Math.cos(lat0) * Math.cos(lat1) * Math.cos(deltaLng));
       },
 
-      xYZLatLngSqChordDistance_: function(x, y, z, lat, lng) {
-        var radLat = lat * (Math.PI / 180);
-        var radLng = lng * (Math.PI / 180);
-        var cosLat = Math.cos(radLat);
-
-        var xDiff = x - Math.sin(radLng) * cosLat;
-        var yDiff = y - Math.sin(radLat);
-        var zDiff = z - Math.cos(radLng) * cosLat;
-
-        return xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
-      },
-
       getTransitionTime_: function() {
         // A modification of the duration (ms) over which transitions between
         // locations should occur. Slows down the attract loop to 6x the normal
@@ -1129,36 +1117,24 @@ Fired when the globe's webgl context has been initialized or it failed to initia
           var newHoverIndex = -1;
           if (this.mouseOver_) {
             var hoverPoint = this.pickPoint(tmp3Vec2, this.lastOverX_,
-                  this.lastOverY_, inverseWorld, cameraPosition);
+                this.lastOverY_, inverseWorld, cameraPosition);
             if (hoverPoint) {
               newHoverIndex = this.markerTree_.nearestNeighbor(hoverPoint[0],
-                    hoverPoint[1], hoverPoint[2], this.markerSize_);
-              if (newHoverIndex === -1 && this.lastHoveredIndex_ !== -1) {
-                // Allow for expanded marker size due to previous hover.
-                var lastHoveredMarker = this.markers_[this.lastHoveredIndex_];
-                var lastSqDist = this.xYZLatLngSqChordDistance_(hoverPoint[0],
-                    hoverPoint[1], hoverPoint[2], lastHoveredMarker.lat,
-                    lastHoveredMarker.lng);
-                var hoverMarkerSqSize = this.markerSize_ * this.markerSize_ *
-                    this.markerHoverScale_ * this.markerHoverScale_;
-                if (lastSqDist < hoverMarkerSqSize) {
-                  newHoverIndex = this.lastHoveredIndex_;
-                }
-              }
+                  hoverPoint[1], hoverPoint[2],
+                  this.markerSize_ * this.markerHoverScale_);
             }
           }
 
-          // TODO(bckenny): correct click intersection based on hover
           if (this.mouseClicked_) {
             this.mouseClicked_ = false;
-
             // Find the click position on the globe (if any).
             var pickedPoint = this.pickPoint(tmp3Vec2, this.lastClickX_,
                 this.lastClickY_, inverseWorld, cameraPosition);
             if (pickedPoint) {
               // Find the marker clicked on (if any).
               var nearest = this.markerTree_.nearestNeighbor(pickedPoint[0],
-                  pickedPoint[1], pickedPoint[2], this.markerSize_);
+                  pickedPoint[1], pickedPoint[2],
+                  this.markerSize_ * this.markerHoverScale_);
               clickedMarkerIndex = nearest;
             }
           }
