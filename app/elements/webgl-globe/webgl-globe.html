@@ -1033,7 +1033,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
               // Find the marker clicked on (if any).
               var nearest = this.markerTree_.nearestNeighbor(pickedPoint[0],
                   pickedPoint[1], pickedPoint[2], this.markerSize_);
-              clickedMarkerIndex = nearest.index;
+              clickedMarkerIndex = nearest;
             }
           }
 
@@ -1119,10 +1119,12 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
               // If markers are defined, find the nearest to the random point.
               if (this.markers) {
-                var nearest = this.getNearestMarker(latitude, longitude);
-                var nearestMarker = this.markers[nearest.index];
-                latitude = nearestMarker.lat;
-                longitude = nearestMarker.lng;
+                var nearestIndex = this.getNearestMarker(latitude, longitude);
+                if (nearestIndex >= 0) {
+                  var nearestMarker = this.markers[nearestIndex];
+                  latitude = nearestMarker.lat;
+                  longitude = nearestMarker.lng;
+                }
               }
 
               if (latitude !== currentLoc.lat && longitude !== currentLoc.lng) {
@@ -1213,19 +1215,10 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
       getNearestMarker: function(latitude, longitude) {
         if (!this.markerTree_) {
-          return null;
+          return -1;
         }
 
-        var nearest = this.markerTree_.nearestNeighborByLatLng(latitude,
-            longitude);
-
-        // Calculate the approximate distance from input to point over surface
-        // of a spherical Earth. Uses the equatorial radius.
-        var angularDistance = 2 * Math.asin(nearest.distance / 2);
-        var approximateDistance = angularDistance * 6378;
-        nearest.distance = approximateDistance;
-
-        return nearest;
+        return this.markerTree_.nearestNeighborByLatLng(latitude, longitude);
       },
 
       getMarkersWithinDistance: function(latitude, longitude, distanceKm) {
@@ -1236,11 +1229,8 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         var angularDistance = distanceKm / 6378;
         var chordDistance = 2 * Math.sin(angularDistance / 2);
 
-        var neighbors = this.markerTree_.nearestNeighborsByLatLng(latitude,
-            longitude, chordDistance);
-
-        // TODO(bckenny): convert to distance over land?
-        return neighbors;
+        return this.markerTree_.nearestNeighborsByLatLng(latitude, longitude,
+            chordDistance);
       }
     });
   })();
