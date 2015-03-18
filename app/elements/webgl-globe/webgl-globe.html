@@ -61,6 +61,9 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         position: absolute;
         bottom: 0;
       }
+      .markerHovered {
+        cursor: pointer;
+      }
     </style>
     <canvas id="canvas"></canvas>
     <template if="{{scrollTarget}}">
@@ -103,6 +106,12 @@ Fired when the globe's webgl context has been initialized or it failed to initia
      * @type {!Matrix4x4}
      */
     var tmpTransform1 = new Matrix4x4();
+
+    /**
+     * Matrix used for ephemeral transformations.
+     * @type {!Matrix4x4}
+     */
+    var tmpTransform2 = new Matrix4x4();
 
     /**
      * Temporary vec3 Float32Array for passing values into WebGL.
@@ -360,6 +369,15 @@ Fired when the globe's webgl context has been initialized or it failed to initia
       markerSize_: 0.0075,
 
       /**
+       * Scale for `markerSize_` on hover.
+       *
+       * @property markerHoverScale_
+       * @type number
+       * @default 1.5
+       */
+      markerHoverScale_: 1.5,
+
+      /**
        * ArrayBuffer for marker sprite geometry.
        *
        * @property markerArrayBuffer_
@@ -385,6 +403,24 @@ Fired when the globe's webgl context has been initialized or it failed to initia
        * @default 0
        */
       markerDrawCount_: 0,
+
+      /**
+       * ArrayBuffer for marker sprite geometry on hover
+       *
+       * @property markerHoverArrayBuffer_
+       * @type WebGLBuffer
+       * @default null
+       */
+      markerHoverArrayBuffer_: null,
+
+      /**
+       * ArrayBuffer for marker sprite indices on hover.
+       *
+       * @property markerIndexBuffer_
+       * @type WebGLBuffer
+       * @default null
+       */
+      markerHoverIndexBuffer_: null,
 
       /**
        * An acceleration structure for doing spatial queries on the markers.
@@ -527,6 +563,41 @@ Fired when the globe's webgl context has been initialized or it failed to initia
        * @default -1
        */
       lastClickY: -1,
+
+      /**
+       * Whether the mouse is currently over the globe canvas.
+       * @property mouseOver_
+       * @type bool
+       * @default false
+       */
+      mouseOver_: false,
+
+      /**
+       * The x coordinate of the last mouse over event, relative to the top left
+       * of the `webgl-globe` element.
+       * @property lastOverX_
+       * @type number
+       * @default -1
+       */
+      lastOverX_: -1,
+
+      /**
+       * The y coordinate of the last mouse over event, relative to the top left
+       * of the `webgl-globe` element.
+       * @property lastOverY_
+       * @type number
+       * @default -1
+       */
+      lastOverY_: -1,
+
+      /**
+       * The index of the marker hovered over by the mouse in the last frame, or
+       * -1 if none.
+       * @property lastHoveredIndex_
+       * @type number
+       * @default -1
+       */
+      lastHoveredIndex_: -1,
 
       /**
        * True if the last location change was caused by the attract loop.
@@ -707,7 +778,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
             this.webglReady_ = true;
             if (this.markers) {
-              this.initMarkerGeometry_();
+              this.initMarkers_();
             }
             this.async(this.scheduleUpdate_);
 
@@ -845,17 +916,15 @@ Fired when the globe's webgl context has been initialized or it failed to initia
           }.bind(this));
       },
 
-      initMarkerGeometry_: function() {
+      initMarkers_: function() {
+        var startTime = nowish();
+
         var gl = this.gl;
 
-        var startTime = nowish();
+        // Create WebGL geometry for markers.
         var spriteGeometry = generateSpriteGeometry(this.markers,
             this.markerSize_);
         var spriteIndices = generateSpriteIndexArray(this.markers.length);
-        var endTime = nowish();
-
-        IOWA.Analytics.trackPerf('globe', 'sprite creation',
-            Math.ceil(endTime - startTime), null, this.MAX_PERF_TIMEOUT_);
 
         this.markerArrayBuffer_ = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.markerArrayBuffer_);
@@ -865,6 +934,22 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.markerIndexBuffer_);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, spriteIndices, gl.STATIC_DRAW);
 
+        this.markerDrawCount_ = spriteIndices.length;
+
+        // Create geometry for single marker used for hover effects.
+        spriteGeometry = generateSpriteGeometry([{lat: 0, lng: 0}],
+            this.markerSize_ * this.markerHoverScale_);
+        spriteIndices = generateSpriteIndexArray(1);
+
+        this.markerHoverArrayBuffer_ = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.markerHoverArrayBuffer_);
+        gl.bufferData(gl.ARRAY_BUFFER, spriteGeometry, gl.STATIC_DRAW);
+
+        this.markerHoverIndexBuffer_ = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.markerHoverIndexBuffer_);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, spriteIndices, gl.STATIC_DRAW);
+
+        // Enable new buffers for drawing.
         gl.enableVertexAttribArray(this.markerProgram_.attributes.coord);
         gl.enableVertexAttribArray(this.markerProgram_.attributes.uvCoord);
 
@@ -874,16 +959,22 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         gl.vertexAttribPointer(this.markerProgram_.attributes.uvCoord, 2,
             gl.FLOAT, false, 28, 16);
 
-        this.markerDrawCount_ = spriteIndices.length;
-
-        // create acceleration structure for nearest-neighbor queries
+        // Create acceleration structure for nearest-neighbor queries.
         this.markerTree_ = new KdTree(this.markers_);
+
+        var endTime = nowish();
+        IOWA.Analytics.trackPerf('globe', 'marker creation',
+            Math.ceil(endTime - startTime), null, this.MAX_PERF_TIMEOUT_);
+
+        // Add listeners for marker hover.
+        this.$.canvas.addEventListener('mousemove', this.handleMouseMove_.bind(this));
+        this.$.canvas.addEventListener('mouseout', this.handleMouseOut_.bind(this));
       },
 
       markersChanged: function() {
         // If webgl isn't initialized yet, initWebgl_ will handle marker init.
         if (this.webglReady_) {
-          this.initMarkerGeometry_();
+          this.initMarkers_();
         }
       },
 
@@ -893,6 +984,18 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         var deltaLng = (p1.lng - p0.lng) * Math.PI / 180;
         return Math.acos(Math.sin(lat0) * Math.sin(lat1) +
             Math.cos(lat0) * Math.cos(lat1) * Math.cos(deltaLng));
+      },
+
+      xYZLatLngSqChordDistance_: function(x, y, z, lat, lng) {
+        var radLat = lat * (Math.PI / 180);
+        var radLng = lng * (Math.PI / 180);
+        var cosLat = Math.cos(radLat);
+
+        var xDiff = x - Math.sin(radLng) * cosLat;
+        var yDiff = y - Math.sin(radLat);
+        var zDiff = z - Math.cos(radLng) * cosLat;
+
+        return xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
       },
 
       getTransitionTime_: function() {
@@ -1011,15 +1114,41 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         cameraPosition[2] = inverseWorld.getElement(2, 3);
 
         // Since lighting is in canonical globe space, use a single MVPMatrix.
-        worldTransform.product(this.projectionTransform_, worldTransform);
+        var mvpTransform = tmpTransform2;
+        mvpTransform.product(this.projectionTransform_, worldTransform);
 
         var sunDirection = getSolarPosition(new Date(), tmp3Vec0);
 
-        this.renderGlobe_(worldTransform, cameraPosition, sunDirection);
+        this.renderGlobe_(mvpTransform, cameraPosition, sunDirection);
 
-        // Render markers (if set) and handle mouse clicks on them.
+        // Render markers (if set) and handle mouse events on them.
         var clickedMarkerIndex = -1;
         if (this.markerDrawCount_ > 0) {
+          // Handle hover first.
+          // Find the hover position on the globe (if any).
+          var newHoverIndex = -1;
+          if (this.mouseOver_) {
+            var hoverPoint = this.pickPoint(tmp3Vec2, this.lastOverX_,
+                  this.lastOverY_, inverseWorld, cameraPosition);
+            if (hoverPoint) {
+              newHoverIndex = this.markerTree_.nearestNeighbor(hoverPoint[0],
+                    hoverPoint[1], hoverPoint[2], this.markerSize_);
+              if (newHoverIndex === -1 && this.lastHoveredIndex_ !== -1) {
+                // Allow for expanded marker size due to previous hover.
+                var lastHoveredMarker = this.markers_[this.lastHoveredIndex_];
+                var lastSqDist = this.xYZLatLngSqChordDistance_(hoverPoint[0],
+                    hoverPoint[1], hoverPoint[2], lastHoveredMarker.lat,
+                    lastHoveredMarker.lng);
+                var hoverMarkerSqSize = this.markerSize_ * this.markerSize_ *
+                    this.markerHoverScale_ * this.markerHoverScale_;
+                if (lastSqDist < hoverMarkerSqSize) {
+                  newHoverIndex = this.lastHoveredIndex_;
+                }
+              }
+            }
+          }
+
+          // TODO(bckenny): correct click intersection based on hover
           if (this.mouseClicked_) {
             this.mouseClicked_ = false;
 
@@ -1034,9 +1163,31 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             }
           }
 
+          // Render all markers.
           this.gl.enable(this.gl.BLEND);
-          this.renderMarkers_(worldTransform);
+          this.renderMarkers_(mvpTransform, this.markerArrayBuffer_,
+              this.markerIndexBuffer_, this.markerDrawCount_);
+
+          // Render hovered marker, if any.
+          if (newHoverIndex > -1) {
+            var hoveredMarker = this.markers_[newHoverIndex];
+            worldTransform
+              .rotateY(hoveredMarker.lng * Math.PI / 180)
+              .rotateX(-hoveredMarker.lat * Math.PI / 180);
+            mvpTransform.product(this.projectionTransform_, worldTransform);
+
+            this.renderMarkers_(mvpTransform, this.markerHoverArrayBuffer_,
+                this.markerHoverIndexBuffer_, 6);
+          }
           this.gl.disable(this.gl.BLEND);
+
+          // If entering or exiting hovering, toggle a pointer cursor.
+          if (this.lastHoveredIndex_ === -1 && newHoverIndex !== -1) {
+            this.$.canvas.classList.add('markerHovered');
+          } else if (this.lastHoveredIndex_ !== -1 && newHoverIndex === -1) {
+            this.$.canvas.classList.remove('markerHovered');
+          }
+          this.lastHoveredIndex_ = newHoverIndex;
         }
 
         this.updateRequestId_ = 0;
@@ -1068,21 +1219,21 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             0);
       },
 
-      renderMarkers_: function(mvpTransform) {
+      renderMarkers_: function(mvpTransform, arrayBuffer, indexBuffer, count) {
         var gl = this.gl;
 
         this.markerProgram_.use();
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.markerArrayBuffer_);
+        gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
         gl.vertexAttribPointer(this.markerProgram_.attributes.coord, 4,
             gl.FLOAT, false, 28, 0);
         gl.vertexAttribPointer(this.markerProgram_.attributes.uvCoord, 2,
             gl.FLOAT, false, 28, 16);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.markerIndexBuffer_);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 
         this.markerProgram_.uniforms.mvpMatrix(mvpTransform.m_);
 
-        gl.drawElements(gl.TRIANGLES, this.markerDrawCount_, gl.UNSIGNED_SHORT,
+        gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT,
             0);
       },
 
@@ -1136,6 +1287,25 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             lng: longitude
           };
         }
+      },
+
+      handleMouseMove_: function(e) {
+        e.stopPropagation();
+
+        this.mouseOver_ = true;
+        if (e.offsetX) {
+          this.lastOverX_ = e.offsetX;
+          this.lastOverY_ = e.offsetY;
+        } else {
+          this.lastOverX_ = e.layerX;
+          this.lastOverY_ = e.layerY;
+        }
+      },
+
+      handleMouseOut_: function(e) {
+        e.stopPropagation();
+
+        this.mouseOver_ = false;
       },
 
       handleTap: function(e) {
