@@ -11,16 +11,19 @@ handlers:
   static_files: app/manifest.json
   upload: app/manifest\.json$
   mime_type: application/manifest+json
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 - url: $PREFIX$/sitemap\.xml$
   static_files: app/sitemap.xml
   upload: app/sitemap\.xml$
+  secure: always
 
 - url: $PREFIX$/embed.*
   static_files: app/embed.html
   upload: app/embed$
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
@@ -30,31 +33,37 @@ handlers:
   static_files: app/\1
   upload: app/(.+(elements\.html|\.js|\.css))$
   expiration: 10m
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 - url: $PREFIX$/experiment
   static_dir: app/experiment
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 - url: $PREFIX$/fonts
   static_dir: app/fonts
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 - url: $PREFIX$/images
   static_dir: app/images
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 - url: $PREFIX$/styles
   static_dir: app/styles
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 - url: $PREFIX$/scripts
   static_dir: app/scripts
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
@@ -62,6 +71,7 @@ handlers:
   static_dir: app/temporary_api
   # need access from the backend
   application_readable: true
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
@@ -70,23 +80,27 @@ handlers:
   upload: app/.+\.html$
   # need access to app/templates
   application_readable: true
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 - url: $PREFIX$/(.+\.(json|ico|txt|mp3))$
   static_files: app/\1
   upload: app/(.+\.(json|ico|txt|mp3))$
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 # development-only
 - url: $PREFIX$/bower_components
   static_dir: app/bower_components
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
 - url: $PREFIX$/elements
   static_dir: app/elements
+  secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
 
