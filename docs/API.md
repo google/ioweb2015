@@ -107,6 +107,20 @@ TBD
 ```
 
 
+### GET /api/v1/user/notify
+
+*Requires authentication*
+
+Current notification state. Response body sample:
+
+```json
+{
+  "notify": true,
+  "subscribers": ["123456789", "987654321"]
+}
+```
+
+
 ### PUT /api/v1/user/notify
 
 *Requires authentication*
@@ -138,6 +152,23 @@ You can also do both in a single API call:
 
 Note that in the latter case `notify` parameter still refers to
 the global notification state scoped to a user, not a specific subscriber ID.
+
+
+### GET /api/v1/user/schedule?since=unix-timestamp
+
+*Requires authentication*
+
+Retrieve bookmarked sessions list. Response body sample:
+
+```json
+[
+  "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+  "05012279-E037-46D1-AD91-C0892277B01B"
+]
+```
+
+If `since` query param is present, the reponse will contain only the items
+changed since the specified timestamp.
 
 
 ### PUT /api/v1/user/schedule/:session_id
