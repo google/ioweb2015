@@ -310,6 +310,7 @@
         var globe = IOWA.Elements.Main.querySelector('webgl-globe');
         if (globe) {
           globe.canvasResized();
+          globe.restartAttractLoop();
         }
         this.resetExtendedSearch();
 
