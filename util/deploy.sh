@@ -8,16 +8,14 @@ then
   exit 1
 fi
 
+# Build it.
 echo "Building IOWA: $deployVersion"
-gcloud config set project io-webapp
 gulp --env prod
 
 echo "Deploying IOWA: $deployVersion"
-gcloud preview app deploy dist/backend --version $deployVersion
+gcloud preview app deploy dist/backend --project io-webapp \
+  --version $deployVersion
 
-# Create release tag.
+# Tag a release.
 git tag -a $deployVersion -m 'Release $deployVersion'
 git push origin --tags
-
-# Reset to staging.
-gcloud config set project io-webapp-staging
