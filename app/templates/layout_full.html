@@ -224,6 +224,8 @@ limitations under the License.
 
     <template is="auto-binding" id="t">
 
+      <google-signin scopes="profile https://www.googleapis.com/auth/drive.appfolder" signedIn="{{isSignedIn}}"></google-signin>
+
       <!-- Responsive handlers -->
       <core-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"
                         queryMatches="{{isPhoneSize}}"></core-media-query>
@@ -265,10 +267,9 @@ limitations under the License.
                 <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
               </a>
             </paper-tab>
-            <paper-tab label="signin" role="">
-              <a href="#" data-track-link="nav-signin" data-anim-ripple layout horizontal center>Sign-in</a>
-            </paper-tab>
           </paper-tabs>
+          <a href="#" class="button-link" data-track-link="nav-signin" on-tap="{{signIn}}" hidden?="{{isSignedIn}}">Sign-in</a>
+          <paper-icon-button icon="io:more-vert" hidden?="{{!isSignedIn}}"></paper-icon-button>
         </core-toolbar>
         <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="io-logo large" iologodestination></div>

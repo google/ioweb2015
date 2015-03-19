@@ -173,6 +173,11 @@ core-drawer-panel {
       pointer-events: none;
     }
   }
+
+  .button-link {
+    text-transform: uppercase;
+    color: inherit;
+  }
 }
 
 /* paper-tabs focus states for keyboard */
@@ -302,7 +307,7 @@ experiment-fab-container {
     paper-tabs {
       display: inline-block;
     }
-    paper-icon-button {
+    [icon="menu"] {
       display: none;
     }
   }

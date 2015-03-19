@@ -1,0 +1,146 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/google-apis/google-js-api.html">
+
+<!--
+`<google-signin>` uses Google Sign-n 2.0 to authorize users using Google's
+OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
+
+#### Example
+
+    <google-signin></google-signin>
+
+@element google-signin
+-->
+<polymer-element name="google-signin" attributes="clientId scopes signedIn">
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+    </style>
+    <google-js-api on-js-api-load="{{loadAuth}}"></google-js-api>
+  </template>
+  <script>
+  Polymer({
+    publish: {
+      /**
+       * A Google Developers client Id.
+       *
+       * @attribute clientId
+       * @type string
+       * @default null
+       */
+      clientId: null,
+
+      /**
+       * A space-separated list of OAuth2 scopes.
+       *
+       * @attribute scopes
+       * @type string
+       * @default null
+       */
+      scopes: null,
+
+      /**
+       * If true, the is signed in.
+       *
+       * @attribute signedIn
+       * @type bool
+       * @default false
+       */
+      signedIn: false,
+    },
+
+    attached: function() {
+
+    },
+
+// confusing some things are properties some are methods.
+//   auth2.isSignedIn.get() vs user.isSignedIn()
+// .get() is weird
+
+    loadAuth: function(e, detail, sender) {
+      gapi.load('auth2', function() {
+        this.auth2 = gapi.auth2.init({
+          client_id: this.clientId,
+          scope: this.scopes,
+          fetch_basic_profile: true
+        })
+
+        // Listen for sign-in state changes.
+        this.auth2.isSignedIn.listen(this.signinChangedHandler.bind(this));
+
+        // Listen for changes to current user.
+        // this.auth2.currentUser.listen(this.userChangedHandler.bind(this));
+
+        // if (this.auth2.isSignedIn.get()) {
+        //   this.auth2.signIn();
+        // }
+
+        // if (this.autoSignin) {
+        //   this.auth2.then(this.signIn.bind(this), this.onSignInError.bind(this));
+        // }
+      }.bind(this));
+    },
+
+    signIn: function() {
+      if (this.auth2.isSignedIn.get()) {
+        return;
+      }
+
+      // Sign the user in, and then retrieve their ID.
+      this.auth2.signIn().then(function() {
+        console.log(this.auth2.currentUser.get())
+        console.log(this.auth2.currentUser.get().getId());
+      });
+
+
+      // this.auth2.grantOfflineAccess({'redirect_uri': 'postmessage'}).then(function(resp) {
+      //   var auth_code = resp.code;
+      // });
+    },
+
+    signOut: function() {
+      this.auth2.signOut().then(function() {
+        // Let the current user listener trigger the changes.
+        // this.auth2.disconnect(); // revoke oauth scopes.
+      }, function(error) {
+        console.error(error);
+      });
+    },
+
+    signinChangedHandler: function(signedIn) {
+      this.signedIn = signedIn;
+    },
+
+    // userChangedHandler: function(user) {
+    //   console.log(user.isSignedIn())
+    // },
+
+    onSignInError: function(error) {
+      console.error(error);
+    },
+
+    getProfile: function() {
+      var profile = this.auth2.currntUser.get().getBasicProfile();
+      console.log('ID: ' + profile.getId());
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail());
+    }
+  });
+  </script>
+</polymer-element>
