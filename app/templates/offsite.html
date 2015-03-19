@@ -380,7 +380,7 @@
               location.lng(), this.offsiteSearchRadius);
           this.offsiteMarkerResults = [];
           for (var i = 0; i < nearestMarkers.length; i++) {
-            this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i].index]);
+            this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i]]);
           }
 
           globe.location = {
@@ -438,7 +438,7 @@
               centerLocation.lat, centerLocation.lng, this.offsiteSearchRadius);
           this.offsiteMarkerResults = [];
           for (var i = 0; i < nearestMarkers.length; i++) {
-            this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i].index]);
+            this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i]]);
           }
         }
 

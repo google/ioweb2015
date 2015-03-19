@@ -74,11 +74,34 @@ IOWA.WebglGlobe.KdTree = function(points) {
   ysorted.sort(IOWA.WebglGlobe.KdTree.compareY_);
   zsorted.sort(IOWA.WebglGlobe.KdTree.compareZ_);
 
+  // TODO(bckenny): just build as you go
+  var root = IOWA.WebglGlobe.KdTree.build_(xsorted, ysorted, zsorted, 0);
+
   /**
-   * The root of the tree.
-   * @private {IOWA.WebglGlobe.KdNode}
+   * The actual kd tree, stored as a flat array. The tree is complete and cannot
+   * have nodes added or deleted, so store_ can densely pack into array. Layout
+   * of the nodes in the array: [..., pointsIndex, x, y, z, ...]. For a node at
+   * index i, its left child is at 2i + 4 and its right child is at 2i + 8.
+   * @private {!Float64Array}
    */
-  this.root_ = IOWA.WebglGlobe.KdTree.build_(xsorted, ysorted, zsorted, 0);
+  this.store_ = IOWA.WebglGlobe.KdTree.buildFlatStore_(root, 0,
+      new Float64Array(points.length * 4));
+
+  var treeHeight = IOWA.WebglGlobe.KdTree.intLogBase2_(points.length);
+
+  /**
+   * A stack for indices while traversing the tree iteratively, sized exactly
+   * for this tree.
+   * @private {!Int32Array}
+   */
+  this.indexStack_ = new Int32Array(treeHeight + 1);
+
+  /**
+   * A stack for distances to nodes while traversing the tree iteratively, sized
+   * exactly for this tree.
+   * @private {!Float64Array}
+   */
+  this.distanceStack_ = new Float64Array(treeHeight + 1);
 };
 
 /**
@@ -253,6 +276,59 @@ IOWA.WebglGlobe.KdTree.lessThanZ_ = function(a, b) {
 };
 
 /**
+ * Returns the integer (truncated) log base 2 of the integer v, aka the place of
+ * the highest-order bit in v. Equivalent to Math.floor(Math.log2(v)). From
+ * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
+ * @param {number} v
+ * @return {number}
+ * @private
+ */
+IOWA.WebglGlobe.KdTree.intLogBase2_ = function(v) {
+  v = v | 0;
+  var r = 0;
+  if (v & 0xFFFF0000) {
+    v >>= 16;
+    r |= 16;
+  }
+  if (v & 0xFF00) {
+    v >>= 8;
+    r |= 8;
+  }
+  if (v & 0xF0) {
+    v >>= 4;
+    r |= 4;
+  }
+  if (v & 0xC) {
+    v >>= 2;
+    r |= 2;
+  }
+  if (v & 0x2) {
+    r |= 1;
+  }
+  return r;
+};
+
+/**
+ * For a given array length, find the split index that will produce a *complete*
+ * binary tree when applied repeatedly to the resulting subarrays.
+ * @param {number} length
+ * @return {number}
+ * @private
+ */
+IOWA.WebglGlobe.KdTree.arraySplit_ = function(length) {
+  var treeHeight = IOWA.WebglGlobe.KdTree.intLogBase2_(length);
+  var firstBit = 1 << treeHeight;
+  var secondBit = 1 << (treeHeight - 1);
+
+  // If the bottom level is more than half filled, split after left subtree of
+  // height - 1; if less than half, split before a right subtree of height - 2.
+  if (length & secondBit) {
+    return firstBit - 1;
+  }
+  return length ^ firstBit | secondBit;
+};
+
+/**
  * Build a k-d tree from the provided arrays, sorted in each dimension.
  * @param {!Array<IOWA.WebglGlobe.KdNode>} sorted0 An array of points to put in
  *     the tree, sorted in the dimension indicated by the current depth.
@@ -272,14 +348,14 @@ IOWA.WebglGlobe.KdTree.build_ = function(sorted0, sorted1, sorted2, depth) {
     return null;
   }
 
-  var medianIndex = (sorted0.length / 2) | 0;
-  var medianNode = sorted0[medianIndex];
+  var splitIndex = IOWA.WebglGlobe.KdTree.arraySplit_(sorted0.length);
+  var splitNode = sorted0[splitIndex];
   var point, lessThan;
 
   // Divide this dimension's array to left and right of median.
   var left0 = [];
   var right0 = [];
-  for (var i = 0; i < medianIndex; i++) {
+  for (var i = 0; i < splitIndex; i++) {
     left0[i] = sorted0[i];
   }
   i++;
@@ -295,16 +371,16 @@ IOWA.WebglGlobe.KdTree.build_ = function(sorted0, sorted1, sorted2, depth) {
   var right1 = [];
   for (i = 0; i < sorted1.length; i++) {
     point = sorted1[i];
-    if (point === medianNode) {
+    if (point === splitNode) {
       continue;
     }
 
     if (dimension === 0) {
-      lessThan = IOWA.WebglGlobe.KdTree.lessThanX_(point, medianNode);
+      lessThan = IOWA.WebglGlobe.KdTree.lessThanX_(point, splitNode);
     } else if (dimension === 1) {
-      lessThan = IOWA.WebglGlobe.KdTree.lessThanY_(point, medianNode);
+      lessThan = IOWA.WebglGlobe.KdTree.lessThanY_(point, splitNode);
     } else {
-      lessThan = IOWA.WebglGlobe.KdTree.lessThanZ_(point, medianNode);
+      lessThan = IOWA.WebglGlobe.KdTree.lessThanZ_(point, splitNode);
     }
     if (lessThan) {
       left1.push(point);
@@ -318,16 +394,16 @@ IOWA.WebglGlobe.KdTree.build_ = function(sorted0, sorted1, sorted2, depth) {
   var right2 = [];
   for (i = 0; i < sorted2.length; i++) {
     point = sorted2[i];
-    if (point === medianNode) {
+    if (point === splitNode) {
       continue;
     }
 
     if (dimension === 0) {
-      lessThan = IOWA.WebglGlobe.KdTree.lessThanX_(point, medianNode);
+      lessThan = IOWA.WebglGlobe.KdTree.lessThanX_(point, splitNode);
     } else if (dimension === 1) {
-      lessThan = IOWA.WebglGlobe.KdTree.lessThanY_(point, medianNode);
+      lessThan = IOWA.WebglGlobe.KdTree.lessThanY_(point, splitNode);
     } else {
-      lessThan = IOWA.WebglGlobe.KdTree.lessThanZ_(point, medianNode);
+      lessThan = IOWA.WebglGlobe.KdTree.lessThanZ_(point, splitNode);
     }
     if (lessThan) {
       left2.push(point);
@@ -337,159 +413,234 @@ IOWA.WebglGlobe.KdTree.build_ = function(sorted0, sorted1, sorted2, depth) {
   }
 
   // Shuffle to the next dimension and recurse.
-  medianNode.left = IOWA.WebglGlobe.KdTree.build_(left1, left2, left0,
+  splitNode.left = IOWA.WebglGlobe.KdTree.build_(left1, left2, left0,
       depth + 1);
-  medianNode.right = IOWA.WebglGlobe.KdTree.build_(right1, right2, right0,
+  splitNode.right = IOWA.WebglGlobe.KdTree.build_(right1, right2, right0,
       depth + 1);
 
-  return medianNode;
+  return splitNode;
 };
 
 /**
- * Find the nearest value in the tree to target, as defined by comparator
- * sorting.
- * @param {{x: number, y: number, z: number}} target
- * @param {IOWA.WebglGlobe.KdNode} current The current root node of the search.
- * @param {number} depth The current traversal depth within the tree.
- * @param {{neighbor: ?IOWA.WebglGlobe.KdNode, sqDistance: number}} candidate
- * @return {{neighbor: ?IOWA.WebglGlobe.KdNode, sqDistance: number}}
- * @private
+ * A lazy way to create a flat-array representation of the tree instead of
+ * during construction.
+ * @param {!IOWA.WebglGlobe.KdNode} current The current root node of the traversal.
+ * @param {number} currentIndex The current node's index in store.
+ * @param {!Float64Array} store The backing array for tree storage.
+ * @return {!Float64Array}
  */
-IOWA.WebglGlobe.KdTree.nearest_ = function(target, current, depth, candidate) {
-  var xDiff = target.x - current.x;
-  var yDiff = target.y - current.y;
-  var zDiff = target.z - current.z;
-  xDiff *= xDiff;
-  yDiff *= yDiff;
-  zDiff *= zDiff;
+IOWA.WebglGlobe.KdTree.buildFlatStore_ = function(current, currentIndex, store) {
+  store[currentIndex] = current.index;
+  store[currentIndex + 1] = current.x;
+  store[currentIndex + 2] = current.y;
+  store[currentIndex + 3] = current.z;
 
-  // Test if current is closer than the current candidate.
-  var sqDistance = xDiff + yDiff + zDiff;
-  if (sqDistance < candidate.sqDistance) {
-    candidate.sqDistance = sqDistance;
-    candidate.neighbor = current;
+  currentIndex /= 4;
+  if (current.left) {
+    IOWA.WebglGlobe.KdTree.buildFlatStore_(current.left,
+        (2 * currentIndex + 1) * 4, store);
+
+    if (current.right) {
+      IOWA.WebglGlobe.KdTree.buildFlatStore_(current.right,
+          (2 * currentIndex + 2) * 4, store);
+    }
   }
 
-  // Determine which side of split in current dimension that target is in.
-  var leftFirst;
-  var testSqDistance;
-  var dimension = depth % 3;
-  if (dimension === 0) {
-    leftFirst = target.x < current.x;
-    testSqDistance = xDiff;
-  } else if (dimension === 1) {
-    leftFirst = target.y < current.y;
-    testSqDistance = yDiff;
-  } else {
-    leftFirst = target.z < current.z;
-    testSqDistance = zDiff;
-  }
-
-  // Recurse to children, prioritizing the side of the split target is in.
-  var first = leftFirst ? current.left : current.right;
-  var second = leftFirst ? current.right : current.left;
-  if (first !== null) {
-    candidate = IOWA.WebglGlobe.KdTree.nearest_(target, first, depth + 1,
-        candidate);
-  }
-  // Don't visit the other side of the split if farther away than candidate.
-  if (testSqDistance <= candidate.sqDistance && second !== null) {
-    candidate = IOWA.WebglGlobe.KdTree.nearest_(target, second, depth + 1,
-        candidate);
-  }
-
-  return candidate;
+  return store;
 };
 
 /**
- * Find the points within a specified distance from target location.
- * @param {{x: number, y: number, z: number, sqDistance: number}} target
- * @param {IOWA.WebglGlobe.KdNode} current The current root node of the search.
- * @param {number} depth The current traversal depth within the tree.
- * @param {!Array<{neighbor: ?IOWA.WebglGlobe.KdNode, sqDistance: number}>} neighbors
- * @return {!Array<{neighbor: ?IOWA.WebglGlobe.KdNode, sqDistance: number}>}
+ * Returns the index of the nearest node in the tree to the target coordinates,
+ * as defined by comparator sorting, within a bounding sphere of radius
+ * maxDistance. If no suitable node is found, an index of -1 is returned. To
+ * search regardless of distance, a maxDistance of Number.MAX_VALUE or Infinity
+ * may be used.
+ * @param {number} targetX
+ * @param {number} targetY
+ * @param {number} targetZ
+ * @param {number} maxDistance
+ * @return {number}
  * @private
  */
-IOWA.WebglGlobe.KdTree.neighborhood_ = function(target, current, depth, neighbors) {
-  var xDiff = target.x - current.x;
-  var yDiff = target.y - current.y;
-  var zDiff = target.z - current.z;
-  xDiff *= xDiff;
-  yDiff *= yDiff;
-  zDiff *= zDiff;
+IOWA.WebglGlobe.KdTree.prototype.nearest_ = function(targetX, targetY, targetZ, maxDistance) {
+  var candidateIndex = -1;
+  var candidateSqDistance = maxDistance * maxDistance;
+  var treeStore = this.store_;
+  var indexStack = this.indexStack_;
+  var sqDistanceStack = this.distanceStack_;
 
-  // Test if current is wthin distance bounds.
-  var sqDistance = xDiff + yDiff + zDiff;
-  if (sqDistance < target.sqDistance) {
-    neighbors.push({
-      neighbor: current,
-      sqDistance: sqDistance
-    });
-  }
+  var stackPointer = 0;
+  var current = 0;
+  var depth = 0;
 
-  // Determine which side of split in current dimension that target is in.
-  var leftFirst;
-  var testSqDistance;
-  var dimension = depth % 3;
-  if (dimension === 0) {
-    leftFirst = target.x < current.x;
-    testSqDistance = xDiff;
-  } else if (dimension === 1) {
-    leftFirst = target.y < current.y;
-    testSqDistance = yDiff;
-  } else {
-    leftFirst = target.z < current.z;
-    testSqDistance = zDiff;
-  }
+  do {
+    // When a leaf node is reached, pop the next node off the stack instead.
+    if (current >= treeStore.length) {
+      depth = stackPointer;
+      stackPointer--;
+      var testSqDistance = sqDistanceStack[stackPointer];
+      // Ignore new node if distance to its side of split is larger than current
+      // search distance.
+      if (testSqDistance <= candidateSqDistance && indexStack[stackPointer] < treeStore.length) {
+        current = indexStack[stackPointer];
+      } else {
+        continue;
+      }
+    }
 
-  // Recurse to children, prioritizing the side of the split target is in.
-  var first = leftFirst ? current.left : current.right;
-  var second = leftFirst ? current.right : current.left;
-  if (first !== null) {
-    neighbors = IOWA.WebglGlobe.KdTree.neighborhood_(target, first, depth + 1,
-        neighbors);
-  }
-  // Don't visit the other side of the split if farther away than limit.
-  if (testSqDistance <= target.sqDistance && second !== null) {
-    neighbors = IOWA.WebglGlobe.KdTree.neighborhood_(target, second, depth + 1,
-        neighbors);
-  }
+    var xDiff = targetX - treeStore[current + 1];
+    var yDiff = targetY - treeStore[current + 2];
+    var zDiff = targetZ - treeStore[current + 3];
+
+    // Use current as the new candidate if it is closer to the target.
+    var sqDistance = xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
+    if (sqDistance < candidateSqDistance) {
+      candidateSqDistance = sqDistance;
+      candidateIndex = current;
+    }
+
+    // Don't attempt to visit children if we're already at a leaf.
+    var baseIndex = current << 1;
+    if (baseIndex + 4 < treeStore.length) {
+      // Visit children, prioritizing the side of the split target is in.
+      var dimension = (depth % 3) | 0;
+      var testDistance;
+      if (dimension === 0) {
+        testDistance = xDiff;
+      } else if (dimension === 1) {
+        testDistance = yDiff;
+      } else {
+        testDistance = zDiff;
+      }
+      // "Left" (< 0) is at baseIndex + 4, "right" (>= 0) is at baseIndex + 8.
+      var firstOffset = testDistance < 0 ? 4 : 8;
+      var firstIndex = baseIndex + firstOffset;
+      var secondIndex = baseIndex + (firstOffset ^ 12);
+
+      // Push the other child on the node stack.
+      indexStack[stackPointer] = secondIndex;
+      sqDistanceStack[stackPointer] = testDistance * testDistance;
+      stackPointer++;
+
+      // Start anew with the first child.
+      current = firstIndex;
+      depth++;
+    } else {
+      // At a leaf; use an invalid index so next node will be from the stack.
+      current = baseIndex + 4;
+    }
+  } while (stackPointer > 0);
+
+  return candidateIndex < 0 ? candidateIndex : treeStore[candidateIndex];
+};
+
+/**
+ * Find the points within a specified distance from the target coordinates. If
+ * none are found, an empty array is returned. A second array,
+ * opt_sqDistancesArray, may be provided to store the square of the distances
+ * from the target to the found points. It may be reused repeatedly, but will
+ * not be cleared first, so only the first n entries will be valid, where n is
+ * the number of entries in the returned neighbors array.
+ * @param {number} targetX
+ * @param {number} targetY
+ * @param {number} targetZ
+ * @param {number} targetDistance The distance in which to search for neighbors.
+ * @param {Array<number>=} opt_sqDistancesArray
+ * @return {!Array<number>}
+ * @private
+ */
+IOWA.WebglGlobe.KdTree.prototype.neighborhood_ = function(targetX, targetY, targetZ, targetDistance, opt_sqDistancesArray) {
+  var neighbors = [];
+  var targetSqDistance = targetDistance * targetDistance;
+  var treeStore = this.store_;
+  var indexStack = this.indexStack_;
+  var sqDistanceStack = this.distanceStack_;
+
+  var stackPointer = 0;
+  var current = 0;
+  var depth = 0;
+
+  var storeDistances = (opt_sqDistancesArray != null);
+
+  do {
+    // When a leaf node is reached, pop the next node off the stack instead.
+    if (current >= treeStore.length) {
+      depth = stackPointer;
+      stackPointer--;
+      var testSqDistance = sqDistanceStack[stackPointer];
+      // Ignore new node if distance to its side of split is larger than search
+      // distance.
+      if (testSqDistance <= targetSqDistance && indexStack[stackPointer] < treeStore.length) {
+        current = indexStack[stackPointer];
+      } else {
+        continue;
+      }
+    }
+
+    var xDiff = targetX - treeStore[current + 1];
+    var yDiff = targetY - treeStore[current + 2];
+    var zDiff = targetZ - treeStore[current + 3];
+
+    // Add current to neighbors if it is wthin distance bounds of target.
+    var sqDistance = xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
+    if (sqDistance < targetSqDistance) {
+      if (storeDistances) {
+        opt_sqDistancesArray[neighbors.length] = sqDistance;
+      }
+      neighbors.push(current);
+    }
+
+    // Don't attempt to visit children if we're already at a leaf.
+    var baseIndex = current << 1;
+    if (baseIndex + 4 < treeStore.length) {
+      // Visit children, prioritizing the side of the split target is in.
+      var dimension = (depth % 3) | 0;
+      var testDistance;
+      if (dimension === 0) {
+        testDistance = xDiff;
+      } else if (dimension === 1) {
+        testDistance = yDiff;
+      } else {
+        testDistance = zDiff;
+      }
+      // "Left" (< 0) is at baseIndex + 4, "right" (>= 0) is at baseIndex + 8.
+      var firstOffset = testDistance < 0 ? 4 : 8;
+      var firstIndex = baseIndex + firstOffset;
+      var secondIndex = baseIndex + (firstOffset ^ 12);
+
+      // Push the other child on the node stack.
+      indexStack[stackPointer] = secondIndex;
+      sqDistanceStack[stackPointer] = testDistance * testDistance;
+      stackPointer++;
+
+      // Start anew with the first child.
+      current = firstIndex;
+      depth++;
+    } else {
+      // At a leaf; use an invalid index so next node will be from the stack.
+      current = baseIndex + 4;
+    }
+  } while (stackPointer > 0);
 
   return neighbors;
 };
 
 /**
- * Finds the nearest neighbor to the specified coordinates and returns an object
- * with the index of that neighbor in the original point array along with the
- * distance from that neighbor to the target point. The distance is the chord
- * length between those points; the angular distance (assuming a unit sphere)
- * would be 2 * Math.asin(distance / 2).
- * An optional maximum distance can be specified, which will ignore any points
- * beyond that distance. An index of -1 will be returned if no point is found.
+ * Finds the nearest neighbor to the specified coordinates and returns the index
+ * of that neighbor in the original point array. An optional maximum distance
+ * can be specified, which will ignore any points beyond that distance. An index
+ * of -1 will be returned if no point is found.
  * @param {number} x
  * @param {number} y
  * @param {number} z
  * @param {number=} opt_maxDistance
- * @return {{index: number, distance: number}}
+ * @return {number}
  */
 IOWA.WebglGlobe.KdTree.prototype.nearestNeighbor = function(x, y, z, opt_maxDistance) {
-  var searchPoint = {
-    x: x,
-    y: y,
-    z: z
-  };
+  var distance = (opt_maxDistance == null) ? Number.MAX_VALUE : opt_maxDistance;
+  var result = this.nearest_(x, y, z, distance);
 
-  var result = {
-    neighbor: null,
-    sqDistance: opt_maxDistance == null ? Number.MAX_VALUE :
-        opt_maxDistance * opt_maxDistance
-  };
-  result = IOWA.WebglGlobe.KdTree.nearest_(searchPoint, this.root_, 0, result);
-
-  return {
-    index: result.neighbor ? result.neighbor.index : -1,
-    distance: Math.sqrt(result.sqDistance)
-  };
+  return result;
 };
 
 /**
@@ -497,8 +648,8 @@ IOWA.WebglGlobe.KdTree.prototype.nearestNeighbor = function(x, y, z, opt_maxDist
  * longitude instead of a three-dimensional coordinate.
  * @param {number} lat
  * @param {number} lng
- * @param {numebr=} opt_maxDistance
- * @return {{index: number, distance: number}}
+ * @param {number=} opt_maxDistance
+ * @return {number}
  */
 IOWA.WebglGlobe.KdTree.prototype.nearestNeighborByLatLng = function(lat, lng, opt_maxDistance) {
   var radLat = lat * (Math.PI / 180);
@@ -516,32 +667,30 @@ IOWA.WebglGlobe.KdTree.prototype.nearestNeighborByLatLng = function(lat, lng, op
  * longitude. Returns an empty array if none are found.
  * @param {number} lat
  * @param {number} lng
- * @param {numebr} maxDistance
- * @return {!Array<{index: number, distance: number}>}
+ * @param {number} maxDistance
+ * @return {!Array<number>}
  */
 IOWA.WebglGlobe.KdTree.prototype.nearestNeighborsByLatLng = function(lat, lng, maxDistance) {
   var radLat = lat * (Math.PI / 180);
   var radLng = lng * (Math.PI / 180);
   var cosLat = Math.cos(radLat);
 
-  var searchPoint = {
-    x: Math.sin(radLng) * cosLat,
-    y: Math.sin(radLat),
-    z: Math.cos(radLng) * cosLat,
-    sqDistance: maxDistance * maxDistance
-  };
+  var x = Math.sin(radLng) * cosLat;
+  var y = Math.sin(radLat);
+  var z = Math.cos(radLng) * cosLat;
 
-  var neighbors = IOWA.WebglGlobe.KdTree.neighborhood_(searchPoint, this.root_,
-      0, []);
-  var results = [];
+  var sqDistancesArray = [];
+  var neighbors = this.neighborhood_(x, y, z, maxDistance, sqDistancesArray);
+
+  // Sort by distance.
+  neighbors.sort(function(a, b) {
+    return sqDistancesArray[a] - sqDistancesArray[b];
+  });
+
+  // Replace internal indices with indices into original points array.
   for (var i = 0; i < neighbors.length; i++) {
-    results[i] = {
-      index: neighbors[i].neighbor.index,
-      distance: Math.sqrt(neighbors[i].sqDistance)
-    };
+    neighbors[i] = this.store_[neighbors[i]];
   }
 
-  results.sort(function(a, b) { return a.distance - b.distance; });
-
-  return results;
+  return neighbors;
 };
