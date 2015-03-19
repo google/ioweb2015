@@ -120,7 +120,9 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 	if err != nil {
 		return nil, err
 	}
-	tmplCache.templates[key] = t
+	if !isDev() {
+		tmplCache.templates[key] = t
+	}
 	return t, nil
 }
 
