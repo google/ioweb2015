@@ -62,10 +62,15 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
        * @default false
        */
       signedIn: false,
-    },
 
-    attached: function() {
-
+      /**
+       * The logged in user.
+       *
+       * @attribute user
+       * @type object
+       * @default {}
+       */
+      user: null
     },
 
 // confusing some things are properties some are methods.
@@ -86,13 +91,12 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
         // Listen for changes to current user.
         // this.auth2.currentUser.listen(this.userChangedHandler.bind(this));
 
-        // if (this.auth2.isSignedIn.get()) {
-        //   this.auth2.signIn();
-        // }
-
-        // if (this.autoSignin) {
-        //   this.auth2.then(this.signIn.bind(this), this.onSignInError.bind(this));
-        // }
+        // this.auth2.then(function() {
+        //   if (this.auth2.isSignedIn.get()) {
+        //     // send getAuthResponse().id_token to server
+        //     // use currentUser to display profile
+        //   }
+        // }.bind(this), this.onSignInError.bind(this));
       }.bind(this));
     },
 
@@ -101,29 +105,59 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
         return;
       }
 
-      // Sign the user in, and then retrieve their ID.
+      // Sign the user in.
       this.auth2.signIn().then(function() {
-        console.log(this.auth2.currentUser.get())
-        console.log(this.auth2.currentUser.get().getId());
-      });
 
+        // Grant offline access for server calls.
+        // TODO: check with server if user already has token.
+        this.auth2.grantOfflineAccess({'redirect_uri': 'postmessage'}).then(function(resp) {
+          var authCode = resp.code;
 
-      // this.auth2.grantOfflineAccess({'redirect_uri': 'postmessage'}).then(function(resp) {
-      //   var auth_code = resp.code;
-      // });
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/v1/auth');
+
+          var accessToken = this.auth2.currentUser.get().getAuthResponse().access_token;
+
+          xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+
+          xhr.onload = function(e) {
+            console.log(this, this.response)
+          };
+
+          xhr.send(resp);
+
+        }.bind(this), function(error) {
+          console.error(error);
+        });
+      }.bind(this));
     },
 
     signOut: function() {
       this.auth2.signOut().then(function() {
         // Let the current user listener trigger the changes.
-        // this.auth2.disconnect(); // revoke oauth scopes.
-      }, function(error) {
+        this.auth2.disconnect(); // revoke oauth scopes.
+      }.bind(this), function(error) {
         console.error(error);
       });
     },
 
     signinChangedHandler: function(signedIn) {
       this.signedIn = signedIn;
+
+      this.currentUser = this.auth2.currentUser.get();
+
+      if (this.signedIn) {
+        var profile = this.currentUser.getBasicProfile();
+        this.user = {
+          id: profile.getId(),
+          name: profile.getName(),
+          image: profile.getImageUrl(),
+          email: profile.getEmail()
+        }
+      } else {
+        this.user = null;
+      }
     },
 
     // userChangedHandler: function(user) {
@@ -135,7 +169,7 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
     },
 
     getProfile: function() {
-      var profile = this.auth2.currntUser.get().getBasicProfile();
+      var profile = this.auth2.currentUser.get().getBasicProfile();
       console.log('ID: ' + profile.getId());
       console.log('Name: ' + profile.getName());
       console.log('Image URL: ' + profile.getImageUrl());

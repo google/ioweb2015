@@ -177,7 +177,19 @@ core-drawer-panel {
   .button-link {
     text-transform: uppercase;
     color: inherit;
+    margin: 0 12px;
   }
+
+  .profilepic {
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+    margin-right: 0;
+  }
+}
+
+#signin-settings-panel {
+  width: 344px;
 }
 
 /* paper-tabs focus states for keyboard */
@@ -259,10 +271,14 @@ experiment-fab-container {
       left: -64px;
       position: relative;
     }
-
   }
   .masthead-title {
     font-size: 20px;
+  }
+  #navbar {
+    .profilepic {
+      display: none;
+    }
   }
 }
 
@@ -306,6 +322,11 @@ experiment-fab-container {
   #navbar {
     paper-tabs {
       display: inline-block;
+      margin: 0;
+    }
+    paper-menu-button {
+      height: 40px;
+      margin: 0;
     }
     [icon="menu"] {
       display: none;

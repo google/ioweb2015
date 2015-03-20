@@ -83,7 +83,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
-    IOWA.Elements.SignIn = signin;
+    IOWA.Elements.GoogleSignIn = signin;
 
     // Kickoff a11y helpers for elements
     IOWA.A11y.init();
@@ -104,6 +104,7 @@ IOWA.Elements = (function() {
     template.offsiteMarkerResults = [];
     template.countdownEnded = false;
     template.isSignedIn = false;
+    template.currentUser = null;
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
@@ -291,7 +292,11 @@ IOWA.Elements = (function() {
     };
 
     template.signIn = function() {
-      IOWA.Elements.SignIn.signIn();
+      IOWA.Elements.GoogleSignIn.signIn();
+    };
+
+    template.signOut = function() {
+      IOWA.Elements.GoogleSignIn.signOut();
     };
 
     template.addEventListener('template-bound', updateElements);
