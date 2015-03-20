@@ -93,6 +93,7 @@ Example:
       this.text = message;
       this.tapHandler_ = opt_tapHandler;
       this.show();
+      this.fire('toast-message', { message: message });
     },
 
     handleTap: function() {
