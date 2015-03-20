@@ -195,7 +195,7 @@ IOWA.PageAnimation = (function() {
       var sections = document.querySelectorAll('.subpage__content');
       Array.prototype.forEach.call(sections, function(section) {
         section.style.display = 'none';
-      })
+      });
       section.style.display = '';
     }
     var slideInAnimation = section ? sectionSlideIn(section) : contentSlideIn();
