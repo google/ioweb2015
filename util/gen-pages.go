@@ -21,7 +21,7 @@ var (
 	templatesRoot = flag.String("d", "app/templates", "templates dir")
 
 	// metaTemplates defines which templates go into a page meta as string values.
-	metaTemplates = []string{"title", "mastheadBgClass"}
+	metaTemplates = []string{"title", "mastheadBgClass", "defaultSubpage"}
 )
 
 type pageMeta map[string]interface{}
