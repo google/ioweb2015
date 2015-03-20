@@ -61,13 +61,14 @@ IOWA.PageAnimation = (function() {
   }
 
   /**
-   * Returns an animation to slide and fade out the main content of the page.
-   * Used together with contentSlideIn for page transitions.
+   * Returns an animation to slide out and fade out a section of a page.
+   * Used together with sectionSlideIn for subpage transitions.
+   * @param {Element} section Section to slide out.
    * @return {Animation} Page animation definition.
    */
-  function contentSlideOut() {
-    var main = IOWA.Elements.Main.querySelector('.slide-up');
-    var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
+  function sectionSlideOut(section) {
+    var main = section.querySelector('.slide-up');
+    var mainDelayed = section.querySelector('.slide-up-delay');
     var start = {
       transform: 'translate(0, 0)',
       opacity: 1
@@ -79,6 +80,40 @@ IOWA.PageAnimation = (function() {
     return new AnimationGroup([
       new Animation(main, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
       new Animation(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
+    ]);
+  }
+
+  /**
+   * Returns an animation to slide up and fade in a section of a page.
+   * Used together with sectionSlideOut for subpage transitions.
+   * @param {Element} section Section to slide in.
+   * @return {Animation} Page animation definition.
+   */
+  function sectionSlideIn(section) {
+    var main = section.querySelector('.slide-up');
+    var mainDelayed = section.querySelector('.slide-up-delay');
+    var start = {
+      transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
+      opacity: 0
+    };
+    var end = {
+      transform: 'translate(0, 0)',
+      opacity: 1
+    };
+    return new AnimationGroup([
+      new Animation(main, [start, end], CONTENT_SLIDE_OPTIONS),
+      new Animation(mainDelayed, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
+    ]);
+  }
+
+  /**
+   * Returns an animation to slide and fade out the main content of the page.
+   * Used together with contentSlideIn for page transitions.
+   * @return {Animation} Page animation definition.
+   */
+  function contentSlideOut() {
+    return new AnimationGroup([
+      sectionSlideOut(IOWA.Elements.Main),
       elementFadeOut(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
       elementFadeOut(IOWA.Elements.IOLogoLarge, CONTENT_SLIDE_OPTIONS),
       elementFadeOut(IOWA.Elements.Footer, {duration: 0}) // Hide instantly.
@@ -92,19 +127,8 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function contentSlideIn() {
-    var main = IOWA.Elements.Main.querySelector('.slide-up');
-    var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
-    var start = {
-      transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
-      opacity: 0
-    };
-    var end = {
-      transform: 'translate(0, 0)',
-      opacity: 1
-    };
     return new AnimationGroup([
-      new Animation(main, [start, end], CONTENT_SLIDE_OPTIONS),
-      new Animation(mainDelayed, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
+      sectionSlideIn(IOWA.Elements.Main),
       elementFadeIn(IOWA.Elements.Footer, CONTENT_SLIDE_DELAY_OPTIONS)
     ]);
   }
@@ -166,9 +190,17 @@ IOWA.PageAnimation = (function() {
    * and fades in the masthead meta.
    * @return {Animation} Ripple animation definition.
    */
-  function pageFirstRender() {
+  function pageFirstRender(section) {
+    if (section) {
+      var sections = document.querySelectorAll('.subpage__content');
+      Array.prototype.forEach.call(sections, function(section) {
+        section.style.display = 'none';
+      })
+      section.style.display = '';
+    }
+    var slideInAnimation = section ? sectionSlideIn(section) : contentSlideIn();
     return new AnimationGroup([
-      contentSlideIn(),
+      slideInAnimation,
       elementFadeIn(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS)
     ], CONTENT_SLIDE_OPTIONS);
   }
@@ -272,6 +304,8 @@ IOWA.PageAnimation = (function() {
   return {
     elementFadeOut: elementFadeOut,
     elementFadeIn: elementFadeIn,
+    sectionSlideOut: sectionSlideOut,
+    sectionSlideIn: sectionSlideIn,
     contentSlideOut: contentSlideOut,
     contentSlideIn: contentSlideIn,
     pageSlideIn: pageSlideIn,

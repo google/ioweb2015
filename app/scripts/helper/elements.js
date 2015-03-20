@@ -25,14 +25,20 @@ IOWA.Elements = (function() {
           IOWA.Elements.FAB.onFabClick();
         }
       };
-
-      IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender(), function() {
-        // Fire event when the page transitions are final.
-        IOWA.Elements.Template.fire('page-transition-done');
-
-        optionallyLaunchExperiment();
-        IOWA.ServiceWorkerRegistration.register();
-      });
+      // Check if hash refers to a page's section.
+      var selectedSubpage = location.hash.substring(1);
+      var subpage = document.querySelector(
+        '#subpage-' + selectedSubpage);
+      if (subpage) {
+        IOWA.Elements.Template.selectedSubpage = selectedSubpage;
+      }
+      IOWA.PageAnimation.play(
+        IOWA.PageAnimation.pageFirstRender(subpage), function() {
+          // Fire event when the page transitions are final.
+          IOWA.Elements.Template.fire('page-transition-done');
+          optionallyLaunchExperiment();
+          IOWA.ServiceWorkerRegistration.register();
+        });
     });
 
     var main = document.querySelector('.io-main');
@@ -79,6 +85,7 @@ IOWA.Elements = (function() {
     var template = document.getElementById('t');
     template.pages = IOWA.PAGES; // defined in auto-generated ../pages.js
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
+    template.selectedSubpage = template.pages[template.selectedPage].defaultSubpage;
     template.fullscreenVideoActive = false;
     template.photoGalleryActive = false;
     template.extendedMapActive = false;
