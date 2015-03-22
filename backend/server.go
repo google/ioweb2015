@@ -6,9 +6,7 @@
 package main
 
 import (
-	"errors"
 	"flag"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -16,8 +14,6 @@ import (
 	"path/filepath"
 
 	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/jwt"
 )
 
 var (
@@ -33,14 +29,8 @@ func main() {
 	}
 	cache = newMemoryCache()
 	wrapHandler = logHandler
-	handle("/", catchAllHandler)
-	handle("/api/extended", serveIOExtEntries)
-	handle("/api/social", serveSocial)
-	// setup root redirect if we're prefixed
-	if config.Prefix != "/" {
-		redirect := http.HandlerFunc(redirectHandler)
-		http.Handle("/", wrapHandler(redirect))
-	}
+	rootHandleFn = catchAllHandler
+	registerHandlers()
 
 	if err := http.ListenAndServe(config.Addr, nil); err != nil {
 		// don't need context here
@@ -76,24 +66,9 @@ func logHandler(h http.Handler) http.Handler {
 	})
 }
 
-// newContext returns a newly created context of the in-flight request r
-// and its response writer w.
-func newContext(r *http.Request, w io.Writer) context.Context {
-	return context.WithValue(context.Background(), ctxKeyWriter, w)
-}
-
-// serviceCredentials returns a token source for the service account serviceAccountEmail.
-func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource, error) {
-	if config.Google.ServiceAccount.Key == "" || config.Google.ServiceAccount.Email == "" {
-		return nil, errors.New("serviceCredentials: key or email is empty")
-	}
-	cred := &jwt.Config{
-		Email:      config.Google.ServiceAccount.Email,
-		PrivateKey: []byte(config.Google.ServiceAccount.Key),
-		Scopes:     scopes,
-		TokenURL:   config.Google.TokenURL,
-	}
-	return cred.TokenSource(oauth2.NoContext), nil
+// newContext returns a context of the in-flight request r.
+func newContext(r *http.Request) context.Context {
+	return context.Background()
 }
 
 // httpTransport returns a suitable HTTP transport for current backend hosting environment.

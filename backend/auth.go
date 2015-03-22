@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/jwt"
 )
 
 // twitterCredentials implements oauth2.TokenSource for Twitter App authentication.
@@ -72,13 +73,27 @@ func twitterClient(c context.Context) (*http.Client, error) {
 }
 
 // serviceAccountClient creates a new HTTP client with an access token
-// obtained using the service account backend/service-account.pem.
+// obtained using the service account config.Google.ServiceAccount.
 func serviceAccountClient(c context.Context, scopes ...string) (*http.Client, error) {
 	cred, err := serviceCredentials(c, scopes...)
 	if err != nil {
 		return nil, err
 	}
 	return &http.Client{Transport: oauth2Transport(c, cred)}, nil
+}
+
+// serviceCredentials returns a token source for config.Google.ServiceAccount.
+func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource, error) {
+	if config.Google.ServiceAccount.Key == "" || config.Google.ServiceAccount.Email == "" {
+		return nil, errors.New("serviceCredentials: key or email is empty")
+	}
+	cred := &jwt.Config{
+		Email:      config.Google.ServiceAccount.Email,
+		PrivateKey: []byte(config.Google.ServiceAccount.Key),
+		Scopes:     scopes,
+		TokenURL:   config.Google.TokenURL,
+	}
+	return cred.TokenSource(c), nil
 }
 
 // oauth2Transport returns an HTTP transport suitable for making OAuth2-ed requests.

@@ -6,13 +6,9 @@
 package main
 
 import (
-	"errors"
-	"io"
 	"net/http"
 
 	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/jwt"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
@@ -25,22 +21,17 @@ func init() {
 		panic("initConfig: " + err.Error())
 	}
 	cache = &gaeMemcache{}
-	wrapHandler = checkWhitelist
-	handle("/", serveTemplate)
-	handle("/api/extended", serveIOExtEntries)
-	handle("/api/social", serveSocial)
-	// setup root redirect if we're prefixed
-	if config.Prefix != "/" {
-		redirect := http.HandlerFunc(redirectHandler)
-		http.Handle("/", wrapHandler(redirect))
+	if isStaging() {
+		wrapHandler = checkWhitelist
 	}
+	rootHandleFn = serveTemplate
+	registerHandlers()
 }
 
 // allowPassthrough returns true if the request r can be handled w/o whitelist check.
+// Currently, only GAE Cron and Task Queue jobs are allowed.
 func allowPassthrough(r *http.Request) bool {
-	return isProd() ||
-		r.Header.Get("X-AppEngine-Cron") == "true" ||
-		r.Header.Get("X-AppEngine-TaskName") != ""
+	return r.Header.Get("X-AppEngine-Cron") == "true" || r.Header.Get("X-AppEngine-TaskName") != ""
 }
 
 // checkWhitelist checks whether the current user is allowed to access
@@ -53,47 +44,29 @@ func checkWhitelist(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
-		ac := appengine.NewContext(r)
-		u := user.Current(ac)
-		if u == nil {
-			url, err := user.LoginURL(ac, r.URL.Path)
+		c := appengine.NewContext(r)
+		u := user.Current(c)
+		switch {
+		case u != nil && isWhitelisted(u.Email):
+			h.ServeHTTP(w, r)
+		case u != nil:
+			errorf(c, "%s is not whitelisted", u.Email)
+			http.Error(w, "Access denied, sorry. Try with a different account.", http.StatusForbidden)
+		default:
+			url, err := user.LoginURL(c, r.URL.Path)
 			if err != nil {
-				errorf(ac, "user.LoginURL(%q): %v", r.URL.Path, err)
+				errorf(c, "user.LoginURL(%q): %v", r.URL.Path, err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 			http.Redirect(w, r, url, http.StatusFound)
-			return
 		}
-		if !isWhitelisted(u.Email) {
-			errorf(ac, "%s is not whitelisted", u.Email)
-			http.Error(w, "Access denied, sorry. Try with a different account.", http.StatusForbidden)
-			return
-		}
-
-		h.ServeHTTP(w, r)
 	})
 }
 
-// newContext returns a newly created context of the in-flight request r.
-// and its response writer w.
-func newContext(r *http.Request, w io.Writer) context.Context {
-	c := appengine.NewContext(r)
-	return context.WithValue(c, ctxKeyWriter, w)
-}
-
-// serviceCredentials returns a token source for the service account serviceAccountEmail.
-func serviceCredentials(c context.Context, scopes ...string) (oauth2.TokenSource, error) {
-	if config.Google.ServiceAccount.Key == "" || config.Google.ServiceAccount.Email == "" {
-		return nil, errors.New("serviceCredentials: key or email is empty")
-	}
-	cred := &jwt.Config{
-		Email:      config.Google.ServiceAccount.Email,
-		PrivateKey: []byte(config.Google.ServiceAccount.Key),
-		Scopes:     scopes,
-		TokenURL:   config.Google.TokenURL,
-	}
-	return cred.TokenSource(c), nil
+// newContext returns a context of the in-flight request r.
+func newContext(r *http.Request) context.Context {
+	return appengine.NewContext(r)
 }
 
 // httpTransport returns a suitable HTTP transport for current backend hosting environment.
