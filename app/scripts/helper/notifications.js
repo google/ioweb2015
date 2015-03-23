@@ -17,14 +17,48 @@
 window.IOWA = window.IOWA || {};
 
 IOWA.Notifications = IOWA.Notifications || (function() {
-  "use strict";
+  'use strict';
+
+  var NOTIFY_ENDPOINT = 'api/v1/user/notify';
+
+  var _xhrWrapperPromise = function(body) {
+    return new Promise(function(resolve, reject) {
+      // TODO: Where can we get the current access token from? Will it refresh if it expires?
+      var accessToken = '';
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('PUT', NOTIFY_ENDPOINT);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.setRequestHeader('Authorization', 'Bearer' + accessToken);
+
+      xhr.onerror = reject;
+      xhr.onload = function() {
+        var response = JSON.parse(this.response);
+        if (this.status < 400) {
+          resolve(response);
+        } else {
+          reject(response);
+        }
+      };
+
+      xhr.send(JSON.stringify(body));
+    });
+  };
 
   var _sendSubscriptionIdToServerPromise = function(subscriptionId) {
-    // no-op
+    return _xhrWrapperPromise({
+      notify: true,
+        subscriber: subscriptionId
+    });
   };
 
   var _removeSubscriptionIdFromServerPromise = function(subscriptionId) {
-    // no-op
+    // TODO: Our intention here doesn't match the semantics of the API call, since we're presumably
+    // just trying to unsubscribe the current device, not all devices.
+    return _xhrWrapperPromise({
+      notify: false,
+      subscriber: subscriptionId
+    });
   };
 
   var isSupported = (ServiceWorkerRegistration &&

@@ -14,75 +14,90 @@
  * limitations under the License.
  */
 
-var DB_NAME = 'push-notifications-timestamp';
-var DB_KEY = 'timestamp';
+var DB_KEY = 'token';
+var DB_NAME = 'push-notification-updates';
+var DEFAULT_ICON = 'images/touch/homescreen192.png';
+var SESSIONS_ENDPOINT = 'api/v1/schedule';
+var UPDATES_ENDPOINT = 'api/v1/user/updates';
+
+function loadToken() {
+  return simpleDB.open(DB_NAME).then(function(db) {
+    return db.get(DB_KEY).then(function(token) {
+      return token;
+    });
+  });
+}
+
+function fetchUpdates(token) {
+  return fetch(new Request(UPDATES_ENDPOINT, {Authorization: token}));
+}
+
+function parseResponse(response) {
+  if (response.status >= 400) {
+    throw Error('The request to ' + response.url + ' failed: ' +
+                response.statusText + ' (' + response.status + ')');
+  }
+  return response.json();
+}
+
+function processResponse(json) {
+  var notifications = generateSessionNotifications(json.sessions)
+    .concat(generateVideoNotifications(json.videos))
+    .concat(generateExtNotifications(json.ext));
+
+  return Promise.all(notifications.map(function(notification) {
+    return self.registration.showNotification(notification.title, notification);
+  })).then(function() {
+    return json.token;
+  });
+}
+
+function generateSessionNotifications(sessions) {
+  return shed.networkFirst(SESSIONS_ENDPOINT).then(parseResponse).then(function(json) {
+    return sessions.reduce(function(notifications, session) {
+      if (json.session) {
+        notifications.append({
+          title: 'Session "' + json.session.title + '" was updated.',
+          body: 'You previously starred this session.',
+          icon: DEFAULT_ICON,
+          tag: 'session-' + session
+        });
+      }
+      return notifications;
+    }, []);
+  });
+}
+
+function generateVideoNotifications(videos) {
+  // TODO: Implement.
+  return [];
+}
+
+function generateExtNotifications(videos) {
+  // TODO: Implement.
+  return [];
+}
+
+function saveToken(token) {
+  return simpleDB.open(DB_NAME).then(function(db) {
+    return db.set(DB_KEY, token);
+  });
+}
 
 self.addEventListener('push', function(event) {
-  var now;
-
   event.waitUntil(
-    self.registration.pushManager.getSubscription().then(function(subscription) {
-      if (!subscription || !subscription.subscriptionId) {
-        throw Error('Unable to get the current subscription id.');
-      }
-      return subscription.subscriptionId;
-    }).then(function(subscriptionId) {
-      return simpleDB.open(DB_NAME).then(function(db) {
-        return db.get(DB_KEY).then(function(timestamp) {
-          var endpoint = 'api/v1/' + subscriptionId + '/notifications';
-          var url = new URL(endpoint, self.location);
-          if (timestamp) {
-            url.search = 'since=' + encodeURIComponent(timestamp);
-          }
-          now = Date.now();
-          return fetch(url);
-        });
-      });
-    }).then(function(response) {
-      if (response.status >= 400) {
-        throw Error('The request to ' + response.url + ' failed: ' +
-                    response.statusText + ' (' + response.status + ')');
-      }
-      return response.json();
-    }).then(function(notifications) {
-      return Promise.all(notifications.map(function(notification) {
-        return self.registration.showNotification(notification.title, {
-          body: notification.body,
-          icon: notification.icon,
-          tag: notification.tag
-        });
-      }));
-    }).then(function() {
-      return simpleDB.open(DB_NAME).then(function(db) {
-        return db.set(DB_KEY, now);
-      });
-    }).catch(function(error) {
-      console.error('Unable to handle event', event, 'due to error', error);
-    })
+    loadToken()
+      .then(fetchUpdates)
+      .then(parseResponse)
+      .then(processResponse)
+      .then(saveToken)
+      .catch(function(error) {
+        console.error('Unable to handle event', event, 'due to error', error);
+      })
   );
 });
 
 self.addEventListener('notificationclick', function(event) {
   console.log('notificationclick:', event);
-  /*// Android doesn't close the notification when you click on it
-  // See: http://crbug.com/463146
-  event.notification.close();
-
-  // This looks to see if the current is already open and
-  // focuses if it is
-  event.waitUntil(
-    self.clients.matchAll({
-      type: "window"
-    })
-      .then(function(clientList) {
-        for (var i = 0; i < clientList.length; i++) {
-          var client = clientList[i];
-          if (client.url == '/' && 'focus' in client)
-            return client.focus();
-        }
-        if (self.clients.openWindow) {
-          return self.clients.openWindow('/');
-        }
-      })
-  );*/
+  // TODO: Implement.
 });
