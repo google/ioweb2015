@@ -154,36 +154,28 @@ Note that in the latter case `notify` parameter still refers to
 the global notification state scoped to a user, not a specific subscriber ID.
 
 
-### GET /api/v1/:subscription_id/notifications?since=unix-timestamp
+### GET /api/v1/user/updates
 
-Retrieve details about all notifications relevant to a given `subscription_id`. Response body sample:
+*Authorization: _OAUTH2_ACCESS_TOKEN_* or *X-Token: <one-time token obtained from the previous request>*
+
+Response body sample:
 
 ```json
-[
-  {
-    title: 'Event XYZ Changed',
-    body: 'The details for one of your starred events, XYZ, has been updated.',
-    icon: 'images/touch/homescreen192.png',
-    tag: 'event-6D752F30-3EB9-4014-8281-CBD28FD33B5A'
-  },
-  {
-    title: 'New I/O Extended Event',
-    body: 'A new I/O extended event is now scheduled for your area.',
-    icon: 'images/touch/homescreen192.png',
-    tag: 'extended'
-  },
-  {
-    title: 'A new YouTube Video is Available',
-    body: 'A new YouTube video is available for one of your starred sessions.',
-    icon: 'images/touch/homescreen192.png',
-    tag: 'video-6D752F30-3EB9-4014-8281-CBD28FD33B5A'
-  },
-  ...
-]
+{
+  "sessions": [
+    "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+    "05012279-E037-46D1-AD91-C0892277B01B"
+  ],
+  "videos": ["... new/updated videos ..."],
+  "ext": ["... i/o extended ..."],
+  "token": "use this token for the next request"
+}
 ```
 
-If `since` query param is present, the reponse will contain only the relevant notifications
-since the specified timestamp.
+If `Authorization` is set, then the response will come back with just the `token` field populated,
+for use in the next request.
+If `X-Token` is set, then the response will come back with fields set
+for all the updated resources, and additionally the `token` field will be populated.
 
 
 ### PUT /api/v1/user/schedule/:session_id
