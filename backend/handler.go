@@ -3,34 +3,36 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
-
-	"golang.org/x/net/context"
 )
-
-// ctxKey is a custom type for context.Context values.
-type ctxKey int
-
-const (
-	ctxKeyWriter ctxKey = iota
-	ctxKeyGAEContext
-)
-
-// writer returns a response writer associated with the give context c.
-func writer(c context.Context) io.Writer {
-	w, _ := c.Value(ctxKeyWriter).(io.Writer)
-	return w
-}
 
 // wrapHandler is the last in a handler chain call,
 // which wraps all app handlers.
-// A variable so that GAE and standalone can have different wrappers.
+// GAE and standalone servers have different wrappers, hence a variable.
 var wrapHandler func(http.Handler) http.Handler
+
+// rootHandleFn is a request handler func for config.Prefix pattern.
+// GAE and standalone servers have different root handle func.
+var rootHandleFn func(http.ResponseWriter, *http.Request)
+
+// registerHandlers sets up all backend handle funcs, including the API.
+func registerHandlers() {
+	handle("/", rootHandleFn)
+	handle("/api/extended", serveIOExtEntries)
+	handle("/api/social", serveSocial)
+	// setup root redirect if we're prefixed
+	if config.Prefix != "/" {
+		var redirect http.Handler = http.HandlerFunc(redirectHandler)
+		if wrapHandler != nil {
+			redirect = wrapHandler(redirect)
+		}
+		http.Handle("/", redirect)
+	}
+}
 
 // handle registers a handle function fn for the pattern prefixed
 // with httpPrefix.
@@ -77,7 +79,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := newContext(r, w)
+	c := newContext(r)
 	r.ParseForm()
 	_, wantsPartial := r.Form["partial"]
 	_, experimentShare := r.Form["experiment"]
@@ -124,7 +126,7 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	_, refresh := r.Form["refresh"]
 
-	c := newContext(r, w)
+	c := newContext(r)
 	w.Header().Set("Cache-Control", "public, max-age=60")
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
@@ -160,7 +162,7 @@ func serveSocial(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	_, refresh := r.Form["refresh"]
 
-	c := newContext(r, w)
+	c := newContext(r)
 	w.Header().Set("Cache-Control", "public, max-age=60")
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"net/http"
 	"regexp"
 	"testing"
@@ -19,7 +18,7 @@ func TestRenderTemplate(t *testing.T) {
 	}
 	for i, test := range table {
 		r, _ := http.NewRequest("GET", "/dummy", nil)
-		c := newContext(r, new(bytes.Buffer))
+		c := newContext(r)
 		if _, err := renderTemplate(c, test.tmpl, test.partial, nil); err != nil {
 			t.Fatalf("%d: renderTemplate(%v, %q, %v): %v", i, c, test.tmpl, test.partial, err)
 		}
@@ -30,7 +29,7 @@ func TestRenderEnv(t *testing.T) {
 	revert := overrideEnv("prod")
 	defer revert()
 	req, _ := http.NewRequest("GET", "/about", nil)
-	c := newContext(req, new(bytes.Buffer))
+	c := newContext(req)
 
 	out, err := renderTemplate(c, "about", false, nil)
 	if err != nil {
@@ -45,7 +44,7 @@ func TestRenderEnv(t *testing.T) {
 
 func TestRenderOgImage(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/about", nil)
-	c := newContext(req, new(bytes.Buffer))
+	c := newContext(req)
 
 	data := &templateData{OgImage: ogImageExperiment}
 	out, err := renderTemplate(c, "about", false, data)
@@ -61,7 +60,7 @@ func TestRenderOgImage(t *testing.T) {
 
 func TestRenderOgDesc(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/about?experiment", nil)
-	c := newContext(req, new(bytes.Buffer))
+	c := newContext(req)
 
 	data := &templateData{Desc: descExperiment}
 	out, err := renderTemplate(c, "about", false, data)
