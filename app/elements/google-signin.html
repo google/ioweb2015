@@ -130,7 +130,7 @@ Fired when the signed in state of the user changes.
             console.log(this, this.response)
           };
 
-          xhr.send(resp);
+          xhr.send(JSON.stringify(resp));
 
         }.bind(this), function(error) {
           console.error(error);
