@@ -24,6 +24,15 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
 
 @element google-signin
 -->
+<!--
+Fired when the signed in state of the user changes.
+
+@event signin-change
+@param {Object} detail
+@param {Object} detail.signedIn True if the user is authenticated.
+@param {Object} detail.user The current user.
+@param {Object} detail.response The current user's token response.
+-->
 <polymer-element name="google-signin" attributes="clientId scopes signedIn">
   <template>
     <style>
@@ -72,10 +81,6 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
        */
       user: null
     },
-
-// confusing some things are properties some are methods.
-//   auth2.isSignedIn.get() vs user.isSignedIn()
-// .get() is weird
 
     loadAuth: function(e, detail, sender) {
       gapi.load('auth2', function() {
@@ -137,6 +142,11 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
       this.auth2.signOut().then(function() {
         // Let the current user listener trigger the changes.
         this.auth2.disconnect(); // revoke oauth scopes.
+
+        this.fire('signin-change', {
+          signedIn: false, user: null
+        });
+
       }.bind(this), function(error) {
         console.error(error);
       });
@@ -153,8 +163,13 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
           id: profile.getId(),
           name: profile.getName(),
           image: profile.getImageUrl(),
-          email: profile.getEmail()
+          email: profile.getEmail(),
+          tokenResponse: this.currentUser.getAuthResponse()
         }
+        this.fire('signin-change', {
+          signedIn: true,
+          user: this.user
+        });
       } else {
         this.user = null;
       }
@@ -166,14 +181,6 @@ OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
 
     onSignInError: function(error) {
       console.error(error);
-    },
-
-    getProfile: function() {
-      var profile = this.auth2.currentUser.get().getBasicProfile();
-      console.log('ID: ' + profile.getId());
-      console.log('Name: ' + profile.getName());
-      console.log('Image URL: ' + profile.getImageUrl());
-      console.log('Email: ' + profile.getEmail());
     }
   });
   </script>
