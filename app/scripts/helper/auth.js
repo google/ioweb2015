@@ -27,7 +27,15 @@ IOWA.Auth = IOWA.Auth || (function() {
   }
 
   document.addEventListener('signin-change', function(e) {
-    tokenResponse_ = e.detail.user ? e.detail.user.tokenResponse : null;
+    var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
+    if (e.detail.user) {
+      tokenResponse_ = e.detail.user.tokenResponse;
+      drawerProfilePic.src = e.detail.user.image;
+      drawerProfilePic.hidden = false;
+    } else {
+      tokenResponse_ = null;
+      drawerProfilePic.hidden = true;
+    }
   });
 
   return {

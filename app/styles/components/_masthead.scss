@@ -148,6 +148,13 @@ core-drawer-panel {
   }
 }
 
+.profilepic {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  margin-right: 0;
+}
+
 #navbar {
   background-color: transparent;
 
@@ -178,13 +185,6 @@ core-drawer-panel {
     text-transform: uppercase;
     color: inherit;
     margin: 0 12px;
-  }
-
-  .profilepic {
-    height: 32px;
-    width: 32px;
-    border-radius: 50%;
-    margin-right: 0;
   }
 }
 
@@ -317,7 +317,7 @@ experiment-fab-container {
     font-size: 20px;
   }
   #navbar {
-    .profilepic {
+    > .profilepic {
       display: none;
     }
   }
