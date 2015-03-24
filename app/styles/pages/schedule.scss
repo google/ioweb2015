@@ -34,6 +34,14 @@ $name: 'page-schedule';
 
   paper-tabs {
     max-width: 450px;
+
+    a {
+      color: inherit;
+    }
+  }
+
+  paper-tab {
+    flex: none;
   }
 
   paper-dropdown-menu {
