@@ -190,6 +190,46 @@ core-drawer-panel {
 
 #signin-settings-panel {
   width: 344px;
+  color: $color-text;
+  font-size: 14px;
+  line-height: 18px;
+
+  core-label {
+    padding: $mobileKeyline 0;
+  }
+
+  ul {
+    padding-left: $mobileKeyline;
+    margin: 0;
+  }
+
+  .profilepic {
+    margin-right:  $mobileKeyline / 2;
+  }
+
+  .card-content {
+    padding: $mobileKeyline;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $color-light-grey-border;
+    }
+
+    &:last-child {
+      padding: $tabletKeyline $mobileKeyline;
+    }
+  }
+
+  paper-checkbox {
+    margin-right: $tabletKeyline;
+  }
+
+  .settings-email {
+    color: $color-gray;
+  }
+
+  a {
+    text-transform: uppercase;
+  }
 }
 
 /* paper-tabs focus states for keyboard */

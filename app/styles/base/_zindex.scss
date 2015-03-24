@@ -27,40 +27,36 @@ paper-fab {
   z-index: 2;
 }
 
-#navbar {
+experiment-fab-container {
   z-index: 3;
 }
 
-experiment-fab-container {
+#page-schedule .masthead-meta {
   z-index: 4;
 }
 
-#page-schedule .masthead-meta {
+.fullvideo_thumbnail {
   z-index: 5;
 }
 
-.fullvideo_thumbnail {
+.fullvideo__container {
   z-index: 6;
 }
 
-.fullvideo__container {
+io-gallery {
   z-index: 7;
 }
 
-io-gallery {
+.marker-results, .view__events {
   z-index: 8;
 }
 
-.marker-results, .view__events {
+.navbar__overlay {
   z-index: 9;
 }
 
-.navbar__overlay {
-  z-index: 10;
-}
-
 .io-logo-container {
-  z-index: 11; // highest
+  z-index: 10; // highest
 }
 
 experiment-fab-container[playmode="playing"],

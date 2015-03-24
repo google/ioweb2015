@@ -274,12 +274,19 @@ limitations under the License.
             <paper-menu-button>
               <paper-icon-button icon="io:more-vert" aria-label="Settings"></paper-icon-button>
               <paper-dropdown id="signin-settings-panel" class="dropdown" halign="right" valign="top">
-                <h4>Notifications</h4>
-                <core-label horizontal layout>
-                  <paper-checkbox checked autoFocus for></paper-checkbox>
-                  <div>I want to receive notifications from the Google I/O 2015 website.</div>
-                </core-label>
-                <div>
+                <div class="card-content" layout horizontal>
+                  <div><img _src="{{currentUser.image}}" class="profilepic"></div>
+                  <div>
+                    <div>{{currentUser.name}}</div>
+                    <div class="settings-email">{{currentUser.email}}</div>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <h4>Notifications</h4>
+                  <core-label horizontal layout>
+                    <paper-checkbox checked autoFocus for></paper-checkbox>
+                    <h5>I want to receive notifications from the Google I/O 2015 website.</h5>
+                  </core-label>
                   <p>If this option is deselected, I understand I won't be notified when:</p>
                   <ul>
                     <li>New Extended events register near me</li>
@@ -288,11 +295,9 @@ limitations under the License.
                     <li>Specific session videos are made available</li>
                   </ul>
                 </div>
-                <div class="card">
-                  <div class="card-content link-spacing">
-                    <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blak">Terms of Service</a>
-                    <a href="#" data-track-link="login-signout" on-tap="{{signOut}}">Sign-out</a>
-                  </div>
+                <div class="card-content" layout horizontal justified>
+                  <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blak">Terms of Service</a>
+                  <a href="#" data-track-link="login-signout" on-tap="{{signOut}}">Sign-out</a>
                 </div>
               </paper-dropdown>
             </paper-menu-button>
