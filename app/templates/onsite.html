@@ -2,218 +2,178 @@
 
 {% define "mastheadBgClass" %}bg-dark-grey{% end %}
 
+{% define "selectedSubpage" %}event{% end %}
+
 {% define "masthead" %}
   <h1><i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg></h1>
-  <paper-tabs class="white" selected="{{selectedOnsiteTab}}">
-    <paper-tab>Event</paper-tab>
-    <paper-tab>Travel</paper-tab>
+  <paper-tabs class="white" selected="{{pages[selectedPage].selectedSubpage}}" valueattr="label" link>
+    <paper-tab label="event">
+      <a href="#event" data-track-link="onsite-event" data-subpage-link
+                       layout horizontal center-center>Event</a>
+    </paper-tab>
+    <paper-tab label="travel">
+      <a href="#travel" data-track-link="onsite-travel"  data-subpage-link
+                        layout horizontal center-center>Travel</a>
+    </paper-tab>
   </paper-tabs>
 {% end %}
 
 {% define "content" %}
 
-<core-pages selected="{{selectedOnsiteTab}}" on-core-select="{{onOnsiteTabChange}}">
-<section>
+<div class="subpage__container">
 
-  <div class="card__container card__container--top slide-up">
-    <div class="card js-experiment-visualizer">
-      <div class="card-content">
-        <h3 class="card__title">Pro Tips</h3>
-        <div>Learn everything you need to know about Google I/O. Find out how to best navigate the conference, organize your schedule, and get the most from the event.</div>
-      </div>
-      <div class="card-content">
-        <a href="#" data-ajax-link data-track-link="onsite-faq">View FAQ</a>
-      </div>
-    </div>
-  </div>
+  <section id="subpage-event" class="subpage__content">
 
-  <div class="slide-up-delay">
-    <section class="page__section onsite__pic onsite__pic--reg js-experiment-instrument"></section>
-
-    <section id="sandbox" class="page__section bg-light-grey js-experiment-instrument">
-      <h2>Sandbox</h2>
-      <div>The Sandbox is hands-on inspiration. Post up at a workstation to work through modules on Android, Chrome, Cloud and APIs with experts on hand for guidance, or swing by to chat and exchange ideas with Googlers as they demo tools.</div>
-      <div class="sandbox__details sidebyside" layout horizontal wrap>
-        <div flex?="{{!isPhoneSize}}">
-          <h4>Partners</h4>
-          <div>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</div>
-        </div>
-        <div flex?="{{!isPhoneSize}}">
-          <h4>Google areas</h4>
-          <div>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</div>
-        </div>
-        <div flex?="{{!isPhoneSize}}">
-          <h4>Code labs</h4>
-          <div>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="page__section pics__section js-experiment-instrument">
-      <div layout horizontal>
-        <div class="photo__afterhours" flex two?="{{isDesktopSize}}"></div>
-        <div layout vertical flex>
-          <div class="photo__afterhours--top" flex></div>
-          <div class="photo__afterhours--bottom" flex></div>
-        </div>
-      </div>
-    </section>
-
-    <div class="card__container">
+    <div class="card__container card__container--top slide-up">
       <div class="card js-experiment-visualizer">
         <div class="card-content">
-          <h3 class="card__title">After Hours</h3>
-          <div>Registered attendees are invited to party with us After Hours. It's a great opportunity to mingle in a fun and relaxed environment. Enjoy food, drink, music, games and more. Conference credentials are required for entry.</div>
+          <h3 class="card__title">Pro Tips</h3>
+          <div>Learn everything you need to know about Google I/O. Find out how to best navigate the conference, organize your schedule, and get the most from the event.</div>
+        </div>
+        <div class="card-content">
+          <a href="#" data-ajax-link data-track-link="onsite-faq">View FAQ</a>
         </div>
       </div>
     </div>
 
-    <section id="community" class="page__section bg-light-grey js-experiment-instrument">
-      <h2>Community Events</h2>
-      <div>The Sandbox is hands-on inspiration. Post up at a workstation to work through modules on Android, Chrome, Cloud and APIs with experts on hand for guidance, or swing by to chat and exchange ideas with Googlers as they demo tools.</div>
-      <div class="sandbox__details sidebyside" layout horizontal wrap>
-        <div flex?="{{!isPhoneSize}}">
-          <h4>Donations</h4>
-          <p>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
-          <a href="#">Learn more</a>
+    <div class="slide-up-delay">
+      <section class="page__section onsite__pic onsite__pic--reg js-experiment-instrument"></section>
+
+      <section id="sandbox" class="page__section bg-light-grey js-experiment-instrument">
+        <h2>Sandbox</h2>
+        <div>The Sandbox is hands-on inspiration. Post up at a workstation to work through modules on Android, Chrome, Cloud and APIs with experts on hand for guidance, or swing by to chat and exchange ideas with Googlers as they demo tools.</div>
+        <div class="sandbox__details sidebyside" layout horizontal wrap>
+          <div flex?="{{!isPhoneSize}}">
+            <h4>Partners</h4>
+            <div>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</div>
+          </div>
+          <div flex?="{{!isPhoneSize}}">
+            <h4>Google areas</h4>
+            <div>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</div>
+          </div>
+          <div flex?="{{!isPhoneSize}}">
+            <h4>Code labs</h4>
+            <div>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</div>
+          </div>
         </div>
-        <div flex?="{{!isPhoneSize}}">
-          <h4>Fundraisers</h4>
-          <p>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
-          <a href="#">Learn more</a>
+      </section>
+
+      <section class="page__section pics__section js-experiment-instrument">
+        <div layout horizontal>
+          <div class="photo__afterhours" flex two?="{{isDesktopSize}}"></div>
+          <div layout vertical flex>
+            <div class="photo__afterhours--top" flex></div>
+            <div class="photo__afterhours--bottom" flex></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="card__container">
+        <div class="card js-experiment-visualizer">
+          <div class="card-content">
+            <h3 class="card__title">After Hours</h3>
+            <div>Registered attendees are invited to party with us After Hours. It's a great opportunity to mingle in a fun and relaxed environment. Enjoy food, drink, music, games and more. Conference credentials are required for entry.</div>
+          </div>
         </div>
       </div>
-    </section>
 
-    <section id="hashtag" class="page__section bg-cyan js-experiment-instrument">
-      <a href="//www.google.com/?#q=%23io15" target="_blank" data-track-link="about-hashtag-search"><div class="io__hash"></div></a>
-    </section>
+      <section id="community" class="page__section bg-light-grey js-experiment-instrument">
+        <h2>Community Events</h2>
+        <div>The Sandbox is hands-on inspiration. Post up at a workstation to work through modules on Android, Chrome, Cloud and APIs with experts on hand for guidance, or swing by to chat and exchange ideas with Googlers as they demo tools.</div>
+        <div class="sandbox__details sidebyside" layout horizontal wrap>
+          <div flex?="{{!isPhoneSize}}">
+            <h4>Donations</h4>
+            <p>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
+            <a href="#">Learn more</a>
+          </div>
+          <div flex?="{{!isPhoneSize}}">
+            <h4>Fundraisers</h4>
+            <p>Sed posuere consectetur est at lobortis. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
+            <a href="#">Learn more</a>
+          </div>
+        </div>
+      </section>
 
-  </div>
+      <section id="hashtag" class="page__section bg-cyan js-experiment-instrument">
+        <a href="//www.google.com/?#q=%23io15" target="_blank" data-track-link="about-hashtag-search"><div class="io__hash"></div></a>
+      </section>
+    </div>
 
-</section>
-<section>
+  </section>
 
-  <div class="card__container card__container--top"> <!-- <div class="card__container card__container--top slide-up"> -->
-    <div class="card js-experiment-visualizer">
-      <div class="card-content">
-        <h3>Google I/O is Innovation in the Open. Connect face-to-face with developers and designers from around the world, check the latest product releases first hand, and chat directly with Googlers.</h3>
+  <section id="subpage-travel" class="subpage__content">
+
+    <div class="card__container card__container--top slide-up">
+      <div class="card js-experiment-visualizer">
+        <div class="card-content">
+          <h3>Google I/O is Innovation in the Open. Connect face-to-face with developers and designers from around the world, check the latest product releases first hand, and chat directly with Googlers.</h3>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- <div class="slide-up-delay"> -->
-    <section class="page__section onsite__pic js-experiment-instrument"></section>
+    <div class="slide-up-delay">
+      <section class="page__section onsite__pic js-experiment-instrument"></section>
 
-    <section id="traveldetails" class="page__section bg-light-grey js-experiment-instrument">
-      <h2>Travel details</h2>
-      <div class="sidebyside" layout horizontal wrap>
-        <div flex?="{{!isPhoneSize}}">
-          <h4 layout horizontal center><core-icon icon="io:directions" aria-hidden="true"></core-icon> Getting to San Francisco</h4>
-          <p>Here are the three major airports in the Bay Area with international airline service:</p>
-          <ul>
-            <li><a href="https://www.google.com/maps/dir/San+Francisco+International+Airport,+San+Francisco,+CA+94128/Moscone+Center+West,+800+Howard+Street,+San+Francisco,+CA+94103,+United+States/@37.696524,-122.4990949,12z/data=!3m2!4b1!5s0x808580871e84c835:0x6898ed8f6d5ebf0b!4m17!4m16!1m5!1m1!1s0x808f778c55555555:0xa4f25c571acded3f!2m2!1d-122.378955!2d37.621313!1m5!1m1!1s0x80858087111726eb:0x635ab8069f6523c3!2m2!1d-122.404025!2d37.783083!2m2!7e2!8j1421306400!3e0?hl=en" target="_blank">San Francisco International Airport (SFO)</a><br>
-            ~14 miles</li>
-            <li><a href="https://www.google.com/maps/dir/Oakland+International+Airport,+Oakland,+CA/Moscone+Center+West,+800+Howard+Street,+San+Francisco,+CA+94103,+United+States/@37.7688173,-122.3703704,12z/data=!3m2!4b1!5s0x808580871e84c835:0x6898ed8f6d5ebf0b!4m17!4m16!1m5!1m1!1s0x808f845402c0a641:0xb0630c0f03017460!2m2!1d-122.219743!2d37.712569!1m5!1m1!1s0x80858087111726eb:0x635ab8069f6523c3!2m2!1d-122.404025!2d37.783083!2m2!7e2!8j1421306400!3e0?hl=en" target="_blank">Oakland International Airport (OAK)</a><br>
-            ~20 miles</li>
-            <li><a href="https://www.google.com/maps/dir/San+Jose+International+Airport-Sjc,+Airport+Boulevard,+San+Jose,+CA,+United+States/Moscone+Center+West,+800+Howard+Street,+San+Francisco,+CA+94103,+United+States/@37.5944754,-122.4295683,10z/data=!3m1!4b1!4m17!4m16!1m5!1m1!1s0x808fcbc3fab3c59b:0xbcfa443f6df67e3e!2m2!1d-121.928937!2d37.363947!1m5!1m1!1s0x80858087111726eb:0x635ab8069f6523c3!2m2!1d-122.404025!2d37.783083!2m2!7e2!8j1421306400!3e0?hl=en" target="_blank">San Jose International Airport (SJC)</a><br>
-            ~46 miles</li>
-          </ul>
-          <!-- <h5><i18n-msg msgid="airport-shuttle">Airport Shuttle</i18n-msg></h5>
-          <p>Super Shuttle International is offering a discount to all Google I/O attendees. Reservations must be booked in advance either <a href="https://www.supershuttle.com/default.aspx?GC=G66Z7">online</a> or by calling 1-800-BLUE-VAN (1-800-258-3826). The discount code for Google I/O is G66Z7.</p> -->
+      <section id="traveldetails" class="page__section bg-light-grey js-experiment-instrument">
+        <h2>Travel details</h2>
+        <div class="sidebyside" layout horizontal wrap>
+          <div flex?="{{!isPhoneSize}}">
+            <h4 layout horizontal center><core-icon icon="io:directions" aria-hidden="true"></core-icon> Getting to San Francisco</h4>
+            <p>Here are the three major airports in the Bay Area with international airline service:</p>
+            <ul>
+              <li><a href="https://www.google.com/maps/dir/San+Francisco+International+Airport,+San+Francisco,+CA+94128/Moscone+Center+West,+800+Howard+Street,+San+Francisco,+CA+94103,+United+States/@37.696524,-122.4990949,12z/data=!3m2!4b1!5s0x808580871e84c835:0x6898ed8f6d5ebf0b!4m17!4m16!1m5!1m1!1s0x808f778c55555555:0xa4f25c571acded3f!2m2!1d-122.378955!2d37.621313!1m5!1m1!1s0x80858087111726eb:0x635ab8069f6523c3!2m2!1d-122.404025!2d37.783083!2m2!7e2!8j1421306400!3e0?hl=en" target="_blank">San Francisco International Airport (SFO)</a><br>
+              ~14 miles</li>
+              <li><a href="https://www.google.com/maps/dir/Oakland+International+Airport,+Oakland,+CA/Moscone+Center+West,+800+Howard+Street,+San+Francisco,+CA+94103,+United+States/@37.7688173,-122.3703704,12z/data=!3m2!4b1!5s0x808580871e84c835:0x6898ed8f6d5ebf0b!4m17!4m16!1m5!1m1!1s0x808f845402c0a641:0xb0630c0f03017460!2m2!1d-122.219743!2d37.712569!1m5!1m1!1s0x80858087111726eb:0x635ab8069f6523c3!2m2!1d-122.404025!2d37.783083!2m2!7e2!8j1421306400!3e0?hl=en" target="_blank">Oakland International Airport (OAK)</a><br>
+              ~20 miles</li>
+              <li><a href="https://www.google.com/maps/dir/San+Jose+International+Airport-Sjc,+Airport+Boulevard,+San+Jose,+CA,+United+States/Moscone+Center+West,+800+Howard+Street,+San+Francisco,+CA+94103,+United+States/@37.5944754,-122.4295683,10z/data=!3m1!4b1!4m17!4m16!1m5!1m1!1s0x808fcbc3fab3c59b:0xbcfa443f6df67e3e!2m2!1d-121.928937!2d37.363947!1m5!1m1!1s0x80858087111726eb:0x635ab8069f6523c3!2m2!1d-122.404025!2d37.783083!2m2!7e2!8j1421306400!3e0?hl=en" target="_blank">San Jose International Airport (SJC)</a><br>
+              ~46 miles</li>
+            </ul>
+            <!-- <h5><i18n-msg msgid="airport-shuttle">Airport Shuttle</i18n-msg></h5>
+            <p>Super Shuttle International is offering a discount to all Google I/O attendees. Reservations must be booked in advance either <a href="https://www.supershuttle.com/default.aspx?GC=G66Z7">online</a> or by calling 1-800-BLUE-VAN (1-800-258-3826). The discount code for Google I/O is G66Z7.</p> -->
+          </div>
+          <div flex?="{{!isPhoneSize}}">
+            <h4 layout horizontal center><core-icon icon="io:hotel" aria-hidden="true"></core-icon> Hotels</h4>
+            <p>We have room blocks at the following hotels:</p>
+            <ul>
+              <li><a href="http://www.marriott.com/meeting-event-hotels/group-corporate-travel/groupCorp.mi?resLinkData=GOOGLE%20I/O%5ESFODT%60GOOGOOA%7CGOOGOOB%7CGOOGOOC%60299.00-329.00%60USD%60false%605/27/15%605/29/15%605/5/15&app=resvlink&stop_mobi=yes" target="_blank">San Francisco Marriott Marquis</a><br>
+              Group Code: GOOA
+              </li>
+              <li><a href="https://gc.synxis.com/rez.aspx?Hotel=26753&Chain=10179&arrive=05/26/2015&depart=5/30/2015&adult=1&child=0&group=12340802300" target="_blank">Palomar San Francisco</a><br>
+              Group Code: 12340802300
+              </li>
+              <li><a href="https://secure3.hilton.com/en_US/hi/reservation/book.htm?ctyhocn=SFOSFHH&spec_plan=GIO" target="_blank">Parc 55</a><br>
+              Group Code: GIO
+              </li>
+              <li><a href="http://www.marriott.com/meeting-event-hotels/group-corporate-travel/groupCorp.mi?resLinkData=GOOGLE%20I/O%20DEVELOPERS%20CONFERENCE%5ESFOCD%60GIOGIOA%7CGIOGIOB%60239.00%60USD%60false%605/26/15%605/30/15%6005/05/15&app=resvlink&stop_mobi=yes" target="_blank">Courtyard by Marriott SF Downtown</a><br>
+              Group Code: GIO
+              </li>
+              <li><a href="http://www.marriott.com/meeting-event-hotels/group-corporate-travel/groupCorp.mi?resLinkData=Google%20Conference%5Esfoak%60goggoga%60239.00%60USD%60false%605/27/15%605/29/15%6005/06/15&app=resvlink&stop_mobi=yes" target="_blank">Hotel Adagio</a><br>
+              Group Code: GOG or Google I/O Conference
+              </li>
+              <li><a href="https://gc.synxis.com/rez.aspx?Hotel=59679&Chain=15564&Dest=SFO%20&template=CAR&arrive=5/27/2015&depart=5/29/2015&adult=1&child=0&group=1505GOOGLE_001&shell=JV_GCF" target="_blank">Hotel Carlton</a><br>
+              Group Code: 1505GOOGLE_001
+              </li>
+            </ul>
+          </div>
+          <div flex?="{{!isPhoneSize}}">
+            <h4 layout horizontal center><core-icon icon="io:place" aria-hidden="true"></core-icon> Moscone Center West</h4>
+            <p>The <a href="https://www.moscone.com/directions/index.shtml" target="_blank">Moscone Center</a> is located at the corner of 4th &amp; Howard Streets at 800 Howard St., San Francisco, CA 94103.</p>
+            <p>Public transportation to the Moscone Center is accessible via:</p>
+            <ul>
+              <li><a href="https://www.bart.gov/" target="_blank">BART</a><br>
+              Subway linking San Francisco to Oakland and Berkeley</li>
+              <li><a href="https://www.sfmta.com/" target="_blank">MUNI Metro</a><br>
+              Citywide buses, trollies and cable cars</li>
+              <li><a href="http://www.caltrain.com/" target="_blank">Caltrain</a><br>
+              Regional rail system</li>
+            </ul>
+            <p><a href="http://get.lyft.com/lyftxgoogle/?code=GOOGLEIO" target="_blank"><core-icon src="images/onsite/lyft_pink.svg" aria-hidden="true" class="lyft-logo"></core-icon></a> We've also partnered with Lyft to make sure your journey is as easy as possible. New users can download Lyft and apply the promo code <a href="http://get.lyft.com/lyftxgoogle/?code=GOOGLEIO" target="_blank">GOOGLEIO</a> to get $50 off their first 10 rides. Current Lyft users will receive promo codes shortly before I/O.</p>
+          </div>
         </div>
-        <div flex?="{{!isPhoneSize}}">
-          <h4 layout horizontal center><core-icon icon="io:hotel" aria-hidden="true"></core-icon> Hotels</h4>
-          <p>We have room blocks at the following hotels:</p>
-          <ul>
-            <li><a href="http://www.marriott.com/meeting-event-hotels/group-corporate-travel/groupCorp.mi?resLinkData=GOOGLE%20I/O%5ESFODT%60GOOGOOA%7CGOOGOOB%7CGOOGOOC%60299.00-329.00%60USD%60false%605/27/15%605/29/15%605/5/15&app=resvlink&stop_mobi=yes" target="_blank">San Francisco Marriott Marquis</a><br>
-            Group Code: GOOA
-            </li>
-            <li><a href="https://gc.synxis.com/rez.aspx?Hotel=26753&Chain=10179&arrive=05/26/2015&depart=5/30/2015&adult=1&child=0&group=12340802300" target="_blank">Palomar San Francisco</a><br>
-            Group Code: 12340802300
-            </li>
-            <li><a href="https://secure3.hilton.com/en_US/hi/reservation/book.htm?ctyhocn=SFOSFHH&spec_plan=GIO" target="_blank">Parc 55</a><br>
-            Group Code: GIO
-            </li>
-            <li><a href="http://www.marriott.com/meeting-event-hotels/group-corporate-travel/groupCorp.mi?resLinkData=GOOGLE%20I/O%20DEVELOPERS%20CONFERENCE%5ESFOCD%60GIOGIOA%7CGIOGIOB%60239.00%60USD%60false%605/26/15%605/30/15%6005/05/15&app=resvlink&stop_mobi=yes" target="_blank">Courtyard by Marriott SF Downtown</a><br>
-            Group Code: GIO
-            </li>
-            <li><a href="http://www.marriott.com/meeting-event-hotels/group-corporate-travel/groupCorp.mi?resLinkData=Google%20Conference%5Esfoak%60goggoga%60239.00%60USD%60false%605/27/15%605/29/15%6005/06/15&app=resvlink&stop_mobi=yes" target="_blank">Hotel Adagio</a><br>
-            Group Code: GOG or Google I/O Conference
-            </li>
-            <li><a href="https://gc.synxis.com/rez.aspx?Hotel=59679&Chain=15564&Dest=SFO%20&template=CAR&arrive=5/27/2015&depart=5/29/2015&adult=1&child=0&group=1505GOOGLE_001&shell=JV_GCF" target="_blank">Hotel Carlton</a><br>
-            Group Code: 1505GOOGLE_001
-            </li>
-          </ul>
-        </div>
-        <div flex?="{{!isPhoneSize}}">
-          <h4 layout horizontal center><core-icon icon="io:place" aria-hidden="true"></core-icon> Moscone Center West</h4>
-          <p>The <a href="https://www.moscone.com/directions/index.shtml" target="_blank">Moscone Center</a> is located at the corner of 4th &amp; Howard Streets at 800 Howard St., San Francisco, CA 94103.</p>
-          <p>Public transportation to the Moscone Center is accessible via:</p>
-          <ul>
-            <li><a href="https://www.bart.gov/" target="_blank">BART</a><br>
-            Subway linking San Francisco to Oakland and Berkeley</li>
-            <li><a href="https://www.sfmta.com/" target="_blank">MUNI Metro</a><br>
-            Citywide buses, trollies and cable cars</li>
-            <li><a href="http://www.caltrain.com/" target="_blank">Caltrain</a><br>
-            Regional rail system</li>
-          </ul>
-          <p><a href="http://get.lyft.com/lyftxgoogle/?code=GOOGLEIO" target="_blank"><core-icon src="images/onsite/lyft_pink.svg" aria-hidden="true" class="lyft-logo"></core-icon></a> We've also partnered with Lyft to make sure your journey is as easy as possible. New users can download Lyft and apply the promo code <a href="http://get.lyft.com/lyftxgoogle/?code=GOOGLEIO" target="_blank">GOOGLEIO</a> to get $50 off their first 10 rides. Current Lyft users will receive promo codes shortly before I/O.</p>
-        </div>
-      </div>
-    </section>
-  <!-- </div> -->
+      </section>
+    </div>
 
-</section>
-</core-pages>
+  </section>
 
-<script>
-(function() {
-
-  // Page-specific JS that runs when this page is loaded for the first time.
-  function initPage() {
-    var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
-
-    if (page.hasBeenLoaded) {
-      return;
-    }
-
-    page.load = function() {
-      // TODO(devnook): deep linking into the travel tab doesn't correctly run the page transition animations.
-      IOWA.Elements.Template.selectedOnsiteTab = location.hash.substring(1) == 'travel' ? 1 : 0;
-    };
-
-    IOWA.Elements.Template.onOnsiteTabChange = function(e, detail, sender) {
-      if (!detail.isSelected) {
-        detail.item.classList.remove('show');
-        return;
-      }
-
-      this.async(function() {
-        detail.item.classList.add('show');
-
-        // Update URL hash if it's after a page load.
-        if (this.pageTransitionDone) {
-          var tabs = IOWA.Elements.MastheadMeta.querySelector('paper-tabs');
-          history.replaceState(
-            {}, null, '#' + tabs.selectedItem.textContent.toLowerCase());
-        }
-      }, null, 100);
-    };
-
-    page.load(); // Run load callback on page load.
-    page.hasBeenLoaded = true;
-  }
-
-  // IE will be "loading" at this point. Other browsers will already be "complete".
-  if (document.readyState !== 'loading') {
-    initPage();
-  }
-
-  // Necessary for IE's lack of native <template>
-  // https://github.com/GoogleChrome/ioweb2015/issues/599
-  window._initPage = initPage;
-
-})();
-</script>
+</div>
 {% end %}
