@@ -92,6 +92,10 @@
 
 .masthead-meta {
   opacity: 0;  // Initial opacity, fades in on load.
+
+  paper-tabs a {
+    color: inherit;
+  }
 }
 
 .masthead__ripple, .ripple {

@@ -25,13 +25,15 @@ IOWA.Elements = (function() {
           IOWA.Elements.FAB.onFabClick();
         }
       };
-      // Check if hash refers to a page's section.
+
+      // Deep link into a subpage.
       var selectedSubpage = location.hash.substring(1);
-      var subpage = document.querySelector(
-        '#subpage-' + selectedSubpage);
+      var subpage = document.querySelector('#subpage-' + selectedSubpage);
       if (subpage) {
-        IOWA.Elements.Template.selectedSubpage = selectedSubpage;
+        var template = IOWA.Elements.Template;
+        template.pages[template.selectedPage].selectedSubpage = selectedSubpage;
       }
+
       IOWA.PageAnimation.play(
         IOWA.PageAnimation.pageFirstRender(subpage), function() {
           // Fire event when the page transitions are final.
@@ -85,7 +87,6 @@ IOWA.Elements = (function() {
     var template = document.getElementById('t');
     template.pages = IOWA.PAGES; // defined in auto-generated ../pages.js
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
-    template.selectedSubpage = template.pages[template.selectedPage].defaultSubpage;
     template.fullscreenVideoActive = false;
     template.photoGalleryActive = false;
     template.extendedMapActive = false;
