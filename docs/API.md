@@ -156,7 +156,7 @@ the global notification state scoped to a user, not a specific subscriber ID.
 
 ### GET /api/v1/user/updates
 
-*Authorization: _OAUTH2_ACCESS_TOKEN_* or *X-Token: <one-time token obtained from the previous request>*
+*Authorization: Bearer _OAUTH2_ACCESS_TOKEN_* or *Authorization: _UPDATES_TOKEN_*
 
 Response body sample:
 
@@ -172,10 +172,11 @@ Response body sample:
 }
 ```
 
-If `Authorization` is set, then the response will come back with just the `token` field populated,
-for use in the next request.
-If `X-Token` is set, then the response will come back with fields set
-for all the updated resources, and additionally the `token` field will be populated.
+If the `Authorization` header is set to a valid OAuth 2 token, then the response will come back with
+just the `token` field populated, for use in the next request.
+If `Authorization` header is set to an update token, then the response will come back with fields
+set for all the updated resources. Additionally, the `token` field will be populated, for use in
+the next request.
 
 
 ### PUT /api/v1/user/schedule/:session_id
