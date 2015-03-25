@@ -156,7 +156,7 @@ the global notification state scoped to a user, not a specific subscriber ID.
 
 ### GET /api/v1/user/updates
 
-*Authorization: Bearer _OAUTH2_ACCESS_TOKEN_* or *Authorization: _UPDATES_TOKEN_*
+*Authorization: Bearer _OAUTH2_ACCESS_TOKEN_* or *Authorization: _SW_TOKEN_*
 
 Response body sample:
 
@@ -174,7 +174,7 @@ Response body sample:
 
 If the `Authorization` header is set to a valid OAuth 2 token, then the response will come back with
 just the `token` field populated, for use in the next request.
-If `Authorization` header is set to an update token, then the response will come back with fields
+If `Authorization` header is set to an SW token, then the response will come back with fields
 set for all the updated resources. Additionally, the `token` field will be populated, for use in
 the next request.
 
