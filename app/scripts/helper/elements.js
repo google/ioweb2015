@@ -59,6 +59,13 @@ IOWA.Elements = (function() {
     var toast = document.getElementById('toast');
     var i18n = document.createElement('i18n-msg');
 
+    var signin = document.querySelector('google-signin');
+    if (window.ENV === 'prod') {
+      signin.clientId = '608394197750-o7mgghf5dven1havuj43n902gansj0h9.apps.googleusercontent.com';
+    } else {
+      signin.clientId = '835117351912-nm0ibl2t5tld4vlfttb1l1tldh8ids3m.apps.googleusercontent.com';
+    }
+
     var ripple = masthead.querySelector('.masthead__ripple__content');
     IOWA.Util.resizeRipple(ripple);
 
@@ -76,6 +83,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
+    IOWA.Elements.GoogleSignIn = signin;
 
     // Kickoff a11y helpers for elements
     IOWA.A11y.init();
@@ -95,6 +103,8 @@ IOWA.Elements = (function() {
     template.selectedCity = null;
     template.offsiteMarkerResults = [];
     template.countdownEnded = false;
+    template.isSignedIn = false;
+    template.currentUser = null;
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
@@ -279,6 +289,14 @@ IOWA.Elements = (function() {
       if (this.selectedPage == 'home') {
         IOWA.A11y.focusNavigation();
       }
+    };
+
+    template.signIn = function() {
+      IOWA.Elements.GoogleSignIn.signIn();
+    };
+
+    template.signOut = function() {
+      IOWA.Elements.GoogleSignIn.signOut();
     };
 
     template.addEventListener('template-bound', updateElements);
