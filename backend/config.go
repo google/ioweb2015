@@ -11,9 +11,14 @@ import (
 // usually obtained by reading a server config file in an init() func.
 var config appConfig
 
-// isDev returns true if current app environment is "dev".
+// isDev returns true if current app environment is in a dev mode.
 func isDev() bool {
-	return config.Env == "dev"
+	return !isStaging() && !isProd()
+}
+
+// isStaging returns true if current app environment is "stage".
+func isStaging() bool {
+	return config.Env == "stage"
 }
 
 // isProd returns true if current app environment is "prod".

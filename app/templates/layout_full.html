@@ -183,6 +183,9 @@ limitations under the License.
   <div drawer layout vertical>
     <core-toolbar class="tall bg-cyan">
       <div class="top io-logo" flex></div>
+      <div class="top">
+        <img class="profilepic" hidden>
+      </div>
       <div class="bottom">
         <div class="typo-white"><i18n-msg msgid="iodate">May 28 - 29</i18-msg>, 2015</div>
         <div>San Francisco, CA</div>
@@ -215,11 +218,6 @@ limitations under the License.
             <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
           </a>
         </paper-item>
-        <paper-item label="registration">
-          <a href="registration" data-ajax-link  data-anim-drawer data-track-link="nav-drawer-registration">
-            <i18n-msg msgid="registration">Registration</i18n-msg>
-          </a>
-        </paper-item>
       </core-menu>
     </div>
   </div>
@@ -228,6 +226,8 @@ limitations under the License.
     <div id="content-container">
 
     <template is="auto-binding" id="t">
+
+      <google-signin scopes="https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin>
 
       <!-- Responsive handlers -->
       <core-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"
@@ -270,15 +270,41 @@ limitations under the License.
                 <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
               </a>
             </paper-tab>
-            <paper-tab label="registration" role="">
-              <a href="registration" data-ajax-link data-track-link="nav-registration" data-anim-ripple layout horizontal center>
-                <i18n-msg msgid="registration">Registration</i18n-msg>
-              </a>
-            </paper-tab>
-            <paper-tab label="signin" role="">
-              <a href="#" data-track-link="nav-signin" data-anim-ripple layout horizontal center>Sign-in</a>
-            </paper-tab>
           </paper-tabs>
+          <a href="#" class="button-link" data-track-link="nav-signin" on-tap="{{signIn}}" hidden?="{{currentUser}}">Sign-in</a>
+          <template if="{{currentUser}}">
+            <img _src="{{currentUser.image}}" class="profilepic">
+            <paper-menu-button>
+              <paper-icon-button icon="io:more-vert" aria-label="Settings"></paper-icon-button>
+              <paper-dropdown id="signin-settings-panel" class="dropdown" halign="right" valign="top">
+                <div class="card-content" layout horizontal>
+                  <div><img _src="{{currentUser.image}}" class="profilepic"></div>
+                  <div>
+                    <div>{{currentUser.name}}</div>
+                    <div class="settings-email">{{currentUser.email}}</div>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <h4>Notifications</h4>
+                  <core-label horizontal layout>
+                    <paper-checkbox checked autoFocus for></paper-checkbox>
+                    <h5>I want to receive notifications from the Google I/O 2015 website.</h5>
+                  </core-label>
+                  <p>If this option is deselected, I understand I won't be notified when:</p>
+                  <ul>
+                    <li>New Extended events register near me</li>
+                    <li>I/O is about to start</li>
+                    <li>Bookmarked sessions are about to start</li>
+                    <li>Specific session videos are made available</li>
+                  </ul>
+                </div>
+                <div class="card-content" layout horizontal justified>
+                  <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blak">Terms of Service</a>
+                  <a href="#" data-track-link="login-signout" on-tap="{{signOut}}">Sign-out</a>
+                </div>
+              </paper-dropdown>
+            </paper-menu-button>
+          </template>
         </core-toolbar>
         <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="io-logo large" iologodestination></div>
@@ -302,7 +328,7 @@ limitations under the License.
             <a href="https://plus.google.com/+GoogleDevelopers" target="_blank" class="share-icon" data-track-link="footer-share-gplus" data-share-type="gplus" on-click="{{openShareWindow}}"><core-icon icon="io:post-gplus"></core-icon></a>
             <a href="https://twitter.com/googledevs" target="_blank" class="share-icon" data-track-link="footer-share-twitter" data-share-type="twitter" on-click="{{openShareWindow}}"><core-icon icon="io:post-twitter"></core-icon></a>
           </span>
-          <a href="#" class="footer-backtotop" on-click="{{backToTop}}">Back to the top <core-icon icon="expand-less"></core-icon></a>
+          <a href="#" class="footer-backtotop" on-tap="{{backToTop}}">Back to the top <core-icon icon="expand-less"></core-icon></a>
         </div>
 
         <div class="footer-content footer-content--middle" layout horizontal>
@@ -345,6 +371,7 @@ limitations under the License.
 <script src="scripts/main.js"></script>
 <script src="scripts/pages.js"></script>
 <script src="scripts/helper/util.js"></script>
+<script src="scripts/helper/auth.js"></script>
 <script src="scripts/helper/page-animation.js"></script>
 <script src="scripts/helper/elements.js"></script>
 <script src="scripts/helper/a11y.js"></script>

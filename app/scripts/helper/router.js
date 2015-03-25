@@ -150,6 +150,36 @@ IOWA.Router = (function() {
   }
 
   /**
+   * Navigates to a new subpage.
+   * @param {Event} e Event that triggered navigation.
+   * @param {Element} el Element clicked.
+   * @private
+   */
+  function handleSubpageLink(e, el) {
+    e.preventDefault();
+    e.stopPropagation();
+    var main = IOWA.Elements.Main;
+    var template = IOWA.Elements.Template;
+    var currentSubpageName = template.selectedSubpage;
+    var nextSubpageName = el.hash.substring(1);
+    if (currentSubpageName !== nextSubpageName) {
+      var oldSubpage = main.querySelector('#subpage-' + currentSubpageName);
+      var newSubpage = main.querySelector('#subpage-' + nextSubpageName);
+      IOWA.PageAnimation.play(
+          IOWA.PageAnimation.sectionSlideOut(oldSubpage), function() {
+        oldSubpage.style.display = 'none';
+        newSubpage.style.display = '';
+        IOWA.History.pushState({
+          'path': el.pathname + el.hash,
+          fromHashChange: true
+        }, '', el.href);
+        IOWA.Elements.Template.subpageName = nextSubpageName;
+        IOWA.PageAnimation.play(IOWA.PageAnimation.sectionSlideIn(newSubpage));
+      });
+    }
+  }
+
+  /**
    * Navigates to a new page. Uses ajax for data-ajax-link links.
    * @param {Event} e Event that triggered navigation.
    * @private
@@ -177,6 +207,11 @@ IOWA.Router = (function() {
 
         // Ignore links that go offsite.
         if (el.target) {
+          return;
+        }
+
+        if (el.hasAttribute('data-subpage-link')) {
+          handleSubpageLink(e, el);
           return;
         }
 

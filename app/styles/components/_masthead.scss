@@ -148,6 +148,13 @@ core-drawer-panel {
   }
 }
 
+.profilepic {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  margin-right: 0;
+}
+
 #navbar {
   background-color: transparent;
 
@@ -172,6 +179,57 @@ core-drawer-panel {
     &.core-selected {
       pointer-events: none;
     }
+  }
+
+  .button-link {
+    text-transform: uppercase;
+    color: inherit;
+    margin: 0 12px;
+  }
+}
+
+#signin-settings-panel {
+  width: 344px;
+  color: $color-text;
+  font-size: 14px;
+  line-height: 18px;
+
+  core-label {
+    padding: $mobileKeyline 0;
+  }
+
+  ul {
+    padding-left: $mobileKeyline;
+    margin: 0;
+  }
+
+  .profilepic {
+    margin-right:  $mobileKeyline / 2;
+  }
+
+  .card-content {
+    padding: $mobileKeyline;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $color-light-grey-border;
+    }
+
+    &:last-child {
+      padding: $tabletKeyline $mobileKeyline;
+    }
+  }
+
+  paper-checkbox {
+    margin-right: $tabletKeyline;
+  }
+
+  .settings-email {
+    color: $color-gray;
+  }
+
+  a {
+    text-transform: uppercase;
+    color: $color-cyan-A700;
   }
 }
 
@@ -254,10 +312,14 @@ experiment-fab-container {
       left: -64px;
       position: relative;
     }
-
   }
   .masthead-title {
     font-size: 20px;
+  }
+  #navbar {
+    > .profilepic {
+      display: none;
+    }
   }
 }
 
@@ -301,8 +363,13 @@ experiment-fab-container {
   #navbar {
     paper-tabs {
       display: inline-block;
+      margin: 0;
     }
-    paper-icon-button {
+    paper-menu-button {
+      height: 40px;
+      margin: 0;
+    }
+    [icon="menu"] {
       display: none;
     }
   }

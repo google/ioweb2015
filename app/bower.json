@@ -42,6 +42,7 @@
     "google-map": "GoogleWebComponents/google-map#^0.4.2",
     "i18n-msg": "ebidel/i18n-msg#^0.0.2",
     "paper-button": "Polymer/paper-button#^0.5.5",
+    "paper-checkbox": "Polymer/paper-checkbox#^0.5.5",
     "paper-icon-button": "Polymer/paper-icon-button#^0.5.5",
     "paper-dialog": "Polymer/paper-dialog#^0.5.5",
     "paper-dropdown": "Polymer/paper-dropdown#^0.5.5",
@@ -49,14 +50,16 @@
     "paper-fab": "Polymer/paper-fab#^0.5.5",
     "paper-item": "Polymer/paper-item#^0.5.5",
     "paper-input": "Polymer/paper-input#^0.5.5",
+    "paper-menu-button": "Polymer/paper-menu-button#^0.5.5",
     "paper-radio-group": "Polymer/paper-radio-group#^0.5.5",
-    "paper-slider": "Polymer/paper-slider#^0.5.5",
+    "paper-slider": "Polymer/paper-slider#ecdcdf86571bb897e56fabda2a684928a6f7a996",
     "paper-tabs": "Polymer/paper-tabs#^0.5.5",
     "paper-toast": "Polymer/paper-toast#^0.5.5",
     "polymer": "Polymer/polymer#^0.5.5",
     "shed": "wibblymat/shed#^1.0.0",
     "es6-promise-2.0.1.min": "https://es6-promises.s3.amazonaws.com/es6-promise-2.0.1.min.js",
-    "web-animations-js": "web-animations/web-animations-js#^1.0.7"
+    "web-animations-js": "web-animations/web-animations-js#^1.0.7",
+    "paper-checkbox": "Polymer/paper-checkbox#~0.5.5"
   },
   "resolutions": {
     "web-animations-js": "1.0.7"

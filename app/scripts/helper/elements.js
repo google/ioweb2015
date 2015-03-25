@@ -25,14 +25,20 @@ IOWA.Elements = (function() {
           IOWA.Elements.FAB.onFabClick();
         }
       };
-
-      IOWA.PageAnimation.play(IOWA.PageAnimation.pageFirstRender(), function() {
-        // Fire event when the page transitions are final.
-        IOWA.Elements.Template.fire('page-transition-done');
-
-        optionallyLaunchExperiment();
-        IOWA.ServiceWorkerRegistration.register();
-      });
+      // Check if hash refers to a page's section.
+      var selectedSubpage = location.hash.substring(1);
+      var subpage = document.querySelector(
+        '#subpage-' + selectedSubpage);
+      if (subpage) {
+        IOWA.Elements.Template.selectedSubpage = selectedSubpage;
+      }
+      IOWA.PageAnimation.play(
+        IOWA.PageAnimation.pageFirstRender(subpage), function() {
+          // Fire event when the page transitions are final.
+          IOWA.Elements.Template.fire('page-transition-done');
+          optionallyLaunchExperiment();
+          IOWA.ServiceWorkerRegistration.register();
+        });
     });
 
     var main = document.querySelector('.io-main');
@@ -53,6 +59,13 @@ IOWA.Elements = (function() {
     var toast = document.getElementById('toast');
     var i18n = document.createElement('i18n-msg');
 
+    var signin = document.querySelector('google-signin');
+    if (window.ENV === 'prod') {
+      signin.clientId = '608394197750-o7mgghf5dven1havuj43n902gansj0h9.apps.googleusercontent.com';
+    } else {
+      signin.clientId = '835117351912-nm0ibl2t5tld4vlfttb1l1tldh8ids3m.apps.googleusercontent.com';
+    }
+
     var ripple = masthead.querySelector('.masthead__ripple__content');
     IOWA.Util.resizeRipple(ripple);
 
@@ -70,6 +83,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
+    IOWA.Elements.GoogleSignIn = signin;
 
     // Kickoff a11y helpers for elements
     IOWA.A11y.init();
@@ -79,6 +93,7 @@ IOWA.Elements = (function() {
     var template = document.getElementById('t');
     template.pages = IOWA.PAGES; // defined in auto-generated ../pages.js
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
+    template.selectedSubpage = template.pages[template.selectedPage].defaultSubpage;
     template.fullscreenVideoActive = false;
     template.photoGalleryActive = false;
     template.extendedMapActive = false;
@@ -88,6 +103,8 @@ IOWA.Elements = (function() {
     template.selectedCity = null;
     template.offsiteMarkerResults = [];
     template.countdownEnded = false;
+    template.isSignedIn = false;
+    template.currentUser = null;
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
@@ -272,6 +289,14 @@ IOWA.Elements = (function() {
       if (this.selectedPage == 'home') {
         IOWA.A11y.focusNavigation();
       }
+    };
+
+    template.signIn = function() {
+      IOWA.Elements.GoogleSignIn.signIn();
+    };
+
+    template.signOut = function() {
+      IOWA.Elements.GoogleSignIn.signOut();
     };
 
     template.addEventListener('template-bound', updateElements);
