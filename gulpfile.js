@@ -187,6 +187,7 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
     'main.js',
     'pages.js',
     'helper/util.js',
+    '../bower_components/es6-promise-2.0.1.min/index.js',
     'helper/auth.js',
     'helper/page-animation.js',
     'helper/elements.js',
@@ -196,6 +197,7 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
     'helper/router.js',
     'helper/request.js',
     'helper/picasa.js',
+    'helper/simple-db.js',
     'helper/notifications.js',
     'bootstrap.js'
   ].map(function(script) {
@@ -211,6 +213,7 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
 
   var serviceWorkerScriptStream = gulp.src([
     APP_DIR + '/bower_components/shed/shed.js',
+    APP_DIR + '/scripts/helper/simple-db.js',
     APP_DIR + '/scripts/shed/*.js'
   ])
     .pipe(reload({stream: true, once: true}))
@@ -498,6 +501,7 @@ gulp.task('generate-page-metadata', function(done) {
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
   del.sync([APP_DIR + '/service-worker.js']);
   var importScripts = glob.sync('scripts/shed/*.js', {cwd: APP_DIR});
+  importScripts.unshift('scripts/helper/simple-db.js');
   importScripts.unshift('bower_components/shed/shed.js');
 
   // Run with --fetch-dev to generate a service-worker.js that will handle fetch events.

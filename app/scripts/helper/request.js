@@ -63,7 +63,46 @@ IOWA.Request = IOWA.Request || (function() {
     freshXhr.send();
   };
 
+  var xhrPromise = function(method, url, isAuthRequired, body) {
+    return new Promise(function(resolve, reject) {
+      var authInfo;
+      if (isAuthRequired) {
+        authInfo = IOWA.Auth.getTokenResponse();
+        if (!authInfo) {
+          throw Error(method + ' ' + url + ' failed; not logged in.');
+        }
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open(method, url);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      if (authInfo) {
+        var tokenType = authInfo.token_type;
+        var accessToken = authInfo.access_token;
+        xhr.setRequestHeader('Authorization', tokenType + ' ' + accessToken);
+      }
+
+      xhr.onerror = reject;
+      xhr.onload = function() {
+        if (this.status < 400) {
+          var response = JSON.parse(this.response);
+          resolve(response);
+        } else {
+          reject(method + ' ' + url + ' failed due to with status ' + this.statusText);
+        }
+      };
+
+      if (body) {
+        xhr.send(JSON.stringify(body));
+      } else {
+        xhr.send();
+      }
+    });
+  };
+
   return {
-    cacheThenNetwork: cacheThenNetwork
+    cacheThenNetwork: cacheThenNetwork,
+    xhrPromise: xhrPromise
   };
 })();

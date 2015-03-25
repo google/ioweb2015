@@ -21,41 +21,15 @@ IOWA.Notifications = IOWA.Notifications || (function() {
 
   var NOTIFY_ENDPOINT = 'api/v1/user/notify';
 
-  var _xhrWrapperPromise = function(body) {
-    return new Promise(function(resolve, reject) {
-      // TODO: Where can we get the current access token from? Will it refresh if it expires?
-      var accessToken = '';
-
-      var xhr = new XMLHttpRequest();
-      xhr.open('PUT', NOTIFY_ENDPOINT);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('Authorization', 'Bearer' + accessToken);
-
-      xhr.onerror = reject;
-      xhr.onload = function() {
-        var response = JSON.parse(this.response);
-        if (this.status < 400) {
-          resolve(response);
-        } else {
-          reject(response);
-        }
-      };
-
-      xhr.send(JSON.stringify(body));
-    });
-  };
-
-  var _sendSubscriptionIdToServerPromise = function(subscriptionId) {
-    return _xhrWrapperPromise({
+  var sendSubscriptionIdToServerPromise_ = function(subscriptionId) {
+    return IOWA.Request.xhrPromise('PUT', NOTIFY_ENDPOINT, true, {
       notify: true,
-        subscriber: subscriptionId
+      subscriber: subscriptionId
     });
   };
 
-  var _removeSubscriptionIdFromServerPromise = function(subscriptionId) {
-    // TODO: Our intention here doesn't match the semantics of the API call, since we're presumably
-    // just trying to unsubscribe the current device, not all devices.
-    return _xhrWrapperPromise({
+  var removeSubscriptionIdFromServerPromise_ = function(subscriptionId) {
+    return IOWA.Request.xhrPromise('PUT', NOTIFY_ENDPOINT, true, {
       notify: false,
       subscriber: subscriptionId
     });
@@ -73,13 +47,13 @@ IOWA.Notifications = IOWA.Notifications || (function() {
     }).then(function(subscription) {
       if (subscription && subscription.subscriptionId) {
         // Send the latest subscription id to the server, just in case it's changed.
-        return _sendSubscriptionIdToServerPromise(subscription.subscriptionId).then(function() {
+        return sendSubscriptionIdToServerPromise_(subscription.subscriptionId).then(function() {
           return true;
         });
       } else {
         return false;
       }
-    });
+    }).catch(IOWA.Util.logError);
   };
 
   var subscribePromise = function() {
@@ -88,7 +62,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
     }).then(function(subscription) {
       if (subscription && subscription.subscriptionId) {
         // If subscribing succeeds, send the subscription to the server. Return a resolved promise.
-        return _sendSubscriptionIdToServerPromise(subscription.subscriptionId);
+        return sendSubscriptionIdToServerPromise_(subscription.subscriptionId);
       } else {
         // Otherwise, cause the promise to reject with an explanation of the error.
         if (Notification.permission === 'denied') {
@@ -97,7 +71,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
           throw Error('Unable to subscribe due to an unknown error.');
         }
       }
-    });
+    }).catch(IOWA.Util.logError);
   };
 
   var unsubscribePromise = function() {
@@ -105,11 +79,11 @@ IOWA.Notifications = IOWA.Notifications || (function() {
       return registration.pushManager.getSubscription();
     }).then(function(subscription) {
       if (subscription && subscription.subscriptionId) {
-        return _removeSubscriptionIdFromServerPromise(subscription.subscriptionId).then(function() {
+        return removeSubscriptionIdFromServerPromise_(subscription.subscriptionId).then(function() {
           return subscription.unsubscribe();
         });
       }
-    });
+    }).catch(IOWA.Util.logError);
   };
 
   return {

@@ -133,7 +133,9 @@ IOWA.Util = IOWA.Util || (function() {
     supportsHTMLImports: 'import' in document.createElement('link'),
     smoothScroll: smoothScroll,
     getStaticBaseURL: getStaticBaseURL,
-    resizeRipple: resizeRipple
+    resizeRipple: resizeRipple,
+    logInfo: console.log.bind(console),
+    logError: console.error.bind(console)
   };
 
 })();
