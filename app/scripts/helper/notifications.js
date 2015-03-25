@@ -35,11 +35,11 @@ IOWA.Notifications = IOWA.Notifications || (function() {
     });
   };
 
-  var isSupported = (ServiceWorkerRegistration &&
-                     ServiceWorkerRegistration.prototype.showNotification &&
+  var isSupported = (window.ServiceWorkerRegistration &&
+                     window.ServiceWorkerRegistration.prototype.showNotification &&
                      window.PushManager &&
-                     Notification.permission &&
-                     Notification.permission !== 'denied') ? true : false;
+                     window.Notification &&
+                     window.Notification.permission !== 'denied') ? true : false;
 
   var isAlreadySubscribedPromise = function() {
     return navigator.serviceWorker.ready.then(function(registration) {
