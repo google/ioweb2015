@@ -89,7 +89,7 @@ IOWA.Request = IOWA.Request || (function() {
           var response = JSON.parse(this.response);
           resolve(response);
         } else {
-          reject(method + ' ' + url + ' failed due to with status ' + this.statusText);
+          reject(method + ' ' + url + ' failed with status ' + this.statusText);
         }
       };
 
