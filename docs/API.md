@@ -154,21 +154,29 @@ Note that in the latter case `notify` parameter still refers to
 the global notification state scoped to a user, not a specific subscriber ID.
 
 
-### GET /api/v1/user/schedule?since=unix-timestamp
+### GET /api/v1/user/updates
 
-*Requires authentication*
+*Authorization: Bearer _OAUTH2_ACCESS_TOKEN_* or *Authorization: _SW_TOKEN_*
 
-Retrieve bookmarked sessions list. Response body sample:
+Response body sample:
 
 ```json
-[
-  "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
-  "05012279-E037-46D1-AD91-C0892277B01B"
-]
+{
+  "sessions": [
+    "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+    "05012279-E037-46D1-AD91-C0892277B01B"
+  ],
+  "videos": ["... new/updated videos ..."],
+  "ext": ["... i/o extended ..."],
+  "token": "use this token for the next request"
+}
 ```
 
-If `since` query param is present, the reponse will contain only the items
-changed since the specified timestamp.
+If the `Authorization` header is set to a valid OAuth 2 token, then the response will come back with
+just the `token` field populated, for use in the next request.
+If `Authorization` header is set to an SW token, then the response will come back with fields
+set for all the updated resources. Additionally, the `token` field will be populated, for use in
+the next request.
 
 
 ### PUT /api/v1/user/schedule/:session_id
