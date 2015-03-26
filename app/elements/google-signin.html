@@ -12,7 +12,8 @@ limitations under the License.
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/google-apis/google-js-api.html">
+<!-- <link rel="import" href="../bower_components/google-apis/google-js-api.html"> -->
+<link rel="import" href="../bower_components/google-apis/google-client-api.html">
 
 <!--
 `<google-signin>` uses Google Sign-n 2.0 to authorize users using Google's
@@ -33,7 +34,7 @@ Fired when the signed in state of the user changes.
 @param {Object} detail.user The current user.
 @param {Object} detail.response The current user's token response.
 -->
-<polymer-element name="google-signin" attributes="clientId scopes signedIn">
+<!-- <polymer-element name="google-signin" attributes="clientId scopes signedIn">
   <template>
     <style>
       :host {
@@ -185,3 +186,171 @@ Fired when the signed in state of the user changes.
   });
   </script>
 </polymer-element>
+ -->
+
+<polymer-element name="google-signin" attributes="clientId scopes signedIn">
+<template>
+  <style>
+    :host {
+      display: none;
+    }
+  </style>
+  <google-client-api on-api-load="{{loadAuth}}"></google-client-api>
+</template>
+<script>
+(function() {
+
+  var AUTH_ENDPOINT = '/api/v1/auth';
+
+  Polymer({
+    publish: {
+      /**
+       * A Google Developers client Id.
+       *
+       * @attribute clientId
+       * @type string
+       * @default null
+       */
+      clientId: null,
+
+      /**
+       * A space-separated list of OAuth2 scopes.
+       *
+       * @attribute scopes
+       * @type string
+       * @default null
+       */
+      scopes: null,
+
+      /**
+       * If true, the is signed in.
+       *
+       * @attribute signedIn
+       * @type bool
+       * @default false
+       */
+      signedIn: false,
+
+      /**
+       * The logged in user.
+       *
+       * @attribute user
+       * @type object
+       * @default {}
+       */
+      user: null
+    },
+
+    created: function() {
+      this.cookiePolicy = window.ENV === 'dev' ?
+          'single_host_origin' : location.protocol + '//' + location.host;
+    },
+
+    loadAuth: function(e, detail, sender) {
+      // gapi.auth.authorize () doesn't do popup.
+      gapi.auth.authorize({
+        client_id: this.clientId,
+        scope: this.scopes,
+        immediate: true,
+        cookie_policy: this.cookiePolicy
+      }, this.signinChangedHandler.bind(this));
+    },
+
+    signIn: function() {
+      if (this.signedIn) {
+        return;
+      }
+
+      gapi.auth.signIn({
+        clientid: this.clientId,
+        scope: this.scopes,
+        immediate: false,
+        accesstype: 'offline',
+        redirecturi: 'postmessage',
+        cookiepolicy: this.cookiePolicy,
+        callback: this.signinChangedHandler.bind(this)
+      });
+    },
+
+    signOut: function() {
+      this.disconnect(); // revoke tokens
+
+      gapi.auth.signOut(); // Call after tokens are revoked.
+
+      this.signedIn = false;
+      this.user = null;
+
+      this.fire('signin-change', {
+        signedIn: false, user: null
+      });
+    },
+
+    disconnect: function() {
+      var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' +
+                      gapi.auth.getToken().access_token +
+                      '&callback=%%callback%%';
+
+      var lib = document.createElement('core-shared-lib');
+      lib.url = revokeUrl;
+    },
+
+    signinChangedHandler: function(authResult) {
+
+      if (authResult && !authResult.error) {
+
+        // Only send one-time code to server after the consent screen (first login).
+        if (authResult.status.signed_in && authResult.code &&
+            authResult.status.method === 'PROMPT') {
+          this.sendCodeToServer(authResult.code);
+        }
+
+        // Get user's basic profile info, pic, email.
+        gapi.client.load('oauth2', 'v2', function () {
+          gapi.client.oauth2.userinfo.get().execute(function(resp) {
+            this.user = resp;
+            this.user.tokenResponse = gapi.auth.getToken();
+
+            this.fire('signin-change', {signedIn: true, user: this.user});
+
+            this.signedIn = true;
+
+          }.bind(this));
+        }.bind(this));
+
+      } else {
+        switch (authResult.error) {
+          case 'user_signed_out':
+            this.signedIn = false;
+            this.user = null;
+            break;
+          case 'immediate_failed':
+            break;
+          case 'access_denied':
+            break;
+          default:
+            console.error('Login error:', authResult.error);
+            break;
+        }
+      }
+    },
+
+    sendCodeToServer: function(oneTimeCode) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', AUTH_ENDPOINT);
+
+      var accessToken = gapi.auth.getToken().access_token;
+
+      xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      xhr.onload = function(e) {
+        // TODO(ericbidelman): handle response.
+      };
+
+      xhr.send(JSON.stringify({code: oneTimeCode}));
+    }
+  });
+})();
+</script>
+</polymer-element>
+
