@@ -227,7 +227,8 @@ limitations under the License.
 
     <template is="auto-binding" id="t">
 
-      <google-signin scopes="https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin>
+      <!-- <google-signin scopes="https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin> -->
+      <google-signin scopes="profile email https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin>
 
       <!-- Responsive handlers -->
       <core-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"
@@ -273,12 +274,12 @@ limitations under the License.
           </paper-tabs>
           <a href="#" class="button-link" data-track-link="nav-signin" on-tap="{{signIn}}" hidden?="{{currentUser}}">Sign-in</a>
           <template if="{{currentUser}}">
-            <img _src="{{currentUser.image}}" class="profilepic">
+            <img _src="{{currentUser.picture}}" class="profilepic">
             <paper-menu-button>
               <paper-icon-button icon="io:more-vert" aria-label="Settings"></paper-icon-button>
               <paper-dropdown id="signin-settings-panel" class="dropdown" halign="right" valign="top">
                 <div class="card-content" layout horizontal>
-                  <div><img _src="{{currentUser.image}}" class="profilepic"></div>
+                  <div><img _src="{{currentUser.picture}}" class="profilepic"></div>
                   <div>
                     <div>{{currentUser.name}}</div>
                     <div class="settings-email">{{currentUser.email}}</div>

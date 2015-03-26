@@ -2,28 +2,34 @@
 
 {% define "mastheadBgClass" %}bg-cyan{% end %}
 
-{% define "defaultSubpage" %}agenda{% end %}
+{% define "selectedSubpage" %}agenda{% end %}
 
 {% define "masthead" %}
   <h1>Schedule</h1>
   <div layout horizontal justified>
-    <paper-tabs class="white" valueattr="label"
-        selected="{{ selectedSubpage }}" scrollable?="{{isPhoneSize}}">
-      <paper-tab label="agenda" layout horizontal>
-        <a href="schedule#agenda" data-subpage-link
-            data-track-link="schedule-agenda" layout horizontal center >Agenda</a>
+    <paper-tabs class="white" selected="{{pages[selectedPage].selectedSubpage}}" valueattr="label"
+                scrollable?="{{isPhoneSize}}" link>
+      <paper-tab label="agenda">
+        <a href="#agenda" data-track-link="schedule-agenda" data-subpage-link
+                          layout horizontal center-center>Agenda</a>
       </paper-tab>
-      <paper-tab label="day1" layout horizontal>
-        <a href="schedule#day1" data-subpage-link
-            data-track-link="schedule-day1" layout horizontal center>Day 1</a>
+      <paper-tab label="day1">
+        <a href="#day1" data-track-link="schedule-day1" data-subpage-link
+                        layout horizontal center-center>Day 1</a>
       </paper-tab>
-      <paper-tab layout horizontal>Day 2</paper-tab>
-      <paper-tab>My schedule</paper-tab>
+      <paper-tab label="day2">
+        <a href="#day2" data-track-link="schedule-day2" data-subpage-link
+                        layout horizontal center-center>Day 2</a>
+      </paper-tab>
+      <paper-tab label="mysched">
+        <a href="#mysched" data-track-link="schedule-mysched" data-subpage-link
+                           layout horizontal center-center>My Schedule</a>
+      </paper-tab>
     </paper-tabs>
     <paper-dropdown-menu>
       <paper-dropdown class="dropdown" halign="right">
         <core-menu class="menu" selected="1">
-          <paper-item>pst</paper-item>
+          <paper-item>PST</paper-item>
           <paper-item>MST</paper-item>
           <paper-item>CST</paper-item>
           <paper-item>EST</paper-item>

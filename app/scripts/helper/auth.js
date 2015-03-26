@@ -62,7 +62,7 @@ IOWA.Auth = IOWA.Auth || (function() {
     var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     if (e.detail.user) {
       tokenResponse_ = e.detail.user.tokenResponse;
-      drawerProfilePic.src = e.detail.user.image;
+      drawerProfilePic.src = e.detail.user.picture;
       drawerProfilePic.hidden = false;
       saveUpdatesToken_();
     } else {

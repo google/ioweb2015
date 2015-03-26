@@ -158,10 +158,13 @@ IOWA.Router = (function() {
   function handleSubpageLink(e, el) {
     e.preventDefault();
     e.stopPropagation();
+
     var main = IOWA.Elements.Main;
-    var template = IOWA.Elements.Template;
-    var currentSubpageName = template.selectedSubpage;
+    var t = IOWA.Elements.Template;
+
+    var currentSubpageName = t.pages[t.selectedPage].selectedSubpage;
     var nextSubpageName = el.hash.substring(1);
+
     if (currentSubpageName !== nextSubpageName) {
       var oldSubpage = main.querySelector('#subpage-' + currentSubpageName);
       var newSubpage = main.querySelector('#subpage-' + nextSubpageName);
@@ -173,7 +176,7 @@ IOWA.Router = (function() {
           'path': el.pathname + el.hash,
           fromHashChange: true
         }, '', el.href);
-        IOWA.Elements.Template.subpageName = nextSubpageName;
+
         IOWA.PageAnimation.play(IOWA.PageAnimation.sectionSlideIn(newSubpage));
       });
     }
