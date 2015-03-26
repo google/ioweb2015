@@ -42,7 +42,7 @@
     "google-map": "GoogleWebComponents/google-map#^0.4.2",
     "i18n-msg": "ebidel/i18n-msg#^0.0.2",
     "paper-button": "Polymer/paper-button#^0.5.5",
-    "paper-checkbox": "Polymer/paper-checkbox#^0.5.5",
+    "paper-checkbox": "Polymer/paper-checkbox#~0.5.5",
     "paper-icon-button": "Polymer/paper-icon-button#^0.5.5",
     "paper-dialog": "Polymer/paper-dialog#^0.5.5",
     "paper-dropdown": "Polymer/paper-dropdown#^0.5.5",
@@ -58,10 +58,26 @@
     "polymer": "Polymer/polymer#^0.5.5",
     "shed": "wibblymat/shed#^1.0.0",
     "es6-promise-2.0.1.min": "https://es6-promises.s3.amazonaws.com/es6-promise-2.0.1.min.js",
-    "web-animations-js": "web-animations/web-animations-js#^1.0.7",
-    "paper-checkbox": "Polymer/paper-checkbox#~0.5.5"
+    "web-animations-js": "web-animations/web-animations-js#^1.0.7"
   },
   "resolutions": {
-    "web-animations-js": "1.0.7"
+    "web-animations-js": "1.0.7",
+    "core-iconset-svg": "^0.5.5",
+    "core-icon": "^0.5.5",
+    "paper-button": "^0.5.5",
+    "paper-input": "^0.5.5",
+    "polymer": "^0.5.5",
+    "font-roboto": "^0.5",
+    "core-a11y-keys": "^0.5",
+    "core-iconset": "^0.5",
+    "core-icons": "^0.5",
+    "core-focusable": "^0.5",
+    "paper-ripple": "^0.5",
+    "paper-shadow": "^0.5",
+    "core-input": "^0.5",
+    "core-style": "^0.5",
+    "core-component-page": "^0.5",
+    "webcomponentsjs": "^0.5",
+    "core-meta": "^0.5"
   }
 }
