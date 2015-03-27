@@ -228,7 +228,8 @@ limitations under the License.
     <template is="auto-binding" id="t">
 
       <!-- <google-signin scopes="https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin> -->
-      <google-signin scopes="profile email https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin>
+      <google-signin scopes="profile email https://www.googleapis.com/auth/drive.appfolder"
+                     user="{{currentUser}}"></google-signin>
 
       <!-- Responsive handlers -->
       <core-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"
@@ -247,7 +248,7 @@ limitations under the License.
           <div flex>
             <a href="./" class="io-logo-link" data-ajax-link data-track-link="nav-home"
                          data-anim-ripple aria-label="Home" tabindex="0">
-              <div class="io-logo"></div>
+              <div class="io-logo" iologodestination></div>
             </a>
           </div>
           <paper-tabs class="white {{ navBgClass }}" valueattr="label" selected="{{selectedPage}}" link noink>
@@ -309,7 +310,6 @@ limitations under the License.
         </core-toolbar>
         <div class="masthead-container" flex end?="{{!isPhoneSize}}"
              layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
-          <div class="io-logo large" iologodestination></div>
           <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}"
                layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>

@@ -34,14 +34,14 @@ Fired when the signed in state of the user changes.
 @param {Object} detail.user The current user.
 @param {Object} detail.response The current user's token response.
 -->
-<!-- <polymer-element name="google-signin" attributes="clientId scopes signedIn">
+<!-- <polymer-element name="google-signin" attributes="clientId scopes signedIn load">
   <template>
     <style>
       :host {
         display: none;
       }
     </style>
-    <google-js-api on-js-api-load="{{loadAuth}}"></google-js-api>
+    <google-js-api on-js-api-load="{{onLoadAuth}}"></google-js-api>
   </template>
   <script>
   Polymer({
@@ -80,10 +80,19 @@ Fired when the signed in state of the user changes.
        * @type object
        * @default {}
        */
-      user: null
+      user: null,
+
+      /**
+       * If true, the JS client library is loaded and auth is initialized.
+       *
+       * @attribute load
+       * @type bool
+       * @default false
+       */
+      load: false
     },
 
-    loadAuth: function(e, detail, sender) {
+    onLoadAuth: function(e, detail, sender) {
       gapi.load('auth2', function() {
         this.auth2 = gapi.auth2.init({
           client_id: this.clientId,
@@ -188,14 +197,16 @@ Fired when the signed in state of the user changes.
 </polymer-element>
  -->
 
-<polymer-element name="google-signin" attributes="clientId scopes signedIn">
+<polymer-element name="google-signin" attributes="clientId scopes signedIn load">
 <template>
   <style>
     :host {
       display: none;
     }
   </style>
-  <google-client-api on-api-load="{{loadAuth}}"></google-client-api>
+  <template if="{{load}}">
+    <google-client-api on-api-load="{{onLoadAuth}}"></google-client-api>
+  </template>
 </template>
 <script>
 (function() {
@@ -238,7 +249,16 @@ Fired when the signed in state of the user changes.
        * @type object
        * @default {}
        */
-      user: null
+      user: null,
+
+      /**
+       * If true, the JS client library is loaded and auth is initialized.
+       *
+       * @attribute load
+       * @type bool
+       * @default false
+       */
+      load: false
     },
 
     created: function() {
@@ -246,7 +266,7 @@ Fired when the signed in state of the user changes.
           'single_host_origin' : location.protocol + '//' + location.host;
     },
 
-    loadAuth: function(e, detail, sender) {
+    onLoadAuth: function(e, detail, sender) {
       // gapi.auth.authorize () doesn't do popup.
       gapi.auth.authorize({
         client_id: this.clientId,

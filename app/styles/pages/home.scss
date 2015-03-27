@@ -140,11 +140,9 @@ $name: 'page-home';
   .home-photo {
     height: 745px;
     margin-top: -104px;
-  }
-
-  #registration {
     position: relative;
     margin-bottom: -264px;
+
     .registration__setreminder {
       background: #fff;
       color: $color-cyan-A700;
@@ -191,11 +189,9 @@ $name: 'page-home';
 @media (min-width: $desktop-breakpoint-mid) {
   $overlayCardTop: 181px;
 
-  #registration {
-    margin-bottom: -248px;
-  }
   .home-photo {
     margin-top: -112px;
+    margin-bottom: -248px;
   }
   .page__section--attend {
     padding-top: $largeKeyline + $desktopKeyline;
@@ -219,9 +215,6 @@ $name: 'page-home';
 }
 
 @media (min-width: $desktop-breakpoint-max) {
-  .home-photo {
-    margin-top: -111px;
-  }
   .page__section--attend {
     margin-bottom: -105px;
   }

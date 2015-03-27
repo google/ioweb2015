@@ -35,44 +35,6 @@
   <div class="slide-up-delay">
     <section class="home-photo page__section js-experiment-instrument js-experiment-instrument--no-bottom-margin"></section>
 
-    <section id="registration" class="page__section js-experiment-instrument js-experiment-instrument--no-top-margin bg-cyan">
-      <h2 tabindex="0">I/O begins May 28 at 9:00 AM PDT</h2>
-
-      <!-- <paper-button class="registration__setreminder" hidden?="{{isPhoneSize}}"
-          data-track-link="home-set-reminder">
-        <core-icon icon="io:notifications-none"></core-icon> <i18n-msg msgid="setreminder">Set a Reminder</i18n-msg>
-      </paper-button> -->
-
-      <div class="io-countdown" layout vertical center>
-        <countdown-timer bgcolor="#00BCD4"
-                         date="May 28 2015 09:00:00 GMT-0700 (PDT)"
-                         dateadjustment="5" easeintime="490" waittime="100"
-                         easeouttime="390"
-                         thresholdInformation="{{thresholdInfo}}"
-                         on-timerthreshold="{{onCountdownTimerThreshold}}"
-                         value="{{countdownValue}}">
-        </countdown-timer>
-
-        <template if="{{thresholdInfo.thresholdDays}}">
-          <h4 class="countdown-label"><a href="schedule" data-ajax-link>Day<span hidden?="{{countdownValue === 1}}">s</span> until I/O begins</a></h4>
-        </template>
-
-        <template if="{{thresholdInfo.thresholdHours}}">
-          <h4 class="countdown-label"><a href="schedule" data-ajax-link>Hour<span hidden?="{{countdownValue === 1}}">s</span> until I/O begins</a></h4>
-        </template>
-
-        <template if="{{thresholdInfo.thresholdMinutes}}">
-          <h4 class="countdown-label"><a href="schedule" data-ajax-link>Minute<span hidden?="{{countdownValue === 1}}">s</span> until I/O begins</a></h4>
-        </template>
-
-        <template if="{{thresholdInfo.thresholdSeconds}}">
-          <h4 class="countdown-label"><a href="schedule" data-ajax-link>Second<span hidden?="{{countdownValue === 1}}">s</span> until I/O begins</a></h4>
-        </template>
-
-      </div>
-
-    </section>
-
     <div class="registration__card card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
       <!-- <template if="{{isPhoneSize}}">
         <div class="card js-experiment-visualizer" auto-vertical flex>
