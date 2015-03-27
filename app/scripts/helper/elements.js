@@ -286,14 +286,6 @@ IOWA.Elements = (function() {
       }
     };
 
-    // If the Home button was clicked, move focus to the About button
-    // after the Home button has faded out
-    template.manageHomeFocus = function(e, detail, sender) {
-      if (this.selectedPage == 'home') {
-        IOWA.A11y.focusNavigation();
-      }
-    };
-
     template.signIn = function() {
       IOWA.Elements.GoogleSignIn.signIn();
     };

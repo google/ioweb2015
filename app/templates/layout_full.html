@@ -244,10 +244,10 @@ limitations under the License.
         </div>
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}" role="navigation">
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-          <div flex disabled?="{{selectedPage === 'home'}}">
-            <a class="io-logo-link" href="./" data-ajax-link data-track-link="nav-home" data-anim-ripple aria-label="Home" aria-hidden="{{selectedPage === 'home'}}"
-            tabindex="{{selectedPage === 'home' ? -1 : 0}}">
-              <div on-transitionend="{{manageHomeFocus}}" on-webkittransitionend="{{manageHomeFocus}}" class="io-logo"></div>
+          <div flex>
+            <a href="./" class="io-logo-link" data-ajax-link data-track-link="nav-home"
+                         data-anim-ripple aria-label="Home" tabindex="0">
+              <div class="io-logo"></div>
             </a>
           </div>
           <paper-tabs class="white {{ navBgClass }}" valueattr="label" selected="{{selectedPage}}" link noink>
@@ -307,9 +307,11 @@ limitations under the License.
             </paper-menu-button>
           </template>
         </core-toolbar>
-        <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+        <div class="masthead-container" flex end?="{{!isPhoneSize}}"
+             layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="io-logo large" iologodestination></div>
-          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
+          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}"
+               layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>

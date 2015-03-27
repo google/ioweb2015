@@ -24,15 +24,6 @@ $name: 'page-home';
 
 ##{$name} {
 
-// Homepage doesn't include top-left io logo.
-.masthead {
-  core-toolbar {
-    .io-logo {
-      opacity: 0;
-    }
-  }
-}
-
 .masthead-container {
   .io-logo {
     display: inline-block;
