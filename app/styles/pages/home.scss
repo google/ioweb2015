@@ -30,6 +30,13 @@ $name: 'page-home';
   }
 }
 
+.masthead-meta--corner {
+  display: block;
+  position: absolute;
+  top: 16px;
+  left: 95px;
+}
+
 .home-photo {
   background: url(../images/home/Image-01.jpg) no-repeat 50% 0;
   background-size: cover;
@@ -99,6 +106,9 @@ $name: 'page-home';
 }
 
 @media (max-width: $phone-breakpoint-max) {
+  .masthead-meta--corner {
+    display: none;
+  }
   name-cycler {
     min-width: 160px;
   }

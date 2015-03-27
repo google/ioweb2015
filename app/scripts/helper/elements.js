@@ -57,7 +57,6 @@ IOWA.Elements = (function() {
 
     var masthead = document.querySelector('.masthead');
     var mastheadMeta = masthead.querySelector('.masthead-meta');
-    var ioLogoLarge = masthead.querySelector('.io-logo.large');
     var nav = masthead.querySelector('#navbar');
     var navPaperTabs = nav.querySelector('paper-tabs');
     var drawerMenu = document.getElementById('drawer-menu');
@@ -90,7 +89,6 @@ IOWA.Elements = (function() {
     IOWA.Elements.Toast = toast;
     IOWA.Elements.LiveStatus = liveStatus;
     IOWA.Elements.IOLogo = ioLogo;
-    IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
     IOWA.Elements.GoogleSignIn = signin;
 
