@@ -245,7 +245,7 @@ limitations under the License.
         </div>
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}" role="navigation">
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
-          <div flex>
+          <div flex disabled?="{{selectedPage === 'home'}}">
             <a href="./" class="io-logo-link" data-ajax-link data-track-link="nav-home"
                          data-anim-ripple aria-label="Home" tabindex="0">
               <div class="io-logo" iologodestination></div>
