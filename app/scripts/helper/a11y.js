@@ -70,7 +70,7 @@ IOWA.A11y = IOWA.A11y || (function() {
     init: init,
     addFocusStates: addFocusStates,
     focusNavigation: focusNavigation,
-    updateStatus: updateStatus
+    announceLiveChange: announceLiveChange
   };
 
 })();
