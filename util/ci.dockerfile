@@ -11,12 +11,22 @@ RUN apt-get install -y \
 	bzr git mercurial \
 	--no-install-recommends
 
+ENV CLOUDSDK_CORE_DISABLE_PROMPTS=1
+ENV CLOUDSDK_PYTHON_SITEPACKAGES=1
+ADD https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz /gcloud.tar.gz
+RUN mkdir /gcloud && \
+  tar -xzf /gcloud.tar.gz --strip 1 -C /gcloud && \
+  /gcloud/install.sh && \
+  /gcloud/bin/gcloud components update app -q && \
+  rm -f /gcloud.tar.gz
+ENV PATH=/gcloud/bin:$PATH
+
+ENV NODE_VERSION 0.10.38
+ENV NPM_VERSION 2.7.3
 # verify gpg and sha256: http://nodejs.org/dist/v0.10.31/SHASUMS256.txt.asc
 # gpg: aka "Timothy J Fontaine (Work) <tj.fontaine@joyent.com>"
-RUN gpg --keyserver pool.sks-keyservers.net --recv-keys 7937DFD2AB06298B2293C3187D33FF9D0246406D
-
-ENV NODE_VERSION 0.10.35
-ENV NPM_VERSION 2.1.18
+# gpg: aka "Julien Gilli <jgilli@fastmail.fm>"
+RUN gpg --keyserver pool.sks-keyservers.net --recv-keys 7937DFD2AB06298B2293C3187D33FF9D0246406D 114F43EE0176B71C7BC219DD50A3051F888C628D
 
 RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
 	&& curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -27,14 +37,14 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
 	&& npm install -g npm@"$NPM_VERSION" \
 	&& npm cache clear
 
-RUN npm install -g gulp bower phantomjs@1.9.13
+RUN npm install -g gulp bower
 
-ENV GOLANG_VERSION 1.4
+ENV GOLANG_VERSION 1.4.2
 
 RUN curl -sSL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz \
-		| tar -v -C /usr/src -xz
+		| tar -C /usr/src -xz
 
-RUN cd /usr/src/go/src && ./make.bash --no-clean 2>&1
+RUN cd /usr/src/go/src && ./make.bash --no-clean > /dev/null
 
 ENV PATH /usr/src/go/bin:$PATH
 
