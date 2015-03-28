@@ -25,6 +25,7 @@ $name: 'page-home';
 ##{$name} {
 
 .masthead-container {
+  max-width: 100% !important;
   .io-logo {
     display: inline-block;
   }
@@ -101,6 +102,22 @@ $name: 'page-home';
 
     core-icon {
       margin-left: 5px;
+    }
+  }
+}
+
+#countdown-container {
+  countdown-timer {
+    border-right: 1px solid rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+    height: 165px;
+  }
+  h4 {
+    margin-left: $desktopKeyline + 2;
+  }
+  .countdown-num {
+    &:last-of-type countdown-timer {
+      border-right: none;
     }
   }
 }
