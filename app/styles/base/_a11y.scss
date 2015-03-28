@@ -1,10 +1,10 @@
 /* Handle focus state for I/O logo home button */
 .io-logo-link:focus {
   outline: none;
-}
 
-.io-logo-link:focus .io-logo::after {
-  display: block;
+  .io-logo::after {
+    display: block;
+  }
 }
 
 /* Adds a white circle behind the I/O logo as a focus state */
@@ -41,7 +41,8 @@ paper-tab a:focus {
  * or an anchor inside of a paper-tab
  */
 .bg-dark-grey paper-tab.focused,
-.bg-dark-grey paper-tab .focused {
+.bg-dark-grey paper-tab .focused,
+.bg-dark-grey [focused] {
   background: rgba(255, 255, 255, 0.26);
 }
 
@@ -50,7 +51,10 @@ paper-tab a:focus {
 .bg-medium-grey paper-tab.focused,
 .bg-cyan paper-tab .focused,
 .bg-light-grey paper-tab .focused,
-.bg-medium-grey paper-tab .focused {
+.bg-medium-grey paper-tab .focused,
+.bg-cyan [focused],
+.bg-light-grey [focused],
+.bg-medium-grey [focused] {
   background: rgba(255, 255, 255, 0.36);
 }
 
