@@ -26,16 +26,16 @@ IOWA.PageAnimation = (function() {
   var CONTENT_SLIDE_LENGTH = '100px';
 
   var CONTENT_SLIDE_OPTIONS = {
-      duration: CONTENT_SLIDE_DURATION,
-      easing: CONTENT_SLIDE_EASING,
-      fill: 'forwards'
+    duration: CONTENT_SLIDE_DURATION,
+    easing: CONTENT_SLIDE_EASING,
+    fill: 'forwards'
   };
 
   var CONTENT_SLIDE_DELAY_OPTIONS = {
-      duration: CONTENT_SLIDE_DURATION,
-      delay: CONTENT_SLIDE_DELAY,
-      easing: CONTENT_SLIDE_EASING,
-      fill: 'forwards'
+    duration: CONTENT_SLIDE_DURATION,
+    delay: CONTENT_SLIDE_DELAY,
+    easing: CONTENT_SLIDE_EASING,
+    fill: 'forwards'
   };
 
   /**
@@ -179,8 +179,8 @@ IOWA.PageAnimation = (function() {
       backgroundColor: color
     };
     var animation = new Animation(ripple, [start, end], {
-        duration: duration,
-        fill: 'forwards'  // Makes ripple keep its state at the end of animation
+      duration: duration,
+      fill: 'forwards'  // Makes ripple keep its state at the end of animation
     });
     return animation;
   }
@@ -245,11 +245,11 @@ IOWA.PageAnimation = (function() {
     card.style.transformOrigin = '0 0';
     card.style.webkitTransformOrigin = '0 0';
     var cardTransition = new Animation(card, [
-        {transform: 'translate3d(0, 0, 0) scale(1)'},
-        {transform: [translate, scale].join(' ')}
-      ], {
-        duration: duration,
-        fill: 'forwards'
+      {transform: 'translate3d(0, 0, 0) scale(1)'},
+      {transform: [translate, scale].join(' ')}
+    ], {
+      duration: duration,
+      fill: 'forwards'
     });
 
     var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
