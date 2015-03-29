@@ -16,7 +16,7 @@
 
 window.IOWA = window.IOWA || {};
 
-IOWA.Analytics = (function(exports) {
+IOWA.Analytics = IOWA.Analytics || (function(exports) {
 
   "use strict";
 

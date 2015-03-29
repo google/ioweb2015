@@ -20,8 +20,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="social-post.html">
 
-<!-- TODO: load these -->
-<!-- <script src="../scripts/helper/analytics.js"></script> -->
+<script src="../scripts/analytics.js"></script>
 <script src="../scripts/helper/request.js"></script>
 
 <!--
@@ -53,13 +52,14 @@ The `<io-gadget>` element renders a youtube video + social feed.
                             videoid="{{selectedVideoId}}" autohide="1"
                             controls="2" modestbranding="1" showinfo="0"
                             iv_load_policy="3" rel="0" autoplay="0"
-                            on-google-youtube-ready="{{onReady}}"></google-youtube>
+                            on-google-youtube-ready="{{onVideoReady}}"
+                            on-google-youtube-state-change="{{onStateChange}}"></google-youtube>
 
           </div>
           <div class="card-content card--video-meta" layout horizontal center>
             <div flex>
               <div class="video-title">{{videoTitle}}&nbsp;</div>
-              <div class="video-author">Ellie Powers</div>
+              <div class="video-author">{{videoAuthor}}</div>
             </div>
             <div>
               <paper-dropdown-menu label="Switch channel">
@@ -145,6 +145,15 @@ The `<io-gadget>` element renders a youtube video + social feed.
       selectedVideoId: null,
 
       /**
+       * The author of the video, as returned by the YT API.
+       *
+       * @attribute videoAuthor
+       * @type string
+       * @default ''
+       */
+      videoAuthor: '',
+
+      /**
        * The title of the video, as returned by the YT API.
        *
        * @attribute videoTitle
@@ -196,12 +205,36 @@ The `<io-gadget>` element renders a youtube video + social feed.
             this.updateSocialPosts.bind(this), this.socialPostUpdateInterval);
       },
 
-      onReady: function(e, detail, sender) {
-        this.videoTitle = this.$.video.player.getVideoData().title;
-      },
-
       videoIdsChanged: function() {
         this.selectedVideoId = this.videoIds[0];
+      },
+
+      updateVideoInfo: function() {
+        var meta = this.$.video.player.getVideoData();
+        this.videoTitle = meta.title;
+        this.videoAuthor = meta.author;
+      },
+
+      onVideoReady: function(e, detail, sender) {
+        this.updateVideoInfo();
+      },
+
+      onStateChange: function(e, detail) {
+        switch (detail.data) {
+          case YT.PlayerState.CUED:
+            this.$.video.play();
+            break;
+          case YT.PlayerState.PLAYING:
+            this.updateVideoInfo();
+            IOWA.Analytics.trackEvent('gadget', 'video', this.selectedVideoId);
+            break;
+        }
+      },
+
+      selectedVideoIdChanged: function(oldVal, newVal) {
+        if (this.videoIds.indexOf(newVal) !== -1) {
+          this.$.video.play(); // Start auto-playing video when new one was selected.
+        }
       },
 
       updateSocialPosts: function() {
