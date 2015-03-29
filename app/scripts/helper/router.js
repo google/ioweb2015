@@ -87,12 +87,12 @@ IOWA.Router = (function() {
     ];
     if (!isFadeRipple) {
       var mastheadAnim = new Animation(IOWA.Elements.Masthead, [
-          {backgroundColor: mastheadColor},
-          {backgroundColor: rippleColor}
-        ], {
-          duration: 300,
-          delay: 0,
-          fill: 'forwards'  // Makes ripple keep its state after animation.
+        {backgroundColor: mastheadColor},
+        {backgroundColor: rippleColor}
+      ], {
+        duration: 300,
+        delay: 0,
+        fill: 'forwards'  // Makes ripple keep its state after animation.
       });
       animGroup.push(mastheadAnim);
     }
