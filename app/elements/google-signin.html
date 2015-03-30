@@ -131,9 +131,9 @@ Fired when the signed in state of the user changes.
           var xhr = new XMLHttpRequest();
           xhr.open('POST', 'api/v1/auth');
 
-          var accessToken = this.auth2.currentUser.get().getAuthResponse().access_token;
+          var token = this.auth2.currentUser.get().getAuthResponse();
 
-          xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+          xhr.setRequestHeader('Authorization', 'Bearer ' + (token.id_token || token.access_token));
           xhr.setRequestHeader('Content-Type', 'application/json');
 
           xhr.onload = function(e) {
@@ -358,9 +358,9 @@ Fired when the signed in state of the user changes.
       var xhr = new XMLHttpRequest();
       xhr.open('POST', AUTH_ENDPOINT);
 
-      var accessToken = gapi.auth.getToken().access_token;
+      var token = gapi.auth.getToken();
 
-      xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+      xhr.setRequestHeader('Authorization', 'Bearer ' + (token.id_token || token.access_token));
       xhr.setRequestHeader('Content-Type', 'application/json');
 
       xhr.onload = function(e) {

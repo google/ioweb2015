@@ -194,7 +194,15 @@ core-drawer-panel {
   }
 }
 
-#signin-settings-panel {
+.card__signin-intro {
+  position: absolute !important;
+  top: initial !important;
+  right: $tabletKeyline;
+  @include shadow-z2();
+}
+
+#signin-settings-panel,
+.card__signin-intro {
   width: 344px;
   color: $color-text;
   font-size: 14px;
@@ -210,11 +218,15 @@ core-drawer-panel {
   }
 
   .profilepic {
-    margin-right:  $mobileKeyline / 2;
+    margin-right: $mobileKeyline / 2;
+  }
+
+  .card__title {
+    padding-bottom: $mobileKeyline !important;
   }
 
   .card-content {
-    padding: $mobileKeyline;
+    padding: $mobileKeyline !important;
 
     &:not(:last-child) {
       border-bottom: 1px solid $color-light-grey-border;

@@ -17,6 +17,24 @@
 IOWA.Elements = (function() {
   "use strict";
 
+  function showSigninHelp() {
+    var signinIntroEl = document.querySelector('.card__signin-intro');
+    var showSigninIntro = !JSON.parse(localStorage.getItem('showSigninIntro'));
+    if (showSigninIntro) {
+      signinIntroEl.addEventListener('core-overlay-close-completed', function(e) {
+        e.stopPropagation();
+        localStorage.setItem('showSigninIntro', JSON.stringify(true));
+
+        signinIntroEl.parentElement.removeChild(signinIntroEl);
+        signinIntroEl = null;
+      });
+
+      signinIntroEl.opened = true;
+    } else {
+      signinIntroEl.parentElement.removeChild(signinIntroEl);
+    }
+  }
+
   function optionallyLaunchExperiment() {
     if (window.location.search.indexOf('experiment') > -1) {
       IOWA.Elements.FAB.onFabClick();
@@ -43,6 +61,8 @@ IOWA.Elements = (function() {
           IOWA.Elements.Template.fire('page-transition-done');
           optionallyLaunchExperiment();
           IOWA.ServiceWorkerRegistration.register();
+
+          showSigninHelp(); // show signin help popup on page load.
         }
       );
 
