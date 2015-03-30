@@ -182,6 +182,8 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
       updateSocialPostsTimeout_: null,
 
+      wasPaused_: false,
+
       /**
        * List of API results.
        *
@@ -222,10 +224,18 @@ The `<io-gadget>` element renders a youtube video + social feed.
       onStateChange: function(e, detail) {
         switch (detail.data) {
           case YT.PlayerState.CUED:
+            this.wasPaused_ = false;
             this.$.video.play();
+            break;
+          case YT.PlayerState.PAUSED:
+            this.wasPaused_ = true;
             break;
           case YT.PlayerState.PLAYING:
             this.updateVideoInfo();
+            if (!this.wasPaused_) {
+              IOWA.Analytics.trackEvent('gadget', 'video', this.selectedVideoId);
+            }
+            this.wasPaused_ = false;
             break;
         }
       },
@@ -233,7 +243,6 @@ The `<io-gadget>` element renders a youtube video + social feed.
       selectedVideoIdChanged: function(oldVal, newVal) {
         if (this.videoIds.indexOf(newVal) !== -1) {
           this.$.video.play(); // Start auto-playing video when new one was selected.
-          IOWA.Analytics.trackEvent('gadget', 'video', this.selectedVideoId);
         }
       },
 
