@@ -17,6 +17,24 @@
 IOWA.Elements = (function() {
   "use strict";
 
+  function showSigninHelp() {
+    var signinIntroEl = document.querySelector('.card__signin-intro');
+    var showSigninIntro = !JSON.parse(localStorage.getItem('showSigninIntro'));
+    if (showSigninIntro) {
+      signinIntroEl.addEventListener('core-overlay-close-completed', function(e) {
+        e.stopPropagation();
+        localStorage.setItem('showSigninIntro', JSON.stringify(true));
+
+        signinIntroEl.parentElement.removeChild(signinIntroEl);
+        signinIntroEl = null;
+      });
+
+      signinIntroEl.opened = true;
+    } else {
+      signinIntroEl.parentElement.removeChild(signinIntroEl);
+    }
+  }
+
   function optionallyLaunchExperiment() {
     if (window.location.search.indexOf('experiment') > -1) {
       IOWA.Elements.FAB.onFabClick();
@@ -301,6 +319,7 @@ IOWA.Elements = (function() {
     template.addEventListener('page-transition-done', function(e) {
       this.pageTransitionDone = true;
       IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
+      showSigninHelp();
     });
     template.addEventListener('page-transition-start', function(e) {
       this.pageTransitionDone = false;

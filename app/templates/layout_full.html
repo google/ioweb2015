@@ -312,6 +312,24 @@ limitations under the License.
             </paper-menu-button>
           </template>
         </core-toolbar>
+
+        <core-overlay class="card card-content card__signin-intro"
+                      transition="core-transition-center" autoCloseDisabled>
+          <div class="card-content">
+            <h4 class="card__title">Sign in</h4>
+            <p>By signing-in, you can create a customized I/O schedule and receive reminders shortly before the sessions you bookmark start.</p>
+            <p>Once signed-in, you can also choose to be notified when:</p>
+            <ul>
+              <li>I/O is about to start</li>
+              <li>New I/O Extended events register near your location</li>
+              <li>Specific session videos are made available</li>
+            </ul>
+          </div>
+          <div class="card-content">
+            <a href="#" data-track-link="signin-intro" core-overlay-toggle>Got it</a>
+          </div>
+        </core-overlay>
+
         <div class="masthead-container" flex end?="{{!isPhoneSize}}"
              layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
           <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}"
@@ -319,6 +337,7 @@ limitations under the License.
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
+
         <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}"></experiment-fab-container>
       </header>
 
