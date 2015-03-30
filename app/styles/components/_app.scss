@@ -332,6 +332,20 @@ h6 {
   opacity: 0.4 !important;
 }
 
+// Aria live region. Should be "hidden" without actually being
+// hidden, or else aria live polling won't work
+#live-status {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  text-transform: none;
+  width: 1px;
+}
+
 @media (max-width: $phone-breakpoint-max) {
   .io-countdown {
     margin: $desktopKeyline auto;

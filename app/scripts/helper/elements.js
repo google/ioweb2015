@@ -59,6 +59,7 @@ IOWA.Elements = (function() {
     var fab = masthead.querySelector('experiment-fab-container');
     var footer = document.querySelector('footer');
     var toast = document.getElementById('toast');
+    var liveStatus = document.getElementById('live-status');
     var i18n = document.createElement('i18n-msg');
 
     var signin = document.querySelector('google-signin');
@@ -82,6 +83,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.Ripple = ripple;
     IOWA.Elements.FAB = fab;
     IOWA.Elements.Toast = toast;
+    IOWA.Elements.LiveStatus = liveStatus;
     IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;

@@ -23,6 +23,7 @@ IOWA.A11y = IOWA.A11y || (function() {
   function init() {
     // Differentiate focus coming from mouse and keyboard
     addFocusStates('paper-tabs a');
+    document.addEventListener('toast-message', announceLiveChange);
   }
 
   // Elements passed to this method will receive classes reflecting the focus
@@ -56,10 +57,20 @@ IOWA.A11y = IOWA.A11y || (function() {
     IOWA.Elements.NavPaperTabs.items[0].firstElementChild.focus();
   }
 
+  // Pipe text to an aria-live region. This is automatically trigged
+  // when toasts are shown.
+  function announceLiveChange(e) {
+    // Annoying timeout hack to work around https://code.google.com/p/chromium/issues/detail?id=469254
+    setTimeout(function() {
+      IOWA.Elements.LiveStatus.textContent = e.detail.message;
+    }, 1000);
+  }
+
   return {
     init: init,
     addFocusStates: addFocusStates,
-    focusNavigation: focusNavigation
+    focusNavigation: focusNavigation,
+    announceLiveChange: announceLiveChange
   };
 
 })();
