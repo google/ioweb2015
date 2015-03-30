@@ -17,25 +17,40 @@
 $name: 'page-videos';
 
 @import '../base/_vars';
-@import '../base/_layout';
-@import '../base/_color';
 @import '../base/_breakpoints';
-@import '../base/_shadow';
-@import '../base/_typography';
 
 
 ##{$name} {
+
+.masthead-container {
+  max-width: 100%;
+}
 
 .masthead {
   margin-bottom: 0;
 }
 
-@media (max-width: $phone-breakpoint-max) {
+.photo__masthead {
+  background: url(../images/videos/keynote.jpg) no-repeat 50% 50%;
+  background-size: cover;
+  top: -$navbarHeight;
+  z-index: -1;
+}
 
+@media (max-width: $phone-breakpoint-max) {
+  .photo__masthead {
+    top: -$navbarHeightMobile;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
 
+}
+
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .photo__masthead {
+    background-image: url(../images/videos/keynote@2x.jpg);
+  }
 }
 
 }

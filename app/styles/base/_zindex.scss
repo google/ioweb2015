@@ -36,28 +36,32 @@ experiment-fab-container {
   z-index: 4;
 }
 
-.fullvideo_thumbnail {
+#navbar {
   z-index: 5;
 }
 
-.fullvideo__container {
+.fullvideo_thumbnail {
   z-index: 6;
 }
 
-io-gallery {
+.fullvideo__container {
   z-index: 7;
 }
 
-.marker-results, .view__events {
+io-gallery {
   z-index: 8;
 }
 
-.navbar__overlay {
+.marker-results, .view__events {
   z-index: 9;
 }
 
+.navbar__overlay {
+  z-index: 10;
+}
+
 .io-logo-container {
-  z-index: 10; // highest
+  z-index: 12; // highest
 }
 
 experiment-fab-container[playmode="playing"],

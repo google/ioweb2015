@@ -224,8 +224,8 @@ Fired when loading animation is complete.
         scale = 0.18;
       }
 
-      // Ensure masthead is behind top transition up card up and FAB.
-      this.parentElement.style.zIndex = 1;
+      // Ensure FAB is in front of masthead transition up.
+      this.fab.style.zIndex = getComputedStyle(this.parentElement).zIndex + 1;
 
       var animationProps = {
         duration: 500,

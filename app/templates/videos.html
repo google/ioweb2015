@@ -1,22 +1,20 @@
 {% define "title" %}Videos{% end %}
 
-{% define "mastheadBgClass" %}bg-dark-grey{% end %}
+{% define "mastheadBgClass" %}bg-photo{% end %}
 
 {% define "masthead" %}
- <!-- Intentionally left blank. -->
+ <div class="photo__masthead" fit></div>
 {% end %}
 
 {% define "content" %}
 
-<div class="slide-up">
-
-  <section class="page__section bg-cyan">
+  <section class="page__section bg-dark-grey slide-up">
     <div class="card__container">
       <h1>Videos</h1>
     </div>
   </section>
 
-  <section class="page__section">
+  <section class="page__section slide-up-delay">
     <div class="card__container">
       <div class="card js-experiment-visualizer" on-core-change="{{updateIframeCode}}">
         <div class="card-content">
@@ -60,8 +58,6 @@
       </div>
     </div>
   </section>
-
-</div>
 
 <script>
 (function() {

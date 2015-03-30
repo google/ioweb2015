@@ -108,7 +108,6 @@ IOWA.Elements = (function() {
     IOWA.Elements.FAB = fab;
     IOWA.Elements.Toast = toast;
     IOWA.Elements.LiveStatus = liveStatus;
-    IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.Footer = footer;
     IOWA.Elements.GoogleSignIn = signin;
 
