@@ -277,7 +277,7 @@ limitations under the License.
               </a>
             </paper-tab>
           </paper-tabs>
-          <a href="#" class="button-link" data-track-link="nav-signin" on-tap="{{signIn}}" hidden?="{{currentUser}}">Sign-in</a>
+          <a href="#" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign-in</a>
           <template if="{{currentUser}}">
             <img _src="{{currentUser.picture}}" class="profilepic">
             <paper-menu-button>
