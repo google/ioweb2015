@@ -63,6 +63,14 @@ IOWA.Request = IOWA.Request || (function() {
     freshXhr.send();
   };
 
+  /**
+   * XMLHttpRequest wrapper that returns a promise and supports our authorization scheme.
+   * @param {string} method The HTTP method.
+   * @param {string} url The HTTP request URL.
+   * @param {boolean} isAuthRequired Whether to include an Authorization header.
+   * @param {object} body Optional HTTP request body.
+   * @return {Promise} Resolves with response body, or rejects with an error on HTTP failure.
+   */
   var xhrPromise = function(method, url, isAuthRequired, body) {
     return new Promise(function(resolve, reject) {
       var authInfo;
@@ -89,15 +97,11 @@ IOWA.Request = IOWA.Request || (function() {
           var response = JSON.parse(this.response);
           resolve(response);
         } else {
-          reject(method + ' ' + url + ' failed with status ' + this.statusText);
+          reject(Error(method + ' ' + url + ' failed with status ' + this.statusText));
         }
       };
 
-      if (body) {
-        xhr.send(JSON.stringify(body));
-      } else {
-        xhr.send();
-      }
+      xhr.send(body ? JSON.stringify(body) : null);
     });
   };
 

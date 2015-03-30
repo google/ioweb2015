@@ -21,73 +21,131 @@ IOWA.Notifications = IOWA.Notifications || (function() {
 
   var NOTIFY_ENDPOINT = 'api/v1/user/notify';
 
-  var sendSubscriptionIdToServerPromise_ = function(subscriptionId) {
+  /**
+   * Globally enables push notifications for the current user, and passes along the browser's push
+   * subscription id and endpoint value to the backend.
+   * @param {string} subscriptionId The subscription.subscriptionId value.
+   * @param {string} endpoint The subscription.endpoint value.
+   * @return {Promise} Resolves with response body, or rejects with an error on HTTP failure.
+   */
+  var enableNotificationsPromise_ = function(subscriptionId, endpoint) {
     return IOWA.Request.xhrPromise('PUT', NOTIFY_ENDPOINT, true, {
       notify: true,
-      subscriber: subscriptionId
+      subscriber: subscriptionId,
+      endpoint: endpoint
     });
   };
 
-  var removeSubscriptionIdFromServerPromise_ = function(subscriptionId) {
+  /**
+   * Passes along the browser's push subscription id and endpoint value to the backend.
+   * Does not change the notify value, so push notifications might be disabled globally for the
+   * current user.
+   * @param {string} subscriptionId The subscription.subscriptionId value.
+   * @param {string} endpoint The subscription.endpoint value.
+   * @return {Promise} Resolves with response body, or rejects with an error on HTTP failure.
+   */
+  var updateSubscriptionInfoPromise_ = function(subscriptionId, endpoint) {
     return IOWA.Request.xhrPromise('PUT', NOTIFY_ENDPOINT, true, {
-      notify: false,
-      subscriber: subscriptionId
+      subscriber: subscriptionId,
+      endpoint: endpoint
     });
   };
 
+  /**
+   * Disables push notifications globally for the current user.
+   * @return {Promise} Resolves with response body, or rejects with an error on HTTP failure.
+   */
+  var disableNotificationsPromise_ = function() {
+    return IOWA.Request.xhrPromise('PUT', NOTIFY_ENDPOINT, true, {notify: false});
+  };
+
+  /**
+   * {boolean} Whether the browser supports all the prerequisites for using push notifications.
+   */
   var isSupported = (window.ServiceWorkerRegistration &&
                      window.ServiceWorkerRegistration.prototype.showNotification &&
                      window.PushManager &&
-                     window.Notification &&
-                     window.Notification.permission !== 'denied') ? true : false;
+                     window.Notification) ? true : false;
 
-  var isAlreadySubscribedPromise = function() {
+  /**
+   * Checks whether the logged in user has notifications enabled globally on our backend.
+   * @return {Promise} Resolves with the boolean value of the user's backend notification state.
+   */
+  var isNotifyEnabledPromise = function() {
+    return IOWA.Request.xhrPromise('GET', NOTIFY_ENDPOINT, true).then(function(response) {
+      return response.notify;
+    }).catch(IOWA.Util.reportError);
+  };
+
+  /**
+   * Checks whether the current browser already has a push subscription. If it does, the
+   * the subscription id and endpoint value are passed along to the backend to ensure they're
+   * up to date.
+   * @return {Promise} Resolves with true if there's an existing subscription, or false otherwise.
+   */
+  var isExistingSubscriptionPromise = function() {
     return navigator.serviceWorker.ready.then(function(registration) {
       return registration.pushManager.getSubscription();
     }).then(function(subscription) {
       if (subscription && subscription.subscriptionId) {
         // Send the latest subscription id to the server, just in case it's changed.
-        return sendSubscriptionIdToServerPromise_(subscription.subscriptionId).then(function() {
+        return updateSubscriptionInfoPromise_(subscription.subscriptionId, subscription.endpoint).then(function() {
+          return true;
+        }).catch(function() {
+          // Return true even if the request to send the subscription id to the server fails, since
+          // the user is subscribed.
           return true;
         });
       } else {
         return false;
       }
-    }).catch(IOWA.Util.logError);
+    }).catch(IOWA.Util.reportError);
   };
 
+  /**
+   * Ensures that there's a push subscription active for the current browser, and then passes along
+   * the info to backend server, while also setting the global notification state to true.
+   * @return {Promise} Resolves with notify endpoint response body on success.
+   */
   var subscribePromise = function() {
     return navigator.serviceWorker.ready.then(function(registration) {
       return registration.pushManager.subscribe();
     }).then(function(subscription) {
       if (subscription && subscription.subscriptionId) {
         // If subscribing succeeds, send the subscription to the server. Return a resolved promise.
-        return sendSubscriptionIdToServerPromise_(subscription.subscriptionId);
+        return enableNotificationsPromise_(subscription.subscriptionId, subscription.endpoint);
       } else {
         // Otherwise, cause the promise to reject with an explanation of the error.
-        if (Notification.permission === 'denied') {
+        if (window.Notification.permission === 'denied') {
           throw Error('Unable to subscribe due to permissions being denied.');
         } else {
           throw Error('Unable to subscribe due to an unknown error.');
         }
       }
-    }).catch(IOWA.Util.logError);
+    }).catch(IOWA.Util.reportError);
   };
 
+  /**
+   * Unregisters the push subscription for the current browser, and sets the global notification
+   * state on the backend to false.
+   * @return {Promise}
+   */
   var unsubscribePromise = function() {
-    return navigator.serviceWorker.ready.then(function(registration) {
+    var disablePushManager = navigator.serviceWorker.ready.then(function(registration) {
       return registration.pushManager.getSubscription();
     }).then(function(subscription) {
       if (subscription && subscription.subscriptionId) {
-        return removeSubscriptionIdFromServerPromise_(subscription.subscriptionId).then(function() {
-          return subscription.unsubscribe();
-        });
+        return subscription.unsubscribe();
       }
-    }).catch(IOWA.Util.logError);
+    });
+
+    return Promise.all(disableNotificationsPromise_(), disablePushManager)
+      .catch(IOWA.Util.reportError);
   };
 
   return {
-    isAlreadySubscribedPromise: isAlreadySubscribedPromise,
+    isExistingSubscriptionPromise: isExistingSubscriptionPromise,
+    isNotifyEnabledPromise: isNotifyEnabledPromise,
     isSupported: isSupported,
     subscribePromise: subscribePromise,
     unsubscribePromise: unsubscribePromise

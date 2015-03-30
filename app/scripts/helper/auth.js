@@ -31,8 +31,12 @@ IOWA.Auth = IOWA.Auth || (function() {
     return tokenResponse_;
   }
 
-  function saveUpdatesToken_() {
-    // Check to see if we already have an updates token in IDB.
+  /**
+   * Ensures that we have a valid token in IndexedDB used by the service worker to fetch updates.
+   * @return {Promise}
+   */
+  function ensureSWToken_() {
+    // Check to see if we already have a SW token in IDB.
     return simpleDB.open(DB_NAME).then(function(db) {
       return db.get(DB_KEY).then(function(token) {
         return token;
@@ -47,15 +51,19 @@ IOWA.Auth = IOWA.Auth || (function() {
           });
         });
       }
-    }).catch(IOWA.Util.logError);
+    }).catch(IOWA.Util.reportError);
   }
 
-  // This should be called whenever the user logs out, since the updates token is associated with
-  // the currently logged in user.
-  function clearUpdatesToken_() {
+  /**
+   * Removes the token in IndexedDB used by the service worker to fetch updates.
+   * This should be called whenever the user logs out, since the SW token is associated with
+   * the currently logged in user.
+   * @return {Promise}
+   */
+  function clearSWToken_() {
     return simpleDB.open(DB_NAME).then(function(db) {
       return db.delete(DB_KEY);
-    }).catch(IOWA.Util.logError);
+    }).catch(IOWA.Util.reportError);
   }
 
   document.addEventListener('signin-change', function(e) {
@@ -64,11 +72,11 @@ IOWA.Auth = IOWA.Auth || (function() {
       tokenResponse_ = e.detail.user.tokenResponse;
       drawerProfilePic.src = e.detail.user.picture;
       drawerProfilePic.hidden = false;
-      saveUpdatesToken_();
+      ensureSWToken_(); // This kicks off an async network request, wrapped in a promise.
     } else {
       tokenResponse_ = null;
       drawerProfilePic.hidden = true;
-      clearUpdatesToken_();
+      clearSWToken_(); // This kicks off an async network request, wrapped in a promise.
     }
   });
 
