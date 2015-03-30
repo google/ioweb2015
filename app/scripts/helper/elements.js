@@ -61,6 +61,8 @@ IOWA.Elements = (function() {
           IOWA.Elements.Template.fire('page-transition-done');
           optionallyLaunchExperiment();
           IOWA.ServiceWorkerRegistration.register();
+
+          showSigninHelp(); // show signin help popup on page load.
         }
       );
 
@@ -319,7 +321,6 @@ IOWA.Elements = (function() {
     template.addEventListener('page-transition-done', function(e) {
       this.pageTransitionDone = true;
       IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
-      showSigninHelp();
     });
     template.addEventListener('page-transition-start', function(e) {
       this.pageTransitionDone = false;
