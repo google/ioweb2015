@@ -17,14 +17,17 @@
 IOWA.Elements = (function() {
   "use strict";
 
-  var updateElements = function() {
+  function optionallyLaunchExperiment() {
+    if (window.location.search.indexOf('experiment') > -1) {
+      IOWA.Elements.FAB.onFabClick();
+    }
+  }
+
+  function updateElements() {
     var ioLogo = document.querySelector('io-logo');
-    ioLogo.addEventListener('io-logo-animation-done', function() {
-      var optionallyLaunchExperiment = function() {
-        if (window.location.search.indexOf('experiment') > -1) {
-          IOWA.Elements.FAB.onFabClick();
-        }
-      };
+    ioLogo.addEventListener('io-logo-animation-done', function(e) {
+      // Loading auth is delayed until logo animation is done.
+      IOWA.Elements.GoogleSignIn.load = true;
 
       // Deep link into a subpage.
       var selectedSubpage = location.hash.substring(1);
@@ -40,7 +43,9 @@ IOWA.Elements = (function() {
           IOWA.Elements.Template.fire('page-transition-done');
           optionallyLaunchExperiment();
           IOWA.ServiceWorkerRegistration.register();
-        });
+        }
+      );
+
     });
 
     var main = document.querySelector('.io-main');
@@ -52,7 +57,6 @@ IOWA.Elements = (function() {
 
     var masthead = document.querySelector('.masthead');
     var mastheadMeta = masthead.querySelector('.masthead-meta');
-    var ioLogoLarge = masthead.querySelector('.io-logo.large');
     var nav = masthead.querySelector('#navbar');
     var navPaperTabs = nav.querySelector('paper-tabs');
     var drawerMenu = document.getElementById('drawer-menu');
@@ -85,15 +89,14 @@ IOWA.Elements = (function() {
     IOWA.Elements.Toast = toast;
     IOWA.Elements.LiveStatus = liveStatus;
     IOWA.Elements.IOLogo = ioLogo;
-    IOWA.Elements.IOLogoLarge = ioLogoLarge;
     IOWA.Elements.Footer = footer;
     IOWA.Elements.GoogleSignIn = signin;
 
     // Kickoff a11y helpers for elements
     IOWA.A11y.init();
-  };
+  }
 
-  var init = function() {
+  function init() {
     var template = document.getElementById('t');
     template.pages = IOWA.PAGES; // defined in auto-generated ../pages.js
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
@@ -286,14 +289,6 @@ IOWA.Elements = (function() {
       }
     };
 
-    // If the Home button was clicked, move focus to the About button
-    // after the Home button has faded out
-    template.manageHomeFocus = function(e, detail, sender) {
-      if (this.selectedPage == 'home') {
-        IOWA.A11y.focusNavigation();
-      }
-    };
-
     template.signIn = function() {
       IOWA.Elements.GoogleSignIn.signIn();
     };
@@ -316,7 +311,7 @@ IOWA.Elements = (function() {
     IOWA.Elements.ScrollContainer = document.querySelector(
         'core-drawer-panel [main]');
     template.ScrollContainer = IOWA.Elements.ScrollContainer;
-  };
+  }
 
   return {
     init: init

@@ -54,6 +54,11 @@ with the attribute `iologodestination`.
 
 @element io-logo
 -->
+<!--
+Fired when loading animation is complete.
+
+@event io-logo-animation-done
+-->
 <polymer-element name="io-logo" attributes="height width year page">
   <template>
     <link rel="stylesheet" href="io-logo.css">
@@ -211,13 +216,12 @@ with the attribute `iologodestination`.
       var diffX = dest.left - current.left;
       var diffY = dest.top - current.top;
 
+      var isMobileSize = containerWidth <= 769;
+
       // Magic padding/margin offsets to get the I/O logo in its final position.
-      if (containerWidth > 769) { // Tablet/desktop
-        diffY += 9;
-        scale = 0.83;
-      } else {
-        diffY -= 19;
-        scale = 0.58;
+      if (!isMobileSize) {
+        diffY -= 62;
+        scale = 0.18;
       }
 
       // Ensure masthead is behind top transition up card up and FAB.
@@ -248,22 +252,10 @@ with the attribute `iologodestination`.
         easing: 'cubic-bezier(0,0,0.21,1)'
       });
 
-      if (this.page == 'home') {
-        // At the same time, clip masthead background and move I/O logo.
-        var animations = new AnimationGroup([
-          mastheadClipAnimation,
-          fabAnimation,
-          // I/O logo movement.
-          new Animation(this, [
-            {transform: 'none'},
-            {transform: 'translate3d(' + diffX + 'px,' + diffY + 'px,0) scale(' + scale + ')'}
-          ], animationProps)
-        ]);
-      } else {
+      if (isMobileSize) {
         // Initialize fab offscreen.
         this.fab.style.transform = 'translateY(' +
             (mastheadY + fabMetrics.height / 2)  + 'px)';
-
         // Fade out I/O logo then clip masthead background.
         var animations = new AnimationSequence([
           // I/O logo fade out.
@@ -275,11 +267,17 @@ with the attribute `iologodestination`.
             fill: 'forwards',
             easing: 'cubic-bezier(0,0,0.21,1)'
           })
-          // Should be possible to run the group after the first animation but
-          // Chrome glitches. Instead use two players.
-          // new AnimationGroup([
-          //   fabAnimation, mastheadClipAnimation
-          // ])
+        ]);
+      } else {
+        // At the same time, clip masthead background and move I/O logo.
+        var animations = new AnimationGroup([
+          mastheadClipAnimation,
+          fabAnimation,
+          // I/O logo movement.
+          new Animation(this, [
+            {transform: 'none'},
+            {transform: 'translate3d(' + diffX + 'px,' + diffY + 'px,0) scale(' + scale + ')'}
+          ], animationProps)
         ]);
       }
 
@@ -288,10 +286,7 @@ with the attribute `iologodestination`.
       player.onfinish = function(e) {
         var el = this.parentElement;
 
-        if (this.page === 'home') {
-          el.parentElement.removeChild(el);
-          this.fire('io-logo-animation-done');
-        } else {
+        if (isMobileSize) {
           document.timeline.play(
             new AnimationGroup([fabAnimation, mastheadClipAnimation]
           )).onfinish = function(e) {
@@ -299,8 +294,10 @@ with the attribute `iologodestination`.
             el.parentElement.removeChild(el);
             this.fire('io-logo-animation-done');
           }.bind(this);
+        } else {
+          el.parentElement.removeChild(el);
+          this.fire('io-logo-animation-done');
         }
-
       }.bind(this);
     }
   });

@@ -33,27 +33,27 @@
   // &.huge {
   //   height: 272px;
   // }
+
+  /* Adds a white circle behind the I/O logo as a focus state */
+  &::after {
+    content: '';
+    display: none;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    position: absolute;
+    margin-left: -10px;
+    margin-top: -14px;
+  }
 }
 
 /* Handle focus state for I/O logo home button */
 .io-logo-link:focus {
   outline: none;
-}
 
-.io-logo-link:focus .io-logo::after {
-  display: block;
-}
-
-/* Adds a white circle behind the I/O logo as a focus state */
-.io-logo::after {
-  content: '';
-  display: none;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  position: absolute;
-  margin-left: -10px;
-  margin-top: -14px;
+  .io-logo::after {
+    display: block;
+  }
 }
 
 .bg-dark-grey .io-logo::after {
@@ -84,8 +84,6 @@
       margin-top: $mobileKeyline / 2;
       margin-left: $mobileKeyline / 2;
       display: inline-block;
-      opacity: 0;
-      transition: opacity 300ms cubic-bezier(0,0,0.2,1);
     }
   }
 }
@@ -96,6 +94,10 @@
   paper-tabs a {
     color: inherit;
   }
+}
+
+.masthead-meta--corner {
+  display: none;
 }
 
 .masthead__ripple, .ripple {
@@ -257,10 +259,6 @@ core-drawer-panel {
   position: relative;
   padding: 10px 0 40px 0;
 
-  .io-logo {
-    display: none;
-  }
-
   paper-tabs {
     text-transform: uppercase;
     width: 100%;
@@ -284,15 +282,13 @@ core-drawer-panel {
 }
 
 .masthead-title {
-  color: $color-cyan-A700 !important;
-  line-height: 24px;
-  margin-bottom: 4px;
+  line-height: 20px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .masthead-subtitle {
-  color: $color-bluegrey-700;
   font-size: 14px;
-  font-weight: 500;
   line-height: 20px;
 }
 
@@ -307,21 +303,17 @@ experiment-fab-container {
   .masthead-container {
     @include keyline-72l();
 
-    .io-logo.large {
-      width: 177px;
-      height: 128px;
-    }
-
     paper-tabs[scrollable] {
       left: -64px;
       position: relative;
     }
   }
-  .masthead-title {
-    font-size: 20px;
-  }
+
   #navbar {
     > .profilepic {
+      display: none;
+    }
+    .io-logo {
       display: none;
     }
   }
@@ -334,29 +326,11 @@ experiment-fab-container {
     margin-bottom: -115px;
     min-height: 540px;
     height: 540px; // Needed due to https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview
-
-    core-toolbar {
-      .io-logo {
-        opacity: 1;
-      }
-    }
-  }
-
-  .masthead-title, .masthead-subtitle {
-    text-align: right;
   }
 
   .masthead-container {
     max-width: 704px;
     padding: 0 0 170px 0;
-  }
-
-  .masthead-title {
-    line-height: 28px;
-  }
-
-  .masthead-subtitle {
-    margin-bottom: 20px;
   }
 
   experiment-fab-container {
@@ -388,10 +362,6 @@ experiment-fab-container {
 @media (min-width: $desktop-breakpoint-mid) {
   .masthead-container {
     max-width: 896px;
-  }
-  .masthead-title {
-    font-size: 32px;
-    line-height: 38px;
   }
 }
 

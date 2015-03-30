@@ -24,19 +24,18 @@ $name: 'page-home';
 
 ##{$name} {
 
-// Homepage doesn't include top-left io logo.
-.masthead {
-  core-toolbar {
-    .io-logo {
-      opacity: 0;
-    }
-  }
-}
-
 .masthead-container {
+  max-width: 100% !important;
   .io-logo {
     display: inline-block;
   }
+}
+
+.masthead-meta--corner {
+  display: block;
+  position: absolute;
+  top: 16px;
+  left: 95px;
 }
 
 .home-photo {
@@ -107,7 +106,26 @@ $name: 'page-home';
   }
 }
 
+#countdown-container {
+  countdown-timer {
+    border-right: 1px solid rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+    height: 165px;
+  }
+  h4 {
+    margin-left: $desktopKeyline + 2;
+  }
+  .countdown-num {
+    &:last-of-type countdown-timer {
+      border-right: none;
+    }
+  }
+}
+
 @media (max-width: $phone-breakpoint-max) {
+  .masthead-meta--corner {
+    display: none;
+  }
   name-cycler {
     min-width: 160px;
   }
@@ -149,11 +167,9 @@ $name: 'page-home';
   .home-photo {
     height: 745px;
     margin-top: -104px;
-  }
-
-  #registration {
     position: relative;
     margin-bottom: -264px;
+
     .registration__setreminder {
       background: #fff;
       color: $color-cyan-A700;
@@ -200,11 +216,9 @@ $name: 'page-home';
 @media (min-width: $desktop-breakpoint-mid) {
   $overlayCardTop: 181px;
 
-  #registration {
-    margin-bottom: -248px;
-  }
   .home-photo {
     margin-top: -112px;
+    margin-bottom: -248px;
   }
   .page__section--attend {
     padding-top: $largeKeyline + $desktopKeyline;
@@ -228,9 +242,6 @@ $name: 'page-home';
 }
 
 @media (min-width: $desktop-breakpoint-max) {
-  .home-photo {
-    margin-top: -111px;
-  }
   .page__section--attend {
     margin-bottom: -105px;
   }

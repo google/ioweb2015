@@ -228,7 +228,8 @@ limitations under the License.
     <template is="auto-binding" id="t">
 
       <!-- <google-signin scopes="https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin> -->
-      <google-signin scopes="profile email https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin>
+      <google-signin scopes="profile email https://www.googleapis.com/auth/drive.appfolder"
+                     user="{{currentUser}}"></google-signin>
 
       <!-- Responsive handlers -->
       <core-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"
@@ -245,10 +246,14 @@ limitations under the License.
         <core-toolbar id="navbar" class="{{ {'core-narrow': isPhoneSize} | tokenList }}" role="navigation">
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
           <div flex disabled?="{{selectedPage === 'home'}}">
-            <a class="io-logo-link" href="./" data-ajax-link data-track-link="nav-home" data-anim-ripple aria-label="Home" aria-hidden="{{selectedPage === 'home'}}"
-            tabindex="{{selectedPage === 'home' ? -1 : 0}}">
-              <div on-transitionend="{{manageHomeFocus}}" on-webkittransitionend="{{manageHomeFocus}}" class="io-logo"></div>
+            <a href="./" class="io-logo-link" data-ajax-link data-track-link="nav-home"
+                         data-anim-ripple aria-label="Home" tabindex="0">
+              <div class="io-logo" iologodestination></div>
             </a>
+            <div class="masthead-meta--corner">
+              <h2 class="masthead-title">May 28 - 29, 2015</h2>
+              <h4 class="masthead-subtitle">Moscone Center West,<br>San Francisco, CA</h4>
+            </div>
           </div>
           <paper-tabs class="white {{ navBgClass }}" valueattr="label" selected="{{selectedPage}}" link noink>
             <paper-tab label="about" role="">
@@ -307,9 +312,10 @@ limitations under the License.
             </paper-menu-button>
           </template>
         </core-toolbar>
-        <div class="masthead-container" flex end?="{{!isPhoneSize}}" layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
-          <div class="io-logo large" iologodestination></div>
-          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}" layout vertical end-justified?="{{isPhoneSize}}" flex>
+        <div class="masthead-container" flex end?="{{!isPhoneSize}}"
+             layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">
+          <div class="masthead-meta {{ {transition: pageTransitioningOut} | tokenList }}"
+               layout vertical end-justified?="{{isPhoneSize}}" flex>
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
