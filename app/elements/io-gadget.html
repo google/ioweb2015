@@ -226,7 +226,6 @@ The `<io-gadget>` element renders a youtube video + social feed.
             break;
           case YT.PlayerState.PLAYING:
             this.updateVideoInfo();
-            IOWA.Analytics.trackEvent('gadget', 'video', this.selectedVideoId);
             break;
         }
       },
@@ -234,6 +233,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
       selectedVideoIdChanged: function(oldVal, newVal) {
         if (this.videoIds.indexOf(newVal) !== -1) {
           this.$.video.play(); // Start auto-playing video when new one was selected.
+          IOWA.Analytics.trackEvent('gadget', 'video', this.selectedVideoId);
         }
       },
 
