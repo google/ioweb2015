@@ -34,7 +34,6 @@ $name: 'page-videos';
   background: url(../images/videos/keynote.jpg) no-repeat 50% 50%;
   background-size: cover;
   top: -$navbarHeight;
-  z-index: -1;
 }
 
 @media (max-width: $phone-breakpoint-max) {
