@@ -168,17 +168,23 @@ IOWA.Router = (function() {
     if (currentSubpageName !== nextSubpageName) {
       var oldSubpage = main.querySelector('#subpage-' + currentSubpageName);
       var newSubpage = main.querySelector('#subpage-' + nextSubpageName);
-      IOWA.PageAnimation.play(
-          IOWA.PageAnimation.sectionSlideOut(oldSubpage), function() {
-        oldSubpage.style.display = 'none';
-        newSubpage.style.display = '';
-        IOWA.History.pushState({
-          'path': el.pathname + el.hash,
-          fromHashChange: true
-        }, '', el.href);
-
-        IOWA.PageAnimation.play(IOWA.PageAnimation.sectionSlideIn(newSubpage));
-      });
+      IOWA.PageAnimation.play(new AnimationGroup([
+          IOWA.PageAnimation.sectionSlideOut(oldSubpage),
+          IOWA.PageAnimation.elementFadeOut(
+              IOWA.Elements.Footer, {duration: 400})
+        ]), function() {
+          oldSubpage.style.display = 'none';
+          newSubpage.style.display = '';
+          IOWA.History.pushState({
+            'path': el.pathname + el.hash,
+            fromHashChange: true
+          }, '', el.href);
+          IOWA.PageAnimation.play(new AnimationGroup([
+            IOWA.PageAnimation.sectionSlideIn(newSubpage),
+            IOWA.PageAnimation.elementFadeIn(
+                IOWA.Elements.Footer, {duration: 400})
+          ]));
+        });
     }
   }
 
@@ -365,7 +371,17 @@ IOWA.Router = (function() {
       } else {
         animationFunc = IOWA.PageAnimation.pageSlideIn;
       }
-
+      var main = IOWA.Elements.Main;
+      var subpages = main.querySelectorAll('.subpage__content');
+      var subpageName = template.pages[template.selectedPage].selectedSubpage;
+      var selectedSubpage = main.querySelector('#subpage-' + subpageName);
+      if (selectedSubpage) {
+        for (var i = 0; i < subpages.length; i++) {
+          var subpage = subpages[i];
+          subpage.style.display = 'none';
+        }
+        selectedSubpage.style.display = '';
+      }
       IOWA.PageAnimation.play(animationFunc(), function() {
         // Fire event when the page transitions are final.
         IOWA.Elements.Template.fire('page-transition-done');
