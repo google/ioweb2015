@@ -29,7 +29,7 @@
     "type": "image/png",
     "density": "4"
   }],
-  "chrome_related_applications": [{
+  "related_applications": [{
     "platform": "web"
   }, {
     "platform": "android",
