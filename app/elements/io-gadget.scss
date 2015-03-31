@@ -65,6 +65,10 @@
   }
 }
 
+.card--livestream {
+  min-height: 287px;
+}
+
 .play__button--card {
   bottom: initial;
   top: calc(50% - 56px/2);
@@ -80,6 +84,7 @@
 social-post {
   padding: $tabletKeyline 0;
   border-bottom: 1px solid $color-light-grey-border;
+  margin-bottom: 0 !important;
 
   &::shadow header {
     margin-bottom: $mobileKeyline / 2;
@@ -114,6 +119,12 @@ paper-dropdown-menu {
 .video-author {
   color: $color-gray;
   font-size: 14px;
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  #social-feed {
+    flex-shrink: 0;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {

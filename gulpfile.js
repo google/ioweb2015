@@ -79,6 +79,20 @@ gulp.task('vulcanize-elements', ['sass'], function() {
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
 });
 
+// vulcanize embed gadget.
+gulp.task('vulcanize-gadget-elements', ['sass'], function() {
+  return gulp.src([
+      APP_DIR + '/elements/embed-elements.html'
+    ])
+    .pipe($.vulcanize({
+      strip: !argv.pretty,
+      csp: true,
+      inline: true,
+      dest: APP_DIR + '/elements'
+    }))
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
+});
+
 // vulcanize extended form elements separately.
 gulp.task('vulcanize-extended-elements', ['sass'], function() {
   return gulp.src([
@@ -308,7 +322,11 @@ gulp.task('serve:dist', ['default'], function(callback) {
   startGaeBackend(backendDir, false, callback);
 });
 
-gulp.task('vulcanize', ['vulcanize-elements', 'vulcanize-extended-elements']);
+gulp.task('vulcanize', [
+  'vulcanize-elements',
+  'vulcanize-extended-elements',
+  'vulcanize-gadget-elements']
+);
 
 gulp.task('js', ['jshint', 'jscs']);
 
