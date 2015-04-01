@@ -291,10 +291,12 @@ Fired when loading animation is complete.
             new AnimationGroup([fabAnimation, mastheadClipAnimation]
           )).onfinish = function(e) {
             this.fab.style.transform = 'none'; // Remove transform.
+            this.fab.style.zIndex = 'auto';
             el.parentElement.removeChild(el);
             this.fire('io-logo-animation-done');
           }.bind(this);
         } else {
+          this.fab.style.zIndex = 'auto';
           el.parentElement.removeChild(el);
           this.fire('io-logo-animation-done');
         }

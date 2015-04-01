@@ -8,59 +8,117 @@
 
 {% define "content" %}
 
-  <section class="page__section bg-dark-grey slide-up">
-    <div class="card__container">
-      <h1>Videos</h1>
+<core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
+  <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video"></paper-icon-button>
+  <span flex>Videos</span>
+</core-toolbar>
+
+<section class="page__section page__section--banner bg-dark-grey slide-up">
+  <div class="card__container">
+    <h1>Videos</h1>
+  </div>
+</section>
+
+<div class="slide-up-delay">
+
+  <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+
+    <div class="videolist__wrapper" layout vertical flex two relative>
+
+      <core-list data="{{videoList}}" selectionEnabled="false" height="600" fit>
+        <template>
+          <div class="item">
+            <div class="card card__video js-experiment-visualizer"
+                 data-videoid="{{videoList[index].id}}"
+                 data-videoimg="{{videoList[index].thumbnailUrl}}"
+                 on-tap="{{openVideo}}">
+              <div class="card__photo" relative>
+                <core-image _src="{{videoList[index].thumbnailUrl}}" load?="{{!!videoList[index]}}"
+                            sizing="cover" preload placeholder="images/io15-color.png" fade fit></core-image>
+
+              </div>
+              <div class="card-content">
+                <img src="images/play-video-button.png"
+                     class="play__button play__button--card" title="Play video" alt="Play video">
+                <div class="video-title" title="{{videoList[index].title}}">{{videoList[index].title}}&nbsp;</div>
+                <div class="video-author" hidden?="{{!videoList[index].speakers}}">{{videoList[index].speakers}}&nbsp;</div>
+              </div>
+            </div>
+          </div>
+          <div class="divider"></div>
+        </template>
+      </core-list>
+
     </div>
-  </section>
 
-  <section class="page__section slide-up-delay">
-    <div class="card__container">
-      <div class="card js-experiment-visualizer" on-core-change="{{updateIframeCode}}">
-        <div class="card-content">
-          <h3>Customize your widget</h3>
-        </div>
+    <paper-dropdown-menu label="Filter" class="card--filters" hidden?="{{!isPhoneSize}}">
+      <paper-dropdown valign="top" halign="left" class="dropdown">
+        <paper-item><a href="https://developers.google.com" target="_blank" data-track-link="footer-link-devsite">developers.google.com</a></paper-item>
+        <paper-item><a href="https://plus.google.com/+GoogleDevelopers" target="_blank" data-track-link="footer-link-gplus">+googledevelopers</a></paper-item>
+        <paper-item><a href="https://twitter.com/googledevs" target="_blank" data-track-link="footer-link-twitter">@googledevs</a></paper-item>
+        <paper-item><a href="http://googledevelopers.blogspot.com/" target="_blank" data-track-link="footer-link-blog">Blog</a></paper-item>
+      </paper-dropdown>
+    </paper-dropdown-menu>
 
-        <div class="card-content">f
-          <h4 class="card__title">1. Select widget content</h4>
-          <div class="customize__area">
-            <paper-radio-group selected="{{selectedGadgetLayout}}">
-              <paper-radio-button name="both" label="Live video stream + Google Developers social feed"></paper-radio-button>
-              <paper-radio-button name="video" label="Live video stream only"></paper-radio-button>
-              <paper-radio-button name="feed" label="Google Developers social feed only"></paper-radio-button>
-            </paper-radio-group>
-          </div>
-
-          <div class="card__title" layout horizontal end wrap>
-            <h4>2. Select widget size</h4>
-            <span class="heading-info">Minimum 300px and maximum 1000px</span>
-          </div>
-          <div class="customize__area">
-            <core-label layout inline horizontal center>
-              Width (px)
-              <paper-slider min="300" max="1000" value="875" editable pin immediateValue="{{gadgetWidth}}" for></paper-slider>
-            </core-label>
-            <core-label layout inline horizontal center>
-              Height (px)
-              <paper-slider min="300" max="1000" value="450" editable pin immediateValue="{{gadgetHeight}}" for></paper-slider>
-            </core-label>
-          </div>
-
-          <h4>3. Embed this code into your site</h4>
-          <div class="customize__area">
-            <paper-input-decorator label="Embed code snippet">
-              <paper-autogrow-textarea rows="2">
-                <textarea readonly on-focus="{{selectGadgetCodeSnippet}}">{{embedIframeCode}}</textarea>
-              </paper-autogrow-textarea>
-            </paper-input-decorator>
-          </div>
+    <div id="filterbox" class="card card--filters js-experiment-visualizer" flex?="{{!isPhoneSize}}" hidden?="{{isPhoneSize}}">
+      <div class="card-content">
+        <h4>Filter</h4>{{filterThreshold}}
+      </div>
+      <div class="card-content">
+        <div class="filter-rows">
+          <core-label horizontal layout center justified>
+            <span>DevByte</span>
+            <paper-checkbox for></paper-checkbox>
+          </core-label>
+          <core-label horizontal layout center justified>
+            <span>Design</span>
+            <paper-checkbox for></paper-checkbox>
+          </core-label>
+          <core-label horizontal layout center justified>
+            <span>Develop</span>
+            <paper-checkbox for></paper-checkbox>
+          </core-label>
+          <core-label horizontal layout center justified>
+            <span>Distribute</span>
+            <paper-checkbox for></paper-checkbox>
+          </core-label>
         </div>
       </div>
+
     </div>
-  </section>
+
+  </div>
+
+</div>
+
+<template id="video-template" if="{{fullscreenVideoActive}}">
+  <div class="fullvideo__container" fit hidden>
+    <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch video" fit>
+    <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
+                    autohide="1" controls="2" modestbranding="1" showinfo="0"
+                    iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
+  </div>
+</template>
 
 <script>
 (function() {
+
+  function fetchVideos(callback) {
+    var xhr = new XMLHttpRequest();
+    var url = '//storage.googleapis.com/iosched-updater-dev.appspot.com/past_io_videolibrary_v5.json';
+    xhr.open('GET', url);
+    xhr.onload = function(e) {
+      IOWA.Elements.Template.videoList = JSON.parse(e.target.response).video_library;
+      callback();
+    };
+    xhr.send();
+  }
+
+  function onPageTransitionDone_(e) {
+    fetchVideos(function() {
+      document.removeEventListener('page-transition-done', onPageTransitionDone_);
+    });
+  }
 
   // Page-specific JS that runs when this page is loaded for the first time.
   function initPage() {
@@ -71,7 +129,7 @@
     }
 
     page.load = function() {
-
+      document.addEventListener('page-transition-done', onPageTransitionDone_);
     };
 
     page.load(); // Run load callback on page load.

@@ -134,7 +134,8 @@ IOWA.Elements = (function() {
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
       'bg-medium-grey': '#CFD8DC',
-      'bg-dark-grey': '#455A64'
+      'bg-dark-grey': '#455A64',
+      'bg-photo': '#455A64'
     };
 
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
@@ -251,6 +252,27 @@ IOWA.Elements = (function() {
       // Wait one rAF for template to have stamped.
       this.async(function() {
         this.cardVideoTakeover(this.currentCard);
+      });
+    };
+
+    template.openVideo = function(e, detail, sender) {
+      this.currentCard = sender;
+      this.fullscreenVideoActive = true; // Active the placeholder template.
+
+      IOWA.Analytics.trackEvent('video', 'watch', sender.getAttribute('data-videoid'));
+
+      // Wait one rAF for template to have stamped.
+      this.async(function() {
+        var videoContainer = document.querySelector('.fullvideo__container');
+        var video = videoContainer.querySelector('google-youtube');
+
+        video.addEventListener('google-youtube-ready', function(e) {
+          video.videoid = sender.getAttribute('data-videoid'); // IE10 doesn't support .dataset.
+          this.cardVideoTakeover(this.currentCard);
+        }.bind(this));
+
+        var thumbnail = videoContainer.querySelector('.fullvideo_thumbnail');
+        thumbnail.src = sender.getAttribute('data-videoimg'); // IE10 doesn't support .dataset.
       });
     };
 
