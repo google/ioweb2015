@@ -98,7 +98,7 @@ func fetchIOExtEntries(c context.Context, url string) ([]*extEntry, error) {
 			errorf(c, "fetchIOExtEntries: strconv(XMLLng): %v; item: %#v", err, e)
 			continue
 		}
-		if e.Name == "" || e.Link == "" || e.City == "" {
+		if e.Name == "" || e.Link == "" {
 			logf(c, "fetchIOExtEntries: skipping %#v", e)
 			continue
 		}
