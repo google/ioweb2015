@@ -15,6 +15,9 @@
  */
 
 (function() {
+  // Polyfill Promise() in browsers that don't support it natively.
+  ES6Promise.polyfill();
+
   function afterImports() {
     IOWA.Elements.init();
     IOWA.Router.init();
