@@ -104,20 +104,23 @@
       IOWA.Elements.Template.selectedGadgetLayout = 'both';
     };
 
-    IOWA.Elements.Template.updateIframeCode = function() {
-      var url = IOWA.Util.getStaticBaseURL() + 'embed';
-      if (this.selectedGadgetLayout === 'video') {
-        url += '?noFeed';
-      } else if (this.selectedGadgetLayout === 'feed') {
-        url += '?noVideo';
-      }
+    IOWA.Elements.Template.updateIframeCode = function(e, detail, sender) {
+      // Debounce all the on-change events from the form inputs.
+      IOWA.Elements.Template.job('updateframe', function() {
+        var url = IOWA.Util.getStaticBaseURL() + 'embed';
+        if (this.selectedGadgetLayout === 'video') {
+          url += '?noFeed';
+        } else if (this.selectedGadgetLayout === 'feed') {
+          url += '?noVideo';
+        }
 
-      this.embedIframeCode = '<iframe src="' + url + '" style="width:' +
-                             this.gadgetWidth + 'px;height:' +
-                             this.gadgetHeight +'px"' +
-                             ' frameborder="0" allowfullscreen></iframe>';
-      var container = document.querySelector('.page__section--gadgetpreview');
-      container.firstElementChild.innerHTML = this.embedIframeCode;
+        this.embedIframeCode = '<iframe src="' + url + '" style="width:' +
+                               this.gadgetWidth + 'px;height:' +
+                               this.gadgetHeight +'px"' +
+                               ' frameborder="0" allowfullscreen></iframe>';
+        var container = document.querySelector('.page__section--gadgetpreview');
+        container.firstElementChild.innerHTML = this.embedIframeCode;
+      }, 50);
     },
 
     IOWA.Elements.Template.selectGadgetCodeSnippet = function(e, detail, sender) {
