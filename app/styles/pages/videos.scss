@@ -38,6 +38,21 @@ $name: 'page-videos';
   top: -$navbarHeight;
 }
 
+.card__photo--stage {
+  height: 100%;
+  h5 {
+    color: white;
+    text-shadow: .5px .5px 1px rgba(0, 0, 0, 0.25);
+    position: relative;
+    top: $mobileKeyline;
+  }
+}
+
+.play__button__container {
+  background-size: 40px;
+  height: 60px;
+}
+
 core-list {
   .item {
     padding: 0 3px; // leave space for box shadow.

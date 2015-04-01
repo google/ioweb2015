@@ -3,7 +3,13 @@
 {% define "mastheadBgClass" %}bg-photo{% end %}
 
 {% define "masthead" %}
- <div class="photo__masthead" fit></div>
+<div class="photo__masthead" fit>
+  <div class="card__photo--stage" layout vertical center-center>
+    <div class="play__button__container" on-tap="{{openSectionVideo}}" data-track-link="videos-watch-recap-video">
+      <h5>Watch the 2014 recap video</h5>
+    </div>
+  </div>
+</div>
 {% end %}
 
 {% define "content" %}
