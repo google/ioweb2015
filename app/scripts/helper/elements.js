@@ -120,6 +120,7 @@ IOWA.Elements = (function() {
     template.pages = IOWA.PAGES; // defined in auto-generated ../pages.js
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.fullscreenVideoActive = false;
+    template.mastheadVideoActive = false;
     template.photoGalleryActive = false;
     template.extendedMapActive = false;
     template.pageTransitionDone = false;

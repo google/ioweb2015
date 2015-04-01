@@ -24,6 +24,8 @@ $name: 'page-videos';
 
 ##{$name} {
 
+$playButtonHeightWidth: 40px;
+
 .masthead-container {
   max-width: 100%;
 }
@@ -48,8 +50,14 @@ $name: 'page-videos';
   }
 }
 
+.play__button--card {
+  height: $playButtonHeightWidth;
+  width: $playButtonHeightWidth;
+}
+
 .play__button__container {
-  background-size: 40px;
+  cursor: pointer;
+  background-size: $playButtonHeightWidth;
   height: 60px;
 }
 
@@ -91,8 +99,24 @@ core-list {
   margin-bottom: $desktopKeyline;
 }
 
-.filter-rows > * {
-  margin-bottom: $tabletKeyline;
+.filter-rows {
+  border-bottom: 1px solid $color-light-grey-border;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:not(:first-child) {
+    padding-top: 32px;
+  }
+
+  &.disabled {
+    color: $color-gray;
+  }
+
+  > core-label {
+    margin-bottom: $tabletKeyline;
+  }
 }
 
 @media (max-width: $phone-breakpoint-max) {
