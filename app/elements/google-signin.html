@@ -198,6 +198,32 @@ Fired when the signed in state of the user changes.
 </polymer-element>
  -->
 
+<!--
+`<google-signin>` uses Google Sign-in 1.0 to authorize users using Google's
+OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
+
+#### Example
+
+    <google-signin clientId="..." scopes="..."></google-signin>
+
+@element google-signin
+-->
+<!--
+Fired when the signed in state of the user changes.
+
+@event signin-change
+@param {Object} detail
+@param {Object} detail.signedIn True if the user is authenticated.
+@param {Object} detail.user The current user.
+@param {Object} detail.response The current user's token response.
+-->
+<!--
+Fired when sign in fails for some reason.
+
+@event signin-fail
+@param {Object} detail
+@param {Object} detail.error The reason for sign in failure.
+-->
 <polymer-element name="google-signin" attributes="clientId scopes signedIn load">
 <template>
   <style>
@@ -326,6 +352,8 @@ Fired when the signed in state of the user changes.
           this.getBasicProfile();
         }
       } else {
+        this.fire('signin-fail', {error: authResult.error});
+
         switch (authResult.error) {
           case 'user_signed_out':
             this.signedIn = false;

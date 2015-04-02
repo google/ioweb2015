@@ -50,6 +50,9 @@ IOWA.Auth = IOWA.Auth || (function() {
     var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     drawerProfilePic.hidden = true;
 
+    var signInButton = IOWA.Elements.Nav.querySelector('.button-link');
+    signInButton.removeAttribute('disabled');
+
     // TODO(jeffy): user just signed out. Stop notifications?
   }
 
@@ -97,6 +100,8 @@ IOWA.Auth = IOWA.Auth || (function() {
       clearSWToken_(); // This kicks off an async network request, wrapped in a promise.
     }
   });
+
+  document.addEventListener('signin-fail', clearUserUI);
 
   return {
     getTokenResponse: getTokenResponse_

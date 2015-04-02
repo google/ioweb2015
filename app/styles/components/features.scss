@@ -14,32 +14,8 @@
  * limitations under the License.
  */
 
-@import 'base/_breakpoints';
-@import 'base/_color';
-@import 'base/_shadow';
-@import 'base/_typography';
-
-@import 'base/_reset';
-@import 'base/_layout';
-@import 'base/_zindex';
-
-@import 'base/a11y';
-
-@import 'components/_app';
-@import 'components/_masthead';
-@import 'components/_card';
-@import 'components/_footer';
-@import 'components/features';
-
-@import 'pages/home';
-@import 'pages/schedule';
-@import 'pages/about';
-@import 'pages/onsite';
-@import 'pages/offsite';
-@import 'pages/registration';
-@import 'pages/faq';
-
-@import 'pages/widget';
-
-@import 'pages/videos';
-
+.nosupport-notifications {
+  .notification__feature {
+    display: none;
+  }
+}
