@@ -174,7 +174,8 @@ Fired when the signed in state of the user changes.
           name: profile.getName(),
           image: profile.getImageUrl(),
           email: profile.getEmail(),
-          tokenResponse: this.currentUser.getAuthResponse()
+          tokenResponse: this.currentUser.getAuthResponse(),
+          notify: false
         }
         this.fire('signin-change', {
           signedIn: true,
@@ -317,7 +318,6 @@ Fired when the signed in state of the user changes.
     signinChangedHandler: function(authResult) {
 
       if (authResult && !authResult.error) {
-
         // Only send one-time code to server after the consent screen (first login).
         if (authResult.status.signed_in && authResult.code &&
             authResult.status.method === 'PROMPT') {
@@ -325,7 +325,6 @@ Fired when the signed in state of the user changes.
         } else {
           this.getBasicProfile();
         }
-
       } else {
         switch (authResult.error) {
           case 'user_signed_out':

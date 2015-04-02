@@ -293,7 +293,7 @@ limitations under the License.
                 <div class="card-content">
                   <h4>Notifications</h4>
                   <core-label horizontal layout>
-                    <paper-checkbox checked autoFocus for></paper-checkbox>
+                    <paper-checkbox checked?="{{currentUser.notify}}" autoFocus for on-tap="{{updateNotifyUser}}"></paper-checkbox>
                     <h5>I want to receive notifications from the Google I/O 2015 website.</h5>
                   </core-label>
                   <p>If this option is deselected, I understand I won't be notified when:</p>
