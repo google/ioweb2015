@@ -140,15 +140,18 @@
     var url = '//storage.googleapis.com/iosched-updater-dev.appspot.com/past_io_videolibrary_v5.json';
     xhr.open('GET', url);
     xhr.onload = function(e) {
-      IOWA.Elements.Template.videoList = JSON.parse(e.target.response).video_library;
-      callback();
+      if (e.target.status == 200) {
+        callback(JSON.parse(e.target.response).video_library);
+      }
     };
     xhr.send();
   }
 
   function onPageTransitionDone_(e) {
-    fetchVideos(function() {
-      document.removeEventListener('page-transition-done', onPageTransitionDone_);
+    document.removeEventListener('page-transition-done', onPageTransitionDone_);
+
+    fetchVideos(function(videos) {
+       IOWA.Elements.Template.videoList = videos;
     });
   }
 
