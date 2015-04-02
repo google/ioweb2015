@@ -57,7 +57,7 @@ IOWA.A11y = IOWA.A11y || (function() {
       });
     }, 0);
   }
-  // Cleanup method for elements with manged focus states
+  // Cleanup method for elements with managed focus states
   function removeFocusStates(selector) {
     Array.prototype.forEach.call(document.querySelectorAll(selector), function(el) {
       el.removeEventListener('mousedown', onMouseDown);

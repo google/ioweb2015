@@ -260,16 +260,17 @@
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+      var subtabs = '#subpage-tabs a';
 
       if (page.hasBeenLoaded) {
         return;
       }
 
       page.load = function() {
-        IOWA.A11y.addFocusStates('#subpage-tabs a');
+        IOWA.A11y.addFocusStates(subtabs);
       };
       page.unload = function() {
-        IOWA.A11y.removeFocusStates('#subpage-tabs a');
+        IOWA.A11y.removeFocusStates(subtabs);
       };
 
       page.load(); // Run load callback on page load.
