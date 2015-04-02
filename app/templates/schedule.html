@@ -260,17 +260,21 @@
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
-      var subtabs = '#subpage-tabs a';
+      var SUBTAB_SELECTOR = '#subpage-tabs a';
 
       if (page.hasBeenLoaded) {
         return;
       }
 
       page.load = function() {
-        IOWA.A11y.addFocusStates(subtabs);
+        // Wait 1 rAF for template to stamp.
+        IOWA.Elements.Template.async(function() {
+          IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
+        });
       };
+
       page.unload = function() {
-        IOWA.A11y.removeFocusStates(subtabs);
+        IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
       };
 
       page.load(); // Run load callback on page load.
