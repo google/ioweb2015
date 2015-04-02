@@ -72,10 +72,12 @@
 
     <paper-dropdown-menu label="Filter" class="card--filters" hidden?="{{!isPhoneSize}}">
       <paper-dropdown valign="top" halign="left" class="dropdown">
-        <paper-item><a href="https://developers.google.com" target="_blank" data-track-link="footer-link-devsite">developers.google.com</a></paper-item>
-        <paper-item><a href="https://plus.google.com/+GoogleDevelopers" target="_blank" data-track-link="footer-link-gplus">+googledevelopers</a></paper-item>
-        <paper-item><a href="https://twitter.com/googledevs" target="_blank" data-track-link="footer-link-twitter">@googledevs</a></paper-item>
-        <paper-item><a href="http://googledevelopers.blogspot.com/" target="_blank" data-track-link="footer-link-blog">Blog</a></paper-item>
+        <core-menu class="menu">
+          <paper-item>DevByte</paper-item>
+          <paper-item>Design</paper-item>
+          <paper-item>Develop</paper-item>
+          <paper-item>Distribute</paper-item>
+        </core-menu>
       </paper-dropdown>
     </paper-dropdown-menu>
 
