@@ -125,6 +125,11 @@ overlay-host::shadow {
   }
 }
 
+.card__photo core-image::shadow #placeholder {
+  background-color: $color-cyan-500;
+  background-size: contain !important;
+}
+
 footer {
   paper-dropdown-menu::shadow #label {
     color: inherit;

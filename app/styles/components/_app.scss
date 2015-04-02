@@ -92,12 +92,16 @@ h6 {
   }
 }
 
-.bg-light-grey, .bg-medium-grey, .bg-dark-grey, .bg-cyan {
+.bg-light-grey, .bg-medium-grey, .bg-dark-grey, .bg-cyan, .bg-photo {
   a {
     font-size: 14px;
     line-height: 1;
     letter-spacing: 0.01em;
   }
+}
+
+.bg-photo {
+  background-color: $color-bluegrey-700;
 }
 
 .bg-cyan {
