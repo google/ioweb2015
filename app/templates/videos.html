@@ -74,9 +74,7 @@
       <paper-dropdown valign="top" halign="left" class="dropdown">
         <core-menu class="menu">
           <paper-item>DevByte</paper-item>
-          <paper-item>Design</paper-item>
-          <paper-item>Develop</paper-item>
-          <paper-item>Distribute</paper-item>
+          <paper-item disabled>Sessions</paper-item>
         </core-menu>
       </paper-dropdown>
     </paper-dropdown-menu>
@@ -92,33 +90,28 @@
             <span>DevByte</span>
             <paper-checkbox for></paper-checkbox>
           </core-label>
-          <core-label horizontal layout center justified>
-            <span>Design</span>
-            <paper-checkbox for></paper-checkbox>
-          </core-label>
-          <core-label horizontal layout center justified>
-            <span>Develop</span>
-            <paper-checkbox for></paper-checkbox>
-          </core-label>
-          <core-label horizontal layout center justified>
-            <span>Distribute</span>
-            <paper-checkbox for></paper-checkbox>
-          </core-label>
-        </div>
-
-        <div class="filter-rows disabled">
-          <core-label horizontal layout center justified>
+          <core-label horizontal layout center justified class="disabled">
             <span>Sessions</span>
             <paper-checkbox for disabled></paper-checkbox>
           </core-label>
-          <core-label horizontal layout center justified>
-            <span>Sandbox talks</span>
-            <paper-checkbox for disabled></paper-checkbox>
-          </core-label>
-          <core-label horizontal layout center justified>
-            <span>Workshops</span>
-            <paper-checkbox for disabled></paper-checkbox>
-          </core-label>
+        </div>
+
+        <div class="filter-rows">
+          <template repeat="{{theme in filterThemes}}">
+            <core-label horizontal layout center justified>
+              <span>{{theme}}</span>
+              <paper-checkbox for></paper-checkbox>
+            </core-label>
+          </template>
+        </div>
+
+        <div class="filter-rows">
+          <template repeat="{{topic in filterTopics}}">
+            <core-label horizontal layout center justified>
+              <span>{{topic}}</span>
+              <paper-checkbox for></paper-checkbox>
+            </core-label>
+          </template>
         </div>
 
       </div>

@@ -111,7 +111,7 @@ core-list {
     padding-top: 32px;
   }
 
-  &.disabled {
+  .disabled {
     color: $color-gray;
   }
 
@@ -157,7 +157,7 @@ core-list {
     height: fit-content;
   }
   .videolist__wrapper {
-    height: 100vh;
+    height: 200vh;
   }
 }
 

@@ -142,6 +142,29 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
+    template.filterThemes = [
+      'Develop & Design',
+      'Engage & Earn',
+      "What's Next"
+    ];
+
+    template.filterTopics = [
+      'Accessibility',
+      'Android',
+      'Audience Growth',
+      'Auto',
+      'Chrome / Web',
+      'Design',
+      'Earn',
+      'Games',
+      'Google Play',
+      'Location',
+      'Search',
+      'Tools & APIs',
+      'TV & Living Room',
+      'Wearables'
+    ];
+
     template.scrollLock = function(enable) {
       document.body.classList.toggle('noscroll', enable);
     };
