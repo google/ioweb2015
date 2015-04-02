@@ -22,33 +22,48 @@ IOWA.A11y = IOWA.A11y || (function() {
 
   function init() {
     // Differentiate focus coming from mouse and keyboard
-    addFocusStates('paper-tabs a');
+    addFocusStates('#navbar paper-tabs a');
     document.addEventListener('toast-message', announceLiveChange);
   }
 
+  // Handlers managed by the addFocusStates and removeFocusStates methods
+  var onMouseDown = function(e) {
+    this.classList.add('pressed');
+  };
+  var onMouseUp = function(e) {
+    this.classList.remove('pressed');
+  };
+  var onFocus = function(e) {
+    // Only render the "focused" state if the element gains focus due to
+    // keyboard navigation.
+    if (!this.classList.contains('pressed')) {
+      this.classList.add('focused');
+    }
+  };
+  var onBlur = function(e) {
+    this.classList.remove('focused');
+  };
   // Elements passed to this method will receive classes reflecting the focus
   // and pressed states.
   function addFocusStates(selector) {
+    // This is done on the next tick to ensure the elements have made it into
+    // the DOM from the page template
+    setTimeout(function() {
+      Array.prototype.forEach.call(document.querySelectorAll(selector), function(el) {
+        el.addEventListener('mousedown', onMouseDown);
+        el.addEventListener('mouseup', onMouseUp);
+        el.addEventListener('focus', onFocus);
+        el.addEventListener('blur', onBlur);
+      });
+    }, 0);
+  }
+  // Cleanup method for elements with managed focus states
+  function removeFocusStates(selector) {
     Array.prototype.forEach.call(document.querySelectorAll(selector), function(el) {
-      el.addEventListener('mousedown', function(e) {
-        this.classList.add('pressed');
-      });
-
-      el.addEventListener('mouseup', function(e) {
-        this.classList.remove('pressed');
-      });
-
-      el.addEventListener('focus', function(e) {
-        // Only render the "focused" state if the element gains focus due to
-        // keyboard navigation.
-        if (!this.classList.contains('pressed')) {
-          this.classList.add('focused');
-        }
-      });
-
-      el.addEventListener('blur', function(e) {
-        this.classList.remove('focused');
-      });
+      el.removeEventListener('mousedown', onMouseDown);
+      el.removeEventListener('mouseup', onMouseUp);
+      el.removeEventListener('focus', onFocus);
+      el.removeEventListener('blur', onBlur);
     });
   }
 
@@ -69,6 +84,7 @@ IOWA.A11y = IOWA.A11y || (function() {
   return {
     init: init,
     addFocusStates: addFocusStates,
+    removeFocusStates: removeFocusStates,
     focusNavigation: focusNavigation,
     announceLiveChange: announceLiveChange
   };

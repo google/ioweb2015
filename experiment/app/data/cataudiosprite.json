@@ -100,47 +100,47 @@
     },
     "parallelogram_A-sharp-major": {
       "start": 64,
-      "end": 65.04489795918367,
+      "end": 65.20163265306122,
       "loop": false
     },
     "parallelogram_C-minor": {
       "start": 67,
-      "end": 67.99265306122449,
+      "end": 68.28,
       "loop": false
     },
     "parallelogram_D-sharp-major": {
-      "start": 69,
-      "end": 70.17551020408163,
+      "start": 70,
+      "end": 71.09714285714286,
       "loop": false
     },
     "parallelogram_G-minor": {
-      "start": 72,
-      "end": 73.01877551020408,
+      "start": 73,
+      "end": 74.09714285714286,
       "loop": false
     },
     "parallelogram_G-sharp-major": {
-      "start": 75,
-      "end": 76.01877551020408,
+      "start": 76,
+      "end": 77.09714285714286,
       "loop": false
     },
     "stringbass_A-sharp": {
-      "start": 78,
-      "end": 79.09714285714286,
+      "start": 79,
+      "end": 80.01877551020408,
       "loop": false
     },
     "stringbass_C2": {
-      "start": 81,
-      "end": 82.20163265306122,
+      "start": 82,
+      "end": 83.04489795918367,
       "loop": false
     },
     "stringbass_F": {
-      "start": 84,
-      "end": 85.09714285714286,
+      "start": 85,
+      "end": 86.01877551020408,
       "loop": false
     },
     "stringbass_G": {
-      "start": 87,
-      "end": 88.28,
+      "start": 88,
+      "end": 88.99265306122449,
       "loop": false
     }
   }

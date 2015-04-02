@@ -54,6 +54,7 @@ IOWA.Elements = (function() {
       var subpage = document.querySelector('#subpage-' + selectedSubpage);
       if (subpage) {
         tpl.pages[tpl.selectedPage].selectedSubpage = selectedSubpage;
+        subpage.classList.add('active');
       }
 
       IOWA.PageAnimation.play(

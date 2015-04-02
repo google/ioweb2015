@@ -16,75 +16,76 @@
   </section>
 </paper-action-dialog>
 
-<section class="card__container card__container--top slide-up">
-  <div class="card js-experiment-visualizer">
-    <div class="card-content">
-      <h3>Personalize the I/O live stream for your website and share the #io15 conversation from the event with your audience.</h3>
-    </div>
-    <div class="card-content">
-      <a href="#" data-ajax-link data-anim-card data-track-link="widget-faq" on-tap="{{toggleGadgetFaq}}">
-        <i18n-msg msgid="live-faq">Read I/O Live Embed Widget FAQ</i18n-msg>
-      </a>
-    </div>
-    <div class="ripple">
-      <div class="ripple__content"></div>
-    </div>
-  </div>
-</section>
-
-<div class="slide-up-delay">
-
-  <section class="page__section page__section--gadgetpreview bg-medium-grey">
-    <div layout horizontal center-center>
-      <!-- dynamically populated with embed iframe preview -->
-    </div>
-  </section>
-
-  <section class="page__section--customizer">
-    <div class="card__container">
-      <div class="card js-experiment-visualizer" on-core-change="{{updateIframeCode}}">
-        <div class="card-content">
-          <h3>Customize your widget</h3>
-        </div>
-
-        <div class="card-content">
-          <h4 class="card__title">1. Select widget content</h4>
-          <div class="customize__area">
-            <paper-radio-group selected="{{selectedGadgetLayout}}">
-              <paper-radio-button name="both" label="Live video stream + Google Developers social feed"></paper-radio-button>
-              <paper-radio-button name="video" label="Live video stream only"></paper-radio-button>
-              <paper-radio-button name="feed" label="Google Developers social feed only"></paper-radio-button>
-            </paper-radio-group>
-          </div>
-
-          <div class="card__title" layout horizontal end wrap>
-            <h4>2. Select widget size</h4>
-            <span class="heading-info">Minimum 300px and maximum 1000px</span>
-          </div>
-          <div class="customize__area">
-            <core-label layout inline horizontal center>
-              Width (px)
-              <paper-slider min="300" max="1000" value="875" editable pin immediateValue="{{gadgetWidth}}" for></paper-slider>
-            </core-label>
-            <core-label layout inline horizontal center>
-              Height (px)
-              <paper-slider min="300" max="1000" value="450" editable pin immediateValue="{{gadgetHeight}}" for></paper-slider>
-            </core-label>
-          </div>
-
-          <h4>3. Embed this code into your site</h4>
-          <div class="customize__area">
-            <paper-input-decorator label="Embed code snippet">
-              <paper-autogrow-textarea rows="2">
-                <textarea readonly on-focus="{{selectGadgetCodeSnippet}}">{{embedIframeCode}}</textarea>
-              </paper-autogrow-textarea>
-            </paper-input-decorator>
-          </div>
-        </div>
+<div class="active">
+  <section class="card__container card__container--top slide-up">
+    <div class="card js-experiment-visualizer">
+      <div class="card-content">
+        <h3>Personalize the I/O live stream for your website and share the #io15 conversation from the event with your audience.</h3>
+      </div>
+      <div class="card-content">
+        <a href="#" data-ajax-link data-anim-card data-track-link="widget-faq" on-tap="{{toggleGadgetFaq}}">
+          <i18n-msg msgid="live-faq">Read I/O Live Embed Widget FAQ</i18n-msg>
+        </a>
+      </div>
+      <div class="ripple">
+        <div class="ripple__content"></div>
       </div>
     </div>
   </section>
 
+  <div class="slide-up-delay">
+
+    <section class="page__section page__section--gadgetpreview bg-medium-grey">
+      <div layout horizontal center-center>
+        <!-- dynamically populated with embed iframe preview -->
+      </div>
+    </section>
+
+    <section class="page__section--customizer">
+      <div class="card__container">
+        <div class="card js-experiment-visualizer" on-core-change="{{updateIframeCode}}">
+          <div class="card-content">
+            <h3>Customize your widget</h3>
+          </div>
+
+          <div class="card-content">
+            <h4 class="card__title">1. Select widget content</h4>
+            <div class="customize__area">
+              <paper-radio-group selected="{{selectedGadgetLayout}}">
+                <paper-radio-button name="both" label="Live video stream + Google Developers social feed"></paper-radio-button>
+                <paper-radio-button name="video" label="Live video stream only"></paper-radio-button>
+                <paper-radio-button name="feed" label="Google Developers social feed only"></paper-radio-button>
+              </paper-radio-group>
+            </div>
+
+            <div class="card__title" layout horizontal end wrap>
+              <h4>2. Select widget size</h4>
+              <span class="heading-info">Minimum 320px and maximum 1000px</span>
+            </div>
+            <div class="customize__area">
+              <core-label layout inline horizontal center>
+                Width (px)
+                <paper-slider min="320" max="1000" value="875" editable pin immediateValue="{{gadgetWidth}}" for></paper-slider>
+              </core-label>
+              <core-label layout inline horizontal center>
+                Height (px)
+                <paper-slider min="300" max="1000" value="450" editable pin immediateValue="{{gadgetHeight}}" for></paper-slider>
+              </core-label>
+            </div>
+
+            <h4>3. Embed this code into your site</h4>
+            <div class="customize__area">
+              <paper-input-decorator label="Embed code snippet">
+                <paper-autogrow-textarea rows="2">
+                  <textarea readonly on-focus="{{selectGadgetCodeSnippet}}">{{embedIframeCode}}</textarea>
+                </paper-autogrow-textarea>
+              </paper-input-decorator>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </div>
 
 <script>
@@ -104,20 +105,23 @@
       IOWA.Elements.Template.selectedGadgetLayout = 'both';
     };
 
-    IOWA.Elements.Template.updateIframeCode = function() {
-      var url = IOWA.Util.getStaticBaseURL() + 'embed';
-      if (this.selectedGadgetLayout === 'video') {
-        url += '?noFeed';
-      } else if (this.selectedGadgetLayout === 'feed') {
-        url += '?noVideo';
-      }
+    IOWA.Elements.Template.updateIframeCode = function(e, detail, sender) {
+      // Debounce all the on-change events from the form inputs.
+      IOWA.Elements.Template.job('updateframe', function() {
+        var url = IOWA.Util.getStaticBaseURL() + 'embed';
+        if (this.selectedGadgetLayout === 'video') {
+          url += '?noFeed';
+        } else if (this.selectedGadgetLayout === 'feed') {
+          url += '?noVideo';
+        }
 
-      this.embedIframeCode = '<iframe src="' + url + '" style="width:' +
-                             this.gadgetWidth + 'px;height:' +
-                             this.gadgetHeight +'px"' +
-                             ' frameborder="0" allowfullscreen></iframe>';
-      var container = document.querySelector('.page__section--gadgetpreview');
-      container.firstElementChild.innerHTML = this.embedIframeCode;
+        this.embedIframeCode = '<iframe src="' + url + '" style="width:' +
+                               this.gadgetWidth + 'px;height:' +
+                               this.gadgetHeight +'px"' +
+                               ' frameborder="0" allowfullscreen></iframe>';
+        var container = document.querySelector('.page__section--gadgetpreview');
+        container.firstElementChild.innerHTML = this.embedIframeCode;
+      }, 50);
     },
 
     IOWA.Elements.Template.selectGadgetCodeSnippet = function(e, detail, sender) {

@@ -67,8 +67,9 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function sectionSlideOut(section) {
-    var main = section.querySelector('.slide-up');
-    var mainDelayed = section.querySelector('.slide-up-delay');
+    var prefix = section.classList.contains('active') ? '': '.active ';
+    var main = section.querySelector(prefix + '.slide-up');
+    var mainDelayed = section.querySelector(prefix + '.slide-up-delay');
     var start = {
       transform: 'translate(0, 0)',
       opacity: 1
@@ -90,8 +91,9 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function sectionSlideIn(section) {
-    var main = section.querySelector('.slide-up');
-    var mainDelayed = section.querySelector('.slide-up-delay');
+    var prefix = section.classList.contains('active') ? '': '.active ';
+    var main = section.querySelector(prefix + '.slide-up');
+    var mainDelayed = section.querySelector(prefix + '.slide-up-delay');
     var start = {
       transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
       opacity: 0

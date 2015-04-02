@@ -175,10 +175,13 @@ IOWA.Router = (function() {
         ]), function() {
           oldSubpage.style.display = 'none';
           newSubpage.style.display = '';
+          oldSubpage.classList.remove('active');
+          newSubpage.classList.add('active');
           IOWA.History.pushState({
             'path': el.pathname + el.hash,
             fromHashChange: true
           }, '', el.href);
+          t.pages[t.selectedPage].selectedSubpage = nextSubpageName;
           IOWA.PageAnimation.play(new AnimationGroup([
             IOWA.PageAnimation.sectionSlideIn(newSubpage),
             IOWA.PageAnimation.elementFadeIn(

@@ -26,119 +26,121 @@
     </div>
   </template>
 
-  <div class="card__container card__container--top sidebyside slide-up" layout horizontal vertical?="{{isPhoneSize}}" relative>
-    <div class="card js-experiment-visualizer" layout vertical auto-vertical flex>
-      <div class="card-content" flex?="{{!isPhoneSize}}">
-        <h3 class="card__title">Live stream</h3>
-        <div>Watch the keynote and select sessions in real-time, from your laptop or mobile device.</div>
-      </div>
-      <div class="card-content">
-        <a href="schedule" data-track-link="offsite-browse-schedule" data-ajax-link data-anim-card>Browse live stream schedule</a>
-      </div>
-    </div>
-    <div class="card js-experiment-visualizer" auto-vertical flex>
-      <div class="card-content">
-        <h3 class="card__title">I/O Live Embed Widget</h3>
-        <div>Personalize the I/O live stream for your website and share the #io15 conversation from the event with your audience.</div>
-      </div>
-      <div class="card-content">
-        <a href="widget" data-track-link="offsite-widget" data-ajax-link data-anim-card>Customize the I/O Live Embed</a>
-      </div>
-    </div>
-    <div class="ripple">
-      <div class="ripple__content"></div>
-    </div>
-  </div>
-
-
-  <div class="slide-up-delay">
-    <section class="card__photo--stage page__section js-experiment-instrument" layout vertical center-center>
-      <div class="play__button__container" on-tap="{{openSectionVideo}}" data-track-link="offsite-watch-extended-recap-video">
-        <h5><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></h5>
-      </div>
-    </section>
-
-    <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}" relative>
-      <div class="card js-experiment-visualizer" auto-vertical flex>
+  <div class="active">
+    <div class="card__container card__container--top sidebyside slide-up" layout horizontal vertical?="{{isPhoneSize}}" relative>
+      <div class="card js-experiment-visualizer" layout vertical auto-vertical flex>
+        <div class="card-content" flex?="{{!isPhoneSize}}">
+          <h3 class="card__title">Live stream</h3>
+          <div>Watch the keynote and select sessions in real-time, from your laptop or mobile device.</div>
+        </div>
         <div class="card-content">
-          <h3 class="card__title"><i18n-msg msgid="ioextendevents">I/O Extended events</i18n-msg></h3>
-          <div><i18n-msg msgid="ioextendevents-details">I/O Extended events may include live streamed sessions, local developer demos, hackathons and more. These events are brought to you by our Google Developer Groups, Student Ambassadors, and local developers.</i18n-msg></div>
+          <a href="schedule" data-track-link="offsite-browse-schedule" data-ajax-link data-anim-card>Browse live stream schedule</a>
         </div>
       </div>
       <div class="card js-experiment-visualizer" auto-vertical flex>
         <div class="card-content">
-          <h3 class="card__title"><i18n-msg msgid="hostioextend">Host an I/O Extended event</i18n-msg></h3>
-          <div>We've got you covered with all the information you need to bring I/O to your neighborhood.</div>
+          <h3 class="card__title">I/O Live Embed Widget</h3>
+          <div>Personalize the I/O live stream for your website and share the #io15 conversation from the event with your audience.</div>
         </div>
-        <div class="card-content link-spacing">
-          <a href="//docs.google.com/presentation/d/1rUwLzz3-Hgcs9eu1uph4En1FUCcpTQspw-xpK4Kaoms/pub?start=true&loop=false&delayms=30000"
-             data-track-link="offsite-download-organizers-guide" target="_blank"><i18n-msg msgid="organizerguide">Organizer Guide</i18n-msg></a> <a href="form" data-ajax-link data-track-link="offsite-submit-event"><i18n-msg msgid="submitevent">Submit your event</i18n-msg></a>
+        <div class="card-content">
+          <a href="widget" data-track-link="offsite-widget" data-ajax-link data-anim-card>Customize the I/O Live Embed</a>
         </div>
+      </div>
+      <div class="ripple">
+        <div class="ripple__content"></div>
       </div>
     </div>
 
-    <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument {{ {'no-webgl': !webglSupported} | tokenList }}">
 
-      <div class="marker-results">
-        <div class="card marker-card">
-          <paper-icon-button icon="io:close" class="close-button" on-tap="{{resetExtendedSearch}}"></paper-icon-button>
-          <template repeat="{{marker in offsiteMarkerResults}}">
-            <div class="card-content">
-              <h4 class="card__title">{{marker.name}}</h4>
-              <div layout horizontal center justified>
-                <span><a href="//www.google.com/maps/place/{{marker.lat}},{{marker.lng}}" target="_blank">View in Google Maps</a></span>
-                <a href="{{marker.link}}" data-track-link="offsite-visit-eventpage" target="_blank">Event details</a>
+    <div class="slide-up-delay">
+      <section class="card__photo--stage page__section js-experiment-instrument" layout vertical center-center>
+        <div class="play__button__container" on-tap="{{openSectionVideo}}" data-track-link="offsite-watch-extended-recap-video">
+          <h5><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></h5>
+        </div>
+      </section>
+
+      <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}" relative>
+        <div class="card js-experiment-visualizer" auto-vertical flex>
+          <div class="card-content">
+            <h3 class="card__title"><i18n-msg msgid="ioextendevents">I/O Extended events</i18n-msg></h3>
+            <div><i18n-msg msgid="ioextendevents-details">I/O Extended events may include live streamed sessions, local developer demos, hackathons and more. These events are brought to you by our Google Developer Groups, Student Ambassadors, and local developers.</i18n-msg></div>
+          </div>
+        </div>
+        <div class="card js-experiment-visualizer" auto-vertical flex>
+          <div class="card-content">
+            <h3 class="card__title"><i18n-msg msgid="hostioextend">Host an I/O Extended event</i18n-msg></h3>
+            <div>We've got you covered with all the information you need to bring I/O to your neighborhood.</div>
+          </div>
+          <div class="card-content link-spacing">
+            <a href="//docs.google.com/presentation/d/1rUwLzz3-Hgcs9eu1uph4En1FUCcpTQspw-xpK4Kaoms/pub?start=true&loop=false&delayms=30000"
+               data-track-link="offsite-download-organizers-guide" target="_blank"><i18n-msg msgid="organizerguide">Organizer Guide</i18n-msg></a> <a href="form" data-ajax-link data-track-link="offsite-submit-event"><i18n-msg msgid="submitevent">Submit your event</i18n-msg></a>
+          </div>
+        </div>
+      </div>
+
+      <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument {{ {'no-webgl': !webglSupported} | tokenList }}">
+
+        <div class="marker-results">
+          <div class="card marker-card">
+            <paper-icon-button icon="io:close" class="close-button" on-tap="{{resetExtendedSearch}}"></paper-icon-button>
+            <template repeat="{{marker in offsiteMarkerResults}}">
+              <div class="card-content">
+                <h4 class="card__title">{{marker.name}}</h4>
+                <div layout horizontal center justified>
+                  <span><a href="//www.google.com/maps/place/{{marker.lat}},{{marker.lng}}" target="_blank">View in Google Maps</a></span>
+                  <a href="{{marker.link}}" data-track-link="offsite-visit-eventpage" target="_blank">Event details</a>
+                </div>
+                <div class="marker-card--closest">This is the closest event to your search.</div>
               </div>
-              <div class="marker-card--closest">This is the closest event to your search.</div>
-            </div>
-          </template>
+            </template>
+          </div>
         </div>
-      </div>
 
-      <h2 class="extended-title" hidden?="{{!webglSupported}}">Find an I/O Extended event near you</h2>
-      <template if="{{!webglSupported}}">
-        <h2 class="extended-title">Searching for events is not supported in your browser :(</h2>
-      </template>
-
-      <div class="action__links" layout vertical>
-        <template if="{{extendedMapActive && didExtendedSearch && !offsiteMarkerResults.length}}">
-          <h4>There are no events near that location. Try another search or check back later to find new events.</h4>
+        <h2 class="extended-title" hidden?="{{!webglSupported}}">Find an I/O Extended event near you</h2>
+        <template if="{{!webglSupported}}">
+          <h2 class="extended-title">Searching for events is not supported in your browser :(</h2>
         </template>
 
-        <!-- <paper-button data-track-link="offsite-notify-me">
-          <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
-        </paper-button> -->
-        <paper-button class="view__events" on-tap="{{openExtendedMap}}" hidden?="{{!webglSupported}}">
-          <a href="#" data-track-link="offsite-view-2015-events"><core-icon icon="io:place"></core-icon>Find 2015 events</a>
-        </paper-button>
-        <div class="search__map" layout horizontal center self-center relative hidden?="{{!webglSupported}}">
-          <core-icon icon="io:search"></core-icon>
-          <paper-input id="autocomplete" label="Search for a location"></paper-input>
+        <div class="action__links" layout vertical>
+          <template if="{{extendedMapActive && didExtendedSearch && !offsiteMarkerResults.length}}">
+            <h4>There are no events near that location. Try another search or check back later to find new events.</h4>
+          </template>
+
+          <!-- <paper-button data-track-link="offsite-notify-me">
+            <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
+          </paper-button> -->
+          <paper-button class="view__events" on-tap="{{openExtendedMap}}" hidden?="{{!webglSupported}}">
+            <a href="#" data-track-link="offsite-view-2015-events"><core-icon icon="io:place"></core-icon>Find 2015 events</a>
+          </paper-button>
+          <div class="search__map" layout horizontal center self-center relative hidden?="{{!webglSupported}}">
+            <core-icon icon="io:search"></core-icon>
+            <paper-input id="autocomplete" label="Search for a location"></paper-input>
+          </div>
         </div>
-      </div>
-      <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}"
-           on-marker-click="{{onMarkerClick}}" relative>
+        <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}"
+             on-marker-click="{{onMarkerClick}}" relative>
 
-        <google-maps-api on-api-load="{{initExtendedSearchBox}}" clientId="google-io" libraries="places" hidden></google-maps-api>
+          <google-maps-api on-api-load="{{initExtendedSearchBox}}" clientId="google-io" libraries="places" hidden></google-maps-api>
 
-        <webgl-globe id="offsite-globe"
-                     markers="{{offsiteLocations}}"
-                     locationTarget="{'lat': 36.5, 'lng': 0}"
-                     fov="0.3927"
-                     offsetY="-0.625"
-                     transitionDuration="4000"
-                     attractLoop
-                     scrollTarget="{{ScrollContainer}}"
-                     scrollTriggered="{{offsiteGlobeVisible}}"
-                     noInit?="{{!pageTransitionDone}}"
-                     noDraw?="{{mode === 'active'}}"
-                     webglSupported="{{webglSupported}}"></webgl-globe>
+          <webgl-globe id="offsite-globe"
+                       markers="{{offsiteLocations}}"
+                       locationTarget="{'lat': 36.5, 'lng': 0}"
+                       fov="0.3927"
+                       offsetY="-0.625"
+                       transitionDuration="4000"
+                       attractLoop
+                       scrollTarget="{{ScrollContainer}}"
+                       scrollTriggered="{{offsiteGlobeVisible}}"
+                       noInit?="{{!pageTransitionDone}}"
+                       noDraw?="{{mode === 'active'}}"
+                       webglSupported="{{webglSupported}}"></webgl-globe>
 
-        <core-ajax url="api/extended" handleAs="json"
-                   auto?="{{pageTransitionDone && !offsiteLocations}}"
-                   response="{{offsiteLocations}}"></core-ajax>
-      </div>
-    </section>
+          <core-ajax url="api/extended" handleAs="json"
+                     auto?="{{pageTransitionDone && !offsiteLocations}}"
+                     response="{{offsiteLocations}}"></core-ajax>
+        </div>
+      </section>
+    </div>
   </div>
 
   <script>

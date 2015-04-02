@@ -124,6 +124,21 @@ IOWA.Util = IOWA.Util || (function() {
     return parentRect;
   };
 
+  /**
+   * Reports an error to Google Analytics.
+   * Normally, this is done in the window.onerror handler, but this helper method can be used in the
+   * catch() of a promise to log rejections.
+   * @param {Error|string} error The error to report.
+   */
+  var reportError = function(error) {
+    // Google Analytics has a max size of 500 bytes for the event location field.
+    // If we have an error with a stack trace, the trailing 500 bytes are likely to be the most
+    // relevant, so grab those.
+    var location = (error && typeof error.stack === 'string') ?
+      error.stack.slice(-500) : 'Unknown Location';
+    IOWA.Analytics.trackError(location, error);
+  };
+
   return {
     isFF: isFF,
     isIE: isIE,
@@ -133,7 +148,8 @@ IOWA.Util = IOWA.Util || (function() {
     supportsHTMLImports: 'import' in document.createElement('link'),
     smoothScroll: smoothScroll,
     getStaticBaseURL: getStaticBaseURL,
-    resizeRipple: resizeRipple
+    resizeRipple: resizeRipple,
+    reportError: reportError
   };
 
 })();
