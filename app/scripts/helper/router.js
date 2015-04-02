@@ -176,6 +176,8 @@ IOWA.Router = (function() {
           'path': el.pathname + el.hash,
           fromHashChange: true
         }, '', el.href);
+        // Update selected subpage to trigger changes in paper-tabs
+        t.pages[t.selectedPage].selectedSubpage = nextSubpageName;
 
         IOWA.PageAnimation.play(IOWA.PageAnimation.sectionSlideIn(newSubpage));
       });

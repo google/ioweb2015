@@ -7,7 +7,7 @@
 {% define "masthead" %}
   <h1>Schedule</h1>
   <div layout horizontal justified>
-    <paper-tabs class="white" selected="{{pages[selectedPage].selectedSubpage}}" valueattr="label"
+    <paper-tabs id="subpage-tabs" class="white" selected="{{pages[selectedPage].selectedSubpage}}" valueattr="label"
                 scrollable?="{{isPhoneSize}}" link>
       <paper-tab label="agenda">
         <a href="#agenda" data-track-link="schedule-agenda" data-subpage-link
@@ -255,4 +255,36 @@
     </div>
   </section>
 </div>
+<script>
+  (function() {
+    // Page-specific JS that runs when this page is loaded for the first time.
+    function initPage() {
+      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+      var subtabs = '#subpage-tabs a';
+
+      if (page.hasBeenLoaded) {
+        return;
+      }
+
+      page.load = function() {
+        IOWA.A11y.addFocusStates(subtabs);
+      };
+      page.unload = function() {
+        IOWA.A11y.removeFocusStates(subtabs);
+      };
+
+      page.load(); // Run load callback on page load.
+      page.hasBeenLoaded = true;
+    }
+
+    // IE will be "loading" at this point. Other browsers will already be "complete".
+    if (document.readyState !== 'loading') {
+      initPage();
+    }
+
+    // Necessary for IE's lack of native <template>
+    // https://github.com/GoogleChrome/ioweb2015/issues/599
+    window._initPage = initPage;
+  })();
+  </script>
 {% end %}
