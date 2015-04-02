@@ -34,6 +34,7 @@ IOWA.Auth = IOWA.Auth || (function() {
   function setUserUI(user) {
     tokenResponse_ = user.tokenResponse;
 
+    var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     drawerProfilePic.src = user.picture;
     drawerProfilePic.hidden = false;
 
@@ -45,6 +46,8 @@ IOWA.Auth = IOWA.Auth || (function() {
 
   function clearUserUI() {
     tokenResponse_ = null;
+
+    var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     drawerProfilePic.hidden = true;
 
     // TODO(jeffy): user just signed out. Stop notifications?
@@ -86,7 +89,6 @@ IOWA.Auth = IOWA.Auth || (function() {
   }
 
   document.addEventListener('signin-change', function(e) {
-    var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     if (e.detail.user) {
       setUserUI(e.detail.user);
       ensureSWToken_(); // This kicks off an async network request, wrapped in a promise.
