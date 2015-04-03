@@ -36,7 +36,7 @@ $playButtonHeightWidth: 40px;
 }
 
 .photo__masthead {
-  background: url(../images/videos/keynote.jpg) no-repeat 50% 50%;
+  background: url(../images/videos/keynote.jpg) no-repeat 50% 0;
   background-size: cover;
   top: -$navbarHeight;
 }
@@ -120,6 +120,20 @@ core-list {
   }
 }
 
+paper-dialog {
+  height: 167px;
+  width: calc(100vw - 64px);
+
+  paper-icon-button {
+    z-index: 10;
+    color: white;
+    position: absolute;
+    top: $mobileKeyline;
+    left: $mobileKeyline;
+  }
+}
+
+
 @media (max-width: $phone-breakpoint-max) {
   .photo__masthead {
     top: -$navbarHeightMobile;
@@ -159,6 +173,10 @@ core-list {
   .videolist__wrapper {
     height: 200vh;
   }
+  paper-dialog {
+    width: 704px;
+    height: 396px;
+  }
 }
 
 @media (min-width: $desktop-breakpoint-min) {
@@ -170,6 +188,17 @@ core-list {
     .card__photo {
       height: 387px;
     }
+  }
+  paper-dialog {
+    width: 896px;
+    height: 504px
+  }
+}
+
+@media (min-width: $desktop-breakpoint-max) {
+  paper-dialog {
+    width: 1024px;
+    height: 575px;
   }
 }
 
