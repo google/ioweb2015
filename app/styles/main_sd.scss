@@ -126,6 +126,16 @@ overlay-host::shadow {
   }
 }
 
+#page-videos {
+  .filter-rows {
+    paper-radio-button::shadow #radioLabel {
+      order: -1;
+      margin: 0 10px 0 0;
+      flex: 1;
+    }
+  }
+}
+
 .card__photo core-image::shadow #placeholder {
   background-color: $color-cyan-500;
   background-size: contain !important;

@@ -115,8 +115,11 @@ core-list {
     color: $color-gray;
   }
 
-  > core-label {
-    margin-bottom: $tabletKeyline;
+  paper-radio-group {
+    paper-radio-button {
+      padding: 0;
+      margin-bottom: $mobileKeyline;
+    }
   }
 }
 

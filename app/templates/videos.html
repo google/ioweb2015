@@ -42,23 +42,23 @@
 
     <div class="videolist__wrapper" layout vertical flex two relative>
 
-      <core-list data="{{videoList}}" selectionEnabled="false" height="600" fit>
+      <core-list data="{{filteredVideoList}}" selectionEnabled="false" height="600" fit>
         <template>
           <div class="item">
             <div class="card card__video js-experiment-visualizer"
-                 data-videoid="{{videoList[index].id}}"
-                 data-videoimg="{{videoList[index].thumbnailUrl}}"
+                 data-videoid="{{filteredVideoList[index].id}}"
+                 data-videoimg="{{filteredVideoList[index].thumbnailUrl}}"
                  on-tap="{{openVideo}}">
               <div class="card__photo" relative>
-                <core-image _src="{{videoList[index].thumbnailUrl}}" load?="{{!!videoList[index]}}"
-                            sizing="cover" preload placeholder="images/io15-color.png" fade fit></core-image>
-
+                <core-image _src="{{filteredVideoList[index].thumbnailUrl}}"
+                            load?="{{!!filteredVideoList[index]}}" sizing="cover" preload
+                            placeholder="images/io15-color.png" fade fit></core-image>
               </div>
               <div class="card-content">
                 <img src="images/play-video-button.png"
                      class="play__button play__button--card" title="Play video" alt="Play video">
-                <div class="video-title" title="{{videoList[index].title}}">{{videoList[index].title}}&nbsp;</div>
-                <div class="video-author" hidden?="{{!videoList[index].speakers}}">{{videoList[index].speakers}}&nbsp;</div>
+                <div class="video-title" title="{{filteredVideoList[index].title}}">{{filteredVideoList[index].title}}&nbsp;</div>
+                <div class="video-author" hidden?="{{!filteredVideoList[index].speakers}}">{{filteredVideoList[index].speakers}}&nbsp;</div>
               </div>
             </div>
           </div>
@@ -70,7 +70,7 @@
 
     <paper-dropdown-menu label="Filter" class="card--filters" hidden?="{{!isPhoneSize}}">
       <paper-dropdown valign="top" halign="left" class="dropdown">
-        <core-menu class="menu">
+        <core-menu class="menu" selected="0">
           <paper-item>DevByte</paper-item>
           <paper-item disabled>Sessions</paper-item>
         </core-menu>
@@ -79,37 +79,31 @@
 
     <div id="filterbox" class="card card--filters js-experiment-visualizer" flex?="{{!isPhoneSize}}" hidden?="{{isPhoneSize}}">
       <div class="card-content">
-        <h4>Filter</h4>{{filterThreshold}}
+        <h4>Filter</h4>
       </div>
       <div class="card-content">
 
         <div class="filter-rows">
-          <core-label horizontal layout center justified>
-            <span>DevByte</span>
-            <paper-checkbox for></paper-checkbox>
-          </core-label>
-          <core-label horizontal layout center justified class="disabled">
-            <span>Sessions</span>
-            <paper-checkbox for disabled></paper-checkbox>
-          </core-label>
+          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
+            <paper-radio-button layout horizontal center name="DevByte" label="DevByte" checked></paper-radio-button>
+            <paper-radio-button layout horizontal center name="Session" label="Session" disabled></paper-radio-button>
+          </paper-radio-group>
         </div>
 
-        <div class="filter-rows">
-          <template repeat="{{theme in filterThemes}}">
-            <core-label horizontal layout center justified>
-              <span>{{theme}}</span>
-              <paper-checkbox for></paper-checkbox>
-            </core-label>
-          </template>
-        </div>
+        <!-- <div class="filter-rows">
+          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
+            <template repeat="{{theme in filterThemes}}">
+              <paper-radio-button layout horizontal center name="{{theme}}" label="{{theme}}"></paper-radio-button>
+            </template>
+          </paper-radio-group>
+        </div> -->
 
         <div class="filter-rows">
-          <template repeat="{{topic in filterTopics}}">
-            <core-label horizontal layout center justified>
-              <span>{{topic}}</span>
-              <paper-checkbox for></paper-checkbox>
-            </core-label>
-          </template>
+          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
+            <template repeat="{{topic in filterTopics}}">
+              <paper-radio-button layout horizontal center name="{{topic}}" label="{{topic}}"></paper-radio-button>
+            </template>
+          </paper-radio-group>
         </div>
 
       </div>
@@ -135,7 +129,7 @@
   function fetchVideos(callback) {
     var xhr = new XMLHttpRequest();
     // TODO(ericbidelman): update to real API endpoint when it's ready.
-    var url = '//storage.googleapis.com/iosched-updater-dev.appspot.com/past_io_videolibrary_v5.json';
+    var url = '//storage.googleapis.com/iosched-updater-dev.appspot.com/session_data_v2.696.json';
     xhr.open('GET', url);
     xhr.onload = function(e) {
       if (e.target.status == 200) {
@@ -149,7 +143,8 @@
     document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
     fetchVideos(function(videos) {
-       IOWA.Elements.Template.videoList = videos;
+      IOWA.Elements.Template.videoList = videos;
+      IOWA.Elements.Template.filteredVideoList = videos;
     });
   }
 
@@ -164,6 +159,12 @@
     page.load = function() {
       // Reset template variables for when revisiting the page.
       IOWA.Elements.Template.mastheadVideoActive = false;
+      IOWA.Elements.Template.filteredVideoList = IOWA.Elements.Template.videoList; // reset filter.
+
+      // Don't re-fetch videos when navigating back to this page.
+      if (IOWA.Elements.Template.videoList.length) {
+        return;
+      }
 
       document.addEventListener('page-transition-done', onPageTransitionDone_);
     };
@@ -177,6 +178,16 @@
 
       this.mastheadVideoActive = true; // stamp template
       IOWA.Elements.Main.querySelector('paper-dialog').toggle();
+    };
+
+    IOWA.Elements.Template.onVideoFilter = function(e, detail, sender) {
+      e.stopPropagation();
+      if (detail.isSelected) {
+        var videos = IOWA.Elements.Template.videoList;
+        this.filteredVideoList = videos.filter(function(item) {
+          return item.topic === sender.selected;
+        });
+      }
     };
 
     page.load(); // Run load callback on page load.

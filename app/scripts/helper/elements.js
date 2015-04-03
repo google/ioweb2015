@@ -129,8 +129,14 @@ IOWA.Elements = (function() {
     template.selectedCity = null;
     template.offsiteMarkerResults = [];
     template.countdownEnded = false;
+
+    // Sign-in defaults.
     template.isSignedIn = false;
     template.currentUser = null;
+
+    // Videos page defaults.
+    template.videoList = [];
+    template.filteredVideoList = [];
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
@@ -154,6 +160,7 @@ IOWA.Elements = (function() {
       'Audience Growth',
       'Auto',
       'Chrome / Web',
+      'Polymer',
       'Design',
       'Earn',
       'Games',
