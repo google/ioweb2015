@@ -321,21 +321,10 @@ Fired when the signed in state of the user changes.
         // Only send one-time code to server after the consent screen (first login).
         if (authResult.status.signed_in && authResult.code &&
             authResult.status.method === 'PROMPT') {
-          this.sendCodeToServer(authResult.code);
+          this.sendCodeToServer(authResult.code, this.getBasicProfile.bind(this));
+        } else {
+          this.getBasicProfile();
         }
-
-        // Get user's basic profile info, pic, email.
-        gapi.client.load('oauth2', 'v2', function () {
-          gapi.client.oauth2.userinfo.get().execute(function(resp) {
-            this.user = resp;
-            this.user.tokenResponse = gapi.auth.getToken();
-
-            this.fire('signin-change', {signedIn: true, user: this.user});
-
-            this.signedIn = true;
-
-          }.bind(this));
-        }.bind(this));
 
       } else {
         switch (authResult.error) {
@@ -354,7 +343,22 @@ Fired when the signed in state of the user changes.
       }
     },
 
-    sendCodeToServer: function(oneTimeCode) {
+    getBasicProfile: function() {
+      // Get user's basic profile info, pic, email.
+      gapi.client.load('oauth2', 'v2', function () {
+        gapi.client.oauth2.userinfo.get().execute(function(resp) {
+          this.user = resp;
+          this.user.tokenResponse = gapi.auth.getToken();
+
+          this.fire('signin-change', {signedIn: true, user: this.user});
+
+          this.signedIn = true;
+
+        }.bind(this));
+      }.bind(this));
+    },
+
+    sendCodeToServer: function(oneTimeCode, callback) {
       var xhr = new XMLHttpRequest();
       xhr.open('POST', AUTH_ENDPOINT);
 
@@ -364,7 +368,12 @@ Fired when the signed in state of the user changes.
       xhr.setRequestHeader('Content-Type', 'application/json');
 
       xhr.onload = function(e) {
-        // TODO(ericbidelman): handle response.
+        // TODO(ericbidelman): remove 404 check when endpoint is in.
+        if (e.target.status === 200 || e.target.status === 404) {
+          callback();
+        } else {
+          console.error('Sign-in error: one-time token was not sent to server');
+        }
       };
 
       xhr.send(JSON.stringify({code: oneTimeCode}));
