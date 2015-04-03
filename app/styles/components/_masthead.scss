@@ -176,7 +176,7 @@ core-drawer-panel {
   .button-link {
     text-transform: uppercase;
     color: inherit;
-    margin: 0 12px;
+    margin-right: $mobileKeyline / 2;
   }
 }
 
@@ -185,6 +185,10 @@ core-drawer-panel {
   top: initial !important;
   right: $tabletKeyline;
   @include shadow-z2();
+}
+
+#signin-nav-elements {
+  background-color: transparent;
 }
 
 #signin-settings-panel,

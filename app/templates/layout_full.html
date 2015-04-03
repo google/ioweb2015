@@ -256,7 +256,7 @@ limitations under the License.
               <h4 class="masthead-subtitle">Moscone Center West,<br>San Francisco, CA</h4>
             </div>
           </div>
-          <paper-tabs class="white {{ navBgClass }}" valueattr="label" selected="{{selectedPage}}" link noink>
+          <paper-tabs class="white {{navBgClass}}" valueattr="label" selected="{{selectedPage}}" link noink>
             <paper-tab label="about" role="">
               <a href="about" data-ajax-link data-track-link="nav-about" data-anim-ripple layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>
@@ -278,41 +278,43 @@ limitations under the License.
               </a>
             </paper-tab>
           </paper-tabs>
-          <a href="#" class="button-link" data-track-link="nav-signin"
-                      on-click="{{signIn}}" hidden?="{{currentUser}}" disabled>Sign-in</a>
-          <template if="{{currentUser}}">
-            <img _src="{{currentUser.picture}}" class="profilepic">
-            <paper-menu-button>
-              <paper-icon-button icon="io:more-vert" aria-label="Settings"></paper-icon-button>
-              <paper-dropdown id="signin-settings-panel" class="dropdown" halign="right" valign="top">
-                <div class="card-content" layout horizontal>
-                  <div><img _src="{{currentUser.picture}}" class="profilepic"></div>
-                  <div>
-                    <div>{{currentUser.name}}</div>
-                    <div class="settings-email">{{currentUser.email}}</div>
+          <span id="signin-nav-elements" class="{{isPhoneSize ? '' : navBgClass}}"
+                layout horizontal center>
+            <a href="#" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign-in</a>
+            <template if="{{currentUser}}">
+              <img _src="{{currentUser.picture}}" class="profilepic">
+              <paper-menu-button>
+                <paper-icon-button icon="io:more-vert" aria-label="Settings"></paper-icon-button>
+                <paper-dropdown id="signin-settings-panel" class="dropdown" halign="right" valign="top">
+                  <div class="card-content" layout horizontal>
+                    <div><img _src="{{currentUser.picture}}" class="profilepic"></div>
+                    <div>
+                      <div>{{currentUser.name}}</div>
+                      <div class="settings-email">{{currentUser.email}}</div>
+                    </div>
                   </div>
-                </div>
-                <div class="card-content notification__feature">
-                  <h4>Notifications</h4>
-                  <core-label horizontal layout>
-                    <paper-checkbox checked?="{{currentUser.notify}}" autoFocus for on-tap="{{updateNotifyUser}}"></paper-checkbox>
-                    <h5>I want to receive notifications from the Google I/O 2015 website.</h5>
-                  </core-label>
-                  <p>If this option is deselected, I understand I won't be notified when:</p>
-                  <ul>
-                    <li>New Extended events register near me</li>
-                    <li>I/O is about to start</li>
-                    <li>Bookmarked sessions are about to start</li>
-                    <li>Specific session videos are made available</li>
-                  </ul>
-                </div>
-                <div class="card-content" layout horizontal justified>
-                  <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blak">Terms of Service</a>
-                  <a href="#" data-track-link="login-signout" on-tap="{{signOut}}">Sign-out</a>
-                </div>
-              </paper-dropdown>
-            </paper-menu-button>
-          </template>
+                  <div class="card-content">
+                    <h4>Notifications</h4>
+                    <core-label horizontal layout>
+                      <paper-checkbox checked autoFocus for></paper-checkbox>
+                      <h5>I want to receive notifications from the Google I/O 2015 website.</h5>
+                    </core-label>
+                    <p>If this option is deselected, I understand I won't be notified when:</p>
+                    <ul>
+                      <li>New Extended events register near me</li>
+                      <li>I/O is about to start</li>
+                      <li>Bookmarked sessions are about to start</li>
+                      <li>Specific session videos are made available</li>
+                    </ul>
+                  </div>
+                  <div class="card-content" layout horizontal justified>
+                    <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blak">Terms of Service</a>
+                    <a href="#" data-track-link="login-signout" on-tap="{{signOut}}">Sign-out</a>
+                  </div>
+                </paper-dropdown>
+              </paper-menu-button>
+            </template>
+          </span>
         </core-toolbar>
 
         <core-overlay class="card card-content card__signin-intro"
