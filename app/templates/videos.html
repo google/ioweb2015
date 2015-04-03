@@ -183,6 +183,11 @@
     IOWA.Elements.Template.onVideoFilter = function(e, detail, sender) {
       e.stopPropagation();
       if (detail.isSelected) {
+        if (sender.selected == 'All') {
+          this.filteredVideoList = this.videoList;
+          return;
+        }
+
         var videos = IOWA.Elements.Template.videoList;
         this.filteredVideoList = videos.filter(function(item) {
           return item.topic === sender.selected;

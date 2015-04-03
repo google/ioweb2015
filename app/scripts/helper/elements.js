@@ -155,6 +155,7 @@ IOWA.Elements = (function() {
     ];
 
     template.filterTopics = [
+      'All',
       'Accessibility',
       'Android',
       'Audience Growth',
