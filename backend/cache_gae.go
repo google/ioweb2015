@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
-
 	"google.golang.org/appengine/memcache"
 )
 
@@ -30,4 +29,8 @@ func (mc *gaeMemcache) get(c context.Context, key string) ([]byte, error) {
 		return nil, err
 	}
 	return item.Value, nil
+}
+
+func (mc *gaeMemcache) flush(c context.Context) error {
+	return memcache.Flush(c)
 }

@@ -26,8 +26,10 @@ func TestRenderTemplate(t *testing.T) {
 }
 
 func TestRenderEnv(t *testing.T) {
-	revert := overrideEnv("prod")
+	revert := preserveConfig()
 	defer revert()
+	config.Env = "prod"
+
 	req, _ := http.NewRequest("GET", "/about", nil)
 	c := newContext(req)
 

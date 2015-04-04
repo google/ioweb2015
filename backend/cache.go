@@ -24,6 +24,8 @@ type cacheInterface interface {
 	// get gets data from the cache put under key.
 	// it returns errCacheMiss if item is not in the cache or expired.
 	get(c context.Context, key string) ([]byte, error)
+	// flush flushes all items from memcache.
+	flush(c context.Context) error
 }
 
 // memoryCache is a very simple in-memory cache.
@@ -59,4 +61,11 @@ func (mc *memoryCache) get(c context.Context, key string) ([]byte, error) {
 		return nil, errCacheMiss
 	}
 	return item.data, nil
+}
+
+func (mc *memoryCache) flush(c context.Context) error {
+	mc.Lock()
+	defer mc.Unlock()
+	mc.items = make(map[string]*cacheItem)
+	return nil
 }

@@ -6,12 +6,18 @@
   "ioExtFeedUrl": "https://spreadsheets.google.com/feeds/list/SHEET/WORKSHEET/private/full",
   "google": {
     "tokenUrl": "https://accounts.google.com/o/oauth2/token",
+    "verifyUrl": "https://www.googleapis.com/oauth2/v2/tokeninfo",
+    "certUrl": "https://www.googleapis.com/oauth2/v1/certs",
     "serviceAccount": {
       "private_key_id": "ignored",
       "private_key": "-----BEGIN PRIVATE KEY----- content -----END PRIVATE KEY-----\n",
       "client_email": "example@developer.gserviceaccount.com",
       "client_id": "example.apps.googleusercontent.com",
       "type": "service_account"
+    },
+    "auth": {
+      "client": "web-app client ID",
+      "secret": "web-app client secret"
     }
   },
   "twitter": {

@@ -448,8 +448,7 @@ function buildBackend(cb) {
 
 // Run backend tests
 function testBackend() {
-  var args = ['test', '-v'];
-  return spawn('go', args, {cwd: BACKEND_DIR, stdio: 'inherit'});
+  return spawn('go', ['test'], {cwd: BACKEND_DIR, stdio: 'inherit'});
 }
 
 // Start GAE-based backend server with backendDir as the app root directory.

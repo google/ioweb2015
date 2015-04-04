@@ -52,10 +52,16 @@ type appConfig struct {
 	// Google credentials
 	Google struct {
 		TokenURL       string `json:"tokenUrl"`
+		VerifyURL      string `json:"verifyUrl"`
+		CertURL        string `json:"certUrl"`
 		ServiceAccount struct {
 			Key   string `json:"private_key"`
 			Email string `json:"client_email"`
 		} `json:"serviceAccount"`
+		Auth struct {
+			Client string `json:"client"`
+			Secret string `json:"secret"`
+		} `json:"auth"`
 	} `json:"google"`
 }
 

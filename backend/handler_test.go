@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -23,8 +24,11 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 
 func TestServeTemplate(t *testing.T) {
 	const ctype = "text/html;charset=utf-8"
-	revert := overridePrefix("/root")
+
+	revert := preserveConfig()
 	defer revert()
+	config.Prefix = "/root"
+
 	table := []struct{ path, slug, canonical string }{
 		{"/", "home", "/root/"},
 		{"/home?experiment", "home", "/root/"},
@@ -99,5 +103,82 @@ func TestServeTemplate404(t *testing.T) {
 	}
 	if v := w.Header().Get("Cache-Control"); v != "" {
 		t.Errorf("don't want Cache-Control: %q", v)
+	}
+}
+
+func TestHandleAuth(t *testing.T) {
+	defer preserveConfig()()
+	const code = "fake-auth-code"
+
+	table := []struct {
+		token            string
+		doExchange       bool
+		exchangeRespCode int
+		success          bool
+	}{
+		{"valid", true, http.StatusOK, true},
+		{"valid", true, http.StatusBadRequest, false},
+		{"", false, http.StatusOK, false},
+		{testIDToken, true, http.StatusOK, true},
+		{testIDToken, true, http.StatusBadRequest, false},
+	}
+
+	for i, test := range table {
+		done := make(chan struct{}, 1)
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if v := r.FormValue("code"); v != code {
+				t.Errorf("code = %q; want %q", v, code)
+			}
+			if v := r.FormValue("client_id"); v != testClientID {
+				t.Errorf("client_id = %q; want %q", v, testClientID)
+			}
+			if v := r.FormValue("client_secret"); v != testClientSecret {
+				t.Errorf("client_secret = %q; want %q", v, testClientSecret)
+			}
+			if v := r.FormValue("redirect_uri"); v != "postmessage" {
+				t.Errorf("redirect_uri = %q; want postmessage", v)
+			}
+			if v := r.FormValue("grant_type"); v != "authorization_code" {
+				t.Errorf("grant_type = %q; want authorization_code", v)
+			}
+
+			w.WriteHeader(test.exchangeRespCode)
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{
+				"access_token": "new-access-token",
+				"refresh_token": "new-refresh-token",
+				"id_token": %q,
+				"expires_in": 3600
+			}`, testIDToken)
+
+			done <- struct{}{}
+		}))
+		defer ts.Close()
+		config.Google.TokenURL = ts.URL
+
+		p := strings.NewReader(`{"code": "` + code + `"}`)
+		r, _ := http.NewRequest("POST", "/api/v1/auth", p)
+		r.Header.Set("Authorization", "Bearer "+test.token)
+		w := httptest.NewRecorder()
+
+		cache.flush(newContext(r))
+		handleAuth(w, r)
+
+		if test.success && w.Code != http.StatusOK {
+			t.Errorf("%d: code = %d; want 200\nbody: %s", i, w.Code, w.Body.String())
+		} else if !test.success && w.Code == http.StatusOK {
+			t.Errorf("%d: code = 200; want > 399\nbody: %s", i, w.Body)
+		}
+
+		select {
+		case <-done:
+			if !test.doExchange {
+				t.Errorf("%d: should not have done code exchange", i)
+			}
+		default:
+			if test.doExchange {
+				t.Errorf("code exchange never happened")
+			}
+		}
 	}
 }
