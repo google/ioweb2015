@@ -8,6 +8,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/net/context"
 )
 
 // wrapHandler is the last in a handler chain call,
@@ -24,6 +26,7 @@ func registerHandlers() {
 	handle("/", rootHandleFn)
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
+	handle("/api/v1/auth", handleAuth)
 	// setup root redirect if we're prefixed
 	if config.Prefix != "/" {
 		var redirect http.Handler = http.HandlerFunc(redirectHandler)
@@ -140,14 +143,14 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 	entries, err := ioExtEntries(c, refresh)
 	if err != nil {
 		errorf(c, "ioExtEntries: %v", err)
-		writeJSONError(w, err)
+		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	body, err := json.Marshal(entries)
 	if err != nil {
 		errorf(c, "json.Marshal: %v", err)
-		writeJSONError(w, err)
+		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -176,14 +179,14 @@ func serveSocial(w http.ResponseWriter, r *http.Request) {
 	entries, err := socialEntries(c, refresh)
 	if err != nil {
 		errorf(c, "socialEntries: %v", err)
-		writeJSONError(w, err)
+		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	body, err := json.Marshal(entries)
 	if err != nil {
 		errorf(c, "json.Marshal: %v", err)
-		writeJSONError(w, err)
+		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -192,8 +195,74 @@ func serveSocial(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleAuth is the main authentication handler.
+// It expects the following request header and body:
+//
+//     Authorization: Bearer <ID or access token>
+//     Content-Type: application/json
+//     {"code": "one-time authorization code from hybrid server-side flow"}
+//
+// which will result in a 200 OK empty response upon successful ID/access token
+// and code verifications. The client can count it as "fully logged in" confirmation.
+//
+// ID token is prefered over access token.
+func handleAuth(w http.ResponseWriter, r *http.Request) {
+	// TODO: don't propagate error messages for security reasons
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c := newContext(r)
+	ah := r.Header.Get("authorization")
+	// TODO: remove when done testing
+	logf(c, "authorization: %s", ah)
+
+	c, err := authUser(c, ah)
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+	var flow struct {
+		Code string `json:"code"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&flow); err != nil {
+		writeJSONError(w, http.StatusBadRequest, fmt.Errorf("invalid JSON body: %v", err))
+		return
+	}
+	creds, err := fetchCredentials(c, flow.Code)
+	if err != nil {
+		writeJSONError(w, http.StatusForbidden, err)
+		return
+	}
+	if err := storeCredentials(c, creds); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err)
+	}
+}
+
 // writeJSONError sets response code to 500 and writes an error message to w.
-func writeJSONError(w http.ResponseWriter, err error) {
-	w.WriteHeader(http.StatusInternalServerError)
+func writeJSONError(w http.ResponseWriter, code int, err error) {
+	w.WriteHeader(code)
 	fmt.Fprintf(w, `{"error": %q}`, err.Error())
+}
+
+// errStatus converts some known errors of this package into the corresponding
+// HTTP response status code.
+// Defaults to 500 Internal Server Error.
+func errStatus(err error) int {
+	switch err {
+	case errAuthMissing:
+		return http.StatusUnauthorized
+	case errAuthInvalid:
+		return http.StatusForbidden
+	default:
+		return http.StatusInternalServerError
+	}
+}
+
+// ctxKey is a custom type for context.Context values.
+// See below for specific keys.
+type ctxKey int
+
+const ctxKeyUser ctxKey = iota
+
+func contextUser(c context.Context) string {
+	user, _ := c.Value(ctxKeyUser).(string)
+	return user
 }
