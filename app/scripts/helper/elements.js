@@ -370,6 +370,14 @@ IOWA.Elements = (function() {
       IOWA.Elements.GoogleSignIn.signOut();
     };
 
+    template.updateNotifyUser = function(e, detail, sender) {
+      var notify = sender.checked;
+
+      // TODO(jeffy)
+      // 1. If the user hasn't enabled notifications yet, go through permission flow.
+      // 2. enabled/disabled notifications based on `notify`.
+    };
+
     template.addEventListener('template-bound', updateElements);
     template.addEventListener('page-transition-done', function(e) {
       this.pageTransitionDone = true;

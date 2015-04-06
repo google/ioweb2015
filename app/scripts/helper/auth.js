@@ -31,6 +31,31 @@ IOWA.Auth = IOWA.Auth || (function() {
     return tokenResponse_;
   }
 
+  function setUserUI(user) {
+    tokenResponse_ = user.tokenResponse;
+
+    var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
+    drawerProfilePic.src = user.picture;
+    drawerProfilePic.hidden = false;
+
+    // Set notifications checkbox appropriately in settings UI.
+    IOWA.Notifications.isNotifyEnabledPromise().then(function(notify) {
+      IOWA.Elements.GoogleSignIn.user.notify = notify;
+    });
+  }
+
+  function clearUserUI() {
+    tokenResponse_ = null;
+
+    var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
+    drawerProfilePic.hidden = true;
+
+    var signInButton = IOWA.Elements.Nav.querySelector('.button-link');
+    signInButton.removeAttribute('disabled');
+
+    // TODO(jeffy): user just signed out. Stop notifications?
+  }
+
   /**
    * Ensures that we have a valid token in IndexedDB used by the service worker to fetch updates.
    * @return {Promise}
@@ -67,18 +92,16 @@ IOWA.Auth = IOWA.Auth || (function() {
   }
 
   document.addEventListener('signin-change', function(e) {
-    var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     if (e.detail.user) {
-      tokenResponse_ = e.detail.user.tokenResponse;
-      drawerProfilePic.src = e.detail.user.picture;
-      drawerProfilePic.hidden = false;
+      setUserUI(e.detail.user);
       ensureSWToken_(); // This kicks off an async network request, wrapped in a promise.
     } else {
-      tokenResponse_ = null;
-      drawerProfilePic.hidden = true;
+      clearUserUI();
       clearSWToken_(); // This kicks off an async network request, wrapped in a promise.
     }
   });
+
+  document.addEventListener('signin-fail', clearUserUI);
 
   return {
     getTokenResponse: getTokenResponse_
