@@ -84,7 +84,7 @@ IOWA.A11y = IOWA.A11y || (function() {
   function announceLiveChange(e) {
     // Annoying timeout hack to work around https://code.google.com/p/chromium/issues/detail?id=469254
     setTimeout(function() {
-      IOWA.Elements.LiveStatus.textContent = e.detail.message;
+      IOWA.Elements.LiveStatus.textContent = 'Notification: ' + e.detail.message;
     }, 1000);
   }
 
