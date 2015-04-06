@@ -29,6 +29,11 @@ IOWA.A11y = IOWA.A11y || (function() {
   // Handlers managed by the addFocusStates and removeFocusStates methods.
   var onMouseDown = function(e) {
     this.classList.add('pressed');
+    // this hackery is required for paper-slider which prevents
+    // default on mousedown so dragging doesn't select text on screen
+    // without a proper mousedown, focus does not move off of the slider
+    // if you click on another slider
+    this.focus();
   };
 
   var onMouseUp = function(e) {
@@ -42,9 +47,11 @@ IOWA.A11y = IOWA.A11y || (function() {
       this.classList.add('focused');
     }
   };
+
   var onBlur = function(e) {
     this.classList.remove('focused');
   };
+
   // Elements passed to this method will receive classes reflecting the focus
   // and pressed states.
   function addFocusStates(selector) {
