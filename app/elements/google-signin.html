@@ -381,6 +381,11 @@ Fired when sign in fails for some reason.
 
           this.signedIn = true;
 
+          if (IOWA.Notifications.isSupported) {
+            IOWA.Notifications.isExistingSubscriptionPromise().then(function(notify) {
+              this.user.notify = notify;
+            }.bind(this));
+          }
         }.bind(this));
       }.bind(this));
     },

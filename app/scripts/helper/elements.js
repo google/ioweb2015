@@ -371,11 +371,14 @@ IOWA.Elements = (function() {
     };
 
     template.updateNotifyUser = function(e, detail, sender) {
-      var notify = sender.checked;
-
-      // TODO(jeffy)
-      // 1. If the user hasn't enabled notifications yet, go through permission flow.
-      // 2. enabled/disabled notifications based on `notify`.
+      // Both these functions are asynchronous and return promises. Since there's no specific
+      // callback or follow-up that needs to be performed once they complete, the returned promise
+      // is ignored.
+      if (sender.checked) {
+        IOWA.Notifications.subscribePromise();
+      } else {
+        IOWA.Notifications.unsubscribePromise();
+      }
     };
 
     template.addEventListener('template-bound', updateElements);
