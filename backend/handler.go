@@ -211,8 +211,6 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c := newContext(r)
 	ah := r.Header.Get("authorization")
-	// TODO: remove when done testing
-	logf(c, "authorization: %s", ah)
 
 	c, err := authUser(c, ah)
 	if err != nil {

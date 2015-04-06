@@ -106,10 +106,12 @@ func fetchCredentials(c context.Context, code string) (*oauth2Credentials, error
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
+		er, _ := ioutil.ReadAll(res.Body)
+		errorf(c, "fetchCredentials: %s", er)
 		return nil, fmt.Errorf("fetchCredentials: remote says: %s", res.Status)
 	}
-	defer res.Body.Close()
 	var body struct {
 		AccessToken  string `json:"access_token"`
 		RefreshToken string `json:"refresh_token"`
