@@ -19,6 +19,8 @@ backend/bin
 backend/app.yaml
 backend/cron.yaml
 backend/*.config
+backend/*.config.*
+!backend/server.config.template
 *.pem
 *.p12
 util/drone-*.json

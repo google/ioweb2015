@@ -160,7 +160,7 @@ gulp.task('copy-assets', function() {
 });
 
 // Copy backend files.
-gulp.task('copy-backend', ['backend:config'], function(cb) {
+gulp.task('copy-backend', function(done) {
   gulp.src([
     BACKEND_DIR + '/**/*.go',
     BACKEND_DIR + '/*.yaml',
@@ -171,10 +171,10 @@ gulp.task('copy-backend', ['backend:config'], function(cb) {
     var destBackend = [DIST_STATIC_DIR, BACKEND_DIR].join('/');
     // ../app <= dist/backend/app
     fs.symlinkSync('../' + APP_DIR, destBackend + '/' + APP_DIR);
-    // make sure we have the right app env and prefix
-    updateServerConfig(destBackend, argv.env || 'prod', URL_PREFIX)
-    // create dist/backend/app.yaml from backend/app.yaml.template
-    generateGaeConfig(destBackend, URL_PREFIX, cb);
+    // create server config for the right env
+    generateServerConfig(destBackend, URL_PREFIX, argv.env || 'prod');
+    // create GAE config from backend/app.yaml.template
+    generateGaeConfig(destBackend, URL_PREFIX, done);
   });
 });
 
@@ -276,8 +276,6 @@ gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 
     {cwd: BACKEND_DIR, stdio: 'inherit'}
   );
 
-  updateServerConfig(BACKEND_DIR, argv.env || 'dev', URL_PREFIX);
-
   if (noWatch) {
     start();
     serverAddr = 'http://' + serverAddr;
@@ -314,7 +312,6 @@ gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev', 'generate-page-metadata'], function(callback) {
   var watchFiles = argv.watch !== false;
-  updateServerConfig(BACKEND_DIR, argv.env || 'dev', URL_PREFIX);
   generateGaeConfig(BACKEND_DIR, URL_PREFIX, function() {
     startGaeBackend(BACKEND_DIR, watchFiles, callback)
   });
@@ -352,8 +349,10 @@ gulp.task('copy-experiment-to-site', ['build-experiment'], function(cb) {
 // Build self-sufficient backend server binary w/o GAE support.
 gulp.task('backend', buildBackend);
 
-// Create server config if one doesn't exist. Needed to run the server.
-gulp.task('backend:config', generateServerConfig);
+// Create server config with defaults.
+gulp.task('backend:config', function() {
+  generateServerConfig();
+});
 
 // Backend TDD: watch for changes and run tests in an infinite loop.
 gulp.task('backend:test', function(cb) {
@@ -395,25 +394,43 @@ gulp.task('godeps', function() {
 // decrypt backend/server.config.enc into backend/server.config.
 // use --pass cmd line arg to provide a pass phrase.
 gulp.task('decrypt', function(done) {
-  var file = BACKEND_DIR + '/server.config';
-  var args = ['aes-256-cbc', '-d', '-in', file + '.enc', '-out', file];
+  var tarFile = BACKEND_DIR + '/config.tar';
+  var args = ['aes-256-cbc', '-d', '-in', tarFile + '.enc', '-out', tarFile];
   if (argv.pass) {
     args.push('-pass', 'pass:' + argv.pass);
   }
-  spawn('openssl', args, {stdio: 'inherit'}).
-  on('exit', done);
+  spawn('openssl', args, {stdio: 'inherit'}).on('exit', function(code) {
+    if (code !== 0) {
+      done(code);
+      return;
+    }
+    spawn('tar', ['-x', '-f', tarFile, '-C', BACKEND_DIR], {stdio: 'inherit'}).
+    on('exit', fs.unlink.bind(fs, tarFile, done));
+  });
 });
 
 // encrypt backend/server.config into backend/server.config.enc.
 // use --pass cmd line arg to provide a pass phrase.
 gulp.task('encrypt', function(done) {
-  var file = BACKEND_DIR + '/server.config';
-  var args = ['aes-256-cbc', '-in', file, '-out', file + '.enc'];
-  if (argv.pass) {
-    args.push('-pass', 'pass:' + argv.pass);
-  }
-  spawn('openssl', args, {stdio: 'inherit'}).
-  on('exit', done);
+  var tarFile = BACKEND_DIR + '/config.tar';
+  var tarArgs = ['-c', '-f', tarFile, '-C', BACKEND_DIR,
+    'server.config.dev',
+    'server.config.stage',
+    'server.config.prod'
+  ];
+
+  spawn('tar', tarArgs, {stdio: 'inherit'}).on('exit', function(code) {
+    if (code !== 0) {
+      done(code);
+      return;
+    }
+    var args = ['aes-256-cbc', '-in', tarFile, '-out', tarFile + '.enc'];
+    if (argv.pass) {
+      args.push('-pass', 'pass:' + argv.pass);
+    }
+    spawn('openssl', args, {stdio: 'inherit'}).
+    on('exit', fs.unlink.bind(fs, tarFile, done));
+  });
 });
 
 gulp.task('setup', function(cb) {
@@ -487,26 +504,25 @@ function generateGaeConfig(dest, prefix, callback) {
     .on('end', callback);
 }
 
-// Create default server config if it doesn't exist already using the template.
-// Needed to start the server.
-function generateServerConfig(callback) {
-  if (fs.existsSync(BACKEND_DIR + '/server.config')) {
-    callback();
-    return;
-  }
-  gulp.src(BACKEND_DIR + '/server.config.template', {base: BACKEND_DIR})
-    .pipe($.rename('server.config'))
-    .pipe(gulp.dest(BACKEND_DIR))
-    .on('end', callback);
-}
+// Create server config, needed to start the server.
+// dest and prefix default to BACKEND_DIR and URL_PREFIX respectively.
+// env defaults to '--env' cmd line arg or 'dev' if none given.
+function generateServerConfig(dest, prefix, env) {
+  dest = (dest || BACKEND_DIR) + '/server.config';
+  prefix = prefix || URL_PREFIX;
+  env = env || argv.env || 'dev';
 
-// Update existing server.config in backendDir with provided env and prefix.
-function updateServerConfig(backendDir, env, prefix) {
-  var file = backendDir + '/server.config';
-  var cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
+  // source template
+  var src = BACKEND_DIR + '/server.config.' + env;
+  // use server.config.template if server.config.<env> doesn't exist
+  if (!fs.existsSync(src)) {
+    src = BACKEND_DIR + '/server.config.template';
+  }
+
+  var cfg = JSON.parse(fs.readFileSync(src, 'utf8'));
   cfg.env = env;
   cfg.prefix = prefix;
-  fs.writeFileSync(file, JSON.stringify(cfg, null, 2));
+  fs.writeFileSync(dest, JSON.stringify(cfg, null, 2));
 }
 
 // generate pages.js out of templates.
