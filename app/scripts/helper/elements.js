@@ -48,11 +48,13 @@ IOWA.Elements = (function() {
       IOWA.Elements.GoogleSignIn.load = true;
 
       // Deep link into a subpage.
-      var selectedSubpage = location.hash.substring(1);
+      var tpl = IOWA.Elements.Template;
+      var defaultSubpage = tpl.pages[tpl.selectedPage].selectedSubpage;
+      var selectedSubpage = location.hash.substring(1) || defaultSubpage;
       var subpage = document.querySelector('#subpage-' + selectedSubpage);
       if (subpage) {
-        var template = IOWA.Elements.Template;
-        template.pages[template.selectedPage].selectedSubpage = selectedSubpage;
+        tpl.pages[tpl.selectedPage].selectedSubpage = selectedSubpage;
+        subpage.classList.add('active');
       }
 
       IOWA.PageAnimation.play(
