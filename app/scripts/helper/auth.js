@@ -39,8 +39,19 @@ IOWA.Auth = IOWA.Auth || (function() {
     drawerProfilePic.hidden = false;
 
     // Set notifications checkbox appropriately in settings UI.
+    // First, check to see if notifications are enabled globally, via an API call to the backend.
     IOWA.Notifications.isNotifyEnabledPromise().then(function(notify) {
-      IOWA.Elements.GoogleSignIn.user.notify = notify;
+      if (notify) {
+        // If notifications are on globally, next check to see if there's an existing push manager
+        // subscription for the current browser.
+        IOWA.Notifications.isExistingSubscriptionPromise().then(function(existingSubscription) {
+          // Set user.notify property based on whether there's an existing push manager subscription
+          IOWA.Elements.GoogleSignIn.user.notify = existingSubscription;
+        });
+      } else {
+        // If notifications are off globally, then always set the user.notify to false.
+        IOWA.Elements.GoogleSignIn.user.notify = false;
+      }
     });
   }
 
@@ -52,8 +63,6 @@ IOWA.Auth = IOWA.Auth || (function() {
 
     var signInButton = IOWA.Elements.Nav.querySelector('.button-link');
     signInButton.removeAttribute('disabled');
-
-    // TODO(jeffy): user just signed out. Stop notifications?
   }
 
   /**
@@ -94,10 +103,14 @@ IOWA.Auth = IOWA.Auth || (function() {
   document.addEventListener('signin-change', function(e) {
     if (e.detail.user) {
       setUserUI(e.detail.user);
-      ensureSWToken_(); // This kicks off an async network request, wrapped in a promise.
+      // This kicks off an async network request, wrapped in a promise.
+      ensureSWToken_();
     } else {
       clearUserUI();
-      clearSWToken_(); // This kicks off an async network request, wrapped in a promise.
+      // This kicks off an async network request, wrapped in a promise.
+      // If the user has signed out, then we want to unsubscribe from the browser's push manager
+      // and also clear the SW token. (We don't want to turn off notifications globally, though.)
+      IOWA.Notifications.unsubscribeFromPushManagerPromise().then(clearSWToken_);
     }
   });
 

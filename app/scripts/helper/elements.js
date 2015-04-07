@@ -375,9 +375,19 @@ IOWA.Elements = (function() {
       // callback or follow-up that needs to be performed once they complete, the returned promise
       // is ignored.
       if (sender.checked) {
+        // subscribePromise() handles registering a subscription with the browser's push manager
+        // and toggling the notify state to true in the backend via an API call.
         IOWA.Notifications.subscribePromise();
       } else {
-        IOWA.Notifications.unsubscribePromise();
+        // The steps to turn off notifications are broken down into two separate promises, the first
+        // which unsubscribes from the browser's push manager and the second which sets the notify
+        // state to false in the backend via an API call.
+        // Note that we are deliberately not clearing the SW token stored in IDB, since that is tied
+        // to the user's logged in state and will remain valid if notifications are re-enabled
+        // later on.
+        IOWA.Notifications.unsubscribeFromPushManagerPromise()
+          .then(disableNotificationsPromise)
+          .catch(IOWA.Util.reportError);
       }
     };
 

@@ -55,7 +55,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
    * Disables push notifications globally for the current user.
    * @return {Promise} Resolves with response body, or rejects with an error on HTTP failure.
    */
-  var disableNotificationsPromise_ = function() {
+  var disableNotificationsPromise = function() {
     return IOWA.Request.xhrPromise('PUT', NOTIFY_ENDPOINT, true, {notify: false});
   };
 
@@ -126,21 +126,17 @@ IOWA.Notifications = IOWA.Notifications || (function() {
   };
 
   /**
-   * Unregisters the push subscription for the current browser, and sets the global notification
-   * state on the backend to false.
+   * Unsubscribe the push subscription for the current browser.
    * @return {Promise}
    */
-  var unsubscribePromise = function() {
-    var disablePushManager = navigator.serviceWorker.ready.then(function(registration) {
+  var unsubscribeFromPushManagerPromise = function() {
+    return navigator.serviceWorker.ready.then(function(registration) {
       return registration.pushManager.getSubscription();
     }).then(function(subscription) {
       if (subscription && subscription.subscriptionId) {
         return subscription.unsubscribe();
       }
     });
-
-    return Promise.all(disableNotificationsPromise_(), disablePushManager)
-      .catch(IOWA.Util.reportError);
   };
 
   var init = function() {
@@ -150,11 +146,12 @@ IOWA.Notifications = IOWA.Notifications || (function() {
   };
 
   return {
+    disableNotificationsPromise: disableNotificationsPromise,
     isExistingSubscriptionPromise: isExistingSubscriptionPromise,
     isNotifyEnabledPromise: isNotifyEnabledPromise,
     isSupported: isSupported,
     subscribePromise: subscribePromise,
-    unsubscribePromise: unsubscribePromise,
+    unsubscribeFromPushManagerPromise: unsubscribeFromPushManagerPromise,
     init: init
   };
 })();
