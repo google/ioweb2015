@@ -48,13 +48,14 @@ type templateCache struct {
 
 // templateData is the templates context
 type templateData struct {
-	Env     string
-	Prefix  string
-	Slug    string
-	Title   string
-	Desc    string
-	OgTitle string
-	OgImage string
+	Env      string
+	ClientID string
+	Prefix   string
+	Slug     string
+	Title    string
+	Desc     string
+	OgTitle  string
+	OgImage  string
 }
 
 // renderTemplate executes a template found in name.html file
@@ -71,6 +72,7 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	if data.Env == "" {
 		data.Env = config.Env
 	}
+	data.ClientID = config.Google.Auth.Client
 	data.Title = pageTitle(tpl)
 	data.Slug = name
 	data.Prefix = config.Prefix

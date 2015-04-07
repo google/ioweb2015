@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -25,53 +25,36 @@ func TestRenderTemplate(t *testing.T) {
 	}
 }
 
-func TestRenderEnv(t *testing.T) {
-	revert := preserveConfig()
-	defer revert()
+func TestRenderTemplateData(t *testing.T) {
+	defer preserveConfig()()
 	config.Env = "prod"
+	config.Prefix = "/root"
+	config.Google.Auth.Client = "dummy-client-id"
 
 	req, _ := http.NewRequest("GET", "/about", nil)
 	c := newContext(req)
 
-	out, err := renderTemplate(c, "about", false, nil)
-	if err != nil {
-		t.Fatalf("renderTemplate(..., about, false): %v", err)
+	data := &templateData{
+		OgImage: "some-image.png",
+		Desc:    "dummy description",
 	}
-
-	rx := `window\.ENV\s+=\s+"prod";`
-	if matched, err := regexp.Match(rx, out); !matched || err != nil {
-		t.Errorf("didn't match %s to: %s (%v)", rx, string(out), err)
-	}
-}
-
-func TestRenderOgImage(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/about", nil)
-	c := newContext(req)
-
-	data := &templateData{OgImage: ogImageExperiment}
 	out, err := renderTemplate(c, "about", false, data)
 	if err != nil {
-		t.Fatalf("renderTemplate(..., about, false): %v", err)
+		t.Fatalf("renderTemplate(about, false): %v", err)
+	}
+	sout := string(out)
+
+	subs := []string{
+		`window.ENV = "prod"`,
+		`window.PREFIX = "/root"`,
+		`<meta property="og:image" content="/root/images/some-image.png">`,
+		`<meta property="og:description" content="dummy description">`,
+		`google-signin clientId="dummy-client-id"`,
 	}
 
-	rx := `<meta\sproperty="og:image"\scontent="` + config.Prefix + `/images/` + data.OgImage + `">`
-	if matched, err := regexp.Match(rx, out); !matched || err != nil {
-		t.Errorf("didn't match %s to: %s (%v)", rx, string(out), err)
-	}
-}
-
-func TestRenderOgDesc(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/about?experiment", nil)
-	c := newContext(req)
-
-	data := &templateData{Desc: descExperiment}
-	out, err := renderTemplate(c, "about", false, data)
-	if err != nil {
-		t.Fatalf("renderTemplate(..., about, false): %v", err)
-	}
-
-	rx := `<meta\sproperty="og:description"\scontent="` + descExperiment + `">`
-	if matched, err := regexp.Match(rx, out); !matched || err != nil {
-		t.Errorf("didn't match %s to: %s (%v)", rx, string(out), err)
+	for _, s := range subs {
+		if !strings.Contains(sout, s) {
+			t.Errorf("%s doesn't contain %s", out, s)
+		}
 	}
 }
