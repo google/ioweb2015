@@ -120,7 +120,12 @@ IOWA.Auth = IOWA.Auth || (function() {
     }
   });
 
-  document.addEventListener('signin-fail', clearUserUI);
+  document.addEventListener('signin-fail', function(e) {
+    clearUserUI();
+    if (e.detail.oneTimeCodeFail) {
+      IOWA.Analytics.trackError('login', 'error', e.detail.error);
+    }
+  });
 
   return {
     getTokenResponse: getTokenResponse_

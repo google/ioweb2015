@@ -336,6 +336,10 @@ Fired when sign in fails for some reason.
     },
 
     disconnect: function() {
+      if (!gapi.auth.getToken()) {
+        return;
+      }
+
       var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' +
                       gapi.auth.getToken().access_token +
                       '&callback=%%callback%%';
@@ -387,7 +391,7 @@ Fired when sign in fails for some reason.
       }.bind(this));
     },
 
-    sendCodeToServer: function(oneTimeCode, callback) {
+    sendCodeToServer: function(oneTimeCode, callback, opt_onSignInError) {
       var xhr = new XMLHttpRequest();
       xhr.open('POST', AUTH_ENDPOINT);
 
@@ -401,9 +405,14 @@ Fired when sign in fails for some reason.
         if (e.target.status === 200 || e.target.status === 404) {
           callback();
         } else {
-          console.error('Sign-in error: one-time token was not sent to server');
+          this.signOut(); // One-time token could not be saved in backend. Log user out.
+
+          this.fire('signin-fail', {
+            error: 'One-time token was not sent to server',
+            oneTimeCodeFail: true
+          });
         }
-      };
+      }.bind(this);
 
       xhr.send(JSON.stringify({code: oneTimeCode}));
     }
