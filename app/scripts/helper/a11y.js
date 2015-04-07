@@ -21,18 +21,25 @@ IOWA.A11y = IOWA.A11y || (function() {
   "use strict";
 
   function init() {
-    // Differentiate focus coming from mouse and keyboard
+    // Differentiate focus coming from mouse and keyboard.
     addFocusStates('#navbar paper-tabs a');
     document.addEventListener('toast-message', announceLiveChange);
   }
 
-  // Handlers managed by the addFocusStates and removeFocusStates methods
+  // Handlers managed by the addFocusStates and removeFocusStates methods.
   var onMouseDown = function(e) {
     this.classList.add('pressed');
+    // this hackery is required for paper-slider which prevents
+    // default on mousedown so dragging doesn't select text on screen
+    // without a proper mousedown, focus does not move off of the slider
+    // if you click on another slider
+    this.focus();
   };
+
   var onMouseUp = function(e) {
     this.classList.remove('pressed');
   };
+
   var onFocus = function(e) {
     // Only render the "focused" state if the element gains focus due to
     // keyboard navigation.
@@ -40,26 +47,26 @@ IOWA.A11y = IOWA.A11y || (function() {
       this.classList.add('focused');
     }
   };
+
   var onBlur = function(e) {
     this.classList.remove('focused');
   };
+
   // Elements passed to this method will receive classes reflecting the focus
   // and pressed states.
   function addFocusStates(selector) {
-    // This is done on the next tick to ensure the elements have made it into
-    // the DOM from the page template
-    setTimeout(function() {
-      Array.prototype.forEach.call(document.querySelectorAll(selector), function(el) {
-        el.addEventListener('mousedown', onMouseDown);
-        el.addEventListener('mouseup', onMouseUp);
-        el.addEventListener('focus', onFocus);
-        el.addEventListener('blur', onBlur);
-      });
-    }, 0);
+    var nodes = document.querySelectorAll(selector);
+    Array.prototype.forEach.call(nodes, function(el) {
+      el.addEventListener('mousedown', onMouseDown);
+      el.addEventListener('mouseup', onMouseUp);
+      el.addEventListener('focus', onFocus);
+      el.addEventListener('blur', onBlur);
+    });
   }
   // Cleanup method for elements with managed focus states
   function removeFocusStates(selector) {
-    Array.prototype.forEach.call(document.querySelectorAll(selector), function(el) {
+    var nodes = document.querySelectorAll(selector);
+    Array.prototype.forEach.call(nodes, function(el) {
       el.removeEventListener('mousedown', onMouseDown);
       el.removeEventListener('mouseup', onMouseUp);
       el.removeEventListener('focus', onFocus);
@@ -77,7 +84,7 @@ IOWA.A11y = IOWA.A11y || (function() {
   function announceLiveChange(e) {
     // Annoying timeout hack to work around https://code.google.com/p/chromium/issues/detail?id=469254
     setTimeout(function() {
-      IOWA.Elements.LiveStatus.textContent = e.detail.message;
+      IOWA.Elements.LiveStatus.textContent = 'Notification: ' + e.detail.message;
     }, 1000);
   }
 

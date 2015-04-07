@@ -27,6 +27,7 @@ func main() {
 	if err := initConfig(*flagConfig, *flagAddr); err != nil {
 		panic("initConfig: " + err.Error())
 	}
+
 	cache = newMemoryCache()
 	wrapHandler = logHandler
 	rootHandleFn = catchAllHandler
@@ -69,12 +70,6 @@ func logHandler(h http.Handler) http.Handler {
 // newContext returns a context of the in-flight request r.
 func newContext(r *http.Request) context.Context {
 	return context.Background()
-}
-
-// httpTransport returns a suitable HTTP transport for current backend hosting environment.
-// In this standalone version it simply returns http.DefaultTransport.
-func httpTransport(c context.Context) http.RoundTripper {
-	return http.DefaultTransport
 }
 
 // logf logs an info message using Go's standard log package.

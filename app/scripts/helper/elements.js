@@ -110,7 +110,6 @@ IOWA.Elements = (function() {
     IOWA.Elements.FAB = fab;
     IOWA.Elements.Toast = toast;
     IOWA.Elements.LiveStatus = liveStatus;
-    IOWA.Elements.IOLogo = ioLogo;
     IOWA.Elements.Footer = footer;
     IOWA.Elements.GoogleSignIn = signin;
 
@@ -123,6 +122,7 @@ IOWA.Elements = (function() {
     template.pages = IOWA.PAGES; // defined in auto-generated ../pages.js
     template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
     template.fullscreenVideoActive = false;
+    template.mastheadVideoActive = false;
     template.photoGalleryActive = false;
     template.extendedMapActive = false;
     template.pageTransitionDone = false;
@@ -131,17 +131,49 @@ IOWA.Elements = (function() {
     template.selectedCity = null;
     template.offsiteMarkerResults = [];
     template.countdownEnded = false;
+
+    // Sign-in defaults.
     template.isSignedIn = false;
     template.currentUser = null;
+
+    // Videos page defaults.
+    template.videoList = [];
+    template.filteredVideoList = [];
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
       'bg-medium-grey': '#CFD8DC',
-      'bg-dark-grey': '#455A64'
+      'bg-dark-grey': '#455A64',
+      'bg-photo': '#455A64'
     };
 
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
+
+    template.filterThemes = [
+      'Develop & Design',
+      'Engage & Earn',
+      "What's Next"
+    ];
+
+    template.filterTopics = [
+      'All',
+      'Accessibility',
+      'Android',
+      'Audience Growth',
+      'Auto',
+      'Chrome / Web',
+      'Polymer',
+      'Design',
+      'Earn',
+      'Games',
+      'Google Play',
+      'Location',
+      'Search',
+      'Tools & APIs',
+      'TV & Living Room',
+      'Wearables'
+    ];
 
     template.scrollLock = function(enable) {
       document.body.classList.toggle('noscroll', enable);
@@ -257,6 +289,27 @@ IOWA.Elements = (function() {
       });
     };
 
+    template.openVideo = function(e, detail, sender) {
+      this.currentCard = sender;
+      this.fullscreenVideoActive = true; // Active the placeholder template.
+
+      IOWA.Analytics.trackEvent('video', 'watch', sender.getAttribute('data-videoid'));
+
+      // Wait one rAF for template to have stamped.
+      this.async(function() {
+        var videoContainer = document.querySelector('.fullvideo__container');
+        var video = videoContainer.querySelector('google-youtube');
+
+        video.addEventListener('google-youtube-ready', function(e) {
+          video.videoid = sender.getAttribute('data-videoid'); // IE10 doesn't support .dataset.
+          this.cardVideoTakeover(this.currentCard);
+        }.bind(this));
+
+        var thumbnail = videoContainer.querySelector('.fullvideo_thumbnail');
+        thumbnail.src = sender.getAttribute('data-videoimg'); // IE10 doesn't support .dataset.
+      });
+    };
+
     template.openShareWindow = function(e, detail, sender) {
       e.preventDefault();
 
@@ -317,6 +370,14 @@ IOWA.Elements = (function() {
 
     template.signOut = function() {
       IOWA.Elements.GoogleSignIn.signOut();
+    };
+
+    template.updateNotifyUser = function(e, detail, sender) {
+      var notify = sender.checked;
+
+      // TODO(jeffy)
+      // 1. If the user hasn't enabled notifications yet, go through permission flow.
+      // 2. enabled/disabled notifications based on `notify`.
     };
 
     template.addEventListener('template-bound', updateElements);

@@ -1,0 +1,214 @@
+{% define "title" %}Videos{% end %}
+
+{% define "mastheadBgClass" %}bg-photo{% end %}
+
+{% define "masthead" %}
+<div class="photo__masthead" fit>
+  <div class="card__photo--stage" layout vertical center-center>
+    <div class="play__button__container" on-tap="{{openMastheadVideo}}" data-link-track="video-recap-watch">
+      <h5>Watch the 2014 recap video</h5>
+    </div>
+  </div>
+</div>
+{% end %}
+
+{% define "content" %}
+<core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
+  <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video"></paper-icon-button>
+  <span flex>Videos</span>
+</core-toolbar>
+
+<paper-dialog transition="core-transition-center" backdrop layered="false"
+              on-core-overlay-close-completed="{{closeMastheadVideo}}">
+  <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close dialog"></paper-icon-button>
+  <template if="{{mastheadVideoActive}}">
+    <div class="fullvideo__container" fit>
+      <google-youtube videoid="ksvdvCDO7pA" fluid
+          autohide="1" controls="2" modestbranding="1" showinfo="0"
+          iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
+    </div>
+  </template>
+</paper-dialog>
+
+<section class="page__section page__section--banner bg-dark-grey slide-up">
+  <div class="card__container">
+    <h1>Videos</h1>
+  </div>
+</section>
+
+<div class="slide-up-delay">
+
+  <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+
+    <div class="videolist__wrapper" layout vertical flex two relative>
+
+      <core-list data="{{filteredVideoList}}" selectionEnabled="false" height="600" fit>
+        <template>
+          <div class="item">
+            <div class="card card__video js-experiment-visualizer"
+                 data-videoid="{{filteredVideoList[index].id}}"
+                 data-videoimg="{{filteredVideoList[index].thumbnailUrl}}"
+                 on-tap="{{openVideo}}">
+              <div class="card__photo" relative>
+                <core-image _src="{{filteredVideoList[index].thumbnailUrl}}"
+                            load?="{{!!filteredVideoList[index]}}" sizing="cover" preload
+                            placeholder="images/io15-color.png" fade fit></core-image>
+              </div>
+              <div class="card-content">
+                <img src="images/play-video-button.png"
+                     class="play__button play__button--card" title="Play video" alt="Play video">
+                <div class="video-title" title="{{filteredVideoList[index].title}}">{{filteredVideoList[index].title}}&nbsp;</div>
+                <div class="video-author" hidden?="{{!filteredVideoList[index].speakers}}">{{filteredVideoList[index].speakers}}&nbsp;</div>
+              </div>
+            </div>
+          </div>
+          <div class="divider"></div>
+        </template>
+      </core-list>
+
+    </div>
+
+    <paper-dropdown-menu label="Filter" class="card--filters" hidden?="{{!isPhoneSize}}">
+      <paper-dropdown valign="top" halign="left" class="dropdown">
+        <core-menu class="menu" selected="0">
+          <paper-item>DevByte</paper-item>
+          <paper-item disabled>Sessions</paper-item>
+        </core-menu>
+      </paper-dropdown>
+    </paper-dropdown-menu>
+
+    <div id="filterbox" class="card card--filters js-experiment-visualizer" flex?="{{!isPhoneSize}}" hidden?="{{isPhoneSize}}">
+      <div class="card-content">
+        <h4>Filter</h4>
+      </div>
+      <div class="card-content">
+
+        <div class="filter-rows">
+          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
+            <paper-radio-button layout horizontal center name="DevByte" label="DevByte" checked></paper-radio-button>
+            <paper-radio-button layout horizontal center name="Session" label="Session" disabled></paper-radio-button>
+          </paper-radio-group>
+        </div>
+
+        <!-- <div class="filter-rows">
+          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
+            <template repeat="{{theme in filterThemes}}">
+              <paper-radio-button layout horizontal center name="{{theme}}" label="{{theme}}"></paper-radio-button>
+            </template>
+          </paper-radio-group>
+        </div> -->
+
+        <div class="filter-rows">
+          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
+            <template repeat="{{topic in filterTopics}}">
+              <paper-radio-button layout horizontal center name="{{topic}}" label="{{topic}}"></paper-radio-button>
+            </template>
+          </paper-radio-group>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<template id="video-template" if="{{fullscreenVideoActive}}">
+  <div class="fullvideo__container" fit hidden>
+    <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch video" fit>
+    <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
+                    autohide="1" controls="2" modestbranding="1" showinfo="0"
+                    iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
+  </div>
+</template>
+
+<script>
+(function() {
+
+  function fetchVideos(callback) {
+    var xhr = new XMLHttpRequest();
+    // TODO(ericbidelman): update to real API endpoint when it's ready.
+    var url = '//storage.googleapis.com/iosched-updater-dev.appspot.com/session_data_v2.696.json';
+    xhr.open('GET', url);
+    xhr.onload = function(e) {
+      if (e.target.status == 200) {
+        callback(JSON.parse(e.target.response).video_library);
+      }
+    };
+    xhr.send();
+  }
+
+  function onPageTransitionDone_(e) {
+    document.removeEventListener('page-transition-done', onPageTransitionDone_);
+
+    fetchVideos(function(videos) {
+      IOWA.Elements.Template.videoList = videos;
+      IOWA.Elements.Template.filteredVideoList = videos;
+    });
+  }
+
+  // Page-specific JS that runs when this page is loaded for the first time.
+  function initPage() {
+    var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+
+    if (page.hasBeenLoaded) {
+      return;
+    }
+
+    page.load = function() {
+      // Reset template variables for when revisiting the page.
+      IOWA.Elements.Template.mastheadVideoActive = false;
+      IOWA.Elements.Template.filteredVideoList = IOWA.Elements.Template.videoList; // reset filter.
+
+      // Don't re-fetch videos when navigating back to this page.
+      if (IOWA.Elements.Template.videoList.length) {
+        return;
+      }
+
+      document.addEventListener('page-transition-done', onPageTransitionDone_);
+    };
+
+    IOWA.Elements.Template.closeMastheadVideo = function(e, detail, sender) {
+      IOWA.Elements.Template.mastheadVideoActive = false;
+    };
+
+    IOWA.Elements.Template.openMastheadVideo = function(e, detail, sender) {
+      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+
+      this.mastheadVideoActive = true; // stamp template
+      IOWA.Elements.Main.querySelector('paper-dialog').toggle();
+    };
+
+    IOWA.Elements.Template.onVideoFilter = function(e, detail, sender) {
+      e.stopPropagation();
+      if (detail.isSelected) {
+        if (sender.selected == 'All') {
+          this.filteredVideoList = this.videoList;
+          return;
+        }
+
+        var videos = IOWA.Elements.Template.videoList;
+        this.filteredVideoList = videos.filter(function(item) {
+          return item.topic === sender.selected;
+        });
+      }
+    };
+
+    page.load(); // Run load callback on page load.
+    page.hasBeenLoaded = true;
+  }
+
+  // IE will be "loading" at this point. Other browsers will already be "complete".
+  if (document.readyState !== 'loading') {
+    initPage();
+  }
+
+  // Necessary for IE's lack of native <template>
+  // https://github.com/GoogleChrome/ioweb2015/issues/599
+  window._initPage = initPage;
+
+})();
+</script>
+
+{% end %}

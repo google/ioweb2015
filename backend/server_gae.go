@@ -20,7 +20,14 @@ func init() {
 	if err := initConfig("server.config", ""); err != nil {
 		panic("initConfig: " + err.Error())
 	}
+
+	// use built-in memcache service
 	cache = &gaeMemcache{}
+	// apps hosted on GAE use a different HTTP transport
+	httpTransport = func(c context.Context) http.RoundTripper {
+		return &urlfetch.Transport{Context: c}
+	}
+	// staging instance is accessed only by whitelisted people/domains
 	if isStaging() {
 		wrapHandler = checkWhitelist
 	}
@@ -67,12 +74,6 @@ func checkWhitelist(h http.Handler) http.Handler {
 // newContext returns a context of the in-flight request r.
 func newContext(r *http.Request) context.Context {
 	return appengine.NewContext(r)
-}
-
-// httpTransport returns a suitable HTTP transport for current backend hosting environment.
-// In this GAE-hosted version it uses appengine/urlfetch#Transport.
-func httpTransport(c context.Context) http.RoundTripper {
-	return &urlfetch.Transport{Context: c}
 }
 
 // logf logs an info message using appengine's context.

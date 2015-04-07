@@ -65,11 +65,11 @@
             <div class="customize__area">
               <core-label layout inline horizontal center>
                 Width (px)
-                <paper-slider min="320" max="1000" value="875" editable pin immediateValue="{{gadgetWidth}}" for></paper-slider>
+                <paper-slider min="320" max="1000" value="875" editable pin immediateValue="{{gadgetWidth}}" aria-valuetext="{{gadgetWidth}} pixels" for></paper-slider>
               </core-label>
               <core-label layout inline horizontal center>
                 Height (px)
-                <paper-slider min="300" max="1000" value="450" editable pin immediateValue="{{gadgetHeight}}" for></paper-slider>
+                <paper-slider min="300" max="1000" value="450" editable pin immediateValue="{{gadgetHeight}}" aria-valuetext="{{gadgetHeight}} pixels" for></paper-slider>
               </core-label>
             </div>
 
@@ -94,6 +94,8 @@
   // Page-specific JS that runs when this page is loaded for the first time.
   function initPage() {
     var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+    var RADIO_SELECTOR = '.customize__area paper-radio-button';
+    var SLIDER_SELECTOR = '.customize__area paper-slider';
 
     if (page.hasBeenLoaded) {
       return;
@@ -103,6 +105,11 @@
       // Reset template variables for when revisiting the page.
       IOWA.Elements.Template.selectedGadgetVideoSize = 'small';
       IOWA.Elements.Template.selectedGadgetLayout = 'both';
+      // Wait 1 rAF for template to stamp.
+      IOWA.Elements.Template.async(function() {
+        IOWA.A11y.addFocusStates(RADIO_SELECTOR);
+        IOWA.A11y.addFocusStates(SLIDER_SELECTOR);
+      });
     };
 
     IOWA.Elements.Template.updateIframeCode = function(e, detail, sender) {
@@ -130,6 +137,11 @@
 
     IOWA.Elements.Template.toggleGadgetFaq = function(e, detail, sender) {
       IOWA.Elements.Main.querySelector('#gadgetfaq').toggle();
+    };
+
+    page.unload = function() {
+      IOWA.A11y.removeFocusStates(RADIO_SELECTOR);
+      IOWA.A11y.removeFocusStates(SLIDER_SELECTOR);
     };
 
     page.load(); // Run load callback on page load.

@@ -277,7 +277,8 @@ limitations under the License.
               </a>
             </paper-tab>
           </paper-tabs>
-          <a href="#" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign-in</a>
+          <a href="#" class="button-link" data-track-link="nav-signin"
+                      on-click="{{signIn}}" hidden?="{{currentUser}}" disabled>Sign-in</a>
           <template if="{{currentUser}}">
             <img _src="{{currentUser.picture}}" class="profilepic">
             <paper-menu-button>
@@ -290,10 +291,10 @@ limitations under the License.
                     <div class="settings-email">{{currentUser.email}}</div>
                   </div>
                 </div>
-                <div class="card-content">
+                <div class="card-content notification__feature">
                   <h4>Notifications</h4>
                   <core-label horizontal layout>
-                    <paper-checkbox checked autoFocus for></paper-checkbox>
+                    <paper-checkbox checked?="{{currentUser.notify}}" autoFocus for on-tap="{{updateNotifyUser}}"></paper-checkbox>
                     <h5>I want to receive notifications from the Google I/O 2015 website.</h5>
                   </core-label>
                   <p>If this option is deselected, I understand I won't be notified when:</p>
@@ -317,16 +318,21 @@ limitations under the License.
                       transition="core-transition-center" autoCloseDisabled backdrop>
           <div class="card-content">
             <h4 class="card__title">Sign in</h4>
-            <p>By signing-in, you can create a customized I/O schedule and receive reminders shortly before the sessions you bookmark start.</p>
-            <p>Once signed-in, you can also choose to be notified when:</p>
-            <ul>
-              <li>I/O is about to start</li>
-              <li>New I/O Extended events register near your location</li>
-              <li>Specific session videos are made available</li>
-            </ul>
+            <p>By signing in to the 2015 I/O web app, you can create a customized I/O schedule.</p>
+            <div class="notification__feature">
+              <p>Once signed-in, you can choose to receive notifications on this device when:</p>
+              <ul>
+                <li>New I/O Extended events register near your location</li>
+                <li>I/O is about to start</li>
+                <li>Sessions added to My Schedule are about to start</li>
+                <li>Specific session videos are made available</li>
+              </ul>
+              <p><b>Note</b>: Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
+            </div>
           </div>
-          <div class="card-content">
-            <a href="#" data-track-link="signin-intro" core-overlay-toggle>Got it</a>
+          <div class="card-content link-spacing">
+            <a href="#" data-track-link="signin-intro-signin" on-click="{{signIn}}" core-overlay-toggle>Sign in</a>
+            <a href="#" data-track-link="signin-intro-later" core-overlay-toggle>Maybe later</a>
           </div>
         </core-overlay>
 
@@ -371,7 +377,7 @@ limitations under the License.
               </paper-dropdown>
             </paper-dropdown-menu>
             <span><a href="https://plus.google.com/u/0/communities/105113874753230740413" target="_blank" data-track-link="footer-community">I/O Community</a></span>
-            <span><a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Terms</a></span>
+            <span><a href="https://www.google.com/intl/en/policies/privacy/" target="_blank">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Terms</a></span>
             <span class="footer-share-links--bottom">
               <a href="https://plus.google.com/+GoogleDevelopers" target="_blank" class="share-icon"  data-track-link="footer-share-gplus" data-share-type="gplus" on-click="{{openShareWindow}}"><core-icon icon="io:post-gplus"></core-icon></a>
               <a href="https://twitter.com/googledevs" target="_blank" class="share-icon" data-track-link="footer-share-twitter" data-share-type="twitter" on-click="{{openShareWindow}}"><core-icon icon="io:post-twitter"></core-icon></a>
@@ -396,7 +402,7 @@ limitations under the License.
   Append messages from the toast to this aria-live region to have
   them read aloud
 -->
-<div id="live-status" role="alert" aria-live="assertive" aria-atomic="true">
+<div id="live-status" role="status" aria-live="polite" aria-atomic="true">
 </div>
 
 <!-- build:js scripts/site-scripts.js -->

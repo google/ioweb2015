@@ -1,26 +1,120 @@
 package main
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"fmt"
+	"math/big"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
+)
+
+const (
+	testUserID       = "user-12345"
+	testClientID     = "test-client-id"
+	testClientSecret = "test-client-secret"
+)
+
+var (
+	testIDToken   string
+	testJWSKey    []byte
+	testJWSCert   []byte
+	testJWSCertID = "test-cert"
 )
 
 func TestMain(m *testing.M) {
+	cache = newMemoryCache()
+	testJWSKey, testJWSCert = jwsTestKey(time.Now(), time.Now().Add(24*time.Hour))
+
+	token := jwt.New(jwt.GetSigningMethod("RS256"))
+	token.Header["kid"] = testJWSCertID
+	token.Claims = map[string]interface{}{
+		"iss": "accounts.google.com",
+		"exp": time.Now().Add(2 * time.Hour).Unix(),
+		"aud": testClientID,
+		"azp": testClientID,
+		"sub": testUserID,
+	}
+	var err error
+	testIDToken, err = token.SignedString(testJWSKey)
+	if err != nil {
+		panic("token.SignedString: " + err.Error())
+	}
+
+	cert := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Add("Cache-Control", "max-age=86400")
+		w.Header().Set("Age", "0")
+		fmt.Fprintf(w, `{"%s": %q}`, testJWSCertID, testJWSCert)
+	}))
+	defer cert.Close()
+
+	tokeninfo := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.FormValue("access_token") == "" {
+			http.Error(w, "no access token found", http.StatusBadRequest)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{
+			"issued_to": %q,
+			"user_id": %q,
+			"expires_in": 3600
+		}`, config.Google.Auth.Client, testUserID)
+	}))
+	defer tokeninfo.Close()
+
 	config.Dir = "app"
 	config.Env = "dev"
 	config.Prefix = "/myprefix"
-	cache = newMemoryCache()
+
+	config.Google.Auth.Client = testClientID
+	config.Google.Auth.Secret = testClientSecret
+	config.Google.VerifyURL = tokeninfo.URL
+	config.Google.CertURL = cert.URL
+
 	os.Exit(m.Run())
 }
 
-func overrideEnv(env string) func() {
-	orig := config.Env
-	config.Env = env
-	return func() { config.Env = orig }
+func preserveConfig() func() {
+	orig := config
+	return func() { config = orig }
 }
 
-func overridePrefix(pref string) func() {
-	orig := config.Prefix
-	config.Prefix = pref
-	return func() { config.Prefix = orig }
+func jwsTestKey(notBefore, notAfter time.Time) (pemKey []byte, pemCert []byte) {
+	key, err := rsa.GenerateKey(rand.Reader, 1024)
+	if err != nil {
+		panic(fmt.Sprintf("rsa.GenerateKey: %v", err))
+	}
+	pemKey = pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(key),
+	})
+
+	tcert := x509.Certificate{
+		SerialNumber:          big.NewInt(1),
+		Subject:               pkix.Name{CommonName: "www.example.org"},
+		Issuer:                pkix.Name{CommonName: "www.example.org"},
+		NotBefore:             notBefore,
+		NotAfter:              notAfter,
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		BasicConstraintsValid: true,
+	}
+
+	var cert []byte
+	cert, err = x509.CreateCertificate(rand.Reader, &tcert, &tcert, &key.PublicKey, key)
+	if err != nil {
+		panic(fmt.Sprintf("x509.CreateCertificate: %v", err))
+	}
+	pemCert = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
+
+	return pemKey, pemCert
 }

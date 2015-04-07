@@ -1,0 +1,39 @@
+@import 'color';
+
+/* Focus states for paper-radio-buttons */
+paper-radio-button::shadow #radioContainer::after {
+  content: '';
+  background: rgba(0, 0, 0, 0.12);
+  display: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  position: absolute;
+  margin-left: -8px;
+  margin-top: -8px;
+}
+
+paper-radio-button[checked]::shadow #radioContainer::after {
+  background: rgba($color-form-controls, 0.12);
+}
+
+paper-radio-button.focused::shadow #radioContainer::after {
+  display: block;
+}
+
+/* Focus states for paper-sliders */
+paper-slider::shadow #sliderKnob::after {
+  content: '';
+  background: rgba($color-form-controls, 0.12);
+  display: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  position: absolute;
+  margin-left: -22px;
+}
+
+paper-slider.focused::shadow #sliderKnob::after {
+  background: rgba($color-form-controls, 0.12);
+  display: block;
+}

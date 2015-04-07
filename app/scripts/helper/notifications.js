@@ -143,11 +143,18 @@ IOWA.Notifications = IOWA.Notifications || (function() {
       .catch(IOWA.Util.reportError);
   };
 
+  var init = function() {
+    if (!isSupported) {
+      document.body.classList.add('nosupport-notifications');
+    }
+  };
+
   return {
     isExistingSubscriptionPromise: isExistingSubscriptionPromise,
     isNotifyEnabledPromise: isNotifyEnabledPromise,
     isSupported: isSupported,
     subscribePromise: subscribePromise,
-    unsubscribePromise: unsubscribePromise
+    unsubscribePromise: unsubscribePromise,
+    init: init
   };
 })();

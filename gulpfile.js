@@ -141,6 +141,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/*.{html,txt,ico}',
     APP_DIR + '/manifest.json',
     APP_DIR + '/clear_cache.html',
+    APP_DIR + '/embed.html',
     APP_DIR + '/sitemap.xml',
     APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
@@ -447,8 +448,7 @@ function buildBackend(cb) {
 
 // Run backend tests
 function testBackend() {
-  var args = ['test', '-v'];
-  return spawn('go', args, {cwd: BACKEND_DIR, stdio: 'inherit'});
+  return spawn('go', ['test'], {cwd: BACKEND_DIR, stdio: 'inherit'});
 }
 
 // Start GAE-based backend server with backendDir as the app root directory.

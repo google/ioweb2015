@@ -21,6 +21,7 @@
   function afterImports() {
     IOWA.Elements.init();
     IOWA.Router.init();
+    IOWA.Notifications.init();
 
     CoreStyle.g.paperInput.labelColor = '#009688';
     CoreStyle.g.paperInput.focusedColor = '#009688';

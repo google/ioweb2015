@@ -174,7 +174,8 @@ Fired when the signed in state of the user changes.
           name: profile.getName(),
           image: profile.getImageUrl(),
           email: profile.getEmail(),
-          tokenResponse: this.currentUser.getAuthResponse()
+          tokenResponse: this.currentUser.getAuthResponse(),
+          notify: false
         }
         this.fire('signin-change', {
           signedIn: true,
@@ -197,6 +198,32 @@ Fired when the signed in state of the user changes.
 </polymer-element>
  -->
 
+<!--
+`<google-signin>` uses Google Sign-in 1.0 to authorize users using Google's
+OAuth 2.0 flow. See https://developers.google.com/identity/sign-in/web/sign-in.
+
+#### Example
+
+    <google-signin clientId="..." scopes="..."></google-signin>
+
+@element google-signin
+-->
+<!--
+Fired when the signed in state of the user changes.
+
+@event signin-change
+@param {Object} detail
+@param {Object} detail.signedIn True if the user is authenticated.
+@param {Object} detail.user The current user.
+@param {Object} detail.response The current user's token response.
+-->
+<!--
+Fired when sign in fails for some reason.
+
+@event signin-fail
+@param {Object} detail
+@param {Object} detail.error The reason for sign in failure.
+-->
 <polymer-element name="google-signin" attributes="clientId scopes signedIn load">
 <template>
   <style>
@@ -317,27 +344,16 @@ Fired when the signed in state of the user changes.
     signinChangedHandler: function(authResult) {
 
       if (authResult && !authResult.error) {
-
         // Only send one-time code to server after the consent screen (first login).
         if (authResult.status.signed_in && authResult.code &&
             authResult.status.method === 'PROMPT') {
-          this.sendCodeToServer(authResult.code);
+          this.sendCodeToServer(authResult.code, this.getBasicProfile.bind(this));
+        } else {
+          this.getBasicProfile();
         }
-
-        // Get user's basic profile info, pic, email.
-        gapi.client.load('oauth2', 'v2', function () {
-          gapi.client.oauth2.userinfo.get().execute(function(resp) {
-            this.user = resp;
-            this.user.tokenResponse = gapi.auth.getToken();
-
-            this.fire('signin-change', {signedIn: true, user: this.user});
-
-            this.signedIn = true;
-
-          }.bind(this));
-        }.bind(this));
-
       } else {
+        this.fire('signin-fail', {error: authResult.error});
+
         switch (authResult.error) {
           case 'user_signed_out':
             this.signedIn = false;
@@ -354,7 +370,22 @@ Fired when the signed in state of the user changes.
       }
     },
 
-    sendCodeToServer: function(oneTimeCode) {
+    getBasicProfile: function() {
+      // Get user's basic profile info, pic, email.
+      gapi.client.load('oauth2', 'v2', function () {
+        gapi.client.oauth2.userinfo.get().execute(function(resp) {
+          this.user = resp;
+          this.user.tokenResponse = gapi.auth.getToken();
+
+          this.fire('signin-change', {signedIn: true, user: this.user});
+
+          this.signedIn = true;
+
+        }.bind(this));
+      }.bind(this));
+    },
+
+    sendCodeToServer: function(oneTimeCode, callback) {
       var xhr = new XMLHttpRequest();
       xhr.open('POST', AUTH_ENDPOINT);
 
@@ -364,7 +395,12 @@ Fired when the signed in state of the user changes.
       xhr.setRequestHeader('Content-Type', 'application/json');
 
       xhr.onload = function(e) {
-        // TODO(ericbidelman): handle response.
+        // TODO(ericbidelman): remove 404 check when endpoint is in.
+        if (e.target.status === 200 || e.target.status === 404) {
+          callback();
+        } else {
+          console.error('Sign-in error: one-time token was not sent to server');
+        }
       };
 
       xhr.send(JSON.stringify({code: oneTimeCode}));

@@ -60,6 +60,9 @@
   &.bg-dark-grey {
     color: $color-bluegrey-100;
   }
+  &.bg-photo {
+    color: white;
+  }
 
   core-toolbar {
     .io-logo {
@@ -145,6 +148,11 @@ core-drawer-panel {
 
 #navbar {
   background-color: transparent;
+  height: $navbarHeight;
+
+  &.core-narrow {
+    height: $navbarHeightMobile;
+  }
 
   paper-tabs {
     display: none;
