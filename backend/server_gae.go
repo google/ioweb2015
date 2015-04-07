@@ -7,6 +7,7 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"golang.org/x/net/context"
 
@@ -25,7 +26,10 @@ func init() {
 	cache = &gaeMemcache{}
 	// apps hosted on GAE use a different HTTP transport
 	httpTransport = func(c context.Context) http.RoundTripper {
-		return &urlfetch.Transport{Context: c}
+		return &urlfetch.Transport{
+			Context:  c,
+			Deadline: 3 * time.Second,
+		}
 	}
 	// staging instance is accessed only by whitelisted people/domains
 	if isStaging() {

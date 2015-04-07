@@ -15,12 +15,17 @@ var httpTransport = func(_ context.Context) http.RoundTripper {
 	return http.DefaultTransport
 }
 
-// httpClient create a new HTTP client using httpTransport().
+// httpClient create a new HTTP client using httpTransport(),
+// setting request timeout to 3 seconds if supported.
 func httpClient(c context.Context) *http.Client {
-	return &http.Client{
-		Transport: httpTransport(c),
-		Timeout:   5 * time.Second,
+	cl := &http.Client{Transport: httpTransport(c)}
+	type canceler interface {
+		CancelRequest(*http.Request)
 	}
+	if _, ok := cl.Transport.(canceler); ok {
+		cl.Timeout = 3 * time.Second
+	}
+	return cl
 }
 
 // oauth2Client creates a new HTTP client using oauth2.Transport,
