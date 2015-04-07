@@ -289,8 +289,11 @@ Fired when sign in fails for some reason.
     },
 
     created: function() {
-      this.cookiePolicy = window.ENV === 'dev' ?
-          'single_host_origin' : location.protocol + '//' + location.host;
+      if (window.ENV === 'dev' || location.hostname === 'localhost') {
+        this.cookiePolicy = 'single_host_origin';
+      } else {
+        this.cookiePolicy = location.protocol + '//' + location.host;
+      }
     },
 
     onLoadAuth: function(e, detail, sender) {
