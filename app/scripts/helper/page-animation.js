@@ -117,7 +117,7 @@ IOWA.PageAnimation = (function() {
     return new AnimationGroup([
       sectionSlideOut(IOWA.Elements.Main),
       elementFadeOut(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
-      elementFadeOut(IOWA.Elements.IOLogoLarge, CONTENT_SLIDE_OPTIONS),
+      elementFadeOut(IOWA.Elements.MastheadMetaCorner, CONTENT_SLIDE_OPTIONS),
       elementFadeOut(IOWA.Elements.Footer, {duration: 0}) // Hide instantly.
     ]);
   }
@@ -131,6 +131,7 @@ IOWA.PageAnimation = (function() {
   function contentSlideIn() {
     return new AnimationGroup([
       sectionSlideIn(IOWA.Elements.Main),
+      elementFadeIn(IOWA.Elements.MastheadMetaCorner, CONTENT_SLIDE_OPTIONS),
       elementFadeIn(IOWA.Elements.Footer, CONTENT_SLIDE_DELAY_OPTIONS)
     ]);
   }
@@ -216,7 +217,6 @@ IOWA.PageAnimation = (function() {
     var animationGroup =  new AnimationGroup([
       contentSlideIn(),
       elementFadeIn(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
-      elementFadeIn(IOWA.Elements.IOLogoLarge, CONTENT_SLIDE_OPTIONS)
     ], CONTENT_SLIDE_OPTIONS);
     return animationGroup;
   }
@@ -268,7 +268,6 @@ IOWA.PageAnimation = (function() {
     return new AnimationSequence([
       animationGroup,
       elementFadeOut(IOWA.Elements.Ripple, {duration: 0}), // Hide instantly.
-      elementFadeOut(IOWA.Elements.IOLogoLarge, {duration: 0}), // Same.
       elementFadeOut(IOWA.Elements.Footer, {duration: 0}),  // Same.
       elementFadeOut(IOWA.Elements.MastheadMeta, {duration: 0}) // Same.
     ]);

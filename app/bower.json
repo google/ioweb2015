@@ -41,7 +41,6 @@
     "google-apis": "GoogleWebComponents/google-apis#^0.4.4",
     "google-youtube": "GoogleWebComponents/google-youtube#^1.0.6",
     "google-map": "GoogleWebComponents/google-map#^0.4.2",
-    "i18n-msg": "ebidel/i18n-msg#^0.0.2",
     "paper-button": "Polymer/paper-button#^0.5.5",
     "paper-checkbox": "Polymer/paper-checkbox#~0.5.5",
     "paper-icon-button": "Polymer/paper-icon-button#^0.5.5",
