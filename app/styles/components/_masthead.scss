@@ -189,6 +189,8 @@ core-drawer-panel {
 
 #signin-nav-elements {
   background-color: transparent;
+  /* Should match Polymer/paper-tabs/paper-tab.css#L17 */
+  transition: color .1s cubic-bezier(0.4, 0.0, 1, 1);
 }
 
 #signin-settings-panel,
