@@ -126,6 +126,16 @@ overlay-host::shadow {
       color: inherit;
     }
   }
+  .session__detail::shadow #scroller {
+    width: 100%;
+    padding: 0;
+  }
+
+  @media (min-width: $tablet-breakpoint-min) {
+    .session__detail::shadow #scroller {
+      width: 768px;
+    }
+  }
 }
 
 #page-videos {
