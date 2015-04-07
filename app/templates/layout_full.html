@@ -227,8 +227,10 @@ limitations under the License.
 
     <template is="auto-binding" id="t">
 
-      <!-- <google-signin scopes="https://www.googleapis.com/auth/drive.appfolder" user="{{currentUser}}"></google-signin> -->
-      <google-signin clientId="608394197750-o7mgghf5dven1havuj43n902gansj0h9.apps.googleusercontent.com"
+      <!-- <google-signin clientId="{% .ClientID %}"
+                     scopes="https://www.googleapis.com/auth/drive.appfolder"
+                     user="{{currentUser}}"></google-signin> -->
+      <google-signin clientId="{% .ClientID %}"
                      scopes="profile email https://www.googleapis.com/auth/drive.appfolder"
                      user="{{currentUser}}"></google-signin>
 
