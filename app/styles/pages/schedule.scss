@@ -75,7 +75,104 @@ core-icon[icon="schedule"] {
   white-space: nowrap;
 }
 
+.session__detail {
+  $lineHeight: 32px;
+
+  color: $color-link-grey;
+  font-size: 14px;
+
+  paper-fab {
+    background: #fff;
+    color: inherit;
+    position: absolute;
+    right: 16px;
+    bottom: calc(-40px/2);
+
+    &.active {
+      color: white;
+      background-color: $color-cyan-400;
+    }
+  }
+  paper-icon-button {
+    z-index: 10;
+    color: white;
+    position: absolute;
+    top: $mobileKeyline;
+    left: $mobileKeyline;
+  }
+  .card__photo {
+    height: 203px;
+  }
+  .session__info__section {
+    padding: $tabletKeyline;
+    &:last-child {
+      border-top: 1px solid $color-light-grey-border;
+      text-transform: uppercase;
+    }
+  }
+  .session__desc {
+    margin: $tabletKeyline 0;
+  }
+  .session__title {
+    color: #000;
+  }
+  .session__categories {
+    color: $color-session-detail-light-grey;
+    font-weight: 400;
+    line-height: $lineHeight;
+  }
+  .session__time {
+    color: $color-link-grey;
+    font-weight: 400;
+    line-height: $lineHeight;
+  }
+  .session__livestream {
+    color: $color-session-detail-light-grey;
+    text-align: right;
+  }
+  .session__social {
+    line-height: $lineHeight;
+
+    a {
+      color: inherit;
+    }
+    .share-icon {
+      margin-right: 12px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.session__speakers {
+  border-top: 1px solid $color-light-grey-border;
+
+  .profilepic {
+    height: 56px;
+    width: 56px;
+    margin-right: $tabletKeyline;
+  }
+
+  .speaker__card {
+    margin-top: $desktopKeyline;
+  }
+}
+
+.speaker__info {
+  .speaker__name {
+    color: #000;
+    font-size: 16px;
+  }
+  .speaker__desc {
+    padding: $mobileKeyline 0;
+  }
+}
+
 @media (max-width: $phone-breakpoint-max) {
+  .session__detail {
+    margin: 0;
+  }
   .page__section--top {
     margin-top: $mobileKeyline;
   }
@@ -102,6 +199,23 @@ core-icon[icon="schedule"] {
   }
   .schedule-rows {
     width: 300px; // Needed for IE11, to ensure the flexed children have proper widths.
+  }
+  .session__detail {
+    .card__photo {
+      height: 430px;
+    }
+    paper-fab {
+      bottom: calc(-56px/2); // FAB height / 2
+    }
+  }
+  .session__speakers {
+    .profilepic {
+      height: 72px;
+      width: 72px;
+    }
+    .speaker__card {
+      width: 50%;
+    }
   }
 }
 

@@ -50,7 +50,7 @@
                  data-videoimg="{{filteredVideoList[index].thumbnailUrl}}"
                  on-tap="{{openVideo}}">
               <div class="card__photo" relative>
-                <core-image _src="{{filteredVideoList[index].thumbnailUrl}}"
+                <core-image src="{{filteredVideoList[index].thumbnailUrl}}"
                             load?="{{!!filteredVideoList[index]}}" sizing="cover" preload
                             placeholder="images/io15-color.png" fade fit></core-image>
               </div>
