@@ -136,9 +136,35 @@ paper-dropdown-menu {
   font-size: 14px;
 }
 
+.preroll {
+  background-color: $color-bluegrey-700;
+  color: #fff;
+  padding: $tabletKeyline;
+
+  h2, h3 {
+    color: inherit;
+  }
+
+  h2 {
+    margin-top: $tabletKeyline;
+  }
+
+  h3 {
+    color: $color-cyan-400;
+  }
+
+  img {
+    width: 200px;
+    height: auto;
+  }
+}
+
 @media (max-width: $phone-breakpoint-max) {
   #social-feed {
     flex-shrink: 0;
+  }
+  .preroll {
+    min-height: 230px;
   }
 }
 

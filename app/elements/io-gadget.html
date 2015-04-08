@@ -43,38 +43,74 @@ The `<io-gadget>` element renders a youtube video + social feed.
     <section id="gadget-content" layout horizontal vertical?="{{isPhoneSize}}" fit>
 
       <template if="{{!noVideo}}">
-        <div class="card card--livestream" layout vertical auto-vertical flex two>
-          <div flex class="card__photo" relative>
-            <img src="../images/play-video-button.png"
-                 class="play__button play__button--card"
-                 title="Start watching" alt="Start watching">
 
-            <google-youtube id="video" height="100%" width="100%" fit
-                            videoid="{{selectedVideoId}}" autohide="1"
-                            controls="2" modestbranding="1" showinfo="0"
-                            iv_load_policy="3" rel="0" autoplay="0"
-                            on-google-youtube-ready="{{onVideoReady}}"
-                            on-google-youtube-state-change="{{onStateChange}}"></google-youtube>
-
-          </div>
-          <div class="card-content card--video-meta" layout horizontal center>
-            <div flex>
-              <div class="video-title" title="{{videoTitle}}">{{videoTitle}}&nbsp;</div>
-              <div class="video-author">{{videoAuthor}}</div>
-            </div>
-            <div>
-              <paper-dropdown-menu label="Switch channel">
-                <paper-dropdown valign="bottom" halign="right" class="dropdown">
-                  <core-menu class="menu" valueattr="videoid" selected="{{selectedVideoId}}}">
-                    <template repeat="{{video,i in videoIds}}">
-                      <paper-item videoid="{{video}}">Video {{i + 1}}</paper-item>
-                    </template>
-                  </core-menu>
-                </paper-dropdown>
-              </paper-dropdown-menu>
+        <template if="{{view === VIEWS_.BEFORE}}">
+          <div class="preroll" layout vertical center-center auto-vertical flex two>
+            <img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo">
+            <div layout vertical>
+              <h2>Tune in on May 28, starting at 9AM PDT.</h2>
+              <h3 self-start>#io15</h3>
             </div>
           </div>
-        </div>
+        </template>
+
+        <template if="{{view === VIEWS_.BETWEEN}}">
+          <div class="preroll" layout vertical center-center auto-vertical flex two>
+            <img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo">
+            <div layout vertical>
+              <h2>Tune in again on May 29, starting at 9AM PDT.</h2>
+              <h3 self-start>#io15</h3>
+            </div>
+          </div>
+        </template>
+
+        <template if="{{view === VIEWS_.AFTER}}">
+          <div class="preroll" layout vertical center-center auto-vertical flex two>
+            <img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo">
+            <div layout vertical>
+              <h2>Thanks for another great Google I/O!</h2>
+              <h3 self-start>#io15</h3>
+            </div>
+          </div>
+        </template>
+
+        <template if="{{view === VIEWS_.LIVE}}">
+
+          <div class="card card--livestream" layout vertical auto-vertical flex two>
+            <div flex class="card__photo" relative>
+              <img src="../images/play-video-button.png"
+                   class="play__gbutton play__button--card"
+                   title="Start watching" alt="Start watching">
+
+              <google-youtube id="video" height="100%" width="100%" fit
+                              videoid="{{selectedVideoId}}" autohide="1"
+                              controls="2" modestbranding="1" showinfo="0"
+                              iv_load_policy="3" rel="0" autoplay="0"
+                              on-google-youtube-ready="{{onVideoReady}}"
+                              on-google-youtube-state-change="{{onStateChange}}"></google-youtube>
+
+            </div>
+            <div class="card-content card--video-meta" layout horizontal center>
+              <div flex>
+                <div class="video-title" title="{{videoTitle}}">{{videoTitle}}&nbsp;</div>
+                <div class="video-author">{{videoAuthor}}</div>
+              </div>
+              <div>
+                <paper-dropdown-menu label="Switch channel">
+                  <paper-dropdown valign="bottom" halign="right" class="dropdown">
+                    <core-menu class="menu" valueattr="videoid" selected="{{selectedVideoId}}}">
+                      <template repeat="{{video,i in videoIds}}">
+                        <paper-item videoid="{{video}}">Video {{i + 1}}</paper-item>
+                      </template>
+                    </core-menu>
+                  </paper-dropdown>
+                </paper-dropdown-menu>
+              </div>
+            </div>
+          </div>
+
+        </template>
+
       </template>
 
       <template if="{{!noFeed}}">
@@ -106,6 +142,8 @@ The `<io-gadget>` element renders a youtube video + social feed.
   </template>
   <script>
   (function() {
+
+    var VIEWS_ = {BEFORE: 0, LIVE: 1, BETWEEN: 2, AFTER: 3};
 
     Polymer({
 
@@ -183,9 +221,14 @@ The `<io-gadget>` element renders a youtube video + social feed.
        */
       socialPostUpdateInterval: 30000,
 
-      updateSocialPostsTimeout_: null,
-
-      wasPaused_: false,
+      /**
+       * The view to show.
+       *
+       * @property view
+       * @type number
+       * @default 0
+       */
+      view: null,
 
       /**
        * List of API results.
@@ -194,6 +237,12 @@ The `<io-gadget>` element renders a youtube video + social feed.
        * @type array
        * @default []
        */
+
+      updateSocialPostsTimeout_: null,
+
+      wasPaused_: false,
+
+      VIEWS_: VIEWS_,
 
       created: function() {
         this.socialPosts = [];
@@ -208,6 +257,8 @@ The `<io-gadget>` element renders a youtube video + social feed.
          // Set a timeout to fetch new posts after 30 seconds.
         this.updateSocialPostsTimeout_ = window.setTimeout(
             this.updateSocialPosts.bind(this), this.socialPostUpdateInterval);
+
+        this.setView();
       },
 
       videoIdsChanged: function() {
@@ -215,7 +266,8 @@ The `<io-gadget>` element renders a youtube video + social feed.
       },
 
       updateVideoInfo: function() {
-        var meta = this.$.video.player.getVideoData();
+        var video = this.$['gadget-content'].querySelector('google-youtube');
+        var meta = video.player.getVideoData();
         this.videoTitle = meta.title;
         this.videoAuthor = meta.author;
       },
@@ -225,10 +277,12 @@ The `<io-gadget>` element renders a youtube video + social feed.
       },
 
       onStateChange: function(e, detail) {
+        var video = this.$['gadget-content'].querySelector('google-youtube');
+
         switch (detail.data) {
           case YT.PlayerState.CUED:
             this.wasPaused_ = false;
-            this.$.video.play();
+            video.play();
             break;
           case YT.PlayerState.PAUSED:
             this.wasPaused_ = true;
@@ -244,8 +298,9 @@ The `<io-gadget>` element renders a youtube video + social feed.
       },
 
       selectedVideoIdChanged: function(oldVal, newVal) {
-        if (this.videoIds.indexOf(newVal) !== -1) {
-          this.$.video.play(); // Start auto-playing video when new one was selected.
+        var video = this.$['gadget-content'].querySelector('google-youtube');
+        if (video && this.videoIds.indexOf(newVal) !== -1) {
+          video.play(); // Start auto-playing video when new one was selected.
         }
       },
 
@@ -276,6 +331,44 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
       onOpenSchedule: function(e, detail, sender) {
         IOWA.Analytics.trackEvent('gadget', 'link', 'open-schedule-link');
+      },
+
+      setView: function() {
+        var day1Start = new Date('May 28 2015 08:30:00 GMT-0700 (PDT)');
+        var day1End = new Date('May 28 2015 17:00:00 GMT-0700 (PDT)');
+        var day2Start = new Date('May 29 2015 08:30:00 GMT-0700 (PDT)');
+        var day2End = new Date('May 29 2015 17:00:00 GMT-0700 (PDT)');
+
+        var now = new Date();
+        var offset = 50;
+
+        if (now < day1Start) {
+          this.view = this.VIEWS_.BEFORE;
+          var timeout = (day1Start - now) + offset;
+          if (timeout > 0) {
+            setTimeout(this.setView.bind(this), timeout); // refresh view when I/O starts.
+          }
+        } else if (now > day1Start && now < day1End ||
+                   now > day2Start && now < day2End) {
+          this.view = this.VIEWS_.LIVE;
+          var timeout = (day2Start - (day1End - now)) + offset;
+          if (timeout > 0) {
+            setTimeout(this.setView.bind(this), timeout); // refresh view when day 1 ends.
+          }
+        } else if (now > day1End && now < day2Start) {
+          this.view = this.VIEWS_.BETWEEN;
+          var timeout = (day2Start - now) + offset;
+          if (timeout > 0) {
+            setTimeout(this.setView.bind(this), timeout); // refresh view when day2 starts.
+          }
+        } else if (now > day2End) {
+          this.view = this.VIEWS_.AFTER;
+          var timeout = (day2End - now) + offset;
+          if (timeout > 0) {
+            console.log(timeout)
+            setTimeout(this.setView.bind(this), timeout); // refresh view when day2 ends.
+          }
+        }
       }
 
     });
