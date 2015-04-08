@@ -13,7 +13,7 @@
 {% end %}
 
 {% define "content" %}
-<core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
+<core-toolbar class="navbar__overlay navbar__overlay--video" hidden?="{{!fullscreenVideoActive}}" fit>
   <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video"></paper-icon-button>
   <span flex>Videos</span>
 </core-toolbar>
