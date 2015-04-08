@@ -71,6 +71,10 @@
       display: inline-block;
     }
   }
+
+  .photo__masthead--fullbleed {
+    top: -$navbarHeight;
+  }
 }
 
 .masthead-meta {
@@ -286,6 +290,11 @@ experiment-fab-container {
 }
 
 @media (max-width: $phone-breakpoint-max) {
+  .masthead {
+    .photo__masthead--fullbleed {
+      top: -$navbarHeightMobile;
+    }
+  }
   .masthead-container {
     @include keyline-72l();
 
