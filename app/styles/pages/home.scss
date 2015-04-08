@@ -24,6 +24,11 @@ $name: 'page-home';
 
 ##{$name} {
 
+.masthead {
+  min-height: 600px;
+  height: 600px;
+}
+
 .masthead-container {
   max-width: 100% !important;
   .io-logo {
@@ -107,18 +112,18 @@ $name: 'page-home';
 }
 
 #countdown-container {
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
   countdown-timer {
-    border-right: 1px solid rgba(255,255,255,0.4);
-    margin-bottom: 16px;
-    height: 165px;
-  }
-  h4 {
-    margin-left: $desktopKeyline + 2;
-  }
-  .countdown-num {
-    &:last-of-type countdown-timer {
-      border-right: none;
-    }
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 
