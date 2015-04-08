@@ -888,6 +888,11 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
     for (var v = 0; v < valuesAsArray.length; v++) {
 
+      // Don't skip zero values when we need to fill out
+      // to meet the unit count.
+      if (v >= valuesAsArray.length - this.unitCount_)
+        skipLeadingZeroValues = false;
+
       if (skipLeadingZeroValues && valuesAsArray[v] === '00')
         continue;
 
@@ -921,6 +926,11 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     this.ctx_.font = '500 14px Roboto';
 
     for (var v = 0; v < valuesAsArray.length; v++) {
+
+      // Don't skip zero values when we need to fill out
+      // to meet the unit count.
+      if (v >= valuesAsArray.length - this.unitCount_)
+        skipLeadingZeroValues = false;
 
       if (skipLeadingZeroValues && valuesAsArray[v] === '00')
         continue;
