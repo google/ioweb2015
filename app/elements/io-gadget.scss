@@ -32,12 +32,16 @@
   padding: 0 $mobileKeyline;
 
   h4 {
-    color: #fff;;
+    color: #fff;
+    a {
+      color: currentcolor;
+    }
   }
 }
 
 #gadget-content {
   margin-top: 64px;
+  overflow: hidden;
 }
 
 .card {
@@ -114,6 +118,17 @@ paper-dropdown-menu {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+#copyright-text {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #fff;
+  padding: 0 $mobileKeyline / 2;
+  font-size: 12px;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .video-author {

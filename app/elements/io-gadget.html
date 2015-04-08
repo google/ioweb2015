@@ -36,7 +36,8 @@ The `<io-gadget>` element renders a youtube video + social feed.
                       queryMatches="{{isPhoneSize}}"></core-media-query>
 
     <div id="livebanner" layout horizontal center end-justified>
-      <h4>I/O Live</h4>
+      <h4><a href="{{location.hostname}}/schedule" target="_blank"
+             on-click="{{onOpenSchedule}}">I/O Live Schedule</a></h4>
     </div>
 
     <section id="gadget-content" layout horizontal vertical?="{{isPhoneSize}}" fit>
@@ -99,6 +100,8 @@ The `<io-gadget>` element renders a youtube video + social feed.
       </template>
 
     </section>
+
+    <div id="copyright-text">Video &amp; social announcements &copy; Google</div>
 
   </template>
   <script>
@@ -269,6 +272,10 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
       processSocialPosts: function(socialPosts) {
         this.socialPosts = socialPosts;
+      },
+
+      onOpenSchedule: function(e, detail, sender) {
+        IOWA.Analytics.trackEvent('gadget', 'link', 'open-schedule-link');
       }
 
     });
