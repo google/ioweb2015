@@ -100,11 +100,8 @@ I/O Extended event entries. Response body sample:
 
 ### GET /api/v1/schedule
 
-Event full schedule. Response body sample:
-
-```json
-TBD
-```
+Event full schedule and other data.
+See `app/temporary_api/schedule.json` for a sample response.
 
 
 ### GET /api/v1/user/notify
@@ -162,12 +159,44 @@ Response body sample:
 
 ```json
 {
-  "sessions": [
-    "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
-    "05012279-E037-46D1-AD91-C0892277B01B"
+  "sessions": {
+    "0486a8f4-4acb-e311-b297-00155d5066d7": {
+      "captionsUrl": "http://io-captions.appspot.com/?event=e1\u0026android=t",
+      "color": "#0288d1",
+      "description": "How do you make your cloud applications fast?",
+      "endTimestamp": "2014-06-25T20:45:00Z",
+      "hashtag": "Cloud",
+      "id": "0486a8f4-4acb-e311-b297-00155d5066d7",
+      "isLivestream": false,
+      "mainTag": "TOPIC_CLOUDSERVICES",
+      "photoUrl": "http://storage.googleapis.com/iosched-updater-dev.appspot.com/images/sessions/__w-200-400-600-800-1000__/0486a8f4-4acb-e311-b297-00155d5066d7.jpg",
+      "relatedContent": "4y4-xn4Vi04 Command Your Cloud with gCloud\nqdyNKNt2XLY Optimizing disk I/O in the cloud\nDWpBNm6lBU4 Putting Google's Network to work for You\nQ8jZHc0NS6A Building node.js applications with App Engine and Custom Runtimes\n",
+      "room": "room1",
+      "speakers": [
+        "afb30576-a1cc-e311-b297-00155d5066d7",
+        "b7139c80-8de2-e311-b297-00155d5066d7"
+      ],
+      "startTimestamp": "2014-06-25T20:00:00Z",
+      "tags": [
+        "TYPE_SESSIONS",
+        "THEME_DEVELOP",
+        "TOPIC_CLOUDSERVICES"
+      ],
+      "title": "Making your cloud apps Google-fast",
+      "url": "https://www.google.com/events/io/schedule/session/0486a8f4-4acb-e311-b297-00155d5066d7",
+      "youtubeUrl": "https://youtu.be/7jm6wINhWDI"
+    }
+  },
+  "videos": {... new/updated video objects? ...},
+  "ioext": [
+    {
+      "name": "I/O Extended 2015 - San Francisco",
+      "link": "https://plus.google.com/events/cviqm849n5smqepqgqn2lut99bk",
+      "city": "San Francisco",
+      "lat": 37.7552464,
+      "lng": -122.4185384
+    }
   ],
-  "videos": ["... new/updated videos ..."],
-  "ext": ["... i/o extended ..."],
   "token": "use this token for the next request"
 }
 ```
@@ -177,6 +206,20 @@ just the `token` field populated, for use in the next request.
 If `Authorization` header is set to an SW token, then the response will come back with fields
 set for all the updated resources. Additionally, the `token` field will be populated, for use in
 the next request.
+
+
+### GET /api/v1/user/schedule
+
+*Requires authentication*
+
+Returns bookmarked sessions list of a user.
+
+```json
+[
+  "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+  "05012279-E037-46D1-AD91-C0892277B01B"
+]
+```
 
 
 ### PUT /api/v1/user/schedule/:session_id

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -27,6 +28,7 @@ func registerHandlers() {
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
 	handle("/api/v1/auth", handleAuth)
+	handle("/api/v1/schedule", serveSchedule)
 	// setup root redirect if we're prefixed
 	if config.Prefix != "/" {
 		var redirect http.Handler = http.HandlerFunc(redirectHandler)
@@ -232,6 +234,53 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	if err := storeCredentials(c, creds); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
 	}
+}
+
+func serveSchedule(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	f, err := os.Open(filepath.Join(config.Dir, "temporary_api", "schedule.json"))
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer f.Close()
+	io.Copy(w, f)
+
+	//res, err := http.Get("http://storage.googleapis.com/io2015-data.appspot.com/session_data_v1.1.json")
+	//if err != nil {
+	//	http.Error(w, err.Error(), 500)
+	//	return
+	//}
+	//defer res.Body.Close()
+	//var body map[string][]map[string]interface{}
+	//if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
+	//	http.Error(w, err.Error(), 500)
+	//	return
+	//}
+
+	//data := make(map[string]interface{})
+	//for key, list := range body {
+	//	m := make(map[string]interface{})
+	//	for _, item := range list {
+	//		id, ok := item["id"].(string)
+	//		if !ok {
+	//			id, ok = item["original_id"].(string)
+	//		}
+	//		if !ok {
+	//			continue
+	//		}
+	//		m[id] = item
+	//	}
+	//	data[key] = m
+	//}
+
+	//b, err := json.MarshalIndent(data, "", "  ")
+	//if err != nil {
+	//	http.Error(w, err.Error(), 500)
+	//	return
+	//}
+	//w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	//w.Write(b)
 }
 
 // writeJSONError sets response code to 500 and writes an error message to w.
