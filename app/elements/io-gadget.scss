@@ -32,12 +32,16 @@
   padding: 0 $mobileKeyline;
 
   h4 {
-    color: #fff;;
+    color: #fff;
+    a {
+      color: currentcolor;
+    }
   }
 }
 
 #gadget-content {
   margin-top: 64px;
+  overflow: hidden;
 }
 
 .card {
@@ -116,14 +120,51 @@ paper-dropdown-menu {
   white-space: nowrap;
 }
 
+#copyright-text {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #fff;
+  padding: 0 $mobileKeyline / 2;
+  font-size: 12px;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .video-author {
   color: $color-gray;
   font-size: 14px;
 }
 
+.preroll {
+  background-color: $color-bluegrey-700;
+  color: #fff;
+  padding: $tabletKeyline;
+
+  h2, h3 {
+    color: inherit;
+  }
+
+  h2 {
+    margin-top: $tabletKeyline;
+  }
+
+  h3 {
+    color: $color-cyan-400;
+  }
+
+  img {
+    width: 200px;
+    height: auto;
+  }
+}
+
 @media (max-width: $phone-breakpoint-max) {
   #social-feed {
     flex-shrink: 0;
+  }
+  .preroll {
+    min-height: 230px;
   }
 }
 

@@ -3,18 +3,71 @@
 {% define "mastheadBgClass" %}bg-dark-grey{% end %}
 
 {% define "masthead" %}
-  <h1><i18n-msg msgid="live-blogging">I/O Live Embed Widget</i18n-msg></h1>
+  <h1>I/O Live Embed Widget</h1>
 {% end %}
 
 {% define "content" %}
 
-<paper-action-dialog id="gadgetfaq" backdrop transition="core-transition-center">
+<paper-dialog id="gadgetfaq" backdrop transition="core-transition-center" layered="false">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close dialog"></paper-icon-button>
   <section>
-    <h1 class="card__title">I/O Live Embed Widget FAQ</h1>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    <h2 class="card__title">I/O Live Embed Widget FAQ</h2>
+    <h4>What is the I/O Live widget?</h4>
+    <p>A widget to embed on your website that allows you to deliver highlights and live announcements directly from Google I/O. It features the following elements:</p>
+    <ul>
+      <li>The complete I/O live video stream (this includes the Keynote and all sessions)</li>
+      <li>Social feed from <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a></li>
+    </ul>
+
+    <h4>Can the widget be customized?</h4>
+    <p>Yes. Here's what you can customize:</p>
+    <ul>
+      <li>The content the widget will include:
+        <ul>
+          <li>live video stream &amp; Google Developers social fee
+          <li>only the live video stream
+          <li>only the Google Developers social feed
+        </ul>
+      </li>
+      <li>The size of the widget</li>
+    </ul>
+
+    <h4>How do I customize the widget?</h4>
+    <p>On the configuration page, under "Customize your widget" just select which content you want to display and what size you want the widget to have. As you select the different options, the preview section further down on the page adapts in real time so you can see exactly how the widget will look once embedded on your website.</p>
+
+    <h4>How do I embed the widget on my website?</h4>
+    <p>After you customize the widget to your preference, scroll to "3. Embed this code into your site" at the bottom of this page. Copy the HTML code and add it to your website.</p>
+
+    <h4>When can I embed the widget on my website?</h4>
+    <p>You can embed the widget in advance of Google I/O. We encourage you to embed it as soon as possible to get your audience excited to tune in on the event dates.</p>
+
+    <h4>What will the widget look like before Google I/O 2015 starts and after it ends?</h4>
+    <ul>
+      <li><em>Before May 28</em>: The widget will display a message letting viewers know I/O is coming up soon. If you've decided to include the social feed in the widget, it will display I/O related posts from the @GoogleDevs page. Lots of things will be posted in advance of I/O on this page to help inform your audience and get them excited for the event.
+    </li>
+      <li><em>On May 28 &amp; 29</em>: If you have decided to include the live stream in the widget, it will start displaying between 8-9AM PDT on May 28. After the Keynote ends, it will automatically start displaying the remaining streaming channels instead. The live stream will run until end of day on May 29.</li>
+      <li><em>After I/O ends</em>: After all sessions end at approximately 5PM PDT on May 29, the live stream will be replaced by a text card.</li>
+    </ul>
+
+    <h4>What content will show up on the @GoogleDevs social feed?</h4>
+    <p>The social feed will surface public posts from the <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a> page made before and during Google I/O.</p>
+
+    <h4>Can my viewers still see the @GoogleDevs feed after May 29?</h4>
+    <p>Yes. As long as the widget is embedded on your website, viewers will still be able to scroll through the feed and see I/O announcements and highlights published on <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a>.</p>
+
+    <h4>Can I choose to add feeds from other Twitter pages besides @GoogleDevs?</h4>
+    <p>No. The only Twitter feed that can be added to the widget is the one from <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a> as it's the official Google I/O social channel.</p>
+
+    <h4>Can readers reply, retweet or favorite tweets coming in through the social feed on the widget?</h4>
+    <p>Not directly from the widget but they can access the original posts on Twitter by clicking on each tweet. Once on Twitter, viewers can reply, retweet or favorite tweets as usual.</p>
+
+    <h4>Is there a way I can track the number of people viewing the widget at any time?</h4>
+    <p>The widget doesn't have built-in analytics, but Google Analytics does provide <a href="https://support.google.com/analytics/answer/1638635?hl=en">real-time reports</a> so you can get an idea of how many active users are on the page where the widget is hosted.</p>
+
+    <p class="footer__text">Your use of this gadget is subject to the <a href="http://www.google.com/intl/en/policies/terms/">Google Terms of Service</a>.</p>
+
   </section>
-</paper-action-dialog>
+</paper-dialog>
 
 <div class="active">
   <section class="card__container card__container--top slide-up">
@@ -23,7 +76,7 @@
         <h3>Personalize the I/O live stream for your website and share the #io15 conversation from the event with your audience.</h3>
       </div>
       <div class="card-content">
-        <a href="#" data-ajax-link data-anim-card data-track-link="widget-faq" on-tap="{{toggleGadgetFaq}}">
+        <a href="#" data-ajax-link data-anim-card data-track-link="widget-faq" on-click="{{toggleGadgetFaq}}">
           <i18n-msg msgid="live-faq">Read I/O Live Embed Widget FAQ</i18n-msg>
         </a>
       </div>
