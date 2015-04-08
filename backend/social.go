@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -47,7 +48,7 @@ func socialEntries(c context.Context, refresh bool) ([]*socEntry, error) {
 		e := &socEntry{
 			Kind:   "tweet",
 			URL:    fmt.Sprintf(tweetURL, config.Twitter.Account, t.Id),
-			Text:   t.Text,
+			Text:   html.UnescapeString(t.Text),
 			Author: "@" + t.User.ScreenName,
 			When:   time.Time(t.CreatedAt),
 		}
