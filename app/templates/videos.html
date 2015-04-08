@@ -130,23 +130,20 @@
 <script>
 (function() {
 
-  function fetchVideos(callback) {
-    var xhr = new XMLHttpRequest();
-    // TODO(ericbidelman): update to real API endpoint when it's ready.
-    var url = '//storage.googleapis.com/iosched-updater-dev.appspot.com/session_data_v2.696.json';
-    xhr.open('GET', url);
-    xhr.onload = function(e) {
-      if (e.target.status == 200) {
-        callback(JSON.parse(e.target.response).video_library);
-      }
-    };
-    xhr.send();
+  // TODO(ericbidelman): consolidate this API call with /schedule page usage.
+  var VIDEOS_ENDPOINT = 'api/v1/schedule';
+
+  function fetchVideos() {
+    return IOWA.Request.xhrPromise('GET', VIDEOS_ENDPOINT, false).then(function(resp) {
+      var videoLib = resp.video_library;
+      return Object.keys(videoLib).map(function(key) { return videoLib[key]; });
+    });
   }
 
   function onPageTransitionDone_(e) {
     document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
-    fetchVideos(function(videos) {
+    fetchVideos().then(function(videos) {
       IOWA.Elements.Template.videoList = videos;
       IOWA.Elements.Template.filteredVideoList = videos;
     });
