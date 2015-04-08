@@ -38,7 +38,6 @@ $playButtonHeightWidth: 40px;
 .photo__masthead {
   background: url(../images/videos/keynote.jpg) no-repeat 50% 0;
   background-size: cover;
-  top: -$navbarHeight;
 }
 
 .card__photo--stage {
@@ -138,9 +137,6 @@ paper-dialog {
 
 
 @media (max-width: $phone-breakpoint-max) {
-  .photo__masthead {
-    top: -$navbarHeightMobile;
-  }
   .page__section--banner {
     padding: 16px;
   }

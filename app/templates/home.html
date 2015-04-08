@@ -2,10 +2,8 @@
 
 {% define "mastheadBgClass" %}bg-cyan{% end %}
 
-{% define "masthead" %}{% end %}
-
-{% define "countdown" %}
-<div id="countdown-container" fit>
+{% define "masthead" %}
+<div id="countdown-container" class="photo__masthead--fullbleed" fit>
   <countdown-timer bgcolor="#00BCD4"
       date="May 28 2015 09:00:00 GMT-0700 (PDT)"
       easeintime="490" waittime="100"
@@ -14,7 +12,6 @@
       value="{{countdownValue}}" autoStart>
   </countdown-timer>
 </div>
-
 {% end %}
 
 {% define "content" %}
