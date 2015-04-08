@@ -262,9 +262,18 @@ func serveSchedule(w http.ResponseWriter, r *http.Request) {
 	//for key, list := range body {
 	//	m := make(map[string]interface{})
 	//	for _, item := range list {
-	//		id, ok := item["id"].(string)
-	//		if !ok {
-	//			id, ok = item["original_id"].(string)
+	//		var (
+	//			id string
+	//			ok bool
+	//		)
+	//		switch key {
+	//		case "tags":
+	//			id, ok = item["tag"].(string)
+	//		default:
+	//			id, ok = item["id"].(string)
+	//			if !ok {
+	//				id, ok = item["original_id"].(string)
+	//			}
 	//		}
 	//		if !ok {
 	//			continue

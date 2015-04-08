@@ -8043,65 +8043,15 @@
     }
   },
   "tags": {
-    "00ca0d28-d3d0-e311-b297-00155d5066d7": {
+    "THEME_DESIGN": {
       "abstract": "",
-      "category": "TYPE",
-      "name": "Office Hours",
-      "order_in_category": 6,
-      "original_id": "00ca0d28-d3d0-e311-b297-00155d5066d7",
-      "tag": "TYPE_OFFICEHOURS"
-    },
-    "08e12eae-a487-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TYPE",
-      "name": "Sessions",
+      "category": "THEME",
+      "name": "Design",
       "order_in_category": 1,
-      "original_id": "08e12eae-a487-e311-84db-00155d5066d7",
-      "tag": "TYPE_SESSIONS"
+      "original_id": "c120fdc1-8dd0-e311-b297-00155d5066d7",
+      "tag": "THEME_DESIGN"
     },
-    "09e12eae-a487-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TYPE",
-      "name": "Workshops",
-      "order_in_category": 5,
-      "original_id": "09e12eae-a487-e311-84db-00155d5066d7",
-      "tag": "TYPE_WORKSHOPS"
-    },
-    "0ae12eae-a487-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TYPE",
-      "name": "Code Lab",
-      "order_in_category": 2,
-      "original_id": "0ae12eae-a487-e311-84db-00155d5066d7",
-      "tag": "TYPE_CODELAB"
-    },
-    "0eedf9a6-3688-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#0d904f",
-      "name": "Monetization",
-      "order_in_category": 10,
-      "original_id": "0eedf9a6-3688-e311-84db-00155d5066d7",
-      "tag": "TOPIC_MONETIZATION"
-    },
-    "1f44b5d9-cdf9-e311-903f-00155d5066d7": {
-      "abstract": "",
-      "category": "TYPE",
-      "name": "Birds of a Feather",
-      "order_in_category": 7,
-      "original_id": "1f44b5d9-cdf9-e311-903f-00155d5066d7",
-      "tag": "TYPE_BIRDSOFAFEATHER"
-    },
-    "20c32a95-d3d0-e311-b297-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#795548",
-      "name": "Location",
-      "order_in_category": 8,
-      "original_id": "20c32a95-d3d0-e311-b297-00155d5066d7",
-      "tag": "TOPIC_LOCATION"
-    },
-    "2ade1c01-8ed0-e311-b297-00155d5066d7": {
+    "THEME_DEVELOP": {
       "abstract": "",
       "category": "THEME",
       "name": "Develop",
@@ -8109,7 +8059,7 @@
       "original_id": "2ade1c01-8ed0-e311-b297-00155d5066d7",
       "tag": "THEME_DEVELOP"
     },
-    "41335208-8ed0-e311-b297-00155d5066d7": {
+    "THEME_DISTRIBUTE": {
       "abstract": "",
       "category": "THEME",
       "name": "Distribute",
@@ -8117,7 +8067,25 @@
       "original_id": "41335208-8ed0-e311-b297-00155d5066d7",
       "tag": "THEME_DISTRIBUTE"
     },
-    "51ad7559-3788-e311-84db-00155d5066d7": {
+    "TOPIC_ACCESSIBILITY": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#646464",
+      "name": "Accessibility",
+      "order_in_category": 0,
+      "original_id": "5820cc6e-fde0-e311-b297-00155d5066d7",
+      "tag": "TOPIC_ACCESSIBILITY"
+    },
+    "TOPIC_ANDROID": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#558b2f",
+      "name": "Android",
+      "order_in_category": 1,
+      "original_id": "c8e37a77-3688-e311-84db-00155d5066d7",
+      "tag": "TOPIC_ANDROID"
+    },
+    "TOPIC_CHROME_WEB": {
       "abstract": "",
       "category": "TOPIC",
       "color": "#3367d6",
@@ -8127,113 +8095,7 @@
       "original_id": "51ad7559-3788-e311-84db-00155d5066d7",
       "tag": "TOPIC_CHROME_WEB"
     },
-    "5820cc6e-fde0-e311-b297-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#646464",
-      "name": "Accessibility",
-      "order_in_category": 0,
-      "original_id": "5820cc6e-fde0-e311-b297-00155d5066d7",
-      "tag": "TOPIC_ACCESSIBILITY"
-    },
-    "82af5c68-fde0-e311-b297-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#00838f",
-      "name": "Dart",
-      "order_in_category": 4,
-      "original_id": "82af5c68-fde0-e311-b297-00155d5066d7",
-      "tag": "TOPIC_DART"
-    },
-    "84af5c68-fde0-e311-b297-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#2a56c6",
-      "name": "Go",
-      "order_in_category": 6,
-      "original_id": "84af5c68-fde0-e311-b297-00155d5066d7",
-      "tag": "TOPIC_GO"
-    },
-    "96a7df80-d3d0-e311-b297-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#c3570b",
-      "name": "Growth",
-      "order_in_category": 7,
-      "original_id": "96a7df80-d3d0-e311-b297-00155d5066d7",
-      "tag": "TOPIC_GROWTH"
-    },
-    "a1305602-3788-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#ad1457",
-      "name": "Wearables",
-      "order_in_category": 15,
-      "original_id": "a1305602-3788-e311-84db-00155d5066d7",
-      "tag": "TOPIC_WEARABLES"
-    },
-    "a2320d3e-3788-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#673ab7",
-      "name": "Polymer",
-      "order_in_category": 12,
-      "original_id": "a2320d3e-3788-e311-84db-00155d5066d7",
-      "tag": "TOPIC_POLYMER"
-    },
-    "aea61daf-3688-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#ce4319",
-      "name": "Media",
-      "order_in_category": 9,
-      "original_id": "aea61daf-3688-e311-84db-00155d5066d7",
-      "tag": "TOPIC_MEDIA"
-    },
-    "c120fdc1-8dd0-e311-b297-00155d5066d7": {
-      "abstract": "",
-      "category": "THEME",
-      "name": "Design",
-      "order_in_category": 1,
-      "original_id": "c120fdc1-8dd0-e311-b297-00155d5066d7",
-      "tag": "THEME_DESIGN"
-    },
-    "c496b215-d3d0-e311-b297-00155d5066d7": {
-      "abstract": "",
-      "category": "TYPE",
-      "name": "App Reviews",
-      "order_in_category": 3,
-      "original_id": "c496b215-d3d0-e311-b297-00155d5066d7",
-      "tag": "TYPE_APPREVIEWS"
-    },
-    "c899de92-3688-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#b93221",
-      "name": "Games",
-      "order_in_category": 5,
-      "original_id": "c899de92-3688-e311-84db-00155d5066d7",
-      "tag": "TOPIC_GAMES"
-    },
-    "c8e37a77-3688-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#558b2f",
-      "name": "Android",
-      "order_in_category": 1,
-      "original_id": "c8e37a77-3688-e311-84db-00155d5066d7",
-      "tag": "TOPIC_ANDROID"
-    },
-    "d472f7fb-3688-e311-84db-00155d5066d7": {
-      "abstract": "",
-      "category": "TOPIC",
-      "color": "#8e24aa",
-      "name": "Performance",
-      "order_in_category": 11,
-      "original_id": "d472f7fb-3688-e311-84db-00155d5066d7",
-      "tag": "TOPIC_PERFORMANCE"
-    },
-    "dc28355c-d3d0-e311-b297-00155d5066d7": {
+    "TOPIC_CLOUDSERVICES": {
       "abstract": "",
       "category": "TOPIC",
       "color": "#0288d1",
@@ -8243,15 +8105,88 @@
       "original_id": "dc28355c-d3d0-e311-b297-00155d5066d7",
       "tag": "TOPIC_CLOUDSERVICES"
     },
-    "e7e8dc1b-d3d0-e311-b297-00155d5066d7": {
+    "TOPIC_DART": {
       "abstract": "",
-      "category": "TYPE",
-      "name": "'Box Talks",
+      "category": "TOPIC",
+      "color": "#00838f",
+      "name": "Dart",
       "order_in_category": 4,
-      "original_id": "e7e8dc1b-d3d0-e311-b297-00155d5066d7",
-      "tag": "TYPE_BOXTALKS"
+      "original_id": "82af5c68-fde0-e311-b297-00155d5066d7",
+      "tag": "TOPIC_DART"
     },
-    "eea54986-3688-e311-84db-00155d5066d7": {
+    "TOPIC_GAMES": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#b93221",
+      "name": "Games",
+      "order_in_category": 5,
+      "original_id": "c899de92-3688-e311-84db-00155d5066d7",
+      "tag": "TOPIC_GAMES"
+    },
+    "TOPIC_GO": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#2a56c6",
+      "name": "Go",
+      "order_in_category": 6,
+      "original_id": "84af5c68-fde0-e311-b297-00155d5066d7",
+      "tag": "TOPIC_GO"
+    },
+    "TOPIC_GROWTH": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#c3570b",
+      "name": "Growth",
+      "order_in_category": 7,
+      "original_id": "96a7df80-d3d0-e311-b297-00155d5066d7",
+      "tag": "TOPIC_GROWTH"
+    },
+    "TOPIC_LOCATION": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#795548",
+      "name": "Location",
+      "order_in_category": 8,
+      "original_id": "20c32a95-d3d0-e311-b297-00155d5066d7",
+      "tag": "TOPIC_LOCATION"
+    },
+    "TOPIC_MEDIA": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#ce4319",
+      "name": "Media",
+      "order_in_category": 9,
+      "original_id": "aea61daf-3688-e311-84db-00155d5066d7",
+      "tag": "TOPIC_MEDIA"
+    },
+    "TOPIC_MONETIZATION": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#0d904f",
+      "name": "Monetization",
+      "order_in_category": 10,
+      "original_id": "0eedf9a6-3688-e311-84db-00155d5066d7",
+      "tag": "TOPIC_MONETIZATION"
+    },
+    "TOPIC_PERFORMANCE": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#8e24aa",
+      "name": "Performance",
+      "order_in_category": 11,
+      "original_id": "d472f7fb-3688-e311-84db-00155d5066d7",
+      "tag": "TOPIC_PERFORMANCE"
+    },
+    "TOPIC_POLYMER": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#673ab7",
+      "name": "Polymer",
+      "order_in_category": 12,
+      "original_id": "a2320d3e-3788-e311-84db-00155d5066d7",
+      "tag": "TOPIC_POLYMER"
+    },
+    "TOPIC_TOOLS": {
       "abstract": "",
       "category": "TOPIC",
       "color": "#607d8b",
@@ -8260,7 +8195,7 @@
       "original_id": "eea54986-3688-e311-84db-00155d5066d7",
       "tag": "TOPIC_TOOLS"
     },
-    "f2a54986-3688-e311-84db-00155d5066d7": {
+    "TOPIC_UX": {
       "abstract": "",
       "category": "TOPIC",
       "color": "#00897b",
@@ -8268,6 +8203,71 @@
       "order_in_category": 14,
       "original_id": "f2a54986-3688-e311-84db-00155d5066d7",
       "tag": "TOPIC_UX"
+    },
+    "TOPIC_WEARABLES": {
+      "abstract": "",
+      "category": "TOPIC",
+      "color": "#ad1457",
+      "name": "Wearables",
+      "order_in_category": 15,
+      "original_id": "a1305602-3788-e311-84db-00155d5066d7",
+      "tag": "TOPIC_WEARABLES"
+    },
+    "TYPE_APPREVIEWS": {
+      "abstract": "",
+      "category": "TYPE",
+      "name": "App Reviews",
+      "order_in_category": 3,
+      "original_id": "c496b215-d3d0-e311-b297-00155d5066d7",
+      "tag": "TYPE_APPREVIEWS"
+    },
+    "TYPE_BIRDSOFAFEATHER": {
+      "abstract": "",
+      "category": "TYPE",
+      "name": "Birds of a Feather",
+      "order_in_category": 7,
+      "original_id": "1f44b5d9-cdf9-e311-903f-00155d5066d7",
+      "tag": "TYPE_BIRDSOFAFEATHER"
+    },
+    "TYPE_BOXTALKS": {
+      "abstract": "",
+      "category": "TYPE",
+      "name": "'Box Talks",
+      "order_in_category": 4,
+      "original_id": "e7e8dc1b-d3d0-e311-b297-00155d5066d7",
+      "tag": "TYPE_BOXTALKS"
+    },
+    "TYPE_CODELAB": {
+      "abstract": "",
+      "category": "TYPE",
+      "name": "Code Lab",
+      "order_in_category": 2,
+      "original_id": "0ae12eae-a487-e311-84db-00155d5066d7",
+      "tag": "TYPE_CODELAB"
+    },
+    "TYPE_OFFICEHOURS": {
+      "abstract": "",
+      "category": "TYPE",
+      "name": "Office Hours",
+      "order_in_category": 6,
+      "original_id": "00ca0d28-d3d0-e311-b297-00155d5066d7",
+      "tag": "TYPE_OFFICEHOURS"
+    },
+    "TYPE_SESSIONS": {
+      "abstract": "",
+      "category": "TYPE",
+      "name": "Sessions",
+      "order_in_category": 1,
+      "original_id": "08e12eae-a487-e311-84db-00155d5066d7",
+      "tag": "TYPE_SESSIONS"
+    },
+    "TYPE_WORKSHOPS": {
+      "abstract": "",
+      "category": "TYPE",
+      "name": "Workshops",
+      "order_in_category": 5,
+      "original_id": "09e12eae-a487-e311-84db-00155d5066d7",
+      "tag": "TYPE_WORKSHOPS"
     }
   },
   "video_library": {
