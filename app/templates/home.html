@@ -2,61 +2,17 @@
 
 {% define "mastheadBgClass" %}bg-cyan{% end %}
 
-{% define "masthead" %}
-<div id="countdown-container" class="io-countdown" layout horizontal center-center>
-  <div class="countdown-num">
-    <countdown-timer bgcolor="#00BCD4"
-                     date="May 28 2015 09:00:00 GMT-0700 (PDT)"
-                     easeintime="490" waittime="100"
-                     easeouttime="390"
-                     thresholdInformation="{{daysThresholdInfo}}"
-                     value="{{countdownValue}}" autoStart>
-    </countdown-timer>
-    <h4 class="countdown-label">Days</h4>
-  </div>
-  <div class="countdown-num">
-    <countdown-timer bgcolor="#00BCD4"
-                     date="May 28 2015 09:00:00 GMT-0700 (PDT)"
-                     easeintime="490" waittime="100"
-                     easeouttime="390"
-                     thresholdInformation="{{thresholdInfo}}"
-                     value="{{countdownValue}}" autoStart>
-    </countdown-timer>
-    <h4 class="countdown-label">Hours</h4>
-  </div>
-  <div class="countdown-num">
-    <countdown-timer bgcolor="#00BCD4"
-                     date="May 28 2015 09:00:00 GMT-0700 (PDT)"
-                     easeintime="490" waittime="100"
-                     easeouttime="390"
-                     thresholdInformation="{{thresholdInfo}}"
-                     value="{{countdownValue}}" autoStart>
-    </countdown-timer>
-    <h4 class="countdown-label">Minutues</h4>
-  </div>
-  <div class="countdown-num">
-    <countdown-timer bgcolor="#00BCD4"
-                     date="May 28 2015 09:00:00 GMT-0700 (PDT)"
-                     easeintime="490" waittime="100"
-                     easeouttime="390"
-                     thresholdInformation="{{thresholdInfo}}"
-                     value="{{countdownValue}}" autoStart>
-    </countdown-timer>
-    <h4 class="countdown-label">Seconds</h4>
-  </div>
+{% define "masthead" %}{% end %}
 
-<!--   <template if="{{thresholdInfo.thresholdHours}}">
-    <h4 class="countdown-label"><a href="schedule" data-ajax-link>Hour<span hidden?="{{countdownValue === 1}}">s</span> until I/O begins</a></h4>
-  </template>
-
-  <template if="{{thresholdInfo.thresholdMinutes}}">
-    <h4 class="countdown-label"><a href="schedule" data-ajax-link>Minute<span hidden?="{{countdownValue === 1}}">s</span> until I/O begins</a></h4>
-  </template>
-
-  <template if="{{thresholdInfo.thresholdSeconds}}">
-    <h4 class="countdown-label"><a href="schedule" data-ajax-link>Second<span hidden?="{{countdownValue === 1}}">s</span> until I/O begins</a></h4>
-  </template>
- -->
+{% define "countdown" %}
+<div id="countdown-container" fit>
+  <countdown-timer bgcolor="#00BCD4"
+      date="May 28 2015 09:00:00 GMT-0700 (PDT)"
+      easeintime="490" waittime="100"
+      easeouttime="400"
+      thresholdInformation="{{daysThresholdInfo}}"
+      value="{{countdownValue}}" autoStart>
+  </countdown-timer>
 </div>
 
 {% end %}

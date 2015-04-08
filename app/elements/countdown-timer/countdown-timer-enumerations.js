@@ -4,7 +4,9 @@ IOWA.CountdownTimer.Colors = {
   MediumBlue: '#80DEEA',
   DarkBlue: '#00ACC1',
   Black: '#000',
-  Shadow: 'rgba(0,0,0,0.4)'
+  Shadow: 'rgba(0,0,0,0.4)',
+  Divider: 'rgba(255,255,255,0.4)',
+  Label: '#445A64'
 };
 
 /**
@@ -21,6 +23,6 @@ IOWA.CountdownTimer.Animation = {
 };
 
 IOWA.CountdownTimer.Modes = {
-  Days: 1,
-  HoursMinutesSeconds: 2
+  SingleValue: 1,
+  Continuous: 2
 };

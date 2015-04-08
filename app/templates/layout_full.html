@@ -350,6 +350,10 @@ limitations under the License.
         </div>
 
         <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}"></experiment-fab-container>
+
+        {% define "countdown" %}{% end %}
+        {% template "countdown" .%}
+
       </header>
 
       <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}" >
@@ -451,4 +455,3 @@ limitations under the License.
 
 </body>
 </html>
-
