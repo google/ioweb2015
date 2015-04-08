@@ -848,8 +848,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
           this.linePadding_ +
           this.linePadding_ +
           this.baseNumberWidth_;
-    }
-    else if (this.unitCount_ === 4) {
+    } else if (this.unitCount_ === 4) {
       x += this.linePadding_ +
           this.baseNumberWidth_ +
           this.baseNumberWidth_ +
@@ -899,7 +898,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
         break;
 
       if (valueAsString !== '')
-        valueAsString += "|";
+        valueAsString += '|';
 
       valueAsString += valuesAsArray[v];
       unitsLeftToAdd--;
@@ -1022,7 +1021,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
       this.ctx_.save();
 
-      if (valueAsString[i] === "|") {
+      if (valueAsString[i] === '|') {
         this.drawDividerLine_();
       } else {
         this.ctx_.translate(this.letterPadding_, this.letterPadding_);
