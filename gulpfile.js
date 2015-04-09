@@ -215,6 +215,7 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
     'helper/picasa.js',
     'helper/simple-db.js',
     'helper/notifications.js',
+    'helper/schedule.js',
     'bootstrap.js'
   ].map(function(script) {
     return APP_DIR + '/scripts/' + script;
