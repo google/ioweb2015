@@ -51,6 +51,7 @@ Creates a countdown timer to a specific date.
         display: block;
         width: 300px;
         height: 200px;
+        transition: opacity 400ms cubic-bezier(0,0,0.2,1);
       }
 
       .countdown-timer,
@@ -284,6 +285,11 @@ Creates a countdown timer to a specific date.
         this.timer.setOnTimerThresholdReachedCallback(
           this.onTimerThresholdReached_.bind(this));
         this.timer.setOnTimerTickCallback(this.onTimerTick.bind(this));
+
+        this.style.opacity = 0;
+        this.async(function() {
+          this.style.opacity = 1;
+        }, null, 600);
       },
 
       detached: function() {
