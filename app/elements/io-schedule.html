@@ -1,0 +1,336 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/core-label/core-label.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+
+<!--
+The `<io-schedule>` element renders a schedule for a given day(s).
+
+@element io-schedule
+-->
+<polymer-element name="io-schedule">
+  <template>
+    <link rel="stylesheet" href="io-schedule.css">
+    <link rel="stylesheet" href="../styles/pages/schedule.css">
+    <div class="card__container sidebyside" layout horizontal>
+      <div flex layout vertical>
+        <template repeat="{{timeBlock in timeBlocks_ | filterByProperty(day, true)}}">
+          <div class="card day-title" aria-label="" hidden?="{{ !timeBlock.dayStart || day }}">
+            {{timeBlock.dayStart}}
+          </div>
+          <div class="card" aria-label="" hidden?="{{timeBlock.isEmpty}}">
+            <div class="card-content">
+              <h4>{{timeBlock.name}}</h4>
+            </div>
+            <div class="card-content schedule-rows" layout horizontal>
+              <template repeat="{{session in sessions | filterByProperty(timeBlock.day, true) | filterByProperty(timeBlock.name, true)}}">
+                <div layout horizontal hidden?="{{ session.hide }}">
+                  <paper-radio-button name="" role="radio"
+                      tabindex="0" aria-checked="false"
+                      aria-label="" class=""></paper-radio-button>
+                  <div layout vertical flex>
+                    <span class="schedule-title" auto-vertical flex>
+                      {{ session.title }}
+                    </span>
+                    <span class="schedule-time" auto-vertical flex two>
+                      {{ session.startTimestamp | formatSessionTimeFilter}} :
+                      {{ session.endTimestamp | formatSessionTimeFilter}}
+                    </span>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <div class="card__container" layout vertical>
+        <div class="card js-experiment-visualizer" aria-label="Filters">
+          <div class="card-content">
+            <h4>Filters</h4>
+          </div>
+          <div class="card-content">
+            <div id="filters">
+              <div class="filter-rows filter-section">
+                <core-label center horizontal layout>
+                  <div flex>Design</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="themeDesign" for></paper-checkbox>
+                </core-label>
+                <core-label center horizontal layout>
+                  <div flex>Develop</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="themeDevelop" for></paper-checkbox>
+                </core-label>
+                <core-label center horizontal layout>
+                  <div flex>Distribute</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="themeDistribute" for></paper-checkbox>
+                </core-label>
+              </div>
+              <div class="filter-rows filter-section">
+                <core-label center horizontal layout>
+                  <div flex>Sessions</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="typeSessions" for></paper-checkbox>
+                </core-label>
+                <core-label center horizontal layout>
+                  <div flex>Sandbox Talks</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="typeSandbox" for></paper-checkbox>
+                </core-label>
+                <core-label center horizontal layout>
+                  <div flex>Workshops</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="typeWorkshops" for></paper-checkbox>
+                </core-label>
+                <core-label center horizontal layout>
+                  <div flex>Office Hours</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="typeOfficeHours" for></paper-checkbox>
+                </core-label>
+                <core-label center horizontal layout>
+                  <div flex>Code Labs</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="typeCode Labs" for></paper-checkbox>
+                </core-label>
+              </div>
+              <div class="filter-rows filter-section">
+                <core-label center horizontal layout>
+                  <div flex>Live Streamed</div>
+                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
+                      role="checkbox" tabindex="0" aria-checked="true"
+                      name="isLivestream" for></paper-checkbox>
+                </core-label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  (function() {
+
+    // TODO: Remove dummy data once this
+    // https://github.com/GoogleChrome/ioweb2015/pull/923/files lands.
+    var sessions = [
+       {
+        "id": "046787bd-49cb-e311-b297-00155d5066d7",
+        "color": "#0288d1",
+        "description": "Can you predict the future using Big Data? Can you divine if your users will come back to your site or where the next social conflict will arise? And most importantly, can Brazil be defeated at soccer on their own turf? In this talk, we'll go through the process of data extraction, modelling and prediction as well as generating a live dashboard to visualize the results. We’ll demonstrate how you can use Google Cloud and Open Source technologies to make predictions about the biggest soccer matches in the world. You’ll see how to use Google BigQuery for data analytics and Monte Carlo simulations, as well as how to create machine learning models in R and pandas. We predict that after this talk you’ll have the necessary tools to cast your own eye on the future.",
+        "endTimestamp": "2014-06-26T23:45:00Z",
+        "hashtag": "Cloud",
+        "isLivestream": false,
+        "mainTag": "TOPIC_CLOUDSERVICES",
+        "photoUrl": "http://storage.googleapis.com/iosched-updater-dev.appspot.com/images/sessions/__w-200-400-600-800-1000__/046787bd-49cb-e311-b297-00155d5066d7.jpg",
+        "room": "room7",
+        "themeDevelop": true,
+        "speakers": [
+          "7cde3b93-0fcc-e311-b297-00155d5066d7",
+          "59f963be-0fcc-e311-b297-00155d5066d7"
+        ],
+        "startTimestamp": "2014-06-26T23:00:00Z",
+        "tags": [
+          "TYPE_SESSIONS",
+          "THEME_DEVELOP",
+          "TOPIC_CLOUDSERVICES"
+        ],
+        "title": "Predicting the future with the Google Cloud Platform",
+        "url": "https://www.google.com/events/io/schedule/session/046787bd-49cb-e311-b297-00155d5066d7",
+        "youtubeUrl": "https://youtu.be/YyvvxFeADh8",
+        "hide": false,
+        "day1": true,
+        "10am": true,
+        "timeBlock": "day1_10am"
+      },
+      {
+        "id": "02e345e6-cef9-e311-903f-00155d5066d7",
+        "description": "Meetup for Google I/O participants from North America.",
+        "endTimestamp": "2014-06-25T19:30:00Z",
+        "isLivestream": true,
+        "room": "b0982afc-cdf9-e311-903f-00155d5066d7",
+        "speakers": [],
+        "startTimestamp": "2014-06-25T19:00:00Z",
+        "tags": [
+          "TYPE_BIRDSOFAFEATHER",
+          "THEME_DEVELOP"
+        ],
+        "title": "North America meetup",
+        "url": "https://www.google.com/events/io/schedule/session/02e345e6-cef9-e311-903f-00155d5066d7",
+        "hide": true,
+        "day1": true,
+        "11am": true,
+        "timeBlock": "day1_11am"
+      },
+      {
+        "id": "02e345e6-cef9-e311-903f-00155d5066d7",
+        "description": "Meetup for Google I/O participants from North America.",
+        "endTimestamp": "2014-06-25T19:30:00Z",
+        "isLivestream": true,
+        "room": "b0982afc-cdf9-e311-903f-00155d5066d7",
+        "speakers": [],
+        "startTimestamp": "2014-06-25T19:00:00Z",
+        "tags": [
+          "TYPE_BIRDSOFAFEATHER",
+          "THEME_DEVELOP"
+        ],
+        "title": "North America meetup",
+        "url": "https://www.google.com/events/io/schedule/session/02e345e6-cef9-e311-903f-00155d5066d7",
+        "hide": true,
+        "day2": true,
+        "11am": true,
+        "timeBlock": "day2_11am"
+      }
+    ];
+
+    var timeBlocks = [];
+    var timeBlocksIndex = {};
+
+    function populateTimeBlocks() {
+      var days = ['day1', 'day2'];
+      var hours = ['10am', '11am', '12am', '1pm', '2pm', '3pm', '4pm'];
+      for (var i = 0; i < days.length; i++) {
+        for (var j = 0; j < hours.length; j++) {
+          var timeBlock = {
+            name: hours[j],
+            day: days[i],
+            isEmpty: true
+          };
+          timeBlock[days[i]] = true;
+          if (j === 0) {
+            timeBlock['dayStart'] = days[i];
+          }
+          timeBlocks.push(timeBlock);
+          var timeBlockId = days[i] + '_' + hours[j];
+          timeBlocksIndex[timeBlockId] = timeBlocks.length - 1;
+        }
+      }
+    }
+    populateTimeBlocks();
+
+
+    Polymer({
+
+      publish: {
+        /**
+         * The data about scheduled I/O sessions.
+         *
+         * @attribute sessions
+         * @type array
+         */
+         sessions: sessions,
+        /**
+         * Optional day to filter the sessions, e.g. 'day1'.
+         *
+         * @attribute day
+         * @type string
+         * @default ''
+         */
+         day: ''
+      },
+
+      /**
+       * Array of filter names applied to sessions list.
+       *
+       * @property filters
+       * @type array
+       * @default []
+       */
+      filters: [],
+
+      timeBlocks_: timeBlocks,
+
+      timeBlocksIndex_: timeBlocksIndex,
+
+      ready: function() {
+        var filterEls = this.$.filters.querySelectorAll(
+            'paper-checkbox[checked]');
+        for (var i = 0, length = filterEls.length; i < length; i++) {
+          this.filters.push(filterEls[i].getAttribute('name'));
+        }
+        this.filtersChanged();
+      },
+
+      applyFilter: function(e) {
+        var filterName = e.target.getAttribute('name');
+        var filterIndex = this.filters.indexOf(filterName);
+        if (e.target.checked && filterIndex < 0) {
+          this.filters.push(filterName);
+        } else if (!e.target.checked && filterIndex > -1) {
+          this.filters.splice(filterIndex, 1);
+        }
+      },
+
+      filtersChanged: function() {
+        for (var i = 0; i < this.sessions.length; i++) {
+          sessions[i].hide = !this.matchesFilters(sessions[i]);
+        }
+        this.checkEmptyBlocks();
+      },
+
+      matchesFilters: function(session) {
+        for (var i = 0; i < this.filters.length; i++) {
+          if (!session[this.filters[i]]) {
+            return false;
+          }
+        }
+        return true;
+      },
+
+      filterByProperty: function(items, propertyName) {
+        if (!propertyName) {
+          return items;
+        }
+        var filtered = [];
+        for (var i = 0; i < items.length; i++) {
+          if (items[i][propertyName]) {
+            filtered.push(items[i]);
+          }
+        }
+        return filtered;
+      },
+
+      checkEmptyBlocks: function() {
+        for (var i = 0; i < this.sessions.length; i++) {
+          var session = this.sessions[i];
+          var block = session.timeBlock;
+          if (this.timeBlocks_[this.timeBlocksIndex_[block]]) {
+            var isEmpty = !this.matchesFilters(session);
+            this.timeBlocks_[this.timeBlocksIndex_[block]].isEmpty = isEmpty;
+          }
+        }
+      },
+
+      // TODO: dedupe with elemennts.js.
+      formatSessionTimeFilter: function(dateStr) {
+        var date = new Date(dateStr);
+        return date.toLocaleTimeString().replace(/:\d+ /, ' ');
+      }
+    });
+
+  })();
+  </script>
+</polymer-element>

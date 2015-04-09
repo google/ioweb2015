@@ -21,8 +21,8 @@
         <a href="#day2" data-track-link="schedule-day2" data-subpage-link
                         layout horizontal center-center>Day 2</a>
       </paper-tab>
-      <paper-tab label="mysched">
-        <a href="#mysched" data-track-link="schedule-mysched" data-subpage-link
+      <paper-tab label="myschedule">
+        <a href="#myschedule" data-track-link="schedule-mysched" data-subpage-link
                            layout horizontal center-center>My Schedule</a>
       </paper-tab>
     </paper-tabs>
@@ -199,7 +199,8 @@
         </section>
       </div>
     </section>
-    <section id="subpage-day1" class="subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day1'} | tokenList}}">
+    <section id="subpage-day1"
+        class="subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day1'} | tokenList}}">
       <section class="page__section page__section--top slide-up">
         <div class="card__container card__container--top">
           <div class="card js-experiment-visualizer" aria-label="Agenda">
@@ -217,124 +218,35 @@
       </section>
       <div class="slide-up-delay">
         <section class="page__section">
+          <io-schedule day="day1"></io-schedule>
+        </section>
+      </div>
+    </section>
 
-        <div class="card__container sidebyside" layout horizontal>
-          <div flex layout vertical>
-            <section class="page__section">
-              <div class="card" aria-label="Agenda">
-                <div class="card-content">
-                  <h4>10 AM</h4>
-                </div>
-                <div class="card-content">
-                  <div layout horizontal>
-                    <div class="schedule-rows">
-                      <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                        <span class="" auto-vertical flex>
-                          <paper-radio-button name="" role="radio"
-                        tabindex="0" aria-checked="false"
-                        aria-label="" class=""></paper-radio-button>
-                        </span>
-                        <span class="schedule-time" auto-vertical flex>8:00 AM - 9:00 AM</span>
-                        <span auto-vertical flex two><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></span>
-                      </div>
-
-                      <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                        <span class="" auto-vertical flex>
-                          <paper-radio-button name="" role="radio"
-                        tabindex="0" aria-checked="false"
-                        aria-label="" class=""></paper-radio-button>
-                        </span>
-                        <span class="schedule-time" auto-vertical flex>11:30 AM - 1:30 PM</span>
-                        <span auto-vertical flex two><i18n-msg msgid="lunch">Lunch</i18-msg></span>
-                      </div>
-                      <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                        <span class="" auto-vertical flex>
-                          <paper-radio-button name="" role="radio"
-                        tabindex="0" aria-checked="false"
-                        aria-label="" class=""></paper-radio-button>
-                        </span>
-                        <span class="schedule-time" auto-vertical flex>6:30 PM - 10:00 PM</span>
-                        <span auto-vertical flex two><i18n-msg msgid="afterhours">After Hours</i18-msg></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-            <div class="card" aria-label="Agenda">
-              <div class="card-content">
-                <h4>10 AM</h4>
-              </div>
-              <div class="card-content">
-                <div layout horizontal>
-                  <div class="schedule-rows">
-                    <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                      <span class="" auto-vertical flex>
-                        <paper-radio-button name="" role="radio"
-                      tabindex="0" aria-checked="false"
-                      aria-label="" class=""></paper-radio-button>
-                      </span>
-                      <span class="schedule-time" auto-vertical flex>8:00 AM - 9:00 AM</span>
-                      <span auto-vertical flex two><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></span>
-                    </div>
-                    <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                      <span class="" auto-vertical flex>
-                        <paper-radio-button name="" role="radio"
-                      tabindex="0" aria-checked="false"
-                      aria-label="" class=""></paper-radio-button>
-                      </span>
-                      <span class="schedule-time" auto-vertical flex>9:00 AM - 5:00 PM</span>
-                      <span auto-vertical flex two><i18n-msg msgid="sessions-sandbox">Sessions &amp; Sandbox</i18-msg></span>
-                    </div>
-                    <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                      <span class="" auto-vertical flex>
-                        <paper-radio-button name="" role="radio"
-                      tabindex="0" aria-checked="false"
-                      aria-label="" class=""></paper-radio-button>
-                      </span>
-                      <span class="schedule-time" auto-vertical flex>11:30 AM - 1:30 PM</span>
-                      <span auto-vertical flex two><i18n-msg msgid="lunch">Lunch</i18-msg></span>
-                    </div>
-                    <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                      <span class="" auto-vertical flex>
-                        <paper-radio-button name="" role="radio"
-                      tabindex="0" aria-checked="false"
-                      aria-label="" class=""></paper-radio-button>
-                      </span>
-                      <span class="schedule-time" auto-vertical flex>6:30 PM - 10:00 PM</span>
-                      <span auto-vertical flex two><i18n-msg msgid="afterhours">After Hours</i18-msg></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+  <section id="subpage-day2" class="subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day2'} | tokenList}}">
+    <section class="page__section page__section--top slide-up">
+      <div class="card__container card__container--top">
+        <div class="card js-experiment-visualizer" aria-label="Agenda">
+          <div class="card-content">
+            <h3 class="card__title">Create your schedule</h3>
+            <div>Sign-in to add sessions to your personalized schedule and to view it in your time zone.</div>
           </div>
-          <div class="card__container" layout vertical>
-            <div class="card js-experiment-visualizer" aria-label="Agenda">
-              <div class="card-content">
-                <h4>Filters</h4>
-              </div>
-              <div class="card-content">
-                <div layout horizontal>
-                  <div class="schedule-rows">
-                    <core-label center="" horizontal="" layout="" id="core-label-5">
-                      <div flex="">Design</div>
-                      <paper-checkbox class="blue" checked="" for="" role="checkbox" tabindex="0" aria-checked="true" aria-labelledby="core-label-5"></paper-checkbox>
-                    </core-label>
-                    <core-label center="" horizontal="" layout="" id="core-label-5">
-                      <div flex="">Design</div>
-                      <paper-checkbox class="blue" for="" role="checkbox" tabindex="0" aria-checked="true" aria-labelledby="core-label-5"></paper-checkbox>
-                    </core-label>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="card-content">
+            <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-sign-in">
+              Sign-in to create your schedule
+            </span>
           </div>
         </div>
+      </div>
+    </section>
+    <div class="slide-up-delay">
+      <section class="page__section">
+        <io-schedule day="day2"></io-schedule>
       </section>
     </div>
   </section>
-  <section id="subpage-day2" class="subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day2'} | tokenList}}">
+
+  <section id="subpage-myschedule" class="subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'myschedule'} | tokenList}}">
     <section class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
         <div class="card js-experiment-visualizer" aria-label="Agenda">
