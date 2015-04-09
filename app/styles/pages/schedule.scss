@@ -172,6 +172,8 @@ core-icon[icon="schedule"] {
 @media (max-width: $phone-breakpoint-max) {
   .session__detail {
     margin: 0;
+    left: 0 !important;
+    top: 0 !important;
   }
   .page__section--top {
     margin-top: $mobileKeyline;

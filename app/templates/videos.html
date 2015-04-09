@@ -130,23 +130,17 @@
 <script>
 (function() {
 
-  // TODO(ericbidelman): consolidate this API call with /schedule page usage.
-  var SCHEDULE_ENDPOINT = 'api/v1/schedule';
-
-  function fetchVideos() {
-    return IOWA.Request.xhrPromise('GET', SCHEDULE_ENDPOINT, false).then(function(resp) {
-      var videoLib = resp.video_library;
-      return Object.keys(videoLib).map(function(key) { return videoLib[key]; });
-    });
-  }
-
   function onPageTransitionDone_(e) {
     document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
-    fetchVideos().then(function(videos) {
+    IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
+      var lib = scheduleData.video_library;
+      var videos = Object.keys(lib).map(function(key) { return lib[key]; });
+
       IOWA.Elements.Template.videoList = videos;
       IOWA.Elements.Template.filteredVideoList = videos;
     });
+
   }
 
   // Page-specific JS that runs when this page is loaded for the first time.
@@ -162,7 +156,7 @@
       IOWA.Elements.Template.mastheadVideoActive = false;
       IOWA.Elements.Template.filteredVideoList = IOWA.Elements.Template.videoList; // reset filter.
 
-      // Don't re-fetch videos when navigating back to this page.
+      // Bomb out early and don't re-fetch videos when navigating back to this page.
       if (IOWA.Elements.Template.videoList.length) {
         return;
       }

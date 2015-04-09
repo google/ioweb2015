@@ -317,28 +317,11 @@
 </div>
 <script>
   (function() {
-    var SUBTAB_SELECTOR = '#subpage-tabs a';
 
     // Example id: dc44916c-48e7-e311-b297-00155d5066d7
     var SESSION_ID_REGEX = /\w{8}-(\w{4}-){3}\w{12}$/;
 
-    // TODO(ericbidelman): consolidate this API call with /videos page usage.
-    var SCHEDULE_ENDPOINT = 'api/v1/schedule';
-    var SCHEDULE_ENDPOINT_USERS = 'api/v1/user/schedule/';
-
-    var sessionId = null;
-
-    function fetchSchedule() {
-      //IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
-      return IOWA.Request.xhrPromise('GET', SCHEDULE_ENDPOINT, false).then(function(resp) {
-        return resp;
-      });
-    }
-
-    function selectSession(sessionId) {
-      IOWA.Elements.Template.selectedSession = IOWA.Elements.Template.scheduleData.sessions[sessionId];
-      IOWA.Elements.Main.querySelector('.session__detail').open();
-    }
+    var SUBTAB_SELECTOR = '#subpage-tabs a';
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
@@ -349,28 +332,29 @@
       }
 
       var onPageTransitionDone_ = function(e) {
-        fetchSchedule().then(function(scheduleData) {
-          IOWA.Elements.Template.scheduleData = scheduleData;
-          IOWA.Elements.Template.speakerLookup = scheduleData.speakers;
+        document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
-          selectSession(sessionId);
+        IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
+
+          IOWA.Elements.Template.scheduleData = scheduleData;
+
+          // Deep link into session.
+          var sessionId = location.hash.substring(1).match(SESSION_ID_REGEX);
+          if (sessionId) {
+            IOWA.Elements.Template.selectSession(sessionId[0]);
+          }
         });
 
-        document.removeEventListener('page-transition-done', onPageTransitionDone_);
+        // TODO(ericbidelman): also fetch user signed-in data.
+        // IOWA.Schedule.fetchUserSchedule.then(function(scheduleData) {});
       };
 
       page.load = function() {
         // Reset template variables for when revisiting the page.
-        IOWA.Elements.Template.selectedSession = {};
-        IOWA.Elements.Template.scheduleData = {};
-        IOWA.Elements.Template.speakerLookup = {};
+        IOWA.Elements.Template.selectedSession = null;
+        IOWA.Elements.Template.scheduleData = null;
 
-        // Deep link into session.
-        sessionId = location.hash.substring(1).match(SESSION_ID_REGEX);
-        if (sessionId) {
-          sessionId = sessionId[0];
-          document.addEventListener('page-transition-done', onPageTransitionDone_);
-        }
+        document.addEventListener('page-transition-done', onPageTransitionDone_);
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
@@ -382,6 +366,11 @@
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
       };
 
+      IOWA.Elements.Template.selectSession = function(sessionId) {
+        this.selectedSession = this.scheduleData.sessions[sessionId];
+        IOWA.Elements.Main.querySelector('.session__detail').open();
+      };
+
       IOWA.Elements.Template.toggleSaveSession = function(e, detail, sender) {
         e.stopPropagation();
 
@@ -391,12 +380,7 @@
         var saved = !!selectedSession.saved;
         selectedSession.saved = !saved;
 
-        // PUT /api/v1/user/schedule/:session_id for save
-        // DELETE /api/v1/user/schedule/:session_id for removal.
-        var url = SCHEDULE_ENDPOINT_USERS + selectedSession.id;
-        IOWA.Request.xhrPromise(selectedSession.saved ? 'PUT' : 'DELETE', url, true);
-
-        IOWA.Analytics.trackEvent('session', 'bookmark', saved);
+        IOWA.Schedule.saveSession(selectedSession.id, selectedSession.saved);
       };
 
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
