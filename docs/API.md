@@ -113,42 +113,51 @@ Current notification state. Response body sample:
 ```json
 {
   "notify": true,
-  "subscribers": ["123456789", "987654321"]
+  "subscribers": ["123456789", "987654321"],
+  "ioext": {
+    "name": "Amsterdam",
+    "lat": 52.37607,
+    "lng": 4.886114
+  }
 }
 ```
+
+`ioext` will be `null` or not present at all if I/O Extended notifications are not enabled.
 
 
 ### PUT /api/v1/user/notify
 
 *Requires authentication*
 
-This serves double purpose:
-
-* Toggle global notification state on/off for a single user.
-  Request body:
-
-  ```json
-  {"notify": true}
-  ```
-
-* Add to the subscriber IDs list of a user.
-  Request body:
-
-  ```json
-  {"subscriber": "subscriber ID"}
-  ```
-
-You can also do both in a single API call:
+* Toggle global notification state on/off: `notify`.
+* Add to the subscriber IDs list of a user: `subscriber` and `endpoint`.
+* Subscribe/unsubscribe from "I/O Extended events near me": `ioext`.
 
 ```json
 {
   "notify": true,
-  "subscriber": "subscriber ID"
+  "subscriber": "subscriber ID",
+  "endpoint": "https://push/notifications/endpoint",
+  "ioext": {
+    "name": "Amsterdam",
+    "lat": 52.37607,
+    "lng": 4.886114
+  }
 }
 ```
 
-Note that in the latter case `notify` parameter still refers to
-the global notification state scoped to a user, not a specific subscriber ID.
+All fields are optional. Endpoint defaults to [GCM][gcm].
+Subscriber and endpoint are usually obtained from the [PushRegistration][push-api-reg].
+
+`ioext` will notify users about I/O Extended events happening within 80km of the specified location.
+To turn off these notifications, nullify the `ioext` field:
+
+```json
+{"ioext": null}
+```
+
+Note that `notify` always refers to the global notification state scoped to a user,
+not a specific subscriber ID.
 
 
 ### GET /api/v1/user/updates
@@ -238,3 +247,5 @@ Delete a session from the list.
 
 [signin-guide]: https://developers.google.com/identity/sign-in/web/server-side-flow
 [sign-in-the-user]: https://developers.google.com/identity/sign-in/web/server-side-flow#step_5_sign_in_the_user
+[push-api-reg]: http://www.w3.org/TR/push-api/#idl-def-PushRegistration
+[gcm]: https://developer.android.com/google/gcm/index.html
