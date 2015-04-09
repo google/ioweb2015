@@ -341,7 +341,7 @@
           // Deep link into session.
           var sessionId = location.hash.substring(1).match(SESSION_ID_REGEX);
           if (sessionId) {
-            IOWA.Elements.Template.selectSession(sessionId[0]);
+            IOWA.Elements.Template.openSession(sessionId[0]);
           }
         });
 
@@ -366,7 +366,7 @@
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
       };
 
-      IOWA.Elements.Template.selectSession = function(sessionId) {
+      IOWA.Elements.Template.openSession = function(sessionId) {
         this.selectedSession = this.scheduleData.sessions[sessionId];
         IOWA.Elements.Main.querySelector('.session__detail').open();
       };
