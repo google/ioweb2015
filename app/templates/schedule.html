@@ -258,6 +258,28 @@
       </section>
     </div>
   </section>
+  <section id="subpage-day2" class="subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day2'} | tokenList}}">
+    <section class="page__section page__section--top slide-up">
+      <div class="card__container card__container--top">
+        <div class="card js-experiment-visualizer" aria-label="Agenda">
+          <div class="card-content">
+            <h3 class="card__title">Create your schedule</h3>
+            <div>Sign-in to add sessions to your personalized schedule and to view it in your time zone.</div>
+          </div>
+          <div class="card-content">
+            <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-sign-in">
+              Sign-in to create your schedule
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="slide-up-delay">
+      <section class="page__section">
+        <io-schedule></io-schedule>
+      </section>
+    </div>
+  </section>
 </div>
 <script>
   (function() {
