@@ -287,16 +287,9 @@ Creates a countdown timer to a specific date.
         this.timer.setOnTimerTickCallback(this.onTimerTick.bind(this));
 
         this.style.opacity = 0;
-        setTimeout(this.fadeIn.bind(this), 600);
-      },
-
-      fadeIn: function() {
-
-        function setOpacity() {
+        this.async(function() {
           this.style.opacity = 1;
-        }
-
-        requestAnimationFrame(setOpacity.bind(this));
+        }, null, 600);
       },
 
       detached: function() {
