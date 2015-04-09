@@ -68,39 +68,16 @@ paper-tabs.white {
   }
 }
 
-// Duplicated from base/typography.scss
-overlay-host::shadow {
-  h1, h2, h3, h4, h5, h6, p {
-    margin: 0;
-    padding: 0;
-  }
-
-  p {
-    margin: 0 0 8px 0;
-  }
-
-  h1 {
-    color: $color-heading;
-    @include typo-heading-1();
-  }
-  h2 {
-    color: $color-heading;
-    @include typo-heading-2();
-  }
-  h3 {
-    color: $color-text;
-    @include typo-heading-3();
-  }
-}
-
 #page-widget {
-  overlay-host::shadow paper-action-dialog {
-    @include typo-body();
-    width: 826px;
-    left: calc(50% - 896px / 2) !important;
+  paper-dialog {
+    &::shadow #scroller {
+      width: 100%;
+    }
 
-    & > section  {
-      padding: 12px;
+    @media (min-width: $tablet-breakpoint-min) {
+      &::shadow #scroller {
+        width: 768px;
+      }
     }
   }
 
@@ -124,6 +101,16 @@ overlay-host::shadow {
   paper-dropdown-menu::shadow {
     #arrow {
       color: inherit;
+    }
+  }
+  .session__detail::shadow #scroller {
+    width: 100%;
+    padding: 0;
+  }
+
+  @media (min-width: $tablet-breakpoint-min) {
+    .session__detail::shadow #scroller {
+      width: 768px;
     }
   }
 }

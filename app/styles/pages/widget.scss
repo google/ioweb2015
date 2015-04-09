@@ -49,6 +49,29 @@ core-label {
   margin-right: $rightMargin;
 }
 
+paper-dialog {
+  .card__title {
+    margin-bottom: $tabletKeyline;
+ }
+  section {
+    padding: 0 $tabletKeyline/2;
+
+    h4 {
+      margin: $desktopKeyline 0 $tabletKeyline 0;
+    }
+  }
+}
+
+.footer__text {
+  margin-top: $desktopKeyline;
+}
+
+@media (max-width: $phone-breakpoint-max) {
+  paper-dialog {
+    margin: 0;
+  }
+}
+
 @media (min-width: $tablet-breakpoint-min) {
   .page__section--gadgetpreview {
     margin-top: -135px;

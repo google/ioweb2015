@@ -3,7 +3,20 @@ IOWA.CountdownTimer.Element = function(el) {
   this.renderer_ = new IOWA.CountdownTimer.NumberRenderer(el);
   this.renderer_.init();
 
-  this.currentDayCountValue_ = 0;
+  this.currentCountdownValue_ = {
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  };
+
+  this.nextCountdownValue_ = {
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  };
+
   this.targetDayCountValue_ = 0;
   this.targetDate_ = 0;
   this.needToFreezeDigits_ = true;
@@ -12,11 +25,16 @@ IOWA.CountdownTimer.Element = function(el) {
   this.easeInTime_ = 0;
   this.waitTime_ = 0;
   this.easeOutTime_ = 0;
-  this.mode_ = IOWA.CountdownTimer.Modes.Days;
   this.onThresholdReachedCallback_ = null;
   this.onTimerTickCallback_ = null;
+
   this.lastThreshold_ = '';
-  this.lastDrawnValue_ = Number.MAX_VALUE;
+  this.lastDrawnValue_ = {
+    days: Number.MAX_VALUE,
+    hours: Number.MAX_VALUE,
+    minutes: Number.MAX_VALUE,
+    seconds: Number.MAX_VALUE
+  };
 
   this.animationValue_ = 0;
   this.animationRunning_ = false;
@@ -28,8 +46,8 @@ IOWA.CountdownTimer.Element = function(el) {
   this.drawIfAnimationIsNotRunning =
       this.drawIfAnimationIsNotRunning.bind(this);
   this.update_ = this.update_.bind(this);
-  this.setValuesAndDispatchThresholdEventsIfNeeded_ =
-      this.setValuesAndDispatchThresholdEventsIfNeeded_.bind(this);
+  this.setDayMonthMinutesAndSecondValues_ =
+      this.setDayMonthMinutesAndSecondValues_.bind(this);
 
   this.addEventListeners_();
 
@@ -75,7 +93,7 @@ IOWA.CountdownTimer.Element.prototype = {
     }
     if (now > this.animationEaseOutStartTime_) {
 
-      if (this.currentDayValue === 0) {
+      if (this.countdownTargetReached_()) {
         this.dispatchThresholdEventIfNeeded_("Ended");
         return;
       }
@@ -92,19 +110,33 @@ IOWA.CountdownTimer.Element.prototype = {
     animationValue = IOWA.CountdownTimer.Easing(animationValue);
 
     // Only draw if we need to.
-    if (this.currentDayValue !== this.lastDrawnValue_) {
+    if (this.valueHasChangedSinceLastDraw_()) {
 
       this.renderer_.clear();
-      this.renderer_.draw(this.currentDayValue, animationValue,
+      this.renderer_.draw(this.currentCountdownValue, animationValue,
           animationDirection);
     }
 
     if (animationValue === 0) {
       this.continueAnimationIfNotAtFinalValue_();
-      this.onTimerTickCallback(this.currentDayValue);
+      this.onTimerTickCallback(this.currentCountdownValue);
     } else {
       requestAnimationFrame(this.update_);
     }
+  },
+
+  valueHasChangedSinceLastDraw_: function() {
+    return this.currentCountdownValue.days !== this.lastDrawnValue_.days ||
+        this.currentCountdownValue.hours !== this.lastDrawnValue_.hours ||
+        this.currentCountdownValue.minutes !== this.lastDrawnValue_.minutes ||
+        this.currentCountdownValue.seconds !== this.lastDrawnValue_.seconds;
+  },
+
+  countdownTargetReached_: function() {
+    return this.currentCountdownValue.days === 0 &&
+        this.currentCountdownValue.hours === 0 &&
+        this.currentCountdownValue.minutes === 0 &&
+        this.currentCountdownValue.seconds === 0;
   },
 
   freezeRendererForUnchangingDigits_: function() {
@@ -114,41 +146,16 @@ IOWA.CountdownTimer.Element.prototype = {
 
     this.needToFreezeDigits_ = false;
 
-    var freezeCount = 0;
-    var currentDayValueAsString = Number(this.currentDayValue).toString();
-    var nextDayValueAsString = Number(this.getNextValue_()).toString();
-
-    for (var i = 0; i < nextDayValueAsString.length; i++) {
-      if (nextDayValueAsString[i] !== currentDayValueAsString[i])
-        break;
-
-      freezeCount++;
-    }
-
-    this.renderer_.freeze(freezeCount);
-  },
-
-  getNextValue_: function() {
-
     var milliseconds = this.targetDate_ - Date.now() -
         this.easeOutTime_ - this.waitTime_;
 
-    if (milliseconds < this.millisecondsInAMinute_) {
+    this.convertMillisecondsAndSetObjectValues_(milliseconds,
+        this.nextCountdownValue_);
 
-      return this.convertMillisecondsToSeconds_(milliseconds);
+    this.renderer_.setNextValueForFreezing(
+        this.currentCountdownValue,
+        this.nextCountdownValue_);
 
-    } else if (milliseconds < this.millisecondsInAnHour_) {
-
-      return this.convertMillisecondsToMinutes_(milliseconds);
-
-    } else if (milliseconds < this.millisecondsInADay_) {
-
-      return this.convertMillisecondsToHours_(milliseconds);
-
-    } else {
-
-      return this.convertMillisecondsToDays_(milliseconds);
-    }
   },
 
   updateAnimationTimingValues_: function() {
@@ -166,21 +173,10 @@ IOWA.CountdownTimer.Element.prototype = {
 
     this.stop();
 
-    if (this.mode === IOWA.CountdownTimer.Modes.Days)
-      this.timeAdjustment_--;
-
     if (this.targetDate_ < Date.now())
       return;
 
-    // If we are over a single day to go, and we're at the final value stop
-    // and stay stopped. Otherwise we'll keep the countdown running.
-    var millisecondsToTarget = this.targetDate_ - Date.now();
-
-    if (millisecondsToTarget > this.millisecondsInADay_ &&
-        this.targetDayValue === this.currentDayValue)
-      return;
-
-    this.setValuesAndDispatchThresholdEventsIfNeeded_();
+    this.setDayMonthMinutesAndSecondValues_();
     this.needToFreezeDigits_ = true;
 
     this.updateAnimationTimingValues_();
@@ -188,42 +184,52 @@ IOWA.CountdownTimer.Element.prototype = {
 
   },
 
-  setValuesAndDispatchThresholdEventsIfNeeded_: function() {
+  setDayMonthMinutesAndSecondValues_: function() {
 
     var millisecondsToTarget = this.targetDate_ - Date.now();
 
-    this.lastDrawnValue_ = this.currentDayValue;
+    this.lastDrawnValue_.days = this.currentCountdownValue.days;
+    this.lastDrawnValue_.hours = this.currentCountdownValue.hours;
+    this.lastDrawnValue_.minutes = this.currentCountdownValue.minutes;
+    this.lastDrawnValue_.seconds = this.currentCountdownValue.seconds;
 
-    if (millisecondsToTarget < this.millisecondsInAMinute_) {
+    this.convertMillisecondsAndSetObjectValues_(millisecondsToTarget,
+        this.currentCountdownValue);
 
-      this.mode = IOWA.CountdownTimer.Modes.HoursMinutesSeconds;
-      this.targetDayValue = 0;
-      this.currentDayValue =
-          this.convertMillisecondsToSeconds_(millisecondsToTarget);
-      this.dispatchThresholdEventIfNeeded_("Seconds");
+    this.scheduleRendererRippleIfNeeded_();
+  },
 
-    } else if (millisecondsToTarget < this.millisecondsInAnHour_) {
+  scheduleRendererRippleIfNeeded_: function() {
 
-      this.targetDayValue =
-          this.convertMillisecondsToMinutes_(millisecondsToTarget);
-      this.currentDayValue = this.targetDayValue + this.timeAdjustment_;
-      this.dispatchThresholdEventIfNeeded_("Minutes");
+    if (this.currentCountdownValue.minutes !== this.lastDrawnValue_.minutes)
+      this.renderer_.ripple();
 
-    } else if (millisecondsToTarget < this.millisecondsInADay_) {
+    // TODO(paullewis) Add more cases here.
+  },
 
-      this.targetDayValue =
-          this.convertMillisecondsToHours_(millisecondsToTarget);
-      this.currentDayValue = this.targetDayValue + this.timeAdjustment_;
-      this.dispatchThresholdEventIfNeeded_("Hours");
+  convertMillisecondsAndSetObjectValues_: function(milliseconds, target) {
 
-    } else {
+    var daysToTarget = Math.floor(milliseconds /
+        this.millisecondsInADay_);
 
-      this.targetDayValue =
-          this.convertMillisecondsToDays_(millisecondsToTarget);
-      this.currentDayValue = this.targetDayValue + this.timeAdjustment_;
-      this.dispatchThresholdEventIfNeeded_("Days");
+    milliseconds -= daysToTarget * this.millisecondsInADay_;
 
-    }
+    var hoursToTarget = Math.floor(milliseconds /
+        this.millisecondsInAnHour_);
+
+    milliseconds -= hoursToTarget * this.millisecondsInAnHour_;
+
+    var minutesToTarget = Math.floor(milliseconds /
+        this.millisecondsInAMinute_);
+
+    milliseconds -= minutesToTarget * this.millisecondsInAMinute_;
+
+    var secondsToTarget = Math.floor(milliseconds / 1000);
+
+    target.days = daysToTarget;
+    target.hours = hoursToTarget;
+    target.minutes = minutesToTarget;
+    target.seconds = secondsToTarget;
   },
 
   dispatchThresholdEventIfNeeded_: function(label) {
@@ -240,22 +246,6 @@ IOWA.CountdownTimer.Element.prototype = {
       label: label,
       millisecondsToTarget: Math.max(0, this.targetDate_ - Date.now())
     });
-  },
-
-  convertMillisecondsToDays_: function(milliseconds) {
-    return Math.floor(milliseconds / this.millisecondsInADay_);
-  },
-
-  convertMillisecondsToHours_: function(milliseconds) {
-    return Math.floor(milliseconds / this.millisecondsInAnHour_);
-  },
-
-  convertMillisecondsToMinutes_: function(milliseconds) {
-    return Math.floor(milliseconds / this.millisecondsInAMinute_);
-  },
-
-  convertMillisecondsToSeconds_: function(milliseconds) {
-    return Math.floor(milliseconds / this.millisecondsInASecond_);
   },
 
   start: function() {
@@ -278,7 +268,7 @@ IOWA.CountdownTimer.Element.prototype = {
 
     this.renderer_.init();
     this.renderer_.clear();
-    this.renderer_.draw(this.currentDayValue, 1,
+    this.renderer_.draw(this.currentCountdownValue, 1,
         IOWA.CountdownTimer.Animation.In);
 
   },
@@ -295,7 +285,7 @@ IOWA.CountdownTimer.Element.prototype = {
 
     this.targetDate_ = options.targetDate.getTime();
     this.timeAdjustment_ = options.adjustmentInDays;
-    this.setValuesAndDispatchThresholdEventsIfNeeded_();
+    this.setDayMonthMinutesAndSecondValues_();
 
     this.easeInTime_ = options.easeInTime;
     this.waitTime_ = options.waitTime;
@@ -308,15 +298,15 @@ IOWA.CountdownTimer.Element.prototype = {
     return this.configured_;
   },
 
-  get currentDayValue() {
-    return this.currentDayCountValue_;
+  get currentCountdownValue() {
+    return this.currentCountdownValue_;
   },
 
-  set currentDayValue(value) {
+  set currentCountdownValue(value) {
     if (value < this.targetDayValue || isNaN(value))
       value = this.targetDayValue;
 
-    this.currentDayCountValue_ = value;
+    this.currentCountdownValue_ = value;
   },
 
   get targetDayValue() {
@@ -332,19 +322,6 @@ IOWA.CountdownTimer.Element.prototype = {
       value = 0;
 
     this.targetDayCountValue_ = value;
-  },
-
-  set mode(newMode) {
-
-    if (newMode !== IOWA.CountdownTimer.Modes.Days &&
-        newMode !== IOWA.CountdownTimer.Modes.HoursMinutesSeconds)
-      return;
-
-    this.mode_ = newMode;
-  },
-
-  get mode() {
-    return this.mode_;
   },
 
   set onThresholdReachedCallback(callback) {

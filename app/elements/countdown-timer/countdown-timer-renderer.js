@@ -5,10 +5,19 @@ IOWA.CountdownTimer.NumberRenderer = function(el) {
 
   this.width_ = 0;
   this.height_ = 0;
+
+  this.maxRippleRadius_ = 0;
+  this.unitCount_ = 1;
+
   this.drawX_ = 0;
   this.drawY_ = 0;
   this.letterPadding_ = 6;
-  this.freezeDigitCount_ = 0;
+  this.linePadding_ = 32;
+  this.freezeCount_ = 0;
+
+  this.nextRippleColor_ = 0;
+  this.ripples_ = [];
+  this.backgroundColor_ = IOWA.CountdownTimer.Colors.Background;
 
   this.addEventListeners_();
 };
@@ -26,6 +35,10 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     this.width_ = this.canvas_.parentElement.offsetWidth;
     this.height_ = this.canvas_.parentElement.offsetHeight;
 
+    this.maxRippleRadius_ = Math.sqrt(
+        this.width_ * this.width_ +
+        this.height_ * this.height_);
+
     // Scale the backing store by the dPR.
     this.canvas_.width = this.width_ * dPR;
     this.canvas_.height = this.height_ * dPR;
@@ -36,6 +49,21 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
     // Account for any upscaling by applying a single scale transform.
     this.ctx_.scale(dPR, dPR);
+
+    // Figure out how many units we can fit in the space.
+    this.unitCount_ = 1;
+
+    if (this.width_ > 700) {
+      this.unitCount_ = 2;
+    }
+
+    if (this.width_ > 1000) {
+      this.unitCount_ = 3;
+    }
+
+    if (this.width_ > 1295) {
+      this.unitCount_ = 4;
+    }
   },
 
   addEventListeners_: function() {
@@ -47,14 +75,18 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     window.removeEventListener('resize', this.resizeHandler_);
   },
 
-  measure_: function(value) {
+  drawLine_: function(color, xStart, yStart, xEnd, yEnd) {
 
-    var metrics = {
-      width: value.length * this.baseNumberWidth_,
-      height: this.baseNumberHeight_
-    };
+    this.ctx_.save();
+    this.ctx_.translate(0.5, 0.5);
+    this.ctx_.strokeStyle = color;
+    this.ctx_.beginPath();
+    this.ctx_.moveTo(xStart, yStart);
+    this.ctx_.lineTo(xEnd, yEnd);
+    this.ctx_.stroke();
+    this.ctx_.closePath();
+    this.ctx_.restore();
 
-    return metrics;
   },
 
   drawCircle_: function(color, x, y, radius) {
@@ -118,6 +150,8 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
   drawCover_: function(time) {
 
+    return;
+
     this.ctx_.globalAlpha = (1 - time);
     this.setShadow_('', 0, 0);
 
@@ -142,10 +176,6 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
     this.ctx_.save();
     this.ctx_.translate(this.drawX_, this.drawY_);
-
-    // This is a tweak for the number zero just because
-    // it's way bigger than the other numbers.
-    this.ctx_.translate(-6, 0);
 
     function in_() {
 
@@ -748,7 +778,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
       // Circle Top
 
-    this.ctx_.save();
+      this.ctx_.save();
       this.ctx_.translate(0, (1 - time) * circleTopYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow,
           time, time * circleTopYOffset);
@@ -763,7 +793,6 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue,
           56, 6, 41, 120, 0, 0);
       this.ctx_.restore();
-
 
       this.drawCover_(time);
 
@@ -785,7 +814,6 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue,
           56 + (1 - time) * 20.5, 6, time * 41, 120, 0, 0);
 
-
     }
 
     if (direction === IOWA.CountdownTimer.Animation.In)
@@ -799,42 +827,269 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
   clear: function() {
 
-    this.ctx_.fillStyle = IOWA.CountdownTimer.Colors.Background;
+    this.ctx_.fillStyle = this.backgroundColor_;
     this.ctx_.fillRect(0, 0, this.width_, this.height_);
     this.drawX_ = 0;
     this.drawY_ = 0;
 
   },
 
+  ripple: function() {
+
+    var start = Date.now();
+
+    var x = (this.width_ + this.baseNumberWidth_) * 0.5;
+
+    // Adjust the location of the ripple based on the number of units shown.
+    if (this.unitCount_ === 2) {
+      x += this.linePadding_ + this.baseNumberWidth_;
+    } else if (this.unitCount_ === 3) {
+      x += this.baseNumberWidth_ +
+          this.linePadding_ +
+          this.linePadding_ +
+          this.baseNumberWidth_;
+    } else if (this.unitCount_ === 4) {
+      x += this.linePadding_ +
+          this.baseNumberWidth_ +
+          this.baseNumberWidth_ +
+          this.linePadding_ +
+          this.linePadding_ +
+          this.baseNumberWidth_;
+    }
+
+    this.ripples_.push({
+      start: start,
+      end: start + 2800,
+      x: x,
+      y: this.height_ * 0.5,
+      color: '#FFFFFF',
+      alphaStart: 0.2,
+      alphaEnd: 0
+    });
+
+  },
+
+  drawDividerLine_: function() {
+    this.ctx_.save();
+    this.ctx_.translate(this.drawX_, this.drawY_);
+    this.ctx_.translate(this.linePadding_, -this.linePadding_);
+    this.drawLine_(IOWA.CountdownTimer.Colors.Divider,
+          0, 0, 0, this.baseNumberHeight_ + this.linePadding_ +
+          this.linePadding_ * 0.5);
+    this.drawX_ += (this.linePadding_ * 2);
+    this.ctx_.restore();
+  },
+
+  convertValueObjectToString_: function(valuesAsArray) {
+
+    var valueAsString = '';
+    var unitsLeftToAdd = this.unitCount_;
+    var skipLeadingZeroValues = true;
+
+    for (var v = 0; v < valuesAsArray.length; v++) {
+
+      // Don't skip zero values when we need to fill out
+      // to meet the unit count.
+      if (v >= valuesAsArray.length - this.unitCount_)
+        skipLeadingZeroValues = false;
+
+      if (skipLeadingZeroValues && valuesAsArray[v] === '00')
+        continue;
+
+      // As soon as we find a non-zero value we stop skipping.
+      skipLeadingZeroValues = false;
+
+      if (unitsLeftToAdd === 0)
+        break;
+
+      if (valueAsString !== '')
+        valueAsString += '|';
+
+      valueAsString += valuesAsArray[v];
+      unitsLeftToAdd--;
+    }
+
+    return valueAsString;
+
+  },
+
+  drawLabels_: function(valuesAsArray) {
+
+    var labelX = this.drawX_;
+    var labelY = this.drawY_ + this.baseNumberHeight_ + 48;
+    var labelStepX = 2 * this.baseNumberWidth_ + 2 * this.linePadding_;
+    var unitsLeftToAdd = this.unitCount_;
+    var labelText = '';
+    var skipLeadingZeroValues = true;
+
+    this.ctx_.fillStyle = IOWA.CountdownTimer.Colors.Label;
+    this.ctx_.font = '500 14px Roboto';
+
+    for (var v = 0; v < valuesAsArray.length; v++) {
+
+      // Don't skip zero values when we need to fill out
+      // to meet the unit count.
+      if (v >= valuesAsArray.length - this.unitCount_)
+        skipLeadingZeroValues = false;
+
+      if (skipLeadingZeroValues && valuesAsArray[v] === '00')
+        continue;
+
+      // As soon as we find a non-zero value we stop skipping.
+      skipLeadingZeroValues = false;
+
+      if (unitsLeftToAdd === 0)
+        break;
+
+      switch (v) {
+        case 0:
+          labelText = 'DAY' + (valuesAsArray[v] !== '01' ? 'S' : '');
+          break;
+
+        case 1:
+          labelText = 'HOUR' + (valuesAsArray[v] !== '01' ? 'S' : '');
+          break;
+
+        case 2:
+          labelText = 'MINUTE' + (valuesAsArray[v] !== '01' ? 'S' : '');
+          break;
+
+        case 3:
+          labelText = 'SECOND' + (valuesAsArray[v] !== '01' ? 'S' : '');
+          break;
+      }
+
+      this.ctx_.fillText(labelText, labelX, labelY);
+      labelX += labelStepX;
+      unitsLeftToAdd--;
+    }
+  },
+
   draw: function(value, time, direction) {
 
-    var valueAsString = Number(value).toString();
-    var metrics = this.measure_(valueAsString);
+    var valuesAsArray = [
+        this.convertNumberToStringAndPadIfNeeded_(value.days),
+        this.convertNumberToStringAndPadIfNeeded_(value.hours),
+        this.convertNumberToStringAndPadIfNeeded_(value.minutes),
+        this.convertNumberToStringAndPadIfNeeded_(value.seconds)];
+
+    var valueAsString = this.convertValueObjectToString_(valuesAsArray);
+    var metrics = {
+      width: (this.unitCount_ * 2 * this.baseNumberWidth_) +
+          (this.unitCount_ - 1) * 2 * this.linePadding_,
+      height: this.baseNumberHeight_
+    };
     var characterTime = time;
+
+    var now = Date.now();
+
+    var ripple;
+    var rippleRadius;
+    var rippleDuration;
+    var rippleTime;
+    var rippleAlpha;
+    var rippleTimeNormalized;
+
+    for (var r = 0; r < this.ripples_.length; r++) {
+      ripple = this.ripples_[r];
+
+      if (now > ripple.end) {
+        this.ripples_.splice(r--, 1);
+      }
+
+      rippleDuration = ripple.end - ripple.start;
+      rippleTime = now - ripple.start;
+      rippleTimeNormalized = Math.min(1, rippleTime / rippleDuration);
+      rippleRadius = IOWA.CountdownTimer.Easing(rippleTimeNormalized) *
+          this.maxRippleRadius_;
+      rippleAlpha = ripple.alphaStart +
+          IOWA.CountdownTimer.Easing(rippleTimeNormalized) *
+          (ripple.alphaEnd - ripple.alphaStart)
+
+      this.ctx_.save();
+      this.ctx_.globalAlpha = rippleAlpha;
+      this.drawCircle_(ripple.color, ripple.x, ripple.y, rippleRadius);
+      this.ctx_.restore();
+    }
 
     this.drawX_ = Math.round((this.width_ - metrics.width) * 0.5);
     this.drawY_ = Math.round((this.height_ - metrics.height) * 0.5);
 
+    this.drawLabels_(valuesAsArray);
+
     this.ctx_.strokeStyle = 'rgba(0,0,0,0.3)';
     this.ctx_.fillStyle = '#000';
 
+    // Characters
     for (var i = 0; i < valueAsString.length; i++) {
 
       // Reset the time and set it to 1 if the character is frozen.
       characterTime = time;
 
-      if (i < this.freezeDigitCount_)
+      if (i < this.freezeCount_)
         characterTime = 1;
 
       this.ctx_.save();
-      this.ctx_.translate(this.letterPadding_, this.letterPadding_);
-      this[valueAsString[i]](characterTime, direction);
+
+      if (valueAsString[i] === '|') {
+        this.drawDividerLine_();
+      } else {
+        this.ctx_.translate(this.letterPadding_, this.letterPadding_);
+        this[valueAsString[i]](characterTime, direction);
+      }
+
       this.ctx_.restore();
     }
+
   },
 
-  freeze: function(freezeCount) {
-    this.freezeDigitCount_ = freezeCount;
+  convertNumberToStringAndPadIfNeeded_: function(value) {
+    var str = Number(value).toString();
+    if (value < 10)
+      str = '0' + str;
+
+    return str;
+  },
+
+  setNextValueForFreezing: function(value, freezeValue) {
+
+    var daysValueAsString =
+        this.convertNumberToStringAndPadIfNeeded_(value.days);
+    var hoursValueAsString =
+        this.convertNumberToStringAndPadIfNeeded_(value.hours);
+    var minutesValueAsString =
+        this.convertNumberToStringAndPadIfNeeded_(value.minutes);
+    var secondsValueAsString =
+        this.convertNumberToStringAndPadIfNeeded_(value.seconds);
+
+    var freezeDaysValueAsString =
+        this.convertNumberToStringAndPadIfNeeded_(freezeValue.days);
+    var freezeHoursValueAsString =
+        this.convertNumberToStringAndPadIfNeeded_(freezeValue.hours);
+    var freezeMinutesValueAsString =
+        this.convertNumberToStringAndPadIfNeeded_(freezeValue.minutes);
+    var freezeSecondsValueAsString =
+        this.convertNumberToStringAndPadIfNeeded_(freezeValue.seconds);
+
+    var valueAsString = daysValueAsString + "|" +
+      hoursValueAsString + "|" +
+      minutesValueAsString + "|" +
+      secondsValueAsString;
+
+    var freezeValueAsString = freezeDaysValueAsString + "|" +
+      freezeHoursValueAsString + "|" +
+      freezeMinutesValueAsString + "|" +
+      freezeSecondsValueAsString;
+
+    // The very last character should always be different so never freeze it.
+    for (var i = 0; i < valueAsString.length; i++) {
+
+      this.freezeCount_ = i;
+
+      if (valueAsString[i] !== freezeValueAsString[i])
+        break;
+    }
+
   },
 
   init: function() {

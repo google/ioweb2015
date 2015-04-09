@@ -22,7 +22,7 @@ handlers:
 
 - url: $PREFIX$/embed.*
   static_files: app/embed.html
-  upload: app/embed$
+  upload: app/embed\.html$
   secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"

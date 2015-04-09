@@ -82,6 +82,13 @@ h6 {
   display: none;
 }
 
+.profilepic {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  margin-right: 0;
+}
+
 .link-spacing {
   > a {
     margin-right: $desktopKeyline;
