@@ -967,6 +967,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
   draw: function(value, time, direction) {
 
+    if (this.width_ === 0 && this.height_ === 0)
+      this.configureCanvas_();
+
     var valuesAsArray = [
         this.convertNumberToStringAndPadIfNeeded_(value.days),
         this.convertNumberToStringAndPadIfNeeded_(value.hours),
