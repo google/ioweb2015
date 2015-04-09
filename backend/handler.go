@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,6 +30,8 @@ func registerHandlers() {
 	handle("/api/v1/social", serveSocial)
 	handle("/api/v1/auth", handleAuth)
 	handle("/api/v1/schedule", serveSchedule)
+	handle("/api/v1/user/schedule", serveUserSchedule)
+	handle("/api/v1/user/schedule/", handleUserBookmarks)
 	// setup root redirect if we're prefixed
 	if config.Prefix != "/" {
 		var redirect http.Handler = http.HandlerFunc(redirectHandler)
@@ -290,6 +293,55 @@ func serveSchedule(w http.ResponseWriter, r *http.Request) {
 	//}
 	//w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	//w.Write(b)
+}
+
+func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	var sched []string
+	if sched, err = userSchedule(c); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(sched); err != nil {
+		errorf(c, "encode(%v): %v", sched, err)
+	}
+}
+
+func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	if r.URL.Path[len(r.URL.Path)-1] == '/' {
+		writeJSONError(w, http.StatusBadRequest, errors.New("invalid session ID"))
+		return
+	}
+
+	// TODO: check whether the session ID actually exists?
+	sid := path.Base(r.URL.Path)
+
+	switch r.Method {
+	case "PUT":
+		err = bookmarkSession(c, sid)
+	case "DELETE":
+		err = unbookmarkSession(c, sid)
+	default:
+		writeJSONError(w, http.StatusBadRequest, errors.New("invalid request method"))
+		return
+	}
+
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err)
+	}
 }
 
 // writeJSONError sets response code to 500 and writes an error message to w.
