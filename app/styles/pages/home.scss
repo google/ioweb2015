@@ -16,6 +16,7 @@
 
 $name: 'page-home';
 
+@import '../base/_vars';
 @import '../base/_layout';
 @import '../base/_color';
 @import '../base/_breakpoints';
@@ -23,11 +24,6 @@ $name: 'page-home';
 
 
 ##{$name} {
-
-.masthead {
-  min-height: 600px;
-  height: 600px;
-}
 
 .masthead-container {
   max-width: 100% !important;
@@ -112,7 +108,6 @@ $name: 'page-home';
 }
 
 #countdown-container {
-
   countdown-timer {
     top: 0;
     left: 0;
@@ -151,6 +146,10 @@ $name: 'page-home';
 
 @media (min-width: $tablet-breakpoint-min) {
   $overlayCardTop: 153px;
+
+  #countdown-container {
+    top: -$navbarHeight - 80px;
+  }
 
   .io__hash {
     margin: 80px auto;

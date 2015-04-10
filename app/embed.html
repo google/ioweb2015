@@ -13,18 +13,21 @@
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/main_sd.css" shim-shadowdom>
 
+  <script>
+    // Before embed-elements.html because is uses analytics.js inside.
+    window.ENV = location.hostname.match('localhost') ? 'dev' : 'prod;' // Used in analytics.js
+    window.PREFIX = '/io2015';
+  </script>
+
   <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="elements/embed-elements.html">
 
 </head>
 <body id="page-embed" fullbleed>
 
-<io-gadget videoIds="['8OJ7ih8EE7s','fqULJBBEVQE','yRbOSdAe_JU']"></io-gadget>
+<!-- First video should be the keynote -->
+<io-gadget videoIds="['wtLJPvx7-ys', '8OJ7ih8EE7s','fqULJBBEVQE','yRbOSdAe_JU']"></io-gadget>
 
-<script>
-  window.ENV = location.hostname.match('localhost') ? 'dev' : 'prod;' // Used in analytics.js
-  window.PREFIX = '/io2015';
-</script>
 <script src="scripts/analytics.js"></script>
 <script>
 (function() {

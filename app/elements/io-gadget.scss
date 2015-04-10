@@ -141,23 +141,38 @@ paper-dropdown-menu {
   color: #fff;
   padding: $tabletKeyline;
 
-  h2, h3 {
+  h1, h2, h3, h4, a {
     color: inherit;
   }
 
-  h2 {
-    margin-top: $tabletKeyline;
+  a {
+    font-weight: inherit;
   }
 
-  h3 {
+  h3, .viewvideos {
+    margin-top: $mobileKeyline;
+    margin-bottom: $mobileKeyline;
+  }
+
+  h1, a {
     color: $color-cyan-400;
   }
 
   img {
-    width: 200px;
-    height: auto;
+    width: 90px;
+    height: 65px;
+  }
+
+  h1 {
+    font-size: 34px;
+    line-height: 1;
   }
 }
+
+core-icon {
+  margin-right: $mobileKeyline / 2;
+}
+
 
 @media (max-width: $phone-breakpoint-max) {
   #social-feed {
