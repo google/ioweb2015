@@ -9,7 +9,9 @@
       easeintime="490" waittime="100"
       easeouttime="400"
       thresholdInformation="{{daysThresholdInfo}}"
-      value="{{countdownValue}}" autoStart>
+      value="{{countdownValue}}" autoStart
+      aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O"
+      role="timer">
   </countdown-timer>
 </div>
 {% end %}
