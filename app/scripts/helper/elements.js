@@ -169,6 +169,33 @@ IOWA.Elements = (function() {
       'Wearables'
     ];
 
+    template.formatSessionTimeFilter = function(dateStr) {
+      var date = new Date(dateStr);
+      return date.toLocaleTimeString().replace(/:\d+ /, ' ');
+    };
+
+    template.formatSessionDateFilter = function(dateStr) {
+      var date = new Date(dateStr);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      if (month === 5) {
+        return 'May ' + day;
+      } else if (month === 6) {
+        return 'June ' + day;
+      }
+      return day;
+    };
+
+    template.formatSessionTagsFilter = function(tagList) {
+      if (!tagList) {
+        return;
+      }
+      var list = tagList.map(function(tag) {
+        return this.scheduleData.tags[tag].name;
+      }, this);
+      return list.join(', ');
+    };
+
     template.scrollLock = function(enable) {
       document.body.classList.toggle('noscroll', enable);
     };

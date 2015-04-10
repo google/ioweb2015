@@ -130,26 +130,17 @@
 <script>
 (function() {
 
-  function fetchVideos(callback) {
-    var xhr = new XMLHttpRequest();
-    // TODO(ericbidelman): update to real API endpoint when it's ready.
-    var url = '//storage.googleapis.com/iosched-updater-dev.appspot.com/session_data_v2.696.json';
-    xhr.open('GET', url);
-    xhr.onload = function(e) {
-      if (e.target.status == 200) {
-        callback(JSON.parse(e.target.response).video_library);
-      }
-    };
-    xhr.send();
-  }
-
   function onPageTransitionDone_(e) {
     document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
-    fetchVideos(function(videos) {
+    IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
+      var lib = scheduleData.video_library;
+      var videos = Object.keys(lib).map(function(key) { return lib[key]; });
+
       IOWA.Elements.Template.videoList = videos;
       IOWA.Elements.Template.filteredVideoList = videos;
     });
+
   }
 
   // Page-specific JS that runs when this page is loaded for the first time.
@@ -165,7 +156,7 @@
       IOWA.Elements.Template.mastheadVideoActive = false;
       IOWA.Elements.Template.filteredVideoList = IOWA.Elements.Template.videoList; // reset filter.
 
-      // Don't re-fetch videos when navigating back to this page.
+      // Bomb out early and don't re-fetch videos when navigating back to this page.
       if (IOWA.Elements.Template.videoList.length) {
         return;
       }
