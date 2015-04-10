@@ -39,9 +39,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
             <div class="card-content schedule-rows" layout horizontal>
               <template repeat="{{session in sessions | filterByProperty(timeBlock.day, true) | filterByProperty(timeBlock.name, true)}}">
                 <div layout horizontal hidden?="{{ session.hide }}">
-                  <paper-radio-button name="" role="radio"
-                      tabindex="0" aria-checked="false"
-                      aria-label="" class=""></paper-radio-button>
+                  <paper-radio-button></paper-radio-button>
                   <div layout vertical flex>
                     <span class="schedule-title" auto-vertical flex>
                       {{ session.title }}
@@ -66,63 +64,28 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           <div class="card-content">
             <div id="filters">
               <div class="filter-rows filter-section">
-                <core-label center horizontal layout>
-                  <div flex>Design</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="themeDesign" for></paper-checkbox>
-                </core-label>
-                <core-label center horizontal layout>
-                  <div flex>Develop</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="themeDevelop" for></paper-checkbox>
-                </core-label>
-                <core-label center horizontal layout>
-                  <div flex>Distribute</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="themeDistribute" for></paper-checkbox>
-                </core-label>
+                <template repeat="{{theme in sessionThemes}}">
+                  <core-label center horizontal layout>
+                    <div flex>{{theme}}</div>
+                    <paper-checkbox on-change="{{applyFilter}}"
+                        name="{{theme}}" for></paper-checkbox>
+                  </core-label>
+                </template>
               </div>
               <div class="filter-rows filter-section">
-                <core-label center horizontal layout>
-                  <div flex>Sessions</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="typeSessions" for></paper-checkbox>
-                </core-label>
-                <core-label center horizontal layout>
-                  <div flex>Sandbox Talks</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="typeSandbox" for></paper-checkbox>
-                </core-label>
-                <core-label center horizontal layout>
-                  <div flex>Workshops</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="typeWorkshops" for></paper-checkbox>
-                </core-label>
-                <core-label center horizontal layout>
-                  <div flex>Office Hours</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="typeOfficeHours" for></paper-checkbox>
-                </core-label>
-                <core-label center horizontal layout>
-                  <div flex>Code Labs</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="typeCode Labs" for></paper-checkbox>
-                </core-label>
+                <template repeat="{{type in sessionTypes}}">
+                  <core-label center horizontal layout>
+                    <div flex>{{type}}</div>
+                    <paper-checkbox on-change="{{applyFilter}}"
+                        name="{{type}}" for></paper-checkbox>
+                  </core-label>
+                </template>
               </div>
               <div class="filter-rows filter-section">
                 <core-label center horizontal layout>
                   <div flex>Live Streamed</div>
-                  <paper-checkbox on-change="{{applyFilter}}" class="blue"
-                      role="checkbox" tabindex="0" aria-checked="true"
-                      name="isLivestream" for></paper-checkbox>
+                  <paper-checkbox on-change="{{applyFilter}}"
+                      name="Live Streamed" for></paper-checkbox>
                 </core-label>
               </div>
             </div>
@@ -147,7 +110,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         "mainTag": "TOPIC_CLOUDSERVICES",
         "photoUrl": "http://storage.googleapis.com/iosched-updater-dev.appspot.com/images/sessions/__w-200-400-600-800-1000__/046787bd-49cb-e311-b297-00155d5066d7.jpg",
         "room": "room7",
-        "themeDevelop": true,
         "speakers": [
           "7cde3b93-0fcc-e311-b297-00155d5066d7",
           "59f963be-0fcc-e311-b297-00155d5066d7"
@@ -161,10 +123,15 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         "title": "Predicting the future with the Google Cloud Platform",
         "url": "https://www.google.com/events/io/schedule/session/046787bd-49cb-e311-b297-00155d5066d7",
         "youtubeUrl": "https://youtu.be/YyvvxFeADh8",
+
+        "timeBlock": "day1_10am",
         "hide": false,
-        "day1": true,
-        "10am": true,
-        "timeBlock": "day1_10am"
+        "filters": {
+          "Live Streamed": true,
+          "day1": true,
+          "10am": true,
+          "Engage & Earn": true
+        }
       },
       {
         "id": "02e345e6-cef9-e311-903f-00155d5066d7",
@@ -180,10 +147,15 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         ],
         "title": "North America meetup",
         "url": "https://www.google.com/events/io/schedule/session/02e345e6-cef9-e311-903f-00155d5066d7",
-        "hide": true,
-        "day1": true,
-        "11am": true,
-        "timeBlock": "day1_11am"
+
+        "timeBlock": "day1_11am",
+        "hide": false,
+        "filters": {
+          "Live Streamed": false,
+          "day1": true,
+          "11am": true,
+          "Develop & Design": true
+        }
       },
       {
         "id": "02e345e6-cef9-e311-903f-00155d5066d7",
@@ -199,10 +171,15 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         ],
         "title": "North America meetup",
         "url": "https://www.google.com/events/io/schedule/session/02e345e6-cef9-e311-903f-00155d5066d7",
-        "hide": true,
-        "day2": true,
-        "11am": true,
-        "timeBlock": "day2_11am"
+
+        "timeBlock": "day2_12am",
+        "hide": false,
+        "filters": {
+          "Live Streamed": false,
+          "day2": true,
+          "12am": true,
+          "Develop & Design": true
+        }
       }
     ];
 
@@ -217,9 +194,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           var timeBlock = {
             name: hours[j],
             day: days[i],
-            isEmpty: true
+            isEmpty: true,
+            filters: {}
           };
-          timeBlock[days[i]] = true;
+          timeBlock.filters[days[i]] = true;
           if (j === 0) {
             timeBlock['dayStart'] = days[i];
           }
@@ -241,7 +219,8 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @attribute sessions
          * @type array
          */
-         sessions: sessions,
+        sessions: sessions,
+
         /**
          * Optional day to filter the sessions, e.g. 'day1'.
          *
@@ -249,7 +228,25 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type string
          * @default ''
          */
-         day: ''
+        day: '',
+
+        /**
+         * Array of session theme names.
+         *
+         * @property sessionThemes
+         * @type array
+         * @default []
+         */
+        sessionThemes: [],
+
+        /**
+         * Array of session types.
+         *
+         * @property sessionTypes
+         * @type array
+         * @default []
+         */
+        sessionTypes: []
       },
 
       /**
@@ -293,7 +290,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       matchesFilters: function(session) {
         for (var i = 0; i < this.filters.length; i++) {
-          if (!session[this.filters[i]]) {
+          if (!session.filters[this.filters[i]]) {
             return false;
           }
         }
@@ -306,7 +303,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         }
         var filtered = [];
         for (var i = 0; i < items.length; i++) {
-          if (items[i][propertyName]) {
+          if (items[i].filters[propertyName]) {
             filtered.push(items[i]);
           }
         }

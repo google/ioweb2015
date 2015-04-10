@@ -272,6 +272,12 @@
 
           IOWA.Elements.Template.scheduleData = scheduleData;
 
+          var scheduleEls = document.querySelectorAll('io-schedule');
+          for (var i = 0, length = scheduleEls.length; i < length; i++) {
+            scheduleEls[i].sessionThemes = IOWA.Elements.Template.filterThemes;
+            scheduleEls[i].sessionTypes = IOWA.Elements.Template.filterSessionTypes;
+          }
+
           // Deep link into session.
           var sessionId = location.hash.substring(1).match(SESSION_ID_REGEX);
           if (sessionId) {
