@@ -114,7 +114,7 @@
           </paper-button>
           <div class="search__map" layout horizontal center self-center relative hidden?="{{!webglSupported}}">
             <core-icon icon="io:search"></core-icon>
-            <paper-input id="autocomplete" label="Search for a location"></paper-input>
+            <paper-input id="autocomplete" label="Search for a location" on-keydown="{{onPlacesSearchKeydown}}"></paper-input>
           </div>
         </div>
         <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}"
@@ -361,6 +361,14 @@
           IOWA.Elements.Template.offsiteMarkerResults= [];
           runExtendedMapAnimation();
         });
+      };
+
+      IOWA.Elements.Template.onPlacesSearchKeydown = function(e, detail, sender) {
+        // Prevent places API autocomplete from closing on enter press.
+        // e.g. make sures select a dropdown item.
+        if (e.keyCode == 13) {
+          e.stopImmediatePropagation();
+        }
       };
 
       IOWA.Elements.Template.initExtendedSearchBox = function(e, detail, sender) {
