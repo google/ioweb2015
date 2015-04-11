@@ -30,9 +30,9 @@ const (
 // oauth2Credentials is a user authorization credentials.
 type oauth2Credentials struct {
 	userID       string
-	expiry       time.Time
-	accessToken  string
-	refreshToken string
+	Expiry       time.Time `datastore:"exp"`
+	AccessToken  string    `datastore:"at,noindex"`
+	RefreshToken string    `datastore:"rt,noindex"`
 }
 
 // authUser verifies authentication provided in bearer.
@@ -138,9 +138,9 @@ func fetchCredentials(c context.Context, code string) (*oauth2Credentials, error
 	// use only what we need
 	return &oauth2Credentials{
 		userID:       userID,
-		expiry:       time.Now().Add(time.Duration(body.Expires) * time.Second),
-		accessToken:  body.AccessToken,
-		refreshToken: body.RefreshToken,
+		Expiry:       time.Now().Add(time.Duration(body.Expires) * time.Second),
+		AccessToken:  body.AccessToken,
+		RefreshToken: body.RefreshToken,
 	}, nil
 }
 
