@@ -6,6 +6,9 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
+
+	"golang.org/x/net/context"
 )
 
 func TestServeIOExtEntriesStub(t *testing.T) {
@@ -124,6 +127,8 @@ func TestHandleAuth(t *testing.T) {
 	}
 
 	for i, test := range table {
+		resetTestState(t)
+
 		done := make(chan struct{}, 1)
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if v := r.FormValue("code"); v != code {
@@ -160,8 +165,9 @@ func TestHandleAuth(t *testing.T) {
 		r := newTestRequest(t, "POST", "/api/v1/auth", p)
 		r.Header.Set("Authorization", "Bearer "+test.token)
 		w := httptest.NewRecorder()
+		c := newContext(r)
 
-		cache.flush(newContext(r))
+		cache.flush(c)
 		handleAuth(w, r)
 
 		if test.success && w.Code != http.StatusOK {
@@ -177,8 +183,29 @@ func TestHandleAuth(t *testing.T) {
 			}
 		default:
 			if test.doExchange {
-				t.Errorf("code exchange never happened")
+				t.Errorf("%d: code exchange never happened", i)
 			}
+		}
+
+		// TODO: remove !isGAEtest when standalone DB is implemented
+		if !test.success || !isGAEtest {
+			continue
+		}
+
+		c = context.WithValue(c, ctxKeyUser, testUserID)
+		cred, err := getCredentials(c)
+
+		if err != nil {
+			t.Errorf("%d: getCredentials: %v", i, err)
+		}
+		if cred.AccessToken != "new-access-token" {
+			t.Errorf("%d: cred.AccessToken = %q; want 'new-access-token'", i, cred.AccessToken)
+		}
+		if cred.RefreshToken != "new-refresh-token" {
+			t.Errorf("%d: cred.RefreshToken = %q; want 'new-refresh-token'", i, cred.RefreshToken)
+		}
+		if cred.Expiry.Before(time.Now()) {
+			t.Errorf("%d: cred.Expiry is in the past: %s", i, cred.Expiry)
 		}
 	}
 }

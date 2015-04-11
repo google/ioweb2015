@@ -17,6 +17,8 @@ var (
 )
 
 func init() {
+	isGAEtest = true
+
 	// newTestRequest returns a new *http.Request associated with an aetest.Instance
 	// of test state t.
 	newTestRequest = func(t *testing.T, method, url string, body io.Reader) *http.Request {
