@@ -28,7 +28,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     <link rel="stylesheet" href="../styles/pages/schedule.css">
     <div class="card__container sidebyside" layout horizontal>
       <div flex layout vertical>
-        <template repeat="{{timeBlock in timeBlocks_ | filterByProperty(day, true)}}">
+        <template repeat="{{timeBlock in timeBlocks_ | filterByProperty('day', day)}}">
           <div class="card day-title" aria-label="" hidden?="{{ !timeBlock.dayStart || day }}">
             {{timeBlock.dayStart}}
           </div>
@@ -37,7 +37,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               <h4>{{timeBlock.name}}</h4>
             </div>
             <div class="card-content schedule-rows" layout horizontal>
-              <template repeat="{{session in sessions | filterByProperty(timeBlock.day, true) | filterByProperty(timeBlock.name, true)}}">
+              <template repeat="{{session in sessions | filterByProperty('day', timeBlock.day) | filterByProperty('block',timeBlock.name)}}">
                 <div layout horizontal hidden?="{{ session.hide }}">
                   <paper-radio-button></paper-radio-button>
                   <div layout vertical flex>
@@ -100,85 +100,62 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     // TODO: Remove dummy data once this
     // https://github.com/GoogleChrome/ioweb2015/pull/923/files lands.
     var sessions = [
-       {
-        "id": "046787bd-49cb-e311-b297-00155d5066d7",
-        "color": "#0288d1",
-        "description": "Can you predict the future using Big Data? Can you divine if your users will come back to your site or where the next social conflict will arise? And most importantly, can Brazil be defeated at soccer on their own turf? In this talk, we'll go through the process of data extraction, modelling and prediction as well as generating a live dashboard to visualize the results. We’ll demonstrate how you can use Google Cloud and Open Source technologies to make predictions about the biggest soccer matches in the world. You’ll see how to use Google BigQuery for data analytics and Monte Carlo simulations, as well as how to create machine learning models in R and pandas. We predict that after this talk you’ll have the necessary tools to cast your own eye on the future.",
-        "endTimestamp": "2014-06-26T23:45:00Z",
-        "hashtag": "Cloud",
+      {
+        "id": "bb8bf02d-3afd-e311-903f-00155d5066d7",
+        "title": "Introduction to Classroom",
+        "description": "Come by the School Sandbox Teaching Theater",
+        "day": 2,
+        "block": "10 AM",
+        "start": "10:30 AM",
+        "end": "11:00 AM",
+        "startTimestamp": "2014-06-25T10:30:00Z",
+        "endTimestamp": "2014-06-25T11:00:00Z",
+        "speakers": ["speaker-id-1", "speaker-id-2"],
+        "room": "RoomName 42",
+        "photoUrl": "https://golang.org/doc/gopher/gopherbw.png",
+        "youtubeUrl": "https://youtu.be/YCUZ01yFtsM",
         "isLivestream": false,
-        "mainTag": "TOPIC_CLOUDSERVICES",
-        "photoUrl": "http://storage.googleapis.com/iosched-updater-dev.appspot.com/images/sessions/__w-200-400-600-800-1000__/046787bd-49cb-e311-b297-00155d5066d7.jpg",
-        "room": "room7",
-        "speakers": [
-          "7cde3b93-0fcc-e311-b297-00155d5066d7",
-          "59f963be-0fcc-e311-b297-00155d5066d7"
-        ],
-        "startTimestamp": "2014-06-26T23:00:00Z",
-        "tags": [
-          "TYPE_SESSIONS",
-          "THEME_DEVELOP",
-          "TOPIC_CLOUDSERVICES"
-        ],
-        "title": "Predicting the future with the Google Cloud Platform",
-        "url": "https://www.google.com/events/io/schedule/session/046787bd-49cb-e311-b297-00155d5066d7",
-        "youtubeUrl": "https://youtu.be/YyvvxFeADh8",
-
-        "timeBlock": "day1_10am",
-        "hide": false,
+        "filters": {
+          "Live Streamed": false,
+          "Develop & Design": true
+        }
+      }, {
+        "id": "bb8bf02d-3afdasd1-903f-00155d5066d7",
+        "title": "Gopher rules",
+        "description": "Meet the gopher and learn from the best",
+        "day": 1,
+        "block": "11 AM",
+        "start": "11:30 AM",
+        "end": "12:00 AM",
+        "startTimestamp": "2014-06-24T11:30:00Z",
+        "endTimestamp": "2014-06-24T12:00:00Z",
+        "speakers": ["speaker-id-1", "speaker-id-2"],
+        "room": "RoomName 42",
+        "photoUrl": "https://golang.org/doc/gopher/gopherbw.png",
+        "youtubeUrl": "https://youtu.be/YCUZ01yFtsM",
+        "isLivestream": false,
         "filters": {
           "Live Streamed": true,
-          "day1": true,
-          "10am": true,
+          "Develop & Design": true
+        }
+      }, {
+        "id": "bb8bf0aa-3afdasd1-903f-00155d5066d7",
+        "title": "Gopher rules again",
+        "description": "Meet the gopher and learn from the best",
+        "day": 1,
+        "block": "12 AM",
+        "start": "12:30 AM",
+        "end": "13:00 AM",
+        "startTimestamp": "2014-06-24T12:30:00Z",
+        "endTimestamp": "2014-06-24T13:00:00Z",
+        "speakers": ["speaker-id-1", "speaker-id-2"],
+        "room": "RoomName 42",
+        "photoUrl": "https://golang.org/doc/gopher/gopherbw.png",
+        "youtubeUrl": "https://youtu.be/YCUZ01yFtsM",
+        "isLivestream": false,
+        "filters": {
+          "Live Streamed": true,
           "Engage & Earn": true
-        }
-      },
-      {
-        "id": "02e345e6-cef9-e311-903f-00155d5066d7",
-        "description": "Meetup for Google I/O participants from North America.",
-        "endTimestamp": "2014-06-25T19:30:00Z",
-        "isLivestream": true,
-        "room": "b0982afc-cdf9-e311-903f-00155d5066d7",
-        "speakers": [],
-        "startTimestamp": "2014-06-25T19:00:00Z",
-        "tags": [
-          "TYPE_BIRDSOFAFEATHER",
-          "THEME_DEVELOP"
-        ],
-        "title": "North America meetup",
-        "url": "https://www.google.com/events/io/schedule/session/02e345e6-cef9-e311-903f-00155d5066d7",
-
-        "timeBlock": "day1_11am",
-        "hide": false,
-        "filters": {
-          "Live Streamed": false,
-          "day1": true,
-          "11am": true,
-          "Develop & Design": true
-        }
-      },
-      {
-        "id": "02e345e6-cef9-e311-903f-00155d5066d7",
-        "description": "Meetup for Google I/O participants from North America.",
-        "endTimestamp": "2014-06-25T19:30:00Z",
-        "isLivestream": true,
-        "room": "b0982afc-cdf9-e311-903f-00155d5066d7",
-        "speakers": [],
-        "startTimestamp": "2014-06-25T19:00:00Z",
-        "tags": [
-          "TYPE_BIRDSOFAFEATHER",
-          "THEME_DEVELOP"
-        ],
-        "title": "North America meetup",
-        "url": "https://www.google.com/events/io/schedule/session/02e345e6-cef9-e311-903f-00155d5066d7",
-
-        "timeBlock": "day2_12am",
-        "hide": false,
-        "filters": {
-          "Live Streamed": false,
-          "day2": true,
-          "12am": true,
-          "Develop & Design": true
         }
       }
     ];
@@ -187,22 +164,19 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     var timeBlocksIndex = {};
 
     function populateTimeBlocks() {
-      var days = ['day1', 'day2'];
-      var hours = ['10am', '11am', '12am', '1pm', '2pm', '3pm', '4pm'];
-      for (var i = 0; i < days.length; i++) {
+      var hours = ['10 AM', '11 AM', '12 AM', '1 PM', '2 PM', '3 PM', '4 PM'];
+      for (var i = 1; i < 3; i++) {
         for (var j = 0; j < hours.length; j++) {
           var timeBlock = {
             name: hours[j],
-            day: days[i],
-            isEmpty: true,
-            filters: {}
+            day: i,
+            isEmpty: true
           };
-          timeBlock.filters[days[i]] = true;
           if (j === 0) {
-            timeBlock['dayStart'] = days[i];
+            timeBlock['dayStart'] = i;
           }
           timeBlocks.push(timeBlock);
-          var timeBlockId = days[i] + '_' + hours[j];
+          var timeBlockId = i + hours[j];
           timeBlocksIndex[timeBlockId] = timeBlocks.length - 1;
         }
       }
@@ -225,10 +199,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * Optional day to filter the sessions, e.g. 'day1'.
          *
          * @attribute day
-         * @type string
+         * @type number
          * @default ''
          */
-        day: '',
+        day: null,
 
         /**
          * Array of session theme names.
@@ -297,13 +271,14 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         return true;
       },
 
-      filterByProperty: function(items, propertyName) {
-        if (!propertyName) {
+      filterByProperty: function(items, propertyName, propertyValue) {
+        if (!propertyName || propertyValue === null) {
           return items;
         }
         var filtered = [];
         for (var i = 0; i < items.length; i++) {
-          if (items[i].filters[propertyName]) {
+          var itemValue = items[i][propertyName] || items[i].filters[propertyName];
+          if (itemValue == propertyValue) {
             filtered.push(items[i]);
           }
         }
@@ -313,7 +288,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       checkEmptyBlocks: function() {
         for (var i = 0; i < this.sessions.length; i++) {
           var session = this.sessions[i];
-          var block = session.timeBlock;
+          var block = session.day + session.block;
           if (this.timeBlocks_[this.timeBlocksIndex_[block]]) {
             var isEmpty = !this.matchesFilters(session);
             this.timeBlocks_[this.timeBlocksIndex_[block]].isEmpty = isEmpty;
