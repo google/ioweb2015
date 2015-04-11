@@ -44,7 +44,7 @@ func TestVerifyBearerToken(t *testing.T) {
 		config.Google.Auth.Client = client
 		config.Google.VerifyURL = ts.URL
 
-		r, _ := http.NewRequest("GET", "/", nil)
+		r := newTestRequest(t, "GET", "/", nil)
 		uid, err := verifyBearerToken(newContext(r), token)
 
 		switch {
@@ -87,7 +87,7 @@ func TestVerifyIDToken(t *testing.T) {
 	defer ts.Close()
 	config.Google.CertURL = ts.URL
 
-	r, _ := http.NewRequest("GET", "/", nil)
+	r := newTestRequest(t, "GET", "/", nil)
 	c := newContext(r)
 	cache.flush(c)
 	uid, err := verifyIDToken(c, idToken)
@@ -125,8 +125,7 @@ func TestAuthUser(t *testing.T) {
 		config.Google.VerifyURL = test.verifyURL
 		config.Google.CertURL = test.certURL
 
-		r, _ := http.NewRequest("GET", "/", nil)
-		c := newContext(r)
+		c := newContext(newTestRequest(t, "GET", "/", nil))
 		cache.flush(c)
 		c, err := authUser(c, test.token)
 
