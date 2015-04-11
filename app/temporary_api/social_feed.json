@@ -1,51 +1,159 @@
 [
   {
-    "kind":"tweet",
-    "url":"https://twitter.com/googledevs/status/580786118427209729",
-    "text":"Lear\n <how> Instrument \u0026 Chrome Developer Relations built the sound-based I/O 2015 Experiment w/ WebGL, Web Audio #io15 http://t.co/HaS39hWG2J",
-    "author":"@googledevs",
-    "when":"2015-03-25T17:39:35Z"
+    "kind": "tweet",
+    "url": "https://twitter.com/googledevs/status/580786118427209729",
+    "text": "Lear\n <how> Instrument \u0026 Chrome Developer Relations built the sound-based I/O 2015 Experiment w/ WebGL, Web Audio #io15 http://t.co/HaS39hWG2J",
+    "author": "@googledevs",
+    "when": "2015-03-25T17:39:35Z",
+    "urls": [
+      {
+        "display_url": "goo.gl/HTJcAI",
+        "expanded_url": "http://goo.gl/HTJcAI",
+        "indices": [
+          122,
+          144
+        ],
+        "url": "http://t.co/HaS39hWG2J"
+      }
+    ],
+    "media": [
+      {
+        "id": 266031293949698048,
+        "id_str": "266031293949698048",
+        "indices": [17, 37],
+        "media_url": "http://pbs.twimg.com/media/A7EiDWcCYAAZT1D.jpg",
+        "media_url_https": "https://pbs.twimg.com/media/A7EiDWcCYAAZT1D.jpg",
+        "url": "http://t.co/bAJE6Vom",
+        "display_url": "pic.twitter.com/bAJE6Vom",
+        "expanded_url": "http://twitter.com/BarackObama/status/266031293945503744/photo/1",
+        "type": "photo",
+        "sizes": {
+          "medium": {
+            "w": 600,
+            "h": 399,
+            "resize": "fit"
+          },
+          "thumb": {
+            "w": 150,
+            "h": 150,
+            "resize": "crop"
+          },
+          "small": {
+            "w": 340,
+            "h": 226,
+            "resize": "fit"
+          },
+          "large": {
+            "w": 800,
+            "h": 532,
+            "resize": "fit"
+          }
+        }
+      }
+    ]
   },
   {
-    "kind":"tweet",
-    "url":"https://twitter.com/googledevs/status/578710320358768640",
-    "text":"<script>alert('hello!')</script> The #io15 registration window has closed. We’ll let you know if you’ve been selected soon!",
-    "author":"@googledevs",
-    "when":"2015-03-20T00:11:06Z"
+    "kind": "tweet",
+    "url": "https://twitter.com/googledevs/status/578710320358768640",
+    "text": "<script>alert('hello!')</script> The #io15 registration window has closed. We’ll let you know if you’ve been selected soon!",
+    "author": "@googledevs",
+    "when": "2015-03-20T00:11:06Z",
+    "urls": [],
+    "media": null
   },
   {
-    "kind":"tweet",
-    "url":"https://twitter.com/googledevs/status/578678893239873537",
-    "text":"Only 2hrs left to submit your #io15 registration application for Google I/O 2015 http://t.co/Tr7f0jXzAw",
-    "author":"@googledevs",
-    "when":"2015-03-19T22:06:14Z"
+    "kind": "tweet",
+    "url": "https://twitter.com/googledevs/status/578678893239873537",
+    "text": "Only 2hrs left to submit your #io15 registration application for Google I/O 2015 http://t.co/Tr7f0jXzAw",
+    "author": "@googledevs",
+    "when": "2015-03-19T22:06:14Z",
+    "urls": [
+      {
+        "display_url": "goo.gl/IQAsW2",
+        "expanded_url": "http://goo.gl/IQAsW2",
+        "indices": [
+          81,
+          103
+        ],
+        "url": "http://t.co/Tr7f0jXzAw"
+      }
+    ],
+    "media": null
   },
   {
-    "kind":"tweet",
-    "url":"https://twitter.com/googledevs/status/578285048501178368",
-    "text":"Don’t forget, the #io15 registration window closes at 5pm PDT on 3/19 http://t.co/Tr7f0jXzAw",
-    "author":"@googledevs",
-    "when":"2015-03-18T20:01:14Z"
+    "kind": "tweet",
+    "url": "https://twitter.com/googledevs/status/578285048501178368",
+    "text": "Don’t forget, the #io15 registration window closes at 5pm PDT on 3/19 http://t.co/Tr7f0jXzAw",
+    "author": "@googledevs",
+    "when": "2015-03-18T20:01:14Z",
+    "urls": [
+      {
+        "display_url": "goo.gl/IQAsW2",
+        "expanded_url": "http://goo.gl/IQAsW2",
+        "indices": [
+          70,
+          92
+        ],
+        "url": "http://t.co/Tr7f0jXzAw"
+      }
+    ],
+    "media": null
   },
   {
-    "kind":"tweet",
-    "url":"https://twitter.com/googledevs/status/577983798270246912",
-    "text":"For those on the other side of the world, the #io15 registration window is open until 5pm PDT on 3/19. http://t.co/Tr7f0jXzAw",
-    "author":"@googledevs",
-    "when":"2015-03-18T00:04:10Z"
+    "kind": "tweet",
+    "url": "https://twitter.com/googledevs/status/577983798270246912",
+    "text": "For those on the other side of the world, the #io15 registration window is open until 5pm PDT on 3/19. http://t.co/Tr7f0jXzAw",
+    "author": "@googledevs",
+    "when": "2015-03-18T00:04:10Z",
+    "urls": [
+      {
+        "display_url": "goo.gl/IQAsW2",
+        "expanded_url": "http://goo.gl/IQAsW2",
+        "indices": [
+          103,
+          125
+        ],
+        "url": "http://t.co/Tr7f0jXzAw"
+      }
+    ],
+    "media": null
   },
   {
-    "kind":"tweet",
-    "url":"https://twitter.com/googledevs/status/577862981800701953",
-    "text":"The #io15 registration window is open. Don’t worry, you have until 5pm PDT on 3/19 to apply. http://t.co/Tr7f0jXzAw",
-    "author":"@googledevs",
-    "when":"2015-03-17T16:04:05Z"
+    "kind": "tweet",
+    "url": "https://twitter.com/googledevs/status/577862981800701953",
+    "text": "The #io15 registration window is open. Don’t worry, you have until 5pm PDT on 3/19 to apply. http://t.co/Tr7f0jXzAw",
+    "author": "@googledevs",
+    "when": "2015-03-17T16:04:05Z",
+    "urls": [
+      {
+        "display_url": "goo.gl/IQAsW2",
+        "expanded_url": "http://goo.gl/IQAsW2",
+        "indices": [
+          93,
+          115
+        ],
+        "url": "http://t.co/Tr7f0jXzAw"
+      }
+    ],
+    "media": null
   },
   {
-    "kind":"tweet",
-    "url":"https://twitter.com/googledevs/status/575706314694782976",
-    "text":"Join us for Google I/O 2015 via the global I/O Extended program. Learn more at: http://t.co/tjQ1xrhxAD. #io15 #io15extended",
-    "author":"@googledevs",
-    "when":"2015-03-11T17:14:16Z"
+    "kind": "tweet",
+    "url": "https://twitter.com/googledevs/status/575706314694782976",
+    "text": "Join us for Google I/O 2015 via the global I/O Extended program. Learn more at: http://t.co/tjQ1xrhxAD. #io15 #io15extended",
+    "author": "@googledevs",
+    "when": "2015-03-11T17:14:16Z",
+    "urls": [
+      {
+        "display_url": "goo.gl/m83uo9",
+        "expanded_url": "http://goo.gl/m83uo9",
+        "indices": [
+          80,
+          102
+        ],
+        "url": "http://t.co/tjQ1xrhxAD"
+      }
+    ],
+    "media": null
   }
 ]
