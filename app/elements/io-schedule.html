@@ -30,7 +30,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       <div flex layout vertical>
         <template repeat="{{timeBlock in timeBlocks_ | filterByProperty('day', day)}}">
           <div class="card day-title" aria-label="" hidden?="{{ !timeBlock.dayStart || day }}">
-            {{timeBlock.dayStart}}
+            Day {{timeBlock.dayStart}}
           </div>
           <div class="card" aria-label="" hidden?="{{timeBlock.isEmpty}}">
             <div class="card-content">
