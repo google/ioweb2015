@@ -356,16 +356,28 @@ gulp.task('backend:config', function() {
   generateServerConfig();
 });
 
-// Backend TDD: watch for changes and run tests in an infinite loop.
-gulp.task('backend:test', function(cb) {
-  var watchOpt = process.argv.indexOf('--watch') >= 0;
-  var t = testBackend();
-  if (watchOpt) {
-    gulp.watch([BACKEND_DIR + '/**/*.go'], testBackend);
-    gulp.watch([APP_DIR + '/templates/*'], testBackend);
-    cb();
+// Run backend tests.
+// To watch for changes and run tests in an infinite loop, add '--watch' arg.
+// To test GAE version, add '--gae' arg.
+gulp.task('backend:test', ['backend:config'], function(cb) {
+  var start = function(cmd) {
+    var runTests = testBackend.bind(null, cmd);
+    var proc = runTests();
+    if (argv.watch) {
+      gulp.watch([BACKEND_DIR + '/**/*.go'], runTests);
+      gulp.watch([APP_DIR + '/templates/*'], runTests);
+      cb();
+    } else {
+      proc.on('close', cb);
+    }
+  }
+
+  if (argv.gae) {
+    gaeSdkDir(function(dir) {
+      start(dir + '/goapp');
+    });
   } else {
-    t.on('close', cb);
+    start('go');
   }
 });
 
@@ -465,9 +477,28 @@ function buildBackend(cb) {
   build.on('close', cb);
 }
 
-// Run backend tests
-function testBackend() {
-  return spawn('go', ['test'], {cwd: BACKEND_DIR, stdio: 'inherit'});
+// Run backend tests using commmand cmd.
+// cmd is usually either 'go' or 'goapp'.
+function testBackend(cmd) {
+  return spawn(cmd, ['test'], {cwd: BACKEND_DIR, stdio: 'inherit'});
+}
+
+// Find GAE SDK root dir
+function gaeSdkDir(callback) {
+  var out = '';
+  var proc = spawn('gcloud', ['info', '--format' ,'json'], {
+    timeout: 3,
+    stdio: [process.stdin, 'pipe', process.stderr]
+  });
+
+  proc.stdout.on('data', function(chunk) {
+    out += chunk;
+  });
+
+  proc.stdout.on('end', function() {
+    var info = JSON.parse(out);
+    callback(info.config.paths.sdk_root + '/platform/google_appengine');
+  });
 }
 
 // Start GAE-based backend server with backendDir as the app root directory.

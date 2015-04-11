@@ -7,9 +7,10 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 RUN apt-get install -y \
-	ca-certificates curl gcc libc6-dev make \
+	ca-certificates curl python-pip gcc libc6-dev make \
 	bzr git mercurial \
 	--no-install-recommends
+RUN pip install docker-py
 
 ENV CLOUDSDK_CORE_DISABLE_PROMPTS=1
 ENV CLOUDSDK_PYTHON_SITEPACKAGES=1

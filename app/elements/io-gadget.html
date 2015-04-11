@@ -14,7 +14,6 @@ limitations under the License.
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-media-query/core-media-query.html">
 <link rel="import" href="../bower_components/google-youtube/google-youtube.html">
-<link rel="import" href="../bower_components/core-menu/core-menu.html">
 <link rel="import" href="../bower_components/paper-dropdown/paper-dropdown.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
@@ -37,7 +36,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
     <div id="livebanner" layout horizontal center end-justified>
       <h4><a href="{{'schedule'}}" target="_blank"
-             on-click="{{onOpenSchedule}}">I/O Live Schedule</a></h4>
+             on-click="{{onOpenSchedule}}">I/O Live schedule</a></h4>
     </div>
 
     <section id="gadget-content" layout horizontal vertical?="{{isPhoneSize}}" fit>
@@ -46,30 +45,33 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
         <template if="{{view === VIEWS_.BEFORE}}">
           <div class="preroll" layout vertical center-center auto-vertical flex two>
-            <img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo">
-            <div layout vertical>
-              <h2>Tune in on May 28, starting at 9AM PDT.</h2>
-              <h3 self-start>#io15</h3>
+            <div layout vertical self-start>
+              <h1>I/O live</h1>
+              <h3>Tune in here on May 28, starting at 9AM PDT.<br>
+              Learn more about Google I/O at <a href="https://google.com/io" target="_blank">google.com/io</a>.</h3>
+              <h4>#io15</h4>
             </div>
           </div>
         </template>
 
         <template if="{{view === VIEWS_.BETWEEN}}">
           <div class="preroll" layout vertical center-center auto-vertical flex two>
-            <img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo">
-            <div layout vertical>
-              <h2>Tune in again on May 29, starting at 9AM PDT.</h2>
-              <h3 self-start>#io15</h3>
+            <div layout vertical self-start>
+              <h1>I/O live</h1>
+              <h3>Tune in here again on May 29, starting at 9AM PDT.<br>
+              Meanwhile, watch the 2015 keynote and sessions at <a href="{{'videos'}}" target="_blank">events.google.com/io2015/videos</a>.</h3>
+              <h4>#io15</h4>
             </div>
           </div>
         </template>
 
         <template if="{{view === VIEWS_.AFTER}}">
           <div class="preroll" layout vertical center-center auto-vertical flex two>
-            <img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo">
-            <div layout vertical>
-              <h2>Thanks for another great Google I/O!</h2>
-              <h3 self-start>#io15</h3>
+            <div layout vertical self-start>
+              <h1>I/O live</h1>
+              <h3>Thanks for another great Google I/O.<br>
+              Watch the 2015 keynote and sessions at <a href="{{'videos'}}" target="_blank">events.google.com/io2015/videos</a>.</h3>
+              <h4>#io15</h4>
             </div>
           </div>
         </template>
@@ -93,14 +95,19 @@ The `<io-gadget>` element renders a youtube video + social feed.
             <div class="card-content card--video-meta" layout horizontal center>
               <div flex>
                 <div class="video-title" title="{{videoTitle}}">{{videoTitle}}&nbsp;</div>
-                <div class="video-author">{{videoAuthor}}</div>
+                <!-- <div class="video-author">{{videoAuthor}}</div> -->
               </div>
               <div>
                 <paper-dropdown-menu label="Switch channel">
                   <paper-dropdown valign="bottom" halign="right" class="dropdown">
                     <core-menu class="menu" valueattr="videoid" selected="{{selectedVideoId}}}">
                       <template repeat="{{video,i in videoIds}}">
-                        <paper-item videoid="{{video}}">Video {{i + 1}}</paper-item>
+                        <template if="{{i === 0}}">
+                          <paper-item videoid="{{video}}">Keynote</paper-item>
+                        </template>
+                        <template if="{{i > 0}}">
+                          <paper-item videoid="{{video}}">Channel {{i + 1}}</paper-item>
+                        </template>
                       </template>
                     </core-menu>
                   </paper-dropdown>

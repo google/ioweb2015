@@ -7,6 +7,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"math/big"
 	"net/http"
 	"net/http/httptest"
@@ -28,10 +29,33 @@ var (
 	testJWSKey    []byte
 	testJWSCert   []byte
 	testJWSCertID = "test-cert"
+
+	// The following 3 funcs are overwritten in server_gae_test.go
+	// to make it work with appengine/aetest package.
+
+	// newTestRequest creates a new HTTP request using http.NewRequest.
+	// It marks state t as failed if http.NewRequest returns an error.
+	newTestRequest = func(t *testing.T, method, url string, body io.Reader) *http.Request {
+		req, err := http.NewRequest(method, url, body)
+		if err != nil {
+			t.Fatalf("newTestRequest(%q, %q): %v", err)
+		}
+		return req
+	}
+	// resetTestState is a noop in standalone tests
+	// it resets aetest.Instance in GAE tests
+	resetTestState = func(t *testing.T) {}
+	// cleanupTests is a noop in standalone tests
+	// it closes all running aetest.Instance instances in GAE tests
+	cleanupTests = func() {}
 )
 
 func TestMain(m *testing.M) {
-	cache = newMemoryCache()
+	// GAE tests use gaeMemcache implementation
+	if cache == nil {
+		cache = newMemoryCache()
+	}
+
 	testJWSKey, testJWSCert = jwsTestKey(time.Now(), time.Now().Add(24*time.Hour))
 
 	token := jwt.New(jwt.GetSigningMethod("RS256"))
@@ -80,7 +104,9 @@ func TestMain(m *testing.M) {
 	config.Google.VerifyURL = tokeninfo.URL
 	config.Google.CertURL = cert.URL
 
-	os.Exit(m.Run())
+	code := m.Run()
+	cleanupTests()
+	os.Exit(code)
 }
 
 func preserveConfig() func() {
