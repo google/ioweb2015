@@ -17,6 +17,7 @@ script:
   - gulp
   # backend testing
   - gulp backend:test
+  - gulp backend:test --gae
   # deploy to appspot if this is master branch
   - util/auto-deploy
 cache:

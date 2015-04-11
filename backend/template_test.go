@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"strings"
 	"testing"
 )
@@ -17,7 +16,7 @@ func TestRenderTemplate(t *testing.T) {
 		{"about", true},
 	}
 	for i, test := range table {
-		r, _ := http.NewRequest("GET", "/dummy", nil)
+		r := newTestRequest(t, "GET", "/dummy", nil)
 		c := newContext(r)
 		if _, err := renderTemplate(c, test.tmpl, test.partial, nil); err != nil {
 			t.Fatalf("%d: renderTemplate(%v, %q, %v): %v", i, c, test.tmpl, test.partial, err)
@@ -31,8 +30,8 @@ func TestRenderTemplateData(t *testing.T) {
 	config.Prefix = "/root"
 	config.Google.Auth.Client = "dummy-client-id"
 
-	req, _ := http.NewRequest("GET", "/about", nil)
-	c := newContext(req)
+	r := newTestRequest(t, "GET", "/about", nil)
+	c := newContext(r)
 
 	data := &templateData{
 		OgImage: "some-image.png",

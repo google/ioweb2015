@@ -9,7 +9,7 @@ import (
 )
 
 func TestServeIOExtEntriesStub(t *testing.T) {
-	r, _ := http.NewRequest("GET", "/api/extended", nil)
+	r := newTestRequest(t, "GET", "/api/extended", nil)
 	w := httptest.NewRecorder()
 	serveIOExtEntries(w, r)
 
@@ -42,7 +42,7 @@ func TestServeTemplate(t *testing.T) {
 		{"/form", "form", "/root/form"},
 	}
 	for i, test := range table {
-		r, _ := http.NewRequest("GET", test.path, nil)
+		r := newTestRequest(t, "GET", test.path, nil)
 		w := httptest.NewRecorder()
 		serveTemplate(w, r)
 
@@ -76,7 +76,7 @@ func TestServeTemplateRedirect(t *testing.T) {
 		{"/one/two/", "/one/two"},
 	}
 	for i, test := range table {
-		r, _ := http.NewRequest("GET", test.start, nil)
+		r := newTestRequest(t, "GET", test.start, nil)
 		w := httptest.NewRecorder()
 		serveTemplate(w, r)
 
@@ -91,7 +91,7 @@ func TestServeTemplateRedirect(t *testing.T) {
 }
 
 func TestServeTemplate404(t *testing.T) {
-	r, _ := http.NewRequest("GET", "/a-thing-that-is-not-there", nil)
+	r := newTestRequest(t, "GET", "/a-thing-that-is-not-there", nil)
 	w := httptest.NewRecorder()
 	serveTemplate(w, r)
 	if w.Code != http.StatusNotFound {
@@ -157,7 +157,7 @@ func TestHandleAuth(t *testing.T) {
 		config.Google.TokenURL = ts.URL
 
 		p := strings.NewReader(`{"code": "` + code + `"}`)
-		r, _ := http.NewRequest("POST", "/api/v1/auth", p)
+		r := newTestRequest(t, "POST", "/api/v1/auth", p)
 		r.Header.Set("Authorization", "Bearer "+test.token)
 		w := httptest.NewRecorder()
 
