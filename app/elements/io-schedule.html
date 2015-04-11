@@ -237,11 +237,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       timeBlocksIndex_: timeBlocksIndex,
 
       ready: function() {
-        var filterEls = this.$.filters.querySelectorAll(
-            'paper-checkbox[checked]');
-        for (var i = 0, length = filterEls.length; i < length; i++) {
-          this.filters.push(filterEls[i].getAttribute('name'));
-        }
         this.filtersChanged();
       },
 
