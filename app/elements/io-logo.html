@@ -203,7 +203,7 @@ Fired when loading animation is complete.
       this.backgroundTarget = this.parentElement.querySelector('[iologobackground]');
       this.masthead = document.querySelector('.masthead');
       this.destination = document.querySelector('[iologodestination]');
-      this.fab = document.querySelector('experiment-fab-container');
+      this.fab = document.querySelector('#fab');
 
       var current = this.getBoundingClientRect();
       var dest = this.destination.getBoundingClientRect();
@@ -290,13 +290,17 @@ Fired when loading animation is complete.
           document.timeline.play(
             new AnimationGroup([fabAnimation, mastheadClipAnimation]
           )).onfinish = function(e) {
-            this.fab.style.transform = 'none'; // Remove transform.
+            if (this.fab.localName === 'experiment-fab-container') {
+              this.fab.style.transform = 'none'; // Remove transform.
+            }
             this.fab.style.zIndex = 'auto';
             el.parentElement.removeChild(el);
             this.fire('io-logo-animation-done');
           }.bind(this);
         } else {
-          this.fab.style.zIndex = 'auto';
+          if (this.fab.localName === 'experiment-fab-container') {
+            this.fab.style.zIndex = 'auto';
+          }
           el.parentElement.removeChild(el);
           this.fire('io-logo-animation-done');
         }

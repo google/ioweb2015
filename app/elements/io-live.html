@@ -1,0 +1,116 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/google-youtube/google-youtube.html">
+
+<!--
+The `<io-live>` provides the Google I/O live stream experience.
+
+@element io-live
+-->
+<!--
+Fired when the mode changes.
+
+@event io-live-mode
+-->
+<polymer-element name="io-live">
+  <template>
+    <link rel="stylesheet" href="io-live.css">
+
+    <div class="bottom__bar" layout horizontal end justified>
+      <div>
+        <template if="{{mode === _MODES.PRE}}">
+          <content></content>
+        </template>
+      </div>
+      <paper-fab icon="picture-in-picture" aria-label="My schedule" title="My schedule" on-click="{{onFabClick}}"></paper-fab>
+    </div>
+
+    <template if="{{mode === _MODES.LIVE}}">
+      <div class="fullvideo__container" fit>
+        <!-- <img src="{{''}}images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch I/O Live" fit> -->
+        <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
+                        autohide="1" controls="2" modestbranding="1" showinfo="0"
+                        iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
+      </div>
+    </template>
+
+    <template if="{{mode === _MODES.PRE}}">
+      <countdown-timer role="timer" bgcolor="#00BCD4" date="[[date]]"
+          easeintime="490" waittime="100" easeouttime="400"
+          value="{{countdownValue}}" autoStart
+          aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O">
+      </countdown-timer>
+    </template>
+
+  </template>
+  <script>
+  Polymer({
+
+    _MODES: {LIVE: 'live', PRE: 'pre'},
+
+    publish: {
+      /**
+       * The target date for the event. Should be specified in ISO 8601
+       * format, e.g. 'May 28 2015 09:00:00 GMT-0700 (PDT)'.
+       *
+       * @attribute date
+       * @type string
+       * @default 'May 28 2015 09:00:00 GMT-0700 (PDT)'
+       */
+      date: 'May 28 2015 09:00:00 GMT-0700 (PDT)',
+
+      /**
+       * The mode of operation for the live embed. 'pre' is before the event
+       * starts (e.g. before `date`) and a countdown is shown leading up to the
+       * event. 'live' signifies the event has already started and the live
+       * stream video mode should be shown.
+       *
+       * @attribute mode
+       * @type string
+       * @default ''
+       */
+      mode: {
+        value: '', reflect: true
+      }
+    },
+
+    eventDelegates: {
+      'click': 'toggleVideo'
+    },
+
+    domReady: function() {
+      var now = new Date();
+      var eventStart = new Date(this.date);
+      if (now > eventStart) {
+        this.mode = this._MODES.LIVE;
+      } else {
+        this.mode = 'pre';
+      }
+    },
+
+    modeChanged: function() {
+      this.fire('io-live-mode', {mode: this.mode});
+    },
+
+    toggleVideo: function(e, detail, sender) {
+      this.mode = this._MODES.LIVE;
+    },
+
+    onFabClick: function(e, detail, sender) {
+      e.stopPropagation();
+    }
+  });
+  </script>
+</polymer-element>

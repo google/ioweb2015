@@ -67,8 +67,25 @@ IOWA.Elements = (function() {
           showSigninHelp(); // show signin help popup on page load.
         }
       );
-
     });
+
+    var ioLive = document.querySelector('io-live');
+    if (ioLive) {
+      var onLiveMode_ = function(e) {
+        if (e.detail.mode === 'live') {
+          var els = [IOWA.Elements.Masthead, IOWA.Elements.NavPaperTabs,
+                     IOWA.Elements.Masthead.querySelector('#signin-nav-elements')];
+          els.forEach(function(el) {
+            el.classList.remove('bg-cyan');
+            el.classList.add('bg-photo');
+          });
+
+          ioLive.removeEventListener('io-live-mode', onLiveMode_);
+        }
+      };
+
+      ioLive.addEventListener('io-live-mode', onLiveMode_);
+    }
 
     var main = document.querySelector('.io-main');
 
@@ -83,7 +100,7 @@ IOWA.Elements = (function() {
     var nav = masthead.querySelector('#navbar');
     var navPaperTabs = nav.querySelector('paper-tabs');
     var drawerMenu = document.getElementById('drawer-menu');
-    var fab = masthead.querySelector('experiment-fab-container');
+    var fab = masthead.querySelector('#fab');
     var footer = document.querySelector('footer');
     var toast = document.getElementById('toast');
     var liveStatus = document.getElementById('live-status');
