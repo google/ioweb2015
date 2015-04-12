@@ -207,8 +207,6 @@
     // Example id: dc44916c-48e7-e311-b297-00155d5066d7
     var SESSION_ID_REGEX = /\w{8}-(\w{4}-){3}\w{12}$/;
 
-    var FILTERS_REGEX = /\.*[\?|&]filters\=([^&]+)/;
-
     var SUBTAB_SELECTOR = '#subpage-tabs a';
 
     // Page-specific JS that runs when this page is loaded for the first time.
@@ -220,9 +218,9 @@
       }
 
       var filters = [];
-      var filtersMatch = window.location.search.match(FILTERS_REGEX);
-      if (filtersMatch) {
-        filters = decodeURIComponent(filtersMatch[1]).split(',');
+      var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
+      if (parsedUrl.params.filters) {
+        filters = parsedUrl.params.filters.split(',');
       }
 
       var onPageTransitionDone_ = function(e) {
@@ -271,6 +269,10 @@
       IOWA.Elements.Template.openSession = function(sessionId) {
         this.selectedSession = this.scheduleData.sessions[sessionId];
         IOWA.Elements.Main.querySelector('.session__detail').open();
+        var url = IOWA.Router.composeUrl(
+            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
+            sessionId, window.location.search);
+        history.replaceState({}, null, url);
       };
 
       IOWA.Elements.Template.toggleSaveSession = function(e, detail, sender) {
@@ -286,7 +288,11 @@
       };
 
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
-        history.replaceState({}, null, location.pathname); // Remove session id hash from URL.
+        // Remove session id hash from URL.
+        var url = IOWA.Router.composeUrl(
+            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
+            '', window.location.search);
+        history.replaceState({}, null, url);
       };
 
       page.load(); // Run load callback on page load.

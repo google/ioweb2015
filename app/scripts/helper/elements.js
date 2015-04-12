@@ -49,8 +49,9 @@ IOWA.Elements = (function() {
 
       // Deep link into a subpage.
       var tpl = IOWA.Elements.Template;
+      var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
       var defaultSubpage = tpl.pages[tpl.selectedPage].selectedSubpage;
-      var selectedSubpage = location.hash.substring(1) || defaultSubpage;
+      var selectedSubpage = parsedUrl.subpage || defaultSubpage;
       var subpage = document.querySelector('.subpage-' + selectedSubpage);
       if (subpage) {
         tpl.pages[tpl.selectedPage].selectedSubpage = selectedSubpage;
