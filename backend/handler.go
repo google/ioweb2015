@@ -25,8 +25,8 @@ var rootHandleFn func(http.ResponseWriter, *http.Request)
 // registerHandlers sets up all backend handle funcs, including the API.
 func registerHandlers() {
 	handle("/", rootHandleFn)
-	handle("/api/extended", serveIOExtEntries)
-	handle("/api/social", serveSocial)
+	handle("/api/v1/extended", serveIOExtEntries)
+	handle("/api/v1/social", serveSocial)
 	handle("/api/v1/auth", handleAuth)
 	handle("/api/v1/schedule", serveSchedule)
 	// setup root redirect if we're prefixed

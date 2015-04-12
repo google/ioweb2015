@@ -135,7 +135,7 @@
                        noDraw?="{{mode === 'active'}}"
                        webglSupported="{{webglSupported}}"></webgl-globe>
 
-          <core-ajax url="api/extended" handleAs="json"
+          <core-ajax url="api/v1/extended" handleAs="json"
                      auto?="{{pageTransitionDone && !offsiteLocations}}"
                      response="{{offsiteLocations}}"></core-ajax>
         </div>

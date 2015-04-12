@@ -12,7 +12,7 @@ import (
 )
 
 func TestServeIOExtEntriesStub(t *testing.T) {
-	r := newTestRequest(t, "GET", "/api/extended", nil)
+	r := newTestRequest(t, "GET", "/api/v1/extended", nil)
 	w := httptest.NewRecorder()
 	serveIOExtEntries(w, r)
 
@@ -22,6 +22,20 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 	ctype := "application/json;charset=utf-8"
 	if w.Header().Get("Content-Type") != ctype {
 		t.Errorf("Content-Type: %q; want %q", w.Header().Get("Content-Type"), ctype)
+	}
+}
+
+func TestServeSocialStub(t *testing.T) {
+	r := newTestRequest(t, "GET", "/api/v1/social", nil)
+	w := httptest.NewRecorder()
+	serveSocial(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want %d", w.Code, http.StatusOK)
+	}
+	ctype := "application/json;charset=utf-8"
+	if v := w.Header().Get("Content-Type"); v != ctype {
+		t.Errorf("Content-Type: %q; want %q", v, ctype)
 	}
 }
 
