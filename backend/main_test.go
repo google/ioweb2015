@@ -32,6 +32,7 @@ var (
 
 	// The following 3 funcs are overwritten in server_gae_test.go
 	// to make it work with appengine/aetest package.
+	isGAEtest = false
 
 	// newTestRequest creates a new HTTP request using http.NewRequest.
 	// It marks state t as failed if http.NewRequest returns an error.
