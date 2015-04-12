@@ -23,11 +23,13 @@ const (
 
 // socEntry is an item of the response from /api/social.
 type socEntry struct {
-	Kind   string    `json:"kind"`
-	URL    string    `json:"url"`
-	Text   string    `json:"text"`
-	Author string    `json:"author"`
-	When   time.Time `json:"when"`
+	Kind   string      `json:"kind"`
+	URL    string      `json:"url"`
+	Text   string      `json:"text"`
+	Author string      `json:"author"`
+	When   time.Time   `json:"when"`
+	URLs   interface{} `json:"urls"`
+	Media  interface{} `json:"media"`
 }
 
 // socialEntries returns a list of the most recent social posts.
@@ -51,6 +53,8 @@ func socialEntries(c context.Context, refresh bool) ([]*socEntry, error) {
 			Text:   html.UnescapeString(t.Text),
 			Author: "@" + t.User.ScreenName,
 			When:   time.Time(t.CreatedAt),
+			Media:  t.Entities.Media,
+			URLs:   t.Entities.URLs,
 		}
 		entries = append(entries, e)
 	}
@@ -140,6 +144,10 @@ type tweetEntry struct {
 	User      struct {
 		ScreenName string `json:"screen_name"`
 	} `json:"user"`
+	Entities struct {
+		URLs  interface{} `json:"urls"`
+		Media interface{} `json:"media"`
+	} `json:"entities"`
 }
 
 // twitterTime is a custom Time type to properly unmarshal Twitter timestamp.

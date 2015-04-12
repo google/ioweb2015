@@ -25,6 +25,20 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 	}
 }
 
+func TestServeSocialStub(t *testing.T) {
+	r := newTestRequest(t, "GET", "/api/v1/social", nil)
+	w := httptest.NewRecorder()
+	serveSocial(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want %d", w.Code, http.StatusOK)
+	}
+	ctype := "application/json;charset=utf-8"
+	if v := w.Header().Get("Content-Type"); v != ctype {
+		t.Errorf("Content-Type: %q; want %q", v, ctype)
+	}
+}
+
 func TestServeTemplate(t *testing.T) {
 	const ctype = "text/html;charset=utf-8"
 
