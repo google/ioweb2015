@@ -169,6 +169,14 @@ IOWA.Elements = (function() {
       'Wearables'
     ];
 
+    template.filterSessionTypes = [
+      'Sessions',
+      'Sandbox Talks',
+      'Workshops',
+      'Office Hours',
+      'Code Labs'
+    ];
+
     template.formatSessionTimeFilter = function(dateStr) {
       var date = new Date(dateStr);
       return date.toLocaleTimeString().replace(/:\d+ /, ' ');
