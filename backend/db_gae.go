@@ -14,14 +14,13 @@ const (
 )
 
 // storeCredentials saves OAuth2 credentials cred in a presistent DB.
-// A user must be present in the context.
+// cred must have userID set to a non-zero value.
 func storeCredentials(c context.Context, cred *oauth2Credentials) error {
-	user := contextUser(c)
-	if user == "" {
-		return errors.New("no user in context")
+	if cred.userID == "" {
+		return errors.New("storeCredentials: userID is not set")
 	}
 
-	key := datastore.NewKey(c, kindCredentials, user, 0, nil)
+	key := datastore.NewKey(c, kindCredentials, cred.userID, 0, nil)
 	_, err := datastore.Put(c, key, cred)
 	return err
 }

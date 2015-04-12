@@ -303,13 +303,13 @@ func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var sched []string
-	if sched, err = userSchedule(c); err != nil {
+	var bookmarks []string
+	if bookmarks, err = userSchedule(c); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(sched); err != nil {
-		errorf(c, "encode(%v): %v", sched, err)
+	if err := json.NewEncoder(w).Encode(bookmarks); err != nil {
+		errorf(c, "encode(%v): %v", bookmarks, err)
 	}
 }
 
