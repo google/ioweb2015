@@ -68,6 +68,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                   <core-label center horizontal layout>
                     <div flex>{{theme}}</div>
                     <paper-checkbox on-change="{{applyFilter}}"
+                        checked?="{{isFilterSelected(theme)}}"
                         name="{{theme}}" for></paper-checkbox>
                   </core-label>
                 </template>
@@ -77,6 +78,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                   <core-label center horizontal layout>
                     <div flex>{{type}}</div>
                     <paper-checkbox on-change="{{applyFilter}}"
+                        checked?="{{isFilterSelected(type)}}"
                         name="{{type}}" for></paper-checkbox>
                   </core-label>
                 </template>
@@ -85,6 +87,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                 <core-label center horizontal layout>
                   <div flex>Live Streamed</div>
                   <paper-checkbox on-change="{{applyFilter}}"
+                      checked?="{{isFilterSelected('Live Streamed')}}"
                       name="Live Streamed" for></paper-checkbox>
                 </core-label>
               </div>
@@ -143,7 +146,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         "title": "Gopher rules again",
         "description": "Meet the gopher and learn from the best",
         "day": 1,
-        "block": "12 AM",
+        "block": "12 PM",
         "start": "12:30 AM",
         "end": "13:00 AM",
         "startTimestamp": "2014-06-24T12:30:00Z",
@@ -220,24 +223,24 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type array
          * @default []
          */
-        sessionTypes: []
-      },
+        sessionTypes: [],
 
-      /**
-       * Array of filter names applied to sessions list.
-       *
-       * @property filters
-       * @type array
-       * @default []
-       */
-      filters: [],
+        /**
+         * Array of applied filters.
+         *
+         * @property filters
+         * @type array
+         * @default []
+         */
+        filters: []
+      },
 
       timeBlocks_: timeBlocks,
 
       timeBlocksIndex_: timeBlocksIndex,
 
-      ready: function() {
-        this.filtersChanged();
+      isFilterSelected: function(filterName) {
+        return this.filters.indexOf(filterName) > -1;
       },
 
       applyFilter: function(e) {
@@ -255,15 +258,24 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           sessions[i].hide = !this.matchesFilters(sessions[i]);
         }
         this.checkEmptyBlocks();
+        IOWA.History.pushState({fromHashChange: true}, '', [
+            window.location.origin,
+            window.location.pathname,
+            '?filters=' + encodeURIComponent(this.filters.join(',')),
+            window.location.hash
+        ].join(''));
       },
 
       matchesFilters: function(session) {
+        if (!this.filters.length) {
+          return true;
+        }
         for (var i = 0; i < this.filters.length; i++) {
-          if (!session.filters[this.filters[i]]) {
-            return false;
+          if (session.filters[this.filters[i]]) {
+            return true;
           }
         }
-        return true;
+        return false;
       },
 
       filterByProperty: function(items, propertyName, propertyValue) {
