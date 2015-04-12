@@ -12,7 +12,7 @@ import (
 )
 
 func TestServeIOExtEntriesStub(t *testing.T) {
-	r := newTestRequest(t, "GET", "/api/extended", nil)
+	r := newTestRequest(t, "GET", "/api/v1/extended", nil)
 	w := httptest.NewRecorder()
 	serveIOExtEntries(w, r)
 
