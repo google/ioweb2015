@@ -29,24 +29,24 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     <div class="card__container sidebyside" layout horizontal>
       <div flex layout vertical>
         <template repeat="{{timeBlock in timeBlocks_}}">
-          <div class="card day-title" aria-label="" hidden?="{{ !timeBlock.dayStart || day }}">
+          <div class="card day-title" hidden?="{{!timeBlock.dayStart || day}}">
             Day {{timeBlock.dayStart}}
           </div>
-          <div class="card" aria-label="" hidden?="{{timeBlock.isEmpty || timeBlock.day !== day}}">
+          <div class="card" hidden?="{{timeBlock.isEmpty || timeBlock.day !== day}}">
             <div class="card-content">
               <h4>{{timeBlock.name}}</h4>
             </div>
             <div class="card-content schedule-rows" layout horizontal>
-              <template repeat="{{sessionId in sessionsIndex_ }}">
-                <div layout horizontal hidden?="{{ session[sessionId].hide || sessions[sessionId].day !== timeBlock.day || sessions[sessionId].block !== timeBlock.name }}">
+              <template repeat="{{sessionId in sessionsIndex_}}">
+                <div layout horizontal hidden?="{{session[sessionId].hide || sessions[sessionId].day !== timeBlock.day || sessions[sessionId].block !== timeBlock.name}}">
                   <paper-radio-button></paper-radio-button>
                   <div layout vertical flex>
                     <span class="schedule-title" auto-vertical flex>
-                      {{ sessions[sessionId].title }}
+                      {{sessions[sessionId].title}}
                     </span>
                     <span class="schedule-time" auto-vertical flex two>
-                      {{ sessions[sessionId].start}} :
-                      {{ sessions[sessionId].end}}
+                      {{sessions[sessionId].start}} :
+                      {{sessions[sessionId].end}}
                     </span>
                   </div>
                 </div>
@@ -57,7 +57,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       </div>
 
       <div class="card__container" layout vertical>
-        <div class="card js-experiment-visualizer" aria-label="Filters">
+        <div class="card js-experiment-visualizer">
           <div class="card-content">
             <h4>Filters</h4>
           </div>
@@ -254,6 +254,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       sessionsIndex_: null,
 
       ready: function() {
+        // TODO: Remove when dummy data no longer needed.
         this.sessions = sessions;
       },
 

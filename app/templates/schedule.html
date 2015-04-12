@@ -207,25 +207,20 @@
     // Example id: dc44916c-48e7-e311-b297-00155d5066d7
     var SESSION_ID_REGEX = /\w{8}-(\w{4}-){3}\w{12}$/;
 
+    var FILTERS_REGEX = /\.*[\?|&]filters\=([^&]+)/;
+
     var SUBTAB_SELECTOR = '#subpage-tabs a';
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
 
-      IOWA.Elements.Template.subpageToDayMap = {
-        'day1': 1,
-        'day2': 2,
-        'myschedule': null
-      }
-
       if (page.hasBeenLoaded) {
         return;
       }
 
       var filters = [];
-      var filtersRegex = /\.*[\?|&]filters\=([^&]+)/;
-      var filtersMatch = window.location.search.match(filtersRegex);
+      var filtersMatch = window.location.search.match(FILTERS_REGEX);
       if (filtersMatch) {
         filters = decodeURIComponent(filtersMatch[1]).split(',');
       }

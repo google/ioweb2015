@@ -134,6 +134,12 @@ IOWA.Elements = (function() {
     template.videoList = [];
     template.filteredVideoList = [];
 
+    template.subpageToDayMap = {
+      'day1': 1,
+      'day2': 2,
+      'myschedule': null
+    };
+
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
       'bg-medium-grey': '#CFD8DC',
