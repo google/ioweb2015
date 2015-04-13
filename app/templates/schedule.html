@@ -55,7 +55,7 @@
   </div>
   <div class="session__info__section">
     <h2 class="session__title">{{selectedSession.title}}</h2>
-    <h5 class="session__time">{{selectedSession.startTimestamp | formatSessionDateFilter}} / {{selectedSession.startTimestamp | formatSessionTimeFilter}} - {{selectedSession.endTimestamp | formatSessionTimeFilter}} / {{scheduleData.rooms[selectedSession.room].name}}</h5>
+    <h5 class="session__time">Day {{selectedSession.day}} {{selectedSession.startTimestamp | formatSessionDateFilter}} / {{selectedSession.start}} - {{selectedSession.end}} / {{selectedSession.room}}</h5>
     <h5 class="session__categories">{{selectedSession.tags | formatSessionTagsFilter}}</h5>
     <div class="session__desc">{{selectedSession.description}}</div>
     <div class="session__social" layout horizontal>

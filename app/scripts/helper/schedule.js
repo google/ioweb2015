@@ -63,7 +63,7 @@ IOWA.Schedule = (function() {
    *     should be removed.
    */
   function saveSession(sessionId, save) {
-    var url = SCHEDULE_ENDPOINT_USERS + sessionId.id;
+    var url = SCHEDULE_ENDPOINT_USERS + sessionId;
     IOWA.Request.xhrPromise(save ? 'PUT' : 'DELETE', url, true);
 
     IOWA.Analytics.trackEvent('session', 'bookmark', save);
