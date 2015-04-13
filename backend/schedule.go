@@ -149,35 +149,35 @@ func userSchedule(c context.Context) ([]string, error) {
 	return data.Bookmarks, nil
 }
 
-func bookmarkSession(c context.Context, id string) error {
+func bookmarkSession(c context.Context, id string) ([]string, error) {
 	cred, err := getCredentials(c)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var data *appFolderData
 	if data, err = fetchAppFolderData(c, cred); err != nil {
-		return err
+		return nil, err
 	}
 
 	// check for duplicates
 	sort.Strings(data.Bookmarks)
 	i := sort.SearchStrings(data.Bookmarks, id)
 	if i < len(data.Bookmarks) && data.Bookmarks[i] == id {
-		return nil
+		return data.Bookmarks, nil
 	}
 
 	data.Bookmarks = append(data.Bookmarks, id)
-	return storeAppFolderData(c, cred, data)
+	return data.Bookmarks, storeAppFolderData(c, cred, data)
 }
 
-func unbookmarkSession(c context.Context, id string) error {
+func unbookmarkSession(c context.Context, id string) ([]string, error) {
 	cred, err := getCredentials(c)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var data *appFolderData
 	if data, err = fetchAppFolderData(c, cred); err != nil {
-		return err
+		return nil, err
 	}
 
 	// remove id in question w/o sorting
@@ -189,9 +189,9 @@ func unbookmarkSession(c context.Context, id string) error {
 	}
 	// no need to make a roundtrip if id wasn't in the list
 	if len(list) == len(data.Bookmarks) {
-		return nil
+		return data.Bookmarks, nil
 	}
 
 	data.Bookmarks = list
-	return storeAppFolderData(c, cred, data)
+	return data.Bookmarks, storeAppFolderData(c, cred, data)
 }

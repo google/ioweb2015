@@ -293,12 +293,12 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: check whether the session ID actually exists?
 	sid := path.Base(r.URL.Path)
-
+	var bookmarks []string
 	switch r.Method {
 	case "PUT":
-		err = bookmarkSession(c, sid)
+		bookmarks, err = bookmarkSession(c, sid)
 	case "DELETE":
-		err = unbookmarkSession(c, sid)
+		bookmarks, err = unbookmarkSession(c, sid)
 	default:
 		writeJSONError(w, http.StatusBadRequest, errors.New("invalid request method"))
 		return
@@ -306,6 +306,11 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(bookmarks); err != nil {
+		errorf(c, "handleUserBookmarks: encode(%v): %v", bookmarks, err)
 	}
 }
 
