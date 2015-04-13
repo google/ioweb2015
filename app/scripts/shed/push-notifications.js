@@ -159,6 +159,7 @@ self.addEventListener('notificationclick', function(event) {
   // Chrome displays a "default" notification if there isn't a notification shown in response to a
   // push event. We should ideally never get those, but just do a check first to make sure.
   if (event.notification.tag !== 'user_visible_auto_notification') {
-    clients.openWindow(event.notification.tag);
+    var url = new URL(event.notification.tag, location.href);
+    clients.openWindow(url.toString());
   }
 });
