@@ -296,6 +296,10 @@ paper-fab {
 }
 
 @media (max-width: $phone-breakpoint-max) {
+  experiment-fab-container, #fab {
+    width: 40px;
+    height: 40px;
+  }
   .masthead {
     .photo__masthead--fullbleed {
       top: -$navbarHeightMobile;
