@@ -79,8 +79,18 @@ core-icon[icon="schedule"] {
 
 @media (max-width: $phone-breakpoint-max) {
   .card__container {
-    @include shadow-z1();
+    margin-bottom: 0;
   }
+
+  .card {
+    margin-bottom: $mobileKeyline;
+    @include shadow-z1();
+
+    &.day-title {
+      margin-bottom: 0;
+    }
+  }
+
   .card-content:first-child {
     padding: 16px;
     border-bottom: 1px solid $color-light-grey-border;

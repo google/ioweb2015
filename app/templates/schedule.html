@@ -26,7 +26,7 @@
                            layout horizontal center-center>My Schedule</a>
       </paper-tab>
     </paper-tabs>
-    <paper-dropdown-menu>
+    <paper-dropdown-menu hidden?="{{isPhoneSize}}">
       <paper-dropdown class="dropdown" halign="right">
         <core-menu class="menu" selected="1">
           <paper-item>PST</paper-item>
@@ -196,10 +196,39 @@
       </div>
     </section>
     <div class="slide-up-delay">
+      <div layout horizontal hidden?="{{!isPhoneSize || pages[selectedPage].selectedSubpage === 'myschedule'}}">
+        <span flex>
+          <paper-dropdown-menu>
+            <paper-dropdown class="dropdown" halign="left">
+              <core-menu class="menu" selected="0">
+                <paper-item>Filters</paper-item>
+                <template repeat="{{theme in filterThemes}}">
+                  <paper-item>{{theme}}</paper-item>
+                </template><template repeat="{{type in filterTypes}}">
+                  <paper-item>{{type}}</paper-item>
+                </template>
+                <paper-item>Live Streamed</paper-item>
+              </core-menu>
+            </paper-dropdown>
+          </paper-dropdown-menu>
+        </span>
+        <paper-dropdown-menu>
+          <paper-dropdown class="dropdown" halign="right">
+            <core-menu class="menu" selected="1">
+              <paper-item>PST</paper-item>
+              <paper-item>MST</paper-item>
+              <paper-item>CST</paper-item>
+              <paper-item>EST</paper-item>
+              <paper-item>GMT</paper-item>
+            </core-menu>
+          </paper-dropdown>
+        </paper-dropdown-menu>
+      </div>
+
       <section class="page__section">
         <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
           showAllBlocks="{{ pages[selectedPage].selectedSubpage === 'myschedule'}}"
-          user="{{currentUser}}"></io-schedule>
+          user="{{currentUser}}" isPhoneSize="{{isPhoneSize}}"></io-schedule>
       </section>
     </div>
   </section>

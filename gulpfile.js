@@ -457,7 +457,7 @@ gulp.task('setup', function(cb) {
 // or rebuild stuff.
 function watch() {
   gulp.watch([APP_DIR + '/**/*.html'], reload);
-  gulp.watch([APP_DIR + '/{elements,styles}/**/*.{scss,css}'], ['sass', reload]);
+  gulp.watch([APP_DIR + '/{elements,styles}/**/*.{scss,css}'], ['sass']);
   gulp.watch([APP_DIR + '/scripts/**/*.js'], ['jshint']);
   gulp.watch([APP_DIR + '/images/**/*'], reload);
   gulp.watch([APP_DIR + '/bower.json'], ['bower']);
