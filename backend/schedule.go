@@ -49,7 +49,7 @@ type eventTag struct {
 }
 
 func fetchEventSchedule(c context.Context, url string) (*eventData, error) {
-	res, err := http.Get(url)
+	res, err := httpClient(c).Get(url)
 	if err != nil {
 		return nil, err
 	}
