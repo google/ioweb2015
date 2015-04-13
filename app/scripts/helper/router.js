@@ -469,8 +469,7 @@ IOWA.Router = (function() {
    * @param {string} url The page's url.
    */
   function parseUrl(url) {
-    var parser = document.createElement('a');
-    parser.href = url;
+    var parser = new URL(url);
     var hashParts = parser.hash.replace('#', '').split('/');
     var params = {};
     var paramsList = parser.search.replace('?', '').split('&');
@@ -482,7 +481,7 @@ IOWA.Router = (function() {
       'pathname': parser.pathname,
       'search': parser.search,
       'hash': parser.hash,
-      'page': parser.pathname.replace('/io2015/', ''),
+      'page': parser.pathname.replace(window.PREFIX + '/', ''),
       'subpage': hashParts[0],
       'resourceId': hashParts[1],
       'params': params
@@ -499,16 +498,8 @@ IOWA.Router = (function() {
    * @param {string} search Encoded search string.
    */
   function composeUrl(page, subpage, resourceId, search) {
-    return [
-      window.location.origin,
-      '/io2015/',
-      page,
-      search,
-      '#',
-      subpage || '',
-      '/',
-      resourceId || ''
-    ].join('');
+    return [window.location.origin, window.PREFIX, '/', page, search,
+        '#', subpage || '', '/', resourceId || ''].join('');
   }
 
   /**

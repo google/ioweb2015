@@ -246,7 +246,7 @@
           }
 
           // Deep link into session.
-          var sessionId = location.hash.substring(1).match(SESSION_ID_REGEX);
+          var sessionId = parsedUrl.resourceId;
           if (sessionId) {
             IOWA.Elements.Template.openSession(sessionId[0]);
           }
@@ -273,6 +273,11 @@
         IOWA.Elements.Template.scheduleData = null;
 
         document.addEventListener('page-transition-done', onPageTransitionDone_);
+
+        // TODO: Move to page unload when issues/#951 is fixed.
+        document.removeEventListener('subpage-changed', onSubpageChanged_);
+        document.removeEventListener('signin-change', onSigninChanged_);
+
         document.addEventListener('subpage-changed', onSubpageChanged_);
         document.addEventListener('signin-change', onSigninChanged_);
 
