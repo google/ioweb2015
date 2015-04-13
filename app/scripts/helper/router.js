@@ -184,6 +184,7 @@ IOWA.Router = (function() {
             fromHashChange: true
           }, '', el.href);
           t.pages[t.selectedPage].selectedSubpage = nextSubpageName;
+          IOWA.Elements.Template.fire('subpage-changed');
           IOWA.PageAnimation.play(new AnimationGroup([
             IOWA.PageAnimation.sectionSlideIn(newSubpage),
             IOWA.PageAnimation.elementFadeIn(

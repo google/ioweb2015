@@ -196,7 +196,8 @@
     </section>
     <div class="slide-up-delay">
       <section class="page__section">
-        <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"></io-schedule>
+        <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
+          showAllBlocks="{{ pages[selectedPage].selectedSubpage === 'myschedule'}}"></io-schedule>
       </section>
     </div>
   </section>
@@ -222,6 +223,10 @@
       if (parsedUrl.params.filters) {
         filters = parsedUrl.params.filters.split(',');
       }
+
+      var onSubpageChanged_ = function(e) {
+        IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
+      };
 
       var onPageTransitionDone_ = function(e) {
         document.removeEventListener('page-transition-done', onPageTransitionDone_);
@@ -255,6 +260,7 @@
         IOWA.Elements.Template.scheduleData = null;
 
         document.addEventListener('page-transition-done', onPageTransitionDone_);
+        document.addEventListener('subpage-changed', onSubpageChanged_);
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
