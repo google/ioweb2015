@@ -109,8 +109,8 @@ core-icon[icon="schedule"] {
     }
 
     &[disabled] {
-      background-color: $color-gray;
-      color: $color-light-grey-border;
+      background-color: $color-light-grey-border;
+      color: $color-gray;
     }
   }
   paper-progress {
