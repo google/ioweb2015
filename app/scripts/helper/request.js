@@ -97,7 +97,7 @@ IOWA.Request = IOWA.Request || (function() {
           var response = {};
           try {
             response = JSON.parse(this.response);
-          } catch(e) {
+          } catch (e) {
             // Noop
           }
           resolve(response);
