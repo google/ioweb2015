@@ -348,15 +348,22 @@ limitations under the License.
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
-
-        <experiment-fab-container mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}"></experiment-fab-container>
+        <experiment-fab-container id="fab" mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}"></experiment-fab-container>
+        <!-- <paper-fab id="fab" icon="event" hidden?="{{selectedPage === 'home'}}"></paper-fab> -->
       </header>
 
-      <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}" >
+      <!-- <div id="iolive" hidden?="{{selectedPage != 'home'}}" fit>
+        <io-live mode="{{liveModuleMode}}" date="May 28 2015 09:00:00 GMT-0700 (PDT)" fit>
+          <h2>I/O is starting soon. #io15</h2>
+        </io-live>
+      </div> -->
+
+      <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}">
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
       </main>
 
       <footer layout vertical>
+      <!-- <footer layout vertical hidden?="{{selectedPage === 'home'}}"> -->
 
         <i18n-msg id="share-text" msgid="share-text" hidden>#io15 brings together devs to explore the next generation of tech and mobile. Join us online or in person May 28-29: https://google.com/io</i18n-msg>
 

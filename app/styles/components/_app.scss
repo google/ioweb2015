@@ -109,6 +109,10 @@ h6 {
 
 .bg-photo {
   background-color: $color-bluegrey-700;
+
+  h1, h2, h3, h4 {
+    color: inherit;
+  }
 }
 
 .bg-cyan {
