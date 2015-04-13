@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/net/context"
@@ -29,10 +30,76 @@ const (
 
 // oauth2Credentials is a user authorization credentials.
 type oauth2Credentials struct {
+	sync.Mutex   // locks credentials during refresh token process
 	userID       string
 	Expiry       time.Time `datastore:"exp"`
 	AccessToken  string    `datastore:"at,noindex"`
 	RefreshToken string    `datastore:"rt,noindex"`
+}
+
+// tokenSource returns a reusable oauth2.TokenSource.
+// When expired, a new token will be obtained using cred.RefreshToken
+// and stored in a persistent db.
+// The returned TokenSource valid only within provided context c.
+func (cred *oauth2Credentials) tokenSource(c context.Context) oauth2.TokenSource {
+	t := &oauth2.Token{
+		AccessToken: cred.AccessToken,
+		Expiry:      cred.Expiry,
+	}
+	return oauth2.ReuseTokenSource(t, &tokenRefresher{c, cred})
+}
+
+// tokenRefresher implements oauth2.TokenSource for oauth2Credentials.
+type tokenRefresher struct {
+	ctx  context.Context
+	cred *oauth2Credentials
+}
+
+// Token returns a new access token using tr.cred.RefreshToken
+// It also updates its tr.cred and stores new token with storeCredentials().
+func (tr *tokenRefresher) Token() (*oauth2.Token, error) {
+	if tr.cred.RefreshToken == "" {
+		return nil, errors.New("tokenRefresher: refresh token is not set")
+	}
+	tr.cred.Lock()
+	defer tr.cred.Unlock()
+
+	params := url.Values{
+		"client_id":     {config.Google.Auth.Client},
+		"client_secret": {config.Google.Auth.Secret},
+		"refresh_token": {tr.cred.RefreshToken},
+		"grant_type":    {"refresh_token"},
+	}
+	res, err := httpClient(tr.ctx).PostForm(config.Google.TokenURL, params)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf("tokenRefresher: %v", err)
+	}
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("tokenRefresher: %s; %s", res.Status, body)
+	}
+
+	var t struct {
+		Token  string `json:"access_token"`
+		Expiry int    `json:"expires_in"`
+	}
+	if err := json.Unmarshal(body, &t); err != nil {
+		return nil, fmt.Errorf("tokenRefresher: %v", err)
+	}
+
+	tr.cred.AccessToken = t.Token
+	tr.cred.Expiry = time.Now().Add(time.Duration(t.Expiry) * time.Second)
+	if err := storeCredentials(tr.ctx, tr.cred); err != nil {
+		errorf(tr.ctx, "tokenRefresher: %v", err)
+	}
+	return &oauth2.Token{
+		AccessToken: tr.cred.AccessToken,
+		Expiry:      tr.cred.Expiry,
+	}, nil
 }
 
 // authUser verifies authentication provided in bearer.
