@@ -26,8 +26,9 @@ The `<io-schedule>` element renders a schedule for a given day(s).
   <template>
     <link rel="stylesheet" href="io-schedule.css">
     <link rel="stylesheet" href="../styles/pages/schedule.css">
-    <div class="card__container sidebyside" layout horizontal>
-      <div flex layout vertical>
+    <div class="card__container {{{'sidebyside': !isPhoneSize} | tokenList}}" layout
+        vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+      <div flex?="{{!isPhoneSize}}" layout vertical>
         <template repeat="{{timeBlock in timeBlocks_}}">
           <div class="card day-title" hidden?="{{!timeBlock.dayStart || day}}">
             Day {{timeBlock.dayStart}}
@@ -67,7 +68,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       </div>
 
       <div class="card__container" layout vertical>
-        <div class="card js-experiment-visualizer">
+        <div class="card js-experiment-visualizer" hidden?="{{isPhoneSize}}">
           <div class="card-content">
             <h4>Filters</h4>
           </div>
@@ -272,7 +273,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type Boolean
          * @default false
          */
-        user: null
+        user: null,
+
+        /**
+         * Type of viewport based on media query.
+         *
+         * @property isPhoneSize.
+         * @type Boolean
+         * @default false
+         */
+        isPhoneSize: false
       },
 
       timeBlocks_: timeBlocks,

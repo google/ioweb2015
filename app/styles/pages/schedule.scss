@@ -45,6 +45,19 @@ $name: 'page-schedule';
   }
 }
 
+paper-dropdown-menu {
+  @include typo-button();
+  margin: $tabletKeyline;;
+  padding: 0;
+  border: none;
+  core-menu {
+    margin: 0;
+  }
+  paper-item {
+    font-size: inherit;
+  }
+}
+
 .page__section {
   padding-top: 0;
   padding-left: 0;
@@ -176,7 +189,8 @@ core-icon[icon="schedule"] {
     top: 0 !important;
   }
   .page__section--top {
-    margin-top: $mobileKeyline;
+    margin: 0;
+    padding: 0;
   }
   .masthead-container {
     padding-bottom: $subnavTabsPadding;
@@ -187,6 +201,10 @@ core-icon[icon="schedule"] {
     }
   }
   .card__container {
+    @include shadow-z1();
+  }
+  .card {
+    margin-bottom: 0;
     @include shadow-z1();
   }
   .card-content:first-child {
