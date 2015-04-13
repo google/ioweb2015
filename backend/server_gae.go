@@ -28,7 +28,7 @@ func init() {
 	httpTransport = func(c context.Context) http.RoundTripper {
 		return &urlfetch.Transport{
 			Context:  c,
-			Deadline: 3 * time.Second,
+			Deadline: 10 * time.Second,
 		}
 	}
 	// staging instance is accessed only by whitelisted people/domains
