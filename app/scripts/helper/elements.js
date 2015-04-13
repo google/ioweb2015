@@ -51,7 +51,7 @@ IOWA.Elements = (function() {
       var tpl = IOWA.Elements.Template;
       var defaultSubpage = tpl.pages[tpl.selectedPage].selectedSubpage;
       var selectedSubpage = location.hash.substring(1) || defaultSubpage;
-      var subpage = document.querySelector('#subpage-' + selectedSubpage);
+      var subpage = document.querySelector('.subpage-' + selectedSubpage);
       if (subpage) {
         tpl.pages[tpl.selectedPage].selectedSubpage = selectedSubpage;
         subpage.classList.add('active');
@@ -133,6 +133,12 @@ IOWA.Elements = (function() {
     // Videos page defaults.
     template.videoList = [];
     template.filteredVideoList = [];
+
+    template.subpageToDayMap = {
+      'day1': 1,
+      'day2': 2,
+      'myschedule': null
+    };
 
     template.rippleColors = {
       'bg-cyan': '#00BCD4',

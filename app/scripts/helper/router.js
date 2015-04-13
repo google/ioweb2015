@@ -166,8 +166,8 @@ IOWA.Router = (function() {
     var nextSubpageName = el.hash.substring(1);
 
     if (currentSubpageName !== nextSubpageName) {
-      var oldSubpage = main.querySelector('#subpage-' + currentSubpageName);
-      var newSubpage = main.querySelector('#subpage-' + nextSubpageName);
+      var oldSubpage = main.querySelector('.subpage-' + currentSubpageName);
+      var newSubpage = main.querySelector('.subpage-' + nextSubpageName);
       IOWA.PageAnimation.play(new AnimationGroup([
           IOWA.PageAnimation.sectionSlideOut(oldSubpage),
           IOWA.PageAnimation.elementFadeOut(
@@ -377,7 +377,7 @@ IOWA.Router = (function() {
       var main = IOWA.Elements.Main;
       var subpages = main.querySelectorAll('.subpage__content');
       var subpageName = template.pages[template.selectedPage].selectedSubpage;
-      var selectedSubpage = main.querySelector('#subpage-' + subpageName);
+      var selectedSubpage = main.querySelector('.subpage-' + subpageName);
       if (selectedSubpage) {
         for (var i = 0; i < subpages.length; i++) {
           var subpage = subpages[i];
