@@ -114,6 +114,16 @@ paper-tabs.white {
     padding: 0;
   }
 
+  paper-progress::shadow {
+    #activeProgress {
+      background-color: $color-pink-500;
+    }
+
+    #progressContainer {
+      background-color: $color-pink-50;
+    }
+  }
+
   @media (min-width: $tablet-breakpoint-min) {
     .session__detail::shadow #scroller {
       width: 768px;

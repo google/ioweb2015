@@ -94,7 +94,12 @@ IOWA.Request = IOWA.Request || (function() {
       xhr.onerror = reject;
       xhr.onload = function() {
         if (this.status < 400) {
-          var response = JSON.parse(this.response);
+          var response = {};
+          try {
+            response = JSON.parse(this.response);
+          } catch (e) {
+            // Noop
+          }
           resolve(response);
         } else {
           reject(Error(method + ' ' + url + ' failed with status ' + this.statusText));
