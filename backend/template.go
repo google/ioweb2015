@@ -26,6 +26,9 @@ const (
 	ogImageDefault    = "io15-color.png"
 	ogImageExperiment = "io15-experiment.png"
 
+	// layout for templateData.StartDateStr
+	timeISO8601 = "Jan 02 2006 15:04:05 GMT-0700 (MST)"
+
 	// templatesDir is the templates directory path relative to config.Dir.
 	templatesDir = "templates"
 )
@@ -48,14 +51,15 @@ type templateCache struct {
 
 // templateData is the templates context
 type templateData struct {
-	Env      string
-	ClientID string
-	Prefix   string
-	Slug     string
-	Title    string
-	Desc     string
-	OgTitle  string
-	OgImage  string
+	Env          string
+	ClientID     string
+	Prefix       string
+	Slug         string
+	Title        string
+	Desc         string
+	OgTitle      string
+	OgImage      string
+	StartDateStr string
 }
 
 // renderTemplate executes a template found in name.html file
@@ -76,6 +80,7 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	data.Title = pageTitle(tpl)
 	data.Slug = name
 	data.Prefix = config.Prefix
+	data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(timeISO8601)
 	if data.Desc == "" {
 		data.Desc = descDefault
 	}
