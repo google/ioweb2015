@@ -21,7 +21,7 @@ IOWA.Schedule = (function() {
   "use strict";
 
   var SCHEDULE_ENDPOINT = 'api/v1/schedule';
-  var SCHEDULE_ENDPOINT_USERS = 'api/v1/user/schedule/';
+  var SCHEDULE_ENDPOINT_USERS = 'api/v1/user/schedule';
 
   var scheduleData_ = null;
   var userScheduleData_ = null;
@@ -63,7 +63,7 @@ IOWA.Schedule = (function() {
    *     should be removed.
    */
   function saveSession(sessionId, save) {
-    var url = SCHEDULE_ENDPOINT_USERS + sessionId;
+    var url = SCHEDULE_ENDPOINT_USERS + '/' + sessionId;
     IOWA.Request.xhrPromise(save ? 'PUT' : 'DELETE', url, true);
 
     IOWA.Analytics.trackEvent('session', 'bookmark', save);

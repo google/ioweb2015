@@ -51,7 +51,9 @@
                 sizing="cover" preload fade fit></core-image>
     <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}"
                mini?="{{isPhoneSize}}" class="{{ {active: selectedSession.saved} | tokenList }}"
-               on-click="{{toggleSaveSession}}"></paper-fab>
+               on-click="{{toggleSaveSession}}"
+               disabled?="{{!savedSessions}}"></paper-fab>
+    <paper-progress indeterminate hidden?="{{savedSessions}}"></paper-progress>
   </div>
   <div class="session__info__section">
     <h2 class="session__title">{{selectedSession.title}}</h2>
@@ -264,7 +266,6 @@
         document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
-
           IOWA.Elements.Template.scheduleData = scheduleData;
           IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
@@ -280,9 +281,6 @@
             IOWA.Elements.Template.openSession(sessionId);
           }
         });
-
-        // TODO(ericbidelman): also fetch user signed-in data.
-        // IOWA.Schedule.fetchUserSchedule.then(function(scheduleData) {});
       };
 
       var onSigninChanged_ = function(e) {
@@ -293,6 +291,16 @@
               {duration: 400}), function() {
             signinPropmt.setAttribute('hidden', true);
           });
+
+          // Fetch user's data. Mark sessions they've bookmarked
+          IOWA.Schedule.fetchUserSchedule().then(function(savedSessions) {
+            IOWA.Elements.Template.savedSessions = savedSessions;
+
+            var sessions = IOWA.Elements.Template.scheduleData.sessions;
+            for (var id in sessions) {
+              sessions[id].saved = savedSessions.indexOf(id) !== -1;
+            }
+          });
         }
       };
 
@@ -300,6 +308,7 @@
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
         IOWA.Elements.Template.scheduleData = null;
+        IOWA.Elements.Template.savedSessions = null;
 
         document.addEventListener('page-transition-done', onPageTransitionDone_);
 
@@ -338,10 +347,7 @@
         e.stopPropagation();
 
         var selectedSession = IOWA.Elements.Template.selectedSession;
-
-        // TODO(ericbidelman): get session object from API.
-        var saved = !!selectedSession.saved;
-        selectedSession.saved = !saved;
+        selectedSession.saved = !selectedSession.saved;
 
         IOWA.Schedule.saveSession(selectedSession.id, selectedSession.saved);
       };

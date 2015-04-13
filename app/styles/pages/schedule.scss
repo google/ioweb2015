@@ -107,6 +107,17 @@ core-icon[icon="schedule"] {
       color: white;
       background-color: $color-cyan-400;
     }
+
+    &[disabled] {
+      background-color: $color-gray;
+      color: $color-light-grey-border;
+    }
+  }
+  paper-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
   }
   paper-icon-button {
     z-index: 10;
