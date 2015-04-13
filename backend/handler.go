@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path"
@@ -241,58 +240,24 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 
 func serveSchedule(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
-	f, err := os.Open(filepath.Join(config.Dir, "temporary_api", "schedule.json"))
+	// respond with stubbed JSON entries in dev mode
+	if isDev() {
+		f := filepath.Join(config.Dir, "temporary_api", "schedule.json")
+		http.ServeFile(w, r, f)
+		return
+	}
+
+	// TODO: remove hardcoded URL and do a proper sync with the GCS bucket.
+	c := newContext(r)
+	url := "http://storage.googleapis.com/io2015-data.appspot.com/session_data_v1.1.json"
+	data, err := fetchEventSchedule(c, url)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}
-	defer f.Close()
-	io.Copy(w, f)
-
-	//res, err := http.Get("http://storage.googleapis.com/io2015-data.appspot.com/session_data_v1.1.json")
-	//if err != nil {
-	//	http.Error(w, err.Error(), 500)
-	//	return
-	//}
-	//defer res.Body.Close()
-	//var body map[string][]map[string]interface{}
-	//if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
-	//	http.Error(w, err.Error(), 500)
-	//	return
-	//}
-
-	//data := make(map[string]interface{})
-	//for key, list := range body {
-	//	m := make(map[string]interface{})
-	//	for _, item := range list {
-	//		var (
-	//			id string
-	//			ok bool
-	//		)
-	//		switch key {
-	//		case "tags":
-	//			id, ok = item["tag"].(string)
-	//		default:
-	//			id, ok = item["id"].(string)
-	//			if !ok {
-	//				id, ok = item["original_id"].(string)
-	//			}
-	//		}
-	//		if !ok {
-	//			continue
-	//		}
-	//		m[id] = item
-	//	}
-	//	data[key] = m
-	//}
-
-	//b, err := json.MarshalIndent(data, "", "  ")
-	//if err != nil {
-	//	http.Error(w, err.Error(), 500)
-	//	return
-	//}
-	//w.Header().Set("Content-Type", "application/json;charset=utf-8")
-	//w.Write(b)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		errorf(c, "serveSchedule: %v", err)
+	}
 }
 
 func serveUserSchedule(w http.ResponseWriter, r *http.Request) {

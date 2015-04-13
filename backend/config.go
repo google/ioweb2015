@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 )
 
 // config is a global backend config,
@@ -36,10 +37,12 @@ type appConfig struct {
 	Addr string `json:"addr"`
 	// HTTP prefix
 	Prefix string `json:"prefix"`
+
 	// User emails allowed in staging
 	Whitelist []string
 	// I/O Extended events feed
 	IoExtFeedURL string `json:"ioExtFeedUrl"`
+
 	// Twitter credentials
 	Twitter struct {
 		Account     string `json:"account"`
@@ -49,6 +52,7 @@ type appConfig struct {
 		TokenURL    string `json:"tokenUrl"`
 		TimelineURL string `json:"timelineUrl"`
 	} `json:"twitter"`
+
 	// Google credentials
 	Google struct {
 		TokenURL       string `json:"tokenUrl"`
@@ -68,6 +72,13 @@ type appConfig struct {
 			UploadURL string `json:"upload_url"`
 		} `json:"drive"`
 	} `json:"google"`
+
+	// Event schedule settings
+	Schedule struct {
+		Start    time.Time `json:"start"`
+		Timezone string    `json:"timezone"`
+		Location *time.Location
+	} `json:"schedule"`
 }
 
 // initConfig reads server config file into the config global var.
@@ -79,6 +90,9 @@ func initConfig(configPath, addr string) error {
 	}
 	defer file.Close()
 	if err := json.NewDecoder(file).Decode(&config); err != nil {
+		return err
+	}
+	if config.Schedule.Location, err = time.LoadLocation(config.Schedule.Timezone); err != nil {
 		return err
 	}
 	if addr != "" {
