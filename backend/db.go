@@ -11,7 +11,7 @@ import (
 )
 
 // storeCredentials saves OAuth2 credentials cred in a presistent DB.
-// A user must be present in the context.
+// cred must have userID set to a non-zero value.
 func storeCredentials(c context.Context, cred *oauth2Credentials) error {
 	// TODO: implement
 	return nil

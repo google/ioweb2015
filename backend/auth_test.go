@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"golang.org/x/net/context"
 )
 
 func TestVerifyBearerToken(t *testing.T) {
@@ -137,5 +139,80 @@ func TestAuthUser(t *testing.T) {
 		case test.success && err == nil && contextUser(c) != testUserID:
 			t.Errorf("%d: authUser(%q): %v; want %q", i, test.token, contextUser(c), testUserID)
 		}
+	}
+}
+
+func TestTokenRefresher(t *testing.T) {
+	defer preserveConfig()()
+	config.Google.Auth.Client = "my-client"
+	config.Google.Auth.Secret = "my-secret"
+	cred := &oauth2Credentials{
+		userID:       "uid-123",
+		Expiry:       time.Now(),
+		AccessToken:  "dummy-access",
+		RefreshToken: "dummy-refresh",
+	}
+
+	done := make(chan struct{}, 1)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if v := r.FormValue("client_id"); v != "my-client" {
+			t.Errorf("client_id = %q; want my-client", v)
+		}
+		if v := r.FormValue("client_secret"); v != "my-secret" {
+			t.Errorf("client_secret = %q; want my-secret", v)
+		}
+		if v := r.FormValue("refresh_token"); v != "dummy-refresh" {
+			t.Errorf("refresh_token = %q; want dummy-refresh", v)
+		}
+		if v := r.FormValue("grant_type"); v != "refresh_token" {
+			t.Errorf("grant_type = %q; want refresh_token", v)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{
+      "access_token":"new-access-token",
+      "expires_in":3600,
+      "token_type":"Bearer"
+    }`))
+
+		done <- struct{}{}
+	}))
+	defer ts.Close()
+	config.Google.TokenURL = ts.URL
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	tok, err := cred.tokenSource(c).Token()
+	if err != nil {
+		t.Fatalf("cred.tokenSource().Token: %v", err)
+	}
+	if tok.AccessToken != "new-access-token" {
+		t.Errorf("tok.AccessToken = %q; want new-access-token", tok.AccessToken)
+	}
+	if cred.AccessToken != tok.AccessToken {
+		t.Errorf("cred.AccessToken = %q; want %q", cred.AccessToken, tok.AccessToken)
+	}
+	if !cred.Expiry.After(time.Now()) {
+		t.Errorf("cred.Expiry is in the past: %s", cred.Expiry)
+	}
+
+	select {
+	case <-done:
+		// passed
+	default:
+		t.Errorf("refresh never happened")
+	}
+
+	// TODO: remove when standalone DB is implemented
+	if !isGAEtest {
+		return
+	}
+
+	c = context.WithValue(c, ctxKeyUser, "uid-123")
+	cred2, err := getCredentials(c)
+	if err != nil {
+		t.Fatalf("getCredentials: %v", err)
+	}
+	if reflect.DeepEqual(cred2, cred) {
+		t.Errorf("cred2 = %+v; want %+v", cred2, cred)
 	}
 }
