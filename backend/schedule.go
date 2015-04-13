@@ -97,9 +97,9 @@ func fetchEventSchedule(c context.Context, url string) (*eventData, error) {
 		}
 
 		tzstart := s.StartTime.In(config.Schedule.Location)
-		s.Block = tzstart.Format("03 PM")
-		s.Start = tzstart.Format("03:04 PM")
-		s.End = s.EndTime.In(config.Schedule.Location).Format("03:04 PM")
+		s.Block = tzstart.Format("3 PM")
+		s.Start = tzstart.Format("3:04 PM")
+		s.End = s.EndTime.In(config.Schedule.Location).Format("3:04 PM")
 
 		d := s.StartTime.Sub(config.Schedule.Start)
 		s.Day = 1 + int(d/24/time.Hour)
