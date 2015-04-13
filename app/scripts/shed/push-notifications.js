@@ -19,7 +19,7 @@ var DB_NAME = 'push-notification-updates';
 var DEFAULT_ICON = 'images/touch/homescreen192.png';
 var SESSIONS_ENDPOINT = 'api/v1/schedule';
 var UPDATES_ENDPOINT = 'api/v1/user/updates';
-var SESSION_DETAILS_URL_PREFIX = 'schedule?filters=#';
+var SESSION_DETAILS_URL_PREFIX = 'schedule?filters=#day';
 
 /**
  * Loads a SW token value from IndexedDB.
@@ -115,7 +115,7 @@ function generateSessionNotifications(updatedSessions) {
       title: 'I/O session "' + session.title + '" was updated.',
       body: 'You previously starred this session.',
       icon: session.photoUrl || DEFAULT_ICON,
-      tag: SESSION_DETAILS_URL_PREFIX + sessionId
+      tag: SESSION_DETAILS_URL_PREFIX + session.day + '/' + sessionId
     };
   });
 }
