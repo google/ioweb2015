@@ -29,41 +29,45 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     <div class="card__container {{{'sidebyside': !isPhoneSize} | tokenList}}" layout
         vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
       <div flex?="{{!isPhoneSize}}" layout vertical>
-        <template repeat="{{timeBlock in timeBlocks_}}">
-          <div class="card day-title" hidden?="{{!timeBlock.dayStart || day}}">
-            Day {{timeBlock.dayStart}}
-          </div>
-          <div class="card" hidden?="{{!showAllBlocks && (timeBlock.isEmpty || timeBlock.day !== day)}}">
-            <div class="card-content">
-              <h4>{{timeBlock.name}}</h4>
+        <template repeat="{{timeBlock in timeBlocks_ | filterBlocks(day)}}">
+          <template if="{{timeBlock.dayStart && !day}}">
+            <div class="card day-title">
+              Day {{timeBlock.dayStart}}
             </div>
-            <div class="card-content" layout horizontal
-                hidden?="{{!showAllBlocks || !timeBlock.isEmpty}}">
-              <p>
-                No sessions added for this time
-                <a href="#day{{timeBlock.day}}" data-subpage-link>Browse sessions</a>
-              </p>
-            </div>
-            <div class="card-content schedule-rows" layout horizontal
-                hidden?="{{timeBlock.isEmpty}}">
-              <template repeat="{{sessionId in sessionsIndex_}}">
-                <div layout horizontal hidden?="{{session[sessionId].hide || sessions[sessionId].day !== timeBlock.day || sessions[sessionId].block !== timeBlock.name}}">
-                  <paper-radio-button></paper-radio-button>
-                  <div layout vertical flex>
-                    <span class="schedule-title" auto-vertical flex
-                        data-session-id="{{sessionId}}"
-                        on-click="{{selectSession}}">
-                      {{sessions[sessionId].title}}
-                    </span>
-                    <span class="schedule-time" auto-vertical flex two>
-                      {{sessions[sessionId].start}} :
-                      {{sessions[sessionId].end}}
-                    </span>
+          </template>
+          <template if="{{showAllBlocks || !timeBlock.isEmpty}}">
+            <div class="card">
+              <div class="card-content">
+                <h4>{{timeBlock.name}}</h4>
+              </div>
+              <div class="card-content" layout horizontal
+                  hidden?="{{!showAllBlocks || !timeBlock.isEmpty}}">
+                <p>
+                  No sessions added for this time
+                  <a href="#day{{timeBlock.day}}" data-subpage-link>Browse sessions</a>
+                </p>
+              </div>
+              <div class="card-content schedule-rows" layout vertical
+                  hidden?="{{timeBlock.isEmpty}}">
+                <template repeat="{{sessionId in sessionsIndex_ | filterSessions(timeBlock.day, timeBlock.name)}}">
+                  <div layout horizontal hidden?="{{session[sessionId].hide}}">
+                    <paper-radio-button></paper-radio-button>
+                    <div layout vertical flex>
+                      <span class="schedule-title" auto-vertical flex
+                          data-session-id="{{sessionId}}"
+                          on-click="{{selectSession}}">
+                        {{sessions[sessionId].title}}
+                      </span>
+                      <span class="schedule-time" auto-vertical flex two>
+                        {{sessions[sessionId].start}} :
+                        {{sessions[sessionId].end}}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </template>
+                </template>
+              </div>
             </div>
-          </div>
+          </template>
         </template>
       </div>
 
@@ -111,72 +115,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
   <script>
   (function() {
 
-    // TODO: Remove dummy data once this
-    // https://github.com/GoogleChrome/ioweb2015/pull/923/files lands.
-    var sessions = {
-      "dc44916c-48e7-e311-b297-00155d5066d7":
-      {
-        "id": "bb8bf02d-3afd-e311-903f-00155d5066d7",
-        "title": "Introduction to Classroom",
-        "description": "Come by the School Sandbox Teaching Theater",
-        "day": 2,
-        "block": "10 AM",
-        "start": "10:30 AM",
-        "end": "11:00 AM",
-        "startTimestamp": "2014-06-25T10:30:00Z",
-        "endTimestamp": "2014-06-25T11:00:00Z",
-        "speakers": ["speaker-id-1", "speaker-id-2"],
-        "room": "RoomName 42",
-        "photoUrl": "https://golang.org/doc/gopher/gopherbw.png",
-        "youtubeUrl": "https://youtu.be/YCUZ01yFtsM",
-        "isLivestream": false,
-        "filters": {
-          "Live Streamed": false,
-          "Develop & Design": true
-        }
-      },
-      "bb8bf02d-3afd-e311-903f-00155d5066d7vv":{
-        "id": "bb8bf02d-3afdasd1-903f-00155d5066d7",
-        "title": "Gopher rules",
-        "description": "Meet the gopher and learn from the best",
-        "day": 1,
-        "block": "11 AM",
-        "start": "11:30 AM",
-        "end": "12:00 AM",
-        "startTimestamp": "2014-06-24T11:30:00Z",
-        "endTimestamp": "2014-06-24T12:00:00Z",
-        "speakers": ["speaker-id-1", "speaker-id-2"],
-        "room": "RoomName 42",
-        "photoUrl": "https://golang.org/doc/gopher/gopherbw.png",
-        "youtubeUrl": "https://youtu.be/YCUZ01yFtsM",
-        "isLivestream": false,
-        "filters": {
-          "Live Streamed": true,
-          "Develop & Design": true
-        }
-      },
-      "bb8bf02d-3afd-e311-903f-00155d5066d7nn":{
-        "id": "bb8bf0aa-3afdasd1-903f-00155d5066d7",
-        "title": "Gopher rules again",
-        "description": "Meet the gopher and learn from the best",
-        "day": 1,
-        "block": "12 PM",
-        "start": "12:30 AM",
-        "end": "13:00 AM",
-        "startTimestamp": "2014-06-24T12:30:00Z",
-        "endTimestamp": "2014-06-24T13:00:00Z",
-        "speakers": ["speaker-id-1", "speaker-id-2"],
-        "room": "RoomName 42",
-        "photoUrl": "https://golang.org/doc/gopher/gopherbw.png",
-        "youtubeUrl": "https://youtu.be/YCUZ01yFtsM",
-        "isLivestream": false,
-        "filters": {
-          "Live Streamed": true,
-          "Engage & Earn": true
-        }
-      }
-    };
-
     var timeBlocks = [];
     var timeBlocksIndex = {};
 
@@ -210,7 +148,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @attribute sessions
          * @type array
          */
-        sessions: sessions,
+        sessions: [],
 
         /**
          * Optional day to filter the sessions, e.g. 'day1'.
@@ -289,12 +227,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       timeBlocksIndex_: timeBlocksIndex,
 
-      sessionsIndex_: null,
-
-      ready: function() {
-        // TODO: Remove when dummy data no longer needed.
-        this.sessions = sessions;
-      },
+      sessionsIndex_: [],
 
       sessionsChanged: function() {
         this.sessionsIndex_ = Object.keys(this.sessions);
@@ -353,6 +286,23 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       selectSession: function(e) {
         IOWA.Elements.Template.openSession(
             e.target.getAttribute('data-session-id'));
+      },
+
+      filterSessions: function(items, day, block) {
+        var filtered = [];
+        for (var i = 0; i < items.length; i++) {
+          var session = this.sessions[items[i]];
+          if (session.day === day && session.block === block) {
+            filtered.push(items[i]);
+          }
+        }
+        return filtered;
+      },
+
+      filterBlocks: function(items, day) {
+        return items.filter(function(item) {
+          return item.day === day || !day;
+        });
       }
 
     });
