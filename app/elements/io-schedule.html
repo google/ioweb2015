@@ -54,8 +54,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                     <paper-radio-button></paper-radio-button>
                     <div layout vertical flex>
                       <span class="schedule-title" auto-vertical flex
-                          data-session-id="{{sessionId}}"
-                          on-click="{{selectSession}}">
+                            on-click="{{selectSession}}">
                         {{sessions[sessionId].title}}
                       </span>
                       <span class="schedule-time" auto-vertical flex two>
@@ -143,14 +142,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     Polymer({
 
       publish: {
-        /**
-         * The data about scheduled I/O sessions.
-         *
-         * @attribute sessions
-         * @type array
-         */
-        sessions: [],
-
         /**
          * Optional day to filter the sessions, e.g. 'day1'.
          *
@@ -253,12 +244,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           sessions[i].hide = !this.matchesFilters(sessions[i]);
         }
         this.checkEmptyBlocks();
-        IOWA.History.pushState({fromHashChange: true}, '', [
+
+        var filters = this.filters.join(',');
+        if (filters.length) {
+          IOWA.History.pushState({fromHashChange: true}, '', [
             window.location.origin,
             window.location.pathname,
-            '?filters=' + encodeURIComponent(this.filters.join(',')),
+            '?filters=' + encodeURIComponent(filters),
             window.location.hash
-        ].join(''));
+          ].join(''));
+        }
       },
 
       matchesFilters: function(session) {
@@ -284,9 +279,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         }
       },
 
-      selectSession: function(e) {
+      selectSession: function(e, detail, sender) {
+        var sessionId = sender.templateInstance.model.sessionId;
         IOWA.Elements.Template.openSession(
-            e.target.getAttribute('data-session-id'));
+            sender.templateInstance.model.sessionId);
       },
 
       filterSessions: function(items, day, block) {
