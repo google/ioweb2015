@@ -45,6 +45,12 @@ paper-tabs.white {
   }
 }
 
+.card__signin-intro {
+  &::shadow #scroller {
+    padding: 0;
+  }
+}
+
 #page-offsite {
   paper-input::shadow paper-input-decorator {
     #input {

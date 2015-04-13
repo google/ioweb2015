@@ -319,8 +319,8 @@ limitations under the License.
           </span>
         </core-toolbar>
 
-        <core-overlay class="card card-content card__signin-intro"
-                      transition="core-transition-center" autoCloseDisabled backdrop>
+        <paper-dialog class="card card__signin-intro"
+                      transition="core-transition-center" autoCloseDisabled backdrop layered="false">
           <div class="card-content">
             <h4 class="card__title">Sign in</h4>
             <p>By signing in to the 2015 I/O web app, you can create a customized I/O schedule.</p>
@@ -339,7 +339,7 @@ limitations under the License.
             <a href="#" data-track-link="signin-intro-signin" on-click="{{signIn}}" core-overlay-toggle>Sign in</a>
             <a href="#" data-track-link="signin-intro-later" core-overlay-toggle>Maybe later</a>
           </div>
-        </core-overlay>
+        </paper-dialog>
 
         <div class="masthead-container" flex end?="{{!isPhoneSize}}"
              layout vertical?="{{isPhoneSize}}" horizontal?="{{isDesktopSize || isTabletSize}}">

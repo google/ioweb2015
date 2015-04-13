@@ -322,7 +322,12 @@
 
       IOWA.Elements.Template.openSession = function(sessionId) {
         this.selectedSession = this.scheduleData.sessions[sessionId];
-        IOWA.Elements.Main.querySelector('.session__detail').open();
+
+        // Open paper-dialog.
+        var panel = IOWA.Elements.Main.querySelector('.session__detail');
+        panel.open();
+
+        // Update deep link URL.
         var url = IOWA.Router.composeUrl(
             this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
             sessionId, window.location.search);

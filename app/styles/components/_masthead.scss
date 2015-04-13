@@ -181,7 +181,7 @@ core-drawer-panel {
   position: absolute !important;
   top: initial !important;
   right: $tabletKeyline;
-  @include shadow-z2();
+  margin: 0;
 }
 
 #signin-nav-elements {
