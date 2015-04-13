@@ -105,6 +105,14 @@ func TestMain(m *testing.M) {
 	config.Google.VerifyURL = tokeninfo.URL
 	config.Google.CertURL = cert.URL
 
+	config.Schedule.Start = time.Date(2015, 5, 28, 9, 0, 0, 0, time.UTC)
+	config.Schedule.Timezone = "America/Los_Angeles"
+	config.Schedule.Location, err = time.LoadLocation(config.Schedule.Timezone)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Could not load location %q", config.Schedule.Location)
+		os.Exit(1)
+	}
+
 	code := m.Run()
 	cleanupTests()
 	os.Exit(code)
