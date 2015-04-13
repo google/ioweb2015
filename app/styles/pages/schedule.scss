@@ -45,16 +45,18 @@ $name: 'page-schedule';
   }
 }
 
-paper-dropdown-menu {
-  @include typo-button();
-  margin: $tabletKeyline;;
-  padding: 0;
-  border: none;
-  core-menu {
-    margin: 0;
-  }
-  paper-item {
-    font-size: inherit;
+.page__filters {
+  paper-dropdown-menu {
+    @include typo-button();
+    margin: $tabletKeyline;;
+    padding: 0;
+    border: none;
+    core-menu {
+      margin: 0;
+    }
+    paper-item {
+      font-size: inherit;
+    }
   }
 }
 
