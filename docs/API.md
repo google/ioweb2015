@@ -235,14 +235,29 @@ Returns bookmarked sessions list of a user.
 
 *Requires authentication*
 
-Add a session to the bookmarks list.
+Add a session to the bookmarks list. Response is the altered bookmarks list:
+
+```json
+[
+  "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+  "05012279-E037-46D1-AD91-C0892277B01B",
+  "newly-added-session-id"
+]
+```
 
 
 ### DELETE /api/v1/user/schedule/:session_id
 
 *Requires authentication*
 
-Delete a session from the list.
+Delete a session from the list. Response is the altered bookmarks list:
+
+```json
+[
+  "6D752F30-3EB9-4014-8281-CBD28FD33B5A"
+]
+```
+
 
 
 [signin-guide]: https://developers.google.com/identity/sign-in/web/server-side-flow

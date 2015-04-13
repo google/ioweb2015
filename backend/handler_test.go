@@ -432,6 +432,14 @@ func TestHandleUserSchedulePut(t *testing.T) {
 	default:
 		t.Errorf("upload never happened")
 	}
+
+	var list []string
+	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+		t.Fatalf("Unmarshal(response): %v", err)
+	}
+	if len(list) != 1 || list[0] != "new-session-id" {
+		t.Errorf("list = %v; want ['new-session-id']", list)
+	}
 }
 
 func TestHandleUserScheduleDelete(t *testing.T) {
@@ -520,5 +528,13 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 		// passed
 	default:
 		t.Errorf("upload never happened")
+	}
+
+	var list []string
+	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+		t.Fatalf("Unmarshal(response): %v", err)
+	}
+	if len(list) != 1 || list[0] != "two-session" {
+		t.Errorf("list = %v; want ['two-session']", list)
 	}
 }
