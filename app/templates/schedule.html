@@ -268,12 +268,11 @@
           IOWA.Elements.Template.scheduleData = scheduleData;
           IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
-          var scheduleEls = IOWA.Elements.Main.querySelectorAll('io-schedule');
-          for (var i = 0, length = scheduleEls.length; i < length; i++) {
-            scheduleEls[i].sessionThemes = IOWA.Elements.Template.filterThemes;
-            scheduleEls[i].sessionTypes = IOWA.Elements.Template.filterSessionTypes;
-            scheduleEls[i].filters = filters;
-          }
+          var scheduleEl = IOWA.Elements.Main.querySelector('io-schedule');
+          scheduleEl.sessionThemes = IOWA.Elements.Template.filterThemes;
+          scheduleEl.sessionTypes = IOWA.Elements.Template.filterSessionTypes;
+          scheduleEl.sessions = scheduleData.sessions;
+          scheduleEl.filters = filters;
 
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
