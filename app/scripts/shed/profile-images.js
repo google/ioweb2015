@@ -7,5 +7,4 @@ function profileImageRequest(request) {
 }
 
 shed.precache([DEFAULT_PROFILE_IMAGE_URL]);
-shed.router.get('/(.+)/images/speakers/(.*)', profileImageRequest,
-  {origin: /https?:\/\/storage\.googleapis\.com/});
+shed.router.get('/(.+)/images/speakers/(.*)', profileImageRequest, {origin: /.*\.googleapis\.com/});
