@@ -303,8 +303,8 @@ func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var bookmarks []string
-	if bookmarks, err = userSchedule(c); err != nil {
+	bookmarks, err := userSchedule(c)
+	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}

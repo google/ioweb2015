@@ -62,6 +62,11 @@ type appConfig struct {
 			Client string `json:"client"`
 			Secret string `json:"secret"`
 		} `json:"auth"`
+		Drive struct {
+			Filename  string `json:"filename"`
+			FilesURL  string `json:"files_url"`
+			UploadURL string `json:"upload_url"`
+		} `json:"drive"`
 	} `json:"google"`
 }
 

@@ -18,6 +18,11 @@
     "auth": {
       "client": "web-app client ID",
       "secret": "web-app client secret"
+    },
+    "drive": {
+      "filename": "user_data.json",
+      "files_url": "https://www.googleapis.com/drive/v2/files",
+      "upload_url": "https://www.googleapis.com/upload/drive/v2/files"
     }
   },
   "twitter": {

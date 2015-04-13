@@ -6,23 +6,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-const (
-	appFolderFile = "user_data.json"
-
-	driveFilesURL  = "https://www.googleapis.com/drive/v2/files"
-	driveUploadURL = "https://www.googleapis.com/upload/drive/v2/files"
-)
-
-type appFolderData struct {
-	// id indicates whether the file exists
-	id string
-
-	GCMKey    string   `json:"gcm_key"`
-	Bookmarks []string `json:"starred_sessions"`
-	Videos    []string `json:"viewed_videos"`
-	Feedback  []string `json:"feedback_submitted_sessions"`
-}
-
 // userSchedule returns a slice of session IDs bookmarked by a user.
 // It fetches data from Google Drive AppData folder associated with config.Google.Auth.Client.
 // Context c must include user ID.

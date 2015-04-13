@@ -14,16 +14,28 @@ import (
 	"golang.org/x/net/context"
 )
 
+const searchDriveFiles = "'appfolder' in parents and title = '%s' and trashed = false"
+
+type appFolderData struct {
+	// id indicates whether the file exists
+	id string
+
+	GCMKey    string   `json:"gcm_key"`
+	Bookmarks []string `json:"starred_sessions"`
+	Videos    []string `json:"viewed_videos"`
+	Feedback  []string `json:"feedback_submitted_sessions"`
+}
+
 func fetchAppFolderData(c context.Context, cred *oauth2Credentials) (*appFolderData, error) {
 	// list files in 'appfolder' with title 'user_data.json'
 	// TODO: cache appdata file ID so not to query every time.
 	hc := oauth2Client(c, cred.tokenSource(c))
 	params := url.Values{
-		"q":          {"'appfolder' in parents and title = '" + appFolderFile + "' and trashed = false"},
+		"q":          {fmt.Sprintf(searchDriveFiles, config.Google.Drive.Filename)},
 		"fields":     {"nextPageToken,items(id,downloadUrl,modifiedDate)"},
 		"maxResults": {"100"},
 	}
-	res, err := hc.Get(driveFilesURL + "?" + params.Encode())
+	res, err := hc.Get(config.Google.Drive.FilesURL + "?" + params.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +54,7 @@ func fetchAppFolderData(c context.Context, cred *oauth2Credentials) (*appFolderD
 		} `json:"items"`
 	}
 	if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("fetchAppFolderData: %v", err)
 	}
 
 	var fileID, fileURL string
@@ -90,7 +102,7 @@ func storeAppFolderData(c context.Context, cred *oauth2Credentials, data *appFol
     "title": %q,
     "mimeType": "application/json",
     "parents": [{"id": "appfolder"}]
-  }`, appFolderFile)
+  }`, config.Google.Drive.Filename)
 	pw.Write([]byte(meta))
 
 	// media content
@@ -106,10 +118,10 @@ func storeAppFolderData(c context.Context, cred *oauth2Credentials, data *appFol
 	mp.Close()
 
 	// construct HTTP request
-	m, url := "POST", driveUploadURL
+	m, url := "POST", config.Google.Drive.UploadURL
 	if data.id != "" {
 		m = "PUT"
-		url = driveFilesURL + "/" + data.id
+		url += "/" + data.id
 	}
 	r, err := http.NewRequest(m, url+"?uploadType=multipart", &body)
 	if err != nil {

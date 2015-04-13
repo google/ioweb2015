@@ -1,7 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"mime"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -221,5 +225,300 @@ func TestHandleAuth(t *testing.T) {
 		if cred.Expiry.Before(time.Now()) {
 			t.Errorf("%d: cred.Expiry is in the past: %s", i, cred.Expiry)
 		}
+	}
+}
+
+func TestServeUserSchedule(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer preserveConfig()()
+
+	checkAutHeader := func(who, ah string) {
+		if ah == "" || !strings.HasPrefix(strings.ToLower(ah), "bearer ") {
+			t.Errorf("%s: bad authorization header: %q", who, ah)
+		} else if ah = ah[7:]; ah != "dummy-access" {
+			t.Errorf("%s: authorization = %q; want dummy-access", who, ah)
+		}
+	}
+
+	// drive download file server
+	down := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		checkAutHeader("down", r.Header.Get("authorization"))
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"starred_sessions": ["dummy-session-id"]}`))
+	}))
+	defer down.Close()
+
+	// drive search files server
+	files := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		checkAutHeader("files", r.Header.Get("authorization"))
+		q := "'appfolder' in parents and title = 'user_data.json' and trashed = false"
+		if v := r.FormValue("q"); v != q {
+			t.Errorf("q = %q; want %q", v, q)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"items": [
+      {
+        "id": "not-this-one",
+        "modifiedDate": "2015-04-10T12:12:46.034Z",
+        "downloadUrl": "http://not-this-url"
+      },
+      {
+        "id": "file-id",
+        "modifiedDate": "2015-04-11T12:12:46.034Z",
+        "downloadUrl": %q
+      }
+    ]}`, down.URL)
+	}))
+	defer files.Close()
+
+	config.Google.Drive.FilesURL = files.URL + "/"
+	config.Google.Drive.Filename = "user_data.json"
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	cred := &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}
+	if err := storeCredentials(c, cred); err != nil {
+		t.Fatalf("storeCredentials: %v", err)
+	}
+
+	w := httptest.NewRecorder()
+	r := newTestRequest(t, "GET", "/api/v1/user/schedule", nil)
+	r.Header.Set("Authorization", "Bearer "+testIDToken)
+
+	serveUserSchedule(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+	var list []string
+	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+		t.Fatalf("json.Unmarshal: %v\nResponse: %s", err, w.Body.String())
+	}
+	if len(list) != 1 || list[0] != "dummy-session-id" {
+		t.Errorf("list = %v; want ['dummy-session-id']", list)
+	}
+}
+
+func TestHandleUserSchedulePut(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer preserveConfig()()
+
+	checkAutHeader := func(who, ah string) {
+		if ah == "" || !strings.HasPrefix(strings.ToLower(ah), "bearer ") {
+			t.Errorf("%s: bad authorization header: %q", who, ah)
+		} else if ah = ah[7:]; ah != "dummy-access" {
+			t.Errorf("%s: authorization = %q; want dummy-access", who, ah)
+		}
+	}
+
+	checkMetadata := func(r io.Reader) {
+		var data struct {
+			Title    string `json:"title"`
+			MimeType string `json:"mimeType"`
+			Parents  []struct {
+				Id string `json:"id"`
+			}
+		}
+		if err := json.NewDecoder(r).Decode(&data); err != nil {
+			t.Errorf("checkMetadata: %v", err)
+			return
+		}
+		if data.Title != "user_data.json" {
+			t.Errorf("checkMetadata: data.Title = %q; want user_data.json", data.Title)
+		}
+		if data.MimeType != "application/json" {
+			t.Errorf("checkMetadata: data.MimeType = %q; want application/json", data.MimeType)
+		}
+		if len(data.Parents) != 1 || data.Parents[0].Id != "appfolder" {
+			t.Errorf(`checkMetadata: data.Parents = %+v; want [{"id":"appfolder"}]`, data.Parents)
+		}
+	}
+
+	checkMedia := func(r io.Reader) {
+		var data appFolderData
+		if err := json.NewDecoder(r).Decode(&data); err != nil {
+			t.Errorf("checkMedia: %v", err)
+			return
+		}
+		if len(data.Bookmarks) != 1 || data.Bookmarks[0] != "new-session-id" {
+			t.Errorf("checkMedia: data.Bookmarks = %v; want ['new-session-id']", data.Bookmarks)
+		}
+	}
+
+	// drive search files server
+	files := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		checkAutHeader("files", r.Header.Get("authorization"))
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"items":[]}`))
+	}))
+	defer files.Close()
+
+	// drive upload server
+	upload := make(chan struct{}, 1)
+	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		checkAutHeader("upload", r.Header.Get("authorization"))
+
+		mediaType, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+		if err != nil {
+			t.Fatalf("mime.ParseMediaType: %v", err)
+		}
+		if mediaType != "multipart/related" {
+			t.Errorf("mediaType = %q; want multipart/related", mediaType)
+		}
+
+		mr := multipart.NewReader(r.Body, params["boundary"])
+		count := 0
+		for {
+			p, err := mr.NextPart()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				t.Fatalf("%d: mr.NextPart: %v", count, err)
+			}
+			if v := p.Header.Get("Content-Type"); !strings.HasPrefix(v, "application/json") {
+				t.Errorf("%d: content-type = %q; want application/json", count, v)
+			}
+			switch count {
+			case 0:
+				checkMetadata(p)
+			case 1:
+				checkMedia(p)
+			}
+			count += 1
+		}
+		if count != 2 {
+			t.Errorf("num. of parts = %d; want 2", count)
+		}
+
+		upload <- struct{}{}
+	}))
+	defer up.Close()
+
+	config.Google.Drive.FilesURL = files.URL + "/"
+	config.Google.Drive.UploadURL = up.URL + "/"
+	config.Google.Drive.Filename = "user_data.json"
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	cred := &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}
+	if err := storeCredentials(c, cred); err != nil {
+		t.Fatalf("storeCredentials: %v", err)
+	}
+
+	w := httptest.NewRecorder()
+	r := newTestRequest(t, "PUT", "/api/v1/user/schedule/new-session-id", nil)
+	r.Header.Set("Authorization", "Bearer "+testIDToken)
+
+	handleUserBookmarks(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+	select {
+	case <-upload:
+		// passed
+	default:
+		t.Errorf("upload never happened")
+	}
+}
+
+func TestHandleUserScheduleDelete(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer preserveConfig()()
+
+	// drive download file server
+	down := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"starred_sessions": ["one-session", "two-session"]}`))
+	}))
+	defer down.Close()
+
+	// drive search files server
+	files := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		q := "'appfolder' in parents and title = 'user_data.json' and trashed = false"
+		if v := r.FormValue("q"); v != q {
+			t.Errorf("q = %q; want %q", v, q)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"items": [{
+      "id": "file-id",
+      "modifiedDate": "2015-04-11T12:12:46.034Z",
+      "downloadUrl": %q
+    }]}`, down.URL)
+	}))
+	defer files.Close()
+
+	// drive upload server
+	upload := make(chan struct{}, 1)
+	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() { upload <- struct{}{} }()
+
+		_, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+		if err != nil {
+			t.Fatalf("mime.ParseMediaType: %v", err)
+		}
+
+		mr := multipart.NewReader(r.Body, params["boundary"])
+		if _, err := mr.NextPart(); err != nil {
+			t.Fatalf("0: mr.NextPart: %v", err)
+		}
+
+		p, err := mr.NextPart()
+		if err != nil {
+			t.Fatalf("1: mr.NextPart: %v", err)
+		}
+		var data appFolderData
+		if err := json.NewDecoder(p).Decode(&data); err != nil {
+			t.Fatalf("Decode(mr.NextPart): %v", err)
+		}
+		if len(data.Bookmarks) != 1 || data.Bookmarks[0] != "two-session" {
+			t.Errorf("data.Bookmarks = %v; want ['two-session']", data.Bookmarks)
+		}
+	}))
+	defer up.Close()
+
+	config.Google.Drive.FilesURL = files.URL + "/"
+	config.Google.Drive.UploadURL = up.URL + "/"
+	config.Google.Drive.Filename = "user_data.json"
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	cred := &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}
+	if err := storeCredentials(c, cred); err != nil {
+		t.Fatalf("storeCredentials: %v", err)
+	}
+
+	w := httptest.NewRecorder()
+	r := newTestRequest(t, "DELETE", "/api/v1/user/schedule/one-session", nil)
+	r.Header.Set("Authorization", "Bearer "+testIDToken)
+
+	handleUserBookmarks(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+	select {
+	case <-upload:
+		// passed
+	default:
+		t.Errorf("upload never happened")
 	}
 }
