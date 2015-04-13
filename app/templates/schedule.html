@@ -181,7 +181,8 @@
   <section id="subpage-day1" class="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day1' || pages[selectedPage].selectedSubpage == 'day2' || pages[selectedPage].selectedSubpage == 'myschedule'} | tokenList}}">
     <section class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
-        <div class="card js-experiment-visualizer" aria-label="Agenda">
+        <div id="signin-prompt-card" class="card js-experiment-visualizer" aria-label="Agenda"
+            class="{{ {active: selectedSession.saved} | tokenList }}">
           <div class="card-content">
             <h3 class="card__title">Create your schedule</h3>
             <div>Sign-in to add sessions to your personalized schedule and to view it in your time zone.</div>
@@ -197,7 +198,8 @@
     <div class="slide-up-delay">
       <section class="page__section">
         <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
-          showAllBlocks="{{ pages[selectedPage].selectedSubpage === 'myschedule'}}"></io-schedule>
+          showAllBlocks="{{ pages[selectedPage].selectedSubpage === 'myschedule'}}"
+          user="{{currentUser}}"></io-schedule>
       </section>
     </div>
   </section>
@@ -254,6 +256,17 @@
         // IOWA.Schedule.fetchUserSchedule.then(function(scheduleData) {});
       };
 
+      var onSigninChanged_ = function(e) {
+        if (e.detail.signedIn) {
+          var signinPropmt = document.querySelector('#signin-prompt-card');
+          IOWA.PageAnimation.play(new Animation(
+              signinPropmt, [{opacity: 1}, {opacity: 0}],
+              {duration: 400}), function() {
+            signinPropmt.setAttribute('hidden', true);
+          });
+        }
+      };
+
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
@@ -261,6 +274,7 @@
 
         document.addEventListener('page-transition-done', onPageTransitionDone_);
         document.addEventListener('subpage-changed', onSubpageChanged_);
+        document.addEventListener('signin-change', onSigninChanged_);
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
