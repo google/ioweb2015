@@ -32,16 +32,26 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           <div class="card day-title" hidden?="{{!timeBlock.dayStart || day}}">
             Day {{timeBlock.dayStart}}
           </div>
-          <div class="card" hidden?="{{timeBlock.isEmpty || timeBlock.day !== day}}">
+          <div class="card" hidden?="{{!showAllBlocks && (timeBlock.isEmpty || timeBlock.day !== day)}}">
             <div class="card-content">
               <h4>{{timeBlock.name}}</h4>
             </div>
-            <div class="card-content schedule-rows" layout horizontal>
+            <div class="card-content" layout horizontal
+                hidden?="{{!showAllBlocks || !timeBlock.isEmpty}}">
+              <p>
+                No sessions added for this time
+                <a href="#day{{timeBlock.day}}" data-subpage-link>Browse sessions</a>
+              </p>
+            </div>
+            <div class="card-content schedule-rows" layout horizontal
+                hidden?="{{timeBlock.isEmpty}}">
               <template repeat="{{sessionId in sessionsIndex_}}">
                 <div layout horizontal hidden?="{{session[sessionId].hide || sessions[sessionId].day !== timeBlock.day || sessions[sessionId].block !== timeBlock.name}}">
                   <paper-radio-button></paper-radio-button>
                   <div layout vertical flex>
-                    <span class="schedule-title" auto-vertical flex>
+                    <span class="schedule-title" auto-vertical flex
+                        data-session-id="{{sessionId}}"
+                        on-click="{{selectSession}}">
                       {{sessions[sessionId].title}}
                     </span>
                     <span class="schedule-time" auto-vertical flex two>
@@ -103,7 +113,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     // TODO: Remove dummy data once this
     // https://github.com/GoogleChrome/ioweb2015/pull/923/files lands.
     var sessions = {
-      "bb8bf02d-3afd-e311-903f-00155d5066d7":
+      "dc44916c-48e7-e311-b297-00155d5066d7":
       {
         "id": "bb8bf02d-3afd-e311-903f-00155d5066d7",
         "title": "Introduction to Classroom",
@@ -244,7 +254,25 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type array
          * @default []
          */
-        sessions: []
+        sessions: [],
+
+        /**
+         * Whether to show blocks even if they're empty.
+         *
+         * @property showEmptyBlocks.
+         * @type Boolean
+         * @default false
+         */
+        showAllBlocks: false,
+
+        /**
+         * Whether to show blocks even if they're empty.
+         *
+         * @property showEmptyBlocks.
+         * @type Boolean
+         * @default false
+         */
+        user: null
       },
 
       timeBlocks_: timeBlocks,
@@ -310,6 +338,11 @@ The `<io-schedule>` element renders a schedule for a given day(s).
             this.timeBlocks_[this.timeBlocksIndex_[block]].isEmpty = isEmpty;
           }
         }
+      },
+
+      selectSession: function(e) {
+        IOWA.Elements.Template.openSession(
+            e.target.getAttribute('data-session-id'));
       }
 
     });

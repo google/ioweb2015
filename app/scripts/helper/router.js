@@ -24,6 +24,8 @@ IOWA.Router = (function() {
 
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
+  var FILTERS_REGEX = /\.*[\?|&]filters\=([^&]+)/;
+
   /**
    * Tells what kind of transition is currently happening on the page,
    * e.g. 'hero-card-transition' or 'masthead-ripple-transition'.
@@ -182,6 +184,7 @@ IOWA.Router = (function() {
             fromHashChange: true
           }, '', el.href);
           t.pages[t.selectedPage].selectedSubpage = nextSubpageName;
+          IOWA.Elements.Template.fire('subpage-changed');
           IOWA.PageAnimation.play(new AnimationGroup([
             IOWA.PageAnimation.sectionSlideIn(newSubpage),
             IOWA.PageAnimation.elementFadeIn(
@@ -460,6 +463,46 @@ IOWA.Router = (function() {
   }
 
   /**
+   * Extracts page's state from the url.
+   * Url structure:
+   *    http://<origin>/io2015/<page>?<search>#<subpage>/<resourceId>
+   * @param {string} url The page's url.
+   */
+  function parseUrl(url) {
+    var parser = new URL(url);
+    var hashParts = parser.hash.replace('#', '').split('/');
+    var params = {};
+    var paramsList = parser.search.replace('?', '').split('&');
+    for (var i = 0; i < paramsList.length; i++) {
+      var paramsParts = paramsList[i].split('=');
+      params[paramsParts[0]] = decodeURIComponent(paramsParts[1]);
+    }
+    return {
+      'pathname': parser.pathname,
+      'search': parser.search,
+      'hash': parser.hash,
+      'page': parser.pathname.replace(window.PREFIX + '/', ''),
+      'subpage': hashParts[0],
+      'resourceId': hashParts[1],
+      'params': params
+    };
+  }
+
+  /**
+   * Builds a url from the page's state details.
+   * Url structure:
+   *    http://<origin>/io2015/<page>?<search>#<subpage>/<resourceId>
+   * @param {string} page Name of the page.
+   * @param {string} subpage Name of the subpage.
+   * @param {string} resourceId Resource identifier.
+   * @param {string} search Encoded search string.
+   */
+  function composeUrl(page, subpage, resourceId, search) {
+    return [window.location.origin, window.PREFIX, '/', page, search,
+        '#', subpage || '', '/', resourceId || ''].join('');
+  }
+
+  /**
    * Initialized ajax-based routing on the page.
    */
   function init() {
@@ -497,7 +540,9 @@ IOWA.Router = (function() {
   return {
     init: init,
     getPageName: parsePageNameFromAbsolutePath,
-    animatePageIn: animatePageIn
+    animatePageIn: animatePageIn,
+    parseUrl: parseUrl,
+    composeUrl: composeUrl
   };
 
 })();

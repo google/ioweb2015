@@ -181,7 +181,8 @@
   <section id="subpage-day1" class="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day1' || pages[selectedPage].selectedSubpage == 'day2' || pages[selectedPage].selectedSubpage == 'myschedule'} | tokenList}}">
     <section class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
-        <div class="card js-experiment-visualizer" aria-label="Agenda">
+        <div id="signin-prompt-card" class="card js-experiment-visualizer" aria-label="Agenda"
+            class="{{ {active: selectedSession.saved} | tokenList }}">
           <div class="card-content">
             <h3 class="card__title">Create your schedule</h3>
             <div>Sign-in to add sessions to your personalized schedule and to view it in your time zone.</div>
@@ -196,7 +197,9 @@
     </section>
     <div class="slide-up-delay">
       <section class="page__section">
-        <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"></io-schedule>
+        <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
+          showAllBlocks="{{ pages[selectedPage].selectedSubpage === 'myschedule'}}"
+          user="{{currentUser}}"></io-schedule>
       </section>
     </div>
   </section>
@@ -206,8 +209,6 @@
 
     // Example id: dc44916c-48e7-e311-b297-00155d5066d7
     var SESSION_ID_REGEX = /\w{8}-(\w{4}-){3}\w{12}$/;
-
-    var FILTERS_REGEX = /\.*[\?|&]filters\=([^&]+)/;
 
     var SUBTAB_SELECTOR = '#subpage-tabs a';
 
@@ -220,10 +221,14 @@
       }
 
       var filters = [];
-      var filtersMatch = window.location.search.match(FILTERS_REGEX);
-      if (filtersMatch) {
-        filters = decodeURIComponent(filtersMatch[1]).split(',');
+      var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
+      if (parsedUrl.params.filters) {
+        filters = parsedUrl.params.filters.split(',');
       }
+
+      var onSubpageChanged_ = function(e) {
+        IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
+      };
 
       var onPageTransitionDone_ = function(e) {
         document.removeEventListener('page-transition-done', onPageTransitionDone_);
@@ -241,7 +246,7 @@
           }
 
           // Deep link into session.
-          var sessionId = location.hash.substring(1).match(SESSION_ID_REGEX);
+          var sessionId = parsedUrl.resourceId;
           if (sessionId) {
             IOWA.Elements.Template.openSession(sessionId[0]);
           }
@@ -251,12 +256,30 @@
         // IOWA.Schedule.fetchUserSchedule.then(function(scheduleData) {});
       };
 
+      var onSigninChanged_ = function(e) {
+        if (e.detail.signedIn) {
+          var signinPropmt = document.querySelector('#signin-prompt-card');
+          IOWA.PageAnimation.play(new Animation(
+              signinPropmt, [{opacity: 1}, {opacity: 0}],
+              {duration: 400}), function() {
+            signinPropmt.setAttribute('hidden', true);
+          });
+        }
+      };
+
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
         IOWA.Elements.Template.scheduleData = null;
 
         document.addEventListener('page-transition-done', onPageTransitionDone_);
+
+        // TODO: Move to page unload when issues/#951 is fixed.
+        document.removeEventListener('subpage-changed', onSubpageChanged_);
+        document.removeEventListener('signin-change', onSigninChanged_);
+
+        document.addEventListener('subpage-changed', onSubpageChanged_);
+        document.addEventListener('signin-change', onSigninChanged_);
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
@@ -271,6 +294,10 @@
       IOWA.Elements.Template.openSession = function(sessionId) {
         this.selectedSession = this.scheduleData.sessions[sessionId];
         IOWA.Elements.Main.querySelector('.session__detail').open();
+        var url = IOWA.Router.composeUrl(
+            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
+            sessionId, window.location.search);
+        history.replaceState({}, null, url);
       };
 
       IOWA.Elements.Template.toggleSaveSession = function(e, detail, sender) {
@@ -286,7 +313,11 @@
       };
 
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
-        history.replaceState({}, null, location.pathname); // Remove session id hash from URL.
+        // Remove session id hash from URL.
+        var url = IOWA.Router.composeUrl(
+            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
+            '', window.location.search);
+        history.replaceState({}, null, url);
       };
 
       page.load(); // Run load callback on page load.
