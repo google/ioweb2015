@@ -306,7 +306,7 @@ paper-fab {
     }
   }
   .masthead-container {
-    @include keyline-72l();
+    @include keyline-16l();
 
     paper-tabs[scrollable] {
       left: -64px;
