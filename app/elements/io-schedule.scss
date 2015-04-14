@@ -53,6 +53,7 @@
   text-overflow: ellipsis;
   position: relative;
   padding-right: 24px; // icon width
+  order: -1;
 }
 
 .schedule-time {
@@ -75,7 +76,8 @@ paper-checkbox {
 }
 
 paper-radio-button {
-   margin-right: $tabletKeyline;
+  margin-right: $tabletKeyline;
+  margin-top: 5px;
 }
 
 @media (max-width: $phone-breakpoint-max) {
@@ -97,14 +99,6 @@ paper-radio-button {
     }
   }
 
-  paper-radio-button {
-    margin-top: 5px;
-  }
-
-  .schedule-title {
-    order: -1;
-  }
-
   .no-sessions {
     margin-bottom: $mobileKeyline;
   }
@@ -117,5 +111,14 @@ paper-radio-button {
   .schedule-rows {
     width: 100%;
     box-sizing: border-box;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-mid) {
+  .schedule-title {
+    order: 0;
+  }
+  paper-radio-button {
+    margin-top: 0;
   }
 }
