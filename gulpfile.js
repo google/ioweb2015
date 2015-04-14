@@ -15,7 +15,6 @@ var generateServiceWorker = require('./gulp_scripts/generate_service_worker');
 var runSequence = require('run-sequence');
 var argv = require('yargs').argv;
 var browserSync = require('browser-sync');
-var reload = browserSync.reload;
 var opn = require('opn');
 var merge = require('merge-stream');
 var glob = require('glob');
@@ -33,6 +32,19 @@ var VERSION = argv.build || STATIC_VERSION;
 var PROD_ORIGIN = 'https://events.google.com';
 var URL_PREFIX = (argv.urlPrefix || '').replace(/\/+$/g, '') || '/io2015';
 var EXPERIMENT_STATIC_URL = URL_PREFIX + '/experiment/';
+
+// reload is a noop unless '--reload' cmd line arg is specified.
+var reload = function() {
+  return new require('stream').PassThrough({objectMode: true});
+};
+
+// openUrl is a noop unless '--open' cmd line arg is specified.
+var openUrl = function() {}
+
+if (argv.reload) {
+  reload = browserSync.reload;
+  openUrl = opn;
+}
 
 // Clears files cached by gulp-cache (e.g. anything using $.cache).
 gulp.task('clear', function (done) {
@@ -282,7 +294,7 @@ gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 
     start();
     serverAddr = 'http://' + serverAddr;
     console.log('The site should now be available at: ' + serverAddr);
-    opn(serverAddr + URL_PREFIX);
+    openUrl(serverAddr + URL_PREFIX);
     return;
   }
 
@@ -301,7 +313,7 @@ gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 
   });
 
   run();
-  browserSync({notify: false, proxy: serverAddr, startPath: URL_PREFIX});
+  browserSync({notify: false, proxy: serverAddr, startPath: URL_PREFIX, open: argv.open});
 
   watch();
   gulp.watch([BACKEND_DIR + '/**/*.go'], function() {
@@ -514,12 +526,17 @@ function startGaeBackend(backendDir, watchFiles, callback) {
     serverAddr = 'http://' + serverAddr;
     console.log('The site should now be available at: ' + serverAddr);
     // give GAE server some time to start
-    setTimeout(opn.bind(null, serverAddr + URL_PREFIX, null, null), 2000);
+    setTimeout(openUrl.bind(null, serverAddr + URL_PREFIX, null, null), 2000);
     return;
   }
 
   // give GAE server some time to start
-  setTimeout(browserSync.bind(null, {notify: false, proxy: serverAddr, startPath: URL_PREFIX}), 2000);
+  setTimeout(browserSync.bind(null, {
+    notify: false,
+    proxy: serverAddr,
+    startPath: URL_PREFIX,
+    open: argv.open
+  }), 2000);
   watch();
 }
 
