@@ -86,7 +86,7 @@ function processResponse(body) {
  */
 function generateSessionNotifications(updatedSessions) {
   // Ensure that we have an up-to-date sessions feed cached.
-  // This will happen aysnchronously, independent from the notification creation, so it's should not
+  // This will happen aysnchronously, independent from the notification creation, so it shouldn't be
   // necessary to wait on the promise resolutions.
   shed.helpers.openCache().then(function(cache) {
     cache.match(SESSIONS_ENDPOINT).then(function(response) {
