@@ -75,7 +75,7 @@ $name: 'page-schedule';
   }
 }
 
-.schedule-rows > * {
+.schedule-rows .schedule-row {
   margin-bottom: $tabletKeyline;
 }
 
@@ -87,6 +87,7 @@ core-icon[icon="schedule"] {
   font-size: 14px;
   color: $color-link-grey;
   margin-right: 80px;
+  width: 80px;
   white-space: nowrap;
 }
 
@@ -196,16 +197,15 @@ core-icon[icon="schedule"] {
 }
 
 @media (max-width: $phone-breakpoint-max) {
+  .schedule-title {
+    order: -1;
+  }
   .session__detail {
     margin: 0;
     left: 0 !important;
     top: 0 !important;
     width: 100%;
     height: 100%;
-  }
-  .page__section--top {
-    margin: 0;
-    padding: 0;
   }
   .masthead-container {
     padding-bottom: $subnavTabsPadding;
@@ -231,9 +231,6 @@ core-icon[icon="schedule"] {
 @media (min-width: $tablet-breakpoint-min) {
   .page__section {
     padding-bottom: $desktopKeyline;
-  }
-  .schedule-rows {
-    width: 300px; // Needed for IE11, to ensure the flexed children have proper widths.
   }
   .session__detail {
     .card__photo {

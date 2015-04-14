@@ -12,7 +12,7 @@ limitations under the License.
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-
+<link rel="import" href="../bower_components/core-media-query/core-media-query.html">
 <link rel="import" href="../bower_components/core-label/core-label.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
@@ -22,17 +22,26 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
 @element io-schedule
 -->
-<polymer-element name="io-schedule">
+<polymer-element name="io-schedule" block>
   <template>
-    <link rel="stylesheet" href="io-schedule.css">
-    <link rel="stylesheet" href="../styles/pages/schedule.css">
+    <link rel="stylesheet" href="io-schedule.css" no-shim>
+
+    <core-media-query query="(min-width:320px) and (max-width:767px)"
+                      queryMatches="{{isPhoneSize}}"></core-media-query>
+    <core-media-query query="(min-width:768px) and (max-width:1135px)"
+                      queryMatches="{{isTabletSize}}"></core-media-query>
+    <core-media-query query="(min-width:1136px)"
+                      queryMatches="{{isDesktopSize}}"></core-media-query>
+
     <div class="card__container {{{'sidebyside': !isPhoneSize} | tokenList}}" layout
-        vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+         vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
       <div flex?="{{!isPhoneSize}}" layout vertical>
         <template repeat="{{timeBlock in timeBlocks_ | filterBlocks(day)}}">
           <template if="{{timeBlock.dayStart && !day}}">
             <div class="card day-title">
-              Day {{timeBlock.dayStart}}
+              <div class="card-content">
+                <h4>Day {{timeBlock.dayStart}}</h4>
+              </div>
             </div>
           </template>
           <template if="{{showAllBlocks || !timeBlock.isEmpty}}">
@@ -40,26 +49,26 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
               </div>
-              <div class="card-content" layout horizontal
-                  hidden?="{{!showAllBlocks || !timeBlock.isEmpty}}">
-                <p>
-                  No sessions added for this time
-                  <a href="#day{{timeBlock.day}}" data-subpage-link>Browse sessions</a>
-                </p>
+              <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
+                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified
+                   hidden?="{{!showAllBlocks || !timeBlock.isEmpty}}">
+                <span class="no-sessions">No sessions added for this time</span>
+                <a href="#day{{timeBlock.day}}" data-subpage-link>Browse sessions</a>
               </div>
-              <div class="card-content schedule-rows" layout vertical
-                  hidden?="{{timeBlock.isEmpty}}">
+              <div class="card-content schedule-rows" layout vertical hidden?="{{timeBlock.isEmpty}}">
                 <template repeat="{{sessionId in sessionsIndex_ | filterSessions(timeBlock.day, timeBlock.name)}}">
-                  <div layout horizontal hidden?="{{session[sessionId].hide}}">
-                    <paper-radio-button></paper-radio-button>
-                    <div layout vertical flex>
-                      <span class="schedule-title" auto-vertical flex
-                            on-click="{{selectSession}}">
-                        {{sessions[sessionId].title}}
+                  <div class="schedule-row" layout horizontal center?="{{isDesktopSize}}"
+                       hidden?="{{session[sessionId].hide}}">
+                    <paper-radio-button toggles></paper-radio-button>
+                    <div layout vertical?="{{!isDesktopSize}}" horizontal?="{{isDesktopSize}}" flex
+                         on-click="{{selectSession}}">
+                      <span class="schedule-time" flex auto-vertical>
+                        {{sessions[sessionId].start}} - {{sessions[sessionId].end}}
                       </span>
-                      <span class="schedule-time" auto-vertical flex two>
-                        {{sessions[sessionId].start}} :
-                        {{sessions[sessionId].end}}
+                      <span class="schedule-title" auto-vertical flex?="{{!isPhoneSize}}" two
+                            title="{{sessions[sessionId].title}}">
+                        {{sessions[sessionId].title}}
+                        <core-icon class="schedule-livestream" icon="io:videocam" hidden?="{{!selectSession.isLivestream}}"></core-icon>
                       </span>
                     </div>
                   </div>
@@ -119,7 +128,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
     function populateTimeBlocks() {
       var hours = ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM',
-          '3 PM', '4 PM', '5 PM', '6 PM'];
+                   '3 PM', '4 PM', '5 PM', '6 PM'];
       for (var i = 1; i < 3; i++) {
         for (var j = 0; j < hours.length; j++) {
           var timeBlock = {
@@ -147,14 +156,14 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          *
          * @attribute day
          * @type number
-         * @default ''
+         * @default null
          */
         day: null,
 
         /**
          * Array of session theme names.
          *
-         * @property sessionThemes
+         * @attribute sessionThemes
          * @type array
          * @default []
          */
@@ -163,7 +172,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         /**
          * Array of session types.
          *
-         * @property sessionTypes
+         * @attribute sessionTypes
          * @type array
          * @default []
          */
@@ -172,7 +181,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         /**
          * Array of applied filters.
          *
-         * @property filters
+         * @attribute filters
          * @type array
          * @default []
          */
@@ -181,38 +190,38 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         /**
          * Array of scheduled sessions.
          *
-         * @property sessions.
+         * @attribute sessions
          * @type array
          * @default []
          */
         sessions: [],
 
         /**
+         * User's list of saved sessions.
+         *
+         * @attribute userSessions
+         * @type array
+         * @default []
+         */
+        userSessions: [],
+
+        /**
          * Whether to show blocks even if they're empty.
          *
-         * @property showEmptyBlocks.
+         * @attribute showAllBlocks
          * @type Boolean
          * @default false
          */
         showAllBlocks: false,
 
         /**
-         * Whether to show blocks even if they're empty.
+         * Logged in user.
          *
-         * @property showEmptyBlocks.
-         * @type Boolean
-         * @default false
+         * @attribute user
+         * @type Object
+         * @default null
          */
-        user: null,
-
-        /**
-         * Type of viewport based on media query.
-         *
-         * @property isPhoneSize.
-         * @type Boolean
-         * @default false
-         */
-        isPhoneSize: false
+        user: null
       },
 
       timeBlocks_: timeBlocks,
@@ -223,6 +232,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       sessionsChanged: function() {
         this.sessionsIndex_ = Object.keys(this.sessions);
+      },
+
+      userSessionsChanged: function() {
+        // TODO(devnook): implement
       },
 
       isFilterSelected: function(filterName) {
