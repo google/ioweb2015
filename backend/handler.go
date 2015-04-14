@@ -273,6 +273,9 @@ func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}
+	if bookmarks == nil {
+		bookmarks = []string{}
+	}
 	if err := json.NewEncoder(w).Encode(bookmarks); err != nil {
 		errorf(c, "encode(%v): %v", bookmarks, err)
 	}
