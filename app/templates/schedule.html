@@ -105,15 +105,15 @@
       <div class="card__container card__container--top">
         <div class="card js-experiment-visualizer" aria-label="Agenda">
           <div class="card-content">
-            <h4><i18n-msg msgid="iomonth">May</i18-msg> 27, 2015</h4>
+            <h4>May 27, 2015</h4>
           </div>
           <div class="card-content">
             <div layout horizontal>
               <core-icon icon="schedule" aria-hidden="true"></core-icon>
-              <div class="schedule-rows">
-                <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                  <span class="schedule-time" auto-vertical flex>9:00 AM - 6:00 PM</span>
-                  <span auto-vertical flex two><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></span>
+              <div class="schedule-rows" flex>
+                <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                  <span class="schedule-time">9:00 AM - 6:00 PM</span>
+                  <span class="schedule-title" flex auto-vertical>Badge pick-up</span>
                 </div>
               </div>
             </div>
@@ -126,27 +126,27 @@
         <div class="card__container card__container--top">
           <div class="card js-experiment-visualizer" aria-label="Agenda">
             <div class="card-content">
-              <h4><i18n-msg msgid="iomonth">May</i18-msg> 28, 2015</h4>
+              <h4>May 28, 2015</h4>
             </div>
             <div class="card-content">
               <div layout horizontal>
                 <core-icon icon="schedule" aria-hidden="true"></core-icon>
-                <div class="schedule-rows">
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>8:00 AM - 9:00 AM</span>
-                    <span auto-vertical flex two><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></span>
+                <div class="schedule-rows" flex>
+                  <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                    <span class="schedule-time">8:00 AM - 9:00 AM</span>
+                    <span class="schedule-title" flex auto-vertical>Badge pick-up</span>
                   </div>
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>9:00 AM - 5:00 PM</span>
-                    <span auto-vertical flex two><i18n-msg msgid="sessions-sandbox">Sessions &amp; Sandbox</i18-msg></span>
+                  <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                    <span class="schedule-time">9:00 AM - 5:00 PM</span>
+                    <span class="schedule-title" flex auto-vertical>Sessions &amp; Sandbox</span>
                   </div>
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>11:30 AM - 1:30 PM</span>
-                    <span auto-vertical flex two><i18n-msg msgid="lunch">Lunch</i18-msg></span>
+                  <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                    <span class="schedule-time">11:30 AM - 1:30 PM</span>
+                    <span class="schedule-title" flex auto-vertical>Lunch</span>
                   </div>
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>6:30 PM - 10:00 PM</span>
-                    <span auto-vertical flex two><i18n-msg msgid="afterhours">After Hours</i18-msg></span>
+                  <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                    <span class="schedule-time">6:30 PM - 10:00 PM</span>
+                    <span class="schedule-title" flex auto-vertical>After Hours</span>
                   </div>
                 </div>
               </div>
@@ -158,19 +158,19 @@
         <div class="card__container card__container--top">
           <div class="card js-experiment-visualizer" aria-label="Agenda">
             <div class="card-content">
-              <h4><i18n-msg msgid="iomonth">May</i18-msg> 29, 2015</h4>
+              <h4>May 29, 2015</h4>
             </div>
             <div class="card-content">
               <div layout horizontal>
                 <core-icon icon="schedule" aria-hidden="true"></core-icon>
-                <div class="schedule-rows">
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>9:00 AM - 5:00 PM</span>
-                    <span auto-vertical flex two><i18n-msg msgid="sessions-sandbox">Sessions &amp; Sandbox</i18-msg></span>
+                <div class="schedule-rows" flex>
+                  <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                    <span class="schedule-time">9:00 AM - 5:00 PM</span>
+                    <span class="schedule-title" flex auto-vertical>Sessions &amp; Sandbox</span>
                   </div>
-                  <div layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time" auto-vertical flex>11:30 AM - 1:30 PM</span>
-                    <span auto-vertical flex two><i18n-msg msgid="lunch">Lunch</i18-msg></span>
+                  <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
+                    <span class="schedule-time">11:30 AM - 1:30 PM</span>
+                    <span class="schedule-title" flex auto-vertical>Lunch</span>
                   </div>
                 </div>
               </div>
@@ -230,8 +230,11 @@
 
       <section class="page__section">
         <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
-          showAllBlocks="{{ pages[selectedPage].selectedSubpage === 'myschedule'}}"
-          user="{{currentUser}}" isPhoneSize="{{isPhoneSize}}"></io-schedule>
+          sessions="{{scheduleData.sessions}}" sessionThemes="{{filterThemes}}"
+          sessionTypes="{{filterSessionTypes}}" user="{{currentUser}}"
+          showAllBlocks="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
+          filters="{{sessionURLFilters}}"
+          isPhoneSize="{{isPhoneSize}}"></io-schedule>
       </section>
     </div>
   </section>
@@ -252,12 +255,6 @@
         return;
       }
 
-      var filters = [];
-      var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
-      if (parsedUrl.params.filters) {
-        filters = parsedUrl.params.filters.split(',');
-      }
-
       var onSubpageChanged_ = function(e) {
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
       };
@@ -269,11 +266,13 @@
           IOWA.Elements.Template.scheduleData = scheduleData;
           IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
-          var scheduleEl = IOWA.Elements.Main.querySelector('io-schedule');
-          scheduleEl.sessionThemes = IOWA.Elements.Template.filterThemes;
-          scheduleEl.sessionTypes = IOWA.Elements.Template.filterSessionTypes;
-          scheduleEl.sessions = scheduleData.sessions;
-          scheduleEl.filters = filters;
+          // Deep link into schedule tab.
+          var filters = [];
+          var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
+          if (parsedUrl.params.filters) {
+            filters = parsedUrl.params.filters.split(',');
+          }
+          IOWA.Elements.Template.sessionURLFilters = filters;
 
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
