@@ -70,6 +70,11 @@ To change the app environment when using GAE SDK, provide `--env` argument:
 Both gulp tasks accept optional `--no-watch` argument in case you need to disable
 file watchers and live reload.
 
+Other arguments are:
+
+* `--open` - open serving url in a new browser tab on start.
+* `--reload` - enable live reload. Disabled by default.
+
 ### Building
 
 Run `gulp`. This will create `dist` directory with both front-end and backend parts, ready for deploy.
@@ -108,4 +113,6 @@ binary program.
 `gulp backend:test` will run backend server tests. If, while working on the backend, you feel tired
 of running the command again and again, use `gulp backend:test --watch` to watch for file changes
 and re-run tests automatically.
+
+Add `--gae` cmd line argument to the test task to run GAE-based tests.
 
