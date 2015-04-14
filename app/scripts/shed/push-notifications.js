@@ -19,6 +19,7 @@ var DB_NAME = 'push-notification-updates';
 var DEFAULT_ICON = 'images/touch/homescreen192.png';
 var SESSIONS_ENDPOINT = 'api/v1/schedule';
 var UPDATES_ENDPOINT = 'api/v1/user/updates';
+var SESSION_DETAILS_URL_PREFIX = 'schedule?filters=#day';
 
 /**
  * Loads a SW token value from IndexedDB.
@@ -48,7 +49,7 @@ function fetchUpdates(token) {
  * @return {Promise} Resolves with an object representing the JSON in the response body, or rejects
  *                   if the Response was an HTTP error or didn't contain JSON.
  */
-function parseResponse(response) {
+function parseResponseJSON(response) {
   if (response.status >= 400) {
     throw Error('The request to ' + response.url + ' failed: ' +
                 response.statusText + ' (' + response.status + ')');
@@ -65,7 +66,7 @@ function parseResponse(response) {
 function processResponse(body) {
   var notifications = generateSessionNotifications(body.sessions)
     .concat(generateVideoNotifications(body.videos))
-    .concat(generateExtNotifications(body.ext));
+    .concat(generateIOExtNotifications(body.ioext));
 
   return Promise.all(notifications.map(function(notification) {
     return self.registration.showNotification(notification.title, notification);
@@ -75,49 +76,47 @@ function processResponse(body) {
 }
 
 /**
- * Returns metadata about a session, given a list of sessions and an id.
- * @param {array} sessions A list of sessions, in the format returned by
- *                https://github.com/GoogleChrome/ioweb2015/blob/master/docs/API.md#get-apiv1schedule
- * @param {string} sessionId A session id, corresponding to the id field of an entry in sessions.
- * @return {object} Metadata about the session with id sessionId, or null if it's not in sessions.
- */
-function lookupSession(sessions, sessionId) {
-  // Looping is probably more efficient than, e.g., creating and reusing an object keyed on session
-  // ids, since we probably won't be calling lookupSession() more than once before the SW is killed.
-  var sessionsLength = sessions.length;
-  for (var i = 0; i < sessionsLength; i++) {
-    if (sessions[i].id === sessionsId) {
-      return sessions[i];
-    }
-  }
-
-  return null;
-}
-
-/**
- * Fetches the latest list of sessions from the network (which also updates the cached Response).
- * For each session id that's passed in as a parameter, constructs the data needed to display a
- * notification from the fresh session response.
- * @param {array} sessionIds One or more session ids.
- * @return {Promise} Resolves with an array of objects with data that can be passed directly to
+ * For each session that's passed in as a parameter, constructs the data needed to display a
+ * notification.
+ * Additionally, updates the cached session feed with the latest data from the update, to ensure
+ * that if the session detail page is opened while offline, the details are up to date.
+ * @param {array} updatedSessions One or more sessions.
+ * @return {array} An array of objects with data that can be passed directly to
  *                   registration.showNotification()
  */
-function generateSessionNotifications(sessionIds) {
-  return shed.networkFirst(SESSIONS_ENDPOINT).then(parseResponse).then(function(sessions) {
-    return sessionIds.reduce(function(notifications, sessionId) {
-      var session = lookupSession(sessions, sessionId);
-      if (session) {
-        notifications.append({
-          title: 'Session "' + session.title + '" was updated.',
-          body: 'You previously starred this session.',
-          icon: DEFAULT_ICON,
-          // TODO (jeffposnick): Ensure that there's something meaningful set for tag so that
-          // notifications collapse properly.
-          tag: 'session-' + sessionId
+function generateSessionNotifications(updatedSessions) {
+  // Ensure that we have an up-to-date sessions feed cached.
+  // This will happen aysnchronously, independent from the notification creation, so it shouldn't be
+  // necessary to wait on the promise resolutions.
+  shed.helpers.openCache().then(function(cache) {
+    cache.match(SESSIONS_ENDPOINT).then(function(response) {
+      if (response) {
+        // If there's a cached sessions feed, then update the changed fields and replace the cached
+        // version with the updated version.
+        parseResponseJSON(response).then(function(allSessions) {
+          Object.keys(updatedSessions).forEach(function(sessionId) {
+            allSessions[sessionId] = updatedSessions[sessionId];
+          });
+
+          cache.put(SESSIONS_ENDPOINT, new Response(JSON.stringify(allSessions)));
         });
+      } else {
+        // If there isn't anything already cached for the sessions feed, then cache the whole thing.
+        shed.cache(SESSIONS_ENDPOINT);
       }
-      return notifications;
-    }, []);
+    });
+  }).catch(function(error) {
+    console.error('Could not update the cached sessions feed:', error);
+  });
+
+  return Object.keys(updatedSessions).map(function(sessionId) {
+    var session = updatedSessions[sessionId];
+    return {
+      title: 'I/O session "' + session.title + '" was updated.',
+      body: 'You previously starred this session.',
+      icon: session.photoUrl || DEFAULT_ICON,
+      tag: SESSION_DETAILS_URL_PREFIX + session.day + '/' + sessionId
+    };
   });
 }
 
@@ -126,7 +125,7 @@ function generateVideoNotifications(videos) {
   return [];
 }
 
-function generateExtNotifications(videos) {
+function generateIOExtNotifications(videos) {
   // TODO: Implement.
   return [];
 }
@@ -147,7 +146,7 @@ self.addEventListener('push', function(event) {
   event.waitUntil(
     loadToken()
       .then(fetchUpdates)
-      .then(parseResponse)
+      .then(parseResponseJSON)
       .then(processResponse)
       .then(saveToken)
       .catch(function(error) {
@@ -157,6 +156,10 @@ self.addEventListener('push', function(event) {
 });
 
 self.addEventListener('notificationclick', function(event) {
-  console.log('notificationclick:', event);
-  // TODO: Implement.
+  // Chrome displays a "default" notification if there isn't a notification shown in response to a
+  // push event. We should ideally never get those, but just do a check first to make sure.
+  if (event.notification.tag !== 'user_visible_auto_notification') {
+    var url = new URL(event.notification.tag, location.href);
+    clients.openWindow(url.toString());
+  }
 });
