@@ -231,8 +231,9 @@
       <section class="page__section">
         <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
           sessions="{{scheduleData.sessions}}" sessionThemes="{{filterThemes}}"
-          sessionTypes="{{filterSessionTypes}}" user="{{currentUser}}"
+          sessionTypes="{{filterSessionTypes}}"
           showAllBlocks="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
+          user="{{currentUser}}" userSessions="{{savedSessions}}"
           filters="{{sessionURLFilters}}"
           isPhoneSize="{{isPhoneSize}}"></io-schedule>
       </section>

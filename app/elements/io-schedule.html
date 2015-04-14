@@ -189,9 +189,18 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         sessions: [],
 
         /**
+         * User's list of saved sessions.
+         *
+         * @attribute userSessions
+         * @type array
+         * @default []
+         */
+        userSessions: [],
+
+        /**
          * Whether to show blocks even if they're empty.
          *
-         * @attribute showEmptyBlocks
+         * @attribute showAllBlocks
          * @type Boolean
          * @default false
          */
@@ -224,6 +233,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       sessionsChanged: function() {
         this.sessionsIndex_ = Object.keys(this.sessions);
+      },
+
+      userSessionsChanged: function() {
+        // TODO(devnook): implement
       },
 
       isFilterSelected: function(filterName) {
