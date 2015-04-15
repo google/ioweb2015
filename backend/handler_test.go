@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -536,5 +537,104 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 	}
 	if len(list) != 1 || list[0] != "two-session" {
 		t.Errorf("list = %v; want ['two-session']", list)
+	}
+}
+
+func TestGetUserDefaultPushConfig(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+
+	w := httptest.NewRecorder()
+	r := newTestRequest(t, "GET", "/api/v1/user/notify", nil)
+	r.Header.Set("Authorization", "Bearer "+testIDToken)
+
+	handleUserNotifySettings(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+	var body map[string]interface{}
+	if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
+		t.Fatalf("json.Unmarshal: %v", err)
+	}
+	if v, ok := body["notify"].(bool); !ok || v != false {
+		t.Errorf("body.notify = %+v, ok = %v; want notify = false", body["notify"], ok)
+	}
+	if v := body["subscribers"]; v != nil {
+		t.Errorf("body.subscribers = %+v; want nil", v)
+	}
+	if v := body["ioext"]; v != nil {
+		t.Errorf("body.ioext = %+v; want nil", v)
+	}
+}
+
+func TestStoreUserPushConfig(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+
+	body := strings.NewReader(`{
+    "notify": true,
+    "subscriber": "sub-id",
+    "endpoint": "https://test",
+    "ioext": {
+      "name": "Amsterdam",
+      "lat": 52.37607,
+      "lng": 4.886114
+    }
+  }`)
+	expected := &userPush{
+		userID:      testUserID,
+		Enabled:     true,
+		Subscribers: []string{"sub-id"},
+		Endpoints:   []string{"https://test"},
+		Ext: ioExtPush{
+			Enabled: true,
+			Name:    "Amsterdam",
+			Lat:     52.37607,
+			Lng:     4.886114,
+		},
+	}
+	expected.Pext = &expected.Ext
+
+	w := httptest.NewRecorder()
+	r := newTestRequest(t, "PUT", "/api/v1/user/notify", body)
+	r.Header.Set("Authorization", "Bearer "+testIDToken)
+
+	handleUserNotifySettings(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+
+	var p1 userPush
+	if err := json.Unmarshal(w.Body.Bytes(), &p1); err != nil {
+		t.Errorf("json.Unmarshal: %v", err)
+	}
+	// these are not exposed in the API response
+	p1.userID = expected.userID
+	p1.Endpoints = expected.Endpoints
+	if p1.Pext != nil {
+		p1.Pext.Enabled = true
+		p1.Ext = *p1.Pext
+	}
+	if !reflect.DeepEqual(&p1, expected) {
+		t.Errorf("p1 = %+v; want %+v", p1, expected)
+	}
+	if !reflect.DeepEqual(p1.Pext, expected.Pext) {
+		t.Errorf("p1.Pext = %+v; want %+v", p1.Pext, expected.Pext)
+	}
+
+	c := context.WithValue(newContext(r), ctxKeyUser, testUserID)
+	p2, err := getUserPushInfo(c)
+	if err != nil {
+		t.Errorf("getUserPushInfo: %v", err)
+	}
+	if !reflect.DeepEqual(p2, expected) {
+		t.Errorf("p2 = %+v; want %+v", p2, expected)
+	}
+	if !reflect.DeepEqual(p2.Pext, expected.Pext) {
+		t.Errorf("p2.Pext = %+v; want %+v", p2.Pext, expected.Pext)
 	}
 }
