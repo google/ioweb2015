@@ -46,17 +46,34 @@ Fired when a new toast appears.
       .clickable {
         cursor: pointer;
       }
+      .toast-action {
+        color: #eeff41;
+        text-transform: uppercase;
+        font-weight: 600;
+        padding-left: 24px;
+        cursor: pointer;
+      }
+
+      ::content .toast-action {
+        display: none;
+      }
     </style>
 
-    <div class="{{ {clickable: tapHandler_} | tokenList }}" on-tap="{{handleTap}}">
+    <div class="{{ {clickable: tapHandler_,} | tokenList }}" on-tap="{{handleTap}}" layout horizontal>
       <shadow></shadow>
+      <span class="toast-action" hidden?="{{!action}}"
+            on-tap="{{handleAction}}"><content></content>
+      </span>
     </div>
   </template>
   <script>
   Polymer({
     tapHandler_: null,
+    actionHandler_: null,
 
     listeners_: null,
+
+    action: null,
 
     created: function() {
       this.listeners_ = [];
@@ -67,6 +84,10 @@ Fired when a new toast appears.
         listener.target.removeEventListener(
             listener.eventType, listener.handler);
       });
+    },
+
+    actionChanged: function() {
+      this.textContent = this.action ? this.action : null;
     },
 
     /**
@@ -94,11 +115,15 @@ Fired when a new toast appears.
      * Shows the message in the toast.
      * @method showMessage
      * @param {string} message Message to show.Notification (event) type.
-     * @param {function} tapHandler Optional handler to execute when the toast is tapped.
+     * @param {function} opt_tapHandler Optional handler to execute when the toast is tapped.
+     * @param {string} opt_action Optional action link.
+     * @param {function} opt_actionHandler Optional handler to execute when the action is tapped.
      */
-    showMessage: function(message, opt_tapHandler) {
+    showMessage: function(message, opt_tapHandler, opt_action, opt_actionHandler) {
       this.text = message;
       this.tapHandler_ = opt_tapHandler;
+      this.action = opt_action;
+      this.actionHandler_ = opt_actionHandler;
       this.show();
       this.fire('toast-message', {message: message});
     },
@@ -106,6 +131,15 @@ Fired when a new toast appears.
     handleTap: function() {
       if (typeof this.tapHandler_ == 'function') {
         this.tapHandler_();
+        this.dismiss();
+      }
+    },
+
+    handleAction: function(e) {
+      if (typeof this.actionHandler_ == 'function') {
+        e.stopPropagation();
+        this.actionHandler_();
+        this.dismiss();
       }
     },
 
