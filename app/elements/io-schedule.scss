@@ -119,6 +119,14 @@ paper-progress {
   }
 }
 
+@media (min-width: $desktop-breakpoint-min) {
+  .card {
+    .card-content {
+      padding: 32px;
+    }
+  }
+}
+
 @media (min-width: $desktop-breakpoint-mid) {
   .schedule-title {
     order: 0;
