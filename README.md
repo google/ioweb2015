@@ -116,3 +116,32 @@ and re-run tests automatically.
 
 Add `--gae` cmd line argument to the test task to run GAE-based tests.
 
+
+## Debugging
+
+A list of tools to help in a debugging process.
+**NOT available in prod**
+
+### Proxy with the service account credentials
+
+```
+https://io-webapp-staging.appspot.com/io2015/debug/srvget?url=<some-url>
+```
+
+The backend will GET `some-url` and respond back with the original
+status code, content-type header and the content.
+
+Useful for browsing original CMS data on staging GCS bucket:
+
+https://io-webapp-staging.appspot.com/io2015/debug/srvget?url=https://storage.googleapis.com/io2015-data-dev.google.com.a.appspot.com/manifest_v1.json
+
+
+### List contents of Google Drive AppFolder.
+
+TODO
+
+
+### Send GCM push notifications
+
+TODO
+

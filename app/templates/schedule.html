@@ -28,7 +28,7 @@
     </paper-tabs>
     <paper-dropdown-menu hidden?="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
       <paper-dropdown class="dropdown" halign="right">
-        <core-menu class="menu" selected="{{timezone}}" valueattr="label">
+        <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
           <template repeat="{{zone in timezones}}">
             <paper-item label="{{zone}}">{{zone}}</paper-item>
           </template>
@@ -194,14 +194,15 @@
       </section>
     </div>
   </section>
+
   <section id="subpage-day1" class="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day1' || pages[selectedPage].selectedSubpage == 'day2' || pages[selectedPage].selectedSubpage == 'myschedule'} | tokenList}}">
-    <section class="page__section page__section--top slide-up">
+    <section id="signin-prompt" class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
-        <div id="signin-prompt-card" class="card js-experiment-visualizer" aria-label="Agenda"
-            class="{{ {active: selectedSession.saved} | tokenList }}">
+
+        <div class="card js-experiment-visualizer" aria-label="Agenda">
           <div class="card-content">
-            <h3 class="card__title">Create your schedule</h3>
-            <div>Sign in to add sessions to your personalized schedule and to view it in your time zone.</div>
+            <h3 class="card__title">Create your custom I/O schedule</h3>
+            <div>Sign-in to add sessions to your personalized schedule.</div>
           </div>
           <div class="card-content">
             <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-sign-in">
@@ -209,6 +210,7 @@
             </span>
           </div>
         </div>
+
       </div>
     </section>
     <div class="slide-up-delay">
@@ -231,7 +233,7 @@
         </span>
         <paper-dropdown-menu>
           <paper-dropdown class="dropdown" halign="right">
-            <core-menu class="menu" selected="{{timezone}}" valueattr="label">
+            <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
               <template repeat="{{zone in timezones}}">
                 <paper-item label="{{zone}}">{{zone}}</paper-item>
               </template>
@@ -244,9 +246,10 @@
         <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
           sessions="{{scheduleData.sessions}}" sessionThemes="{{filterThemes}}"
           sessionTypes="{{filterSessionTypes}}"
-          showAllBlocks="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
+          showOnlySavedSessions="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
           user="{{currentUser}}" userSessions="{{savedSessions}}"
-          timezone="{{timezone}}"
+          timezone="{{selectedTimezone}}"
+          fetchingUserData="{{scheduleFetchingUserData}}"
           filters="{{sessionURLFilters}}"></io-schedule>
       </section>
     </div>
@@ -259,6 +262,15 @@
     var SESSION_ID_REGEX = /\w{8}-(\w{4}-){3}\w{12}$/;
 
     var SUBTAB_SELECTOR = '#subpage-tabs a';
+
+    function hideSignInCard() {
+      var signinPropmt = IOWA.Elements.Main.querySelector('#signin-prompt');
+      IOWA.PageAnimation.play(new Animation(signinPropmt,
+        [{opacity: 1}, {opacity: 0}], {duration: 400}), function() {
+          signinPropmt.setAttribute('hidden', true);
+        }
+      );
+    }
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
@@ -275,6 +287,11 @@
       var onPageTransitionDone_ = function(e) {
         document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
+        // If user is already authenticated, hide prompts.
+        if (IOWA.Elements.Template.currentUser) {
+          hideSignInCard();
+        }
+
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
           IOWA.Elements.Template.scheduleData = scheduleData;
           IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
@@ -287,7 +304,7 @@
           }
           IOWA.Elements.Template.sessionURLFilters = filters;
 
-          IOWA.Elements.Template.timezone = 'GMT-08:00';
+          IOWA.Elements.Template.selectedTimezone = 'GMT-08:00'; // PDT timezone.
 
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
@@ -299,15 +316,13 @@
 
       var onSigninChanged_ = function(e) {
         if (e.detail.signedIn) {
-          var signinPropmt = document.querySelector('#signin-prompt-card');
-          IOWA.PageAnimation.play(new Animation(
-              signinPropmt, [{opacity: 1}, {opacity: 0}],
-              {duration: 400}), function() {
-            signinPropmt.setAttribute('hidden', true);
-          });
+          hideSignInCard();
 
           // Fetch user's data. Mark sessions they've bookmarked
+          IOWA.Elements.Template.scheduleFetchingUserData = true;
           IOWA.Schedule.fetchUserSchedule().then(function(savedSessions) {
+            IOWA.Elements.Template.scheduleFetchingUserData = false;
+            savedSessions = savedSessions || [];
             IOWA.Elements.Template.savedSessions = savedSessions;
 
             var sessions = IOWA.Elements.Template.scheduleData.sessions;

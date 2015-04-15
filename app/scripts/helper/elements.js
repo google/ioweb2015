@@ -272,24 +272,9 @@ IOWA.Elements = (function() {
         'title': 'Casablanca, Lisbon, London',
         'GMTOffset': 0
       }
-    }
+    };
 
-    template.timezones = [
-      'GMT-11:00',
-      'GMT-10:00',
-      'GMT-09:00',
-      'GMT-08:00',
-      'GMT-07:00',
-      'GMT-06:00',
-      'GMT-05:00',
-      'GMT-04:30',
-      'GMT-04:00',
-      'GMT-03:30',
-      'GMT-03:00',
-      'GMT-02:00',
-      'GMT-01:00',
-      'GMT-00:00'
-    ]
+    template.timezones = Object.keys(template.timezoneNames);
 
     template.formatSessionTimeFilter = function(dateStr) {
       var date = new Date(dateStr);

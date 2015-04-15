@@ -15,6 +15,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-media-query/core-media-query.html">
 <link rel="import" href="../bower_components/core-label/core-label.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
 
 <!--
@@ -44,31 +45,44 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               </div>
             </div>
           </template>
-          <template if="{{showAllBlocks || timeBlock.sessions.length}}">
+          <template if="{{showOnlySavedSessions || timeBlock.sessions.length}}">
             <div class="card">
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
               </div>
+              <paper-progress indeterminate hidden?="{{!fetchingUserData}}">
+              </paper-progress>
               <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
                    vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified
-                   hidden?="{{!showAllBlocks || timeBlock.sessions.length}}">
+                   hidden?="{{!showOnlySavedSessions || timeBlock.sessions.length}}">
                 <span class="no-sessions">No sessions added for this time</span>
-                <a href="#day{{timeBlock.day}}" data-subpage-link>Browse sessions</a>
+                <a href="#day{{timeBlock.day}}" data-subpage-link>
+                  Browse sessions
+                </a>
               </div>
-              <div class="card-content schedule-rows" layout vertical hidden?="{{!timeBlock.sessions.length}}">
+              <div class="card-content schedule-rows"
+                   layout vertical hidden?="{{!timeBlock.sessions.length}}">
                 <template repeat="{{sessionId in timeBlock.sessions}}">
-                  <div class="schedule-row" layout horizontal center?="{{isDesktopSize}}"
-                       hidden?="{{session[sessionId].hide}}">
-                    <paper-radio-button toggles></paper-radio-button>
-                    <div layout vertical?="{{!isDesktopSize}}" horizontal?="{{isDesktopSize}}" flex
+                  <div class="schedule-row" layout horizontal
+                       center?="{{isDesktopSize}}"
+                       hidden?="{{sessions[sessionId].hide ||  !(!showOnlySavedSessions || (showOnlySavedSessions && sessions[sessionId].saved)) }}">
+                    <paper-radio-button
+                        on-core-change="{{onToggleSaveSession}}"
+                        toggles checked?="{{sessions[sessionId].saved}}"
+                        disabled?="{{showOnlySavedSessions}}"></paper-radio-button>
+                    <div layout vertical?="{{!isDesktopSize}}"
+                         horizontal?="{{isDesktopSize}}" flex
                          on-click="{{selectSession}}">
                       <span class="schedule-time" flex auto-vertical>
                         {{sessions[sessionId].start}} - {{sessions[sessionId].end}}
                       </span>
-                      <span class="schedule-title" auto-vertical flex?="{{!isPhoneSize}}" two
+                      <span class="schedule-title" auto-vertical
+                            flex?="{{!isPhoneSize}}" two
                             title="{{sessions[sessionId].title}}">
                         {{sessions[sessionId].title}}
-                        <core-icon class="schedule-livestream" icon="io:videocam" hidden?="{{!selectSession.isLivestream}}"></core-icon>
+                        <core-icon class="schedule-livestream"
+                            icon="io:videocam"
+                            hidden?="{{!selectSession.isLivestream}}"></core-icon>
                       </span>
                     </div>
                   </div>
@@ -91,7 +105,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                   <core-label center horizontal layout>
                     <div flex>{{theme}}</div>
                     <paper-checkbox on-change="{{applyFilter}}"
-                        checked?="{{isFilterSelected(theme)}}"
+                        checked?="{{filtersState_[theme]}}"
                         name="{{theme}}" for></paper-checkbox>
                   </core-label>
                 </template>
@@ -198,7 +212,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          *
          * @attribute timezone
          * @type string
-         * @default 'GMT-07:00' (PDT Timezone)
+         * @default 'GMT-07:00' (PDT timezone)
          */
         timezone: 'GMT-07:00',
 
@@ -221,13 +235,13 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         userSessions: [],
 
         /**
-         * Whether to show blocks even if they're empty.
+         * Whether to show only saved sessions for any day.
          *
-         * @attribute showAllBlocks
+         * @attribute showOnlySavedSessions
          * @type Boolean
          * @default false
          */
-        showAllBlocks: false,
+        showOnlySavedSessions: false,
 
         /**
          * Logged in user.
@@ -236,7 +250,17 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type Object
          * @default null
          */
-        user: null
+        user: null,
+
+        /**
+         * Whether fetching user data is in progress.
+         *
+         * @attribute fetchingUserData
+         * @type Boolean
+         * @default false
+         */
+        fetchingUserData: false
+
       },
 
       timeBlocks_: timeBlocks,
@@ -245,15 +269,23 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       sessionsIndex_: [],
 
+      filtersState_: {},
+
       sessionsChanged: function() {
         this.sessionsIndex_ = Object.keys(this.sessions);
       },
 
+      dayChanged: function() {
+        this.checkEmptyBlocks();
+      },
+
       userSessionsChanged: function() {
-        // TODO(devnook): implement
+        this.userSessions = this.userSessions || [];
+        this.checkEmptyBlocks();
       },
 
       timezoneChanged: function() {
+        console.log('ssss')
         for (var i = 0; i < this.sessionsIndex_.length; i++) {
           var session = this.sessions[this.sessionsIndex_[i]];
           var time = this.getLocalizedTime(session.startTimestamp);
@@ -279,20 +311,25 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       filtersChanged: function() {
+        for (var i = 0; i < this.filters.length; i++) {
+          this.filtersState_[this.filters[i]] = true;
+        }
         for (var i = 0; i < this.sessions.length; i++) {
           sessions[i].hide = !this.matchesFilters(sessions[i]);
         }
         this.checkEmptyBlocks();
 
         var filters = this.filters.join(',');
+        var filterParam = '';
         if (filters.length) {
-          IOWA.History.pushState({fromHashChange: true}, '', [
-            window.location.origin,
-            window.location.pathname,
-            '?filters=' + encodeURIComponent(filters),
-            window.location.hash
-          ].join(''));
+          filterParam = '?filters=' + encodeURIComponent(filters);
         }
+        IOWA.History.pushState({fromHashChange: true}, '', [
+          window.location.origin,
+          window.location.pathname,
+          filterParam,
+          window.location.hash
+        ].join(''));
       },
 
       matchesFilters: function(session) {
@@ -315,7 +352,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           var session = this.sessions[this.sessionsIndex_[i]];
           var block = session.day + session.block;
           if (this.timeBlocks_[this.timeBlocksIndex_[block]]) {
-            if (this.matchesFilters(session)) {
+            var isValidSession = this.matchesFilters(session) &&
+              (!this.showOnlySavedSessions ||
+               (this.showOnlySavedSessions && session.saved));
+            if (isValidSession) {
               this.timeBlocks_[this.timeBlocksIndex_[block]].sessions.push(
                 this.sessionsIndex_[i]);
             };
@@ -349,6 +389,20 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       getLocalizedTime: function(dateStr) {
         var tzId = IOWA.Elements.Template.timezoneNames[this.timezone].name;
         return moment(dateStr).tz(tzId);
+      },
+
+      onToggleSaveSession: function(e, detail, sender) {
+        this.toggleSaveSession(
+            sender.templateInstance.model.sessionId, e.target.checked);
+      },
+
+      toggleSaveSession: function(sessionId, save) {
+        var session = this.sessions[sessionId];
+        if (session.saved !== save) {
+          IOWA.Schedule.saveSession(sessionId, save).then(function() {
+            session.saved = save;
+          }.bind(this));
+        }
       }
 
     });
