@@ -69,7 +69,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                        hidden?="{{sessions[sessionId].hide ||  !(!showOnlySavedSessions || (showOnlySavedSessions && sessions[sessionId].saved)) }}">
                     <paper-radio-button
                         on-core-change="{{onToggleSaveSession}}"
-                        name="{{sessionId}}"
                         toggles checked?="{{sessions[sessionId].saved}}"
                         disabled?="{{showOnlySavedSessions}}"></paper-radio-button>
                     <div layout vertical?="{{!isDesktopSize}}"
@@ -360,8 +359,9 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         });
       },
 
-      onToggleSaveSession: function(e) {
-        this.toggleSaveSession(e.target.getAttribute('name'), e.target.checked);
+      onToggleSaveSession: function(e, detail, sender) {
+        this.toggleSaveSession(
+            sender.templateInstance.model.sessionId, e.target.checked);
       },
 
       toggleSaveSession: function(sessionId, save) {
