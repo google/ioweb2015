@@ -27,6 +27,13 @@ handlers:
   http_headers:
     Access-Control-Allow-Origin: "*"
 
+- url: $PREFIX$/permissions.*
+  static_files: app/permissions.html
+  upload: app/permissions\.html$
+  secure: always
+  http_headers:
+    Access-Control-Allow-Origin: "*"
+
 # shorter cache for some files that may change frequently,
 # including service worker
 - url: $PREFIX$/(.+(elements\.html|\.js|\.css))$
