@@ -27,7 +27,7 @@ IOWA.Schedule = (function() {
   var userScheduleData_ = null;
 
   function onError(e) {
-    IOWA.Elements.Toast.showMessage('Sign-in to add events to My Schedule', null, 'Sign-in', function() {
+    IOWA.Elements.Toast.showMessage('Sign in to add events to My Schedule', null, 'Sign in', function() {
       IOWA.Elements.GoogleSignIn.signIn();
       // TODO(jeffy): setup push notification, and retry their save.
     });
