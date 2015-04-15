@@ -27,6 +27,7 @@ function install_or_update_gcloud {
     GCLOUD_BIN=$SDK_DIR/bin/gcloud
   fi
 
-  $GCLOUD_BIN components update app -q
+  # TODO: uncomment when this damn thing stops breaking!
+  #$GCLOUD_BIN components update app -q
 }
 
