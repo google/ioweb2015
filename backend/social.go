@@ -124,16 +124,30 @@ func fetchTweets(c context.Context, account string, tc chan *tweetEntry) {
 		errorf(c, "fetchTweets: %v", err)
 	}
 
-	lenFilter := len(config.Twitter.Filter)
 	for _, t := range tweets {
-		i := strings.Index(t.Text, config.Twitter.Filter)
-		if i < 0 {
-			continue
-		}
-		if i+lenFilter == len(t.Text)-1 || t.Text[i+lenFilter] == ' ' {
+		if includesWord(t.Text, config.Twitter.Filter) {
 			tc <- t
 		}
 	}
+}
+
+// includesWord returns true if s contains w followed by a space or a word delimiter.
+func includesWord(s, w string) (ret bool) {
+	lenw := len(w)
+	for {
+		i := strings.Index(s, w)
+		if i < 0 {
+			break
+		}
+		if i+lenw == len(s) {
+			return true
+		}
+		if c := s[i+lenw]; c == ' ' || c == '.' || c == ',' || c == ':' || c == ';' || c == '-' {
+			return true
+		}
+		s = s[i+lenw:]
+	}
+	return false
 }
 
 // tweetEntry is the entry format of Twitter API endpoint.

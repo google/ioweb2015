@@ -31,6 +31,7 @@ func registerHandlers() {
 	handle("/api/v1/schedule", serveSchedule)
 	handle("/api/v1/user/schedule", serveUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserBookmarks)
+	handle("/api/v1/user/notify", handleUserNotifySettings)
 	// setup root redirect if we're prefixed
 	if config.Prefix != "/" {
 		var redirect http.Handler = http.HandlerFunc(redirectHandler)
@@ -273,6 +274,9 @@ func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(w, http.StatusInternalServerError, err)
 		return
 	}
+	if bookmarks == nil {
+		bookmarks = []string{}
+	}
 	if err := json.NewEncoder(w).Encode(bookmarks); err != nil {
 		errorf(c, "encode(%v): %v", bookmarks, err)
 	}
@@ -311,6 +315,105 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(bookmarks); err != nil {
 		errorf(c, "handleUserBookmarks: encode(%v): %v", bookmarks, err)
+	}
+}
+
+// handleUserNotifySettings calls either serves or patches user push config
+// based on HTTP method of request r.
+func handleUserNotifySettings(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		serveUserNotifySettings(w, r)
+	case "PUT":
+		patchUserNotifySettings(w, r)
+	}
+}
+
+// serveUserNotifySettings responds with the current user push configuration.
+func serveUserNotifySettings(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+	data, err := getUserPushInfo(c)
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		errorf(c, "serveUserNotifySettings: %v", err)
+	}
+}
+
+// patchUserNotifySettings updates user push configuration.
+// It doesn't modify existing parameters not present in the payload of r.
+func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	// decode request payload into a flexible map
+	var body map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeJSONError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// get current settings
+	data, err := getUserPushInfo(c)
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// patch settings according to the payload
+	if v, ok := body["notify"].(bool); ok {
+		data.Enabled = v
+	}
+	if sub, ok := body["subscriber"].(string); ok {
+		url, ok := body["endpoint"].(string)
+		if !ok || url == "" {
+			url = config.Google.GCM.Endpoint
+		}
+		var exists bool
+		for _, s := range data.Subscribers {
+			if s == sub {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			data.Subscribers = append(data.Subscribers, sub)
+			data.Endpoints = append(data.Endpoints, url)
+		}
+	}
+	if v, exists := body["ioext"]; exists {
+		if v == nil {
+			data.Ext.Enabled = false
+			data.Pext = nil
+		} else if v, ok := v.(map[string]interface{}); ok {
+			data.Ext.Enabled = true
+			data.Ext.Name, _ = v["name"].(string)
+			data.Ext.Lat, _ = v["lat"].(float64)
+			data.Ext.Lng, _ = v["lng"].(float64)
+			data.Pext = &data.Ext
+		}
+	}
+
+	// store user configuration
+	// TODO: run in transaction with the previous getUserPushInfo()
+	if err := storeUserPushInfo(c, data); err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		errorf(c, "patchUserNotifySettings: %v", err)
 	}
 }
 

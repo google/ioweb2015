@@ -283,7 +283,7 @@ limitations under the License.
           </paper-tabs>
           <span id="signin-nav-elements" class="{{isPhoneSize ? '' : navBgClass}}"
                 layout horizontal center>
-            <a href="#" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign-in</a>
+            <a href="#" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign in</a>
             <template if="{{currentUser}}">
               <img _src="{{currentUser.picture}}" class="profilepic">
               <paper-menu-button>
@@ -304,7 +304,7 @@ limitations under the License.
                     </core-label>
                     <p>If this option is deselected, I understand I won't be notified when:</p>
                     <ul>
-                      <li>New Extended events register near me</li>
+                      <!-- <li>New Extended events register near me</li> -->
                       <li>I/O is about to start</li>
                       <li>Bookmarked sessions are about to start</li>
                       <li>Specific session videos are made available</li>
@@ -328,7 +328,7 @@ limitations under the License.
             <div class="notification__feature">
               <p>Once signed-in, you can choose to receive notifications on this device when:</p>
               <ul>
-                <li>New I/O Extended events register near your location</li>
+                <!-- <li>New I/O Extended events register near your location</li> -->
                 <li>I/O is about to start</li>
                 <li>Sessions added to My Schedule are about to start</li>
                 <li>Specific session videos are made available</li>

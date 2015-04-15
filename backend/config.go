@@ -66,6 +66,11 @@ type appConfig struct {
 			Client string `json:"client"`
 			Secret string `json:"secret"`
 		} `json:"auth"`
+		GCM struct {
+			Sender   string `json:"sender"`
+			Key      string `json:"key"`
+			Endpoint string `json:"endpoint"`
+		} `json:"gcm"`
 		Drive struct {
 			Filename  string `json:"filename"`
 			FilesURL  string `json:"files_url"`

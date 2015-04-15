@@ -15,13 +15,13 @@ const (
 	// defaultTitle is the site pages default title.
 	defaultTitle = "Google I/O 2015"
 	// descDefault is the default site description
-	descDefault = "Google I/O 2015 brings together developers for an immersive, " +
-		"two-day experience focused on exploring the next generation " +
-		"of technology, mobile and beyond. Join us online or in person " +
-		"May 28-29, 2015."
+	descDefault = "Google I/O 2015 brings together developers for an immersive," +
+    " two-day experience focused on exploring the next generation of " +
+    "technology, mobile and beyond. Join us online or in person May 28-29, " +
+    "2015. #io15"
 	// descExperiment is used when users share an experiment link on social.
 	descExperiment = "Make music with instruments inspired by material design " +
-		"for Google I/O 2015. Play, record and share."
+		"for #io15. Play, record and share."
 	// images for og:image meta tag
 	ogImageDefault    = "io15-color.png"
 	ogImageExperiment = "io15-experiment.png"
