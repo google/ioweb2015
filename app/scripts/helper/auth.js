@@ -137,6 +137,14 @@ IOWA.Auth = IOWA.Auth || (function() {
 
   /**
    * Useful to coordinate activities that need to take place after the user has signed in.
+   *
+   * Usage:
+   * function someUIButtonClicked() {
+   *   IOWA.Auth.waitForSignedIn().then(function() {
+   *     // At this point you can do something that requires being signed in.
+   *   });
+   * }
+   *
    * @return {Promise} Resolves once the user is signed in. Does not reject.
    */
   function waitForSignedIn(message) {
