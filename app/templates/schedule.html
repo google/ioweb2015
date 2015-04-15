@@ -352,6 +352,7 @@
         IOWA.Elements.Template.scheduleFetchingUserData = true;
 
         IOWA.Schedule.saveSession(selectedSession.id, saved).then(function(resp) {
+          // If no response, then the user wasn't' authenticated. Reset.
           if (typeof resp !== 'undefined') {
             selectedSession.saved = saved;
           }
