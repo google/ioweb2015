@@ -15,6 +15,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-media-query/core-media-query.html">
 <link rel="import" href="../bower_components/core-label/core-label.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
 
 <!--
@@ -44,31 +45,46 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               </div>
             </div>
           </template>
-          <template if="{{showAllBlocks || !timeBlock.isEmpty}}">
+          <template if="{{showOnlySavedSessions || timeBlock.isNotEmpty}}">
             <div class="card">
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
               </div>
+              <paper-progress indeterminate hidden?="{{!fetchingUserData}}">
+              </paper-progress>
               <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
-                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified
-                   hidden?="{{!showAllBlocks || !timeBlock.isEmpty}}">
+                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}"
+                   justified
+                   hidden?="{{!showOnlySavedSessions || timeBlock.isNotEmpty}}">
                 <span class="no-sessions">No sessions added for this time</span>
-                <a href="#day{{timeBlock.day}}" data-subpage-link>Browse sessions</a>
+                <a href="#day{{timeBlock.day}}" data-subpage-link>
+                  Browse sessions
+                </a>
               </div>
-              <div class="card-content schedule-rows" layout vertical hidden?="{{timeBlock.isEmpty}}">
+              <div class="card-content schedule-rows"
+                   layout vertical hidden?="{{!timeBlock.isNotEmpty}}">
                 <template repeat="{{sessionId in sessionsIndex_ | filterSessions(timeBlock.day, timeBlock.name)}}">
-                  <div class="schedule-row" layout horizontal center?="{{isDesktopSize}}"
-                       hidden?="{{session[sessionId].hide}}">
-                    <paper-radio-button toggles></paper-radio-button>
-                    <div layout vertical?="{{!isDesktopSize}}" horizontal?="{{isDesktopSize}}" flex
+                  <div class="schedule-row" layout horizontal
+                       center?="{{isDesktopSize}}"
+                       hidden?="{{sessions[sessionId].hide ||  !(!showOnlySavedSessions || (showOnlySavedSessions && sessions[sessionId].saved)) }}">
+                    <paper-radio-button
+                        on-core-change="{{onToggleSaveSession}}"
+                        name="{{sessionId}}"
+                        toggles checked?="{{sessions[sessionId].saved}}"
+                        disabled?="{{showOnlySavedSessions}}"></paper-radio-button>
+                    <div layout vertical?="{{!isDesktopSize}}"
+                         horizontal?="{{isDesktopSize}}" flex
                          on-click="{{selectSession}}">
                       <span class="schedule-time" flex auto-vertical>
                         {{sessions[sessionId].start}} - {{sessions[sessionId].end}}
                       </span>
-                      <span class="schedule-title" auto-vertical flex?="{{!isPhoneSize}}" two
+                      <span class="schedule-title" auto-vertical
+                            flex?="{{!isPhoneSize}}" two
                             title="{{sessions[sessionId].title}}">
                         {{sessions[sessionId].title}}
-                        <core-icon class="schedule-livestream" icon="io:videocam" hidden?="{{!selectSession.isLivestream}}"></core-icon>
+                        <core-icon class="schedule-livestream"
+                            icon="io:videocam"
+                            hidden?="{{!selectSession.isLivestream}}"></core-icon>
                       </span>
                     </div>
                   </div>
@@ -134,7 +150,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           var timeBlock = {
             name: hours[j],
             day: i,
-            isEmpty: true
+            isNotEmpty: false
           };
           if (j === 0) {
             timeBlock['dayStart'] = i;
@@ -206,13 +222,13 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         userSessions: [],
 
         /**
-         * Whether to show blocks even if they're empty.
+         * Whether to show only saved sessions for any day.
          *
-         * @attribute showAllBlocks
+         * @attribute showOnlySavedSessions
          * @type Boolean
          * @default false
          */
-        showAllBlocks: false,
+        showOnlySavedSessions: false,
 
         /**
          * Logged in user.
@@ -221,7 +237,17 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type Object
          * @default null
          */
-        user: null
+        user: null,
+
+        /**
+         * Whether fetching user data is in progress.
+         *
+         * @attribute fetchingUserData
+         * @type Boolean
+         * @default false
+         */
+        fetchingUserData: false
+
       },
 
       timeBlocks_: timeBlocks,
@@ -234,8 +260,13 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         this.sessionsIndex_ = Object.keys(this.sessions);
       },
 
+      dayChanged: function() {
+        this.checkEmptyBlocks();
+      },
+
       userSessionsChanged: function() {
-        // TODO(devnook): implement
+        this.userSessions = this.userSessions || [];
+        this.checkEmptyBlocks();
       },
 
       isFilterSelected: function(filterName) {
@@ -259,14 +290,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         this.checkEmptyBlocks();
 
         var filters = this.filters.join(',');
+        var filterParam = '';
         if (filters.length) {
-          IOWA.History.pushState({fromHashChange: true}, '', [
-            window.location.origin,
-            window.location.pathname,
-            '?filters=' + encodeURIComponent(filters),
-            window.location.hash
-          ].join(''));
+          filterParam = '?filters=' + encodeURIComponent(filters);
         }
+        IOWA.History.pushState({fromHashChange: true}, '', [
+          window.location.origin,
+          window.location.pathname,
+          filterParam,
+          window.location.hash
+        ].join(''));
       },
 
       matchesFilters: function(session) {
@@ -282,12 +315,19 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       checkEmptyBlocks: function() {
+        for (var i = 0; i < this.timeBlocks_.length; i++) {
+          this.timeBlocks_[i].isNotEmpty = false;
+        }
         for (var i = 0; i < this.sessionsIndex_.length; i++) {
           var session = this.sessions[this.sessionsIndex_[i]];
           var block = session.day + session.block;
           if (this.timeBlocks_[this.timeBlocksIndex_[block]]) {
-            var isEmpty = !this.matchesFilters(session);
-            this.timeBlocks_[this.timeBlocksIndex_[block]].isEmpty = isEmpty;
+            var isValidSession = this.matchesFilters(session) &&
+              (!this.showOnlySavedSessions ||
+               (this.showOnlySavedSessions && session.saved));
+            if (isValidSession) {
+              this.timeBlocks_[this.timeBlocksIndex_[block]].isNotEmpty = true;
+            }
           }
         }
       },
@@ -313,6 +353,25 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         return items.filter(function(item) {
           return item.day === day || !day;
         });
+      },
+
+      onToggleSaveSession: function(e) {
+        this.toggleSaveSession(e.target.getAttribute('name'), e.target.checked);
+      },
+
+      toggleSaveSession: function(sessionId, save) {
+        var session = this.sessions[sessionId];
+        if (session.saved !== save) {
+          IOWA.Schedule.saveSession(sessionId, save).then(function() {
+            session.saved = save;
+            var undoHtml = '<div style="color: #EEFF41;">UNDO</div>';
+            IOWA.Elements.Toast.innerHTML = undoHtml;
+            var msg = save ? 'Added to My Schedule' :
+                'Removed from My Schedule';
+            IOWA.Elements.Toast.showMessage(
+                msg, this.toggleSaveSession.bind(this, sessionId, !save));
+          }.bind(this));
+        }
       }
 
     });
