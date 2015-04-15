@@ -8,6 +8,7 @@
     "timezone": "America/Los_Angeles"
   },
   "ioExtFeedUrl": "https://spreadsheets.google.com/feeds/list/SHEET/WORKSHEET/private/full",
+  "secret": "a very long secret used in /api/v1/user/updates",
   "google": {
     "tokenUrl": "https://accounts.google.com/o/oauth2/token",
     "verifyUrl": "https://www.googleapis.com/oauth2/v2/tokeninfo",
@@ -22,6 +23,11 @@
     "auth": {
       "client": "web-app client ID",
       "secret": "web-app client secret"
+    },
+    "gcm": {
+      "sender": "GCP project *number*",
+      "key": "key-for-server-applications",
+      "endpoint": "https://android.googleapis.com/gcm/send"
     },
     "drive": {
       "filename": "user_data.json",
