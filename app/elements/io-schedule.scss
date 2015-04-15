@@ -41,6 +41,10 @@
   margin-bottom: $tabletKeyline;
 }
 
+.filter-rows > core-label {
+  cursor: pointer;
+}
+
 .filter-section {
   border-bottom: 1px solid $color-light-grey-border;
   margin-bottom: $tabletKeyline;
