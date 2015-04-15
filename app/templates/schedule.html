@@ -250,8 +250,9 @@
         <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
           sessions="{{scheduleData.sessions}}" sessionThemes="{{filterThemes}}"
           sessionTypes="{{filterSessionTypes}}"
-          showAllBlocks="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
+          showOnlySavedSessions="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
           user="{{currentUser}}" userSessions="{{savedSessions}}"
+          fetchingUserData="{{scheduleFetchingUserData}}"
           filters="{{sessionURLFilters}}"></io-schedule>
       </section>
     </div>
@@ -319,7 +320,10 @@
           hideSignInCard();
 
           // Fetch user's data. Mark sessions they've bookmarked
+          IOWA.Elements.Template.scheduleFetchingUserData = true;
           IOWA.Schedule.fetchUserSchedule().then(function(savedSessions) {
+            IOWA.Elements.Template.scheduleFetchingUserData = false;
+            savedSessions = savedSessions || [];
             IOWA.Elements.Template.savedSessions = savedSessions;
 
             var sessions = IOWA.Elements.Template.scheduleData.sessions;

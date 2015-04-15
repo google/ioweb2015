@@ -80,6 +80,11 @@ paper-radio-button {
   margin-top: 5px;
 }
 
+paper-progress {
+  display: block;
+  width: 100%;
+}
+
 @media (max-width: $phone-breakpoint-max) {
   .card__container {
     margin-bottom: 0;
@@ -111,6 +116,14 @@ paper-radio-button {
   .schedule-rows {
     width: 100%;
     box-sizing: border-box;
+  }
+}
+
+@media (min-width: $desktop-breakpoint-min) {
+  .card {
+    .card-content {
+      padding: 32px;
+    }
   }
 }
 
