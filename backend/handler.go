@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -32,6 +33,11 @@ func registerHandlers() {
 	handle("/api/v1/user/schedule", serveUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserBookmarks)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
+	// debug handlers; not available in prod
+	if !isProd() {
+		handle("/debug/srvget", debugServiceGetURL)
+	}
+
 	// setup root redirect if we're prefixed
 	if config.Prefix != "/" {
 		var redirect http.Handler = http.HandlerFunc(redirectHandler)
@@ -415,6 +421,37 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		errorf(c, "patchUserNotifySettings: %v", err)
 	}
+}
+
+// debugGetURL fetches a URL with service account credentials.
+// Should not be available on prod.
+func debugServiceGetURL(w http.ResponseWriter, r *http.Request) {
+	req, err := http.NewRequest("GET", r.FormValue("url"), nil)
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+	if req.URL.Scheme != "https" {
+		writeJSONError(w, http.StatusBadRequest, errors.New("dude, use https!"))
+		return
+	}
+
+	c := newContext(r)
+	hc, err := serviceAccountClient(c, "https://www.googleapis.com/auth/devstorage.read_only")
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	res, err := hc.Do(req)
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+	defer res.Body.Close()
+	w.Header().Set("Content-Type", res.Header.Get("Content-Type"))
+	w.WriteHeader(res.StatusCode)
+	io.Copy(w, res.Body)
 }
 
 // writeJSONError sets response code to 500 and writes an error message to w.
