@@ -369,12 +369,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         if (session.saved !== save) {
           IOWA.Schedule.saveSession(sessionId, save).then(function() {
             session.saved = save;
-            var undoHtml = '<div style="color: #EEFF41;">UNDO</div>';
-            IOWA.Elements.Toast.innerHTML = undoHtml;
-            var msg = save ? 'Added to My Schedule' :
-                'Removed from My Schedule';
-            IOWA.Elements.Toast.showMessage(
-                msg, this.toggleSaveSession.bind(this, sessionId, !save));
           }.bind(this));
         }
       }
