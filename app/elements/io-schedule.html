@@ -44,19 +44,19 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               </div>
             </div>
           </template>
-          <template if="{{showAllBlocks || !timeBlock.isEmpty}}">
+          <template if="{{showAllBlocks || timeBlock.sessions.length}}">
             <div class="card">
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
               </div>
               <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
                    vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified
-                   hidden?="{{!showAllBlocks || !timeBlock.isEmpty}}">
+                   hidden?="{{!showAllBlocks || timeBlock.sessions.length}}">
                 <span class="no-sessions">No sessions added for this time</span>
                 <a href="#day{{timeBlock.day}}" data-subpage-link>Browse sessions</a>
               </div>
-              <div class="card-content schedule-rows" layout vertical hidden?="{{timeBlock.isEmpty}}">
-                <template repeat="{{sessionId in sessionsIndex_ | filterSessions(timeBlock.day, timeBlock.name)}}">
+              <div class="card-content schedule-rows" layout vertical hidden?="{{!timeBlock.sessions.length}}">
+                <template repeat="{{sessionId in timeBlock.sessions}}">
                   <div class="schedule-row" layout horizontal center?="{{isDesktopSize}}"
                        hidden?="{{session[sessionId].hide}}">
                     <paper-radio-button toggles></paper-radio-button>
@@ -64,6 +64,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                          on-click="{{selectSession}}">
                       <span class="schedule-time" flex auto-vertical>
                         {{sessions[sessionId].start}} - {{sessions[sessionId].end}}
+                        <div>{{sessions[sessionId].day}} {{sessions[sessionId].block}}</div>
                       </span>
                       <span class="schedule-title" auto-vertical flex?="{{!isPhoneSize}}" two
                             title="{{sessions[sessionId].title}}">
@@ -127,14 +128,20 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     var timeBlocksIndex = {};
 
     function populateTimeBlocks() {
-      var hours = ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM',
-                   '3 PM', '4 PM', '5 PM', '6 PM'];
+      var hours = [];
+      var generator = new Array(13);
+      for (var i = 1; i < generator.length; i++) {
+        hours.push(i + ' AM');
+      }
+      for (var i = 1; i < generator.length; i++) {
+        hours.push(i + ' PM');
+      }
       for (var i = 1; i < 3; i++) {
         for (var j = 0; j < hours.length; j++) {
           var timeBlock = {
             name: hours[j],
             day: i,
-            isEmpty: true
+            sessions: []
           };
           if (j === 0) {
             timeBlock['dayStart'] = i;
@@ -188,6 +195,15 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         filters: [],
 
         /**
+         * Timezone for the schedule times.
+         *
+         * @attribute timezone
+         * @type string
+         * @default 'GMT-07:00' (PDT Timezone)
+         */
+        timezone: 'GMT-07:00',
+
+        /**
          * Array of scheduled sessions.
          *
          * @attribute sessions
@@ -238,6 +254,17 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         // TODO(devnook): implement
       },
 
+      timezoneChanged: function() {
+        for (var i = 0; i < this.sessionsIndex_.length; i++) {
+          var session = this.sessions[this.sessionsIndex_[i]];
+          var time = this.getLocalizedTime(session.startTimestamp);
+          session.start = time.format('hh:mm A');
+          session.end = time.format('hh:mm A');
+          session.block = time.format('h A');
+        }
+        this.checkEmptyBlocks();
+      },
+
       isFilterSelected: function(filterName) {
         return this.filters.indexOf(filterName) > -1;
       },
@@ -282,12 +309,17 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       checkEmptyBlocks: function() {
+        for (var i = 0; i < this.timeBlocks_.length; i++) {
+          this.timeBlocks_[i].sessions = [];
+        }
         for (var i = 0; i < this.sessionsIndex_.length; i++) {
           var session = this.sessions[this.sessionsIndex_[i]];
           var block = session.day + session.block;
           if (this.timeBlocks_[this.timeBlocksIndex_[block]]) {
-            var isEmpty = !this.matchesFilters(session);
-            this.timeBlocks_[this.timeBlocksIndex_[block]].isEmpty = isEmpty;
+            if (this.matchesFilters(session)) {
+              this.timeBlocks_[this.timeBlocksIndex_[block]].sessions.push(
+                this.sessionsIndex_[i]);
+            };
           }
         }
       },
@@ -313,6 +345,11 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         return items.filter(function(item) {
           return item.day === day || !day;
         });
+      },
+
+      getLocalizedTime: function(dateStr) {
+        var tzId = IOWA.Elements.Template.timezoneNames[this.timezone].name;
+        return moment(dateStr).tz(tzId);
       }
 
     });

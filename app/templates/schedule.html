@@ -26,14 +26,12 @@
                            layout horizontal center-center>My Schedule</a>
       </paper-tab>
     </paper-tabs>
-    <paper-dropdown-menu hidden?="{{isPhoneSize}}">
+    <paper-dropdown-menu hidden?="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
       <paper-dropdown class="dropdown" halign="right">
-        <core-menu class="menu" selected="1">
-          <paper-item>PST</paper-item>
-          <paper-item>MST</paper-item>
-          <paper-item>CST</paper-item>
-          <paper-item>EST</paper-item>
-          <paper-item>GMT</paper-item>
+        <core-menu class="menu" selected="{{timezone}}" valueattr="label">
+          <template repeat="{{zone in timezones}}">
+            <paper-item label="{{zone}}">{{zone}}</paper-item>
+          </template>
         </core-menu>
       </paper-dropdown>
     </paper-dropdown-menu>
@@ -233,12 +231,10 @@
         </span>
         <paper-dropdown-menu>
           <paper-dropdown class="dropdown" halign="right">
-            <core-menu class="menu" selected="1">
-              <paper-item>PST</paper-item>
-              <paper-item>MST</paper-item>
-              <paper-item>CST</paper-item>
-              <paper-item>EST</paper-item>
-              <paper-item>GMT</paper-item>
+            <core-menu class="menu" selected="{{timezone}}" valueattr="label">
+              <template repeat="{{zone in timezones}}">
+                <paper-item label="{{zone}}">{{zone}}</paper-item>
+              </template>
             </core-menu>
           </paper-dropdown>
         </paper-dropdown-menu>
@@ -250,6 +246,7 @@
           sessionTypes="{{filterSessionTypes}}"
           showAllBlocks="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
           user="{{currentUser}}" userSessions="{{savedSessions}}"
+          timezone="{{timezone}}"
           filters="{{sessionURLFilters}}"></io-schedule>
       </section>
     </div>
@@ -289,6 +286,8 @@
             filters = parsedUrl.params.filters.split(',');
           }
           IOWA.Elements.Template.sessionURLFilters = filters;
+
+          IOWA.Elements.Template.timezone = 'GMT-08:00';
 
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
