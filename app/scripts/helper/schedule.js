@@ -26,6 +26,13 @@ IOWA.Schedule = (function() {
   var scheduleData_ = null;
   var userScheduleData_ = null;
 
+  function onError(e) {
+    IOWA.Elements.Toast.showMessage('Sign-in to add events to My Schedule', null, 'Sign-in', function() {
+      IOWA.Elements.GoogleSignIn.signIn();
+      // TODO(jeffy): setup push notification, and retry their save.
+    });
+  }
+
   /**
    * Fetches the I/O schedule data.
    * @return {Promise} Resolves with response schedule data.
@@ -68,8 +75,17 @@ IOWA.Schedule = (function() {
 
     var url = SCHEDULE_ENDPOINT_USERS + '/' + sessionId;
     return IOWA.Request.xhrPromise(save ? 'PUT' : 'DELETE', url, true).then(function(resp) {
+
+      if (save) {
+        IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification before it starts.");
+      } else {
+        IOWA.Elements.Toast.showMessage('Removed from My Schedule');
+      }
+
+      // TODO(jeffy): remove notification for session.
+
       return resp;
-    });
+    }).catch(onError);
   }
 
   return {

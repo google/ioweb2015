@@ -132,10 +132,10 @@ core-icon[icon="schedule"] {
   }
   .session__info__section {
     padding: $tabletKeyline;
-    &:last-child {
-      border-top: 1px solid $color-light-grey-border;
-      text-transform: uppercase;
-    }
+  }
+  .session__info__links {
+    border-top: 1px solid $color-light-grey-border;
+    text-transform: uppercase;
   }
   .session__desc {
     margin: $tabletKeyline 0;
