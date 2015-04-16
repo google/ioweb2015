@@ -136,7 +136,8 @@ IOWA.Auth = IOWA.Auth || (function() {
   });
 
   /**
-   * Useful to coordinate activities that need to take place after the user has signed in.
+   * Provides a Promise resolved after the user has signed in.
+   * It's useful when delaying activities that can't take place until after the user signs in.
    *
    * Usage:
    * function someUIButtonClicked() {
@@ -145,6 +146,8 @@ IOWA.Auth = IOWA.Auth || (function() {
    *   });
    * }
    *
+   * @param {string} message The text displayed in the toast.
+   *                         Defaults to 'Please sign in'
    * @return {Promise} Resolves once the user is signed in. Does not reject.
    */
   function waitForSignedIn(message) {

@@ -152,13 +152,13 @@ IOWA.Notifications = IOWA.Notifications || (function() {
   };
 
   /**
-   * There are a number of prerequisites that need to be met before the current browser can actually
-   * enable a given notification:
+   * Provides a Promise which is resolved after all prerequisites for enabling notifications have
+   * been met. Specifically:
    * - User must be signed in.
    * - Global notifications checkbox must be checked.
    * - Notification permissions for the browser must be enabled.
    * This promise can be used to wait for all those prerequisites to be met. It will take care of
-   * prompted the user for the various steps that need to be taken.
+   * prompting the user for the various steps that need to be taken.
    * As an alternative, if you want similar behavior but only want to wait until the user is signed
    * in (regardless of notification state), use IOWA.Auth.waitForSignedIn() directly.
    *
@@ -181,38 +181,41 @@ IOWA.Notifications = IOWA.Notifications || (function() {
       return Promise.reject();
     }
 
-    return IOWA.Auth.waitForSignedIn().then(waitForNotificationsEnabled_).then(function() {
-      return new Promise(function(resolve, reject) {
-        // window.Notification.permission is used for compatability with Chrome 42.
-        if (window.Notification.permission === 'granted') {
-          resolve();
-        } else if (window.Notification.permission === 'denied') {
-          IOWA.Elements.Toast.showMessage('Please enable the page setting for notifications', null, 'Learn how', function() {
-            // TODO: Is there already a helper to open a new page?
-            window.open('permissions', '_blank');
-          });
-
-          if (navigator.permissions) {
-            // If the Permissions API is available (in Chrome 43 and higher), then we can listen
-            // for changes to the notification permission and resolve when it's 'granted'.
-            navigator.permissions.query({name: 'notifications'}).then(function(p) {
-              p.onchange = function() {
-                if (this.status === 'granted') {
-                  resolve();
-                }
-              };
+    return IOWA.Auth.waitForSignedIn()
+      .then(waitForNotificationsEnabled_)
+      .then(function() {
+        return new Promise(function(resolve, reject) {
+          // window.Notification.permission is used for compatability with Chrome 42.
+          if (window.Notification.permission === 'granted') {
+            resolve();
+          } else if (window.Notification.permission === 'denied') {
+            IOWA.Elements.Toast.showMessage('Please enable the page setting for notifications', null, 'Learn how', function() {
+              window.open('permissions', '_blank');
             });
-          } else {
-            reject('Notification permissions are denied and the Permissions API is not available.');
+
+            if (navigator.permissions) {
+              // If the Permissions API is available (in Chrome 43 and higher), then we can listen
+              // for changes to the notification permission and resolve when it's 'granted'.
+              navigator.permissions.query({name: 'notifications'}).then(function(p) {
+                p.onchange = function() {
+                  if (this.status === 'granted') {
+                    resolve();
+                  }
+                };
+              });
+            } else {
+              reject('Notification permissions are denied and the Permissions API is not available.');
+            }
           }
-        }
+        });
       });
-    });
   };
 
   /**
    * Useful to coordinate activities that need to take place after the user has enabled the
    * global notifications settings.
+   * @param {string} message The text displayed in the toast.
+   *                         Defaults to 'Please enable the notification setting'
    * @return {Promise} Resolves when the global notifications option is enabled. Does not reject.
    */
   function waitForNotificationsEnabled_(message) {
