@@ -45,7 +45,7 @@
               on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
   <div class="card__photo" relative>
-    <core-image src="{{selectedSession.photoUrl || 'images/schedule/sessiondetail@2x.jpg'}}"
+    <core-image src="{{selectedSession.photoUrl || 'images/schedule/session_placeholder.jpg'}}"
                 placeholder="images/io15-color.png"
                 sizing="cover" preload fade fit></core-image>
     <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}"
