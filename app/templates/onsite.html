@@ -7,11 +7,11 @@
 {% define "masthead" %}
   <h1><i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg></h1>
   <paper-tabs id="subpage-tabs" class="white" selected="{{pages[selectedPage].selectedSubpage}}" valueattr="label" link>
-    <paper-tab label="event">
+    <paper-tab label="event" role="">
       <a href="#event" data-track-link="onsite-event" data-subpage-link
                        layout horizontal center-center>Event</a>
     </paper-tab>
-    <paper-tab label="travel">
+    <paper-tab label="travel" role="">
       <a href="#travel" data-track-link="onsite-travel"  data-subpage-link
                         layout horizontal center-center>Travel</a>
     </paper-tab>

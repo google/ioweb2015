@@ -20,6 +20,7 @@
 @import 'base/_layout';
 
 @import 'base/a11y_sd';
+@import 'base/forms_sd';
 
 
 core-drawer-panel::shadow {
@@ -86,21 +87,6 @@ paper-tabs.white {
       }
     }
   }
-
-  paper-slider::shadow {
-    #activeProgress,
-    #sliderKnobInner,
-    #sliderKnobInner::before,
-    #sliderBar::shadow #activeProgress {
-      background-color: $color-form-controls;
-    }
-    #sliderContainer.ring #sliderKnobInner {
-      &::before {
-        background-color: $color-form-controls;
-      }
-      border: none;
-    }
-  }
 }
 
 #page-schedule {
@@ -113,17 +99,6 @@ paper-tabs.white {
     width: 100%;
     padding: 0;
   }
-
-  paper-progress::shadow {
-    #activeProgress {
-      background-color: $color-pink-500;
-    }
-
-    #progressContainer {
-      background-color: $color-pink-50;
-    }
-  }
-
   @media (min-width: $tablet-breakpoint-min) {
     .session__detail::shadow #scroller {
       width: 768px;

@@ -3,6 +3,10 @@
 /* Handle focus state for I/O logo home button */
 .io-logo-link:focus {
   outline: none;
+}
+
+.io-logo-link.focused {
+  outline: none;
 
   .io-logo::after {
     display: block;

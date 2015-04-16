@@ -9,19 +9,19 @@
   <div layout horizontal justified>
     <paper-tabs id="subpage-tabs" class="white" valueattr="label" selected="agenda"
                 scrollable?="{{isPhoneSize}}" link>
-      <paper-tab label="agenda">
+      <paper-tab label="agenda" role="">
         <a href="#agenda" data-track-link="schedule-agenda" data-subpage-link
                           layout horizontal center-center>Agenda</a>
       </paper-tab>
-      <paper-tab label="day1">
+      <paper-tab label="day1" role="">
         <a href="#day1" data-track-link="schedule-day1" data-subpage-link
                         layout horizontal center-center>Day 1</a>
       </paper-tab>
-      <paper-tab label="day2">
+      <paper-tab label="day2" role="">
         <a href="#day2" data-track-link="schedule-day2" data-subpage-link
                         layout horizontal center-center>Day 2</a>
       </paper-tab>
-      <paper-tab label="myschedule">
+      <paper-tab label="myschedule" role="">
         <a href="#myschedule" data-track-link="schedule-mysched" data-subpage-link
                            layout horizontal center-center>My Schedule</a>
       </paper-tab>
@@ -40,8 +40,9 @@
 
 {% define "content" %}
 
-<paper-dialog class="session__detail" transition="core-transition-center" layered="false" backdrop
-              on-core-overlay-close-completed="{{onSessionDetailsClose}}">
+<paper-dialog class="session__detail" transition="paper-dialog-transition-bottom" layered="false" backdrop
+              on-core-overlay-close-completed="{{onSessionDetailsClose}}"
+              on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
   <div class="card__photo" relative>
     <core-image src="{{selectedSession.photoUrl || 'images/schedule/sessiondetail@2x.jpg'}}"
@@ -101,7 +102,7 @@
   <section class="subpage-agenda subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'agenda'} | tokenList}}">
     <section class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
-        <div class="card js-experiment-visualizer" aria-label="Agenda">
+        <div class="card js-experiment-visualizer">
           <div class="card-content">
             <h4>May 27, 2015</h4>
           </div>
@@ -122,7 +123,7 @@
     <div class="slide-up-delay">
       <section class="page__section">
         <div class="card__container card__container--top">
-          <div class="card js-experiment-visualizer" aria-label="Agenda">
+          <div class="card js-experiment-visualizer">
             <div class="card-content">
               <h4>May 28, 2015</h4>
             </div>
@@ -162,7 +163,7 @@
       </section>
       <section class="page__section">
         <div class="card__container card__container--top">
-          <div class="card js-experiment-visualizer" aria-label="Agenda">
+          <div class="card js-experiment-visualizer">
             <div class="card-content">
               <h4>May 29, 2015</h4>
             </div>
@@ -199,7 +200,7 @@
     <section id="signin-prompt" class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
 
-        <div class="card js-experiment-visualizer" aria-label="Agenda">
+        <div class="card js-experiment-visualizer">
           <div class="card-content">
             <h3 class="card__title">Create your custom I/O schedule</h3>
             <div>Sign-in to add sessions to your personalized schedule.</div>
@@ -258,10 +259,9 @@
 <script>
   (function() {
 
-    // Example id: dc44916c-48e7-e311-b297-00155d5066d7
-    var SESSION_ID_REGEX = /\w{8}-(\w{4}-){3}\w{12}$/;
-
     var SUBTAB_SELECTOR = '#subpage-tabs a';
+
+    var pageIsDeepLinked_ = true;
 
     function hideSignInCard() {
       var signinPropmt = IOWA.Elements.Main.querySelector('#signin-prompt');
@@ -309,7 +309,10 @@
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
           if (sessionId) {
+            pageIsDeepLinked_ = false;
             IOWA.Elements.Template.openSession(sessionId);
+          } else {
+            pageIsDeepLinked_ = true;
           }
         });
       };
@@ -365,12 +368,6 @@
         // Open paper-dialog.
         var panel = IOWA.Elements.Main.querySelector('.session__detail');
         panel.open();
-
-        // Update deep link URL.
-        var url = IOWA.Router.composeUrl(
-            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
-            sessionId, window.location.search);
-        history.replaceState({}, null, url);
       };
 
       IOWA.Elements.Template.toggleSaveSession = function(e, detail, sender) {
@@ -402,6 +399,21 @@
             this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
             '', window.location.search);
         history.replaceState({}, null, url);
+      };
+
+      IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail, sender) {
+        sender.updateTargetDimensions();
+
+        // Update URL with deep link if we're not from a deep link page load.
+        if (pageIsDeepLinked_) {
+          var url = IOWA.Router.composeUrl(
+              this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
+              this.selectedSession.id, window.location.search);
+
+          history.replaceState({}, null, url);
+        } else {
+          pageIsDeepLinked_ = true;
+        }
       };
 
       page.load(); // Run load callback on page load.

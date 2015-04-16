@@ -157,6 +157,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/sitemap.xml',
     APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
+    APP_DIR + '/styles/pages/permissions.css',
     APP_DIR + '/styles/pages/error.css',
     APP_DIR + '/elements/**/images/*',
     APP_DIR + '/elements/webgl-globe/shaders/*.{frag,vert}',

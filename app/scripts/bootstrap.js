@@ -23,8 +23,8 @@
     IOWA.Router.init();
     IOWA.Notifications.init();
 
-    CoreStyle.g.paperInput.labelColor = '#009688';
-    CoreStyle.g.paperInput.focusedColor = '#009688';
+    CoreStyle.g.paperInput.labelColor = '#008094';
+    CoreStyle.g.paperInput.focusedColor = '#008094';
   }
 
   window.addEventListener('core-media-change', function(e) {
