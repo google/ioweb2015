@@ -47,6 +47,8 @@ IOWA.Analytics = IOWA.Analytics || (function(exports) {
     this.trackPerfEvent('HTMLImportsLoaded', 'Polymer');
     this.trackPerfEvent('polymer-ready', 'Polymer');
 
+    this.trackNotificationPermission();
+
     /**
      * A collection of timing categories, each a collection of start times.
      * @private {!Object<string, Object<string, ?number>}
@@ -211,6 +213,35 @@ IOWA.Analytics = IOWA.Analytics || (function(exports) {
     if (timeStart !== null) {
       this.trackPerf(category, variable, timeEnd - timeStart, opt_label, opt_maxTime);
       categoryTimes[variable] = null;
+    }
+  };
+
+  /**
+   * Sets up tracking for a notification permissions.
+   * Tracks the current notification state at startup, and for browsers that support the
+   * Permissions API, tracks changes to the notification state as well.
+   */
+  Analytics.prototype.trackNotificationPermission = function() {
+    ga('send', {
+      hitType: 'event',
+      nonInteraction: true,
+      eventCategory: 'notifications',
+      eventAction: 'startup',
+      eventLabel: exports.Notification ? exports.Notification.permission : 'unsupported'
+    });
+
+    if (navigator.permissions) {
+      navigator.permissions.query({name:'notifications'}).then(function(p) {
+        p.onchange = function() {
+          ga('send', {
+            hitType: 'event',
+            nonInteraction: true,
+            eventCategory: 'notifications',
+            eventAction: 'change',
+            eventLabel: this.status
+          });
+        };
+      });
     }
   };
 
