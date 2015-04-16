@@ -350,8 +350,8 @@
         document.addEventListener('page-transition-done', onPageTransitionDone_);
 
         // TODO: Move to page unload when issues/#951 is fixed.
-        // document.removeEventListener('subpage-changed', onSubpageChanged_);
-        // document.removeEventListener('signin-change', onSigninChanged_);
+        document.removeEventListener('subpage-changed', onSubpageChanged_);
+        document.removeEventListener('signin-change', onSigninChanged_);
 
         document.addEventListener('subpage-changed', onSubpageChanged_);
 
