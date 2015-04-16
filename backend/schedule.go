@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"reflect"
 	"sort"
 	"strings"
 	"sync"
@@ -20,10 +21,10 @@ const (
 )
 
 type eventData struct {
-	Sessions map[string]*eventSession `json:"sessions"`
-	Speakers map[string]*eventSpeaker `json:"speakers"`
-	Videos   map[string]*eventVideo   `json:"video_library"`
-	Tags     map[string]*eventTag     `json:"tags"`
+	Sessions map[string]*eventSession `json:"sessions,omitempty"`
+	Speakers map[string]*eventSpeaker `json:"speakers,omitempty"`
+	Videos   map[string]*eventVideo   `json:"video_library,omitempty"`
+	Tags     map[string]*eventTag     `json:"tags,omitempty"`
 	// not exposed
 	rooms    map[string]*eventRoom
 	modified time.Time
@@ -82,6 +83,7 @@ type eventTag struct {
 	Cat  string `json:"category"`
 }
 
+// isEmptyEventData returns true if d is nil or its exported fields contain no items.
 func isEmptyEventData(d *eventData) bool {
 	return d == nil || (len(d.Sessions) == 0 && len(d.Speakers) == 0 && len(d.Videos) == 0 && len(d.Tags) == 0)
 }
@@ -192,7 +194,7 @@ func fetchEventManifest(c context.Context, url string, lastSync time.Time) ([]st
 	if err != nil {
 		return nil, mod, err
 	}
-	r.Header.Set("if-modified-since", lastSync.Format(http.TimeFormat))
+	r.Header.Set("if-modified-since", lastSync.UTC().Format(http.TimeFormat))
 	res, err := hc.Do(r)
 	if err != nil {
 		return nil, mod, err
@@ -204,7 +206,8 @@ func fetchEventManifest(c context.Context, url string, lastSync time.Time) ([]st
 	if res.StatusCode != http.StatusOK {
 		return nil, mod, fmt.Errorf("fetchEventManifest: %s", res.Status)
 	}
-	if t, err := time.Parse(http.TimeFormat, res.Header.Get("last-modified")); err == nil {
+	t, err := time.ParseInLocation(http.TimeFormat, res.Header.Get("last-modified"), time.UTC)
+	if err == nil {
 		mod = t
 	}
 
@@ -305,8 +308,37 @@ func slurpEventDataChunk(c context.Context, url string) (*eventData, error) {
 	}, nil
 }
 
+// diffEventData looks for changes in existing items of b comparing to a.
+// It compares only Sessions, Speakers and Videos of eventData.
+// The result is a subset of b or nil if a is empty.
 func diffEventData(a, b *eventData) *dataChanges {
-	return nil
+	if isEmptyEventData(a) {
+		return nil
+	}
+	dc := &dataChanges{
+		Changed: b.modified,
+		eventData: eventData{
+			Sessions: make(map[string]*eventSession),
+			Speakers: make(map[string]*eventSpeaker),
+			Videos:   make(map[string]*eventVideo),
+		},
+	}
+	for id, bs := range b.Sessions {
+		if as, ok := a.Sessions[id]; ok && !reflect.DeepEqual(as, bs) {
+			dc.Sessions[id] = bs
+		}
+	}
+	for id, bs := range b.Speakers {
+		if as, ok := a.Speakers[id]; ok && !reflect.DeepEqual(as, bs) {
+			dc.Speakers[id] = bs
+		}
+	}
+	for id, bs := range b.Videos {
+		if as, ok := a.Videos[id]; ok && !reflect.DeepEqual(as, bs) {
+			dc.Videos[id] = bs
+		}
+	}
+	return dc
 }
 
 // userSchedule returns a slice of session IDs bookmarked by a user.

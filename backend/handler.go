@@ -480,7 +480,7 @@ func syncEventData(w http.ResponseWriter, r *http.Request) {
 			logf(c, "%s: diff is empty (last: %s)", config.Schedule.ManifestURL, oldData.modified)
 			return nil
 		}
-		if err := storeDataChanges(c, diff); err != nil {
+		if err := storeChanges(c, diff); err != nil {
 			return err
 		}
 		if err := startNotifySubscribers(c, diff); err != nil {
