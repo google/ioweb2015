@@ -59,7 +59,7 @@ IOWA.Schedule = (function() {
 
     return IOWA.Request.xhrPromise('GET', SCHEDULE_ENDPOINT_USERS, true).then(function(resp) {
       userScheduleData_ = resp;
-      return userScheduleData_;
+      return userScheduleData_ || [];
     });
   }
 
