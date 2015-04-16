@@ -44,7 +44,7 @@
 
 <paper-dialog class="session__detail" transition="paper-dialog-transition-bottom" layered="false" backdrop
               on-core-overlay-close-completed="{{onSessionDetailsClose}}"
-              on-core-overlay-open-complete="{{onSessionDetailsOpen}}">
+              on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
   <div class="card__photo" relative>
     <core-image src="{{selectedSession.photoUrl || 'images/schedule/sessiondetail@2x.jpg'}}"
@@ -264,6 +264,8 @@
 
     var SUBTAB_SELECTOR = '#subpage-tabs a';
 
+    var updateDeepLink_ = true;
+
     function hideSignInCard() {
       var signinPropmt = IOWA.Elements.Main.querySelector('#signin-prompt');
       IOWA.PageAnimation.play(new Animation(signinPropmt,
@@ -308,7 +310,10 @@
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
           if (sessionId) {
+            updateDeepLink_ = false;
             IOWA.Elements.Template.openSession(sessionId);
+          } else {
+            updateDeepLink_ = true;
           }
         });
       };
@@ -364,12 +369,6 @@
         // Open paper-dialog.
         var panel = IOWA.Elements.Main.querySelector('.session__detail');
         panel.open();
-
-        // Update deep link URL.
-        var url = IOWA.Router.composeUrl(
-            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
-            sessionId, window.location.search);
-        history.replaceState({}, null, url);
       };
 
       IOWA.Elements.Template.toggleSaveSession = function(e, detail, sender) {
@@ -405,6 +404,17 @@
 
       IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail, sender) {
         sender.updateTargetDimensions();
+
+        // Update URL with deep link if we're not from a deep link page load.
+        if (updateDeepLink_) {
+          var url = IOWA.Router.composeUrl(
+              this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
+              this.selectedSession.id, window.location.search);
+
+          history.replaceState({}, null, url);
+        } else {
+          updateDeepLink_ = true;
+        }
       };
 
       page.load(); // Run load callback on page load.
