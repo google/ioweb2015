@@ -20,8 +20,31 @@ IOWA.Request = IOWA.Request || (function() {
 
   "use strict";
 
+  /**
+   * Helper method to populate the Authorization header of an XMLHttpRequest.
+   * The XMLHttpRequest is modified in-place, and nothing is returned.
+   * @param {XMLHttpRequest} xhr The XMLHttpRequest to modify.
+   * @param {object} authInfo The value returned by IOWA.Auth.getTokenResponse()
+   */
+  function setXhrAuthHeader_(xhr, authInfo) {
+    if (authInfo) {
+      xhr.setRequestHeader('Authorization', authInfo.token_type + ' ' + authInfo.access_token);
+    }
+  }
+
   // Inspired by http://jakearchibald.com/2014/offline-cookbook/#cache-then-network
-  var cacheThenNetwork = function(url, cachedContentCallback, freshContentCallback) {
+  var cacheThenNetwork = function(url, cachedContentCallback, freshContentCallback, isAuthRequired) {
+    var authInfo;
+    if (isAuthRequired) {
+      authInfo = IOWA.Auth.getTokenResponse();
+      if (!authInfo) {
+        // If we require auth but aren't logged in, then call freshContentCallback() without any
+        // response body and bail out.
+        freshContentCallback();
+        return;
+      }
+    }
+
     var freshContentPending = true;
     var cachedResponse;
 
@@ -30,6 +53,7 @@ IOWA.Request = IOWA.Request || (function() {
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       var cachedXhr = new XMLHttpRequest();
       cachedXhr.open('GET', url);
+      setXhrAuthHeader_(cachedXhr, authInfo);
       cachedXhr.setRequestHeader('X-Cache-Only', 'true');
 
       cachedXhr.onload = function() {
@@ -49,6 +73,7 @@ IOWA.Request = IOWA.Request || (function() {
 
     var freshXhr = new XMLHttpRequest();
     freshXhr.open('GET', url);
+    setXhrAuthHeader_(freshXhr, authInfo);
     freshXhr.setRequestHeader('X-Cache-Only', 'false');
 
     freshXhr.onload = function() {
@@ -84,12 +109,7 @@ IOWA.Request = IOWA.Request || (function() {
       var xhr = new XMLHttpRequest();
       xhr.open(method, url);
       xhr.setRequestHeader('Content-Type', 'application/json');
-
-      if (authInfo) {
-        var tokenType = authInfo.token_type;
-        var accessToken = authInfo.access_token;
-        xhr.setRequestHeader('Authorization', tokenType + ' ' + accessToken);
-      }
+      setXhrAuthHeader_(xhr, authInfo);
 
       xhr.onerror = reject;
       xhr.onload = function() {

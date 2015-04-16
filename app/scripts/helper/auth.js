@@ -117,6 +117,13 @@ IOWA.Auth = IOWA.Auth || (function() {
         // and also clear the SW token. (We don't want to turn off notifications globally, though.)
         IOWA.Notifications.unsubscribeFromPushManagerPromise().then(clearSWToken_);
       }
+
+      // Clear any requests in the SW cache that might have user-specific data.
+      // Chrome 43 adds support for the Cache Storage API in the window scope, but we can't rely
+      // on that being present, so we have to ask the SW clear out the cache.
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage('clear-cached-user-data');
+      }
     }
   });
 

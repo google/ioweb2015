@@ -323,7 +323,7 @@
 
           // Fetch user's data. Mark sessions they've bookmarked
           IOWA.Elements.Template.scheduleFetchingUserData = true;
-          IOWA.Schedule.fetchUserSchedule().then(function(savedSessions) {
+          IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
             IOWA.Elements.Template.scheduleFetchingUserData = false;
             savedSessions = savedSessions || [];
             IOWA.Elements.Template.savedSessions = savedSessions;

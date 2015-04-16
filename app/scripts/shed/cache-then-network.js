@@ -1,6 +1,11 @@
+// Requests whose URLs contain this string contain user-specific data in their corresponding
+// Responses, and should be cleared when the user logs out.
+var USER_DATA_URL_SUBSTRING = 'api/v1/user';
+
 function serveFromCacheOrNetwork(request) {
-  // Never fall back on the SW cache if this is a request that uses auth.
-  if (request.headers.has('Authorization')) {
+  // Never fall back on the SW cache if this is a request that uses auth, unless it's a request
+  // that has the X-Cache-Only header set.
+  if (request.headers.has('Authorization') && !request.headers.has('X-Cache-Only')) {
     return shed.networkOnly(request);
   }
 
@@ -22,6 +27,22 @@ function serveFromCacheOrNetwork(request) {
   return shed.networkFirst(request);
 }
 
-// TODO: /temporary_api/ can be removed once /api/ is available.
+// temporary_api is useful for testing against static content.
 shed.router.get('/(.+)temporary_api/(.+)', serveFromCacheOrNetwork);
 shed.router.get('/(.+)api/(.+)', serveFromCacheOrNetwork);
+
+self.addEventListener('message', function(event) {
+  if (event.data === 'clear-cached-user-data') {
+    caches.open(shed.options.cacheName).then(function(cache) {
+      cache.keys().then(function(requests) {
+        return requests.filter(function(request) {
+          return request.url.indexOf(USER_DATA_URL_SUBSTRING) !== -1;
+        });
+      }).then(function(userDataRequests) {
+        userDataRequests.forEach(function(userDataRequest) {
+          cache.delete(userDataRequest);
+        });
+      });
+    });
+  }
+});
