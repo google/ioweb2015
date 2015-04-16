@@ -19,9 +19,7 @@
 @import 'base/_typography';
 @import 'base/_layout';
 
-@import 'base/a11y_sd';
 @import 'base/forms_sd';
-
 
 core-drawer-panel::shadow {
   #drawer {
@@ -108,7 +106,7 @@ paper-tabs.white {
 
 #page-videos {
   .filter-rows {
-    paper-radio-button::shadow #radioLabel {
+    io-radio-button::shadow #radioLabel {
       order: -1;
       margin: 0 10px 0 0;
       flex: 1;

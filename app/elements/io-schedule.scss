@@ -76,11 +76,11 @@
   right: 0;
 }
 
-paper-checkbox {
+io-checkbox {
   margin-left: $tabletKeyline;
 }
 
-paper-radio-button {
+io-radio-button {
   margin-right: $tabletKeyline;
   margin-top: 5px;
 }
@@ -136,7 +136,7 @@ paper-progress {
   .schedule-title {
     order: 0;
   }
-  paper-radio-button {
+  io-radio-button {
     margin-top: 0;
   }
 }

@@ -1,0 +1,28 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../bower_components/core-a11y-keys/core-a11y-keys.html">
+<link rel="import" href="io-focusable.html">
+
+<polymer-element name="io-radio-button" extends="paper-radio-button">
+  <template>
+    <link rel="stylesheet" href="io-radio-button.css">
+    <core-a11y-keys target="{{}}" keys="enter ctrl+alt+space" on-keys-pressed="{{tap}}"></core-a11y-keys>
+    <div id="focusBackground"></div>
+    <shadow></shadow>
+  </template>
+  <script>
+    Polymer(Polymer.mixin2({}, Polymer.IOFocusable));
+  </script>
+</polymer-element>

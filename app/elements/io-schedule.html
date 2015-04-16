@@ -16,7 +16,8 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-label/core-label.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="io-radio-button.html">
+<link rel="import" href="io-checkbox.html">
 
 <!--
 The `<io-schedule>` element renders a schedule for a given day(s).
@@ -67,19 +68,22 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                   <div class="schedule-row" layout horizontal
                        center?="{{isDesktopSize}}"
                        hidden?="{{sessions[sessionId].hide ||  !(!showOnlySavedSessions || (showOnlySavedSessions && sessions[sessionId].saved)) }}">
-                    <paper-radio-button
+                    <io-radio-button
                         on-core-change="{{onToggleSaveSession}}"
                         toggles checked?="{{sessions[sessionId].saved}}"
-                        disabled?="{{showOnlySavedSessions}}"></paper-radio-button>
+                        disabled?="{{showOnlySavedSessions}}"
+                        aria-labelledby="session-{{sessionId}}-time session-{{sessionId}}-title"></io-radio-button>
                     <div layout vertical?="{{!isDesktopSize}}"
                          horizontal?="{{isDesktopSize}}" flex
-                         on-click="{{selectSession}}">
-                      <span class="schedule-time" flex auto-vertical>
+                         on-click="{{selectSession}}"
+                         tabindex="0">
+                      <span class="schedule-time" flex auto-vertical id="session-{{sessionId}}-time">
                         {{sessions[sessionId].start}} - {{sessions[sessionId].end}}
                       </span>
                       <span class="schedule-title" auto-vertical
                             flex?="{{!isPhoneSize}}" two
-                            title="{{sessions[sessionId].title}}">
+                            title="{{sessions[sessionId].title}}"
+                            id="session-{{sessionId}}-title">
                         {{sessions[sessionId].title}}
                         <core-icon class="schedule-livestream"
                             icon="io:videocam"
@@ -97,36 +101,36 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       <div class="card__container" layout vertical>
         <div class="card js-experiment-visualizer" hidden?="{{isPhoneSize}}">
           <div class="card-content">
-            <h4>Filters</h4>
+            <h4 id="filters-header">Filters</h4>
           </div>
           <div class="card-content">
             <div id="filters">
               <div class="filter-rows filter-section">
                 <template repeat="{{theme in sessionThemes}}">
-                  <core-label center horizontal layout>
+                  <core-label center horizontal layout aria-labelledby="filters-header">
                     <div flex>{{theme}}</div>
-                    <paper-checkbox on-change="{{applyFilter}}"
+                    <io-checkbox on-change="{{applyFilter}}"
                         checked?="{{filtersState_[theme]}}"
-                        name="{{theme}}" for></paper-checkbox>
+                        name="{{theme}}" for></io-checkbox>
                   </core-label>
                 </template>
               </div>
               <div class="filter-rows filter-section">
                 <template repeat="{{type in sessionTypes}}">
-                  <core-label center horizontal layout>
+                  <core-label center horizontal layout aria-labelledby="filters-header">
                     <div flex>{{type}}</div>
-                    <paper-checkbox on-change="{{applyFilter}}"
+                    <io-checkbox on-change="{{applyFilter}}"
                         checked?="{{isFilterSelected(type)}}"
-                        name="{{type}}" for></paper-checkbox>
+                        name="{{type}}" for></io-checkbox>
                   </core-label>
                 </template>
               </div>
               <div class="filter-rows filter-section">
-                <core-label center horizontal layout>
+                <core-label center horizontal layout aria-labelledby="filters-header">
                   <div flex>Live Streamed</div>
-                  <paper-checkbox on-change="{{applyFilter}}"
+                  <io-checkbox on-change="{{applyFilter}}"
                       checked?="{{isFilterSelected('Live Streamed')}}"
-                      name="Live Streamed" for></paper-checkbox>
+                      name="Live Streamed" for></io-checkbox>
                 </core-label>
               </div>
             </div>
