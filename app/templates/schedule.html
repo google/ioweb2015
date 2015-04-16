@@ -264,7 +264,7 @@
 
     var SUBTAB_SELECTOR = '#subpage-tabs a';
 
-    var updateDeepLink_ = true;
+    var pageIsDeepLinked_ = true;
 
     function hideSignInCard() {
       var signinPropmt = IOWA.Elements.Main.querySelector('#signin-prompt');
@@ -310,10 +310,10 @@
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
           if (sessionId) {
-            updateDeepLink_ = false;
+            pageIsDeepLinked_ = false;
             IOWA.Elements.Template.openSession(sessionId);
           } else {
-            updateDeepLink_ = true;
+            pageIsDeepLinked_ = true;
           }
         });
       };
@@ -406,14 +406,14 @@
         sender.updateTargetDimensions();
 
         // Update URL with deep link if we're not from a deep link page load.
-        if (updateDeepLink_) {
+        if (pageIsDeepLinked_) {
           var url = IOWA.Router.composeUrl(
               this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
               this.selectedSession.id, window.location.search);
 
           history.replaceState({}, null, url);
         } else {
-          updateDeepLink_ = true;
+          pageIsDeepLinked_ = true;
         }
       };
 
