@@ -45,7 +45,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               </div>
             </div>
           </template>
-          <template if="{{showOnlySavedSessions || timeBlock.isNotEmpty}}">
+          <template if="{{showOnlySavedSessions || timeBlock.sessions.length}}">
             <div class="card">
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
@@ -53,17 +53,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               <paper-progress indeterminate hidden?="{{!fetchingUserData}}">
               </paper-progress>
               <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
-                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}"
-                   justified
-                   hidden?="{{!showOnlySavedSessions || timeBlock.isNotEmpty}}">
+                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified
+                   hidden?="{{!showOnlySavedSessions || timeBlock.sessions.length}}">
                 <span class="no-sessions">No sessions added for this time</span>
                 <a href="#day{{timeBlock.day}}" data-subpage-link>
                   Browse sessions
                 </a>
               </div>
               <div class="card-content schedule-rows"
-                   layout vertical hidden?="{{!timeBlock.isNotEmpty}}">
-                <template repeat="{{sessionId in sessionsIndex_ | filterSessions(timeBlock.day, timeBlock.name)}}">
+                   layout vertical hidden?="{{!timeBlock.sessions.length}}">
+                <template repeat="{{sessionId in timeBlock.sessions}}">
                   <div class="schedule-row" layout horizontal
                        center?="{{isDesktopSize}}"
                        hidden?="{{sessions[sessionId].hide ||  !(!showOnlySavedSessions || (showOnlySavedSessions && sessions[sessionId].saved)) }}">
@@ -142,14 +141,20 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     var timeBlocksIndex = {};
 
     function populateTimeBlocks() {
-      var hours = ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM',
-                   '3 PM', '4 PM', '5 PM', '6 PM'];
+      var hours = [];
+      var generator = new Array(13);
+      for (var i = 1; i < generator.length; i++) {
+        hours.push(i + ' AM');
+      }
+      for (var i = 1; i < generator.length; i++) {
+        hours.push(i + ' PM');
+      }
       for (var i = 1; i < 3; i++) {
         for (var j = 0; j < hours.length; j++) {
           var timeBlock = {
             name: hours[j],
             day: i,
-            isNotEmpty: false
+            sessions: []
           };
           if (j === 0) {
             timeBlock['dayStart'] = i;
@@ -201,6 +206,15 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @default []
          */
         filters: [],
+
+        /**
+         * Timezone for the schedule times.
+         *
+         * @attribute timezone
+         * @type string
+         * @default 'GMT-07:00' (PDT timezone)
+         */
+        timezone: 'GMT-07:00',
 
         /**
          * Array of scheduled sessions.
@@ -270,6 +284,18 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         this.checkEmptyBlocks();
       },
 
+      timezoneChanged: function() {
+        console.log('ssss')
+        for (var i = 0; i < this.sessionsIndex_.length; i++) {
+          var session = this.sessions[this.sessionsIndex_[i]];
+          var time = this.getLocalizedTime(session.startTimestamp);
+          session.start = time.format('hh:mm A');
+          session.end = time.format('hh:mm A');
+          session.block = time.format('h A');
+        }
+        this.checkEmptyBlocks();
+      },
+
       isFilterSelected: function(filterName) {
         return this.filters.indexOf(filterName) > -1;
       },
@@ -320,7 +346,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       checkEmptyBlocks: function() {
         for (var i = 0; i < this.timeBlocks_.length; i++) {
-          this.timeBlocks_[i].isNotEmpty = false;
+          this.timeBlocks_[i].sessions = [];
         }
         for (var i = 0; i < this.sessionsIndex_.length; i++) {
           var session = this.sessions[this.sessionsIndex_[i]];
@@ -330,8 +356,9 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               (!this.showOnlySavedSessions ||
                (this.showOnlySavedSessions && session.saved));
             if (isValidSession) {
-              this.timeBlocks_[this.timeBlocksIndex_[block]].isNotEmpty = true;
-            }
+              this.timeBlocks_[this.timeBlocksIndex_[block]].sessions.push(
+                this.sessionsIndex_[i]);
+            };
           }
         }
       },
@@ -357,6 +384,11 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         return items.filter(function(item) {
           return item.day === day || !day;
         });
+      },
+
+      getLocalizedTime: function(dateStr) {
+        var tzId = IOWA.Elements.Template.timezoneNames[this.timezone].name;
+        return moment(dateStr).tz(tzId);
       },
 
       onToggleSaveSession: function(e, detail, sender) {

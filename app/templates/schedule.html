@@ -26,14 +26,12 @@
                            layout horizontal center-center>My Schedule</a>
       </paper-tab>
     </paper-tabs>
-    <paper-dropdown-menu hidden?="{{isPhoneSize}}">
+    <paper-dropdown-menu hidden?="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
       <paper-dropdown class="dropdown" halign="right">
-        <core-menu class="menu" selected="1">
-          <paper-item>PST</paper-item>
-          <paper-item>MST</paper-item>
-          <paper-item>CST</paper-item>
-          <paper-item>EST</paper-item>
-          <paper-item>GMT</paper-item>
+        <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
+          <template repeat="{{zone in timezones}}">
+            <paper-item label="{{zone}}">{{zone}}</paper-item>
+          </template>
         </core-menu>
       </paper-dropdown>
     </paper-dropdown-menu>
@@ -236,12 +234,10 @@
         </span>
         <paper-dropdown-menu>
           <paper-dropdown class="dropdown" halign="right">
-            <core-menu class="menu" selected="1">
-              <paper-item>PST</paper-item>
-              <paper-item>MST</paper-item>
-              <paper-item>CST</paper-item>
-              <paper-item>EST</paper-item>
-              <paper-item>GMT</paper-item>
+            <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
+              <template repeat="{{zone in timezones}}">
+                <paper-item label="{{zone}}">{{zone}}</paper-item>
+              </template>
             </core-menu>
           </paper-dropdown>
         </paper-dropdown-menu>
@@ -253,6 +249,7 @@
           sessionTypes="{{filterSessionTypes}}"
           showOnlySavedSessions="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
           user="{{currentUser}}" userSessions="{{savedSessions}}"
+          timezone="{{selectedTimezone}}"
           fetchingUserData="{{scheduleFetchingUserData}}"
           filters="{{sessionURLFilters}}"></io-schedule>
       </section>
@@ -306,6 +303,8 @@
             filters = parsedUrl.params.filters.split(',');
           }
           IOWA.Elements.Template.sessionURLFilters = filters;
+
+          IOWA.Elements.Template.selectedTimezone = 'GMT-08:00'; // PDT timezone.
 
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;

@@ -201,6 +201,81 @@ IOWA.Elements = (function() {
       'Code Labs'
     ];
 
+    template.timezoneNames = {
+      'GMT-11:00': {
+        'name': 'US/Samoa',
+        'title': 'Midway',
+        'GMTOffset': -11 * 60
+      },
+      'GMT-10:00': {
+        'name': 'US/Hawaii',
+        'title': 'Hawaii-Aleutian Standard Time',
+        'GMTOffset': -10 * 60
+      },
+      'GMT-09:00': {
+        'name': 'US/Alaska',
+        'title': 'Alaska Daylight Time',
+        'GMTOffset': -9 * 60
+      },
+      'GMT-08:00': {
+        'name': 'PST8PDT',
+        'title': 'Pacific Daylight Time, Tijuana',
+        'GMTOffset': -8 * 60
+      },
+      'GMT-07:00': {
+        'name': 'US/Mountain',
+        'title': 'Mountain Standard Time, Chihuahua',
+        'GMTOffset': -7 * 60
+      },
+      'GMT-06:00': {
+        'name': 'US/Central',
+        'title': 'Central Daylight Time, Mexico City',
+        'GMTOffset': -6 * 60
+      },
+      'GMT-05:00': {
+        'name': 'US/Eastern',
+        'title': 'Eastern Daylight Time, Bogota',
+        'GMTOffset': -5 * 60
+      },
+      'GMT-04:30': {
+        'name': 'America/Caracas',
+        'title': 'Caracas',
+        'GMTOffset': -4 * 60 + 30
+      },
+      'GMT-04:00': {
+        'name': 'America/Barbados',
+        'title': 'Barbados, Halifax, Manaus, Santiago',
+        'GMTOffset': -4 * 60
+      },
+      'GMT-03:30': {
+        'name': 'Canada/Newfoundland',
+        'title': 'St. John’s',
+        'GMTOffset': -3 * 60 + 30
+      },
+      'GMT-03:00': {
+        'name': 'America/Buenos_Aires',
+        'title': 'São Paulo, Buenos Aires, Nuuk, Montevideo',
+        'GMTOffset': -3 * 60
+      },
+      'GMT-02:00': {
+        'name': 'Atlantic/South_Georgia',
+        'title': 'South Georgia',
+        'GMTOffset': -2 * 60
+      },
+      'GMT-01:00': {
+        'name': 'Atlantic/Cape_Verde',
+        'title': 'Azores, Cape Verde',
+        'GMTOffset': -60
+      },
+      'GMT-00:00': {
+        'name': 'Africa/Casablanca',
+        'title': 'Casablanca, Lisbon, London',
+        'GMTOffset': 0
+      }
+    };
+
+    template.timezones = Object.keys(template.timezoneNames);
+
     template.formatSessionTimeFilter = function(dateStr) {
       var date = new Date(dateStr);
       return date.toLocaleTimeString().replace(/:\d+ /, ' ');
