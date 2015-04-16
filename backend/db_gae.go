@@ -3,7 +3,10 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
+	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/datastore"
@@ -12,7 +15,15 @@ import (
 const (
 	kindCredentials = "Cred"
 	kindUserPush    = "Push"
+	kindEventData   = "EventData"
 )
+
+// RunInTransaction runs f in a transaction.
+// It calls f with a transaction context tc that f should use for all operations.
+func RunInTransaction(c context.Context, f func(context.Context) error) error {
+	opts := &datastore.TransactionOptions{XG: true}
+	return datastore.RunInTransaction(c, f, opts)
+}
 
 // storeCredentials saves OAuth2 credentials cred in a presistent DB.
 // cred must have userID set to a non-zero value.
@@ -75,4 +86,50 @@ func getUserPushInfo(c context.Context) (*userPush, error) {
 		p.Pext = &p.Ext
 	}
 	return p, err
+}
+
+func storeEventData(c context.Context, d *eventData) error {
+	var b bytes.Buffer
+	if err := gob.NewEncoder(&b).Encode(d); err != nil {
+		return err
+	}
+	// TODO: handle a case where b.Bytes() is > 1Mb
+	ent := &struct {
+		Timestamp time.Time `datastore:"ts"`
+		Bytes     []byte    `datastore:"data"`
+	}{d.modified, b.Bytes()}
+	key := datastore.NewIncompleteKey(c, kindEventData, eventDataParent(c))
+	_, err := datastore.Put(c, key, ent)
+	return err
+}
+
+func getLatestEventData(c context.Context) (*eventData, error) {
+	q := datastore.NewQuery(kindEventData).
+		Ancestor(eventDataParent(c)).
+		Order("-ts").
+		Limit(1)
+
+	var res []*struct {
+		Timestamp time.Time `datastore:"ts"`
+		Bytes     []byte    `datastore:"data"`
+	}
+	if _, err := q.GetAll(c, &res); err != nil {
+		return nil, err
+	}
+
+	data := &eventData{}
+	if len(res) == 0 {
+		return data, nil
+	}
+	err := gob.NewDecoder(bytes.NewReader(res[0].Bytes)).Decode(data)
+	data.modified = res[0].Timestamp
+	return data, err
+}
+
+func storeDataChanges(c context.Context, d *dataChanges) error {
+	return errors.New("not implemented")
+}
+
+func eventDataParent(c context.Context) *datastore.Key {
+	return datastore.NewKey(c, kindEventData, "root", 0, nil)
 }

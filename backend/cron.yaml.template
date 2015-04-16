@@ -5,4 +5,6 @@ cron:
 - description: refresh social entries
   url: $PREFIX$/api/social?refresh
   schedule: every 8 minutes
-
+- description: sync schedule data
+  url: $PREFIX$/sync/gcs
+  schedule: every 30 minutes

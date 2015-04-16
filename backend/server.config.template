@@ -5,7 +5,8 @@
   "prefix": "/io2015",
   "schedule": {
     "start": "2014-06-25T09:00:00-07:00",
-    "timezone": "America/Los_Angeles"
+    "timezone": "America/Los_Angeles",
+    "manifest": "https://storage.googleapis.com/io2015-data.appspot.com/manifest_v1.json"
   },
   "ioExtFeedUrl": "https://spreadsheets.google.com/feeds/list/SHEET/WORKSHEET/private/full",
   "secret": "a very long secret used in /api/v1/user/updates",
