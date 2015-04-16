@@ -285,7 +285,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       timezoneChanged: function() {
-        console.log('ssss')
         for (var i = 0; i < this.sessionsIndex_.length; i++) {
           var session = this.sessions[this.sessionsIndex_[i]];
           var time = this.getLocalizedTime(session.startTimestamp);
