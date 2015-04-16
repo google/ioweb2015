@@ -26,6 +26,7 @@ IOWA.Auth = IOWA.Auth || (function() {
   var UPDATES_ENDPOINT = 'api/v1/user/updates';
 
   var tokenResponse_ = null;
+  var pendingResolutions = [];
 
   function getTokenResponse_() {
     return tokenResponse_;
@@ -109,6 +110,13 @@ IOWA.Auth = IOWA.Auth || (function() {
         // This kicks off an async network request, wrapped in a promise.
         ensureSWToken_();
       }
+
+      // Call the resolve() function for each of the promises that are waiting on being signed in,
+      // and remove each from the queue.
+      while (pendingResolutions.length) {
+        var pendingResolution = pendingResolutions.shift();
+        pendingResolution();
+      }
     } else {
       clearUserUI();
       if (IOWA.Notifications.isSupported) {
@@ -127,8 +135,42 @@ IOWA.Auth = IOWA.Auth || (function() {
     }
   });
 
+  /**
+   * Provides a Promise resolved after the user has signed in.
+   * It's useful when delaying activities that can't take place until after the user signs in.
+   *
+   * Usage:
+   * function someUIButtonClicked() {
+   *   IOWA.Auth.waitForSignedIn().then(function() {
+   *     // At this point you can do something that requires being signed in.
+   *   });
+   * }
+   *
+   * @param {string} message The text displayed in the toast.
+   *                         Defaults to 'Please sign in'
+   * @return {Promise} Resolves once the user is signed in. Does not reject.
+   */
+  function waitForSignedIn(message) {
+    message = message || 'Please sign in';
+
+    // If we're already signed in, return a Promise that resolves immediately.
+    if (tokenResponse_) {
+      return Promise.resolve();
+    }
+
+    // If we're not already signed in, then return a Promise which will resolve later on, if/when
+    // the 'signin-change' event handler is fired for a signed-in event.
+    return new Promise(function(resolve) {
+      pendingResolutions.push(resolve);
+      IOWA.Elements.Toast.showMessage(message, null, 'Sign in', function() {
+        IOWA.Elements.GoogleSignIn.signIn();
+      });
+    });
+  }
+
   return {
-    getTokenResponse: getTokenResponse_
+    getTokenResponse: getTokenResponse_,
+    waitForSignedIn: waitForSignedIn
   };
 
 })();
