@@ -16,7 +16,6 @@
 
 @import '_color';
 
-paper-slider::shadow,
 io-slider::shadow {
   #activeProgress,
   #sliderKnobInner,
@@ -32,14 +31,6 @@ io-slider::shadow {
   }
 }
 
-paper-radio-button::shadow #onRadio,
-paper-radio-button::shadow #onOff,
-paper-checkbox::shadow #checkbox.checked {
-  color: $color-form-controls;
-  border-color: $color-form-controls;
-  background-color: $color-form-controls;
-}
-
 io-radio-button::shadow #onRadio,
 io-radio-button::shadow #onOff,
 io-checkbox::shadow #checkbox.checked {
@@ -48,7 +39,6 @@ io-checkbox::shadow #checkbox.checked {
   background-color: $color-form-controls;
 }
 
-paper-radio-button[checked]::shadow #offRadio,
 io-radio-button[checked]::shadow #offRadio {
   border-color: $color-form-controls;
 }
