@@ -222,24 +222,14 @@ IOWA.Analytics = IOWA.Analytics || (function(exports) {
    * Permissions API, tracks changes to the notification state as well.
    */
   Analytics.prototype.trackNotificationPermission = function() {
-    ga('send', {
-      hitType: 'event',
-      nonInteraction: true,
-      eventCategory: 'notifications',
-      eventAction: 'startup',
-      eventLabel: exports.Notification ? exports.Notification.permission : 'unsupported'
-    });
+    this.trackEvent('notifications', 'startup',
+      exports.Notification ? exports.Notification.permission : 'unsupported');
 
     if (navigator.permissions) {
+      var thisAnalytics = this;
       navigator.permissions.query({name:'notifications'}).then(function(p) {
         p.onchange = function() {
-          ga('send', {
-            hitType: 'event',
-            nonInteraction: true,
-            eventCategory: 'notifications',
-            eventAction: 'change',
-            eventLabel: this.status
-          });
+          thisAnalytics.trackEvent('notifications', 'change', this.status);
         };
       });
     }
