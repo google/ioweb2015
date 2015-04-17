@@ -391,15 +391,13 @@
 
           if (saved) {
             var toastMessage = 'Added to My Schedule.';
-
-            if (IOWA.Notifications.isSupported) {
-              return IOWA.Notifications.waitForPrereqs().then(function() {
-                toastMessage += " You'll get a notification when it starts.";
-                IOWA.Elements.Toast.showMessage(toastMessage);
-              });
-            } else {
+            return IOWA.Notifications.waitForPrereqs().then(function() {
+              toastMessage += " You'll get a notification when it starts.";
+            }).catch(function() {
+              // no-op
+            }).then(function() {
               IOWA.Elements.Toast.showMessage(toastMessage);
-            }
+            });
           } else {
             IOWA.Elements.Toast.showMessage('Removed from My Schedule');
           }
