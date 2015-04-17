@@ -194,7 +194,7 @@ IOWA.Elements = (function() {
 
     template.filterSessionTypes = [
       'Sessions',
-      'Code Labs'
+      'Code Labs',
       'Sandbox talks',
       'Office hours',
       'Misc'
