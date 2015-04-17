@@ -573,13 +573,13 @@ func serveSWToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var zero time.Time
-	token, err := encodeSWToken(contextUser(c), zero)
+	now := time.Now()
+	token, err := encodeSWToken(contextUser(c), now)
 	if err != nil {
 		writeJSONError(w, errStatus(err), err)
 		return
 	}
-	dc := &dataChanges{Token: token}
+	dc := &dataChanges{Token: token, Changed: now}
 	if err := json.NewEncoder(w).Encode(dc); err != nil {
 		errorf(c, "serveSWToke: encode resp: %v", err)
 	}

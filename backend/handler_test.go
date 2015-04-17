@@ -953,9 +953,8 @@ func TestServeSWToken(t *testing.T) {
 	if user != testUserID {
 		t.Errorf("user = %q; want %q", user, testUserID)
 	}
-	var zero time.Time
-	if ts.Unix() != zero.Unix() {
-		t.Errorf("ts = %s; what %s", ts, zero)
+	if now := time.Now(); now.Unix()-ts.Unix() > 3 {
+		t.Errorf("ts = %s; want around %s", ts, now)
 	}
 }
 
