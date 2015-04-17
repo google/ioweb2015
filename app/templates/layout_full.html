@@ -251,7 +251,7 @@ limitations under the License.
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
           <div flex disabled?="{{selectedPage === 'home'}}">
             <a href="./" class="io-logo-link" data-ajax-link data-track-link="nav-home"
-                         data-anim-ripple aria-label="Home" tabindex="0">
+                         data-transition="masthead-ripple-transition" aria-label="Home" tabindex="0">
               <div class="io-logo" iologodestination></div>
             </a>
             <div class="masthead-meta--corner">
@@ -259,29 +259,29 @@ limitations under the License.
               <h4 class="masthead-subtitle">Moscone Center West,<br>San Francisco, CA</h4>
             </div>
           </div>
-          <paper-tabs class="white {{navBgClass}}" valueattr="label" selected="{{selectedPage}}" link noink>
+          <paper-tabs class="white {{pages[selectedPage].mastheadBgClass}}" valueattr="label" selected="{{selectedPage}}" link noink>
             <paper-tab label="about" role="">
-              <a href="about" data-ajax-link data-track-link="nav-about" data-anim-ripple layout horizontal center>
+              <a href="about" data-ajax-link data-track-link="nav-about" data-transition="masthead-ripple-transition" layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="schedule" role="">
-              <a href="schedule" data-ajax-link data-track-link="nav-schedule" data-anim-ripple layout horizontal center>
+              <a href="schedule" data-ajax-link data-track-link="nav-schedule" data-transition="masthead-ripple-transition" layout horizontal center>
                 <i18n-msg msgid="schedule">Schedule</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="onsite" role="">
-              <a href="onsite" data-ajax-link data-track-link="nav-onsite" data-anim-ripple layout horizontal center>
+              <a href="onsite" data-ajax-link data-track-link="nav-onsite" data-transition="masthead-ripple-transition" layout horizontal center>
                 <i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="offsite" role="">
-              <a href="offsite" data-ajax-link data-track-link="nav-offsite" data-anim-ripple layout horizontal center>
+              <a href="offsite" data-ajax-link data-track-link="nav-offsite" data-transition="masthead-ripple-transition" layout horizontal center>
                 <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
               </a>
             </paper-tab>
           </paper-tabs>
-          <span id="signin-nav-elements" class="{{isPhoneSize ? '' : navBgClass}}"
+          <span id="signin-nav-elements" class="{{isPhoneSize ? '' : pages[selectedPage].mastheadBgClass}}"
                 layout horizontal center>
             <a href="#" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign in</a>
             <template if="{{currentUser}}">

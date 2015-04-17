@@ -7,22 +7,22 @@
 {% define "masthead" %}
   <h1>Schedule</h1>
   <div layout horizontal justified>
-    <paper-tabs id="subpage-tabs" class="white" valueattr="label" selected="agenda"
+    <paper-tabs id="subpage-tabs" class="white" valueattr="label" selected="{{pages[selectedPage].selectedSubpage}}"
                 scrollable?="{{isPhoneSize}}" link>
       <paper-tab label="agenda" role="">
-        <a href="#agenda" data-track-link="schedule-agenda" data-subpage-link
+        <a href="#agenda" data-track-link="schedule-agenda" data-ajax-link
                           layout horizontal center-center>Agenda</a>
       </paper-tab>
       <paper-tab label="day1" role="">
-        <a href="#day1" data-track-link="schedule-day1" data-subpage-link
+        <a href="#day1" data-track-link="schedule-day1" data-ajax-link
                         layout horizontal center-center>Day 1</a>
       </paper-tab>
       <paper-tab label="day2" role="">
-        <a href="#day2" data-track-link="schedule-day2" data-subpage-link
+        <a href="#day2" data-track-link="schedule-day2" data-ajax-link
                         layout horizontal center-center>Day 2</a>
       </paper-tab>
       <paper-tab label="myschedule" role="">
-        <a href="#myschedule" data-track-link="schedule-mysched" data-subpage-link
+        <a href="#myschedule" data-track-link="schedule-mysched" data-ajax-link
                            layout horizontal center-center>My Schedule</a>
       </paper-tab>
     </paper-tabs>
@@ -280,10 +280,6 @@
         return;
       }
 
-      var onSubpageChanged_ = function(e) {
-        IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
-      };
-
       var onPageTransitionDone_ = function(e) {
         document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
@@ -294,7 +290,6 @@
 
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
           IOWA.Elements.Template.scheduleData = scheduleData;
-          IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
           // Deep link into schedule tab.
           var filters = [];
@@ -344,12 +339,6 @@
         IOWA.Elements.Template.scheduleFetchingUserData = false;
 
         document.addEventListener('page-transition-done', onPageTransitionDone_);
-
-        // TODO: Move to page unload when issues/#951 is fixed.
-        document.removeEventListener('subpage-changed', onSubpageChanged_);
-        document.removeEventListener('signin-change', onSigninChanged_);
-
-        document.addEventListener('subpage-changed', onSubpageChanged_);
         document.addEventListener('signin-change', onSigninChanged_);
 
         // Wait 1 rAF for template to stamp.
@@ -360,6 +349,7 @@
 
       page.unload = function() {
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
+        document.removeEventListener('signin-change', onSigninChanged_);
       };
 
       IOWA.Elements.Template.openSession = function(sessionId) {

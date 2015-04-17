@@ -20,7 +20,7 @@
 
   function afterImports() {
     IOWA.Elements.init();
-    IOWA.Router.init();
+    IOWA.Router.init(IOWA.Elements.Template);
     IOWA.Notifications.init();
 
     CoreStyle.g.paperInput.labelColor = '#008094';

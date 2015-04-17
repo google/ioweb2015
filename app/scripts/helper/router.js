@@ -24,269 +24,6 @@ IOWA.Router = (function() {
 
   var MASTHEAD_BG_CLASS_REGEX = /(\s|^)bg-[a-z-]+(\s|$)/;
 
-  var FILTERS_REGEX = /\.*[\?|&]filters\=([^&]+)/;
-
-  /**
-   * Tells what kind of transition is currently happening on the page,
-   * e.g. 'hero-card-transition' or 'masthead-ripple-transition'.
-   * @type {=string?}
-   */
-  var currentPageTransition = null;
-
-  /**
-   * True if the URL update was due to a user click. Used to differentiate a
-   * popstate event from a link click and a history pop.
-   * @type {boolean}
-   */
-  var navigationFromLinkClick = false;
-
-  /**
-   * Navigates to a new page via a hero card takeover transition.
-   * @param {Event} e Event that triggered navigation.
-   * @param {Element} el Element clicked.
-   * @param {string} rippleColor Color of the ripple on the card.
-   * @private
-   */
-  function playHeroTransition(e, el, rippleColor) {
-    // TODO: This may need some perf tweaking for FF.
-    var card = null;
-    var currentEl = el;
-    while (!card) {
-      currentEl = currentEl.parentNode;
-      if (currentEl.classList.contains('card__container')) {
-        card = currentEl;
-      }
-    }
-    IOWA.PageAnimation.play(
-      IOWA.PageAnimation.pageCardTakeoverOut(
-          card, e.pageX, e.pageY, 300, rippleColor),
-      function() {
-        IOWA.History.pushState({'path': el.pathname}, '', el.href);
-      }
-    );
-  }
-
-  /**
-   * Navigates to a new page via a masthead nav item ripple transition.
-   * @param {Event} e Event that triggered navigation.
-   * @param {Element} el Element clicked.
-   * @param {string} mastheadColor Color of the masthead.
-   * @param {string} rippleColor Color of the ripple.
-   * @param {boolean} isFadeRipple If true, ripple will just glimpse and fade.
-   * @private
-   */
-  function playMastheadRippleTransition(
-      e, el, mastheadColor, rippleColor, isFadeRipple) {
-    var x = e.touches ? e.touches[0].pageX : e.pageX;
-    var y = e.touches ? e.touches[0].pageY : e.pageY;
-    var duration = isFadeRipple ? 300 : 600;
-    var rippleAnim = IOWA.PageAnimation.ripple(
-          IOWA.Elements.Ripple, x, y, duration,
-          rippleColor, isFadeRipple);
-    var animGroup = [
-      rippleAnim,
-      IOWA.PageAnimation.contentSlideOut(),
-    ];
-    if (!isFadeRipple) {
-      var mastheadAnim = new Animation(IOWA.Elements.Masthead, [
-        {backgroundColor: mastheadColor},
-        {backgroundColor: rippleColor}
-      ], {
-        duration: 300,
-        delay: 0,
-        fill: 'forwards'  // Makes ripple keep its state after animation.
-      });
-      animGroup.push(mastheadAnim);
-    }
-    var animation = new AnimationGroup(animGroup);
-    IOWA.PageAnimation.play(animation, function() {
-      IOWA.History.pushState({'path': el.pathname}, '', el.href);
-    });
-  }
-
-  /**
-   * Navigates to a new page via ajax and page transitions.
-   * @param {Event} e Event that triggered navigation.
-   * @param {Element} el Element clicked.
-   * @param {String} currentPage Current page id.
-   * @param {String} nextPage Id of the page the user navigates to.
-   * @private
-   */
-  function handleAjaxLink(e, el, currentPage, nextPage) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    var template = IOWA.Elements.Template;
-    var bgClass = template.pages[nextPage] &&
-                  template.pages[nextPage].mastheadBgClass;
-    var prevBgClass = template.pages[currentPage].mastheadBgClass;
-
-    template.navBgClass = bgClass;
-
-    var isFadeRipple = prevBgClass === bgClass;
-    var mastheadColor = template.rippleColors[prevBgClass];
-    var rippleColor = isFadeRipple ? '#fff' : template.rippleColors[bgClass];
-
-    if (currentPage !== nextPage) {
-      IOWA.Elements.Template.fire('page-transition-start');
-      if (el.hasAttribute('data-anim-ripple')) {
-        currentPageTransition = 'masthead-ripple-transition';
-        playMastheadRippleTransition(
-            e, el, mastheadColor, rippleColor, isFadeRipple);
-      } else if (el.hasAttribute('data-anim-drawer'))  {
-        var handler = function(e) {
-          e.target.removeEventListener('core-transitionend', handler);
-          currentPageTransition = '';
-          IOWA.History.pushState({'path': el.pathname}, '', el.href);
-        };
-        el.parentNode.addEventListener('core-transitionend', handler);
-      } else if (el.hasAttribute('data-anim-card'))  {
-        currentPageTransition = 'hero-card-transition';
-        playHeroTransition(e, el, rippleColor);
-      } else {
-        currentPageTransition = '';
-        IOWA.History.pushState({'path': el.pathname}, '', el.href);
-      }
-    }
-    // TODO: Update meta.
-  }
-
-  /**
-   * Navigates to a new subpage.
-   * @param {Event} e Event that triggered navigation.
-   * @param {Element} el Element clicked.
-   * @private
-   */
-  function handleSubpageLink(e, el) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    var main = IOWA.Elements.Main;
-    var t = IOWA.Elements.Template;
-
-    var currentSubpageName = t.pages[t.selectedPage].selectedSubpage;
-    var nextSubpageName = el.hash.substring(1);
-
-    if (currentSubpageName !== nextSubpageName) {
-      var oldSubpage = main.querySelector('.subpage-' + currentSubpageName);
-      var newSubpage = main.querySelector('.subpage-' + nextSubpageName);
-      IOWA.PageAnimation.play(new AnimationGroup([
-          IOWA.PageAnimation.sectionSlideOut(oldSubpage),
-          IOWA.PageAnimation.elementFadeOut(
-              IOWA.Elements.Footer, {duration: 400})
-        ]), function() {
-          oldSubpage.style.display = 'none';
-          newSubpage.style.display = '';
-          oldSubpage.classList.remove('active');
-          newSubpage.classList.add('active');
-          IOWA.History.pushState({
-            'path': el.pathname + el.hash,
-            fromHashChange: true
-          }, '', el.href);
-          t.pages[t.selectedPage].selectedSubpage = nextSubpageName;
-          IOWA.Elements.Template.fire('subpage-changed');
-          IOWA.PageAnimation.play(new AnimationGroup([
-            IOWA.PageAnimation.sectionSlideIn(newSubpage),
-            IOWA.PageAnimation.elementFadeIn(
-                IOWA.Elements.Footer, {duration: 400})
-          ]));
-        });
-    }
-  }
-
-  /**
-   * Navigates to a new page. Uses ajax for data-ajax-link links.
-   * @param {Event} e Event that triggered navigation.
-   * @private
-   */
-  function navigate(e) {
-    // Allow user to open page in a new tab.
-    if (e.metaKey || e.ctrlKey) {
-      return;
-    }
-
-    navigationFromLinkClick = true;
-
-    // Inject page if <a> has the data-ajax-link attribute.
-    for (var i = 0; i < e.path.length; ++i) {
-      var el = e.path[i];
-      if (el.localName === 'a') {
-        var currentPage = parsePageNameFromAbsolutePath(location.pathname);
-        var nextPage = parsePageNameFromAbsolutePath(el.pathname);
-
-        // First, record click event if link requests it.
-        if (el.hasAttribute('data-track-link')) {
-          IOWA.Analytics.trackEvent(
-              'link', 'click', el.getAttribute('data-track-link'));
-        }
-
-        // Ignore links that go offsite.
-        if (el.target) {
-          return;
-        }
-
-        if (el.hasAttribute('data-subpage-link')) {
-          handleSubpageLink(e, el);
-          return;
-        }
-
-        // Prevent navigations to the same page.
-        // Note, this prevents in-page anchors. Use IOWA.Util.smoothScroll.
-        if (currentPage === nextPage) {
-          e.preventDefault();
-          return;
-        }
-
-        // Do ajax page navigation if link requests it.
-        if (el.hasAttribute('data-ajax-link')) {
-          runPageHandler('unload', currentPage);
-          handleAjaxLink(e, el, currentPage, nextPage);
-        } else {
-          currentPageTransition = 'no-transition';
-        }
-
-        return; // found first navigation element, quit here.
-      }
-    }
-  }
-
-  /**
-   * Renders a new page by fetching partials through ajax.
-   * @param {string} pageName The name of the new page.
-   * @private
-   */
-  function renderPage(pageName) {
-    var importURL = pageName + '?partial';
-    // TODO(ericbidelman): update call when github.com/Polymer/polymer/pull/1128 lands.
-    Polymer.import([importURL], function() {
-      // Don't proceed if import didn't load correctly.
-      var htmlImport = document.querySelector(
-          'link[rel="import"][href="' + importURL + '"]');
-      if (htmlImport && !htmlImport.import) {
-        return;
-      }
-
-      // FF doesn't execute the <script> inside the main content <template>
-      // (inside page partial import). Instead, the first time the partial is
-      // loaded, find any script tags in and make them runnable by appending them back to the template.
-      if (IOWA.Util.isFF() || IOWA.Util.isIE()) {
-        var contentTemplate = document.querySelector(
-           '#template-' + pageName + '-content');
-        if (!contentTemplate) {
-          var containerTemplate = htmlImport.import.querySelector(
-              '[data-ajax-target-template="template-content-container"]');
-          var scripts = containerTemplate.content.querySelectorAll('script');
-          Array.prototype.forEach.call(scripts, function(node, i) {
-            replaceScriptTagWithRunnableScript(node);
-          });
-        }
-      }
-
-      // Update content of the page.
-      injectPageContent(pageName, htmlImport.import);
-    });
-  }
-
   /**
    * Replaces in-page <script> tag in xhr'd body content with runnable script.
    *
@@ -296,7 +33,6 @@ IOWA.Router = (function() {
   function replaceScriptTagWithRunnableScript(node) {
     var script = document.createElement('script');
     script.text = node.text || node.textContent || node.innerHTML;
-
     // IE doesn't execute the script when it's appended to the middle
     // of the DOM. Append it to body instead, then remove.
     if (IOWA.Util.isIE()) {
@@ -305,162 +41,261 @@ IOWA.Router = (function() {
     } else {
       node.parentNode.replaceChild(script, node); // FF
     }
-  }
+  };
+
+  //constructor.
+  var Router = function() {};
+
+  Router.prototype.state = {
+    start: null,
+    current: null,
+    end: null
+  };
+
+  Router.prototype.init = function(template) {
+    this.t = template;
+    this.state.current = this.parseUrl(window.location.href);
+    window.addEventListener('popstate', function() {
+      this.navigate(window.location.href, 'page-slide-transition');
+    }.bind(this));
+
+    // On iOS, we don't have event bubbling to the document level.
+    // http://www.quirksmode.org/blog/archives/2010/09/click_event_del.html
+    var eventName = IOWA.Util.isIOS() || IOWA.Util.isTouchScreen() ?
+        'touchstart' : 'click';
+
+    document.addEventListener(eventName, this.onClick.bind(this));
+  };
 
   /**
-   * Replaces templated content.
+   * Navigates to a new page state. Uses ajax for data-ajax-link links.
+   * @param {Event} e Event that triggered navigation.
    * @private
    */
-  function replaceTemplateContent(currentPageTemplates) {
-    for (var j = 0; j < currentPageTemplates.length; j++) {
-      var template = currentPageTemplates[j];
-      var templateToReplace = document.getElementById(
-          template.getAttribute('data-ajax-target-template'));
-      if (templateToReplace) {
-        templateToReplace.setAttribute('ref', template.id);
+  Router.prototype.onClick = function(e) {
+    // Allow user to open page in a new tab.
+    if (e.metaKey || e.ctrlKey) {
+      return;
+    }
+
+    // Inject page if <a> has the data-ajax-link attribute.
+    for (var i = 0; i < e.path.length; ++i) {
+      var el = e.path[i];
+      if (el.localName === 'a') {
+        // First, record click event if link requests it.
+        if (el.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'link', 'click', el.getAttribute('data-track-link'));
+        }
+        // Ignore links that go offsite.
+        if (el.target) {
+          return;
+        }
+        if (el.hasAttribute('data-ajax-link')) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.navigate(el.href, e, el);
+        }
+        return; // found first navigation element, quit here.
       }
     }
-  }
+  };
 
-  /**
-   * Updates the page elements during the page transition.
-   * @param {string} pageName New page identifier.
-   * @param {NodeList} currentPageTemplates Content templates to be rendered.
-   * @private
-   */
-  function updatePageElements(pageName, currentPageTemplates) {
-    replaceTemplateContent(currentPageTemplates);
+  Router.pageExitTransitions = {
+      'masthead-ripple-transition': 'playMastheadRippleTransition',
+      'hero-card-transition': 'playHeroTransitionStart',
+      'page-slide-transition': 'playPageSlideOut'
+  };
 
-    var template = IOWA.Elements.Template;
+  Router.pageEnterTransitions = {
+      'masthead-ripple-transition': 'playPageSlideIn',
+      'hero-card-transition': 'playHeroTransitionEnd',
+      'page-slide-transition': 'playPageSlideIn'
+  };
 
-    // Update menu/drawer selected item.
-    template.selectedPage = pageName;
-    IOWA.Elements.DrawerMenu.selected = pageName;
-
-    var currentPageMeta = template.pages[pageName];
-    document.body.id = 'page-' + pageName;
-    document.title = currentPageMeta.title || 'Google I/O 2015';
-
-    var previousPageMeta = template.pages[template.selectedPage];
-    var previousMastheadColor = template.rippleColors[previousPageMeta.mastheadBgClass];
-    var currentMastheadColor = template.rippleColors[currentPageMeta.mastheadBgClass];
-
-    // Prepare the page for a smooth masthead transition.
-    var mastheadBgClass = currentPageMeta.mastheadBgClass;
-    template.navBgClass = mastheadBgClass;
-    // This cannot be updated via data binding, because the masthead
-    // is visible before the binding happens.
-    IOWA.Elements.Masthead.className = IOWA.Elements.Masthead.className.replace(
-        MASTHEAD_BG_CLASS_REGEX, ' ' + mastheadBgClass + ' ');
-
-    // Transition masthead color.
-    IOWA.PageAnimation.play(new Animation(IOWA.Elements.Masthead, [
-      {backgroundColor: previousMastheadColor},
-      {backgroundColor: currentMastheadColor}
-    ], {
-      duration: currentPageTransition ? 0 : 300,
-      fill: 'forwards'
-    }));
-
-    // Hide the masthead ripple before proceeding with page transition.
-    IOWA.PageAnimation.play(
-        IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
-
-    // Scroll to top of new page.
-    IOWA.Elements.ScrollContainer.scrollTop = 0;
-
-    // Wait 1 rAF for DOM to settle.
-    IOWA.Elements.Template.async(function() {
-      var animationFunc;
-      if (currentPageTransition === 'hero-card-transition') {
-        animationFunc = IOWA.PageAnimation.pageCardTakeoverIn;
-      } else {
-        animationFunc = IOWA.PageAnimation.pageSlideIn;
-      }
-      var main = IOWA.Elements.Main;
-      var subpages = main.querySelectorAll('.subpage__content');
-      var subpageName = template.pages[template.selectedPage].selectedSubpage;
-      var selectedSubpage = main.querySelector('.subpage-' + subpageName);
-      if (selectedSubpage) {
-        for (var i = 0; i < subpages.length; i++) {
-          var subpage = subpages[i];
-          subpage.style.display = 'none';
+  Router.prototype.importPage = function() {
+    var pageName = this.state.end.page;
+    return new Promise(function(resolve, reject) {
+      var importURL = pageName + '?partial';
+      // TODO(ericbidelman): update call when
+      // github.com/Polymer/polymer/pull/1128 lands.
+      Polymer.import([importURL], function() {
+        // Don't proceed if import didn't load correctly.
+        var htmlImport = document.querySelector(
+            'link[rel="import"][href="' + importURL + '"]');
+        if (htmlImport && !htmlImport.import) {
+          return;
         }
-        selectedSubpage.style.display = '';
-      }
-      IOWA.PageAnimation.play(animationFunc(), function() {
-        // Fire event when the page transitions are final.
-        IOWA.Elements.Template.fire('page-transition-done');
+        // FF doesn't execute the <script> inside the main content <template>
+        // (inside page partial import). Instead, the first time the partial is
+        // loaded, find any script tags in and make them runnable by appending
+        // them back to the template.
+        if (IOWA.Util.isFF() || IOWA.Util.isIE()) {
+          var contentTemplate = document.querySelector(
+             '#template-' + pageName + '-content');
+          if (!contentTemplate) {
+            var containerTemplate = htmlImport.import.querySelector(
+                '[data-ajax-target-template="template-content-container"]');
+            var scripts = containerTemplate.content.querySelectorAll('script');
+            Array.prototype.forEach.call(scripts, function(node, i) {
+              replaceScriptTagWithRunnableScript(node);
+            });
+          }
+        }
+        // Update content of the page.
+        resolve(htmlImport.import);
       });
-
-      currentPageTransition = '';
     });
   }
 
-  /**
-   * Runs animated page transition.
-   * @param {string} pageName New page identifier.
-   * @private
-   */
-  function animatePageIn(pageName) {
-    // Prequery for content templates.
-    var currentPageTemplates = document.querySelectorAll(
-        '.js-ajax-' + pageName);
-    if (!currentPageTransition) {
-      var animation = IOWA.PageAnimation.contentSlideOut();
-      IOWA.PageAnimation.play(animation, updatePageElements.bind(
-          null, pageName, currentPageTemplates));
-    } else if (currentPageTransition !== 'no-transition') {
-      updatePageElements(pageName, currentPageTemplates);
-    }
-  }
-
-  /**
-   * Parses the page name out of the last entry in absolutePath, split on '/'.
-   * Defaults to 'home' if absolutePath ends in '/' or is ''.
-   * @private
-   */
-  function parsePageNameFromAbsolutePath(absolutePath) {
-    return absolutePath.split('/').pop() || 'home';
-  }
-
-  /**
-   * Renders a new page for the current location.
-   * @private
-   */
-  function renderCurrentPage() {
-    renderPage(parsePageNameFromAbsolutePath(window.location.pathname));
-  }
-
-  /**
-   * Injects new page content into existing layout.
-   * @param {string} pageName New page identifier.
-   * @param {DocumentFragment} importContent HTML containing templates to be
-   *    injected.
-   * @private
-   */
-  function injectPageContent(pageName, importContent) {
-
-    runPageHandler('load', pageName);
-
-    // Add freshly fetched templates to DOM, if not yet present.
-    var newTemplates = importContent.querySelectorAll('.js-ajax-template');
-    for (var i = 0; i < newTemplates.length; i++) {
-      var newTemplate = newTemplates[i];
-      if (!document.getElementById(newTemplate.id)) {
-        document.body.appendChild(newTemplate);
+  Router.prototype.renderTemplates = function(importContent) {
+    var pageName = this.state.end.page;
+    return new Promise(function(resolve, reject) {
+      // Add freshly fetched templates to DOM, if not yet present.
+      var newTemplates = importContent.querySelectorAll('.js-ajax-template');
+      for (var i = 0; i < newTemplates.length; i++) {
+        var newTemplate = newTemplates[i];
+        if (!document.getElementById(newTemplate.id)) {
+          document.body.appendChild(newTemplate);
+        }
       }
-    }
-    animatePageIn(pageName);
-  }
+      // Replace current templates content with new one.
+      var newPageTemplates = document.querySelectorAll(
+          '.js-ajax-' + pageName);
+      for (var j = 0, length = newPageTemplates.length; j < length; j++) {
+        var template = newPageTemplates[j];
+        var templateToReplace = document.getElementById(
+            template.getAttribute('data-ajax-target-template'));
+        if (templateToReplace) {
+          templateToReplace.setAttribute('ref', template.id);
+        }
+      }
+      resolve();
+    });
+  };
 
-  function runPageHandler(funcName, pageName) {
-    var page = IOWA.Elements.Template.pages[pageName];
-    if (page && page[funcName]) {
-      // If page we're going to has a load handler, run it.
-      page[funcName]();
+  Router.prototype.runPageHandler = function(funcName) {
+    var pageName = this.state.current.page;
+    return new Promise(function(resolve, reject) {
+      var page = IOWA.Elements.Template.pages[pageName];
+      if (page && page[funcName]) {
+        // If page we're going to has a load handler, run it.
+        page[funcName]();
+      }
+      resolve();
+    });
+  };
+
+  Router.prototype.updateUIstate = function() {
+    var pageName = this.state.current.page;
+    var pageMeta = this.t.pages[pageName];
+
+    // Update menu/drawer/subtabs selected item.
+    this.t.selectedPage = pageName;
+    this.t.pages[pageName].selectedSubpage = this.state.current.subpage;
+    IOWA.Elements.DrawerMenu.selected = pageName;
+
+    // Update some elements only if navigating to a new page.
+    if (this.state.current.page !== this.state.start.page) {
+      document.body.id = 'page-' + pageName;
+      document.title = pageMeta.title || 'Google I/O 2015';
+      // This cannot be updated via data binding, because the masthead
+      // is visible before the binding happens.
+      IOWA.Elements.Masthead.className = IOWA.Elements.Masthead.className.replace(
+        MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
+      // Reset subpage, since leaving the page.
+      var startPage = this.state.start.page;
+      this.t.pages[startPage].selectedSubpage = startPage.defaultSubpage;
+      // Scroll to top of new page.
+      IOWA.Elements.ScrollContainer.scrollTop = 0;
     }
-  }
+
+    // Show correct subpage.
+    var subpages = IOWA.Elements.Main.querySelectorAll('.subpage__content');
+    var selectedSubpageSection = IOWA.Elements.Main.querySelector(
+        '.subpage-' + this.state.current.subpage);
+    if (selectedSubpageSection) {
+      for (var i = 0; i < subpages.length; i++) {
+        var subpage = subpages[i];
+        subpage.style.display = 'none';
+        subpage.classList.remove('active');
+      }
+      selectedSubpageSection.style.display = '';
+      selectedSubpageSection.classList.add('active');
+    }
+    // If current href is different than the url, update it in the browser.
+    if (this.state.current.href !== window.location.href) {
+      history.pushState({
+        'path': this.state.current.path + this.state.current.hash
+      }, '', this.state.current.href);
+    }
+  };
+
+  // TODO: Remove bind() for performance.
+  Router.prototype.runPageTransition = function(e, source) {
+    var transitionAttribute = source ?
+        source.getAttribute('data-transition') : null;
+    var transition = transitionAttribute || 'page-slide-transition';
+    var router = this;
+    // Start transition.
+    IOWA.Elements.Template.fire('page-transition-start');
+    // Play exit sequence.
+    IOWA.PageAnimation[Router.pageExitTransitions[transition]](
+        this.state.start.page, this.state.end.page, e, source)
+      // Run page's custom unload handlers.
+      .then(this.runPageHandler.bind(this, 'unload'))
+      // Load the new page.
+      .then(this.importPage.bind(this))
+      .then(this.renderTemplates.bind(this))
+      .then(function() {
+        return new Promise(function(resolve, reject) {
+          // Update state of the page in Router.
+          router.state.current = router.parseUrl(router.state.end.href);
+          // Update UI state based on the router's state.
+          router.updateUIstate();
+          resolve();
+        });
+      })
+      // Run page's custom load handlers.
+      .then(this.runPageHandler.bind(this, 'load'))
+      // Play entry sequence.
+      .then(IOWA.PageAnimation[Router.pageEnterTransitions[transition]])
+      .then(function() {
+        // End transition.
+        IOWA.Elements.Template.fire('page-transition-done');
+      }.bind(this));
+  };
+
+
+  Router.prototype.runSubpageTransition = function() {
+    var oldSubpage = IOWA.Elements.Main.querySelector(
+        '.subpage-' + this.state.start.subpage);
+    var newSubpage = IOWA.Elements.Main.querySelector(
+        '.subpage-' + this.state.end.subpage);
+    // Play exit sequence.
+    IOWA.PageAnimation.playSectionSlideOut(oldSubpage)
+      .then(function() {
+        // Update state of the page in Router.
+        this.state.current = this.parseUrl(this.state.end.href);
+        // Update UI state based on the router's state.
+        this.updateUIstate();
+      }.bind(this))
+      // Play entry sequence.
+      .then(IOWA.PageAnimation.playSectionSlideIn.bind(null, newSubpage));
+  };
+
+
+  Router.prototype.navigate = function(href, e, source) {
+    // Copy current state to startState.
+    this.state.start = this.parseUrl(this.state.current.href);
+    this.state.end = this.parseUrl(href);
+    // Navigate to a new page.
+    if (this.state.start.page !== this.state.end.page) {
+      this.runPageTransition(e, source);
+    } else if (this.state.start.subpage !== this.state.end.subpage) {
+      this.runSubpageTransition();
+    }
+  };
 
   /**
    * Extracts page's state from the url.
@@ -468,25 +303,34 @@ IOWA.Router = (function() {
    *    http://<origin>/io2015/<page>?<search>#<subpage>/<resourceId>
    * @param {string} url The page's url.
    */
-  function parseUrl(url) {
+  Router.prototype.parseUrl = function(url) {
     var parser = new URL(url);
     var hashParts = parser.hash.replace('#', '').split('/');
     var params = {};
-    var paramsList = parser.search.replace('?', '').split('&');
-    for (var i = 0; i < paramsList.length; i++) {
-      var paramsParts = paramsList[i].split('=');
-      params[paramsParts[0]] = decodeURIComponent(paramsParts[1]);
+    if (parser.search) {
+      var paramsList = parser.search.replace('?', '').split('&');
+      for (var i = 0; i < paramsList.length; i++) {
+        var paramsParts = paramsList[i].split('=');
+        params[paramsParts[0]] = decodeURIComponent(paramsParts[1]);
+      }
     }
+    var page = parser.pathname.replace(window.PREFIX + '/', '') || 'home';
+    // If pages data is accessible, find default subpage.
+    var pageMeta = (this.t && this.t.pages) ? this.t.pages[page] : null;
+    var defaultSubpage = pageMeta ? pageMeta.defaultSubpage : '';
+    // Get subpage from url or set to the default subpage for this page.
+    var subpage = hashParts[0] || defaultSubpage;
     return {
       'pathname': parser.pathname,
       'search': parser.search,
       'hash': parser.hash,
-      'page': parser.pathname.replace(window.PREFIX + '/', ''),
-      'subpage': hashParts[0],
+      'href': parser.href,
+      'page': page,
+      'subpage': subpage,
       'resourceId': hashParts[1],
       'params': params
     };
-  }
+  };
 
   /**
    * Builds a url from the page's state details.
@@ -497,52 +341,11 @@ IOWA.Router = (function() {
    * @param {string} resourceId Resource identifier.
    * @param {string} search Encoded search string.
    */
-  function composeUrl(page, subpage, resourceId, search) {
+  Router.prototype.composeUrl = function(page, subpage, resourceId, search) {
     return [window.location.origin, window.PREFIX, '/', page, search,
         '#', subpage || '', '/', resourceId || ''].join('');
   }
 
-  /**
-   * Initialized ajax-based routing on the page.
-   */
-  function init() {
-    window.addEventListener('popstate', function(e) {
-      var currentPage = IOWA.Elements.Template.selectedPage;
-      var nextPage = parsePageNameFromAbsolutePath(window.location.pathname);
-
-      // Note: popstate is fired when history.pushState() is called so we need
-      // to determine if the event was organic (browser back/forward button).
-      // If it was, currentPage has not been updated yet and is the previous page.
-      if (!navigationFromLinkClick) {
-        runPageHandler('unload', currentPage);
-      }
-
-      navigationFromLinkClick = false; // Reset
-      IOWA.Elements.Template.scrollLock(false); // Ensure main scroll container can scroll again.
-
-      // Ignore the navigation if it was a hash update, but on the same page.
-      if (e.state && e.state.fromHashChange && nextPage === currentPage) {
-        return;
-      }
-      document.title = (IOWA.Elements.Template.pages[nextPage].title ||
-          'Google I/O 2015');
-      IOWA.Analytics.trackPageView(e.state && e.state.path);
-      renderCurrentPage();
-    });
-
-    // On iOS, we don't have event bubbling to the document level.
-    // http://www.quirksmode.org/blog/archives/2010/09/click_event_del.html
-    var eventName = IOWA.Util.isIOS() || IOWA.Util.isTouchScreen() ?
-        'touchstart' : 'click';
-    document.addEventListener(eventName, navigate);
-  }
-
-  return {
-    init: init,
-    getPageName: parsePageNameFromAbsolutePath,
-    animatePageIn: animatePageIn,
-    parseUrl: parseUrl,
-    composeUrl: composeUrl
-  };
+  return new Router();
 
 })();

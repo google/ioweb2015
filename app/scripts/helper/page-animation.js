@@ -302,6 +302,143 @@ IOWA.PageAnimation = (function() {
     }
   }
 
+  function playPageSlideIn () {
+    return new Promise(function(resolve, reject) {
+      // Wait 1 rAF for DOM to settle.
+      IOWA.Elements.Template.async(function() {
+        // Hide the masthead ripple before proceeding with page transition.
+        // TODO: check.
+        IOWA.PageAnimation.play(
+            IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
+        IOWA.PageAnimation.play(IOWA.PageAnimation.pageSlideIn(), function() {
+          resolve();
+        });
+      });
+
+    });
+  }
+
+  /**
+   * Navigates to a new page via a hero card takeover transition.
+   * @param {Event} e Event that triggered navigation.
+   * @param {Element} el Element clicked.
+   * @param {string} rippleColor Color of the ripple on the card.
+   * @private
+   */
+  function playPageSlideOut() {
+    return new Promise(function(resolve, reject) {
+      // Wait 1rAF for smooth animation.
+      IOWA.Elements.Template.async(function() {
+        var animation = IOWA.PageAnimation.contentSlideOut();
+        IOWA.PageAnimation.play(animation, resolve);
+      });
+    });
+  }
+
+  function playSectionSlideOut(section) {
+    return new Promise(function(resolve, reject) {
+      IOWA.PageAnimation.play(new AnimationGroup([
+      IOWA.PageAnimation.sectionSlideOut(section),
+      IOWA.PageAnimation.elementFadeOut(
+          IOWA.Elements.Footer, {duration: 400})
+      ]), resolve);
+    });
+  }
+
+  function playSectionSlideIn(section) {
+    return new Promise(function(resolve, reject) {
+      IOWA.PageAnimation.play(new AnimationGroup([
+        IOWA.PageAnimation.sectionSlideIn(section),
+        IOWA.PageAnimation.elementFadeIn(
+            IOWA.Elements.Footer, {duration: 400})
+      ]), resolve);
+    });
+  }
+
+  /**
+   * Navigates to a new page via a masthead nav item ripple transition.
+   * @param {Event} e Event that triggered navigation.
+   * @param {Element} el Element clicked.
+   * @param {string} mastheadColor Color of the masthead.
+   * @param {string} rippleColor Color of the ripple.
+   * @param {boolean} isFadeRipple If true, ripple will just glimpse and fade.
+   * @private
+   */
+  function playMastheadRippleTransition(startPage, endPage, e, sourceEl) {
+
+    return new Promise(function(resolve, reject) {
+      var t = IOWA.Elements.Template;
+      var startBgClass = t.pages[startPage].mastheadBgClass;
+      var endBgClass = t.pages[endPage].mastheadBgClass;
+
+      var isFadeRipple = startBgClass === endBgClass;
+      var mastheadColor = t.rippleColors[startBgClass];
+      var rippleColor = isFadeRipple ? '#fff' : t.rippleColors[endBgClass];
+
+
+      var x = e.touches ? e.touches[0].pageX : e.pageX;
+      var y = e.touches ? e.touches[0].pageY : e.pageY;
+      var duration = isFadeRipple ? 300 : 600;
+      var rippleAnim = IOWA.PageAnimation.ripple(
+            IOWA.Elements.Ripple, x, y, duration,
+            rippleColor, isFadeRipple);
+      var animGroup = [
+        rippleAnim,
+        IOWA.PageAnimation.contentSlideOut(),
+      ];
+
+      var animation = new AnimationGroup(animGroup);
+      IOWA.PageAnimation.play(animation, resolve);
+    });
+  }
+
+
+  /**
+   * Navigates to a new page via a hero card takeover transition.
+   * @param {Event} e Event that triggered navigation.
+   * @param {Element} el Element clicked.
+   * @param {string} rippleColor Color of the ripple on the card.
+   * @private
+   */
+  function playHeroTransitionStart(startPage, endPage, e, sourceEl) {
+    return new Promise(function(resolve, reject) {
+      var t = IOWA.Elements.Template;
+      var endBgClass = t.pages[endPage].mastheadBgClass;
+      var rippleColor = t.rippleColors[endBgClass];
+
+      // TODO: This may need some perf tweaking for FF.
+      var card = null;
+      var currentEl = sourceEl;
+      while (!card) {
+        currentEl = currentEl.parentNode;
+        if (currentEl.classList.contains('card__container')) {
+          card = currentEl;
+        }
+      }
+      IOWA.PageAnimation.play(
+        IOWA.PageAnimation.pageCardTakeoverOut(
+            card, e.pageX, e.pageY, 300, rippleColor), resolve);
+    });
+  };
+
+  /**
+   * Navigates to a new page via a hero card takeover transition.
+   * @param {Event} e Event that triggered navigation.
+   * @param {Element} el Element clicked.
+   * @param {string} rippleColor Color of the ripple on the card.
+   * @private
+   */
+  function playHeroTransitionEnd() {
+    return new Promise(function(resolve, reject) {
+      // Wait 1 rAF for DOM to settle.
+      IOWA.Elements.Template.async(function() {
+        IOWA.PageAnimation.play(
+          IOWA.PageAnimation.pageCardTakeoverIn(), resolve);
+      });
+    });
+  };
+
+
   return {
     elementFadeOut: elementFadeOut,
     elementFadeIn: elementFadeIn,
@@ -314,7 +451,16 @@ IOWA.PageAnimation = (function() {
     pageCardTakeoverIn: pageCardTakeoverIn,
     pageFirstRender: pageFirstRender,
     ripple: rippleEffect,
-    play: play
+    play: play,
+
+    playPageSlideOut: playPageSlideOut,
+    playPageSlideIn: playPageSlideIn,
+    playSectionSlideOut: playSectionSlideOut,
+    playSectionSlideIn: playSectionSlideIn,
+    playMastheadRippleTransition: playMastheadRippleTransition,
+    playHeroTransitionStart: playHeroTransitionStart,
+    playHeroTransitionEnd: playHeroTransitionEnd,
+
   };
 
 })();

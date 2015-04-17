@@ -49,8 +49,8 @@ IOWA.Elements = (function() {
 
       // Deep link into a subpage.
       var tpl = IOWA.Elements.Template;
-      var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
-      var defaultSubpage = tpl.pages[tpl.selectedPage].selectedSubpage;
+      var parsedUrl = IOWA.Router.parseUrl(window.location.href);
+      var defaultSubpage = tpl.pages[tpl.selectedPage].defaultSubpage;
       var selectedSubpage = parsedUrl.subpage || defaultSubpage;
       var subpage = document.querySelector('.subpage-' + selectedSubpage);
       if (subpage) {
@@ -132,7 +132,7 @@ IOWA.Elements = (function() {
   function init() {
     var template = document.getElementById('t');
     template.pages = IOWA.PAGES; // defined in auto-generated ../pages.js
-    template.selectedPage = IOWA.Router.getPageName(window.location.pathname);
+    template.selectedPage = IOWA.Router.parseUrl(window.location.href).page;
     template.fullscreenVideoActive = false;
     template.mastheadVideoActive = false;
     template.photoGalleryActive = false;
