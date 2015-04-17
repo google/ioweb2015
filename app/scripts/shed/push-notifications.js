@@ -40,7 +40,11 @@ function loadToken() {
  * @return {Promise} Resolves with a Response, or rejects on a network error.
  */
 function fetchUpdates(token) {
-  return fetch(new Request(UPDATES_ENDPOINT, {Authorization: token}));
+  return fetch(new Request(UPDATES_ENDPOINT, {
+    headers: {
+      Authorization: token
+    }
+  }));
 }
 
 /**
@@ -85,39 +89,43 @@ function processResponse(body) {
  *                   registration.showNotification()
  */
 function generateSessionNotifications(updatedSessions) {
-  // Ensure that we have an up-to-date sessions feed cached.
-  // This will happen aysnchronously, independent from the notification creation, so it shouldn't be
-  // necessary to wait on the promise resolutions.
-  shed.helpers.openCache().then(function(cache) {
-    cache.match(SESSIONS_ENDPOINT).then(function(response) {
-      if (response) {
-        // If there's a cached sessions feed, then update the changed fields and replace the cached
-        // version with the updated version.
-        parseResponseJSON(response).then(function(allSessions) {
-          Object.keys(updatedSessions).forEach(function(sessionId) {
-            allSessions[sessionId] = updatedSessions[sessionId];
+  if (updatedSessions && updatedSessions.length) {
+    // Ensure that we have an up-to-date sessions feed cached.
+    // This will happen aysnchronously, independent from the notification creation, so it shouldn't be
+    // necessary to wait on the promise resolutions.
+    caches.open(shed.options.cacheName).then(function(cache) {
+      cache.match(SESSIONS_ENDPOINT).then(function(response) {
+        if (response) {
+          // If there's a cached sessions feed, then update the changed fields and replace the cached
+          // version with the updated version.
+          parseResponseJSON(response).then(function(allSessions) {
+            Object.keys(updatedSessions).forEach(function(sessionId) {
+              allSessions[sessionId] = updatedSessions[sessionId];
+            });
+
+            cache.put(SESSIONS_ENDPOINT, new Response(JSON.stringify(allSessions)));
           });
-
-          cache.put(SESSIONS_ENDPOINT, new Response(JSON.stringify(allSessions)));
-        });
-      } else {
-        // If there isn't anything already cached for the sessions feed, then cache the whole thing.
-        shed.cache(SESSIONS_ENDPOINT);
-      }
+        } else {
+          // If there isn't anything already cached for the sessions feed, then cache the whole thing.
+          shed.cache(SESSIONS_ENDPOINT);
+        }
+      });
+    }).catch(function(error) {
+      console.error('Could not update the cached sessions feed:', error);
     });
-  }).catch(function(error) {
-    console.error('Could not update the cached sessions feed:', error);
-  });
 
-  return Object.keys(updatedSessions).map(function(sessionId) {
-    var session = updatedSessions[sessionId];
-    return {
-      title: 'I/O session "' + session.title + '" was updated.',
-      body: 'You previously starred this session.',
-      icon: session.photoUrl || DEFAULT_ICON,
-      tag: SESSION_DETAILS_URL_PREFIX + session.day + '/' + sessionId
-    };
-  });
+    return Object.keys(updatedSessions).map(function(sessionId) {
+      var session = updatedSessions[sessionId];
+      return {
+        title: 'I/O session "' + session.title + '" was updated.',
+        body: 'You previously starred this session.',
+        icon: session.photoUrl || DEFAULT_ICON,
+        tag: SESSION_DETAILS_URL_PREFIX + session.day + '/' + sessionId
+      };
+    });
+  } else {
+    return [];
+  }
 }
 
 function generateVideoNotifications(videos) {
