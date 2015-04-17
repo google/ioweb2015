@@ -50,17 +50,25 @@ IOWA.Schedule = (function() {
 
   /**
    * Fetches the user's saved sessions.
-   * @return {Promise} Resolves with response schedule data.
+   * If this is the first time it's been called, then uses the cache-then-network strategy to
+   * first try to read the data stored in the Cache Storage API, and invokes the callback with that
+   * response. It then tries to fetch a fresh copy of the data from the network, saves the response
+   * locally in memory, and invokes callback with that response.
+   * If this has been previously called, then invokes the callback with the previous response cached
+   * locally in memory.
+   * @param {function} callback The callback to execute when the user schedule data is available.
    */
-  function fetchUserSchedule() {
+  function fetchUserSchedule(callback) {
     if (userScheduleData_) {
-      return Promise.resolve(userScheduleData_);
-    }
+      callback(userScheduleData_);
+    } else {
+      var callbackWrapper = function(userScheduleData) {
+        userScheduleData_ = userScheduleData || [];
+        callback(userScheduleData);
+      };
 
-    return IOWA.Request.xhrPromise('GET', SCHEDULE_ENDPOINT_USERS, true).then(function(resp) {
-      userScheduleData_ = resp;
-      return userScheduleData_ || [];
-    });
+      IOWA.Request.cacheThenNetwork(SCHEDULE_ENDPOINT_USERS, callback, callbackWrapper, true);
+    }
   }
 
   /**

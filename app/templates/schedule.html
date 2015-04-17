@@ -276,7 +276,7 @@
       IOWA.Elements.Template.scheduleFetchingUserData = true;
 
       // Fetch user's saved sessions.
-      IOWA.Schedule.fetchUserSchedule().then(function(savedSessions) {
+      IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
         IOWA.Elements.Template.scheduleFetchingUserData = false;
         IOWA.Elements.Template.savedSessions = savedSessions;
 
