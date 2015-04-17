@@ -394,7 +394,12 @@
             return IOWA.Notifications.waitForPrereqs().then(function() {
               toastMessage += " You'll get a notification when it starts.";
             }).catch(function() {
-              // no-op
+              // waitForPrereqs() rejects if the browser doesn't support notifications or if the
+              // notifications permission is set to 'denied'.
+              // If that happens, we want to skip the part where the
+              // " You'll get a notification when it starts." string is appended to the toast,
+              // but we still want to display the toast.
+              // Therefore, handle the rejection with this no-op and proceed to the .then()
             }).then(function() {
               IOWA.Elements.Toast.showMessage(toastMessage);
             });
