@@ -928,3 +928,145 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 		t.Errorf("s2 = %+v\nwant %+v", s2, s)
 	}
 }
+
+func TestServeSWToken(t *testing.T) {
+	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
+	r.Header.Set("authorization", "bearer "+testIDToken)
+	w := httptest.NewRecorder()
+	serveUserUpdates(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	var body struct {
+		Token string `json:"token"`
+	}
+	if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
+		t.Fatalf("json.Unmarshal(%q): %v", w.Body.String(), err)
+	}
+
+	user, ts, err := decodeSWToken(body.Token)
+	if err != nil {
+		t.Fatalf("decodeSWToken(%q): %v", body.Token, err)
+	}
+	if user != testUserID {
+		t.Errorf("user = %q; want %q", user, testUserID)
+	}
+	if now := time.Now(); now.Unix()-ts.Unix() > 3 {
+		t.Errorf("ts = %s; want around %s", ts, now)
+	}
+}
+
+func TestServeUserUpdates(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer preserveConfig()()
+
+	// gdrive stub
+	var gdrive *httptest.Server
+	gdriveDone := make(chan struct{}, 1)
+	gdrive = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/list" {
+			fmt.Fprintf(w, `{"items": [
+        {
+          "id": "file-id",
+          "modifiedDate": "2015-04-11T12:12:46.034Z",
+          "downloadUrl": %q
+        }
+      ]}`, gdrive.URL+"/download")
+			return
+		}
+		w.Write([]byte(`{"starred_sessions": ["session-123"]}`))
+		gdriveDone <- struct{}{}
+	}))
+	defer gdrive.Close()
+
+	config.Google.Drive.FilesURL = gdrive.URL + "/list"
+	config.Google.Drive.Filename = "user_data.json"
+
+	firstMod := time.Date(2015, 4, 15, 0, 0, 0, 0, time.UTC)
+	lastMod := firstMod.AddDate(0, 0, 1)
+	token, err := encodeSWToken(testUserID, firstMod.Add(1*time.Second))
+	if err != nil {
+		t.Fatalf("encodeSWToken: %v", err)
+	}
+
+	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
+	r.Header.Set("authorization", token)
+	c := newContext(r)
+
+	err = storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	})
+	if err != nil {
+		t.Fatalf("storeCredentials: %v", err)
+	}
+
+	err = storeUserPushInfo(c, &userPush{
+		userID: testUserID,
+		Ext: ioExtPush{
+			Enabled: true,
+			Name:    "Amsterdam",
+			Lat:     52.37607,
+			Lng:     4.886114,
+		},
+	})
+	if err != nil {
+		t.Fatalf("storeUserPushInfo: %v", err)
+	}
+
+	err = storeChanges(c, &dataChanges{
+		Changed: firstMod,
+		eventData: eventData{
+			Sessions: map[string]*eventSession{"first": &eventSession{}},
+		},
+	})
+	if err != nil {
+		t.Fatalf("storeChanges(1): %v", err)
+	}
+	err = storeChanges(c, &dataChanges{
+		Changed: lastMod,
+		eventData: eventData{
+			Sessions: map[string]*eventSession{"second": &eventSession{}},
+		},
+	})
+	if err != nil {
+		t.Fatalf("storeChanges(2): %v", err)
+	}
+
+	w := httptest.NewRecorder()
+	serveUserUpdates(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+
+	res := &dataChanges{}
+	if err := json.Unmarshal(w.Body.Bytes(), res); err != nil {
+		t.Fatalf("json.Unmarshal: %v", err)
+	}
+	if res.Changed.Unix() != lastMod.Unix() {
+		t.Errorf("res.Changed = %s; want %s", res.Changed, lastMod)
+	}
+	if _, exists := res.Sessions["first"]; exists {
+		t.Errorf("don't want 'first' session in res")
+	}
+	if _, exists := res.Sessions["second"]; !exists {
+		t.Errorf("want 'second' session in res")
+	}
+
+	user, next, err := decodeSWToken(res.Token)
+	if err != nil {
+		t.Fatalf("decodeSWToken(%q): %v", err)
+	}
+	if user != testUserID {
+		t.Errorf("user = %q; want %q", user, testUserID)
+	}
+	if n := lastMod.Add(1 * time.Second); next.Unix() != n.Unix() {
+		t.Errorf("next = %s; want %s", next, n)
+	}
+}

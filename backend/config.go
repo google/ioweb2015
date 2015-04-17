@@ -42,6 +42,8 @@ type appConfig struct {
 	Whitelist []string
 	// I/O Extended events feed
 	IoExtFeedURL string `json:"ioExtFeedUrl"`
+	// used for SW tokens
+	Secret string `json:"secret"`
 
 	// Twitter credentials
 	Twitter struct {

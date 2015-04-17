@@ -1,6 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"errors"
+	"fmt"
+	"strconv"
 	"time"
 
 	"golang.org/x/net/context"
@@ -76,7 +83,63 @@ func mergeChanges(dst *dataChanges, src *dataChanges) {
 	dst.Changed = src.Changed
 }
 
+// filterUserChanges reduces dc to a subset matching session IDs to bks.
+// TODO: add ioext to dc and filter on radius for ioExtPush.Lat+Lng.
+func filterUserChanges(dc *dataChanges, bks []string, ext *ioExtPush) {
+	for _, id := range bks {
+		delete(dc.Sessions, id)
+	}
+}
+
 func startNotifySubscribers(c context.Context, d *dataChanges) error {
 	// TODO: implement
 	return nil
+}
+
+// swTokenSep is SW token separator used in encode/decodeSWToken.
+var swTokenSep = []byte(" ")
+
+// encodeSWToken returns user ID and timestamp encoded base64 with an HMAC
+// The token format, when base64-decoded is: "uid unix hmac".
+func encodeSWToken(uid string, t time.Time) (string, error) {
+	if config.Secret == "" {
+		return "", errors.New("encodeSWToken: secret is not set")
+	}
+	// TODO: maybe do AES encryption, unless GCM will allow payloads soon
+	// and the whole SWtoken thing becomes redundant.
+	msg := []byte(fmt.Sprintf("%s%s%d", uid, swTokenSep, t.Unix()))
+	mac := hmac.New(sha256.New, []byte(config.Secret))
+	mac.Write(msg)
+	tok := append(msg, swTokenSep...)
+	tok = append(tok, mac.Sum(nil)...)
+	return base64.StdEncoding.EncodeToString(tok), nil
+}
+
+// decodeSWToken decodes t and returns its parts, user ID and timestamp.
+func decodeSWToken(t string) (string, time.Time, error) {
+	var zero time.Time // TODO: find a more elegant way
+	if config.Secret == "" {
+		return "", zero, errors.New("decodeSWToken: secret is not set")
+	}
+	tok, err := base64.StdEncoding.DecodeString(t)
+	if err != nil {
+		return "", zero, fmt.Errorf("decodeSWToken: %v", err)
+	}
+	// "uid unix hmac"
+	parts := bytes.SplitN(tok, swTokenSep, 3)
+	if len(parts) != 3 {
+		return "", zero, errors.New("decodeSWToken: invalid token format")
+	}
+	msg := append(parts[0], swTokenSep...)
+	msg = append(msg, parts[1]...)
+	mac := hmac.New(sha256.New, []byte(config.Secret))
+	mac.Write(msg)
+	if !hmac.Equal(parts[2], mac.Sum(nil)) {
+		return "", zero, errors.New("decodeSWToken: hmac doesn't match")
+	}
+	usec, err := strconv.ParseInt((string(parts[1])), 10, 0)
+	if err != nil {
+		return "", zero, errors.New("decodeSWToken: invalid unix timestamp")
+	}
+	return string(parts[0]), time.Unix(usec, 0), nil
 }

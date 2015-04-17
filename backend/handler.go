@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -33,6 +34,7 @@ func registerHandlers() {
 	handle("/api/v1/user/schedule", serveUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserBookmarks)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
+	handle("/api/v1/user/updates", serveUserUpdates)
 	handle("/sync/gcs", syncEventData)
 	// debug handlers; not available in prod
 	if !isProd() {
@@ -492,6 +494,94 @@ func syncEventData(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		errorf(c, "syncEventSchedule: %v", err)
 		writeError(w, err)
+	}
+}
+
+// serverUserUpdates responds with a dataChanges containing a diff
+// between provided timestamp and current time.
+// Timestamp is encoded in the Authorization token which the client
+// must know beforehand.
+func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
+	ah := r.Header.Get("authorization")
+	// first request to get SW token
+	if strings.HasPrefix(strings.ToLower(ah), bearerHeader) {
+		serveSWToken(w, r)
+		return
+	}
+
+	// handle a request with SW token
+	user, ts, err := decodeSWToken(ah)
+	if err != nil {
+		writeJSONError(w, http.StatusForbidden, err)
+		return
+	}
+	c := context.WithValue(newContext(r), ctxKeyUser, user)
+
+	// fetch user data in parallel with dataChanges
+	var (
+		bookmarks []string
+		pushInfo  *userPush
+		userErr   error
+	)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		if bookmarks, userErr = userSchedule(c); userErr != nil {
+			return
+		}
+		pushInfo, userErr = getUserPushInfo(c)
+	}()
+
+	dc, err := getChangesSince(c, ts)
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	select {
+	case <-time.After(10 * time.Second):
+		errorf(c, "userSchedule/getUserPushInfo timed out")
+		writeJSONError(w, http.StatusInternalServerError, errors.New("timeout"))
+		return
+	case <-done:
+		// user data goroutine finished
+	}
+
+	// userErr indicates any error in the user data retrieval
+	if userErr != nil {
+		errorf(c, "userErr: %v", userErr)
+		writeJSONError(w, http.StatusInternalServerError, userErr)
+		return
+	}
+
+	filterUserChanges(dc, bookmarks, pushInfo.Pext)
+	dc.Token, err = encodeSWToken(user, dc.Changed.Add(1*time.Second))
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err)
+	}
+	if err := json.NewEncoder(w).Encode(dc); err != nil {
+		errorf(c, "serveUserUpdates: encode resp: %v", err)
+	}
+}
+
+// serveSWToken responds with an SW authorization token used by the client
+// in subsequent serveUserUpdates requests.
+func serveSWToken(w http.ResponseWriter, r *http.Request) {
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	now := time.Now()
+	token, err := encodeSWToken(contextUser(c), now)
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+	dc := &dataChanges{Token: token, Changed: now}
+	if err := json.NewEncoder(w).Encode(dc); err != nil {
+		errorf(c, "serveSWToke: encode resp: %v", err)
 	}
 }
 
