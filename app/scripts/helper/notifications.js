@@ -223,7 +223,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
 
     // Check to see if notifications are already enabled.
     return isNotifyEnabledPromise().then(function(isEnabled) {
-      if (isEnabled) {
+      if (isEnabled && window.Notification.permission === 'granted') {
         return Promise.resolve();
       } else {
         // If notifications are not already enabled, then return a Promise which will resolve later
@@ -233,6 +233,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
           IOWA.Elements.Toast.showMessage(message, null, 'Open', function() {
             // Assigning this to IOWA.Elements.SignInSettings wasn't possible, since it's
             // wrapped in a <template if="{{currentUser}}">.
+            // TODO: This doesn't display nicely when there's already an open overlay.
             document.querySelector('#signin-settings-panel').open();
           });
         });
