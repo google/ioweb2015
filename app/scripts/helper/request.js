@@ -33,9 +33,9 @@ IOWA.Request = IOWA.Request || (function() {
   }
 
   // Inspired by http://jakearchibald.com/2014/offline-cookbook/#cache-then-network
-  var cacheThenNetwork = function(url, cachedContentCallback, freshContentCallback, isAuthRequired) {
+  var cacheThenNetwork = function(url, cachedContentCallback, freshContentCallback, opt_isAuthRequired) {
     var authInfo;
-    if (isAuthRequired) {
+    if (opt_isAuthRequired) {
       authInfo = IOWA.Auth.getTokenResponse();
       if (!authInfo) {
         // If we require auth but aren't logged in, then call freshContentCallback() without any

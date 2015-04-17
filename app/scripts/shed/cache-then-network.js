@@ -1,6 +1,6 @@
 // Requests whose URLs contain this string contain user-specific data in their corresponding
 // Responses, and should be cleared when the user logs out.
-var USER_DATA_URL_SUBSTRING = 'api/v1/user';
+var USER_DATA_URL_SUBSTRING = 'api/v1/user/';
 
 function serveFromCacheOrNetwork(request) {
   // Never fall back on the SW cache if this is a request that uses auth, unless it's a request
