@@ -385,18 +385,19 @@
         var selectedSession = IOWA.Elements.Template.selectedSession;
         var saved = !selectedSession.saved;
 
-        IOWA.Elements.Template.scheduleFetchingUserData = true;
-
-        IOWA.Schedule.saveSession(selectedSession.id, saved).then(function(resp) {
-          // If no response, then the user wasn't' authenticated. Reset.
-          if (typeof resp !== 'undefined') {
-            selectedSession.saved = saved;
+        IOWA.Schedule.saveSession(selectedSession.id, saved).then(function() {
+          if (saved) {
+            IOWA.Elements.Toast.showMessage("Added to My Schedule. " +
+              "You'll get a notification before it starts.");
+          } else {
+            IOWA.Elements.Toast.showMessage('Removed from My Schedule');
           }
-          IOWA.Elements.Template.scheduleFetchingUserData = false;
         }).catch(function() {
-
-          selectedSession.saved = false;
+          IOWA.Elements.Toast.showMessage('Unable to add to My Schedule');
+          saved = !saved;
+        }).then(function() {
           IOWA.Elements.Template.scheduleFetchingUserData = false;
+          selectedSession.saved = saved;
         });
       };
 
