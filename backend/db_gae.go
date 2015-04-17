@@ -181,6 +181,7 @@ func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
 	}
 
 	changes := &dataChanges{
+		Changed: t,
 		eventData: eventData{
 			Sessions: make(map[string]*eventSession),
 			Speakers: make(map[string]*eventSpeaker),

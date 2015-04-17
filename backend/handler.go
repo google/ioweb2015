@@ -510,6 +510,7 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// handle a request with SW token
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	user, ts, err := decodeSWToken(ah)
 	if err != nil {
 		writeJSONError(w, http.StatusForbidden, err)
@@ -567,6 +568,7 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 // serveSWToken responds with an SW authorization token used by the client
 // in subsequent serveUserUpdates requests.
 func serveSWToken(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
 	if err != nil {
 		writeJSONError(w, errStatus(err), err)
