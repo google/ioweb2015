@@ -302,15 +302,17 @@ IOWA.PageAnimation = (function() {
     }
   }
 
+  /**
+   * Slides in the content of the page.
+   */
   function playPageSlideIn () {
     return new Promise(function(resolve, reject) {
       // Wait 1 rAF for DOM to settle.
       IOWA.Elements.Template.async(function() {
         // Hide the masthead ripple before proceeding with page transition.
-        // TODO: check.
-        IOWA.PageAnimation.play(
-            IOWA.PageAnimation.elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
-        IOWA.PageAnimation.play(IOWA.PageAnimation.pageSlideIn(), function() {
+        play(
+            elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
+        play(pageSlideIn(), function() {
           resolve();
         });
       });
@@ -319,53 +321,48 @@ IOWA.PageAnimation = (function() {
   }
 
   /**
-   * Navigates to a new page via a hero card takeover transition.
-   * @param {Event} e Event that triggered navigation.
-   * @param {Element} el Element clicked.
-   * @param {string} rippleColor Color of the ripple on the card.
-   * @private
+   * Slides out the content of the page.
    */
   function playPageSlideOut() {
     return new Promise(function(resolve, reject) {
       // Wait 1rAF for smooth animation.
       IOWA.Elements.Template.async(function() {
-        var animation = IOWA.PageAnimation.contentSlideOut();
-        IOWA.PageAnimation.play(animation, resolve);
+        var animation = contentSlideOut();
+        play(animation, resolve);
       });
     });
   }
 
+  /**
+   * Slides out the content of the section.
+   */
   function playSectionSlideOut(section) {
     return new Promise(function(resolve, reject) {
-      IOWA.PageAnimation.play(new AnimationGroup([
-      IOWA.PageAnimation.sectionSlideOut(section),
-      IOWA.PageAnimation.elementFadeOut(
+      play(new AnimationGroup([
+      sectionSlideOut(section),
+      elementFadeOut(
           IOWA.Elements.Footer, {duration: 400})
       ]), resolve);
     });
   }
 
+  /**
+   * Slides in the content of the section.
+   */
   function playSectionSlideIn(section) {
     return new Promise(function(resolve, reject) {
-      IOWA.PageAnimation.play(new AnimationGroup([
-        IOWA.PageAnimation.sectionSlideIn(section),
-        IOWA.PageAnimation.elementFadeIn(
+      play(new AnimationGroup([
+        sectionSlideIn(section),
+        elementFadeIn(
             IOWA.Elements.Footer, {duration: 400})
       ]), resolve);
     });
   }
 
   /**
-   * Navigates to a new page via a masthead nav item ripple transition.
-   * @param {Event} e Event that triggered navigation.
-   * @param {Element} el Element clicked.
-   * @param {string} mastheadColor Color of the masthead.
-   * @param {string} rippleColor Color of the ripple.
-   * @param {boolean} isFadeRipple If true, ripple will just glimpse and fade.
-   * @private
+   * Runs the ripple across the masthead, while sliding out the content.
    */
   function playMastheadRippleTransition(startPage, endPage, e, sourceEl) {
-
     return new Promise(function(resolve, reject) {
       var t = IOWA.Elements.Template;
       var startBgClass = t.pages[startPage].mastheadBgClass;
@@ -375,30 +372,25 @@ IOWA.PageAnimation = (function() {
       var mastheadColor = t.rippleColors[startBgClass];
       var rippleColor = isFadeRipple ? '#fff' : t.rippleColors[endBgClass];
 
-
       var x = e.touches ? e.touches[0].pageX : e.pageX;
       var y = e.touches ? e.touches[0].pageY : e.pageY;
       var duration = isFadeRipple ? 300 : 600;
-      var rippleAnim = IOWA.PageAnimation.ripple(
+      var rippleAnim = rippleEffect(
             IOWA.Elements.Ripple, x, y, duration,
             rippleColor, isFadeRipple);
       var animGroup = [
         rippleAnim,
-        IOWA.PageAnimation.contentSlideOut(),
+        contentSlideOut(),
       ];
 
       var animation = new AnimationGroup(animGroup);
-      IOWA.PageAnimation.play(animation, resolve);
+      play(animation, resolve);
     });
   }
 
-
   /**
-   * Navigates to a new page via a hero card takeover transition.
-   * @param {Event} e Event that triggered navigation.
-   * @param {Element} el Element clicked.
-   * @param {string} rippleColor Color of the ripple on the card.
-   * @private
+   * Expands the card to cover masthead (hero transition),
+   * while sliding out the content.
    */
   function playHeroTransitionStart(startPage, endPage, e, sourceEl) {
     return new Promise(function(resolve, reject) {
@@ -415,44 +407,27 @@ IOWA.PageAnimation = (function() {
           card = currentEl;
         }
       }
-      IOWA.PageAnimation.play(
-        IOWA.PageAnimation.pageCardTakeoverOut(
-            card, e.pageX, e.pageY, 300, rippleColor), resolve);
+      play(pageCardTakeoverOut(
+          card, e.pageX, e.pageY, 300, rippleColor), resolve);
     });
-  };
+  }
 
   /**
-   * Navigates to a new page via a hero card takeover transition.
-   * @param {Event} e Event that triggered navigation.
-   * @param {Element} el Element clicked.
-   * @param {string} rippleColor Color of the ripple on the card.
-   * @private
+   * Slides in the content, the navbar and the logo.
    */
   function playHeroTransitionEnd() {
     return new Promise(function(resolve, reject) {
       // Wait 1 rAF for DOM to settle.
       IOWA.Elements.Template.async(function() {
-        IOWA.PageAnimation.play(
-          IOWA.PageAnimation.pageCardTakeoverIn(), resolve);
+        play(
+          pageCardTakeoverIn(), resolve);
       });
     });
-  };
-
+  }
 
   return {
-    elementFadeOut: elementFadeOut,
-    elementFadeIn: elementFadeIn,
-    sectionSlideOut: sectionSlideOut,
-    sectionSlideIn: sectionSlideIn,
-    contentSlideOut: contentSlideOut,
-    contentSlideIn: contentSlideIn,
-    pageSlideIn: pageSlideIn,
-    pageCardTakeoverOut: pageCardTakeoverOut,
-    pageCardTakeoverIn: pageCardTakeoverIn,
     pageFirstRender: pageFirstRender,
-    ripple: rippleEffect,
     play: play,
-
     playPageSlideOut: playPageSlideOut,
     playPageSlideIn: playPageSlideIn,
     playSectionSlideOut: playSectionSlideOut,
@@ -460,7 +435,6 @@ IOWA.PageAnimation = (function() {
     playMastheadRippleTransition: playMastheadRippleTransition,
     playHeroTransitionStart: playHeroTransitionStart,
     playHeroTransitionEnd: playHeroTransitionEnd,
-
   };
 
 })();

@@ -41,17 +41,28 @@ IOWA.Router = (function() {
     } else {
       node.parentNode.replaceChild(script, node); // FF
     }
-  };
+  }
 
-  //constructor.
+  /**
+   * @constructor
+   */
   var Router = function() {};
 
+  /**
+   * Keeps info about the router state at the start, during and
+   *     after page transition.
+   * @type {Object}
+   */
   Router.prototype.state = {
     start: null,
     current: null,
     end: null
   };
 
+  /**
+   * Initializes the router.
+   * @param {Object} template IOWA.Elements.Template reference.
+   */
   Router.prototype.init = function(template) {
     this.t = template;
     this.state.current = this.parseUrl(window.location.href);
@@ -68,7 +79,8 @@ IOWA.Router = (function() {
   };
 
   /**
-   * Navigates to a new page state. Uses ajax for data-ajax-link links.
+   * Handles all clicks on the document. Navigates to a new page state via
+   *    ajax if the link has data-ajax-link attribute.
    * @param {Event} e Event that triggered navigation.
    * @private
    */
@@ -77,7 +89,6 @@ IOWA.Router = (function() {
     if (e.metaKey || e.ctrlKey) {
       return;
     }
-
     // Inject page if <a> has the data-ajax-link attribute.
     for (var i = 0; i < e.path.length; ++i) {
       var el = e.path[i];
@@ -101,18 +112,33 @@ IOWA.Router = (function() {
     }
   };
 
+  /**
+   * Transition name (data-transition attribute) to transition function map.
+   * @type {Object}
+   * @private
+   */
   Router.pageExitTransitions = {
       'masthead-ripple-transition': 'playMastheadRippleTransition',
       'hero-card-transition': 'playHeroTransitionStart',
       'page-slide-transition': 'playPageSlideOut'
   };
 
+  /**
+   * Transition name (data-transition attribute) to transition function map.
+   * @type {Object}
+   * @private
+   */
   Router.pageEnterTransitions = {
       'masthead-ripple-transition': 'playPageSlideIn',
       'hero-card-transition': 'playHeroTransitionEnd',
       'page-slide-transition': 'playPageSlideIn'
   };
 
+  /**
+   * Imports the content of a new page via HTML Import.
+   * @return {Promise}
+   * @private
+   */
   Router.prototype.importPage = function() {
     var pageName = this.state.end.page;
     return new Promise(function(resolve, reject) {
@@ -146,8 +172,13 @@ IOWA.Router = (function() {
         resolve(htmlImport.import);
       });
     });
-  }
+  };
 
+  /**
+   * Attaches imported templates and loads the content for the current page.
+   * @return {Promise}
+   * @private
+   */
   Router.prototype.renderTemplates = function(importContent) {
     var pageName = this.state.end.page;
     return new Promise(function(resolve, reject) {
@@ -174,6 +205,12 @@ IOWA.Router = (function() {
     });
   };
 
+  /**
+   * Runs custom page hanlers for load and unload, if present.
+   * @param {string} funcName 'load' or 'unload'.
+   * @return {Promise}
+   * @private
+   */
   Router.prototype.runPageHandler = function(funcName) {
     var pageName = this.state.current.page;
     return new Promise(function(resolve, reject) {
@@ -186,6 +223,10 @@ IOWA.Router = (function() {
     });
   };
 
+  /**
+   * Updates the state of UI elements based on the curent state of the router.
+   * @private
+   */
   Router.prototype.updateUIstate = function() {
     var pageName = this.state.current.page;
     var pageMeta = this.t.pages[pageName];
@@ -209,7 +250,6 @@ IOWA.Router = (function() {
       // Scroll to top of new page.
       IOWA.Elements.ScrollContainer.scrollTop = 0;
     }
-
     // Show correct subpage.
     var subpages = IOWA.Elements.Main.querySelectorAll('.subpage__content');
     var selectedSubpageSection = IOWA.Elements.Main.querySelector(
@@ -231,7 +271,22 @@ IOWA.Router = (function() {
     }
   };
 
-  // TODO: Remove bind() for performance.
+  /**
+   * Runs full page transition. The order of the transition:
+   *     + Start transition.
+   *     + Play old page exit animation.
+   *     + Run old page's custom unload handlers.
+   *     + Load the new page.
+   *     + Update state of the page in Router to the new page.
+   *     + Update UI state based on the router's.
+   *     + Run new page's custom load handlers.
+   *     + Play new page entry animation.
+   *     + End transition.
+   * TODO: Limit usage of bind() for performance.
+   * @param {Event} e Event that triggered the transition.
+   * @param {Element} source Element that triggered the transition.
+   * @private
+   */
   Router.prototype.runPageTransition = function(e, source) {
     var transitionAttribute = source ?
         source.getAttribute('data-transition') : null;
@@ -266,7 +321,14 @@ IOWA.Router = (function() {
       }.bind(this));
   };
 
-
+  /**
+   * Runs subpage transition. The order of the transition:
+   *     + Play old subpage slide out animation.
+   *     + Update state of the page in Router to the new page.
+   *     + Update UI state based on the router's.
+   *     + Play new subpage slide in animation.
+   * @private
+   */
   Router.prototype.runSubpageTransition = function() {
     var oldSubpage = IOWA.Elements.Main.querySelector(
         '.subpage-' + this.state.start.subpage);
@@ -284,7 +346,13 @@ IOWA.Router = (function() {
       .then(IOWA.PageAnimation.playSectionSlideIn.bind(null, newSubpage));
   };
 
-
+  /**
+   * Navigates to a new state.
+   * @param {string} href URL describing the new state.
+   * @param {Event} e Event that triggered the transition.
+   * @param {Element} source Element that triggered the transition.
+   * @private
+   */
   Router.prototype.navigate = function(href, e, source) {
     // Copy current state to startState.
     this.state.start = this.parseUrl(this.state.current.href);
@@ -302,6 +370,7 @@ IOWA.Router = (function() {
    * Url structure:
    *    http://<origin>/io2015/<page>?<search>#<subpage>/<resourceId>
    * @param {string} url The page's url.
+   * @return {Object} Page's state.
    */
   Router.prototype.parseUrl = function(url) {
     var parser = new URL(url);
@@ -344,7 +413,7 @@ IOWA.Router = (function() {
   Router.prototype.composeUrl = function(page, subpage, resourceId, search) {
     return [window.location.origin, window.PREFIX, '/', page, search,
         '#', subpage || '', '/', resourceId || ''].join('');
-  }
+  };
 
   return new Router();
 
