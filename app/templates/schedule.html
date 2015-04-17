@@ -390,18 +390,13 @@
           selectedSession.saved = saved;
 
           if (saved) {
-            var toastMessage = 'Added to My Schedule.';
             return IOWA.Notifications.waitForPrereqs().then(function() {
-              toastMessage += " You'll get a notification when it starts.";
+              IOWA.Elements.Toast.showMessage('Added to My Schedule. You\'ll get a notification when it starts.');
             }).catch(function() {
-              // waitForPrereqs() rejects if the browser doesn't support notifications or if the
-              // notifications permission is set to 'denied'.
-              // If that happens, we want to skip the part where the
-              // " You'll get a notification when it starts." string is appended to the toast,
-              // but we still want to display the toast.
-              // Therefore, handle the rejection with this no-op and proceed to the .then()
-            }).then(function() {
-              IOWA.Elements.Toast.showMessage(toastMessage);
+              // waitForPrereqs() rejects if notifications are not supported in the browser, or if
+              // the notifications permission is set to 'denied' and the Permissions API isn't supported.
+              // In either of those cases, just show the toast without mentioning notifications.
+              IOWA.Elements.Toast.showMessage('Added to My Schedule.');
             });
           } else {
             IOWA.Elements.Toast.showMessage('Removed from My Schedule');
