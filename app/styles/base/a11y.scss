@@ -64,6 +64,20 @@ paper-tab a:focus {
   background: rgba(255, 255, 255, 0.36);
 }
 
+#signin-nav-elements > .button-link:focus {
+  outline: none;
+}
+
+.bg-dark-grey #signin-nav-elements > .button-link:focus {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.bg-cyan #signin-nav-elements > .button-link:focus,
+.bg-light-grey #signin-nav-elements > .button-link:focus,
+.bg-medium-grey #signin-nav-elements > .button-link:focus {
+  background: rgba(255, 255, 255, 0.36);
+}
+
 /**
  * Aria live region. Should be "hidden" without actually being
  * hidden, or else aria live polling won't work

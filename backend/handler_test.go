@@ -638,3 +638,293 @@ func TestStoreUserPushConfig(t *testing.T) {
 		t.Errorf("p2.Pext = %+v; want %+v", p2.Pext, expected.Pext)
 	}
 }
+
+func TestFirstSyncEventData(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer preserveConfig()()
+
+	lastMod := time.Date(2015, 4, 15, 0, 0, 0, 0, time.UTC)
+	startDate := time.Date(2015, 5, 28, 22, 0, 0, 0, time.UTC)
+
+	const scheduleFile = `{
+		"rooms":[
+			{
+				"id":"room-id",
+				"name":"Community Lounge"
+			}
+		],
+		"video_library":[
+			{
+				"thumbnailUrl":"http://img.youtube.com/test.jpg",
+				"id":"video-id",
+				"title":"Map Up your Apps!",
+				"desc":"video desc",
+				"year":2015,
+				"topic":"Tools",
+				"speakers":"Some Dude"
+			}
+		],
+		"sessions":[
+			{
+				"id":"session-id",
+				"url":"https://www.google.com",
+				"title":"Introduction to Classroom",
+				"description":"session desc",
+				"startTimestamp":"2015-05-28T22:00:00Z",
+				"endTimestamp":"2015-05-28T23:00:00Z",
+				"isLivestream":true,
+				"tags":["TYPE_BOXTALKS"],
+				"speakers":["speaker-id"],
+				"room":"room-id"
+			}
+		],
+		"speakers":[
+			{
+				"id":"speaker-id",
+				"name":"Google Devs",
+				"bio":"speaker bio",
+				"company":"Google",
+				"plusoneUrl":"https://plus.google.com/user-id",
+				"twitterUrl":"https://twitter.com/googledevs"
+			}
+		],
+		"tags":[
+			{
+				"category":"TYPE",
+				"tag":"TYPE_BOXTALKS",
+				"name":"Boxtalks"
+			}
+		]
+	}`
+
+	video := &eventVideo{
+		Thumb:    "http://img.youtube.com/test.jpg",
+		Id:       "video-id",
+		Title:    "Map Up your Apps!",
+		Desc:     "video desc",
+		Year:     2015,
+		Topic:    "Tools",
+		Speakers: "Some Dude",
+	}
+	session := &eventSession{
+		Id:        "session-id",
+		Title:     "Introduction to Classroom",
+		Desc:      "session desc",
+		IsLive:    true,
+		Tags:      []string{"TYPE_BOXTALKS"},
+		Speakers:  []string{"speaker-id"},
+		Room:      "Community Lounge",
+		StartTime: startDate,
+		EndTime:   startDate.Add(1 * time.Hour),
+		Day:       1,
+		Block:     "3 PM",
+		Start:     "3:00 PM",
+		End:       "4:00 PM",
+		Filters: map[string]bool{
+			"Boxtalks":       true,
+			liveStreamedText: true,
+		},
+	}
+	speaker := &eventSpeaker{
+		Id:      "speaker-id",
+		Name:    "Google Devs",
+		Bio:     "speaker bio",
+		Company: "Google",
+		Plusone: "https://plus.google.com/user-id",
+		Twitter: "https://twitter.com/googledevs",
+	}
+	tag := &eventTag{
+		Cat:  "TYPE",
+		Tag:  "TYPE_BOXTALKS",
+		Name: "Boxtalks",
+	}
+
+	done := make(chan struct{}, 1)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/manifest.json" {
+			w.Header().Set("last-modified", lastMod.Format(http.TimeFormat))
+			w.Write([]byte(`{"data_files": ["schedule.json"]}`))
+			return
+		}
+		if r.URL.Path != "/schedule.json" {
+			t.Errorf("slurp path = %q; want /schedule.json", r.URL.Path)
+		}
+		w.Write([]byte(scheduleFile))
+		done <- struct{}{}
+	}))
+	defer ts.Close()
+
+	config.Schedule.ManifestURL = ts.URL + "/manifest.json"
+	config.Schedule.Start = startDate
+
+	r := newTestRequest(t, "GET", "/sync/gcs", nil)
+	w := httptest.NewRecorder()
+	syncEventData(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	select {
+	case <-done:
+		// passed
+	default:
+		t.Fatalf("slurp never happened")
+	}
+
+	data, err := getLatestEventData(newContext(r))
+	if err != nil {
+		t.Fatalf("getLatestEventData: %v", err)
+	}
+	if data.modified.Unix() != lastMod.Unix() {
+		t.Errorf("data.modified = %s; want %s", data.modified, lastMod)
+	}
+	if v := data.Videos["video-id"]; !reflect.DeepEqual(v, video) {
+		t.Errorf("video = %+v\nwant %+v", v, video)
+	}
+	if v := data.Sessions["session-id"]; !reflect.DeepEqual(v, session) {
+		t.Errorf("session = %+v\nwant %+v", v, session)
+	}
+	if v := data.Speakers["speaker-id"]; !reflect.DeepEqual(v, speaker) {
+		t.Errorf("speaker = %+v\nwant %+v", v, speaker)
+	}
+	if v := data.Tags["TYPE_BOXTALKS"]; !reflect.DeepEqual(v, tag) {
+		t.Errorf("tag = %+v\nwant %+v", v, tag)
+	}
+}
+
+func TestSyncEventDataWithDiff(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer preserveConfig()()
+
+	firstMod := time.Date(2015, 4, 15, 0, 0, 0, 0, time.UTC)
+	lastMod := firstMod.AddDate(0, 0, 1)
+
+	startDate := time.Date(2015, 5, 28, 22, 0, 0, 0, time.UTC)
+	session := &eventSession{
+		Id:        "test-session",
+		Title:     "Introduction to Classroom",
+		Desc:      "session desc",
+		IsLive:    true,
+		Tags:      []string{"TYPE_BOXTALKS"},
+		Speakers:  []string{"speaker-id"},
+		Room:      "Community Lounge",
+		StartTime: startDate,
+		EndTime:   startDate.Add(1 * time.Hour),
+		Day:       1,
+		Block:     "3 PM",
+		Start:     "3:00 PM",
+		End:       "4:00 PM",
+		Filters: map[string]bool{
+			"Boxtalks":       true,
+			liveStreamedText: true,
+		},
+	}
+
+	r := newTestRequest(t, "GET", "/sync/gcs", nil)
+	c := newContext(r)
+	err := storeEventData(c, &eventData{
+		modified: firstMod,
+		Sessions: map[string]*eventSession{session.Id: session},
+	})
+	if err != nil {
+		t.Fatalf("storeEventData: %v", err)
+	}
+	err = storeChanges(c, &dataChanges{
+		Changed: firstMod,
+		eventData: eventData{
+			Videos: map[string]*eventVideo{"dummy-id": &eventVideo{}},
+		},
+	})
+	if err != nil {
+		t.Fatalf("storeChanges: %v", err)
+	}
+
+	const newScheduleFile = `{
+		"sessions":[
+			{
+				"id":"test-session",
+				"url":"https://www.google.com",
+				"title":"Introduction to Classroom",
+				"description":"CHANGED DESCRIPTION",
+				"startTimestamp":"2015-05-28T22:00:00Z",
+				"endTimestamp":"2015-05-28T23:00:00Z",
+				"isLivestream":true,
+				"tags":["TYPE_BOXTALKS"],
+				"speakers":["speaker-id"],
+				"room":"room-id"
+			}
+		]
+	}`
+
+	done := make(chan struct{}, 1)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/manifest.json" {
+			sinceStr := r.Header.Get("if-modified-since")
+			since, err := time.ParseInLocation(http.TimeFormat, sinceStr, time.UTC)
+			if err != nil {
+				t.Errorf("if-modified-since: time.Parse(%q): %v", sinceStr, err)
+			}
+			if since != firstMod {
+				t.Errorf("if-modified-since (%q) = %s; want %s", sinceStr, since, firstMod)
+			}
+			w.Header().Set("last-modified", lastMod.Format(http.TimeFormat))
+			w.Write([]byte(`{"data_files": ["schedule.json"]}`))
+			return
+		}
+		w.Write([]byte(newScheduleFile))
+		done <- struct{}{}
+	}))
+	defer ts.Close()
+
+	config.Schedule.ManifestURL = ts.URL + "/manifest.json"
+	config.Schedule.Start = startDate
+
+	w := httptest.NewRecorder()
+	syncEventData(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	select {
+	case <-done:
+		// passed
+	default:
+		t.Fatalf("slurp never happened")
+	}
+
+	data, err := getLatestEventData(c)
+	if err != nil {
+		t.Fatalf("getLatestEventData: %v", err)
+	}
+	if data.modified.Unix() != lastMod.Unix() {
+		t.Errorf("data.modified = %s; want %s", data.modified, lastMod)
+	}
+
+	s := data.Sessions[session.Id]
+	if s == nil {
+		t.Fatalf("%q session not found in %+v", session.Id, data.Sessions)
+	}
+	if v := "CHANGED DESCRIPTION"; s.Desc != v {
+		t.Errorf("s.Desc = %q; want %q", s.Desc, v)
+	}
+
+	dc, err := getChangesSince(c, firstMod.Add(1*time.Second))
+	if err != nil {
+		t.Fatalf("getChangesAfter: %v", err)
+	}
+	if dc.Changed != lastMod {
+		t.Errorf("dc.Changed = %s; want %s", dc.Changed, lastMod)
+	}
+	if l := len(dc.Videos); l != 0 {
+		t.Errorf("len(dc.Videos) = %d; want 0", l)
+	}
+	if s2 := dc.Sessions[session.Id]; !reflect.DeepEqual(s2, s) {
+		t.Errorf("s2 = %+v\nwant %+v", s2, s)
+	}
+}

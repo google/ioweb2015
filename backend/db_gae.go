@@ -3,7 +3,11 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
+	"encoding/json"
 	"errors"
+	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/datastore"
@@ -12,7 +16,16 @@ import (
 const (
 	kindCredentials = "Cred"
 	kindUserPush    = "Push"
+	kindEventData   = "EventData"
+	kindChanges     = "Changes"
 )
+
+// RunInTransaction runs f in a transaction.
+// It calls f with a transaction context tc that f should use for all operations.
+func RunInTransaction(c context.Context, f func(context.Context) error) error {
+	opts := &datastore.TransactionOptions{XG: true}
+	return datastore.RunInTransaction(c, f, opts)
+}
 
 // storeCredentials saves OAuth2 credentials cred in a presistent DB.
 // cred must have userID set to a non-zero value.
@@ -75,4 +88,121 @@ func getUserPushInfo(c context.Context) (*userPush, error) {
 		p.Pext = &p.Ext
 	}
 	return p, err
+}
+
+// storeEventData saves d in the datastore with auto-generated ID
+// and a common ancestor provided by eventDataParent().
+// All fields are unindexed except for d.modified.
+// Unexported fields other than d.modified are not stored.
+func storeEventData(c context.Context, d *eventData) error {
+	var b bytes.Buffer
+	if err := gob.NewEncoder(&b).Encode(d); err != nil {
+		return err
+	}
+	// TODO: handle a case where b.Bytes() is > 1Mb
+	ent := &struct {
+		Timestamp time.Time `datastore:"ts"`
+		Bytes     []byte    `datastore:"data"`
+	}{d.modified, b.Bytes()}
+	key := datastore.NewIncompleteKey(c, kindEventData, eventDataParent(c))
+	_, err := datastore.Put(c, key, ent)
+	return err
+}
+
+// getLatestEventData fetches most recent version of eventData
+// previously saved with storeEventData().
+func getLatestEventData(c context.Context) (*eventData, error) {
+	q := datastore.NewQuery(kindEventData).
+		Ancestor(eventDataParent(c)).
+		Order("-ts").
+		Limit(1)
+
+	var res []*struct {
+		Timestamp time.Time `datastore:"ts"`
+		Bytes     []byte    `datastore:"data"`
+	}
+	if _, err := q.GetAll(c, &res); err != nil {
+		return nil, err
+	}
+
+	data := &eventData{}
+	if len(res) == 0 {
+		return data, nil
+	}
+	err := gob.NewDecoder(bytes.NewReader(res[0].Bytes)).Decode(data)
+	data.modified = res[0].Timestamp
+	return data, err
+}
+
+// storeChanges saves d in the datastore with auto-generated ID
+// and a common ancestor provided by changesParent().
+// All fields are unindexed except for d.Changed.
+// Even though d.Token is stored, its value must not be used when
+// retrieved from the datastore later on.
+func storeChanges(c context.Context, d *dataChanges) error {
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	// TODO: handle a case where len(b) > 1Mb
+	ent := &struct {
+		Timestamp time.Time `datastore:"ts"`
+		Bytes     []byte    `datastore:"data"`
+	}{d.Changed, b}
+	key := datastore.NewIncompleteKey(c, kindChanges, changesParent(c))
+	_, err = datastore.Put(c, key, ent)
+	return err
+}
+
+// getChangesSince queries datastore for all changes occurred since time t
+// and returns them all combined in one dataChanges result.
+// In a case where multiple changes have been introduced in the same data items,
+// older changes will be overwritten by the most recent ones.
+// At most 1000 changes will be returned.
+// Resulting dataChanges.Changed time will be set to the most recent one.
+func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
+	q := datastore.NewQuery(kindChanges).
+		Ancestor(changesParent(c)).
+		Filter("ts > ", t).
+		Order("ts").
+		Limit(1000)
+
+	var res []*struct {
+		Timestamp time.Time `datastore:"ts"`
+		Bytes     []byte    `datastore:"data"`
+	}
+	if _, err := q.GetAll(c, &res); err != nil {
+		return nil, err
+	}
+
+	changes := &dataChanges{
+		eventData: eventData{
+			Sessions: make(map[string]*eventSession),
+			Speakers: make(map[string]*eventSpeaker),
+			Videos:   make(map[string]*eventVideo),
+		},
+	}
+	if len(res) == 0 {
+		return changes, nil
+	}
+
+	for _, item := range res {
+		dc := &dataChanges{}
+		if err := json.Unmarshal(item.Bytes, dc); err != nil {
+			errorf(c, "getChangesSince: %v at ts = %s", err, item.Timestamp)
+			continue
+		}
+		mergeChanges(changes, dc)
+	}
+	return changes, nil
+}
+
+// eventDataParent returns a common ancestor for all kindEventData entities.
+func eventDataParent(c context.Context) *datastore.Key {
+	return datastore.NewKey(c, kindEventData, "root", 0, nil)
+}
+
+// changesParent returns a common ancestor for all kindChanges entities.
+func changesParent(c context.Context) *datastore.Key {
+	return datastore.NewKey(c, kindChanges, "root", 0, nil)
 }

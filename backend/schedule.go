@@ -4,17 +4,30 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"path"
+	"reflect"
 	"sort"
+	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/net/context"
 )
 
+const (
+	liveStreamedText = "Live Streamed"
+	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
+)
+
 type eventData struct {
-	Sessions map[string]*eventSession `json:"sessions"`
-	Speakers map[string]interface{}   `json:"speakers"`
-	Videos   map[string]interface{}   `json:"video_library"`
-	Tags     map[string]*eventTag     `json:"tags"`
+	Sessions map[string]*eventSession `json:"sessions,omitempty"`
+	Speakers map[string]*eventSpeaker `json:"speakers,omitempty"`
+	Videos   map[string]*eventVideo   `json:"video_library,omitempty"`
+	Tags     map[string]*eventTag     `json:"tags,omitempty"`
+	// not exposed
+	rooms    map[string]*eventRoom
+	modified time.Time
 }
 
 type eventSession struct {
@@ -37,6 +50,28 @@ type eventSession struct {
 	Filters map[string]bool `json:"filters"`
 }
 
+type eventSpeaker struct {
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Bio     string `json:"bio,omitempty"`
+	Company string `json:"company,omitempty"`
+	Thumb   string `json:"thumbnailUrl,omitempty"`
+	Plusone string `json:"plusoneUrl,omitempty"`
+	Twitter string `json:"twitterUrl,omitempty"`
+}
+
+type eventVideo struct {
+	Id       string `json:"id"`
+	Title    string `json:"title"`
+	Desc     string `json:"desc,omitempty"`
+	Topic    string `json:"topic,omitempty"`
+	Speakers string `json:"speakers,omitempty"`
+	Thumb    string `json:"thumbnailUrl,omitempty"`
+	// TODO: past_video_library has it as string,
+	//       while video_library is int.
+	Year int `json:"year"`
+}
+
 type eventRoom struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
@@ -48,8 +83,160 @@ type eventTag struct {
 	Cat  string `json:"category"`
 }
 
-func fetchEventSchedule(c context.Context, url string) (*eventData, error) {
-	res, err := httpClient(c).Get(url)
+// isEmptyEventData returns true if d is nil or its exported fields contain no items.
+func isEmptyEventData(d *eventData) bool {
+	return d == nil || (len(d.Sessions) == 0 && len(d.Speakers) == 0 && len(d.Videos) == 0 && len(d.Tags) == 0)
+}
+
+// fetchEventData retrieves complete event data starting from manifest at url.
+// If the manifest has not changed since lastSync, both returned values are nil.
+func fetchEventData(c context.Context, urlStr string, lastSync time.Time) (*eventData, error) {
+	u, err := url.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	files, lastMod, err := fetchEventManifest(c, u.String(), lastSync)
+	if err != nil {
+		return nil, err
+	}
+	if len(files) == 0 {
+		return nil, nil
+	}
+
+	// base file URLs off manifest location
+	base := path.Dir(u.Path)
+
+	var mu sync.Mutex  // guards chunks and slurpErr
+	var slurpErr error // last slurp error, if any
+	chunks := make([]*eventData, 0, len(files))
+
+	// fetch all files in the manifest in parallel
+	var wg sync.WaitGroup
+	for _, f := range files {
+		u.Path = path.Join(base, f)
+		wg.Add(1)
+		go func(u string) {
+			defer wg.Done()
+			res, err := slurpEventDataChunk(c, u)
+			mu.Lock()
+			defer mu.Unlock()
+			if err != nil {
+				errorf(c, "slurpEventDataChunk(%q): %v", u, err)
+				slurpErr = err
+				return
+			}
+			chunks = append(chunks, res)
+		}(u.String())
+	}
+
+	wg.Wait()
+	if slurpErr != nil {
+		return nil, slurpErr
+	}
+
+	rooms := make(map[string]*eventRoom)
+	data := &eventData{
+		Tags:     make(map[string]*eventTag),
+		Speakers: make(map[string]*eventSpeaker),
+		Videos:   make(map[string]*eventVideo),
+		Sessions: make(map[string]*eventSession),
+		modified: lastMod,
+	}
+
+	for _, chunk := range chunks {
+		for k, v := range chunk.rooms {
+			rooms[k] = v
+		}
+		for k, v := range chunk.Tags {
+			data.Tags[k] = v
+		}
+	}
+
+	for _, chunk := range chunks {
+		for k, v := range chunk.Speakers {
+			data.Speakers[k] = v
+		}
+		for k, v := range chunk.Videos {
+			data.Videos[k] = v
+		}
+		for id, s := range chunk.Sessions {
+			if r, ok := rooms[s.Room]; ok {
+				s.Room = r.Name
+			}
+			s.Filters = make(map[string]bool)
+			s.Filters[liveStreamedText] = s.IsLive
+			for _, t := range s.Tags {
+				if tag, ok := data.Tags[t]; ok {
+					s.Filters[tag.Name] = true
+				}
+			}
+			data.Sessions[id] = s
+		}
+	}
+
+	return data, nil
+}
+
+// fetchEventManifest retrieves a list of URLs containing event schedule data.
+// url should point to the manifest.json file.
+// Returned Time is the timestamp of last modification.
+// If data hasn't changed since lastSync, both returned values are nil.
+func fetchEventManifest(c context.Context, url string, lastSync time.Time) ([]string, time.Time, error) {
+	logf(c, "fetching manifest from %s", url)
+	mod := time.Now()
+	hc, err := serviceAccountClient(c, gcsReadOnlyScope)
+	if err != nil {
+		return nil, mod, fmt.Errorf("fetchEventManifest: %v", err)
+	}
+
+	r, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, mod, err
+	}
+	r.Header.Set("if-modified-since", lastSync.UTC().Format(http.TimeFormat))
+	res, err := hc.Do(r)
+	if err != nil {
+		return nil, mod, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode == http.StatusNotModified {
+		return nil, mod, nil
+	}
+	if res.StatusCode != http.StatusOK {
+		return nil, mod, fmt.Errorf("fetchEventManifest: %s", res.Status)
+	}
+	t, err := time.ParseInLocation(http.TimeFormat, res.Header.Get("last-modified"), time.UTC)
+	if err == nil {
+		mod = t
+	}
+
+	var data struct {
+		Files []string `json:"data_files"`
+	}
+	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
+		return nil, mod, err
+	}
+
+	files := data.Files[:0]
+	for _, f := range data.Files {
+		if strings.HasPrefix(f, "past_io_videolibrary") {
+			continue
+		}
+		files = append(files, f)
+	}
+	return files, mod, err
+}
+
+// slurpEventDataChunk retrieves a chunk of event data at url
+// any, all or none of the returned *eventData fields can be non-empty.
+func slurpEventDataChunk(c context.Context, url string) (*eventData, error) {
+	logf(c, "slurping %s", url)
+	hc, err := serviceAccountClient(c, gcsReadOnlyScope)
+	if err != nil {
+		return nil, fmt.Errorf("slurpEventDataChunk: %v", err)
+	}
+	res, err := hc.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -59,11 +246,11 @@ func fetchEventSchedule(c context.Context, url string) (*eventData, error) {
 	}
 
 	var body struct {
-		Sessions []*eventSession          `json:"sessions"`
-		Rooms    []*eventRoom             `json:"rooms"`
-		Tags     []*eventTag              `json:"tags"`
-		Videos   []map[string]interface{} `json:"video_library"`
-		Speakers []map[string]interface{} `json:"speakers"`
+		Sessions []*eventSession `json:"sessions"`
+		Rooms    []*eventRoom    `json:"rooms"`
+		Tags     []*eventTag     `json:"tags"`
+		Videos   []*eventVideo   `json:"video_library"`
+		Speakers []*eventSpeaker `json:"speakers"`
 	}
 	if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
 		return nil, err
@@ -84,17 +271,6 @@ func fetchEventSchedule(c context.Context, url string) (*eventData, error) {
 		if s.Id == "" {
 			continue
 		}
-		if r, ok := rooms[s.Room]; ok {
-			s.Room = r.Name
-		}
-
-		s.Filters = make(map[string]bool)
-		s.Filters["Live Streamed"] = s.IsLive
-		for _, t := range s.Tags {
-			if tag, ok := tags[t]; ok {
-				s.Filters[tag.Name] = true
-			}
-		}
 
 		tzstart := s.StartTime.In(config.Schedule.Location)
 		s.Block = tzstart.Format("3 PM")
@@ -107,23 +283,20 @@ func fetchEventSchedule(c context.Context, url string) (*eventData, error) {
 		sessions[s.Id] = s
 	}
 
-	videos := make(map[string]interface{}, len(body.Videos))
+	videos := make(map[string]*eventVideo, len(body.Videos))
 	for _, v := range body.Videos {
-		id, ok := v["id"].(string)
-		if !ok || id == "" {
+		if v.Id == "" {
 			continue
 		}
-		delete(v, "vid")
-		videos[id] = v
+		videos[v.Id] = v
 	}
 
-	speakers := make(map[string]interface{}, len(body.Speakers))
+	speakers := make(map[string]*eventSpeaker, len(body.Speakers))
 	for _, s := range body.Speakers {
-		id, ok := s["id"].(string)
-		if !ok || id == "" {
+		if s.Id == "" {
 			continue
 		}
-		speakers[id] = s
+		speakers[s.Id] = s
 	}
 
 	return &eventData{
@@ -131,7 +304,41 @@ func fetchEventSchedule(c context.Context, url string) (*eventData, error) {
 		Speakers: speakers,
 		Videos:   videos,
 		Tags:     tags,
+		rooms:    rooms,
 	}, nil
+}
+
+// diffEventData looks for changes in existing items of b comparing to a.
+// It compares only Sessions, Speakers and Videos of eventData.
+// The result is a subset of b or nil if a is empty.
+func diffEventData(a, b *eventData) *dataChanges {
+	if isEmptyEventData(a) {
+		return nil
+	}
+	dc := &dataChanges{
+		Changed: b.modified,
+		eventData: eventData{
+			Sessions: make(map[string]*eventSession),
+			Speakers: make(map[string]*eventSpeaker),
+			Videos:   make(map[string]*eventVideo),
+		},
+	}
+	for id, bs := range b.Sessions {
+		if as, ok := a.Sessions[id]; ok && !reflect.DeepEqual(as, bs) {
+			dc.Sessions[id] = bs
+		}
+	}
+	for id, bs := range b.Speakers {
+		if as, ok := a.Speakers[id]; ok && !reflect.DeepEqual(as, bs) {
+			dc.Speakers[id] = bs
+		}
+	}
+	for id, bs := range b.Videos {
+		if as, ok := a.Videos[id]; ok && !reflect.DeepEqual(as, bs) {
+			dc.Videos[id] = bs
+		}
+	}
+	return dc
 }
 
 // userSchedule returns a slice of session IDs bookmarked by a user.

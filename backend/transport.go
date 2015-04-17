@@ -51,6 +51,11 @@ func twitterClient(c context.Context) (*http.Client, error) {
 
 // serviceAccountClient creates a new HTTP client using serviceCredentials() and oauth2Client().
 func serviceAccountClient(c context.Context, scopes ...string) (*http.Client, error) {
+	if config.Google.ServiceAccount.Key == "" {
+		// useful for testing
+		errorf(c, "serviceAccountClient: no credentials provided; using standard httpClient")
+		return httpClient(c), nil
+	}
 	cred, err := serviceCredentials(c, scopes...)
 	if err != nil {
 		return nil, err

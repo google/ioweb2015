@@ -33,11 +33,11 @@ func registerHandlers() {
 	handle("/api/v1/user/schedule", serveUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserBookmarks)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
+	handle("/sync/gcs", syncEventData)
 	// debug handlers; not available in prod
 	if !isProd() {
 		handle("/debug/srvget", debugServiceGetURL)
 	}
-
 	// setup root redirect if we're prefixed
 	if config.Prefix != "/" {
 		var redirect http.Handler = http.HandlerFunc(redirectHandler)
@@ -254,10 +254,8 @@ func serveSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: remove hardcoded URL and do a proper sync with the GCS bucket.
 	c := newContext(r)
-	url := "http://storage.googleapis.com/io2015-data.appspot.com/session_data_v1.1.json"
-	data, err := fetchEventSchedule(c, url)
+	data, err := getLatestEventData(c)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
 		return
@@ -454,10 +452,59 @@ func debugServiceGetURL(w http.ResponseWriter, r *http.Request) {
 	io.Copy(w, res.Body)
 }
 
+// syncEventData updates event data stored in a persistent DB,
+// diffs the changes with a previous version, stores those changes
+// and spawns up workers to send push notifications to interested parties.
+func syncEventData(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	err := RunInTransaction(c, func(c context.Context) error {
+		oldData, err := getLatestEventData(c)
+		if err != nil {
+			return err
+		}
+
+		newData, err := fetchEventData(c, config.Schedule.ManifestURL, oldData.modified)
+		if err != nil {
+			return err
+		}
+		if isEmptyEventData(newData) {
+			logf(c, "%s: no data or not modified (last: %s)", config.Schedule.ManifestURL, oldData.modified)
+			return nil
+		}
+		if err := storeEventData(c, newData); err != nil {
+			return err
+		}
+
+		diff := diffEventData(oldData, newData)
+		if isEmptyChanges(diff) {
+			logf(c, "%s: diff is empty (last: %s)", config.Schedule.ManifestURL, oldData.modified)
+			return nil
+		}
+		if err := storeChanges(c, diff); err != nil {
+			return err
+		}
+		if err := startNotifySubscribers(c, diff); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		errorf(c, "syncEventSchedule: %v", err)
+		writeError(w, err)
+	}
+}
+
 // writeJSONError sets response code to 500 and writes an error message to w.
 func writeJSONError(w http.ResponseWriter, code int, err error) {
 	w.WriteHeader(code)
 	fmt.Fprintf(w, `{"error": %q}`, err.Error())
+}
+
+// writeError writes error to w as is, using errStatus() status code.
+func writeError(w http.ResponseWriter, err error) {
+	w.WriteHeader(errStatus(err))
+	w.Write([]byte(err.Error()))
 }
 
 // errStatus converts some known errors of this package into the corresponding

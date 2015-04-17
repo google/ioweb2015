@@ -188,6 +188,11 @@ core-drawer-panel {
   background-color: transparent;
   /* Should match Polymer/paper-tabs/paper-tab.css#L17 */
   transition: color .1s cubic-bezier(0.4, 0.0, 1, 1);
+  margin: 0;
+}
+
+#signin-nav-elements > .button-link {
+  padding: 16px 12px;
 }
 
 #signin-settings-panel,

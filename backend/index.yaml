@@ -1,0 +1,14 @@
+indexes:
+
+- kind: EventData
+  ancestor: yes
+  properties:
+  - name: ts
+    direction: desc
+
+- kind: Changes
+  ancestor: yes
+  properties:
+  - name: ts
+    direction: asc
+

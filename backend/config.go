@@ -80,9 +80,10 @@ type appConfig struct {
 
 	// Event schedule settings
 	Schedule struct {
-		Start    time.Time `json:"start"`
-		Timezone string    `json:"timezone"`
-		Location *time.Location
+		Start       time.Time `json:"start"`
+		Timezone    string    `json:"timezone"`
+		Location    *time.Location
+		ManifestURL string `json:"manifest"`
 	} `json:"schedule"`
 }
 
