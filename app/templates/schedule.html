@@ -386,18 +386,23 @@
         var saved = !selectedSession.saved;
 
         IOWA.Schedule.saveSession(selectedSession.id, saved).then(function() {
+          IOWA.Elements.Template.scheduleFetchingUserData = false;
+          selectedSession.saved = saved;
+
           if (saved) {
-            IOWA.Elements.Toast.showMessage("Added to My Schedule. " +
-              "You'll get a notification before it starts.");
+            var toastMessage = 'Added to My Schedule.';
+
+            if (IOWA.Notifications.isSupported) {
+              return IOWA.Notifications.waitForPrereqs().then(function() {
+                toastMessage += " You'll get a notification when it starts.";
+                IOWA.Elements.Toast.showMessage(toastMessage);
+              });
+            } else {
+              IOWA.Elements.Toast.showMessage(toastMessage);
+            }
           } else {
             IOWA.Elements.Toast.showMessage('Removed from My Schedule');
           }
-        }).catch(function() {
-          IOWA.Elements.Toast.showMessage('Unable to modify My Schedule');
-          saved = !saved;
-        }).then(function() {
-          IOWA.Elements.Template.scheduleFetchingUserData = false;
-          selectedSession.saved = saved;
         });
       };
 
