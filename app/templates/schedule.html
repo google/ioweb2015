@@ -393,7 +393,7 @@
             IOWA.Elements.Toast.showMessage('Removed from My Schedule');
           }
         }).catch(function() {
-          IOWA.Elements.Toast.showMessage('Unable to add to My Schedule');
+          IOWA.Elements.Toast.showMessage('Unable to modify My Schedule');
           saved = !saved;
         }).then(function() {
           IOWA.Elements.Template.scheduleFetchingUserData = false;
