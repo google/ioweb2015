@@ -63,7 +63,7 @@ IOWA.Schedule = (function() {
       callback(userScheduleData_);
     } else {
       var callbackWrapper = function(userScheduleData) {
-        userScheduleData_ = userScheduleData;
+        userScheduleData_ = userScheduleData || [];
         callback(userScheduleData);
       };
 

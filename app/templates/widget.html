@@ -105,9 +105,9 @@
             <h4 class="card__title">1. Select widget content</h4>
             <div class="customize__area">
               <paper-radio-group selected="{{selectedGadgetLayout}}">
-                <paper-radio-button name="both" label="Live video stream + Google Developers social feed"></paper-radio-button>
-                <paper-radio-button name="video" label="Live video stream only"></paper-radio-button>
-                <paper-radio-button name="feed" label="Google Developers social feed only"></paper-radio-button>
+                <io-radio-button name="both" label="Live video stream + Google Developers social feed"></io-radio-button>
+                <io-radio-button name="video" label="Live video stream only"></io-radio-button>
+                <io-radio-button name="feed" label="Google Developers social feed only"></io-radio-button>
               </paper-radio-group>
             </div>
 
@@ -118,11 +118,11 @@
             <div class="customize__area">
               <core-label layout inline horizontal center>
                 Width (px)
-                <paper-slider min="320" max="1000" value="875" editable pin immediateValue="{{gadgetWidth}}" aria-valuetext="{{gadgetWidth}} pixels" for></paper-slider>
+                <io-slider min="320" max="1000" value="875" editable pin immediateValue="{{gadgetWidth}}" aria-valuetext="{{gadgetWidth}} pixels" for></io-slider>
               </core-label>
               <core-label layout inline horizontal center>
                 Height (px)
-                <paper-slider min="300" max="1000" value="450" editable pin immediateValue="{{gadgetHeight}}" aria-valuetext="{{gadgetHeight}} pixels" for></paper-slider>
+                <io-slider min="300" max="1000" value="450" editable pin immediateValue="{{gadgetHeight}}" aria-valuetext="{{gadgetHeight}} pixels" for></io-slider>
               </core-label>
             </div>
 
@@ -147,8 +147,6 @@
   // Page-specific JS that runs when this page is loaded for the first time.
   function initPage() {
     var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
-    var RADIO_SELECTOR = '.customize__area paper-radio-button';
-    var SLIDER_SELECTOR = '.customize__area paper-slider';
 
     if (page.hasBeenLoaded) {
       return;
@@ -158,11 +156,6 @@
       // Reset template variables for when revisiting the page.
       IOWA.Elements.Template.selectedGadgetVideoSize = 'small';
       IOWA.Elements.Template.selectedGadgetLayout = 'both';
-      // Wait 1 rAF for template to stamp.
-      IOWA.Elements.Template.async(function() {
-        IOWA.A11y.addFocusStates(RADIO_SELECTOR);
-        IOWA.A11y.addFocusStates(SLIDER_SELECTOR);
-      });
     };
 
     IOWA.Elements.Template.updateIframeCode = function(e, detail, sender) {
@@ -190,11 +183,6 @@
 
     IOWA.Elements.Template.toggleGadgetFaq = function(e, detail, sender) {
       IOWA.Elements.Main.querySelector('#gadgetfaq').toggle();
-    };
-
-    page.unload = function() {
-      IOWA.A11y.removeFocusStates(RADIO_SELECTOR);
-      IOWA.A11y.removeFocusStates(SLIDER_SELECTOR);
     };
 
     page.load(); // Run load callback on page load.

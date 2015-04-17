@@ -6,6 +6,7 @@ package main
 
 import (
 	"errors"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -55,6 +56,16 @@ func getLatestEventData(c context.Context) (*eventData, error) {
 	return nil, errors.New("not implemented")
 }
 
-func storeDataChanges(c context.Context, d *dataChanges) error {
+func storeChanges(c context.Context, d *dataChanges) error {
 	return errors.New("not implemented")
+}
+
+// getChangesSince queries DB for all changes occurred since time t
+// and returns them all combined in one dataChanges result.
+// In a case where multiple changes have been introduced in the same data items,
+// older changes will be overwritten by the most recent ones.
+// At most 1000 changes will be returned.
+// Resulting dataChanges.Changed time will be set to the most recent one.
+func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
+	return nil, errors.New("not implemented")
 }

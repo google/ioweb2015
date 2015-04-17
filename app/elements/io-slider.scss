@@ -14,9 +14,24 @@
  * limitations under the License.
  */
 
-@import '_color';
+@import '_elements';
 
-io-slider::shadow {
+:host::shadow #sliderKnob::after {
+  content: '';
+  background: rgba($color-form-controls, 0.12);
+  display: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  position: absolute;
+  margin-left: -22px;
+}
+
+:host(.focused)::shadow #sliderKnob::after {
+  display: block;
+}
+
+:host::shadow {
   #activeProgress,
   #sliderKnobInner,
   #sliderKnobInner::before,
@@ -31,20 +46,3 @@ io-slider::shadow {
   }
 }
 
-io-radio-button::shadow #onRadio,
-io-radio-button::shadow #onOff,
-io-checkbox::shadow #checkbox.checked {
-  color: $color-form-controls;
-  border-color: $color-form-controls;
-  background-color: $color-form-controls;
-}
-
-io-radio-button[checked]::shadow #offRadio {
-  border-color: $color-form-controls;
-}
-
-paper-progress::shadow {
-  #progressContainer {
-    background-color: $color-cyan-50;
-  }
-}

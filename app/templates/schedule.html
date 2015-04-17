@@ -45,7 +45,7 @@
               on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
   <div class="card__photo" relative>
-    <core-image src="{{selectedSession.photoUrl || 'images/schedule/sessiondetail@2x.jpg'}}"
+    <core-image src="{{selectedSession.photoUrl || 'images/schedule/session_placeholder.jpg'}}"
                 placeholder="images/io15-color.png"
                 sizing="cover" preload fade fit></core-image>
     <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}"
@@ -206,7 +206,7 @@
             <div>Sign-in to add sessions to your personalized schedule.</div>
           </div>
           <div class="card-content">
-            <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-sign-in">
+            <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-sign-in" on-click="{{signIn}}">
               Sign in to create your schedule
             </span>
           </div>
@@ -272,6 +272,22 @@
       );
     }
 
+    function fetchUserData() {
+      IOWA.Elements.Template.scheduleFetchingUserData = true;
+
+      // Fetch user's saved sessions.
+      IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
+        IOWA.Elements.Template.scheduleFetchingUserData = false;
+        IOWA.Elements.Template.savedSessions = savedSessions;
+
+        //  Mark sessions they've bookmarked.
+        var sessions = IOWA.Elements.Template.scheduleData.sessions;
+        for (var id in sessions) {
+          sessions[id].saved = savedSessions.indexOf(id) !== -1;
+        }
+      });
+    }
+
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
@@ -302,8 +318,8 @@
           if (parsedUrl.params.filters) {
             filters = parsedUrl.params.filters.split(',');
           }
-          IOWA.Elements.Template.sessionURLFilters = filters;
 
+          IOWA.Elements.Template.sessionURLFilters = filters;
           IOWA.Elements.Template.selectedTimezone = 'GMT-08:00'; // PDT timezone.
 
           // Deep link into session.
@@ -320,19 +336,7 @@
       var onSigninChanged_ = function(e) {
         if (e.detail.signedIn) {
           hideSignInCard();
-
-          // Fetch user's data. Mark sessions they've bookmarked
-          IOWA.Elements.Template.scheduleFetchingUserData = true;
-          IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
-            IOWA.Elements.Template.scheduleFetchingUserData = false;
-            savedSessions = savedSessions || [];
-            IOWA.Elements.Template.savedSessions = savedSessions;
-
-            var sessions = IOWA.Elements.Template.scheduleData.sessions;
-            for (var id in sessions) {
-              sessions[id].saved = savedSessions.indexOf(id) !== -1;
-            }
-          });
+          fetchUserData();
         }
       };
 
@@ -340,7 +344,7 @@
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
         IOWA.Elements.Template.scheduleData = null;
-        IOWA.Elements.Template.savedSessions = null;
+        IOWA.Elements.Template.savedSessions = [];
         IOWA.Elements.Template.scheduleFetchingUserData = false;
 
         document.addEventListener('page-transition-done', onPageTransitionDone_);
@@ -350,10 +354,15 @@
         document.removeEventListener('signin-change', onSigninChanged_);
 
         document.addEventListener('subpage-changed', onSubpageChanged_);
-        document.addEventListener('signin-change', onSigninChanged_);
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
+          if (IOWA.Elements.GoogleSignIn.signedIn) {
+            fetchUserData();
+          } else {
+            document.addEventListener('signin-change', onSigninChanged_);
+          }
+
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
       };
