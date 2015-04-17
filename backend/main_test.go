@@ -105,6 +105,7 @@ func TestMain(m *testing.M) {
 	config.Google.VerifyURL = tokeninfo.URL
 	config.Google.CertURL = cert.URL
 	config.Google.ServiceAccount.Key = ""
+	config.Secret = "a-test-secret"
 
 	config.Schedule.Start = time.Date(2015, 5, 28, 9, 0, 0, 0, time.UTC)
 	config.Schedule.Timezone = "America/Los_Angeles"
