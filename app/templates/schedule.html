@@ -385,18 +385,22 @@
         var selectedSession = IOWA.Elements.Template.selectedSession;
         var saved = !selectedSession.saved;
 
-        IOWA.Elements.Template.scheduleFetchingUserData = true;
+        IOWA.Schedule.saveSession(selectedSession.id, saved).then(function() {
+          IOWA.Elements.Template.scheduleFetchingUserData = false;
+          selectedSession.saved = saved;
 
-        IOWA.Schedule.saveSession(selectedSession.id, saved).then(function(resp) {
-          // If no response, then the user wasn't' authenticated. Reset.
-          if (typeof resp !== 'undefined') {
-            selectedSession.saved = saved;
+          if (saved) {
+            return IOWA.Notifications.waitForPrereqs().then(function() {
+              IOWA.Elements.Toast.showMessage('Added to My Schedule. You\'ll get a notification when it starts.');
+            }).catch(function() {
+              // waitForPrereqs() rejects if notifications are not supported in the browser, or if
+              // the notifications permission is set to 'denied' and the Permissions API isn't supported.
+              // In either of those cases, just show the toast without mentioning notifications.
+              IOWA.Elements.Toast.showMessage('Added to My Schedule.');
+            });
+          } else {
+            IOWA.Elements.Toast.showMessage('Removed from My Schedule');
           }
-          IOWA.Elements.Template.scheduleFetchingUserData = false;
-        }).catch(function() {
-
-          selectedSession.saved = false;
-          IOWA.Elements.Template.scheduleFetchingUserData = false;
         });
       };
 

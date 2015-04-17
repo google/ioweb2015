@@ -515,7 +515,7 @@ IOWA.Elements = (function() {
         // to the user's logged in state and will remain valid if notifications are re-enabled
         // later on.
         IOWA.Notifications.unsubscribeFromPushManagerPromise()
-          .then(disableNotificationsPromise)
+          .then(IOWA.Notifications.disableNotificationsPromise)
           .catch(IOWA.Util.reportError);
       }
     };
