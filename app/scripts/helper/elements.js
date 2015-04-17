@@ -181,11 +181,10 @@ IOWA.Elements = (function() {
       'Audience Growth',
       'Auto',
       'Chrome / Web',
-      'Polymer',
       'Design',
       'Earn',
       'Games',
-      'Google Play',
+      'Play',
       'Location',
       'Search',
       'Tools & APIs',
@@ -195,10 +194,10 @@ IOWA.Elements = (function() {
 
     template.filterSessionTypes = [
       'Sessions',
-      'Sandbox Talks',
-      'Workshops',
-      'Office Hours',
       'Code Labs'
+      'Sandbox talks',
+      'Office hours',
+      'Misc'
     ];
 
     template.timezoneNames = {
