@@ -102,6 +102,11 @@ IOWA.Router = (function() {
         if (el.target) {
           return;
         }
+        // Use IOWA.Util.smoothScroll for scroll links.
+        if (el.getAttribute('data-transition') == 'smooth-scroll') {
+          e.preventDefault();
+          return;
+        }
         if (el.hasAttribute('data-ajax-link')) {
           e.preventDefault();
           e.stopPropagation();
