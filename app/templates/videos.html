@@ -135,10 +135,14 @@
 
     IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
       var lib = scheduleData.video_library;
-      var videos = Object.keys(lib).map(function(key) { return lib[key]; });
+      if (lib) {
+        var videos = Object.keys(lib).map(function(key) { return lib[key]; });
+        IOWA.Elements.Template.videoList = videos;
+        IOWA.Elements.Template.filteredVideoList = videos;
+      }
 
-      IOWA.Elements.Template.videoList = videos;
-      IOWA.Elements.Template.filteredVideoList = videos;
+      IOWA.Schedule.generateFilters(scheduleData.tags);
+      IOWA.Elements.Template.filterTopics.unshift('All');
     });
 
   }
