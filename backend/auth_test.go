@@ -9,7 +9,6 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"golang.org/x/net/context"
 )
 
 func TestVerifyBearerToken(t *testing.T) {
@@ -207,8 +206,7 @@ func TestTokenRefresher(t *testing.T) {
 		return
 	}
 
-	c = context.WithValue(c, ctxKeyUser, "uid-123")
-	cred2, err := getCredentials(c)
+	cred2, err := getCredentials(c, "uid-123")
 	if err != nil {
 		t.Fatalf("getCredentials: %v", err)
 	}
