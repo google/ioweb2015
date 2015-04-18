@@ -170,33 +170,38 @@ Response body sample:
 {
   "sessions": {
     "0486a8f4-4acb-e311-b297-00155d5066d7": {
-      "captionsUrl": "http://io-captions.appspot.com/?event=e1\u0026android=t",
-      "color": "#0288d1",
-      "description": "How do you make your cloud applications fast?",
-      "endTimestamp": "2014-06-25T20:45:00Z",
-      "hashtag": "Cloud",
       "id": "0486a8f4-4acb-e311-b297-00155d5066d7",
+      "title": "Making your cloud apps Google-fast",
+      "description": "How do you make your cloud applications fast?",
+      "startTimestamp": "2014-06-25T20:00:00Z",
+      "endTimestamp": "2014-06-25T20:45:00Z",
       "isLivestream": false,
-      "mainTag": "TOPIC_CLOUDSERVICES",
       "photoUrl": "http://storage.googleapis.com/iosched-updater-dev.appspot.com/images/sessions/__w-200-400-600-800-1000__/0486a8f4-4acb-e311-b297-00155d5066d7.jpg",
-      "relatedContent": "4y4-xn4Vi04 Command Your Cloud with gCloud\nqdyNKNt2XLY Optimizing disk I/O in the cloud\nDWpBNm6lBU4 Putting Google's Network to work for You\nQ8jZHc0NS6A Building node.js applications with App Engine and Custom Runtimes\n",
-      "room": "room1",
+      "room": "Room 42",
       "speakers": [
         "afb30576-a1cc-e311-b297-00155d5066d7",
         "b7139c80-8de2-e311-b297-00155d5066d7"
       ],
-      "startTimestamp": "2014-06-25T20:00:00Z",
       "tags": [
         "TYPE_SESSIONS",
         "THEME_DEVELOP",
         "TOPIC_CLOUDSERVICES"
       ],
-      "title": "Making your cloud apps Google-fast",
-      "url": "https://www.google.com/events/io/schedule/session/0486a8f4-4acb-e311-b297-00155d5066d7",
-      "youtubeUrl": "https://youtu.be/7jm6wINhWDI"
+      "youtubeUrl": "https://youtu.be/7jm6wINhWDI",
+      "update": "details"
     }
   },
-  "videos": {... new/updated video objects? ...},
+  "videos": {
+    "naf_WbtFAlY": {
+      "thumbnailUrl": "http://img.youtube.com/vi/naf_WbtFAlY/hqdefault.jpg",
+      "id": "naf_WbtFAlY",
+      "title": "Fullscreen Apps for Android Wear",
+      "desc": "Learn how to write beautiful apps outside the stream on Android Wear, with a focus on how users leave apps and how to design for a round screen.",
+      "year": 2014,
+      "topic": "Android",
+      "speakers": "Michael Kolb, Will Brown"
+    }
+  },
   "ioext": [
     {
       "name": "I/O Extended 2015 - San Francisco",
@@ -209,6 +214,16 @@ Response body sample:
   "token": "use this token for the next request"
 }
 ```
+
+`update` field in the session objects can have one of the following values:
+
+* `details`: any/all session fields have changed.
+* `video`: `youtubeUrl` field is changed.
+* `start`: the session is about to start. this includes the keynote.
+
+`videos` section contains other videos, potentially not related to sessions, e.g. dev bytes.
+
+`ioext` section contains new locations for I/O Extended events.
 
 If the `Authorization` header is set to a valid OAuth 2 token, then the response will come back with
 just the `token` field populated, for use in the next request.
