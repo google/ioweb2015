@@ -330,6 +330,10 @@
           } else {
             pageIsDeepLinked_ = true;
           }
+        }).then(function() {
+          if (IOWA.Elements.GoogleSignIn.signedIn) {
+            fetchUserData();
+          }
         });
       };
 
@@ -357,9 +361,8 @@
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
-          if (IOWA.Elements.GoogleSignIn.signedIn) {
-            fetchUserData();
-          } else {
+          // Wait for signed-in state to fetch user's schedule.
+          if (!IOWA.Elements.GoogleSignIn.signedIn) {
             document.addEventListener('signin-change', onSigninChanged_);
           }
 
