@@ -48,6 +48,9 @@ type eventSession struct {
 	Start   string          `json:"start"`
 	End     string          `json:"end"`
 	Filters map[string]bool `json:"filters"`
+
+	// Update is used only when diff-ing
+	Update string `json:"update"`
 }
 
 type eventSpeaker struct {
@@ -326,6 +329,10 @@ func diffEventData(a, b *eventData) *dataChanges {
 	for id, bs := range b.Sessions {
 		if as, ok := a.Sessions[id]; ok && !reflect.DeepEqual(as, bs) {
 			dc.Sessions[id] = bs
+			bs.Update = updateDetails
+			if as.YouTube != bs.YouTube && bs.YouTube != "" {
+				bs.Update = updateVideo
+			}
 		}
 	}
 	for id, bs := range b.Speakers {

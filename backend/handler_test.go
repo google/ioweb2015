@@ -920,6 +920,7 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 	if l := len(dc.Videos); l != 0 {
 		t.Errorf("len(dc.Videos) = %d; want 0", l)
 	}
+	s.Update = updateDetails
 	if s2 := dc.Sessions[session.Id]; !reflect.DeepEqual(s2, s) {
 		t.Errorf("s2 = %+v\nwant %+v", s2, s)
 	}
@@ -1027,7 +1028,7 @@ func TestServeUserUpdates(t *testing.T) {
 	err = storeChanges(c, &dataChanges{
 		Changed: lastMod,
 		eventData: eventData{
-			Sessions: map[string]*eventSession{"second": &eventSession{}},
+			Sessions: map[string]*eventSession{"second": &eventSession{Update: updateDetails}},
 		},
 	})
 	if err != nil {
@@ -1051,8 +1052,12 @@ func TestServeUserUpdates(t *testing.T) {
 	if _, exists := res.Sessions["first"]; exists {
 		t.Errorf("don't want 'first' session in res")
 	}
-	if _, exists := res.Sessions["second"]; !exists {
+	s, exists := res.Sessions["second"]
+	if !exists {
 		t.Errorf("want 'second' session in res")
+	}
+	if s.Update != updateDetails {
+		t.Errorf("s.Update = %q; want %q", s.Update, updateDetails)
 	}
 
 	user, next, err := decodeSWToken(res.Token)
