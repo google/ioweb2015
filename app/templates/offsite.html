@@ -12,7 +12,7 @@
     <span flex><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></span>
   </core-toolbar>
 
-  <core-toolbar class="navbar__overlay navbar__overlay--extended" aria-hidden="{{!fullscreenVideoActive}}" fit>
+  <core-toolbar class="navbar__overlay navbar__overlay--extended" aria-hidden="{{!extendedMapActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeExtendedMapSection}}" aria-label="Close extended map"></paper-icon-button>
     <span flex>2015 Extended events</span>
   </core-toolbar>
@@ -358,7 +358,7 @@
           }
 
           IOWA.Elements.Template.extendedMapActive = true;
-          IOWA.Elements.Template.offsiteMarkerResults= [];
+          IOWA.Elements.Template.offsiteMarkerResults = [];
           runExtendedMapAnimation();
         });
       };
