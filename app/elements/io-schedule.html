@@ -52,6 +52,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
               </div>
+              <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
               <div class="card-content schedule-rows"
                    layout vertical hidden?="{{!timeBlock.sessions.length}}">
                 <template repeat="{{sessionId in timeBlock.sessions}}">
