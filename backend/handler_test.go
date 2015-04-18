@@ -755,7 +755,8 @@ func TestFirstSyncEventData(t *testing.T) {
 	config.Schedule.ManifestURL = ts.URL + "/manifest.json"
 	config.Schedule.Start = startDate
 
-	r := newTestRequest(t, "GET", "/sync/gcs", nil)
+	r := newTestRequest(t, "POST", "/sync/gcs", nil)
+	r.Header.Set("x-goog-channel-token", "sync-token")
 	w := httptest.NewRecorder()
 	syncEventData(w, r)
 
@@ -821,8 +822,10 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 		},
 	}
 
-	r := newTestRequest(t, "GET", "/sync/gcs", nil)
+	r := newTestRequest(t, "POST", "/sync/gcs", nil)
+	r.Header.Set("x-goog-channel-token", "sync-token")
 	c := newContext(r)
+
 	err := storeEventData(c, &eventData{
 		modified: firstMod,
 		Sessions: map[string]*eventSession{session.Id: session},

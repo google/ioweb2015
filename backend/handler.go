@@ -433,6 +433,14 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 // diffs the changes with a previous version, stores those changes
 // and spawns up workers to send push notifications to interested parties.
 func syncEventData(w http.ResponseWriter, r *http.Request) {
+	// allow only cron jobs, task qeueus and GCS
+	if r.Header.Get("x-appengine-cron") != "true" &&
+		r.Header.Get("x-appengine-taskname") == "" &&
+		r.Header.Get("x-goog-channel-token") != config.SyncToken {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	c := newContext(r)
 	err := runInTransaction(c, func(c context.Context) error {
 		oldData, err := getLatestEventData(c)
@@ -564,6 +572,11 @@ func serveSWToken(w http.ResponseWriter, r *http.Request) {
 
 // TODO: add ioext params
 func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("x-appengine-taskname") == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	c := newContext(r)
 	sessions := strings.Split(r.FormValue("sessions"), " ")
 	if len(sessions) == 0 {
@@ -589,6 +602,11 @@ func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
 
 // handlePingUser sends a GCM "ping" to user devices based on certain conditions.
 func handlePingUser(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("x-appengine-taskname") == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	c := newContext(r)
 	user := r.FormValue("uid")
 	sessions := strings.Split(r.FormValue("sessions"), " ")
