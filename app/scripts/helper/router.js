@@ -123,9 +123,9 @@ IOWA.Router = (function() {
    * @private
    */
   Router.pageExitTransitions = {
-      'masthead-ripple-transition': 'playMastheadRippleTransition',
-      'hero-card-transition': 'playHeroTransitionStart',
-      'page-slide-transition': 'playPageSlideOut'
+    'masthead-ripple-transition': 'playMastheadRippleTransition',
+    'hero-card-transition': 'playHeroTransitionStart',
+    'page-slide-transition': 'playPageSlideOut'
   };
 
   /**
@@ -134,9 +134,9 @@ IOWA.Router = (function() {
    * @private
    */
   Router.pageEnterTransitions = {
-      'masthead-ripple-transition': 'playPageSlideIn',
-      'hero-card-transition': 'playHeroTransitionEnd',
-      'page-slide-transition': 'playPageSlideIn'
+    'masthead-ripple-transition': 'playPageSlideIn',
+    'hero-card-transition': 'playHeroTransitionEnd',
+    'page-slide-transition': 'playPageSlideIn'
   };
 
   /**
