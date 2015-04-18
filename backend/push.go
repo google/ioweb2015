@@ -16,6 +16,12 @@ import (
 	"golang.org/x/net/context"
 )
 
+const (
+	updateDetails = "details"
+	updateVideo   = "video"
+	updateStart   = "start"
+)
+
 //  userPush is user notification configuration.
 type userPush struct {
 	userID string
