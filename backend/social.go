@@ -15,7 +15,8 @@ import (
 
 const (
 	// socialCacheTimeout is how long until social entries are expired.
-	socialCacheTimeout = 10 * time.Minute
+	// The content is still refreshed much earlier via cron jobs.
+	socialCacheTimeout = 48 * time.Hour
 
 	// tweetURL is a single tweet URL format.
 	tweetURL = "https://twitter.com/%s/status/%v"
