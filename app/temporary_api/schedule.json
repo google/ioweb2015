@@ -473,101 +473,121 @@
   },
   "tags": {
     "THEME_DEVELOP&DESIGN": {
+      "order_in_category": 0,
       "tag": "THEME_DEVELOP&DESIGN",
       "name": "Develop & Design",
       "category": "THEME"
     },
     "THEME_ENGAGE&EARN": {
+      "order_in_category": 0,
       "tag": "THEME_ENGAGE&EARN",
       "name": "Engage & Earn",
       "category": "THEME"
     },
     "TOPIC_ACCESSIBILITY": {
+      "order_in_category": 0,
       "tag": "TOPIC_ACCESSIBILITY",
       "name": "Accessibility",
       "category": "TOPIC"
     },
     "TOPIC_ANDROID": {
+      "order_in_category": 1,
       "tag": "TOPIC_ANDROID",
       "name": "Android",
       "category": "TOPIC"
     },
     "TOPIC_AUDIENCEGROWTH": {
+      "order_in_category": 0,
       "tag": "TOPIC_AUDIENCEGROWTH",
       "name": "Audience Growth",
       "category": "TOPIC"
     },
     "TOPIC_AUTO": {
+      "order_in_category": 0,
       "tag": "TOPIC_AUTO",
       "name": "Auto",
       "category": "TOPIC"
     },
     "TOPIC_CHROME_WEB": {
+      "order_in_category": 2,
       "tag": "TOPIC_CHROME_WEB",
       "name": "Chrome / Web",
       "category": "TOPIC"
     },
     "TOPIC_DESIGN": {
+      "order_in_category": 0,
       "tag": "TOPIC_DESIGN",
       "name": "Design",
       "category": "TOPIC"
     },
     "TOPIC_GAMES": {
+      "order_in_category": 5,
       "tag": "TOPIC_GAMES",
       "name": "Games",
       "category": "TOPIC"
     },
     "TOPIC_GOOGLEPLAY": {
+      "order_in_category": 0,
       "tag": "TOPIC_GOOGLEPLAY",
       "name": "Google Play",
       "category": "TOPIC"
     },
     "TOPIC_LOCATION": {
+      "order_in_category": 8,
       "tag": "TOPIC_LOCATION",
       "name": "Location",
       "category": "TOPIC"
     },
     "TOPIC_SEARCH": {
+      "order_in_category": 0,
       "tag": "TOPIC_SEARCH",
       "name": "Search",
       "category": "TOPIC"
     },
     "TOPIC_TOOLS&APIS": {
+      "order_in_category": 0,
       "tag": "TOPIC_TOOLS&APIS",
       "name": "Tools & APIs",
       "category": "TOPIC"
     },
     "TOPIC_TV&LIVINGROOM": {
+      "order_in_category": 0,
       "tag": "TOPIC_TV&LIVINGROOM",
       "name": "TV & Living Room",
       "category": "TOPIC"
     },
     "TOPIC_WEARABLES": {
+      "order_in_category": 15,
       "tag": "TOPIC_WEARABLES",
       "name": "Wearables",
       "category": "TOPIC"
     },
     "TYPE_CODELABS": {
+      "order_in_category": 0,
       "tag": "TYPE_CODELABS",
       "name": "Code Labs",
       "category": "TYPE"
     },
     "TYPE_MISC": {
+      "order_in_category": 0,
       "tag": "TYPE_MISC",
       "name": "Misc",
       "category": "TYPE"
     },
     "TYPE_OFFICEHOURS": {
+      "order_in_category": 6,
       "tag": "TYPE_OFFICEHOURS",
       "name": "Office Hours",
       "category": "TYPE"
     },
     "TYPE_SANDBOXTALKS": {
+      "order_in_category": 0,
       "tag": "TYPE_SANDBOXTALKS",
       "name": "Sandbox Talks",
       "category": "TYPE"
     },
     "TYPE_SESSIONS": {
+      "order_in_category": 1,
       "tag": "TYPE_SESSIONS",
       "name": "Sessions",
       "category": "TYPE"

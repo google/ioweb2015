@@ -78,9 +78,10 @@ type eventRoom struct {
 }
 
 type eventTag struct {
-	Tag  string `json:"tag"`
-	Name string `json:"name"`
-	Cat  string `json:"category"`
+	Order int    `json:"order_in_category"`
+	Tag   string `json:"tag"`
+	Name  string `json:"name"`
+	Cat   string `json:"category"`
 }
 
 // isEmptyEventData returns true if d is nil or its exported fields contain no items.
