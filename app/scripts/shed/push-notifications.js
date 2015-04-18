@@ -105,7 +105,7 @@ function generateSessionNotifications(updatedSessions) {
           // If there's a cached sessions feed, then update the changed fields and replace the cached
           // version with the updated version.
           parseResponseJSON(response).then(function(schedule) {
-            Object.keys(updatedSessions).forEach(function(sessionId) {
+            sessionIds.forEach(function(sessionId) {
               schedule.sessions[sessionId] = updatedSessions[sessionId];
             });
 
