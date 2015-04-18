@@ -8,12 +8,12 @@
 
 {% define "content" %}
   <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
-    <paper-icon-button icon="arrow-back" on-tap="{{closeVideoSection}}" aria-label="Close video"></paper-icon-button>
+    <paper-icon-button icon="arrow-back" on-tap="{{closeVideoSection}}" aria-label="Close video" tabindex="{{fullscreenVideoActive ? 0 : -1}}"></paper-icon-button>
     <span flex><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></span>
   </core-toolbar>
 
   <core-toolbar class="navbar__overlay navbar__overlay--extended" aria-hidden="{{!extendedMapActive}}" fit>
-    <paper-icon-button icon="arrow-back" on-tap="{{closeExtendedMapSection}}" aria-label="Close extended map"></paper-icon-button>
+    <paper-icon-button icon="arrow-back" on-tap="{{closeExtendedMapSection}}" aria-label="Close extended map" tabindex="{{extendedMapActive ? 0 : -1}}"></paper-icon-button>
     <span flex>2015 Extended events</span>
   </core-toolbar>
 
