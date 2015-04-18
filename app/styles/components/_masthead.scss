@@ -189,10 +189,14 @@ core-drawer-panel {
   /* Should match Polymer/paper-tabs/paper-tab.css#L17 */
   transition: color .1s cubic-bezier(0.4, 0.0, 1, 1);
   margin: 0;
-}
 
-#signin-nav-elements > .button-link {
-  padding: 16px 12px;
+  & > .button-link {
+    padding: 16px 12px;
+  }
+
+  & > .profilepic {
+    margin-left: $mobileKeyline / 2;
+  }
 }
 
 #signin-settings-panel,
