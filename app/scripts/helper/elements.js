@@ -168,38 +168,6 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
-    template.filterThemes = [
-      'Develop & Design',
-      'Engage & Earn',
-      "What's Next"
-    ];
-
-    template.filterTopics = [
-      'All',
-      'Accessibility',
-      'Android',
-      'Audience Growth',
-      'Auto',
-      'Chrome / Web',
-      'Design',
-      'Earn',
-      'Games',
-      'Play',
-      'Location',
-      'Search',
-      'Tools & APIs',
-      'TV & Living Room',
-      'Wearables'
-    ];
-
-    template.filterSessionTypes = [
-      'Sessions',
-      'Code Labs',
-      'Sandbox talks',
-      'Office hours',
-      'Misc'
-    ];
-
     template.timezoneNames = {
       'GMT-11:00': {
         'name': 'US/Samoa',
