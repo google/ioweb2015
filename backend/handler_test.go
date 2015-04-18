@@ -12,8 +12,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 func TestServeIOExtEntriesStub(t *testing.T) {
@@ -211,8 +209,7 @@ func TestHandleAuth(t *testing.T) {
 			continue
 		}
 
-		c = context.WithValue(c, ctxKeyUser, testUserID)
-		cred, err := getCredentials(c)
+		cred, err := getCredentials(c, testUserID)
 
 		if err != nil {
 			t.Errorf("%d: getCredentials: %v", i, err)
@@ -626,8 +623,7 @@ func TestStoreUserPushConfig(t *testing.T) {
 		t.Errorf("p1.Pext = %+v; want %+v", p1.Pext, expected.Pext)
 	}
 
-	c := context.WithValue(newContext(r), ctxKeyUser, testUserID)
-	p2, err := getUserPushInfo(c)
+	p2, err := getUserPushInfo(newContext(r), testUserID)
 	if err != nil {
 		t.Errorf("getUserPushInfo: %v", err)
 	}

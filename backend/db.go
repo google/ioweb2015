@@ -13,7 +13,7 @@ import (
 
 // RunInTransaction runs f in a transaction.
 // It calls f with a transaction context tc that f should use for all operations.
-func RunInTransaction(c context.Context, f func(tc context.Context) error) error {
+func runInTransaction(c context.Context, f func(tc context.Context) error) error {
 	// TODO: implement transaction support
 	return f(c)
 }
@@ -25,9 +25,8 @@ func storeCredentials(c context.Context, cred *oauth2Credentials) error {
 	return nil
 }
 
-// getCredentials fetches credentials from a persistent DB.
-// A user must be present in the context.
-func getCredentials(c context.Context) (*oauth2Credentials, error) {
+// getCredentials fetches user credentials from a persistent DB.
+func getCredentials(c context.Context, uid string) (*oauth2Credentials, error) {
 	// TODO: implement
 	return nil, errors.New("not implemented")
 }
@@ -42,9 +41,13 @@ func storeUserPushInfo(c context.Context, p *userPush) error {
 // getUserPushInfo fetches user push configuration from a persistent DB.
 // If the configuration does not exist yet, a default one is returned.
 // Default configuration has all notification settings disabled.
-// A user must be present in the context.
-func getUserPushInfo(c context.Context) (*userPush, error) {
+func getUserPushInfo(c context.Context, uid string) (*userPush, error) {
 	// TODO: implement
+	return nil, errors.New("not implemented")
+}
+
+// listUsersWithPush returns user IDs which have userPush.Enabled == true.
+func listUsersWithPush(c context.Context) ([]string, error) {
 	return nil, errors.New("not implemented")
 }
 

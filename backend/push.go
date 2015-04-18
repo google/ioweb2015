@@ -5,8 +5,11 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -91,8 +94,50 @@ func filterUserChanges(dc *dataChanges, bks []string, ext *ioExtPush) {
 	}
 }
 
-func startNotifySubscribers(c context.Context, d *dataChanges) error {
-	// TODO: implement
+// pingUser sends a "ping" push message to all user devices
+func pingUser(c context.Context, uid string) error {
+	pi, err := getUserPushInfo(c, uid)
+	if err != nil {
+		return fmt.Errorf("pingUser: %v", err)
+	}
+	if !pi.Enabled {
+		return nil
+	}
+
+	params := struct {
+		RIDs []string `json:"registration_ids"`
+	}{
+		RIDs: make([]string, 0, len(pi.Subscribers)),
+	}
+	for i, id := range pi.Subscribers {
+		if pi.Endpoints[i] != config.Google.GCM.Endpoint {
+			logf(c, "pingUser: unknown endpoint %q; reg = %s", pi.Endpoints[i], id)
+			continue
+		}
+		params.RIDs = append(params.RIDs, id)
+	}
+	b, err := json.Marshal(&params)
+	if err != nil {
+		return fmt.Errorf("pingUser: %v", err)
+	}
+	logf(c, "DEBUG: posting to %q:\n%s", config.Google.GCM.Endpoint, b)
+	r, err := http.NewRequest("POST", config.Google.GCM.Endpoint, bytes.NewReader(b))
+	if err != nil {
+		return fmt.Errorf("pingUser: %v", err)
+	}
+	r.Header.Set("content-type", "application/json")
+	r.Header.Set("authorization", "key="+config.Google.GCM.Key)
+
+	res, err := httpClient(c).Do(r)
+	if err != nil {
+		return fmt.Errorf("pingUser: %v", err)
+	}
+	defer res.Body.Close()
+	if b, err = ioutil.ReadAll(res.Body); err != nil {
+		return fmt.Errorf("pingUser: %v", err)
+	}
+	logf(c, "pingUser: response:\n%s", b)
+	// TODO: handle GCM errors in b
 	return nil
 }
 
