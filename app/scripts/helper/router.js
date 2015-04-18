@@ -218,8 +218,9 @@ IOWA.Router = (function() {
    */
   Router.prototype.runPageHandler = function(funcName) {
     var pageName = this.state.current.page;
+    var template = this.t;
     return new Promise(function(resolve, reject) {
-      var page = IOWA.Elements.Template.pages[pageName];
+      var page = template.pages[pageName];
       if (page && page[funcName]) {
         // If page we're going to has a load handler, run it.
         page[funcName]();
@@ -323,6 +324,7 @@ IOWA.Router = (function() {
       .then(function() {
         // End transition.
         IOWA.Elements.Template.fire('page-transition-done');
+        this.runPageHandler('onTransitionDone');
       }.bind(this));
   };
 
