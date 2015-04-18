@@ -17,12 +17,12 @@
 var DB_KEY = 'token';
 var DB_NAME = 'push-notification-updates';
 var DEFAULT_ICON = 'images/touch/homescreen192.png';
-var SESSIONS_ENDPOINT = 'api/v1/schedule';
+var SCHEDULE_ENDPOINT = 'api/v1/schedule';
 var UPDATES_ENDPOINT = 'api/v1/user/updates';
 // Contains a mapping of notification tag values to the corresponding URL that should be opened
 // when the notification is tapped/clicked.
 var TAG_TO_DESTINATION_URL = {
-  schedule: 'schedule#myschedule'
+  'session-details': 'schedule#myschedule'
 };
 var UTM_SOURCE_PARAM = 'utm_source=notification';
 
@@ -94,38 +94,42 @@ function processResponse(body) {
  *                   registration.showNotification()
  */
 function generateSessionNotifications(updatedSessions) {
-  if (updatedSessions && updatedSessions.length) {
+  var sessionIds = Object.keys(updatedSessions);
+  if (sessionIds.length) {
     // Ensure that we have an up-to-date sessions feed cached.
     // This will happen aysnchronously, independent from the notification creation, so it shouldn't be
     // necessary to wait on the promise resolutions.
     caches.open(shed.options.cacheName).then(function(cache) {
-      cache.match(SESSIONS_ENDPOINT).then(function(response) {
+      cache.match(SCHEDULE_ENDPOINT).then(function(response) {
         if (response) {
           // If there's a cached sessions feed, then update the changed fields and replace the cached
           // version with the updated version.
-          parseResponseJSON(response).then(function(allSessions) {
+          parseResponseJSON(response).then(function(schedule) {
             Object.keys(updatedSessions).forEach(function(sessionId) {
-              allSessions[sessionId] = updatedSessions[sessionId];
+              schedule.sessions[sessionId] = updatedSessions[sessionId];
             });
 
-            cache.put(SESSIONS_ENDPOINT, new Response(JSON.stringify(allSessions)));
+            cache.put(SCHEDULE_ENDPOINT, new Response(JSON.stringify(schedule)));
           });
         } else {
           // If there isn't anything already cached for the sessions feed, then cache the whole thing.
-          shed.cache(SESSIONS_ENDPOINT);
+          shed.cache(SCHEDULE_ENDPOINT);
         }
       });
     }).catch(function(error) {
       console.error('Could not update the cached sessions feed:', error);
     });
 
-    return Object.keys(updatedSessions).map(function(sessionId) {
+    return sessionIds.filter(function(sessionId) {
+      // TODO(jeffposnick): Handle notifications for video/start updates.
+      return updatedSessions[sessionId].update === 'details';
+    }).map(function(sessionId) {
       var session = updatedSessions[sessionId];
       return {
         title: 'Some events in My Schedule have been updated',
         body: '"' + session.title + '" was updated.',
         icon: session.photoUrl || DEFAULT_ICON,
-        tag: 'schedule'
+        tag: 'session-details'
       };
     });
   } else {
