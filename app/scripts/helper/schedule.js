@@ -85,10 +85,35 @@ IOWA.Schedule = (function() {
     });
   }
 
+  function generateFilters(tags) {
+    var filterSessionTypes = [];
+    var filterThemes = [];
+    var filterTopics = [];
+
+    for (var t in tags) {
+      switch (tags[t].category) {
+        case 'TYPE':
+          filterSessionTypes.push(tags[t].name);
+          break;
+        case 'TOPIC':
+          filterTopics.push(tags[t].name);
+          break;
+        case 'THEME':
+          filterThemes.push(tags[t].name);
+          break;
+      }
+    }
+
+    IOWA.Elements.Template.filterSessionTypes = filterSessionTypes;
+    IOWA.Elements.Template.filterThemes = filterThemes;
+    IOWA.Elements.Template.filterTopics = filterTopics;
+  }
+
   return {
     fetchSchedule: fetchSchedule,
     fetchUserSchedule: fetchUserSchedule,
-    saveSession: saveSession
+    saveSession: saveSession,
+    generateFilters: generateFilters
   };
 
 })();

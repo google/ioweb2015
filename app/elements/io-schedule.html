@@ -77,7 +77,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                         {{sessions[sessionId].title}}
                         <core-icon class="schedule-livestream"
                             icon="io:videocam"
-                            hidden?="{{!selectSession.isLivestream}}"></core-icon>
+                            hidden?="{{!sessions[sessionId].isLivestream}}"></core-icon>
                       </span>
                     </div>
                   </div>

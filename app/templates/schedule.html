@@ -67,7 +67,7 @@
       <a href="#" target="_blank" class="share-icon" data-share-type="twitter" on-click="{{openShareWindow}}">
         <core-icon icon="io:post-twitter"></core-icon>
       </a>
-      <a href="#" target="_blank" class="share-icon" data-share-type="facebook" on-click="{{openShareWindow}}">
+      <a href="#" target="_blank" class="share-icon" data-share-type="fb" on-click="{{openShareWindow}}">
         <core-icon icon="io:post-facebook"></core-icon>
       </a>
       <span flex class="session__livestream" hidden?="{{!selectedSession.isLivestream}}">Live streamed <core-icon icon="io:videocam"></core-icon></span>
@@ -308,6 +308,10 @@
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
           IOWA.Elements.Template.scheduleData = scheduleData;
 
+          IOWA.Schedule.generateFilters(scheduleData.tags);
+
+          IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
+
           // Deep link into schedule tab.
           var filters = [];
           var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
@@ -385,7 +389,7 @@
 
           if (saved) {
             return IOWA.Notifications.waitForPrereqs().then(function() {
-              IOWA.Elements.Toast.showMessage('Added to My Schedule. You\'ll get a notification when it starts.');
+              IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification when it starts.");
             }).catch(function() {
               // waitForPrereqs() rejects if notifications are not supported in the browser, or if
               // the notifications permission is set to 'denied' and the Permissions API isn't supported.
