@@ -3,8 +3,6 @@ package main
 import (
 	"testing"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 func TestStoreGetCredentials(t *testing.T) {
@@ -20,12 +18,12 @@ func TestStoreGetCredentials(t *testing.T) {
 	}
 
 	r := newTestRequest(t, "GET", "/", nil)
-	c := context.WithValue(newContext(r), ctxKeyUser, "user-123")
+	c := newContext(r)
 	if err := storeCredentials(c, cred1); err != nil {
 		t.Fatalf("storeCredentials: %v", err)
 	}
 
-	cred2, err := getCredentials(c)
+	cred2, err := getCredentials(c, cred1.userID)
 	if err != nil {
 		t.Fatalf("getCredentials: %v", err)
 	}
@@ -44,8 +42,7 @@ func TestStoreGetCredentials(t *testing.T) {
 		t.Errorf("cred2.Expiry = %s; want %s", cred2.Expiry, cred1.Expiry)
 	}
 
-	c = context.WithValue(newContext(r), ctxKeyUser, "random-user")
-	v, err := getCredentials(c)
+	v, err := getCredentials(c, "random-user")
 	if err == nil {
 		t.Errorf("getCredentials: %+v; want error", v)
 	}

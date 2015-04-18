@@ -33,6 +33,9 @@ func main() {
 		if err != nil {
 			return err
 		}
+		if fi.IsDir() && fi.Name() == "debug" {
+			return filepath.SkipDir
+		}
 		if p == *templatesRoot || fi.IsDir() {
 			return nil
 		}

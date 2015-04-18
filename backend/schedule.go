@@ -343,9 +343,8 @@ func diffEventData(a, b *eventData) *dataChanges {
 
 // userSchedule returns a slice of session IDs bookmarked by a user.
 // It fetches data from Google Drive AppData folder associated with config.Google.Auth.Client.
-// Context c must include user ID.
-func userSchedule(c context.Context) ([]string, error) {
-	cred, err := getCredentials(c)
+func userSchedule(c context.Context, uid string) ([]string, error) {
+	cred, err := getCredentials(c, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -356,8 +355,9 @@ func userSchedule(c context.Context) ([]string, error) {
 	return data.Bookmarks, nil
 }
 
-func bookmarkSession(c context.Context, id string) ([]string, error) {
-	cred, err := getCredentials(c)
+// bookmarkSession adds session sid to the bookmarks of user uid.
+func bookmarkSession(c context.Context, uid, sid string) ([]string, error) {
+	cred, err := getCredentials(c, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -368,17 +368,18 @@ func bookmarkSession(c context.Context, id string) ([]string, error) {
 
 	// check for duplicates
 	sort.Strings(data.Bookmarks)
-	i := sort.SearchStrings(data.Bookmarks, id)
-	if i < len(data.Bookmarks) && data.Bookmarks[i] == id {
+	i := sort.SearchStrings(data.Bookmarks, sid)
+	if i < len(data.Bookmarks) && data.Bookmarks[i] == sid {
 		return data.Bookmarks, nil
 	}
 
-	data.Bookmarks = append(data.Bookmarks, id)
+	data.Bookmarks = append(data.Bookmarks, sid)
 	return data.Bookmarks, storeAppFolderData(c, cred, data)
 }
 
-func unbookmarkSession(c context.Context, id string) ([]string, error) {
-	cred, err := getCredentials(c)
+// unbookmarkSession is the opposite of bookmarkSession.
+func unbookmarkSession(c context.Context, uid, sid string) ([]string, error) {
+	cred, err := getCredentials(c, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +391,7 @@ func unbookmarkSession(c context.Context, id string) ([]string, error) {
 	// remove id in question w/o sorting
 	list := data.Bookmarks[:0]
 	for _, item := range data.Bookmarks {
-		if item != id {
+		if item != sid {
 			list = append(list, item)
 		}
 	}

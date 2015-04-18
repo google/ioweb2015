@@ -125,7 +125,7 @@ A list of tools to help in a debugging process.
 ### Proxy with the service account credentials
 
 ```
-https://io-webapp-staging.appspot.com/io2015/debug/srvget?url=<some-url>
+http://HOST/io2015/debug/srvget?url=<some-url>
 ```
 
 The backend will GET `some-url` and respond back with the original
@@ -143,5 +143,11 @@ TODO
 
 ### Send GCM push notifications
 
-TODO
+```
+http://HOST/io2015/debug/push
+```
+
+Follow instructions on that page.
+
+On staging server this is https://io-webapp-staging.appspot.com/io2015/debug/push
 

@@ -74,7 +74,7 @@ IOWA.Schedule = (function() {
   function saveSession(sessionId, save) {
     IOWA.Analytics.trackEvent('session', 'bookmark', save);
 
-    return IOWA.Auth.waitForSignedIn().then(function() {
+    return IOWA.Auth.waitForSignedIn('Sign in to add events to My Schedule').then(function() {
       IOWA.Elements.Template.scheduleFetchingUserData = true;
       var url = SCHEDULE_ENDPOINT_USERS + '/' + sessionId;
       return IOWA.Request.xhrPromise(save ? 'PUT' : 'DELETE', url, true).catch(function(error) {
