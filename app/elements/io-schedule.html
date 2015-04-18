@@ -46,27 +46,18 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               </div>
             </div>
           </template>
-          <template if="{{showOnlySavedSessions || timeBlock.sessions.length}}">
+          <template if="{{timeBlock.sessions.length}}">
             <div class="card">
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
               </div>
-              <paper-progress indeterminate hidden?="{{!fetchingUserData}}">
-              </paper-progress>
-              <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
-                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified
-                   hidden?="{{!showOnlySavedSessions || timeBlock.sessions.length}}">
-                <span class="no-sessions">No sessions added for this time</span>
-                <a href="#day{{timeBlock.day}}" data-ajax-link>
-                  Browse sessions
-                </a>
-              </div>
+              <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
               <div class="card-content schedule-rows"
                    layout vertical hidden?="{{!timeBlock.sessions.length}}">
                 <template repeat="{{sessionId in timeBlock.sessions}}">
                   <div class="schedule-row" layout horizontal
                        center?="{{isDesktopSize}}"
-                       hidden?="{{sessions[sessionId].hide ||  !(!showOnlySavedSessions || (showOnlySavedSessions && sessions[sessionId].saved)) }}">
+                       hidden?="{{sessions[sessionId].hide}}">
                     <io-radio-button
                         on-core-change="{{onToggleSaveSession}}"
                         toggles checked?="{{sessions[sessionId].saved}}"
@@ -94,6 +85,18 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               </div>
             </div>
           </template>
+
+          <template if="{{timeBlock.dayStart && !day && !timeBlock.sessions.length}}">
+            <div class="card">
+              <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
+                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified>
+                <span class="no-sessions">Add more events for this day</span>
+                <a href="#day{{timeBlock.day}}" data-subpage-link>Browse events</a>
+              </div>
+              <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
+            </div>
+          </template>
+
         </template>
       </div>
 

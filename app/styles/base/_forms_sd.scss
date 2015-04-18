@@ -39,9 +39,15 @@ io-checkbox::shadow #checkbox.checked {
   background-color: $color-form-controls;
 }
 
-io-radio-button[checked]::shadow #offRadio {
-  border-color: $color-form-controls;
+io-radio-button {
+  &[checked]::shadow #offRadio {
+    border-color: $color-form-controls;
+  }
+  &[disabled]::shadow #offRadio {
+    border-color: #5a5a5a;
+  }
 }
+
 
 paper-progress::shadow {
   #progressContainer {

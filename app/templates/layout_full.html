@@ -300,15 +300,16 @@ limitations under the License.
                     <h4>Notifications</h4>
                     <core-label horizontal layout>
                       <paper-checkbox checked?="{{currentUser.notify}}" autoFocus for on-tap="{{updateNotifyUser}}"></paper-checkbox>
-                      <h5>I want to receive notifications from the Google I/O 2015 website.</h5>
+                      <h5>I want to receive notifications from the Google I/O 2015 web app.</h5>
                     </core-label>
                     <p>If this option is deselected, I understand I won't be notified when:</p>
                     <ul>
                       <!-- <li>New Extended events register near me</li> -->
                       <li>I/O is about to start</li>
-                      <li>Bookmarked sessions are about to start</li>
-                      <li>Specific session videos are made available</li>
+                      <li>Events added to My Schedule are about to start</li>
+                      <li>Videos of sessions added to My Schedule are available</li>
                     </ul>
+                    <p style="margin-top:8px;"><b>Note</b>: Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
                   </div>
                   <div class="card-content" layout horizontal justified>
                     <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blank">Terms of Service</a>
@@ -330,8 +331,8 @@ limitations under the License.
               <ul>
                 <!-- <li>New I/O Extended events register near your location</li> -->
                 <li>I/O is about to start</li>
-                <li>Sessions added to My Schedule are about to start</li>
-                <li>Specific session videos are made available</li>
+                <li>Events added to My Schedule are about to start</li>
+                <li>Videos of sessions added to My Schedule are available</li>
               </ul>
               <p><b>Note</b>: Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
             </div>

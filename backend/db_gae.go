@@ -7,6 +7,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"golang.org/x/net/context"
@@ -22,7 +23,7 @@ const (
 
 // RunInTransaction runs f in a transaction.
 // It calls f with a transaction context tc that f should use for all operations.
-func RunInTransaction(c context.Context, f func(context.Context) error) error {
+func runInTransaction(c context.Context, f func(context.Context) error) error {
 	opts := &datastore.TransactionOptions{XG: true}
 	return datastore.RunInTransaction(c, f, opts)
 }
@@ -39,17 +40,15 @@ func storeCredentials(c context.Context, cred *oauth2Credentials) error {
 	return err
 }
 
-// getCredentials fetches credentials from a persistent DB.
-// A user must be present in the context.
-func getCredentials(c context.Context) (*oauth2Credentials, error) {
-	user := contextUser(c)
-	if user == "" {
-		return nil, errors.New("no user in context")
+// getCredentials fetches user credentials from a persistent DB.
+func getCredentials(c context.Context, uid string) (*oauth2Credentials, error) {
+	key := datastore.NewKey(c, kindCredentials, uid, 0, nil)
+	cred := &oauth2Credentials{userID: uid}
+	err := datastore.Get(c, key, cred)
+	if err != nil {
+		err = fmt.Errorf("getCredentials: %v", err)
 	}
-
-	key := datastore.NewKey(c, kindCredentials, user, 0, nil)
-	cred := &oauth2Credentials{userID: user}
-	return cred, datastore.Get(c, key, cred)
+	return cred, err
 }
 
 // storeUserPushInfo saves user push configuration in a persistent DB.
@@ -67,15 +66,9 @@ func storeUserPushInfo(c context.Context, p *userPush) error {
 // getUserPushInfo fetches user push configuration from a persistent DB.
 // If the configuration does not exist yet, a default one is returned.
 // Default configuration has all notification settings disabled.
-// A user must be present in the context.
-func getUserPushInfo(c context.Context) (*userPush, error) {
-	user := contextUser(c)
-	if user == "" {
-		return nil, errors.New("getUserPushInfo: no user in context")
-	}
-
-	key := datastore.NewKey(c, kindUserPush, user, 0, nil)
-	p := &userPush{userID: user}
+func getUserPushInfo(c context.Context, uid string) (*userPush, error) {
+	key := datastore.NewKey(c, kindUserPush, uid, 0, nil)
+	p := &userPush{userID: uid}
 	err := datastore.Get(c, key, p)
 	if err == datastore.ErrNoSuchEntity {
 		err = nil
@@ -88,6 +81,24 @@ func getUserPushInfo(c context.Context) (*userPush, error) {
 		p.Pext = &p.Ext
 	}
 	return p, err
+}
+
+// listUsersWithPush returns user IDs which have userPush.Enabled == true.
+// It might not return most recent result because of the datastore eventual consistency.
+func listUsersWithPush(c context.Context) ([]string, error) {
+	users := make([]string, 0)
+	q := datastore.NewQuery(kindUserPush).Filter("on =", true).KeysOnly()
+	for t := q.Run(c); ; {
+		k, err := t.Next(nil)
+		if err == datastore.Done {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("listUsersWithPush: %v", err)
+		}
+		users = append(users, k.StringID())
+	}
+	return users, nil
 }
 
 // storeEventData saves d in the datastore with auto-generated ID
@@ -176,6 +187,7 @@ func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
 	}
 
 	changes := &dataChanges{
+		Changed: t,
 		eventData: eventData{
 			Sessions: make(map[string]*eventSession),
 			Speakers: make(map[string]*eventSpeaker),

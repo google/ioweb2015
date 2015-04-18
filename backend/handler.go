@@ -4,12 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -33,10 +36,14 @@ func registerHandlers() {
 	handle("/api/v1/user/schedule", serveUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserBookmarks)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
+	handle("/api/v1/user/updates", serveUserUpdates)
 	handle("/sync/gcs", syncEventData)
+	handle("/task/notify-subscribers", handleNotifySubscribers)
+	handle("/task/ping-user", handlePingUser)
 	// debug handlers; not available in prod
 	if !isProd() {
 		handle("/debug/srvget", debugServiceGetURL)
+		handle("/debug/push", debugPush)
 	}
 	// setup root redirect if we're prefixed
 	if config.Prefix != "/" {
@@ -273,7 +280,7 @@ func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bookmarks, err := userSchedule(c)
+	bookmarks, err := userSchedule(c, contextUser(c))
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
 		return
@@ -293,6 +300,7 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(w, errStatus(err), err)
 		return
 	}
+	user := contextUser(c)
 
 	if r.URL.Path[len(r.URL.Path)-1] == '/' {
 		writeJSONError(w, http.StatusBadRequest, errors.New("invalid session ID"))
@@ -304,9 +312,9 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 	var bookmarks []string
 	switch r.Method {
 	case "PUT":
-		bookmarks, err = bookmarkSession(c, sid)
+		bookmarks, err = bookmarkSession(c, user, sid)
 	case "DELETE":
-		bookmarks, err = unbookmarkSession(c, sid)
+		bookmarks, err = unbookmarkSession(c, user, sid)
 	default:
 		writeJSONError(w, http.StatusBadRequest, errors.New("invalid request method"))
 		return
@@ -341,7 +349,7 @@ func serveUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(w, errStatus(err), err)
 		return
 	}
-	data, err := getUserPushInfo(c)
+	data, err := getUserPushInfo(c, contextUser(c))
 	if err != nil {
 		writeJSONError(w, errStatus(err), err)
 		return
@@ -369,7 +377,7 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get current settings
-	data, err := getUserPushInfo(c)
+	data, err := getUserPushInfo(c, contextUser(c))
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
 		return
@@ -421,6 +429,202 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// syncEventData updates event data stored in a persistent DB,
+// diffs the changes with a previous version, stores those changes
+// and spawns up workers to send push notifications to interested parties.
+func syncEventData(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	err := runInTransaction(c, func(c context.Context) error {
+		oldData, err := getLatestEventData(c)
+		if err != nil {
+			return err
+		}
+
+		newData, err := fetchEventData(c, config.Schedule.ManifestURL, oldData.modified)
+		if err != nil {
+			return err
+		}
+		if isEmptyEventData(newData) {
+			logf(c, "%s: no data or not modified (last: %s)", config.Schedule.ManifestURL, oldData.modified)
+			return nil
+		}
+		if err := storeEventData(c, newData); err != nil {
+			return err
+		}
+
+		diff := diffEventData(oldData, newData)
+		if isEmptyChanges(diff) {
+			logf(c, "%s: diff is empty (last: %s)", config.Schedule.ManifestURL, oldData.modified)
+			return nil
+		}
+		if err := storeChanges(c, diff); err != nil {
+			return err
+		}
+		if err := notifySubscribersAsync(c, diff); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		errorf(c, "syncEventSchedule: %v", err)
+		writeError(w, err)
+	}
+}
+
+// serverUserUpdates responds with a dataChanges containing a diff
+// between provided timestamp and current time.
+// Timestamp is encoded in the Authorization token which the client
+// must know beforehand.
+func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
+	ah := r.Header.Get("authorization")
+	// first request to get SW token
+	if strings.HasPrefix(strings.ToLower(ah), bearerHeader) {
+		serveSWToken(w, r)
+		return
+	}
+
+	// handle a request with SW token
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	user, ts, err := decodeSWToken(ah)
+	if err != nil {
+		writeJSONError(w, http.StatusForbidden, err)
+		return
+	}
+	c := context.WithValue(newContext(r), ctxKeyUser, user)
+
+	// fetch user data in parallel with dataChanges
+	var (
+		bookmarks []string
+		pushInfo  *userPush
+		userErr   error
+	)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		if bookmarks, userErr = userSchedule(c, user); userErr != nil {
+			return
+		}
+		pushInfo, userErr = getUserPushInfo(c, user)
+	}()
+
+	dc, err := getChangesSince(c, ts)
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	select {
+	case <-time.After(10 * time.Second):
+		errorf(c, "userSchedule/getUserPushInfo timed out")
+		writeJSONError(w, http.StatusInternalServerError, errors.New("timeout"))
+		return
+	case <-done:
+		// user data goroutine finished
+	}
+
+	// userErr indicates any error in the user data retrieval
+	if userErr != nil {
+		errorf(c, "userErr: %v", userErr)
+		writeJSONError(w, http.StatusInternalServerError, userErr)
+		return
+	}
+
+	filterUserChanges(dc, bookmarks, pushInfo.Pext)
+	dc.Token, err = encodeSWToken(user, dc.Changed.Add(1*time.Second))
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err)
+	}
+	if err := json.NewEncoder(w).Encode(dc); err != nil {
+		errorf(c, "serveUserUpdates: encode resp: %v", err)
+	}
+}
+
+// serveSWToken responds with an SW authorization token used by the client
+// in subsequent serveUserUpdates requests.
+func serveSWToken(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+
+	now := time.Now()
+	token, err := encodeSWToken(contextUser(c), now)
+	if err != nil {
+		writeJSONError(w, errStatus(err), err)
+		return
+	}
+	dc := &dataChanges{Token: token, Changed: now}
+	if err := json.NewEncoder(w).Encode(dc); err != nil {
+		errorf(c, "serveSWToke: encode resp: %v", err)
+	}
+}
+
+// TODO: add ioext params
+func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	sessions := strings.Split(r.FormValue("sessions"), " ")
+	if len(sessions) == 0 {
+		logf(c, "handleNotifySubscribers: empty sessions list; won't notify")
+		return
+	}
+
+	users, err := listUsersWithPush(c)
+	if err != nil {
+		errorf(c, "handleNotifySubscribers: %v")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logf(c, "found %d users with notifications enabled", len(users))
+	for _, id := range users {
+		if err := pingUserAsync(c, id, sessions); err != nil {
+			errorf(c, "handleNotifySubscribers: %v", err)
+			// TODO: handle this error case
+		}
+	}
+}
+
+// handlePingUser sends a GCM "ping" to user devices based on certain conditions.
+func handlePingUser(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	user := r.FormValue("uid")
+	sessions := strings.Split(r.FormValue("sessions"), " ")
+	// TODO: add ioext conditions
+	if user == "" || len(sessions) == 0 {
+		errorf(c, "handleMaybePingUser: invalid params user = %q; session = %v", user, sessions)
+		return
+	}
+
+	bookmarks, err := userSchedule(c, user)
+	if err != nil {
+		errorf(c, "handlePingUser: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	sort.Strings(sessions)
+
+	var matched bool
+	for _, id := range bookmarks {
+		i := sort.SearchStrings(sessions, id)
+		if matched = i < len(sessions) && sessions[i] == id; matched {
+			break
+		}
+	}
+	if !matched {
+		logf(c, "none of user sessions matched")
+		return
+	}
+
+	err = pingUser(c, user)
+	if err != nil {
+		errorf(c, "handlePingUser: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
 // debugGetURL fetches a URL with service account credentials.
 // Should not be available on prod.
 func debugServiceGetURL(w http.ResponseWriter, r *http.Request) {
@@ -452,46 +656,44 @@ func debugServiceGetURL(w http.ResponseWriter, r *http.Request) {
 	io.Copy(w, res.Body)
 }
 
-// syncEventData updates event data stored in a persistent DB,
-// diffs the changes with a previous version, stores those changes
-// and spawns up workers to send push notifications to interested parties.
-func syncEventData(w http.ResponseWriter, r *http.Request) {
+// debugPush stores dataChanges from r in the DB and calls notifySubscribersAsync.
+// dataChanges.Token is ignored; dataChanges.Changed is set to current time if not provided.
+// Should not be available on prod.
+func debugPush(w http.ResponseWriter, r *http.Request) {
 	c := newContext(r)
-	err := RunInTransaction(c, func(c context.Context) error {
-		oldData, err := getLatestEventData(c)
+
+	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "text/html;charset=utf-8")
+		t, err := template.ParseFiles(filepath.Join(config.Dir, templatesDir, "debug", "push.html"))
 		if err != nil {
-			return err
+			writeError(w, err)
+			return
 		}
+		if err := t.Execute(w, nil); err != nil {
+			errorf(c, "debugPush: %v", err)
+		}
+		return
+	}
 
-		newData, err := fetchEventData(c, config.Schedule.ManifestURL, oldData.modified)
-		if err != nil {
-			return err
-		}
-		if isEmptyEventData(newData) {
-			logf(c, "%s: no data or not modified (last: %s)", config.Schedule.ManifestURL, oldData.modified)
-			return nil
-		}
-		if err := storeEventData(c, newData); err != nil {
-			return err
-		}
+	w.Header().Set("Content-Type", "application/json")
+	updates := &dataChanges{}
+	if err := json.NewDecoder(r.Body).Decode(updates); err != nil {
+		writeJSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	if updates.Changed.IsZero() {
+		updates.Changed = time.Now()
+	}
 
-		diff := diffEventData(oldData, newData)
-		if isEmptyChanges(diff) {
-			logf(c, "%s: diff is empty (last: %s)", config.Schedule.ManifestURL, oldData.modified)
-			return nil
-		}
-		if err := storeChanges(c, diff); err != nil {
+	fn := func(c context.Context) error {
+		if err := storeChanges(c, updates); err != nil {
 			return err
 		}
-		if err := startNotifySubscribers(c, diff); err != nil {
-			return err
-		}
-		return nil
-	})
+		return notifySubscribersAsync(c, updates)
+	}
 
-	if err != nil {
-		errorf(c, "syncEventSchedule: %v", err)
-		writeError(w, err)
+	if err := runInTransaction(c, fn); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err)
 	}
 }
 

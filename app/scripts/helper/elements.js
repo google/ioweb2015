@@ -181,11 +181,10 @@ IOWA.Elements = (function() {
       'Audience Growth',
       'Auto',
       'Chrome / Web',
-      'Polymer',
       'Design',
       'Earn',
       'Games',
-      'Google Play',
+      'Play',
       'Location',
       'Search',
       'Tools & APIs',
@@ -195,10 +194,10 @@ IOWA.Elements = (function() {
 
     template.filterSessionTypes = [
       'Sessions',
-      'Sandbox Talks',
-      'Workshops',
-      'Office Hours',
-      'Code Labs'
+      'Code Labs',
+      'Sandbox talks',
+      'Office hours',
+      'Misc'
     ];
 
     template.timezoneNames = {
@@ -516,7 +515,7 @@ IOWA.Elements = (function() {
         // to the user's logged in state and will remain valid if notifications are re-enabled
         // later on.
         IOWA.Notifications.unsubscribeFromPushManagerPromise()
-          .then(disableNotificationsPromise)
+          .then(IOWA.Notifications.disableNotificationsPromise)
           .catch(IOWA.Util.reportError);
       }
     };
