@@ -19,7 +19,12 @@ var DB_NAME = 'push-notification-updates';
 var DEFAULT_ICON = 'images/touch/homescreen192.png';
 var SESSIONS_ENDPOINT = 'api/v1/schedule';
 var UPDATES_ENDPOINT = 'api/v1/user/updates';
-var SESSION_DETAILS_URL_PREFIX = 'schedule?filters=#day';
+// Contains a mapping of notification tag values to the corresponding URL that should be opened
+// when the notification is tapped/clicked.
+var TAG_TO_DESTINATION_URL = {
+  schedule: 'schedule#myschedule'
+};
+var UTM_SOURCE_PARAM = 'utm_source=notification';
 
 /**
  * Loads a SW token value from IndexedDB.
@@ -117,10 +122,10 @@ function generateSessionNotifications(updatedSessions) {
     return Object.keys(updatedSessions).map(function(sessionId) {
       var session = updatedSessions[sessionId];
       return {
-        title: 'I/O session "' + session.title + '" was updated.',
-        body: 'You previously starred this session.',
+        title: 'Some events in My Schedule have been updated',
+        body: '"' + session.title + '" was updated.',
         icon: session.photoUrl || DEFAULT_ICON,
-        tag: SESSION_DETAILS_URL_PREFIX + session.day + '/' + sessionId
+        tag: 'schedule'
       };
     });
   } else {
@@ -164,10 +169,8 @@ self.addEventListener('push', function(event) {
 });
 
 self.addEventListener('notificationclick', function(event) {
-  // Chrome displays a "default" notification if there isn't a notification shown in response to a
-  // push event. We should ideally never get those, but just do a check first to make sure.
-  if (event.notification.tag !== 'user_visible_auto_notification') {
-    var url = new URL(event.notification.tag, location.href);
-    clients.openWindow(url.toString());
-  }
+  var relativeUrl = TAG_TO_DESTINATION_URL[event.notification.tag] || '/';
+  var url = new URL(relativeUrl, location.href);
+  url.search += (url.search ? '&' : '') + UTM_SOURCE_PARAM;
+  self.clients.openWindow(url.toString());
 });
