@@ -152,8 +152,6 @@
       var socialPostUpdateInterval = 30000; // 30 seconds
       var updateSocialPostsTimeout;
 
-      console.log(page)
-
       if (page.hasBeenLoaded) {
         return;
       }
@@ -184,7 +182,6 @@
       }
 
       page.load = function() {
-        console.log('load')
         IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
         // Set a timeout to fetch new posts after 30 seconds.
         updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
