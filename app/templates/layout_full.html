@@ -285,7 +285,10 @@ limitations under the License.
           </paper-tabs>
           <span id="signin-nav-elements" class="{{isPhoneSize ? '' : navBgClass}}"
                 layout horizontal center>
-            <a href="#" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign in</a>
+            <!-- Note: Use on-click instead of on-tap so oauth popup is not blocked. Needs user gesture. -->
+            <!-- /fakesignin is not a real endpoint, but we need it to trick router not
+                 to return early from the document-level touchstart listener on mobile. -->
+            <a href="/fakesignin" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign in</a>
             <template if="{{currentUser}}">
               <img _src="{{currentUser.picture}}" class="profilepic">
               <paper-menu-button>
@@ -340,7 +343,7 @@ limitations under the License.
             </div>
           </div>
           <div class="card-content link-spacing">
-            <a href="#" data-track-link="signin-intro-signin" on-click="{{signIn}}" core-overlay-toggle>Sign in</a>
+            <a href="/fakesignin" data-track-link="signin-intro-signin" on-click="{{signIn}}" core-overlay-toggle>Sign in</a>
             <a href="#" data-track-link="signin-intro-later" core-overlay-toggle>Maybe later</a>
           </div>
         </paper-dialog>

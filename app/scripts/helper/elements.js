@@ -459,11 +459,13 @@ IOWA.Elements = (function() {
       }
     };
 
-    template.signIn = function() {
+    template.signIn = function(e) {
+      e && e.preventDefault();
       IOWA.Elements.GoogleSignIn.signIn();
     };
 
-    template.signOut = function() {
+    template.signOut = function(e) {
+      e && e.preventDefault();
       IOWA.Elements.GoogleSignIn.signOut();
     };
 
