@@ -253,6 +253,7 @@ limitations under the License.
           <paper-icon-button icon="menu" core-drawer-toggle></paper-icon-button>
           <div flex disabled?="{{selectedPage === 'home'}}">
             <a href="./" class="io-logo-link" data-ajax-link data-track-link="nav-home"
+                on-click="{{setSelectedPageToHome}}"
                          data-transition="masthead-ripple-transition" aria-label="Home" tabindex="0">
               <div class="io-logo" iologodestination></div>
             </a>

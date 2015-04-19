@@ -147,7 +147,7 @@
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
-      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+      var page = IOWA.Elements.Template.pages['home'];
       var socialPostsEndpoint = 'api/v1/social';
       var socialPostUpdateInterval = 30000; // 30 seconds
       var updateSocialPostsTimeout;
@@ -195,7 +195,7 @@
         // TODO: A temp fix for counter to position itself on page load.
         // Ask @paullewis to take a look.
         var counter = document.querySelector('countdown-timer');
-        if (counter) {
+        if (counter && counter.timer) {
           counter.timer.drawIfAnimationIsNotRunning();
         }
       };

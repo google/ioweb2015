@@ -447,6 +447,10 @@ IOWA.Elements = (function() {
       window.open(url, 'share', options);
     };
 
+    template.setSelectedPageToHome = function() {
+      this.selectedPage = 'home';
+    };
+
     template.backToTop = function(e, detail, sender) {
       e.preventDefault();
       IOWA.Util.smoothScroll(IOWA.Elements.Nav, 250);
