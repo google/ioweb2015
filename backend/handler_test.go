@@ -847,7 +847,7 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 		t.Fatalf("storeEventData: %v", err)
 	}
 	err = storeChanges(c, &dataChanges{
-		Changed: firstMod,
+		Updated: firstMod,
 		eventData: eventData{
 			Videos: map[string]*eventVideo{"dummy-id": &eventVideo{}},
 		},
@@ -930,8 +930,8 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 	if err != nil {
 		t.Fatalf("getChangesAfter: %v", err)
 	}
-	if dc.Changed != lastMod {
-		t.Errorf("dc.Changed = %s; want %s", dc.Changed, lastMod)
+	if dc.Updated != lastMod {
+		t.Errorf("dc.Changed = %s; want %s", dc.Updated, lastMod)
 	}
 	if l := len(dc.Videos); l != 0 {
 		t.Errorf("len(dc.Videos) = %d; want 0", l)
@@ -1036,7 +1036,7 @@ func TestServeUserUpdates(t *testing.T) {
 	}
 
 	err = storeChanges(c, &dataChanges{
-		Changed: firstMod,
+		Updated: firstMod,
 		eventData: eventData{
 			Sessions: map[string]*eventSession{"first": &eventSession{}},
 		},
@@ -1045,7 +1045,7 @@ func TestServeUserUpdates(t *testing.T) {
 		t.Fatalf("storeChanges(1): %v", err)
 	}
 	err = storeChanges(c, &dataChanges{
-		Changed: lastMod,
+		Updated: lastMod,
 		eventData: eventData{
 			Sessions: map[string]*eventSession{"second": &eventSession{Update: updateDetails}},
 		},
@@ -1065,8 +1065,8 @@ func TestServeUserUpdates(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), res); err != nil {
 		t.Fatalf("json.Unmarshal: %v", err)
 	}
-	if res.Changed.Unix() != lastMod.Unix() {
-		t.Errorf("res.Changed = %s; want %s", res.Changed, lastMod)
+	if res.Updated.Unix() != lastMod.Unix() {
+		t.Errorf("res.Changed = %s; want %s", res.Updated, lastMod)
 	}
 	if _, exists := res.Sessions["first"]; exists {
 		t.Errorf("don't want 'first' session in res")

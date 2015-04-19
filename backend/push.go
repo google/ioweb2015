@@ -47,7 +47,7 @@ type ioExtPush struct {
 // TODO: add GobEncoder/Decoder to use gob instead of json when storing in DB.
 type dataChanges struct {
 	Token   string    `json:"token"`
-	Changed time.Time `json:"ts"`
+	Updated time.Time `json:"ts"`
 	eventData
 	// TODO: add ioext data...  anything else?
 }
@@ -89,7 +89,7 @@ func mergeChanges(dst *dataChanges, src *dataChanges) {
 	}
 	dst.Videos = videos
 
-	dst.Changed = src.Changed
+	dst.Updated = src.Updated
 }
 
 // filterUserChanges reduces dc to a subset matching session IDs to bks.

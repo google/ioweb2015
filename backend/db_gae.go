@@ -159,7 +159,7 @@ func storeChanges(c context.Context, d *dataChanges) error {
 	ent := &struct {
 		Timestamp time.Time `datastore:"ts"`
 		Bytes     []byte    `datastore:"data"`
-	}{d.Changed, b}
+	}{d.Updated, b}
 	key := datastore.NewIncompleteKey(c, kindChanges, changesParent(c))
 	_, err = datastore.Put(c, key, ent)
 	return err
@@ -187,7 +187,7 @@ func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
 	}
 
 	changes := &dataChanges{
-		Changed: t,
+		Updated: t,
 		eventData: eventData{
 			Sessions: make(map[string]*eventSession),
 			Speakers: make(map[string]*eventSpeaker),
