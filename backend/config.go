@@ -44,6 +44,8 @@ type appConfig struct {
 	IoExtFeedURL string `json:"ioExtFeedUrl"`
 	// used for SW tokens
 	Secret string `json:"secret"`
+	// A shared secret to identify requests from GCS and gdrive
+	SyncToken string `json:"synct"`
 
 	// Twitter credentials
 	Twitter struct {

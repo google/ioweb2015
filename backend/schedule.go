@@ -48,6 +48,9 @@ type eventSession struct {
 	Start   string          `json:"start"`
 	End     string          `json:"end"`
 	Filters map[string]bool `json:"filters"`
+
+	// Update is used only when diff-ing
+	Update string `json:"update"`
 }
 
 type eventSpeaker struct {
@@ -78,9 +81,10 @@ type eventRoom struct {
 }
 
 type eventTag struct {
-	Tag  string `json:"tag"`
-	Name string `json:"name"`
-	Cat  string `json:"category"`
+	Order int    `json:"order_in_category"`
+	Tag   string `json:"tag"`
+	Name  string `json:"name"`
+	Cat   string `json:"category"`
 }
 
 // isEmptyEventData returns true if d is nil or its exported fields contain no items.
@@ -316,7 +320,7 @@ func diffEventData(a, b *eventData) *dataChanges {
 		return nil
 	}
 	dc := &dataChanges{
-		Changed: b.modified,
+		Updated: b.modified,
 		eventData: eventData{
 			Sessions: make(map[string]*eventSession),
 			Speakers: make(map[string]*eventSpeaker),
@@ -326,6 +330,10 @@ func diffEventData(a, b *eventData) *dataChanges {
 	for id, bs := range b.Sessions {
 		if as, ok := a.Sessions[id]; ok && !reflect.DeepEqual(as, bs) {
 			dc.Sessions[id] = bs
+			bs.Update = updateDetails
+			if as.YouTube != bs.YouTube && bs.YouTube != "" {
+				bs.Update = updateVideo
+			}
 		}
 	}
 	for id, bs := range b.Speakers {

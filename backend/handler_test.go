@@ -15,6 +15,7 @@ import (
 )
 
 func TestServeIOExtEntriesStub(t *testing.T) {
+	defer resetTestState(t)
 	r := newTestRequest(t, "GET", "/api/v1/extended", nil)
 	w := httptest.NewRecorder()
 	serveIOExtEntries(w, r)
@@ -29,6 +30,7 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 }
 
 func TestServeSocialStub(t *testing.T) {
+	defer resetTestState(t)
 	r := newTestRequest(t, "GET", "/api/v1/social", nil)
 	w := httptest.NewRecorder()
 	serveSocial(w, r)
@@ -43,6 +45,7 @@ func TestServeSocialStub(t *testing.T) {
 }
 
 func TestServeTemplate(t *testing.T) {
+	defer resetTestState(t)
 	const ctype = "text/html;charset=utf-8"
 
 	revert := preserveConfig()
@@ -91,6 +94,7 @@ func TestServeTemplate(t *testing.T) {
 }
 
 func TestServeTemplateRedirect(t *testing.T) {
+	defer resetTestState(t)
 	table := []struct{ start, redirect string }{
 		{"/about/", "/about"},
 		{"/one/two/", "/one/two"},
@@ -111,6 +115,7 @@ func TestServeTemplateRedirect(t *testing.T) {
 }
 
 func TestServeTemplate404(t *testing.T) {
+	defer resetTestState(t)
 	r := newTestRequest(t, "GET", "/a-thing-that-is-not-there", nil)
 	w := httptest.NewRecorder()
 	serveTemplate(w, r)
@@ -127,6 +132,7 @@ func TestServeTemplate404(t *testing.T) {
 }
 
 func TestHandleAuth(t *testing.T) {
+	defer resetTestState(t)
 	defer preserveConfig()()
 	const code = "fake-auth-code"
 
@@ -230,6 +236,7 @@ func TestServeUserSchedule(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	checkAutHeader := func(who, ah string) {
@@ -307,6 +314,7 @@ func TestHandleUserSchedulePut(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	checkAutHeader := func(who, ah string) {
@@ -444,6 +452,7 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	// drive download file server
@@ -541,6 +550,7 @@ func TestGetUserDefaultPushConfig(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 
 	w := httptest.NewRecorder()
 	r := newTestRequest(t, "GET", "/api/v1/user/notify", nil)
@@ -570,6 +580,7 @@ func TestStoreUserPushConfig(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 
 	body := strings.NewReader(`{
     "notify": true,
@@ -639,6 +650,7 @@ func TestFirstSyncEventData(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	lastMod := time.Date(2015, 4, 15, 0, 0, 0, 0, time.UTC)
@@ -755,7 +767,8 @@ func TestFirstSyncEventData(t *testing.T) {
 	config.Schedule.ManifestURL = ts.URL + "/manifest.json"
 	config.Schedule.Start = startDate
 
-	r := newTestRequest(t, "GET", "/sync/gcs", nil)
+	r := newTestRequest(t, "POST", "/sync/gcs", nil)
+	r.Header.Set("x-goog-channel-token", "sync-token")
 	w := httptest.NewRecorder()
 	syncEventData(w, r)
 
@@ -795,6 +808,7 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	firstMod := time.Date(2015, 4, 15, 0, 0, 0, 0, time.UTC)
@@ -821,8 +835,10 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 		},
 	}
 
-	r := newTestRequest(t, "GET", "/sync/gcs", nil)
+	r := newTestRequest(t, "POST", "/sync/gcs", nil)
+	r.Header.Set("x-goog-channel-token", "sync-token")
 	c := newContext(r)
+
 	err := storeEventData(c, &eventData{
 		modified: firstMod,
 		Sessions: map[string]*eventSession{session.Id: session},
@@ -831,7 +847,7 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 		t.Fatalf("storeEventData: %v", err)
 	}
 	err = storeChanges(c, &dataChanges{
-		Changed: firstMod,
+		Updated: firstMod,
 		eventData: eventData{
 			Videos: map[string]*eventVideo{"dummy-id": &eventVideo{}},
 		},
@@ -914,18 +930,21 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 	if err != nil {
 		t.Fatalf("getChangesAfter: %v", err)
 	}
-	if dc.Changed != lastMod {
-		t.Errorf("dc.Changed = %s; want %s", dc.Changed, lastMod)
+	if dc.Updated != lastMod {
+		t.Errorf("dc.Changed = %s; want %s", dc.Updated, lastMod)
 	}
 	if l := len(dc.Videos); l != 0 {
 		t.Errorf("len(dc.Videos) = %d; want 0", l)
 	}
+	s.Update = updateDetails
 	if s2 := dc.Sessions[session.Id]; !reflect.DeepEqual(s2, s) {
 		t.Errorf("s2 = %+v\nwant %+v", s2, s)
 	}
 }
 
 func TestServeSWToken(t *testing.T) {
+	defer resetTestState(t)
+
 	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
 	r.Header.Set("authorization", "bearer "+testIDToken)
 	w := httptest.NewRecorder()
@@ -958,6 +977,7 @@ func TestServeUserUpdates(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	// gdrive stub
@@ -1016,7 +1036,7 @@ func TestServeUserUpdates(t *testing.T) {
 	}
 
 	err = storeChanges(c, &dataChanges{
-		Changed: firstMod,
+		Updated: firstMod,
 		eventData: eventData{
 			Sessions: map[string]*eventSession{"first": &eventSession{}},
 		},
@@ -1025,9 +1045,9 @@ func TestServeUserUpdates(t *testing.T) {
 		t.Fatalf("storeChanges(1): %v", err)
 	}
 	err = storeChanges(c, &dataChanges{
-		Changed: lastMod,
+		Updated: lastMod,
 		eventData: eventData{
-			Sessions: map[string]*eventSession{"second": &eventSession{}},
+			Sessions: map[string]*eventSession{"second": &eventSession{Update: updateDetails}},
 		},
 	})
 	if err != nil {
@@ -1045,14 +1065,18 @@ func TestServeUserUpdates(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), res); err != nil {
 		t.Fatalf("json.Unmarshal: %v", err)
 	}
-	if res.Changed.Unix() != lastMod.Unix() {
-		t.Errorf("res.Changed = %s; want %s", res.Changed, lastMod)
+	if res.Updated.Unix() != lastMod.Unix() {
+		t.Errorf("res.Changed = %s; want %s", res.Updated, lastMod)
 	}
 	if _, exists := res.Sessions["first"]; exists {
 		t.Errorf("don't want 'first' session in res")
 	}
-	if _, exists := res.Sessions["second"]; !exists {
+	s, exists := res.Sessions["second"]
+	if !exists {
 		t.Errorf("want 'second' session in res")
+	}
+	if s.Update != updateDetails {
+		t.Errorf("s.Update = %q; want %q", s.Update, updateDetails)
 	}
 
 	user, next, err := decodeSWToken(res.Token)

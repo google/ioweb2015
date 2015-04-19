@@ -433,6 +433,14 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 // diffs the changes with a previous version, stores those changes
 // and spawns up workers to send push notifications to interested parties.
 func syncEventData(w http.ResponseWriter, r *http.Request) {
+	// allow only cron jobs, task qeueus and GCS
+	if r.Header.Get("x-appengine-cron") != "true" &&
+		r.Header.Get("x-appengine-taskname") == "" &&
+		r.Header.Get("x-goog-channel-token") != config.SyncToken {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	c := newContext(r)
 	err := runInTransaction(c, func(c context.Context) error {
 		oldData, err := getLatestEventData(c)
@@ -531,7 +539,7 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filterUserChanges(dc, bookmarks, pushInfo.Pext)
-	dc.Token, err = encodeSWToken(user, dc.Changed.Add(1*time.Second))
+	dc.Token, err = encodeSWToken(user, dc.Updated.Add(1*time.Second))
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err)
 	}
@@ -556,7 +564,7 @@ func serveSWToken(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(w, errStatus(err), err)
 		return
 	}
-	dc := &dataChanges{Token: token, Changed: now}
+	dc := &dataChanges{Token: token, Updated: now}
 	if err := json.NewEncoder(w).Encode(dc); err != nil {
 		errorf(c, "serveSWToke: encode resp: %v", err)
 	}
@@ -564,6 +572,11 @@ func serveSWToken(w http.ResponseWriter, r *http.Request) {
 
 // TODO: add ioext params
 func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("x-appengine-taskname") == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	c := newContext(r)
 	sessions := strings.Split(r.FormValue("sessions"), " ")
 	if len(sessions) == 0 {
@@ -589,6 +602,11 @@ func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
 
 // handlePingUser sends a GCM "ping" to user devices based on certain conditions.
 func handlePingUser(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("x-appengine-taskname") == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	c := newContext(r)
 	user := r.FormValue("uid")
 	sessions := strings.Split(r.FormValue("sessions"), " ")
@@ -676,20 +694,20 @@ func debugPush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	updates := &dataChanges{}
-	if err := json.NewDecoder(r.Body).Decode(updates); err != nil {
+	dc := &dataChanges{}
+	if err := json.NewDecoder(r.Body).Decode(dc); err != nil {
 		writeJSONError(w, http.StatusBadRequest, err)
 		return
 	}
-	if updates.Changed.IsZero() {
-		updates.Changed = time.Now()
+	if dc.Updated.IsZero() {
+		dc.Updated = time.Now()
 	}
 
 	fn := func(c context.Context) error {
-		if err := storeChanges(c, updates); err != nil {
+		if err := storeChanges(c, dc); err != nil {
 			return err
 		}
-		return notifySubscribersAsync(c, updates)
+		return notifySubscribersAsync(c, dc)
 	}
 
 	if err := runInTransaction(c, fn); err != nil {

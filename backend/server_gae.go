@@ -7,6 +7,8 @@ package main
 
 import (
 	"net/http"
+	"path"
+	"strings"
 	"time"
 
 	"golang.org/x/net/context"
@@ -17,11 +19,14 @@ import (
 	"google.golang.org/appengine/user"
 )
 
+// allow requests prefixed with passthruPrefix to bypass checkWhitelist
+var passthruPrefix string
+
 func init() {
 	if err := initConfig("server.config", ""); err != nil {
 		panic("initConfig: " + err.Error())
 	}
-
+	passthruPrefix = path.Join(config.Prefix, "/sync") + "/"
 	// use built-in memcache service
 	cache = &gaeMemcache{}
 	// apps hosted on GAE use a different HTTP transport
@@ -32,7 +37,7 @@ func init() {
 		}
 	}
 	// staging instance is accessed only by whitelisted people/domains
-	if isStaging() {
+	if len(config.Whitelist) > 0 {
 		wrapHandler = checkWhitelist
 	}
 	rootHandleFn = serveTemplate
@@ -42,7 +47,9 @@ func init() {
 // allowPassthrough returns true if the request r can be handled w/o whitelist check.
 // Currently, only GAE Cron and Task Queue jobs are allowed.
 func allowPassthrough(r *http.Request) bool {
-	return r.Header.Get("X-AppEngine-Cron") == "true" || r.Header.Get("X-AppEngine-TaskName") != ""
+	return strings.HasPrefix(r.URL.Path, passthruPrefix) ||
+		r.Header.Get("x-appengine-cron") == "true" ||
+		r.Header.Get("x-appengine-taskname") != ""
 }
 
 // checkWhitelist checks whether the current user is allowed to access

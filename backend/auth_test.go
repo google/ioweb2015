@@ -12,6 +12,7 @@ import (
 )
 
 func TestVerifyBearerToken(t *testing.T) {
+	defer resetTestState(t)
 	defer preserveConfig()()
 	const (
 		token  = "fake-token"
@@ -61,6 +62,7 @@ func TestVerifyBearerToken(t *testing.T) {
 
 func TestVerifyIDToken(t *testing.T) {
 	// TODO: test for invalid claims, e.g. iss, aud, azp, exp.
+	defer resetTestState(t)
 	defer preserveConfig()()
 	const certID = "test-cert"
 	key, cert := jwsTestKey(time.Now(), time.Now().Add(24*time.Hour))
@@ -142,6 +144,7 @@ func TestAuthUser(t *testing.T) {
 }
 
 func TestTokenRefresher(t *testing.T) {
+	defer resetTestState(t)
 	defer preserveConfig()()
 	config.Google.Auth.Client = "my-client"
 	config.Google.Auth.Secret = "my-secret"
