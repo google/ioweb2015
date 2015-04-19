@@ -131,7 +131,7 @@ IOWA.Util = IOWA.Util || (function() {
           try {
             var data = JSON.parse(this.response);
             resolve(data.id);
-          } catch(e) {
+          } catch (e) {
             reject('Parsing URL Shortener result failed.');
           }
         } else if (this.status !== 200) {
