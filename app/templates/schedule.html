@@ -40,8 +40,8 @@
 {% end %}
 
 {% define "content" %}
-
-<paper-dialog class="session__detail" transition="paper-dialog-transition-bottom" layered="false" backdrop
+<!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
+<paper-dialog class="session__detail" transition="paper-dialog-transition-bottom" layered="false" backdrop?="{{!isIOS}}"
               on-core-overlay-close-completed="{{onSessionDetailsClose}}"
               on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
@@ -51,7 +51,7 @@
                 sizing="cover" preload fade fit></core-image>
     <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}"
                mini?="{{isPhoneSize}}" class="{{ {active: selectedSession.saved} | tokenList }}"
-               on-click="{{toggleSaveSession}}"
+               on-up="{{toggleSaveSession}}"
                disabled?="{{scheduleFetchingUserData}}"></paper-fab>
     <paper-progress indeterminate hidden?="{{!currentUser || (savedSessions && !scheduleFetchingUserData)}}"></paper-progress>
   </div>
@@ -61,13 +61,16 @@
     <h5 class="session__categories">{{selectedSession.tags | formatSessionTagsFilter}}</h5>
     <div class="session__desc">{{selectedSession.description}}</div>
     <div class="session__social" layout horizontal>
-      <a href="#" target="_blank" class="share-icon" data-share-type="gplus" on-click="{{openShareWindow}}">
+      <a href="#" target="_blank" class="share-icon" data-share-type="gplus"
+         data-track-link="schedule-detail-share-gplus" on-click="{{openShareWindow}}">
         <core-icon icon="io:post-gplus"></core-icon>
       </a>
-      <a href="#" target="_blank" class="share-icon" data-share-type="twitter" on-click="{{openShareWindow}}">
+      <a href="#" target="_blank" class="share-icon" data-share-type="twitter"
+         data-track-link="schedule-detail-share-twitter" on-click="{{openShareWindow}}">
         <core-icon icon="io:post-twitter"></core-icon>
       </a>
-      <a href="#" target="_blank" class="share-icon" data-share-type="fb" on-click="{{openShareWindow}}">
+      <a href="#" target="_blank" class="share-icon" data-share-type="fb"
+         data-track-link="schedule-detail-share-fb" on-click="{{openShareWindow}}">
         <core-icon icon="io:post-facebook"></core-icon>
       </a>
       <span flex class="session__livestream" hidden?="{{!selectedSession.isLivestream}}">Live streamed <core-icon icon="io:videocam"></core-icon></span>
@@ -95,7 +98,7 @@
     </div>
   </div>
   <!-- <div class="session__info__section session__info__links card-content">
-    <a href="#" data-track-link="schedule-detail-view-related" core-overlay-toggle>View related sessions</a>
+    <a href="#" data-track-link="schedule-detail-related" core-overlay-toggle>View related sessions</a>
   </div> -->
 </paper-dialog>
 
@@ -403,7 +406,8 @@
       };
 
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
-        IOWA.Elements.Template.scheduleFetchingUserData = false;
+        this.scheduleFetchingUserData = false;
+        this.selectedSession = null;
 
         // Remove session id hash from URL.
         var url = IOWA.Router.composeUrl(

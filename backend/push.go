@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -93,10 +94,15 @@ func mergeChanges(dst *dataChanges, src *dataChanges) {
 }
 
 // filterUserChanges reduces dc to a subset matching session IDs to bks.
+// It sorts bks with sort.Strings as a side effect.
 // TODO: add ioext to dc and filter on radius for ioExtPush.Lat+Lng.
 func filterUserChanges(dc *dataChanges, bks []string, ext *ioExtPush) {
-	for _, id := range bks {
-		delete(dc.Sessions, id)
+	sort.Strings(bks)
+	for id := range dc.Sessions {
+		i := sort.SearchStrings(bks, id)
+		if i >= len(bks) || bks[i] != id {
+			delete(dc.Sessions, id)
+		}
 	}
 }
 

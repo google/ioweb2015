@@ -7,16 +7,16 @@
 {% end %}
 
 {% define "content" %}
-
-<paper-dialog id="gadgetfaq" backdrop transition="core-transition-center" layered="false">
+<!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
+<paper-dialog id="gadgetfaq" backdrop?="{{!isIOS}}" transition="core-transition-center" layered="false">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close dialog"></paper-icon-button>
   <section>
     <h2 class="card__title">I/O Live Embed Widget FAQ</h2>
     <h4>What is the I/O Live widget?</h4>
     <p>A widget to embed on your website that allows you to deliver highlights and live announcements directly from Google I/O. It features the following elements:</p>
     <ul>
-      <li>The complete I/O live video stream (this includes the Keynote and all sessions)</li>
-      <li>Social feed from <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a></li>
+      <li>The complete I/O Live video stream (this includes the keynote and all sessions).</li>
+      <li>Social feed from <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a>.</li>
     </ul>
 
     <h4>Can the widget be customized?</h4>
@@ -24,12 +24,12 @@
     <ul>
       <li>The content the widget will include:
         <ul>
-          <li>live video stream &amp; Google Developers social fee
-          <li>only the live video stream
-          <li>only the Google Developers social feed
+          <li>Live video stream &amp; Google Developers social feed.
+          <li>Only the live video stream.
+          <li>Only the Google Developers social feed.
         </ul>
       </li>
-      <li>The size of the widget</li>
+      <li>The size of the widget.</li>
     </ul>
 
     <h4>How do I customize the widget?</h4>
@@ -45,14 +45,14 @@
     <ul>
       <li><em>Before May 28</em>: The widget will display a message letting viewers know I/O is coming up soon. If you've decided to include the social feed in the widget, it will display I/O related posts from the @GoogleDevs page. Lots of things will be posted in advance of I/O on this page to help inform your audience and get them excited for the event.
     </li>
-      <li><em>On May 28 &amp; 29</em>: If you have decided to include the live stream in the widget, it will start displaying between 8-9AM PDT on May 28. After the Keynote ends, it will automatically start displaying the remaining streaming channels instead. The live stream will run until end of day on May 29.</li>
+      <li><em>On May 28 &amp; 29</em>: If you have decided to include the live stream in the widget, it will start displaying between 8-9AM PDT on May 28. After the keynote ends, it will automatically start displaying the remaining streaming channels instead. The live stream will run until end of day on May 29.</li>
       <li><em>After I/O ends</em>: After all sessions end at approximately 5PM PDT on May 29, the live stream will be replaced by a text card.</li>
     </ul>
 
     <h4>What content will show up on the @GoogleDevs social feed?</h4>
     <p>The social feed will surface public posts from the <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a> page made before and during Google I/O.</p>
 
-    <h4>Can my viewers still see the @GoogleDevs feed after May 29?</h4>
+    <h4>Can my viewers still see the <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a> feed after May 29?</h4>
     <p>Yes. As long as the widget is embedded on your website, viewers will still be able to scroll through the feed and see I/O announcements and highlights published on <a href="https://twitter.com/GoogleDevs" target="_blank">@GoogleDevs</a>.</p>
 
     <h4>Can I choose to add feeds from other Twitter pages besides @GoogleDevs?</h4>
@@ -73,10 +73,10 @@
   <section class="card__container card__container--top slide-up">
     <div class="card js-experiment-visualizer">
       <div class="card-content">
-        <h3>Personalize the I/O live stream for your website and share the #io15 conversation directly with your audience.</h3>
+        <h3>Personalize the I/O Live stream for your website and share the #io15 conversation directly with your audience.</h3>
       </div>
       <div class="card-content">
-        <a href="#" data-ajax-link data-transition="hero-card-transition" data-track-link="widget-faq" on-click="{{toggleGadgetFaq}}">
+        <a href="#" data-ajax-link data-transition="hero-card-transition" data-track-link="widget-faq" on-tap="{{toggleGadgetFaq}}">
           <i18n-msg msgid="live-faq">Read I/O Live Embed Widget FAQ</i18n-msg>
         </a>
       </div>
@@ -114,7 +114,7 @@
 
             <div class="card__title" layout horizontal end wrap>
               <h4>2. Select widget size</h4>
-              <span class="heading-info">Minimum 320px and maximum 1000px</span>
+              <!-- <span class="heading-info">Minimum 320px and maximum 1000px</span> -->
             </div>
             <div class="customize__area">
               <core-label layout inline horizontal center>
