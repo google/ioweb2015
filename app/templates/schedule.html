@@ -255,7 +255,8 @@
           user="{{currentUser}}" userSessions="{{savedSessions}}"
           timezone="{{selectedTimezone}}"
           fetchingUserData="{{scheduleFetchingUserData}}"
-          filters="{{sessionURLFilters}}"></io-schedule>
+          filters="{{sessionURLFilters}}"
+          on-session-bookmark="{{toggleSaveSession}}"></io-schedule>
       </section>
     </div>
   </section>
@@ -388,7 +389,12 @@
       IOWA.Elements.Template.toggleSaveSession = function(e, detail, sender) {
         e.stopPropagation();
 
-        var selectedSession = IOWA.Elements.Template.selectedSession;
+        // Toggle bookmarking came from <io-schedule> event.
+        if (detail && detail.sessionId) {
+          this.selectedSession = this.scheduleData.sessions[detail.sessionId];
+        }
+
+        var selectedSession = this.selectedSession;
         var saved = !selectedSession.saved;
 
         IOWA.Schedule.saveSession(selectedSession.id, saved).then(function() {
