@@ -134,8 +134,8 @@ IOWA.Util = IOWA.Util || (function() {
           } catch (e) {
             reject('Parsing URL Shortener result failed.');
           }
-        } else if (this.status !== 200) {
-          reject('Requesting URL Shortener result failed.');
+        } else {
+          resolve(url); // resolve with original URL.
         }
       };
 
