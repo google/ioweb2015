@@ -323,8 +323,9 @@ limitations under the License.
           </span>
         </core-toolbar>
 
+        <!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
         <paper-dialog class="card card__signin-intro"
-                      transition="core-transition-center" autoCloseDisabled backdrop layered="false">
+                      transition="core-transition-center" autoCloseDisabled backdrop?="{{!isIOS}}" layered="false">
           <div class="card-content">
             <h4 class="card__title">Sign in</h4>
             <p>By signing in to the 2015 I/O web app, you can create a customized I/O schedule.</p>

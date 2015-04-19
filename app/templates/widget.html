@@ -7,8 +7,8 @@
 {% end %}
 
 {% define "content" %}
-
-<paper-dialog id="gadgetfaq" backdrop transition="core-transition-center" layered="false">
+<!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
+<paper-dialog id="gadgetfaq" backdrop?="{{!isIOS}}" transition="core-transition-center" layered="false">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close dialog"></paper-icon-button>
   <section>
     <h2 class="card__title">I/O Live Embed Widget FAQ</h2>

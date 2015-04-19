@@ -143,6 +143,7 @@ IOWA.Elements = (function() {
     template.selectedCity = null;
     template.offsiteMarkerResults = [];
     template.countdownEnded = false;
+    template.isIOS = IOWA.Util.isIOS();
 
     // Sign-in defaults.
     template.isSignedIn = false;

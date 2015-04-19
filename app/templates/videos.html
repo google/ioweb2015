@@ -18,7 +18,8 @@
   <span flex>Videos</span>
 </core-toolbar>
 
-<paper-dialog transition="core-transition-center" backdrop layered="false"
+<!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
+<paper-dialog transition="core-transition-center" backdrop?="{{!isIOS}}" layered="false"
               on-core-overlay-close-completed="{{closeMastheadVideo}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close dialog"></paper-icon-button>
   <template if="{{mastheadVideoActive}}">
