@@ -191,13 +191,12 @@
         IOWA.Elements.Template.selectedCity = null;
         IOWA.Elements.Template.fullscreenVideoActive = false;
         IOWA.Elements.Template.webglSupported = true;
+      };
 
+      page.onTransitionDone = function() {
         // TODO: A temp fix for counter to position itself on page load.
         // Ask @paullewis to take a look.
-        var counter = document.querySelector('countdown-timer');
-        if (counter && counter.timer) {
-          counter.timer.drawIfAnimationIsNotRunning();
-        }
+        window.dispatchEvent(new Event('resize'));
       };
 
       page.unload = function() {

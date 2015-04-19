@@ -288,16 +288,21 @@
 
         // Offsite event search radius in kilometers.
         IOWA.Elements.Template.offsiteSearchRadius = 80;
+      };
 
+      page.scrollToJoin = function() {
         if (location.hash.substring(1) === 'join') {
           var onGlobeReady_ = function(e) {
             IOWA.Elements.Template.openExtendedMap(800);
             document.removeEventListener('globe-webgl-init', onGlobeReady_);
           };
-
           document.addEventListener('globe-webgl-init', onGlobeReady_);
         }
       };
+
+      page.onTransitionDone = function() {
+        this.scrollToJoin();
+      }
 
       IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
         runVideoSectionAnimation();
@@ -464,6 +469,7 @@
       };
 
       page.load(); // Run load callback on page load.
+      page.scrollToJoin();
       page.hasBeenLoaded = true;
     }
 

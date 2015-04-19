@@ -211,13 +211,13 @@ IOWA.Router = (function() {
   };
 
   /**
-   * Runs custom page hanlers for load and unload, if present.
-   * @param {string} funcName 'load' or 'unload'.
+   * Runs custom page handlers for load and unload, if present.
+   * @param {string} funcName 'load', 'unload' or'onTransitionDone'.
+   * @param {pageName} pageName Page that owns the handler.
    * @return {Promise}
    * @private
    */
-  Router.prototype.runPageHandler = function(funcName) {
-    var pageName = this.state.current.page;
+  Router.prototype.runPageHandler = function(funcName, pageName) {
     var template = this.t;
     return new Promise(function(resolve, reject) {
       var page = template.pages[pageName];
@@ -304,9 +304,17 @@ IOWA.Router = (function() {
     IOWA.PageAnimation[Router.pageExitTransitions[transition]](
         this.state.start.page, this.state.end.page, e, source)
       // Run page's custom unload handlers.
-      .then(this.runPageHandler.bind(this, 'unload'))
-      // Load the new page.
+      .then(this.runPageHandler.bind(this, 'unload', this.state.start.page))
+      // Fetch the content of the new page.
       .then(this.importPage.bind(this))
+      .then(function(htmlImport) {
+        return new Promise(function(resolve, reject) {
+          // Run page's custom load handlers.
+          this.runPageHandler('load', router.state.end.page);
+          resolve(htmlImport);
+        }.bind(this));
+      }.bind(this))
+      // Render the content of the new page.
       .then(this.renderTemplates.bind(this))
       .then(function() {
         return new Promise(function(resolve, reject) {
@@ -317,15 +325,14 @@ IOWA.Router = (function() {
           resolve();
         });
       })
-      // Run page's custom load handlers.
-      .then(this.runPageHandler.bind(this, 'load'))
       // Play entry sequence.
       .then(IOWA.PageAnimation[Router.pageEnterTransitions[transition]])
       .then(function() {
         // End transition.
         IOWA.Elements.Template.fire('page-transition-done');
-        this.runPageHandler('onTransitionDone');
-      }.bind(this));
+        // Run page's custom onTransitionDone handlers.
+        router.runPageHandler('onTransitionDone', router.state.current.page);
+      });
   };
 
   /**
@@ -344,7 +351,7 @@ IOWA.Router = (function() {
     // Play exit sequence.
     IOWA.PageAnimation.playSectionSlideOut(oldSubpage)
       .then(function() {
-        // Update state of the page in Router.
+        // Update current state of the page in Router and Template.
         this.state.current = this.parseUrl(this.state.end.href);
         // Update UI state based on the router's state.
         this.updateUIstate();
