@@ -122,7 +122,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                   <core-label center horizontal layout aria-labelledby="filters-header">
                     <div flex>{{type}}</div>
                     <io-checkbox on-change="{{applyFilter}}"
-                        checked?="{{isFilterSelected(type)}}"
+                        checked?="{{filtersState_[type]}}"
                         name="{{type}}" for></io-checkbox>
                   </core-label>
                 </template>
@@ -131,7 +131,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                 <core-label center horizontal layout aria-labelledby="filters-header">
                   <div flex>Live Streamed</div>
                   <io-checkbox on-change="{{applyFilter}}"
-                      checked?="{{isFilterSelected('Live Streamed')}}"
+                      checked?="{{filtersState_['Live Streamed']}}"
                       name="Live Streamed" for></io-checkbox>
                 </core-label>
               </div>
@@ -317,6 +317,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       filtersChanged: function() {
+        this.filtersState_ = {};
         for (var i = 0; i < this.filters.length; i++) {
           this.filtersState_[this.filters[i]] = true;
         }
