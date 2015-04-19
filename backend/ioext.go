@@ -9,7 +9,13 @@ import (
 	"golang.org/x/net/context"
 )
 
-const spreadsheetAuthScope = "https://spreadsheets.google.com/feeds"
+const (
+	spreadsheetAuthScope = "https://spreadsheets.google.com/feeds"
+
+	// ioextCacheTimeout is how long until cached extFeed entries are expired.
+	// The content is still refreshed much earlier via cron jobs.
+	ioextCacheTimeout = 48 * time.Hour
+)
 
 // extFeed is the root element of a Google Sheet feed.
 type extFeed struct {
@@ -48,7 +54,7 @@ func ioExtEntries(c context.Context, refresh bool) ([]*extEntry, error) {
 	data, err := json.Marshal(entries)
 	if err != nil {
 		errorf(c, "ioExtEntries: %v", err)
-	} else if err := cache.set(c, feedURL, data, 2*time.Hour); err != nil {
+	} else if err := cache.set(c, feedURL, data, ioextCacheTimeout); err != nil {
 		errorf(c, "ioExtEntries: cache.put(%q): %v", feedURL, err)
 	}
 
