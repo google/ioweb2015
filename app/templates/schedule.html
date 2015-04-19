@@ -413,8 +413,9 @@
         IOWA.Schedule.saveSession(selectedSession.id, saved).then(function() {
           IOWA.Elements.Template.scheduleFetchingUserData = false;
           selectedSession.saved = saved;
-          //IOWA.Elements.Template.scheduleData.sessions[selectedSession.id].saved = saved;
+
           ioScheduleEl.checkEmptyBlocks();
+
           if (saved) {
             return IOWA.Notifications.waitForPrereqs().then(function() {
               IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification when it starts.");
