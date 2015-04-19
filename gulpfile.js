@@ -143,8 +143,12 @@ gulp.task('vulcanize-extended-elements', ['sass'], function() {
 // copy needed assets (images, polymer elements, etc) to /dist directory
 gulp.task('copy-assets', function() {
   var assets = $.useref.assets();
+  var templates = [APP_DIR + '/templates/**/*.html'];
+  if (argv.env == 'prod') {
+    templates.push('!**/templates/debug/**');
+  }
 
-  var templateStream = gulp.src([APP_DIR + '/templates/*.html'], {base: './'})
+  var templateStream = gulp.src(templates, {base: './'})
     .pipe(assets)
     .pipe(assets.restore())
     .pipe($.useref());
