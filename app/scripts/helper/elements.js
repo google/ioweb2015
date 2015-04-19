@@ -143,6 +143,7 @@ IOWA.Elements = (function() {
     template.selectedCity = null;
     template.offsiteMarkerResults = [];
     template.countdownEnded = false;
+    template.isIOS = IOWA.Util.isIOS();
 
     // Sign-in defaults.
     template.isSignedIn = false;
@@ -459,11 +460,17 @@ IOWA.Elements = (function() {
       }
     };
 
-    template.signIn = function() {
+    template.signIn = function(e) {
+      if (e) {
+        e.preventDefault();
+      }
       IOWA.Elements.GoogleSignIn.signIn();
     };
 
-    template.signOut = function() {
+    template.signOut = function(e) {
+      if (e) {
+        e.preventDefault();
+      }
       IOWA.Elements.GoogleSignIn.signOut();
     };
 

@@ -847,7 +847,7 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 		t.Fatalf("storeEventData: %v", err)
 	}
 	err = storeChanges(c, &dataChanges{
-		Changed: firstMod,
+		Updated: firstMod,
 		eventData: eventData{
 			Videos: map[string]*eventVideo{"dummy-id": &eventVideo{}},
 		},
@@ -930,8 +930,8 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 	if err != nil {
 		t.Fatalf("getChangesAfter: %v", err)
 	}
-	if dc.Changed != lastMod {
-		t.Errorf("dc.Changed = %s; want %s", dc.Changed, lastMod)
+	if dc.Updated != lastMod {
+		t.Errorf("dc.Changed = %s; want %s", dc.Updated, lastMod)
 	}
 	if l := len(dc.Videos); l != 0 {
 		t.Errorf("len(dc.Videos) = %d; want 0", l)
@@ -982,7 +982,6 @@ func TestServeUserUpdates(t *testing.T) {
 
 	// gdrive stub
 	var gdrive *httptest.Server
-	gdriveDone := make(chan struct{}, 1)
 	gdrive = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/list" {
 			fmt.Fprintf(w, `{"items": [
@@ -994,99 +993,125 @@ func TestServeUserUpdates(t *testing.T) {
       ]}`, gdrive.URL+"/download")
 			return
 		}
-		w.Write([]byte(`{"starred_sessions": ["session-123"]}`))
-		gdriveDone <- struct{}{}
+		w.Write([]byte(`{"starred_sessions": ["before", "after"]}`))
 	}))
 	defer gdrive.Close()
 
 	config.Google.Drive.FilesURL = gdrive.URL + "/list"
 	config.Google.Drive.Filename = "user_data.json"
 
-	firstMod := time.Date(2015, 4, 15, 0, 0, 0, 0, time.UTC)
-	lastMod := firstMod.AddDate(0, 0, 1)
-	token, err := encodeSWToken(testUserID, firstMod.Add(1*time.Second))
-	if err != nil {
-		t.Fatalf("encodeSWToken: %v", err)
-	}
+	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
 
-	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
-	r.Header.Set("authorization", token)
-	c := newContext(r)
-
-	err = storeCredentials(c, &oauth2Credentials{
+	if err := storeCredentials(c, &oauth2Credentials{
 		userID:      testUserID,
 		Expiry:      time.Now().Add(2 * time.Hour),
-		AccessToken: "dummy-access",
-	})
-	if err != nil {
-		t.Fatalf("storeCredentials: %v", err)
+		AccessToken: "access-token",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeUserPushInfo(c, &userPush{userID: testUserID}); err != nil {
+		t.Fatal(err)
 	}
 
-	err = storeUserPushInfo(c, &userPush{
-		userID: testUserID,
-		Ext: ioExtPush{
-			Enabled: true,
-			Name:    "Amsterdam",
-			Lat:     52.37607,
-			Lng:     4.886114,
-		},
-	})
+	swToken := fetchFirstSWToken(t, testIDToken)
+	_, swTime, err := decodeSWToken(swToken)
 	if err != nil {
-		t.Fatalf("storeUserPushInfo: %v", err)
+		t.Fatal(err)
 	}
+	timeBefore, timeAfter := swTime.AddDate(0, 0, -1), swTime.AddDate(0, 0, 1)
+	swTokenBefore, _ := encodeSWToken(testUserID, timeBefore.Add(-1*time.Second))
+	swTokenAfter, _ := encodeSWToken(testUserID, timeAfter)
 
-	err = storeChanges(c, &dataChanges{
-		Changed: firstMod,
+	if err = storeChanges(c, &dataChanges{
+		Updated: timeBefore,
 		eventData: eventData{
-			Sessions: map[string]*eventSession{"first": &eventSession{}},
+			Sessions: map[string]*eventSession{
+				"before": &eventSession{Update: updateDetails},
+			},
 		},
-	})
-	if err != nil {
-		t.Fatalf("storeChanges(1): %v", err)
+	}); err != nil {
+		t.Fatal(err)
 	}
-	err = storeChanges(c, &dataChanges{
-		Changed: lastMod,
+	if err = storeChanges(c, &dataChanges{
+		Updated: timeAfter,
 		eventData: eventData{
-			Sessions: map[string]*eventSession{"second": &eventSession{Update: updateDetails}},
+			Sessions: map[string]*eventSession{
+				"after":     &eventSession{Update: updateDetails},
+				"unrelated": &eventSession{Update: updateDetails},
+			},
 		},
-	})
-	if err != nil {
-		t.Fatalf("storeChanges(2): %v", err)
+	}); err != nil {
+		t.Fatal(err)
 	}
 
+	table := []struct {
+		token    string
+		sessions []string
+		updated  time.Time
+		next     time.Time
+	}{
+		{swToken, []string{"after"}, timeAfter, timeAfter.Add(1 * time.Second)},
+		{swTokenBefore, []string{"before", "after"}, timeAfter, timeAfter.Add(1 * time.Second)},
+		{swTokenAfter, []string{}, timeAfter, timeAfter.Add(1 * time.Second)},
+	}
+
+	for i, test := range table {
+		r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
+		r.Header.Set("authorization", test.token)
+		w := httptest.NewRecorder()
+		serveUserUpdates(w, r)
+
+		if w.Code != http.StatusOK {
+			t.Errorf("%d: w.Code = %d; want 200\nResponse: %s", i, w.Code, w.Body.String())
+		}
+
+		res := &dataChanges{}
+		if err := json.Unmarshal(w.Body.Bytes(), res); err != nil {
+			t.Errorf("%d: json.Unmarshal: %v", i, err)
+			continue
+		}
+		if res.Updated.Unix() != test.updated.Unix() {
+			t.Errorf("%d: res.Updated = %s; want %s", i, res.Updated, test.updated)
+		}
+		if len(res.Sessions) != len(test.sessions) {
+			t.Errorf("%d: len(res.Sessions) = %d; want %d", i, len(res.Sessions), len(test.sessions))
+		}
+		for _, id := range test.sessions {
+			s, ok := res.Sessions[id]
+			if !ok {
+				t.Errorf("%d: want session %q", i, id)
+				break
+			}
+			if s.Update != updateDetails {
+				t.Errorf("%d: res.Sessions[%q].Update = %q; want %q", i, id, s.Update, updateDetails)
+			}
+		}
+		user, next, err := decodeSWToken(res.Token)
+		if err != nil {
+			t.Errorf("%d: decodeSWToken(%q): %v", i, res.Token, err)
+		}
+		if user != testUserID {
+			t.Errorf("%d: user = %q; want %q", i, user, testUserID)
+		}
+		if next.Unix() != test.next.Unix() {
+			t.Errorf("%d: next = %s; want %s", i, next, test.next)
+		}
+	}
+}
+
+func fetchFirstSWToken(t *testing.T, auth string) string {
+	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
+	r.Header.Set("authorization", bearerHeader+testIDToken)
 	w := httptest.NewRecorder()
-	serveUserUpdates(w, r)
-
+	serveSWToken(w, r)
 	if w.Code != http.StatusOK {
-		t.Errorf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+		t.Fatalf("w.Code = %d; want 200")
 	}
-
-	res := &dataChanges{}
-	if err := json.Unmarshal(w.Body.Bytes(), res); err != nil {
-		t.Fatalf("json.Unmarshal: %v", err)
+	var sw struct {
+		Token string `json:"token"`
 	}
-	if res.Changed.Unix() != lastMod.Unix() {
-		t.Errorf("res.Changed = %s; want %s", res.Changed, lastMod)
+	if err := json.Unmarshal(w.Body.Bytes(), &sw); err != nil {
+		t.Fatal(err)
 	}
-	if _, exists := res.Sessions["first"]; exists {
-		t.Errorf("don't want 'first' session in res")
-	}
-	s, exists := res.Sessions["second"]
-	if !exists {
-		t.Errorf("want 'second' session in res")
-	}
-	if s.Update != updateDetails {
-		t.Errorf("s.Update = %q; want %q", s.Update, updateDetails)
-	}
-
-	user, next, err := decodeSWToken(res.Token)
-	if err != nil {
-		t.Fatalf("decodeSWToken(%q): %v", err)
-	}
-	if user != testUserID {
-		t.Errorf("user = %q; want %q", user, testUserID)
-	}
-	if n := lastMod.Add(1 * time.Second); next.Unix() != n.Unix() {
-		t.Errorf("next = %s; want %s", next, n)
-	}
+	return sw.Token
 }

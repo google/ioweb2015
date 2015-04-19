@@ -62,7 +62,7 @@ Fired when a new toast appears.
     <div class="{{ {clickable: tapHandler_,} | tokenList }}" on-tap="{{handleTap}}" layout horizontal>
       <shadow></shadow>
       <span class="toast-action" hidden?="{{!action}}"
-            on-tap="{{handleAction}}"><content></content>
+            on-click="{{handleAction}}"><content></content>
       </span>
     </div>
   </template>
@@ -74,6 +74,8 @@ Fired when a new toast appears.
     listeners_: null,
 
     action: null,
+
+    handledAction_: false,
 
     created: function() {
       this.listeners_ = [];
@@ -129,16 +131,18 @@ Fired when a new toast appears.
     },
 
     handleTap: function() {
-      if (typeof this.tapHandler_ == 'function') {
+      if (typeof this.tapHandler_ == 'function' && !this.handledAction_) {
         this.tapHandler_();
         this.dismiss();
       }
+      this.handledAction_ = false;
     },
 
     handleAction: function(e) {
       if (typeof this.actionHandler_ == 'function') {
         e.stopPropagation();
         this.actionHandler_();
+        this.handledAction_ = true; // Need because handleTap will also be called from a tap. This handle is a click.
         this.dismiss();
       }
     },

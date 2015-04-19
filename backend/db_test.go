@@ -48,3 +48,58 @@ func TestStoreGetCredentials(t *testing.T) {
 		t.Errorf("getCredentials: %+v; want error", v)
 	}
 }
+
+func TestStoreGetChanges(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+
+	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
+	oneTime := time.Now()
+	twoTime := oneTime.AddDate(0, 0, 1)
+
+	if err := storeChanges(c, &dataChanges{
+		Updated: oneTime,
+		eventData: eventData{
+			Sessions: map[string]*eventSession{"one": &eventSession{}},
+		},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeChanges(c, &dataChanges{
+		Updated: twoTime,
+		eventData: eventData{
+			Sessions: map[string]*eventSession{
+				"two":   &eventSession{},
+				"three": &eventSession{},
+			},
+		},
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	table := []struct {
+		arg time.Time
+		ids []string
+	}{
+		{oneTime.Add(-1 * time.Second), []string{"one", "two", "three"}},
+		{oneTime, []string{"two", "three"}},
+		{twoTime, []string{}},
+	}
+
+	for i, test := range table {
+		dc, err := getChangesSince(c, test.arg)
+		if err != nil {
+			t.Errorf("%d: %v", i, err)
+		}
+		if len(dc.Sessions) != len(test.ids) {
+			t.Errorf("%d: len(dc.Sessions) = %d; want %d", i, len(dc.Sessions), len(test.ids))
+		}
+		for _, id := range test.ids {
+			if _, ok := dc.Sessions[id]; !ok {
+				t.Errorf("%d: want session %q", i, id)
+			}
+		}
+	}
+}

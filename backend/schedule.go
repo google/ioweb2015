@@ -320,7 +320,7 @@ func diffEventData(a, b *eventData) *dataChanges {
 		return nil
 	}
 	dc := &dataChanges{
-		Changed: b.modified,
+		Updated: b.modified,
 		eventData: eventData{
 			Sessions: make(map[string]*eventSession),
 			Speakers: make(map[string]*eventSpeaker),
