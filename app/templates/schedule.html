@@ -276,6 +276,14 @@
       );
     }
 
+    function updateSavedSessionsInUI(savedSessions) {
+      //  Mark/unmarked sessions the user has bookmarked.
+      var sessions = IOWA.Elements.Template.scheduleData.sessions;
+      for (var id in sessions) {
+        sessions[id].saved = savedSessions.indexOf(id) !== -1;
+      }
+    }
+
     function fetchUserData() {
       IOWA.Elements.Template.scheduleFetchingUserData = true;
 
@@ -284,11 +292,7 @@
         IOWA.Elements.Template.scheduleFetchingUserData = false;
         IOWA.Elements.Template.savedSessions = savedSessions;
 
-        //  Mark sessions they've bookmarked.
-        var sessions = IOWA.Elements.Template.scheduleData.sessions;
-        for (var id in sessions) {
-          sessions[id].saved = savedSessions.indexOf(id) !== -1;
-        }
+        updateSavedSessionsInUI(savedSessions);
       });
     }
 
@@ -344,6 +348,9 @@
         if (e.detail.signedIn) {
           hideSignInCard();
           fetchUserData();
+        } else {
+          IOWA.Elements.Template.savedSessions = [];
+          updateSavedSessionsInUI(IOWA.Elements.Template.savedSessions);
         }
       };
 

@@ -289,7 +289,7 @@ limitations under the License.
             <!-- Note: Use on-click instead of on-tap so oauth popup is not blocked. Needs user gesture. -->
             <!-- /fakesignin is not a real endpoint, but we need it to trick router not
                  to return early from the document-level touchstart listener on mobile. -->
-            <a href="/fakesignin" class="button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign in</a>
+            <span class="anchor-like button-link" data-track-link="nav-signin" on-click="{{signIn}}" hidden?="{{currentUser}}">Sign in</span>
             <template if="{{currentUser}}">
               <img _src="{{currentUser.picture}}" class="profilepic">
               <paper-menu-button>
@@ -319,7 +319,7 @@ limitations under the License.
                   </div>
                   <div class="card-content" layout horizontal justified>
                     <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blank">Terms of Service</a>
-                    <a href="#" data-track-link="login-signout" on-tap="{{signOut}}">Sign-out</a>
+                    <span class="anchor-like" data-track-link="login-signout" on-tap="{{signOut}}">Sign-out</span>
                   </div>
                 </paper-dropdown>
               </paper-menu-button>
@@ -345,7 +345,7 @@ limitations under the License.
             </div>
           </div>
           <div class="card-content link-spacing">
-            <a href="/fakesignin" data-track-link="signin-intro-signin" on-click="{{signIn}}" core-overlay-toggle>Sign in</a>
+            <span class="anchor-like" data-track-link="signin-intro-signin" on-click="{{signIn}}" core-overlay-toggle>Sign in</span>
             <a href="#" data-track-link="signin-intro-later" core-overlay-toggle>Maybe later</a>
           </div>
         </paper-dialog>
