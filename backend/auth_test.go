@@ -193,6 +193,9 @@ func TestTokenRefresher(t *testing.T) {
 	if cred.AccessToken != tok.AccessToken {
 		t.Errorf("cred.AccessToken = %q; want %q", cred.AccessToken, tok.AccessToken)
 	}
+	if cred.RefreshToken == "" {
+		t.Errorf("cred.RefreshToken is empty")
+	}
 	if !cred.Expiry.After(time.Now()) {
 		t.Errorf("cred.Expiry is in the past: %s", cred.Expiry)
 	}

@@ -232,32 +232,51 @@ func TestHandleAuth(t *testing.T) {
 	}
 }
 
-func TestServeUserSchedule(t *testing.T) {
+func TestServeUserScheduleExpired(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
 	defer resetTestState(t)
 	defer preserveConfig()()
 
-	checkAutHeader := func(who, ah string) {
-		if ah == "" || !strings.HasPrefix(strings.ToLower(ah), "bearer ") {
-			t.Errorf("%s: bad authorization header: %q", who, ah)
-		} else if ah = ah[7:]; ah != "dummy-access" {
-			t.Errorf("%s: authorization = %q; want dummy-access", who, ah)
-		}
+	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:       testUserID,
+		Expiry:       time.Now().Add(-1 * time.Hour),
+		AccessToken:  "access-token",
+		RefreshToken: "refresh-token",
+	}); err != nil {
+		t.Fatal(err)
 	}
 
-	// drive download file server
-	down := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		checkAutHeader("down", r.Header.Get("authorization"))
+	// Refresh token server stub
+	tokens := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"starred_sessions": ["dummy-session-id"]}`))
+		w.Write([]byte(`{
+      "access_token":"new-access",
+      "expires_in":3600,
+      "token_type":"Bearer"
+    }`))
 	}))
-	defer down.Close()
+	defer tokens.Close()
+	config.Google.TokenURL = tokens.URL
 
-	// drive search files server
-	files := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		checkAutHeader("files", r.Header.Get("authorization"))
+	// Google Drive stub
+	var gdrive *httptest.Server
+	gdrive = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ah := r.Header.Get("authorization")
+		if ah == "" || !strings.HasPrefix(strings.ToLower(ah), "bearer ") {
+			t.Errorf("gdrive %s: bad authorization header: %q", r.URL.Path, ah)
+		} else if ah = ah[7:]; ah != "new-access" {
+			t.Errorf("gdrive %s: authorization = %q; want new-access", r.URL.Path, ah)
+		}
+
+		if r.URL.Path == "/download" {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`{"starred_sessions": ["dummy-session-id"]}`))
+			return
+		}
+
 		q := "'appfolder' in parents and title = 'user_data.json' and trashed = false"
 		if v := r.FormValue("q"); v != q {
 			t.Errorf("q = %q; want %q", v, q)
@@ -275,22 +294,11 @@ func TestServeUserSchedule(t *testing.T) {
         "modifiedDate": "2015-04-11T12:12:46.034Z",
         "downloadUrl": %q
       }
-    ]}`, down.URL)
+    ]}`, gdrive.URL+"/download")
 	}))
-	defer files.Close()
-
-	config.Google.Drive.FilesURL = files.URL + "/"
+	defer gdrive.Close()
+	config.Google.Drive.FilesURL = gdrive.URL + "/"
 	config.Google.Drive.Filename = "user_data.json"
-
-	c := newContext(newTestRequest(t, "GET", "/", nil))
-	cred := &oauth2Credentials{
-		userID:      testUserID,
-		Expiry:      time.Now().Add(2 * time.Hour),
-		AccessToken: "dummy-access",
-	}
-	if err := storeCredentials(c, cred); err != nil {
-		t.Fatalf("storeCredentials: %v", err)
-	}
 
 	w := httptest.NewRecorder()
 	r := newTestRequest(t, "GET", "/api/v1/user/schedule", nil)
@@ -306,7 +314,21 @@ func TestServeUserSchedule(t *testing.T) {
 		t.Fatalf("json.Unmarshal: %v\nResponse: %s", err, w.Body.String())
 	}
 	if len(list) != 1 || list[0] != "dummy-session-id" {
-		t.Errorf("list = %v; want ['dummy-session-id']", list)
+		t.Errorf("list = %v; want ['dummy-session-id']\nResponse: %s", list, w.Body.String())
+	}
+
+	cred, err := getCredentials(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cred.AccessToken != "new-access" {
+		t.Errorf("cred.AccessToken = %q; want 'new-access'", cred.AccessToken)
+	}
+	if cred.RefreshToken == "" {
+		t.Errorf("cred.RefreshToken is empty")
+	}
+	if !cred.Expiry.After(time.Now()) {
+		t.Errorf("cred is expired: %s", cred.Expiry)
 	}
 }
 
