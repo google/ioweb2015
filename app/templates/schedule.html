@@ -50,7 +50,7 @@
                 sizing="cover" preload fade fit></core-image>
     <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}"
                mini?="{{isPhoneSize}}" class="{{ {active: selectedSession.saved} | tokenList }}"
-               on-click="{{toggleSaveSession}}"
+               on-up="{{toggleSaveSession}}"
                disabled?="{{scheduleFetchingUserData}}"></paper-fab>
     <paper-progress indeterminate hidden?="{{!currentUser || (savedSessions && !scheduleFetchingUserData)}}"></paper-progress>
   </div>
