@@ -109,6 +109,41 @@ IOWA.Util = IOWA.Util || (function() {
   }
 
   /**
+   * Use Google's URL shortener to compress an URL for social.
+   * @param {string} url - The full url.
+   * @return {Promise}
+   */
+  function shortenURL(url) {
+    var SHORTENER_API_URL = 'https://www.googleapis.com/urlshortener/v1/url';
+    // TODO: add key to config.
+    var SHORTENER_API_KEY = 'AIzaSyBRMm_PwR1cfjT_yLxBiV9PDrwZPRIRLxg';
+
+    var endpoint = SHORTENER_API_URL + '?key=' + SHORTENER_API_KEY;
+
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest();
+
+      xhr.open('POST', endpoint, true);
+      xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+      xhr.onloadend = function(e) {
+        if (this.status === 200) {
+          try {
+            var data = JSON.parse(this.response);
+            resolve(data.id);
+          } catch (e) {
+            reject('Parsing URL Shortener result failed.');
+          }
+        } else {
+          resolve(url); // resolve with original URL.
+        }
+      };
+
+      xhr.send(JSON.stringify({longUrl: url}));
+    });
+  }
+
+  /**
    * Adjusts the size of the ripple to fully cover the parent element.
    * @param {Element} ripple The ripple DOM element.
    * @return {Object} parentRect Parent bounding rect, for reuse.
@@ -147,6 +182,7 @@ IOWA.Util = IOWA.Util || (function() {
     isTouchScreen: isTouchScreen,
     supportsHTMLImports: 'import' in document.createElement('link'),
     smoothScroll: smoothScroll,
+    shortenURL: shortenURL,
     getStaticBaseURL: getStaticBaseURL,
     resizeRipple: resizeRipple,
     reportError: reportError

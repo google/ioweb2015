@@ -410,42 +410,64 @@ IOWA.Elements = (function() {
       e.preventDefault();
 
       var type = sender.getAttribute('data-share-type');
+      var url = null;
       var width = 600;
       var height = 600;
+      var winOptions = 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=' +
+                       height + ',width=' + width;
 
-      var url = null;
-      switch (type) {
-        case 'fb':
-          height = 229;
-          url = 'https://www.facebook.com/sharer.php?u=' +
-                encodeURIComponent(location.href) +
-                '&t=' + encodeURIComponent(document.title);
-          break;
+      var title = document.title;
+      var summary = null;
 
-        case 'gplus':
-          height = 348;
-          width = 512;
-          url = 'https://plus.google.com/share?url=' +
-                encodeURIComponent(location.href) +
-                '&hl=' + encodeURIComponent(document.documentElement.lang);
-          break;
-
-        case 'twitter':
-          height = 253;
-          var el = document.getElementById('share-text');
-
-          url = 'https://twitter.com/intent/tweet?text=' +
-                encodeURIComponent(el.textContent || 'Google I/O 2015');
-          break;
-
-        default:
-
-          return;
+      var selectedSession = sender.templateInstance.model.selectedSession;
+      if (selectedSession) {
+        title = selectedSession.title;
+        summary = selectedSession.description;
       }
 
-      var options = 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=' +
-                    height + ',width=' + width;
-      window.open(url, 'share', options);
+      // Shorten current URL so it's ready to go.
+      IOWA.Util.shortenURL(location.href).then(function(shortURL) {
+
+        switch (type) {
+          case 'fb':
+            height = 229;
+            url = 'https://www.facebook.com/sharer.php?u=' +
+                  encodeURIComponent(shortURL) +
+                  '&t=' + encodeURIComponent(title);
+
+            break;
+
+          case 'gplus':
+            height = 348;
+            width = 512;
+            url = 'https://plus.google.com/share?url=' +
+                  encodeURIComponent(shortURL) +
+                  '&hl=' + encodeURIComponent(document.documentElement.lang);
+            break;
+
+          case 'twitter':
+            height = 253;
+
+            var el = document.getElementById('share-text');
+            var text = el.textContent || 'Google I/O 2015';
+
+            if (selectedSession) {
+              text = 'Check out "' + title + '" at #io15: ' + shortURL;
+            }
+
+            url = 'https://twitter.com/intent/tweet?text=' +
+                   encodeURIComponent(text);
+
+            break;
+
+          default:
+
+            return;
+        }
+
+        window.open(url, 'share', winOptions);
+      });
+
     };
 
     template.backToTop = function(e, detail, sender) {
