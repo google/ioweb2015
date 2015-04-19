@@ -348,16 +348,19 @@ IOWA.Router = (function() {
         '.subpage-' + this.state.start.subpage);
     var newSubpage = IOWA.Elements.Main.querySelector(
         '.subpage-' + this.state.end.subpage);
+    var router = this;
     // Play exit sequence.
     IOWA.PageAnimation.playSectionSlideOut(oldSubpage)
       .then(function() {
         // Update current state of the page in Router and Template.
-        this.state.current = this.parseUrl(this.state.end.href);
+        router.state.current = router.parseUrl(router.state.end.href);
         // Update UI state based on the router's state.
-        this.updateUIstate();
-      }.bind(this))
+        router.updateUIstate();
+      })
       // Play entry sequence.
-      .then(IOWA.PageAnimation.playSectionSlideIn.bind(null, newSubpage));
+      .then(IOWA.PageAnimation.playSectionSlideIn.bind(null, newSubpage))
+      .then(this.runPageHandler.bind(
+          this, 'onSubpageTransitionDone', router.state.current.page));
   };
 
   /**

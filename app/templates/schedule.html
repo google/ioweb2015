@@ -8,7 +8,7 @@
 {% define "masthead" %}
   <h1>Schedule</h1>
   <div layout horizontal justified>
-    <paper-tabs id="subpage-tabs" class="white" valueattr="label" selected="{{pages[selectedPage].selectedSubpage}}"
+    <paper-tabs id="subpage-tabs" class="white" valueattr="label" selected="agenda"
                 scrollable?="{{isPhoneSize}}" link>
       <paper-tab label="agenda" role="">
         <a href="#agenda" data-track-link="schedule-agenda" data-ajax-link
@@ -299,6 +299,11 @@
       if (page.hasBeenLoaded) {
         return;
       }
+
+      page.onSubpageTransitionDone = function() {
+        var selectedSubpage = IOWA.Elements.Template.pages['schedule'].selectedSubpage;
+        IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = selectedSubpage;
+      };
 
       var onPageTransitionDone_ = function(e) {
         document.removeEventListener('page-transition-done', onPageTransitionDone_);
