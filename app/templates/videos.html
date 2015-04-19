@@ -132,6 +132,7 @@
 (function() {
 
   function onPageTransitionDone_(e) {
+    // Remove listener. We don't want this code running on other pages' transition end.
     document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
     IOWA.Schedule.fetchSchedule().then(function(scheduleData) {

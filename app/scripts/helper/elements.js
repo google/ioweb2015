@@ -489,6 +489,10 @@ IOWA.Elements = (function() {
     template.signIn = function(e) {
       if (e) {
         e.preventDefault();
+        if (e.target.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'link', 'click', e.target.getAttribute('data-track-link'));
+        }
       }
       IOWA.Elements.GoogleSignIn.signIn();
     };
@@ -496,6 +500,10 @@ IOWA.Elements = (function() {
     template.signOut = function(e) {
       if (e) {
         e.preventDefault();
+        if (e.target.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'link', 'click', e.target.getAttribute('data-track-link'));
+        }
       }
       IOWA.Elements.GoogleSignIn.signOut();
     };

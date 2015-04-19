@@ -276,6 +276,14 @@
       );
     }
 
+    function updateSavedSessionsUI(savedSessions) {
+      //  Mark/unmarked sessions the user has bookmarked.
+      var sessions = IOWA.Elements.Template.scheduleData.sessions;
+      for (var id in sessions) {
+        sessions[id].saved = savedSessions.indexOf(id) !== -1;
+      }
+    }
+
     function fetchUserData() {
       IOWA.Elements.Template.scheduleFetchingUserData = true;
 
@@ -284,11 +292,7 @@
         IOWA.Elements.Template.scheduleFetchingUserData = false;
         IOWA.Elements.Template.savedSessions = savedSessions;
 
-        //  Mark sessions they've bookmarked.
-        var sessions = IOWA.Elements.Template.scheduleData.sessions;
-        for (var id in sessions) {
-          sessions[id].saved = savedSessions.indexOf(id) !== -1;
-        }
+        updateSavedSessionsUI(savedSessions);
       });
     }
 
@@ -306,6 +310,7 @@
       };
 
       var onPageTransitionDone_ = function(e) {
+        // Remove listener. We don't want this code running on other pages' transition end.
         document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
         // If user is already authenticated, hide prompts.
@@ -349,6 +354,9 @@
         if (e.detail.signedIn) {
           hideSignInCard();
           fetchUserData();
+        } else {
+          IOWA.Elements.Template.savedSessions = [];
+          updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
         }
       };
 
@@ -365,6 +373,8 @@
         IOWA.Elements.Template.async(function() {
           // Wait for signed-in state to fetch user's schedule.
           if (!IOWA.Elements.GoogleSignIn.signedIn) {
+            // Note: don't need to remove a listener each nav as per:
+            // developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Multiple_identical_event_listeners
             document.addEventListener('signin-change', onSigninChanged_);
           }
 
@@ -374,7 +384,6 @@
 
       page.unload = function() {
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
-        document.removeEventListener('signin-change', onSigninChanged_);
       };
 
       IOWA.Elements.Template.openSession = function(sessionId) {

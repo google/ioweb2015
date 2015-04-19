@@ -171,6 +171,7 @@
       };
 
       page.unload = function() {
+        // Remove listener. We don't want this code running on other pages' transition end.
         document.removeEventListener('page-transition-done', onPageTransitionDone_);
       };
 

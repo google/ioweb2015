@@ -29,14 +29,9 @@
     padding: 0 $mobileKeyline;
   }
 
-  a, .anchor-like {
+  a {
     @include typo-button();
     white-space: nowrap;
-  }
-
-  .anchor-like {
-    color: $color-cyan-A700;
-    cursor: pointer;
   }
 
   h2, h3 {
