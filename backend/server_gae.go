@@ -7,6 +7,7 @@ package main
 
 import (
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -18,11 +19,14 @@ import (
 	"google.golang.org/appengine/user"
 )
 
+// allow requests prefixed with passthruPrefix to bypass checkWhitelist
+var passthruPrefix string
+
 func init() {
 	if err := initConfig("server.config", ""); err != nil {
 		panic("initConfig: " + err.Error())
 	}
-
+	passthruPrefix = path.Join(config.Prefix, "/sync") + "/"
 	// use built-in memcache service
 	cache = &gaeMemcache{}
 	// apps hosted on GAE use a different HTTP transport
@@ -43,7 +47,7 @@ func init() {
 // allowPassthrough returns true if the request r can be handled w/o whitelist check.
 // Currently, only GAE Cron and Task Queue jobs are allowed.
 func allowPassthrough(r *http.Request) bool {
-	return strings.HasPrefix(r.URL.Path, "/sync/") ||
+	return strings.HasPrefix(r.URL.Path, passthruPrefix) ||
 		r.Header.Get("x-appengine-cron") == "true" ||
 		r.Header.Get("x-appengine-taskname") != ""
 }
