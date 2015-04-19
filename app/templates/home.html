@@ -5,10 +5,9 @@
 {% define "masthead" %}
 <div id="countdown-container" class="photo__masthead--fullbleed" fit>
   <countdown-timer bgcolor="#00BCD4"
-      date="May 28 2015 09:00:00 GMT-0700 (PDT)"
+      date="{% .StartDateStr %}"
       easeintime="490" waittime="100"
       easeouttime="400"
-      thresholdInformation="{{daysThresholdInfo}}"
       value="{{countdownValue}}" autoStart
       aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O"
       role="timer">
