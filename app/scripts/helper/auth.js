@@ -38,24 +38,6 @@ IOWA.Auth = IOWA.Auth || (function() {
     var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     drawerProfilePic.src = user.picture;
     drawerProfilePic.hidden = false;
-
-    if (IOWA.Notifications.isSupported) {
-      // Set notifications checkbox appropriately in settings UI.
-      // First, check to see if notifications are enabled globally, via an API call to the backend.
-      IOWA.Notifications.isNotifyEnabledPromise().then(function(notify) {
-        if (notify) {
-          // If notifications are on globally, next check to see if there's an existing push manager
-          // subscription for the current browser.
-          IOWA.Notifications.isExistingSubscriptionPromise().then(function(existingSubscription) {
-            // Set user.notify property based on whether there's an existing push manager subscription
-            IOWA.Elements.GoogleSignIn.user.notify = existingSubscription;
-          });
-        } else {
-          // If notifications are off globally, then always set the user.notify to false.
-          IOWA.Elements.GoogleSignIn.user.notify = false;
-        }
-      });
-    }
   }
 
   function clearUserUI() {

@@ -294,7 +294,8 @@ limitations under the License.
               <img _src="{{currentUser.picture}}" class="profilepic">
               <paper-menu-button>
                 <paper-icon-button icon="io:more-vert" aria-label="Settings"></paper-icon-button>
-                <paper-dropdown id="signin-settings-panel" class="dropdown" halign="right" valign="top">
+                <paper-dropdown id="signin-settings-panel" class="dropdown" halign="right" valign="top"
+                                on-core-overlay-open="{{getNotificationState}}">
                   <div class="card-content" layout horizontal>
                     <div><img _src="{{currentUser.picture}}" class="profilepic"></div>
                     <div>
@@ -305,7 +306,10 @@ limitations under the License.
                   <div class="card-content notification__feature">
                     <h4>Notifications</h4>
                     <core-label horizontal layout>
-                      <paper-checkbox checked?="{{currentUser.notify}}" autoFocus for on-tap="{{updateNotifyUser}}"></paper-checkbox>
+                      <paper-checkbox autoFocus for
+                                      checked?="{{currentUser.notify}}"
+                                      disabled?="{{currentUser.notify === null}}"
+                                      on-tap="{{updateNotifyUser}}"></paper-checkbox>
                       <h5>I want to receive notifications from the Google I/O 2015 web app.</h5>
                     </core-label>
                     <p>If this option is deselected, I understand I won't be notified when:</p>
