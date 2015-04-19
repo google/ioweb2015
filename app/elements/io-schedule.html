@@ -407,7 +407,9 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         var session = this.sessions[sessionId];
         if (session.saved !== save) {
           IOWA.Schedule.saveSession(sessionId, save).then(function() {
+            IOWA.Elements.Template.scheduleFetchingUserData = false;
             session.saved = save;
+            this.checkEmptyBlocks();
           }.bind(this));
         }
       }
