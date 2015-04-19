@@ -332,6 +332,12 @@ paper-fab {
       display: none;
     }
   }
+
+  .card__signin-intro {
+    right: 0;
+    left: 0;
+    width: 100%;
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
