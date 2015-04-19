@@ -73,13 +73,17 @@ function parseResponseJSON(response) {
  *                   Rejects if there are any errors displaying notifications.
  */
 function processResponse(body) {
-  var notifications = generateSessionNotifications(body.sessions)
-    .concat(generateVideoNotifications(body.videos))
-    .concat(generateIOExtNotifications(body.ioext));
+  var notification = generateSessionNotification(body.sessions) || {
+    // If for some reason we weren't able to parse out notification details from body.sessions, then
+    // generate a default, "dummy" notification. Otherwise, Chrome 42/43 on Android will crash if
+    // there's a push event and no notification is shown.
+    title: 'Some events in My Schedule have been updated',
+    body: '',
+    icon: DEFAULT_ICON,
+    tag: 'session-details'
+  };
 
-  return Promise.all(notifications.map(function(notification) {
-    return self.registration.showNotification(notification.title, notification);
-  })).then(function() {
+  return self.registration.showNotification(notification.title, notification).then(function() {
     return body.token;
   });
 }
@@ -93,7 +97,7 @@ function processResponse(body) {
  * @return {array} An array of objects with data that can be passed directly to
  *                   registration.showNotification()
  */
-function generateSessionNotifications(updatedSessions) {
+function generateSessionNotification(updatedSessions) {
   var sessionIds = Object.keys(updatedSessions);
   if (sessionIds.length) {
     // Ensure that we have an up-to-date sessions feed cached.
@@ -120,31 +124,24 @@ function generateSessionNotifications(updatedSessions) {
       console.error('Could not update the cached sessions feed:', error);
     });
 
-    return sessionIds.filter(function(sessionId) {
+    var updatedSessionsTitles = sessionIds.filter(function(sessionId) {
       // TODO(jeffposnick): Handle notifications for video/start updates.
       return updatedSessions[sessionId].update === 'details';
     }).map(function(sessionId) {
-      var session = updatedSessions[sessionId];
-      return {
-        title: 'Some events in My Schedule have been updated',
-        body: '"' + session.title + '" was updated.',
-        icon: session.photoUrl || DEFAULT_ICON,
-        tag: 'session-details'
-      };
+      return '"' + updatedSessions[sessionId].title + '"';
     });
-  } else {
-    return [];
+
+    // New notifications with the same tag will replace any previous notifications with the same
+    // tag, so there's no use sending multiple notifications with the same tag. Instead, create
+    // one notification that has the list of all the session titles that were updated.
+    return {
+      title: 'Some events in My Schedule have been updated',
+      body: updatedSessionsTitles.join(', ') +
+            (updatedSessionsTitles.length === 1 ? ' was' : ' were') + ' updated.',
+      icon: DEFAULT_ICON,
+      tag: 'session-details'
+    };
   }
-}
-
-function generateVideoNotifications(videos) {
-  // TODO: Implement.
-  return [];
-}
-
-function generateIOExtNotifications(videos) {
-  // TODO: Implement.
-  return [];
 }
 
 /**
