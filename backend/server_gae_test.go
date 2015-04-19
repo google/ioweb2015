@@ -37,10 +37,11 @@ func init() {
 		if !ok {
 			return
 		}
-		err := inst.Close()
-		if err != nil {
-			t.Logf("resetTestState: %v", err)
-		}
+		go func() {
+			if err := inst.Close(); err != nil {
+				t.Logf("resetTestState: %v", err)
+			}
+		}()
 		delete(aetInst, t)
 	}
 

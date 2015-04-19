@@ -6,6 +6,7 @@ import (
 )
 
 func TestRenderTemplate(t *testing.T) {
+	defer resetTestState(t)
 	table := []*struct {
 		tmpl    string
 		partial bool
@@ -25,6 +26,7 @@ func TestRenderTemplate(t *testing.T) {
 }
 
 func TestRenderTemplateData(t *testing.T) {
+	defer resetTestState(t)
 	defer preserveConfig()()
 	config.Env = "prod"
 	config.Prefix = "/root"

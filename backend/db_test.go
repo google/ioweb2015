@@ -9,6 +9,7 @@ func TestStoreGetCredentials(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 
 	cred1 := &oauth2Credentials{
 		userID:       "user-123",

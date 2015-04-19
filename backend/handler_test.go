@@ -15,6 +15,7 @@ import (
 )
 
 func TestServeIOExtEntriesStub(t *testing.T) {
+	defer resetTestState(t)
 	r := newTestRequest(t, "GET", "/api/v1/extended", nil)
 	w := httptest.NewRecorder()
 	serveIOExtEntries(w, r)
@@ -29,6 +30,7 @@ func TestServeIOExtEntriesStub(t *testing.T) {
 }
 
 func TestServeSocialStub(t *testing.T) {
+	defer resetTestState(t)
 	r := newTestRequest(t, "GET", "/api/v1/social", nil)
 	w := httptest.NewRecorder()
 	serveSocial(w, r)
@@ -43,6 +45,7 @@ func TestServeSocialStub(t *testing.T) {
 }
 
 func TestServeTemplate(t *testing.T) {
+	defer resetTestState(t)
 	const ctype = "text/html;charset=utf-8"
 
 	revert := preserveConfig()
@@ -91,6 +94,7 @@ func TestServeTemplate(t *testing.T) {
 }
 
 func TestServeTemplateRedirect(t *testing.T) {
+	defer resetTestState(t)
 	table := []struct{ start, redirect string }{
 		{"/about/", "/about"},
 		{"/one/two/", "/one/two"},
@@ -111,6 +115,7 @@ func TestServeTemplateRedirect(t *testing.T) {
 }
 
 func TestServeTemplate404(t *testing.T) {
+	defer resetTestState(t)
 	r := newTestRequest(t, "GET", "/a-thing-that-is-not-there", nil)
 	w := httptest.NewRecorder()
 	serveTemplate(w, r)
@@ -127,6 +132,7 @@ func TestServeTemplate404(t *testing.T) {
 }
 
 func TestHandleAuth(t *testing.T) {
+	defer resetTestState(t)
 	defer preserveConfig()()
 	const code = "fake-auth-code"
 
@@ -230,6 +236,7 @@ func TestServeUserSchedule(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	checkAutHeader := func(who, ah string) {
@@ -307,6 +314,7 @@ func TestHandleUserSchedulePut(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	checkAutHeader := func(who, ah string) {
@@ -444,6 +452,7 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	// drive download file server
@@ -541,6 +550,7 @@ func TestGetUserDefaultPushConfig(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 
 	w := httptest.NewRecorder()
 	r := newTestRequest(t, "GET", "/api/v1/user/notify", nil)
@@ -570,6 +580,7 @@ func TestStoreUserPushConfig(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 
 	body := strings.NewReader(`{
     "notify": true,
@@ -639,6 +650,7 @@ func TestFirstSyncEventData(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	lastMod := time.Date(2015, 4, 15, 0, 0, 0, 0, time.UTC)
@@ -796,6 +808,7 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	firstMod := time.Date(2015, 4, 15, 0, 0, 0, 0, time.UTC)
@@ -930,6 +943,8 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 }
 
 func TestServeSWToken(t *testing.T) {
+	defer resetTestState(t)
+
 	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
 	r.Header.Set("authorization", "bearer "+testIDToken)
 	w := httptest.NewRecorder()
@@ -962,6 +977,7 @@ func TestServeUserUpdates(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	// gdrive stub
