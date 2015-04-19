@@ -39,8 +39,8 @@
 {% end %}
 
 {% define "content" %}
-
-<paper-dialog class="session__detail" transition="paper-dialog-transition-bottom" layered="false" backdrop
+<!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
+<paper-dialog class="session__detail" transition="paper-dialog-transition-bottom" layered="false" backdrop?="{{!isIOS}}"
               on-core-overlay-close-completed="{{onSessionDetailsClose}}"
               on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
