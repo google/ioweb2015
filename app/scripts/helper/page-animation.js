@@ -302,19 +302,139 @@ IOWA.PageAnimation = (function() {
     }
   }
 
+  /**
+   * Slides in the content of the page.
+   */
+  function playPageSlideIn () {
+    return new Promise(function(resolve, reject) {
+      // Wait 1 rAF for DOM to settle.
+      IOWA.Elements.Template.async(function() {
+        // Hide the masthead ripple before proceeding with page transition.
+        play(
+            elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
+        play(pageSlideIn(), function() {
+          resolve();
+        });
+      });
+
+    });
+  }
+
+  /**
+   * Slides out the content of the page.
+   */
+  function playPageSlideOut() {
+    return new Promise(function(resolve, reject) {
+      // Wait 1rAF for smooth animation.
+      IOWA.Elements.Template.async(function() {
+        var animation = contentSlideOut();
+        play(animation, resolve);
+      });
+    });
+  }
+
+  /**
+   * Slides out the content of the section.
+   */
+  function playSectionSlideOut(section) {
+    return new Promise(function(resolve, reject) {
+      play(new AnimationGroup([
+      sectionSlideOut(section),
+      elementFadeOut(
+          IOWA.Elements.Footer, {duration: 400})
+      ]), resolve);
+    });
+  }
+
+  /**
+   * Slides in the content of the section.
+   */
+  function playSectionSlideIn(section) {
+    return new Promise(function(resolve, reject) {
+      play(new AnimationGroup([
+        sectionSlideIn(section),
+        elementFadeIn(
+            IOWA.Elements.Footer, {duration: 400})
+      ]), resolve);
+    });
+  }
+
+  /**
+   * Runs the ripple across the masthead, while sliding out the content.
+   */
+  function playMastheadRippleTransition(startPage, endPage, e, sourceEl) {
+    return new Promise(function(resolve, reject) {
+      var t = IOWA.Elements.Template;
+      var startBgClass = t.pages[startPage].mastheadBgClass;
+      var endBgClass = t.pages[endPage].mastheadBgClass;
+
+      var isFadeRipple = startBgClass === endBgClass;
+      var mastheadColor = t.rippleColors[startBgClass];
+      var rippleColor = isFadeRipple ? '#fff' : t.rippleColors[endBgClass];
+
+      var x = e.touches ? e.touches[0].pageX : e.pageX;
+      var y = e.touches ? e.touches[0].pageY : e.pageY;
+      var duration = isFadeRipple ? 300 : 600;
+      var rippleAnim = rippleEffect(
+            IOWA.Elements.Ripple, x, y, duration,
+            rippleColor, isFadeRipple);
+      var animGroup = [
+        rippleAnim,
+        contentSlideOut(),
+      ];
+
+      var animation = new AnimationGroup(animGroup);
+      play(animation, resolve);
+    });
+  }
+
+  /**
+   * Expands the card to cover masthead (hero transition),
+   * while sliding out the content.
+   */
+  function playHeroTransitionStart(startPage, endPage, e, sourceEl) {
+    return new Promise(function(resolve, reject) {
+      var t = IOWA.Elements.Template;
+      var endBgClass = t.pages[endPage].mastheadBgClass;
+      var rippleColor = t.rippleColors[endBgClass];
+
+      // TODO: This may need some perf tweaking for FF.
+      var card = null;
+      var currentEl = sourceEl;
+      while (!card) {
+        currentEl = currentEl.parentNode;
+        if (currentEl.classList.contains('card__container')) {
+          card = currentEl;
+        }
+      }
+      play(pageCardTakeoverOut(
+          card, e.pageX, e.pageY, 300, rippleColor), resolve);
+    });
+  }
+
+  /**
+   * Slides in the content, the navbar and the logo.
+   */
+  function playHeroTransitionEnd() {
+    return new Promise(function(resolve, reject) {
+      // Wait 1 rAF for DOM to settle.
+      IOWA.Elements.Template.async(function() {
+        play(
+          pageCardTakeoverIn(), resolve);
+      });
+    });
+  }
+
   return {
-    elementFadeOut: elementFadeOut,
-    elementFadeIn: elementFadeIn,
-    sectionSlideOut: sectionSlideOut,
-    sectionSlideIn: sectionSlideIn,
-    contentSlideOut: contentSlideOut,
-    contentSlideIn: contentSlideIn,
-    pageSlideIn: pageSlideIn,
-    pageCardTakeoverOut: pageCardTakeoverOut,
-    pageCardTakeoverIn: pageCardTakeoverIn,
     pageFirstRender: pageFirstRender,
-    ripple: rippleEffect,
-    play: play
+    play: play,
+    playPageSlideOut: playPageSlideOut,
+    playPageSlideIn: playPageSlideIn,
+    playSectionSlideOut: playSectionSlideOut,
+    playSectionSlideIn: playSectionSlideIn,
+    playMastheadRippleTransition: playMastheadRippleTransition,
+    playHeroTransitionStart: playHeroTransitionStart,
+    playHeroTransitionEnd: playHeroTransitionEnd,
   };
 
 })();

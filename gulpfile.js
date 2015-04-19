@@ -228,7 +228,6 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
     'helper/elements.js',
     'helper/a11y.js',
     'helper/service-worker-registration.js',
-    'helper/history.js',
     'helper/router.js',
     'helper/request.js',
     'helper/picasa.js',

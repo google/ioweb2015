@@ -34,7 +34,7 @@
           <div>Watch the keynote and select sessions in real-time, from your laptop or mobile device.</div>
         </div>
         <div class="card-content">
-          <a href="schedule?filters=Live%20Streamed#day1" data-track-link="offsite-browse-schedule" data-ajax-link data-anim-card>Browse live stream schedule</a>
+          <a href="schedule?filters=Live%20Streamed#day1" data-track-link="offsite-browse-schedule" data-ajax-link data-transition="hero-card-transition">Browse live stream schedule</a>
         </div>
       </div>
       <div class="card js-experiment-visualizer" auto-vertical flex>
@@ -43,7 +43,7 @@
           <div>Personalize the I/O live stream for your website and share the #io15 conversation from the event with your audience.</div>
         </div>
         <div class="card-content">
-          <a href="widget" data-track-link="offsite-widget" data-ajax-link data-anim-card>Customize the I/O Live Embed</a>
+          <a href="widget" data-track-link="offsite-widget" data-ajax-link data-transition="hero-card-transition">Customize the I/O Live Embed</a>
         </div>
       </div>
       <div class="ripple">
@@ -271,7 +271,7 @@
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
-      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+      var page = IOWA.Elements.Template.pages['offsite'];
 
       if (page.hasBeenLoaded) {
         return;
@@ -288,16 +288,21 @@
 
         // Offsite event search radius in kilometers.
         IOWA.Elements.Template.offsiteSearchRadius = 80;
+      };
 
+      page.scrollToJoin = function() {
         if (location.hash.substring(1) === 'join') {
           var onGlobeReady_ = function(e) {
             IOWA.Elements.Template.openExtendedMap(800);
             document.removeEventListener('globe-webgl-init', onGlobeReady_);
           };
-
           document.addEventListener('globe-webgl-init', onGlobeReady_);
         }
       };
+
+      page.onTransitionDone = function() {
+        this.scrollToJoin();
+      }
 
       IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
         runVideoSectionAnimation();
@@ -464,6 +469,7 @@
       };
 
       page.load(); // Run load callback on page load.
+      page.scrollToJoin();
       page.hasBeenLoaded = true;
     }
 

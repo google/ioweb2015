@@ -2,17 +2,18 @@
 
 {% define "mastheadBgClass" %}bg-dark-grey{% end %}
 
+{% define "defaultSubpage" %}event{% end %}
 {% define "selectedSubpage" %}event{% end %}
 
 {% define "masthead" %}
   <h1><i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg></h1>
   <paper-tabs id="subpage-tabs" class="white" selected="{{pages[selectedPage].selectedSubpage}}" valueattr="label" link>
     <paper-tab label="event" role="">
-      <a href="#event" data-track-link="onsite-event" data-subpage-link
+      <a href="#event" data-track-link="onsite-event" data-ajax-link
                        layout horizontal center-center>Event</a>
     </paper-tab>
     <paper-tab label="travel" role="">
-      <a href="#travel" data-track-link="onsite-travel"  data-subpage-link
+      <a href="#travel" data-track-link="onsite-travel"  data-ajax-link
                         layout horizontal center-center>Travel</a>
     </paper-tab>
   </paper-tabs>
@@ -32,7 +33,7 @@
           <div>Learn everything you need to know about Google I/O. Find out how to best navigate the conference, organize your schedule, and get the most from the event.</div>
         </div>
         <div class="card-content">
-          <a href="faq" data-ajax-link data-anim-card data-track-link="onsite-faq">View FAQ</a>
+          <a href="faq" data-ajax-link data-transition="hero-card-transition" data-track-link="onsite-faq">View FAQ</a>
         </div>
          <div class="ripple">
           <div class="ripple__content"></div>
@@ -186,7 +187,7 @@
   (function() {
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
-      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+      var page = IOWA.Elements.Template.pages['onsite'];
       var SUBTAB_SELECTOR = '#subpage-tabs a';
 
       if (page.hasBeenLoaded) {

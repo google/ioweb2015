@@ -15,35 +15,35 @@
             <div>
               <h3><i18n-msg msgid="general">General</i18-msg></h3>
               <ul>
-                <!-- <li><a href="#dateloc" on-tap="{{scrollToFaq}}"><i18n-msg msgid="faq-dates-loc">2015 dates &amp; location</i18-msg></a></li> -->
-                <!-- <li><a href="#badgepickup" on-tap="{{scrollToFaq}}"><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></a></li> -->
-                <li><a href="#informed" on-tap="{{scrollToFaq}}"><i18n-msg msgid="stay-informed">Stay informed</i18-msg></a></li>
-                <li><a href="#formats" on-tap="{{scrollToFaq}}">Content formats</a></li>
-                <li><a href="#livestream" on-tap="{{scrollToFaq}}"><i18n-msg msgid="livestream">Live stream &amp; recordings</i18-msg></a></li>
-                <li><a href="#widget" on-tap="{{scrollToFaq}}">I/O Live embed widget</a></li>
-                <li><a href="#extended" on-tap="{{scrollToFaq}}">I/O Extended</a></li>
-                <li><a href="#iowa" on-tap="{{scrollToFaq}}">I/O website</a></li>
+                <!-- <li><a href="#dateloc" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="faq-dates-loc">2015 dates &amp; location</i18-msg></a></li> -->
+                <!-- <li><a href="#badgepickup" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="badge-pickup">Badge pick-up</i18-msg></a></li> -->
+                <li><a href="#informed" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="stay-informed">Stay informed</i18-msg></a></li>
+                <li><a href="#formats" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll">Content formats</a></li>
+                <li><a href="#livestream" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="livestream">Live stream &amp; recordings</i18-msg></a></li>
+                <li><a href="#widget" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll">I/O Live embed widget</a></li>
+                <li><a href="#extended" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll">I/O Extended</a></li>
+                <li><a href="#iowa" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll">I/O website</a></li>
               </ul>
             </div>
             <div>
               <h3><i18n-msg msgid="registration">Registration</i18-msg></h3>
               <ul>
-                <!-- <li><a href="#registration" on-tap="{{scrollToFaq}}"><i18n-msg msgid="registration">Registration</i18-msg></a></li> -->
-                <li><a href="#toc" on-tap="{{scrollToFaq}}"><i18n-msg msgid="toc">Terms &amp; Conditions</i18-msg></a></li>
-                <li><a href="#academic" on-tap="{{scrollToFaq}}"><i18n-msg msgid="acamedic-tickets">Academic tickets</i18-msg></a></li>
-                <li><a href="#presstix" on-tap="{{scrollToFaq}}"><i18n-msg msgid="press-tickets">Press tickets</i18-msg></a></li>
+                <!-- <li><a href="#registration" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="registration">Registration</i18-msg></a></li> -->
+                <li><a href="#toc" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="toc">Terms &amp; Conditions</i18-msg></a></li>
+                <li><a href="#academic" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="acamedic-tickets">Academic tickets</i18-msg></a></li>
+                <li><a href="#presstix" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="press-tickets">Press tickets</i18-msg></a></li>
               </ul>
             </div>
             <div>
               <h3><i18n-msg msgid="attendance-details">Attendance Details</i18-msg></h3>
               <ul>
-                <li><a href="#protips" on-tap="{{scrollToFaq}}">Pro tips</a></li>
-                <li><a href="#badges" on-tap="{{scrollToFaq}}"><i18n-msg msgid="badges">Badges &amp; badge pick-up</i18-msg></a></li>
-                <li><a href="#afterhours" on-tap="{{scrollToFaq}}"><i18n-msg msgid="afterhours">After Hours</i18-msg></a></li>
-                <li><a href="#a11y" on-tap="{{scrollToFaq}}"><i18n-msg msgid="a11y">Accessibility</i18-msg></a></li>
-                <li><a href="#conduct" on-tap="{{scrollToFaq}}"><i18n-msg msgid="conduct">Conduct</i18-msg></a></li>
+                <li><a href="#protips" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll">Pro tips</a></li>
+                <li><a href="#badges" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="badges">Badges &amp; badge pick-up</i18-msg></a></li>
+                <li><a href="#afterhours" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="afterhours">After Hours</i18-msg></a></li>
+                <li><a href="#a11y" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="a11y">Accessibility</i18-msg></a></li>
+                <li><a href="#conduct" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll"><i18n-msg msgid="conduct">Conduct</i18-msg></a></li>
                 <!-- <li><a href="#childcare" on-tap="{{scrollToFaq}}"><i18n-msg msgid="child-care">Child Care</i18-msg></a></li> -->
-                <li><a href="#attire" on-tap="{{scrollToFaq}}">Event attire</li>
+                <li><a href="#attire" on-tap="{{scrollToFaq}}" data-transition="smooth-scroll">Event attire</li>
               </ul>
             </div>
           </div>
@@ -231,7 +231,7 @@
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
-      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+      var page = IOWA.Elements.Template.pages['faq'];
 
       if (page.hasBeenLoaded) {
         return;

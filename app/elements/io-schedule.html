@@ -46,7 +46,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               </div>
             </div>
           </template>
-
           <template if="{{timeBlock.sessions.length}}">
             <div class="card">
               <div class="card-content">
@@ -331,7 +330,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         if (filters.length) {
           filterParam = '?filters=' + encodeURIComponent(filters);
         }
-        IOWA.History.pushState({fromHashChange: true}, '', [
+        history.replaceState({}, '', [
           window.location.origin,
           window.location.pathname,
           filterParam,

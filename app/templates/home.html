@@ -28,11 +28,11 @@
           <h3><i18n-msg msgid="io-description">Google I/O is for developers—the creative coders who are building what's next. Together we'll explore the latest in tech, mobile &amp; beyond.</i18n-msg></h3>
         </div>
         <div class="card-content link-spacing">
-          <a href="about" data-ajax-link data-anim-card
+          <a href="about" data-ajax-link data-transition="hero-card-transition"
              data-track-link="home-learn-more-about-io">
               <i18n-msg msgid="learnmore">Learn more about I/O</i18n-msg>
           </a>
-          <a href="#" data-ajax-link data-anim-card data-track-link="home-set-reminder"
+          <a href="#" data-ajax-link data-transition="hero-card-transition" data-track-link="home-set-reminder"
                       class="notification__feature">
             <core-icon icon="io:notifications-none"></core-icon> Set a reminder
           </a>
@@ -146,7 +146,7 @@
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
-      var page = IOWA.Elements.Template.pages[IOWA.Elements.Template.selectedPage];
+      var page = IOWA.Elements.Template.pages['home'];
       var socialPostsEndpoint = 'api/v1/social';
       var socialPostUpdateInterval = 30000; // 30 seconds
       var updateSocialPostsTimeout;
@@ -190,6 +190,12 @@
         IOWA.Elements.Template.selectedCity = null;
         IOWA.Elements.Template.fullscreenVideoActive = false;
         IOWA.Elements.Template.webglSupported = true;
+      };
+
+      page.onTransitionDone = function() {
+        // TODO: A temp fix for counter to position itself on page load.
+        // Ask @paullewis to take a look.
+        window.dispatchEvent(new Event('resize'));
       };
 
       page.unload = function() {
