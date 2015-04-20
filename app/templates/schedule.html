@@ -207,12 +207,11 @@
         <div class="card js-experiment-visualizer">
           <div class="card-content">
             <h3 class="card__title">Create your custom I/O schedule</h3>
-            <div>
-              <p>Sign in to add events to My Schedule.</p>
-            </div>
-            <div class="notification__feature">
-              <p>To get notifications on this device, you need to sign in and enable notifications.</p>
-              <p class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
+            <div>Sign in to add events to My Schedule.
+              <span class="notification__feature">
+                To get notifications on this device, you need to sign in and enable notifications.
+                <p class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
+              </span>
             </div>
           </div>
           <div class="card-content">
@@ -351,7 +350,7 @@
 
         // If user is already authenticated, hide prompts.
         if (IOWA.Elements.Template.currentUser) {
-          toggleSignInCard(true);
+          // toggleSignInCard(true);
         }
 
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
@@ -388,7 +387,7 @@
 
       var onSigninChanged_ = function(e) {
         if (e.detail.signedIn) {
-          toggleSignInCard(true);
+          // toggleSignInCard(true);
           fetchUserData();
         } else {
           toggleSignInCard(false);
