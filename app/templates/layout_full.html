@@ -235,7 +235,7 @@ limitations under the License.
                      user="{{currentUser}}"></google-signin> -->
       <google-signin clientId="{% .ClientID %}"
                      scopes="profile email https://www.googleapis.com/auth/drive.appfolder"
-                     user="{{currentUser}}"></google-signin>
+                     user="{{currentUser}}" load></google-signin>
 
       <!-- Responsive handlers -->
       <core-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"

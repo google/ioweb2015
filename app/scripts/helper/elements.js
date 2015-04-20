@@ -45,7 +45,7 @@ IOWA.Elements = (function() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function(e) {
       // Loading auth is delayed until logo animation is done.
-      IOWA.Elements.GoogleSignIn.load = true;
+      // IOWA.Elements.GoogleSignIn.load = true;
 
       // Deep link into a subpage.
       var tpl = IOWA.Elements.Template;
