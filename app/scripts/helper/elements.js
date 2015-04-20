@@ -539,7 +539,14 @@ IOWA.Elements = (function() {
     // global notifications are enabled, the current browser has a push subscription,
     // and window.Notification.permission === 'granted'.
     // Updates IOWA.Elements.GoogleSignIn.user.notify = false otherwise.
-    template.getNotificationState = function() {
+    template.getNotificationState = function(e, detail, sender) {
+      // The core-overlay-open event that invokes this is called once when the overlay opens, and
+      // once when it closes. We only want this code to run when the overlay opens.
+      // detail is true when the setting panel is opened, and false when it's closed.
+      if (!detail) {
+        return;
+      }
+
       // This sends a signal to the template that we're still calculating the proper state, and
       // that the checkbox should be disabled for the time being.
       IOWA.Elements.GoogleSignIn.user.notify = null;
