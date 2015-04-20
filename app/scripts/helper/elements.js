@@ -64,7 +64,6 @@ IOWA.Elements = (function() {
           IOWA.Elements.Template.fire('page-transition-done');
           optionallyLaunchExperiment();
           IOWA.ServiceWorkerRegistration.register();
-
           showSigninHelp(); // show signin help popup on page load.
         }
       );
