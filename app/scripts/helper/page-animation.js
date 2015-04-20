@@ -296,11 +296,10 @@ IOWA.PageAnimation = (function() {
    * Moves the delaySection down, shows the card and slides it in.
    * @param {Element} card The card to slide in.
    * @param {Element} delaySection Section that follows up.
+   * @param {Number} slideLength How far to slide out.
    * @return {Animation} Card animation definition.
    */
   function topCardSlideIn(card, delaySection, slideLength) {
-    var slideLength = (card.getBoundingClientRect().top -
-                       delaySection.getBoundingClientRect().top);
     var slideDown = new AnimationGroup([
       new Animation(card, [
         {
@@ -326,11 +325,10 @@ IOWA.PageAnimation = (function() {
    * Slides the card up, hides it and moves the delaySection up.
    * @param {Element} card The card to slide in.
    * @param {Element} delaySection Section that follows up.
+   * @param {Number} slideLength How far to slide out.
    * @return {Animation} Card animation definition.
    */
-  function topCardSlideOut(card, delaySection) {
-    var slideLength = Math.floor(card.getBoundingClientRect().top -
-                       delaySection.getBoundingClientRect().top);
+  function topCardSlideOut(card, delaySection, slideLength) {
     var slideUp = new AnimationGroup([
       new Animation(card, [
         {

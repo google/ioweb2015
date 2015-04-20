@@ -295,7 +295,7 @@
             signinPropmt.style.visibility = 'visible';
             // Change opacity and slide in.
             IOWA.PageAnimation.play(IOWA.PageAnimation.topCardSlideIn(
-              signinPropmt, delaySection), function() {
+              signinPropmt, delaySection, slideLength), function() {
               delaySection.removeAttribute('data-slide-length');
             });
         });
