@@ -188,6 +188,9 @@ func fetchCredentials(c context.Context, code string) (*oauth2Credentials, error
 	if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
 		return nil, err
 	}
+	if body.RefreshToken == "" {
+		return nil, errors.New("fetchCredentials: not offline; refresh token is not set")
+	}
 	// verify that in-flight user ID and received token's user ID match
 	// prefer ID tokens, because they're faster
 	var userID string
