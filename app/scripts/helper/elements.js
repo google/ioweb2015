@@ -515,7 +515,13 @@ IOWA.Elements = (function() {
       if (sender.checked) {
         // subscribePromise() handles registering a subscription with the browser's push manager
         // and toggling the notify state to true in the backend via an API call.
-        IOWA.Notifications.subscribePromise();
+        IOWA.Notifications.subscribePromise().catch(function(error) {
+          if (error && error.name === 'AbortError') {
+            IOWA.Elements.Toast.showMessage('Please update your notification permissions', null, 'Learn how', function() {
+              window.open('permissions', '_blank');
+            });
+          }
+        });
       } else {
         // The steps to turn off notifications are broken down into two separate promises, the first
         // which unsubscribes from the browser's push manager and the second which sets the notify
@@ -523,6 +529,7 @@ IOWA.Elements = (function() {
         // Note that we are deliberately not clearing the SW token stored in IDB, since that is tied
         // to the user's logged in state and will remain valid if notifications are re-enabled
         // later on.
+        IOWA.Elements.Template.dontAutoSubscribe = true;
         IOWA.Notifications.unsubscribeFromPushManagerPromise()
           .then(IOWA.Notifications.disableNotificationsPromise)
           .catch(IOWA.Util.reportError);
@@ -558,7 +565,10 @@ IOWA.Elements = (function() {
           IOWA.Elements.GoogleSignIn.user.notify = false;
         });
       } else {
-        IOWA.Elements.GoogleSignIn.user.notify = false;
+        // Wrap this in an async to ensure that the checked attribute is properly updated.
+        this.async(function() {
+          IOWA.Elements.GoogleSignIn.user.notify = false;
+        });
       }
     };
 

@@ -315,6 +315,8 @@
         return;
       }
 
+      IOWA.Elements.Template.dontAutoSubscribe = false;
+
       page.onSubpageTransitionDone = function() {
         var selectedSubpage = IOWA.Elements.Template.pages['schedule'].selectedSubpage;
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = selectedSubpage;
@@ -426,13 +428,24 @@
           ioScheduleEl.checkEmptyBlocks();
 
           if (saved) {
-            return IOWA.Notifications.waitForPrereqs().then(function() {
+            // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
+            // add the session without attempting to auto-subscribe.
+            return IOWA.Notifications.subscribePromise(IOWA.Elements.Template.dontAutoSubscribe).then(function() {
+              IOWA.Elements.Template.dontAutoSubscribe = false;
               IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification when it starts.");
-            }).catch(function() {
-              // waitForPrereqs() rejects if notifications are not supported in the browser, or if
-              // the notifications permission is set to 'denied' and the Permissions API isn't supported.
-              // In either of those cases, just show the toast without mentioning notifications.
-              IOWA.Elements.Toast.showMessage('Added to My Schedule.');
+            }).catch(function(error) {
+              IOWA.Elements.Template.dontAutoSubscribe = true;
+              if (error && error.name === 'AbortError') {
+                // AbortError indicates that the subscription couldn't be completed due to the page
+                // persmissions for notifications being set to denied.
+                IOWA.Elements.Toast.showMessage('Added to My Schedule. Want to enable notifications?', null, 'Learn how', function() {
+                  window.open('permissions', '_blank');
+                });
+              } else {
+                // If the subscription failed for some other reason, like because we're not
+                // auto-subscribing, show the normal toast.
+                IOWA.Elements.Toast.showMessage('Added to My Schedule.');
+              }
             });
           } else {
             IOWA.Elements.Toast.showMessage('Removed from My Schedule');
