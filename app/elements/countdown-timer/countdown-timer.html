@@ -270,8 +270,17 @@ Creates a countdown timer to a specific date.
        * Forces the canvas to reassess and adopt
        * its parent's dimensions.
        */
-      resizeRenderer: function() {
+      show: function() {
+
+        if (!this.timer)
+          return;
+
         this.timer.resizeRenderer();
+
+        // Fade in the countdown timer
+        this.async(function() {
+          this.style.opacity = 1;
+        }, null, 600);
       },
 
       bgColorChanged: function() {
@@ -295,9 +304,6 @@ Creates a countdown timer to a specific date.
         this.timer.setOnTimerTickCallback(this.onTimerTick.bind(this));
 
         this.style.opacity = 0;
-        this.async(function() {
-          this.style.opacity = 1;
-        }, null, 600);
       },
 
       detached: function() {

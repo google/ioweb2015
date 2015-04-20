@@ -192,13 +192,18 @@
         IOWA.Elements.Template.webglSupported = true;
       };
 
-      page.onTransitionDone = function() {
+      function showCountdownTimer() {
+
         var countdownEl = document.querySelector('countdown-timer');
 
         if (!countdownEl)
           return;
 
-        countdownEl.resizeRenderer();
+        countdownEl.show();
+      }
+
+      page.onTransitionDone = function() {
+        showCountdownTimer();
       };
 
       page.unload = function() {
