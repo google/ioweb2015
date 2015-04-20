@@ -83,6 +83,17 @@ core-icon[icon="schedule"] {
   margin-right: 40px;
 }
 
+.card__container--top {
+  p {
+    margin: $mobileKeyline auto;
+  }
+
+  .note {
+    color: $color-heading;
+    font-size: 14px;
+  }
+}
+
 .schedule-time {
   font-size: 14px;
   color: $color-link-grey;
