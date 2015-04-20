@@ -525,7 +525,11 @@ function gaeSdkDir(callback) {
 // dev env.
 function startGaeBackend(backendDir, watchFiles, callback) {
   var serverAddr = 'localhost:' + (watchFiles ? '8080' : '3000');
-  var args = ['preview', 'app', 'run', backendDir, '--host', serverAddr];
+  var args = [
+    'preview', 'app', 'run', backendDir,
+    '--host', serverAddr,
+    '--datastore-path', BACKEND_DIR + '/.gae_datastore'
+  ];
 
   var backend = spawn('gcloud', args, {stdio: 'inherit'});
   if (!watchFiles) {
