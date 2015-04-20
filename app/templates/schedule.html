@@ -276,35 +276,18 @@
 
     var ioScheduleEl = null;
     var signinPropmt = null;
-    var delaySection = null;
 
     function toggleSignInCard(hide) {
       signinPropmt = signinPropmt || IOWA.Elements.Main.querySelector('#signin-prompt');
-      delaySection = document.querySelector('.active .slide-up-delay');
-
-      var slideLength = Math.floor(signinPropmt.getBoundingClientRect().top -
-                       delaySection.getBoundingClientRect().top);
       if (hide) {
-        IOWA.PageAnimation.play(IOWA.PageAnimation.topCardSlideOut(
-            signinPropmt, delaySection, slideLength), function() {
-          signinPropmt.style.visibility = 'hidden';
-          signinPropmt.style.opacity = 0;
-
-          delaySection.setAttribute('data-slide-length', slideLength);
+        IOWA.PageAnimation.play(new Animation(signinPropmt,
+        [{opacity: 1}, {opacity: 0}], {duration: 400}), function() {
+          signinPropmt.setAttribute('hidden', true);
         });
       } else {
-        // Prepare sign in card by resetting it opacity to 0.
-        IOWA.PageAnimation.play(new Animation(
-          signinPropmt, [ {opacity: 0}, {opacity: 0} ], {duration: 0}
-          ), function() {
-            // Remove visibility contraint.
-            signinPropmt.style.visibility = 'visible';
-            // Change opacity and slide in.
-            IOWA.PageAnimation.play(IOWA.PageAnimation.topCardSlideIn(
-              signinPropmt, delaySection, slideLength), function() {
-              delaySection.removeAttribute('data-slide-length');
-            });
-        });
+        signinPropmt.removeAttribute('hidden');
+        IOWA.PageAnimation.play(new Animation(signinPropmt,
+        [{opacity: 0}, {opacity: 1}], {duration: 400}));
       }
     }
 
