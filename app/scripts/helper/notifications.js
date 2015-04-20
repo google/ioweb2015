@@ -20,8 +20,6 @@ IOWA.Notifications = IOWA.Notifications || (function() {
   'use strict';
 
   var NOTIFY_ENDPOINT = 'api/v1/user/notify';
-  var pendingResolutions = [];
-  var showToast = true;
 
   /**
    * Globally enables push notifications for the current user, and passes along the browser's push
@@ -107,9 +105,16 @@ IOWA.Notifications = IOWA.Notifications || (function() {
   /**
    * Ensures that there's a push subscription active for the current browser, and then passes along
    * the info to backend server, while also setting the global notification state to true.
+   * @param {boolean} rejectImmediately Whether this function should return a rejected promise right
+   *                                    away. Useful for when we want to keep the same promise-based
+   *                                    flow but to bail out early.
    * @return {Promise} Resolves with notify endpoint response body on success.
    */
-  var subscribePromise = function() {
+  var subscribePromise = function(rejectImmediately) {
+    if (rejectImmediately) {
+      return Promise.reject();
+    }
+
     return navigator.serviceWorker.ready.then(function(registration) {
       return registration.pushManager.subscribe();
     }).then(function(subscription) {
@@ -117,19 +122,9 @@ IOWA.Notifications = IOWA.Notifications || (function() {
         // If subscribing succeeds, send the subscription to the server. Return a resolved promise.
         return enableNotificationsPromise_(subscription.subscriptionId, subscription.endpoint);
       } else {
-        // Otherwise, cause the promise to reject with an explanation of the error.
-        if (window.Notification.permission === 'denied') {
-          throw Error('Unable to subscribe due to permissions being denied.');
-        } else {
-          throw Error('Unable to subscribe due to an unknown error.');
-        }
+        throw Error('Unable to subscribe due to an unknown error.');
       }
-    }).then(function() {
-      while (pendingResolutions.length) {
-        var pendingResolution = pendingResolutions.shift();
-        pendingResolution();
-      }
-    }).catch(IOWA.Util.reportError);
+    });
   };
 
   /**
@@ -152,99 +147,6 @@ IOWA.Notifications = IOWA.Notifications || (function() {
     }
   };
 
-  /**
-   * Provides a Promise which is resolved after all prerequisites for enabling notifications have
-   * been met. Specifically:
-   * - User must be signed in.
-   * - Global notifications checkbox must be checked.
-   * - Notification permissions for the browser must be enabled.
-   * This promise can be used to wait for all those prerequisites to be met. It will take care of
-   * prompting the user for the various steps that need to be taken.
-   * As an alternative, if you want similar behavior but only want to wait until the user is signed
-   * in (regardless of notification state), use IOWA.Auth.waitForSignedIn() directly.
-   *
-   * Usage:
-   * function someUIButtonClicked() {
-   *   IOWA.Notifications.waitForPrereqs().then(function() {
-   *     // At this point you can do something that requires being signed in and having
-   *     // notifications enabled, like adding a sessionId to the list of subscribed sessions.
-   *   });
-   * }
-   *
-   * @return {Promise} Resolves once all the prerequisites for showing notifications are met.
-   *                   Rejects if Notification.permission === 'denied' and the Permissions API
-   *                   (added in Chrome 43) is unavailable, meaning we can't listen for permission
-   *                   changes.
-   *                   Also rejects if the browser doesn't support notifications.
-   */
-  var waitForPrereqs = function() {
-    if (!isSupported) {
-      return Promise.reject();
-    }
-
-    return IOWA.Auth.waitForSignedIn()
-      .then(waitForNotificationsEnabled_)
-      .then(function() {
-        return new Promise(function(resolve, reject) {
-          // window.Notification.permission is used for compatability with Chrome 42.
-          if (window.Notification.permission === 'granted') {
-            resolve();
-          } else if (window.Notification.permission === 'denied') {
-            IOWA.Elements.Toast.showMessage('Please enable the page setting for notifications', null, 'Learn how', function() {
-              window.open('permissions', '_blank');
-            });
-
-            if (navigator.permissions) {
-              // If the Permissions API is available (in Chrome 43 and higher), then we can listen
-              // for changes to the notification permission and resolve when it's 'granted'.
-              navigator.permissions.query({name: 'notifications'}).then(function(p) {
-                p.onchange = function() {
-                  if (this.status === 'granted') {
-                    resolve();
-                  }
-                };
-              });
-            } else {
-              reject('Notification permissions are denied and the Permissions API is not available.');
-            }
-          }
-        });
-      });
-  };
-
-  /**
-   * Useful to coordinate activities that need to take place after the user has enabled the
-   * global notifications settings.
-   * @param {string} message The text displayed in the toast.
-   *                         Defaults to 'Please enable the notification setting'
-   * @return {Promise} Resolves when the global notifications option is enabled. Does not reject.
-   */
-  function waitForNotificationsEnabled_(message) {
-    message = message || 'Please enable the notification setting';
-
-    // Check to see if notifications are already enabled.
-    return isNotifyEnabledPromise().then(function(isEnabled) {
-      if (isEnabled && window.Notification.permission === 'granted') {
-        return Promise.resolve();
-      } else {
-        // If notifications are not already enabled, then return a Promise which will resolve later
-        // on, if/when updateNotifyUser() is called as a result of the box being checked.
-        return new Promise(function(resolve) {
-          pendingResolutions.push(resolve);
-          if (showToast) {
-            showToast = false;
-            IOWA.Elements.Toast.showMessage(message, null, 'Open', function() {
-              // Assigning this to IOWA.Elements.SignInSettings wasn't possible, since it's
-              // wrapped in a <template if="{{currentUser}}">.
-              // TODO: This doesn't display nicely when there's already an open overlay.
-              document.querySelector('#signin-settings-panel').open();
-            });
-          }
-        });
-      }
-    });
-  }
-
   return {
     disableNotificationsPromise: disableNotificationsPromise,
     init: init,
@@ -252,7 +154,6 @@ IOWA.Notifications = IOWA.Notifications || (function() {
     isNotifyEnabledPromise: isNotifyEnabledPromise,
     isSupported: isSupported,
     subscribePromise: subscribePromise,
-    unsubscribeFromPushManagerPromise: unsubscribeFromPushManagerPromise,
-    waitForPrereqs: waitForPrereqs
+    unsubscribeFromPushManagerPromise: unsubscribeFromPushManagerPromise
   };
 })();
