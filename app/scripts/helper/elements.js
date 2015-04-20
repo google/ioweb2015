@@ -516,7 +516,7 @@ IOWA.Elements = (function() {
         // subscribePromise() handles registering a subscription with the browser's push manager
         // and toggling the notify state to true in the backend via an API call.
         IOWA.Notifications.subscribePromise().catch(function(error) {
-          if (error.name && error.name === 'AbortError') {
+          if (error && error.name === 'AbortError') {
             IOWA.Elements.Toast.showMessage('Please update your notification permissions', null, 'Learn how', function() {
               window.open('permissions', '_blank');
             });
