@@ -67,12 +67,12 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
   },
 
   addEventListeners_: function() {
-    this.resizeHandler_ = this.configureCanvas_.bind(this);
-    window.addEventListener('resize', this.resizeHandler_);
+    this.resizeHandler = this.configureCanvas_.bind(this);
+    window.addEventListener('resize', this.resizeHandler);
   },
 
   removeListeners_: function() {
-    window.removeEventListener('resize', this.resizeHandler_);
+    window.removeEventListener('resize', this.resizeHandler);
   },
 
   drawLine_: function(color, xStart, yStart, xEnd, yEnd) {

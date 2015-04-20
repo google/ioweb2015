@@ -193,9 +193,12 @@
       };
 
       page.onTransitionDone = function() {
-        // TODO: A temp fix for counter to position itself on page load.
-        // Ask @paullewis to take a look.
-        window.dispatchEvent(new Event('resize'));
+        var countdownEl = document.querySelector('countdown-timer');
+
+        if (!countdownEl)
+          return;
+
+        countdownEl.resizeRenderer();
       };
 
       page.unload = function() {
