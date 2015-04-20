@@ -269,7 +269,6 @@
     var pageIsDeepLinked_ = true;
 
     var ioScheduleEl = null;
-    var dontAutoSubscribe = false;
 
     function hideSignInCard() {
       var signinPropmt = IOWA.Elements.Main.querySelector('#signin-prompt');
@@ -307,6 +306,8 @@
       if (page.hasBeenLoaded) {
         return;
       }
+
+      IOWA.Elements.Template.dontAutoSubscribe = false;
 
       page.onSubpageTransitionDone = function() {
         var selectedSubpage = IOWA.Elements.Template.pages['schedule'].selectedSubpage;
@@ -418,13 +419,13 @@
           ioScheduleEl.checkEmptyBlocks();
 
           if (saved) {
-            // If dontAutoSubscribe is true, this promise will reject immediately, and we'll just
+            // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
             // add the session without attempting to auto-subscribe.
-            return IOWA.Notifications.subscribePromise(dontAutoSubscribe).then(function() {
-              dontAutoSubscribe = false;
+            return IOWA.Notifications.subscribePromise(IOWA.Elements.Template.dontAutoSubscribe).then(function() {
+              IOWA.Elements.Template.dontAutoSubscribe = false;
               IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification when it starts.");
             }).catch(function(error) {
-              dontAutoSubscribe = true;
+              IOWA.Elements.Template.dontAutoSubscribe = true;
               if (error && error.name === 'AbortError') {
                 // AbortError indicates that the subscription couldn't be completed due to the page
                 // persmissions for notifications being set to denied.

@@ -529,6 +529,7 @@ IOWA.Elements = (function() {
         // Note that we are deliberately not clearing the SW token stored in IDB, since that is tied
         // to the user's logged in state and will remain valid if notifications are re-enabled
         // later on.
+        IOWA.Elements.Template.dontAutoSubscribe = true;
         IOWA.Notifications.unsubscribeFromPushManagerPromise()
           .then(IOWA.Notifications.disableNotificationsPromise)
           .catch(IOWA.Util.reportError);
