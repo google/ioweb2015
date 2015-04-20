@@ -529,6 +529,39 @@ IOWA.Elements = (function() {
       }
     };
 
+    // Updates IOWA.Elements.GoogleSignIn.user.notify = true iff the browser supports notifications,
+    // global notifications are enabled, the current browser has a push subscription,
+    // and window.Notification.permission === 'granted'.
+    // Updates IOWA.Elements.GoogleSignIn.user.notify = false otherwise.
+    template.getNotificationState = function() {
+      // This sends a signal to the template that we're still calculating the proper state, and
+      // that the checkbox should be disabled for the time being.
+      IOWA.Elements.GoogleSignIn.user.notify = null;
+
+      // First, check the things that can be done synchronously, before the promises.
+      if (IOWA.Notifications.isSupported && window.Notification.permission === 'granted') {
+        // Check to see if notifications are enabled globally, via an API call to the backend.
+        IOWA.Notifications.isNotifyEnabledPromise().then(function(isGlobalNotifyEnabled) {
+          if (isGlobalNotifyEnabled) {
+            // If notifications are on globally, next check to see if there's an existing push
+            // subscription for the current browser.
+            IOWA.Notifications.isExistingSubscriptionPromise().then(function(isExistingSubscription) {
+              // Set user.notify property based on whether there's an existing push manager subscription
+              IOWA.Elements.GoogleSignIn.user.notify = isExistingSubscription;
+            });
+          } else {
+            // If notifications are off globally, then always set the user.notify to false.
+            IOWA.Elements.GoogleSignIn.user.notify = false;
+          }
+        }).catch(function() {
+          // If something goes wrong while calculating the notifications state, just assume false.
+          IOWA.Elements.GoogleSignIn.user.notify = false;
+        });
+      } else {
+        IOWA.Elements.GoogleSignIn.user.notify = false;
+      }
+    };
+
     template.addEventListener('template-bound', updateElements);
     template.addEventListener('page-transition-done', function(e) {
       this.pageTransitionDone = true;
