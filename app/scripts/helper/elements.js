@@ -515,7 +515,13 @@ IOWA.Elements = (function() {
       if (sender.checked) {
         // subscribePromise() handles registering a subscription with the browser's push manager
         // and toggling the notify state to true in the backend via an API call.
-        IOWA.Notifications.subscribePromise();
+        IOWA.Notifications.subscribePromise().catch(function(error) {
+          if (error.name && error.name === 'AbortError') {
+            IOWA.Elements.Toast.showMessage('Please update your notification permissions', null, 'Learn how', function() {
+              window.open('permissions', '_blank');
+            });
+          }
+        });
       } else {
         // The steps to turn off notifications are broken down into two separate promises, the first
         // which unsubscribes from the browser's push manager and the second which sets the notify
@@ -558,7 +564,10 @@ IOWA.Elements = (function() {
           IOWA.Elements.GoogleSignIn.user.notify = false;
         });
       } else {
-        IOWA.Elements.GoogleSignIn.user.notify = false;
+        // Wrap this in an async to ensure that the checked attribute is properly updated.
+        this.async(function() {
+          IOWA.Elements.GoogleSignIn.user.notify = false;
+        });
       }
     };
 
