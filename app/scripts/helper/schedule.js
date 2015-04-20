@@ -77,11 +77,13 @@ IOWA.Schedule = (function() {
     return IOWA.Auth.waitForSignedIn('Sign in to add events to My Schedule').then(function() {
       IOWA.Elements.Template.scheduleFetchingUserData = true;
       var url = SCHEDULE_ENDPOINT_USERS + '/' + sessionId;
-      return IOWA.Request.xhrPromise(save ? 'PUT' : 'DELETE', url, true).catch(function(error) {
-        IOWA.Elements.Template.scheduleFetchingUserData = false;
-        IOWA.Elements.Toast.showMessage('Unable to modify My Schedule.');
-        throw error;
-      });
+      return IOWA.Request.xhrPromise(save ? 'PUT' : 'DELETE', url, true)
+        .then(clearCachedUserSchedule)
+        .catch(function(error) {
+          IOWA.Elements.Template.scheduleFetchingUserData = false;
+          IOWA.Elements.Toast.showMessage('Unable to modify My Schedule.');
+          throw error;
+        });
     });
   }
 
@@ -109,7 +111,12 @@ IOWA.Schedule = (function() {
     IOWA.Elements.Template.filterTopics = filterTopics;
   }
 
+  function clearCachedUserSchedule() {
+    userScheduleData_ = null;
+  }
+
   return {
+    clearCachedUserSchedule: clearCachedUserSchedule,
     fetchSchedule: fetchSchedule,
     fetchUserSchedule: fetchUserSchedule,
     saveSession: saveSession,

@@ -273,6 +273,7 @@
     var SUBTAB_SELECTOR = '#subpage-tabs a';
 
     var pageIsDeepLinked_ = true;
+    var alreadyLoadedUserSchedule = false;
 
     var ioScheduleEl = null;
     var signinPropmt = null;
@@ -381,6 +382,7 @@
           }
         }).then(function() {
           if (IOWA.Elements.GoogleSignIn.signedIn) {
+            alreadyLoadedUserSchedule = true;
             fetchUserData();
           }
         });
@@ -389,11 +391,16 @@
       var onSigninChanged_ = function(e) {
         if (e.detail.signedIn) {
           toggleSignInCard(true);
-          fetchUserData();
+          if (!alreadyLoadedUserSchedule) {
+            alreadyLoadedUserSchedule = true;
+            fetchUserData();
+          }
         } else {
+          alreadyLoadedUserSchedule = false;
           toggleSignInCard(false);
           IOWA.Elements.Template.savedSessions = [];
           updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
+          IOWA.Schedule.clearCachedUserSchedule();
         }
       };
 
