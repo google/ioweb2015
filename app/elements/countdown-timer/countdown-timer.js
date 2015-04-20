@@ -295,6 +295,10 @@ IOWA.CountdownTimer.Element.prototype = {
     this.updateAnimationTimingValues_();
   },
 
+  resizeRenderer: function() {
+    this.renderer_.resizeHandler();
+  },
+
   get configured() {
     return this.configured_;
   },
