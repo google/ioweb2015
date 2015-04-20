@@ -269,21 +269,29 @@
     var pageIsDeepLinked_ = true;
 
     var ioScheduleEl = null;
+    var signinPropmt = null;
 
-    function hideSignInCard() {
-      var signinPropmt = IOWA.Elements.Main.querySelector('#signin-prompt');
-      IOWA.PageAnimation.play(new Animation(signinPropmt,
+    function toggleSignInCard(hide) {
+      signinPropmt = signinPropmt || IOWA.Elements.Main.querySelector('#signin-prompt');
+      if (hide) {
+        IOWA.PageAnimation.play(new Animation(signinPropmt,
         [{opacity: 1}, {opacity: 0}], {duration: 400}), function() {
           signinPropmt.setAttribute('hidden', true);
-        }
-      );
+        });
+      } else {
+        signinPropmt.removeAttribute('hidden');
+        IOWA.PageAnimation.play(new Animation(signinPropmt,
+        [{opacity: 0}, {opacity: 1}], {duration: 400}));
+      }
     }
 
     function updateSavedSessionsUI(savedSessions) {
       //  Mark/unmarked sessions the user has bookmarked.
-      var sessions = IOWA.Elements.Template.scheduleData.sessions;
-      for (var id in sessions) {
-        sessions[id].saved = savedSessions.indexOf(id) !== -1;
+      if (IOWA.Elements.Template.scheduleData) {
+        var sessions = IOWA.Elements.Template.scheduleData.sessions;
+        for (var id in sessions) {
+          sessions[id].saved = savedSessions.indexOf(id) !== -1;
+        }
       }
     }
 
@@ -318,7 +326,7 @@
 
         // If user is already authenticated, hide prompts.
         if (IOWA.Elements.Template.currentUser) {
-          hideSignInCard();
+          toggleSignInCard(true);
         }
 
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
@@ -355,9 +363,10 @@
 
       var onSigninChanged_ = function(e) {
         if (e.detail.signedIn) {
-          hideSignInCard();
+          toggleSignInCard(true);
           fetchUserData();
         } else {
+          toggleSignInCard(false);
           IOWA.Elements.Template.savedSessions = [];
           updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
         }
