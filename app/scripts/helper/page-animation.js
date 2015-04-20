@@ -23,7 +23,7 @@ IOWA.PageAnimation = (function() {
   var CONTENT_SLIDE_DURATION = 400;
   var CONTENT_SLIDE_DELAY = 200;
   var CONTENT_SLIDE_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
-  var CONTENT_SLIDE_LENGTH = '100px';
+  var CONTENT_SLIDE_LENGTH = 100;
 
   var CONTENT_SLIDE_OPTIONS = {
     duration: CONTENT_SLIDE_DURATION,
@@ -70,12 +70,15 @@ IOWA.PageAnimation = (function() {
     var prefix = section.classList.contains('active') ? '': '.active ';
     var main = section.querySelector(prefix + '.slide-up');
     var mainDelayed = section.querySelector(prefix + '.slide-up-delay');
+    var currentTranslateY = parseInt(
+        mainDelayed.getAttribute('data-slide-length')) || 0;
+    var translateY = currentTranslateY + CONTENT_SLIDE_LENGTH;
     var start = {
-      transform: 'translate(0, 0)',
+      transform: 'translateY(' + currentTranslateY + 'px)',
       opacity: 1
     };
     var end = {
-      transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
+      transform: 'translateY(' + translateY + 'px)',
       opacity: 0
     };
     return new AnimationGroup([
@@ -94,12 +97,16 @@ IOWA.PageAnimation = (function() {
     var prefix = section.classList.contains('active') ? '': '.active ';
     var main = section.querySelector(prefix + '.slide-up');
     var mainDelayed = section.querySelector(prefix + '.slide-up-delay');
+    var previousSlideLength = parseInt(
+        mainDelayed.getAttribute('data-slide-length')) || 0;
+    var currentTranslateY = previousSlideLength + CONTENT_SLIDE_LENGTH;
+    var translateY = currentTranslateY - CONTENT_SLIDE_LENGTH;
     var start = {
-      transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
+      transform: 'translateY(' + currentTranslateY + 'px)',
       opacity: 0
     };
     var end = {
-      transform: 'translate(0, 0)',
+      transform: 'translateY(' + translateY + 'px)',
       opacity: 1
     };
     return new AnimationGroup([
@@ -286,6 +293,64 @@ IOWA.PageAnimation = (function() {
   }
 
   /**
+   * Moves the delaySection down, shows the card and slides it in.
+   * @param {Element} card The card to slide in.
+   * @param {Element} delaySection Section that follows up.
+   * @param {Number} slideLength How far to slide out.
+   * @return {Animation} Card animation definition.
+   */
+  function topCardSlideIn(card, delaySection, slideLength) {
+    var slideDown = new AnimationGroup([
+      new Animation(card, [
+        {
+          transform: 'translateY(' + slideLength + 'px)',
+          opacity: 0
+        }, {
+          transform: 'translateY(0)',
+          opacity: 1
+        }
+      ], CONTENT_SLIDE_OPTIONS),
+      new Animation(delaySection, [
+        {
+          transform: 'translateY(' + slideLength + 'px)'
+        }, {
+          transform: 'translateY(0)'
+        }
+      ], CONTENT_SLIDE_OPTIONS)
+    ]);
+    return slideDown;
+  }
+
+  /**
+   * Slides the card up, hides it and moves the delaySection up.
+   * @param {Element} card The card to slide in.
+   * @param {Element} delaySection Section that follows up.
+   * @param {Number} slideLength How far to slide out.
+   * @return {Animation} Card animation definition.
+   */
+  function topCardSlideOut(card, delaySection, slideLength) {
+    var slideUp = new AnimationGroup([
+      new Animation(card, [
+        {
+          transform: 'translateY(0)',
+          opacity: 1
+        }, {
+          transform: 'translateY(' + slideLength + 'px)',
+          opacity: 0
+        }
+      ], CONTENT_SLIDE_OPTIONS),
+      new Animation(delaySection, [
+        {
+          transform: 'translateY(0)'
+        }, {
+          transform: 'translateY(' + slideLength + 'px)'
+        }
+      ], CONTENT_SLIDE_DELAY_OPTIONS)
+    ]);
+    return slideUp;
+  }
+
+  /**
    * Plays an animation, animation group or animation sequence. Calls
    *     a callback when it finishes, if one was assigned.
    * @param {AnimationNode} animation Animation or AnimationGroup or
@@ -435,6 +500,8 @@ IOWA.PageAnimation = (function() {
     playMastheadRippleTransition: playMastheadRippleTransition,
     playHeroTransitionStart: playHeroTransitionStart,
     playHeroTransitionEnd: playHeroTransitionEnd,
+    topCardSlideOut: topCardSlideOut,
+    topCardSlideIn: topCardSlideIn
   };
 
 })();
