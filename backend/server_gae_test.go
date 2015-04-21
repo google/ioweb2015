@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	aetInstMu sync.Mutex
+	aetInstWg sync.WaitGroup // keeps track of instances being shut down preemptively
+	aetInstMu sync.Mutex     // guards aetInst
 	aetInst   = make(map[*testing.T]aetest.Instance)
 )
 
@@ -37,10 +38,12 @@ func init() {
 		if !ok {
 			return
 		}
+		aetInstWg.Add(1)
 		go func() {
 			if err := inst.Close(); err != nil {
 				t.Logf("resetTestState: %v", err)
 			}
+			aetInstWg.Done()
 		}()
 		delete(aetInst, t)
 	}
@@ -48,13 +51,15 @@ func init() {
 	// cleanupTests closes all running aetest.Instance instances.
 	cleanupTests = func() {
 		aetInstMu.Lock()
-		defer aetInstMu.Unlock()
-		for t, inst := range aetInst {
-			if err := inst.Close(); err != nil {
-				t.Logf("cleanupTests: %v", err)
-			}
-			delete(aetInst, t)
+		tts := make([]*testing.T, 0, len(aetInst))
+		for t := range aetInst {
+			tts = append(tts, t)
 		}
+		aetInstMu.Unlock()
+		for _, t := range tts {
+			resetTestState(t)
+		}
+		aetInstWg.Wait()
 	}
 }
 
