@@ -159,7 +159,14 @@ func verifyBearerToken(c context.Context, t string) (string, error) {
 // fetchCredentials exchanges one-time authorization code for access and refresh tokens.
 // Context c is required to contain a non-empty user ID under ctxKeyUser,
 // normally obtained by authUser().
+// This func must be called in a datastore transaction.
 func fetchCredentials(c context.Context, code string) (*oauth2Credentials, error) {
+	ctxUser := contextUser(c)
+	cred, err := getCredentials(c, ctxUser)
+	if err != nil {
+		cred = &oauth2Credentials{userID: ctxUser}
+	}
+
 	// exchange code for access tokens
 	p := url.Values{
 		"code":          {code},
@@ -188,30 +195,35 @@ func fetchCredentials(c context.Context, code string) (*oauth2Credentials, error
 	if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
 		return nil, err
 	}
-	if body.RefreshToken == "" {
-		return nil, errors.New("fetchCredentials: not offline; refresh token is not set")
-	}
+
 	// verify that in-flight user ID and received token's user ID match
 	// prefer ID tokens, because they're faster
-	var userID string
+	var tokUser string
 	if body.IdToken != "" {
-		userID, err = verifyIDToken(c, body.IdToken)
+		tokUser, err = verifyIDToken(c, body.IdToken)
 	} else {
-		userID, err = verifyBearerToken(c, body.AccessToken)
+		tokUser, err = verifyBearerToken(c, body.AccessToken)
 	}
 	if err != nil {
 		return nil, err
 	}
-	if userID != contextUser(c) {
-		return nil, fmt.Errorf("userID = %s; want %s", userID, contextUser(c))
+	if tokUser != ctxUser {
+		return nil, fmt.Errorf("tokUser = %s; want %s", tokUser, ctxUser)
 	}
-	// use only what we need
-	return &oauth2Credentials{
-		userID:       userID,
-		Expiry:       time.Now().Add(time.Duration(body.Expires) * time.Second),
-		AccessToken:  body.AccessToken,
-		RefreshToken: body.RefreshToken,
-	}, nil
+
+	if body.RefreshToken == "" && cred.RefreshToken == "" {
+		return nil, errors.New("fetchCredentials: not offline; refresh token is not set")
+	}
+
+	// reuse tokens if none provided in exchange
+	if body.AccessToken != "" {
+		cred.AccessToken = body.AccessToken
+		cred.Expiry = time.Now().Add(time.Duration(body.Expires) * time.Second)
+	}
+	if body.RefreshToken != "" {
+		cred.RefreshToken = body.RefreshToken
+	}
+	return cred, nil
 }
 
 // twitterCredentials implements oauth2.TokenSource for Twitter App authentication.
