@@ -75,23 +75,23 @@ $name: 'page-schedule';
   }
 }
 
-#signin-prompt .card {
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 #signin-prompt {
   transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   max-height: 400px;
-}
 
-#signin-prompt.prompt-hidden  {
-  max-height: 0;
-  padding-bottom: 0;
-}
+  &.prompt-hidden  {
+    max-height: 0;
+    padding-bottom: 0;
 
-.prompt-hidden .card {
-  transform: translateY(-150px);
-  opacity: 0;
+    .card {
+      transform: translateY(-150px);
+      opacity: 0;
+    }
+  }
+
+  .card {
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 .schedule-rows .schedule-row {
