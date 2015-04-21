@@ -61,10 +61,11 @@ $name: 'page-schedule';
 }
 
 .page__section {
-  padding-top: 0;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: $mobileKeyline;
+  padding: 0;
+}
+
+.page__section.page__section--top {
+  padding-bottom: 0;
 }
 
 .card-content  {
@@ -111,6 +112,10 @@ core-icon[icon="schedule"] {
     color: $color-heading;
     font-size: 14px;
   }
+}
+
+.card {
+  margin-bottom: $tabletKeyline;
 }
 
 .schedule-time {
