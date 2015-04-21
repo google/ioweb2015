@@ -92,16 +92,28 @@ IOWA.Schedule = (function() {
     var filterThemes = [];
     var filterTopics = [];
 
-    for (var t in tags) {
-      switch (tags[t].category) {
+    var sortedTags = Object.keys(tags).map(function(tag) {
+      return tags[tag];
+    }).sort(function(a, b) {
+      if (a.order_in_category < b.order_in_category) {
+        return -1;
+      }
+      if (a.order_in_category > b.order_in_category) {
+        return 1;
+      }
+      return 0;
+    });
+
+    for (var i = 0, tag; tag = sortedTags[i]; ++i) {
+      switch (tag.category) {
         case 'TYPE':
-          filterSessionTypes.push(tags[t].name);
+          filterSessionTypes.push(tag.name);
           break;
         case 'TOPIC':
-          filterTopics.push(tags[t].name);
+          filterTopics.push(tag.name);
           break;
         case 'THEME':
-          filterThemes.push(tags[t].name);
+          filterThemes.push(tag.name);
           break;
       }
     }
