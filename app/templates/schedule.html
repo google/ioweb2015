@@ -279,15 +279,13 @@
 
     function toggleSignInCard(hide) {
       signinPropmt = signinPropmt || IOWA.Elements.Main.querySelector('#signin-prompt');
+      if (!signinPropmt) {
+        return;
+      }
       if (hide) {
-        IOWA.PageAnimation.play(new Animation(signinPropmt,
-        [{opacity: 1}, {opacity: 0}], {duration: 400}), function() {
-          signinPropmt.setAttribute('hidden', true);
-        });
+        signinPropmt.classList.add('prompt-hidden');
       } else {
-        signinPropmt.removeAttribute('hidden');
-        IOWA.PageAnimation.play(new Animation(signinPropmt,
-        [{opacity: 0}, {opacity: 1}], {duration: 400}));
+        signinPropmt.classList.remove('prompt-hidden');
       }
     }
 
@@ -328,10 +326,7 @@
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = selectedSubpage;
       };
 
-      var onPageTransitionDone_ = function(e) {
-        // Remove listener. We don't want this code running on other pages' transition end.
-        document.removeEventListener('page-transition-done', onPageTransitionDone_);
-
+      page.onTransitionDone = function(e) {
         // If user is already authenticated, hide prompts.
         if (IOWA.Elements.Template.currentUser) {
           toggleSignInCard(true);
@@ -394,8 +389,6 @@
         IOWA.Elements.Template.scheduleFetchingUserData = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
-
-        document.addEventListener('page-transition-done', onPageTransitionDone_);
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {

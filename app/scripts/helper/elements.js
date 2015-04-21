@@ -62,6 +62,10 @@ IOWA.Elements = (function() {
         IOWA.PageAnimation.pageFirstRender(subpage), function() {
           // Fire event when the page transitions are final.
           IOWA.Elements.Template.fire('page-transition-done');
+          // Run page's custom onTransitionDone handlers, if present.
+          if (tpl.pages[tpl.selectedPage].onTransitionDone) {
+            tpl.pages[tpl.selectedPage].onTransitionDone();
+          }
           optionallyLaunchExperiment();
           IOWA.ServiceWorkerRegistration.register();
           showSigninHelp(); // show signin help popup on page load.
