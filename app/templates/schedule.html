@@ -103,7 +103,7 @@
 </paper-dialog>
 
 <div class="subpage__container">
-  <section class="subpage-agenda subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'agenda'} | tokenList}}">
+  <section class="subpage-agenda subpage__content {{ {active: pages['schedule'].selectedSubpage == 'agenda'} | tokenList}}">
     <section class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
         <div class="card js-experiment-visualizer">
@@ -200,7 +200,7 @@
     </div>
   </section>
 
-  <section id="subpage-day1" class="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{ {active: pages[selectedPage].selectedSubpage == 'day1' || pages[selectedPage].selectedSubpage == 'day2' || pages[selectedPage].selectedSubpage == 'myschedule'} | tokenList}}">
+  <section id="subpage-day1" class="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{ {active: pages['schedule'].selectedSubpage == 'day1' || pages['schedule'].selectedSubpage == 'day2' || pages['schedule'].selectedSubpage == 'myschedule'} | tokenList}}">
     <section id="signin-prompt" class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
 
