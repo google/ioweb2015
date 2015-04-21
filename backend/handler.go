@@ -242,13 +242,15 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(w, http.StatusBadRequest, fmt.Errorf("invalid JSON body: %v", err))
 		return
 	}
-	creds, err := fetchCredentials(c, flow.Code)
+	err = runInTransaction(c, func(c context.Context) error {
+		creds, err := fetchCredentials(c, flow.Code)
+		if err != nil {
+			return err
+		}
+		return storeCredentials(c, creds)
+	})
 	if err != nil {
-		writeJSONError(w, http.StatusForbidden, err)
-		return
-	}
-	if err := storeCredentials(c, creds); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(w, errStatus(err), err)
 	}
 }
 
