@@ -35,4 +35,29 @@
   //   // TODO
   // })
 
+  console.time('worker startup');
+  exports.worker = new Worker('scripts/worker.js');
+  console.timeEnd('worker startup');
+
+  exports.worker.addEventListener('message', function(e) {
+    console.timeEnd('worker fetch data');
+
+    if (!e.data) {
+      return;
+    }
+
+    var template = IOWA.Elements.Template;
+
+    var data = e.data;
+    if ('scheduleData' in data) {
+      template.scheduleData = data.scheduleData;
+      template.filterSessionTypes = data.tags.filterSessionTypes;
+      template.filterThemes = data.tags.filterThemes;
+      template.filterTopics = data.tags.filterTopics;
+    }
+  });
+
+  console.time('worker fetch data');
+  worker.postMessage({cmd: 'CMD_FETCH_SCHEDULE'}); // Start the worker.worker
+
 })(window);
