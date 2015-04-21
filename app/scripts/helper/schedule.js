@@ -104,7 +104,8 @@ IOWA.Schedule = (function() {
       return 0;
     });
 
-    for (var i = 0, tag; tag = sortedTags[i]; ++i) {
+    for (var i = 0; i < sortedTags.length; ++i) {
+      var tag = sortedTags[i];
       switch (tag.category) {
         case 'TYPE':
           filterSessionTypes.push(tag.name);
