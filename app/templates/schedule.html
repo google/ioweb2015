@@ -275,17 +275,17 @@
     var alreadyLoadedUserSchedule = false;
 
     var ioScheduleEl = null;
-    var signinPropmt = null;
+    var signinPrompt = null;
 
     function toggleSignInCard(hide) {
-      signinPropmt = signinPropmt || IOWA.Elements.Main.querySelector('#signin-prompt');
-      if (!signinPropmt) {
+      signinPrompt = signinPrompt || IOWA.Elements.Main.querySelector('#signin-prompt');
+      if (!signinPrompt) {
         return;
       }
       if (hide) {
-        signinPropmt.classList.add('prompt-hidden');
+        signinPrompt.classList.add('prompt-hidden');
       } else {
-        signinPropmt.classList.remove('prompt-hidden');
+        signinPrompt.classList.remove('prompt-hidden');
       }
     }
 
