@@ -28,7 +28,7 @@
       </paper-tab>
     </paper-tabs>
     <paper-dropdown-menu hidden?="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
-      <paper-dropdown class="dropdown" halign="right">
+      <paper-dropdown class="dropdown" halign="right" duration="200">
         <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
           <template repeat="{{zone in timezones}}">
             <paper-item label="{{zone}}">{{zone}}</paper-item>
@@ -266,7 +266,7 @@
       <div class="page__filters" layout horizontal hidden?="{{!isPhoneSize || pages[selectedPage].selectedSubpage === 'myschedule'}}">
         <span flex>
           <paper-dropdown-menu>
-            <paper-dropdown class="dropdown" halign="left">
+            <paper-dropdown class="dropdown" halign="left" duration="200">
               <core-menu class="menu" selected="Filters" valueattr="label"
                   on-core-activate="{{selectFilter}}">
                 <paper-item label="Filters">Filters</paper-item>
@@ -284,7 +284,7 @@
           </paper-dropdown-menu>
         </span>
         <paper-dropdown-menu>
-          <paper-dropdown class="dropdown" halign="right">
+          <paper-dropdown class="dropdown" halign="right" duration="200">
             <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
               <template repeat="{{zone in timezones}}">
                 <paper-item label="{{zone}}">{{zone}}</paper-item>
