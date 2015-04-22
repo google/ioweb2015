@@ -519,10 +519,7 @@
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
         e.stopPropagation();
-        if (detail.isSelected) {
-          ioScheduleEl.filters = (sender.selectedIndex === 0) ? []
-              : [sender.selected];
-        }
+        ioScheduleEl.filters = sender.selectedIndex ? [sender.selected] : [];
       };
 
       page.load(); // Run load callback on page load.
