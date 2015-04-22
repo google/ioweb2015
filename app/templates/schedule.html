@@ -41,7 +41,8 @@
 
 {% define "content" %}
 <!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
-<paper-dialog class="session__detail" transition="paper-dialog-transition-bottom" layered="false" backdrop?="{{!isIOS}}"
+<paper-dialog class="session__detail" transition="paper-dialog-transition-bottom"
+              layered="false" backdrop?="{{!isIOS}}"
               on-core-overlay-close-completed="{{onSessionDetailsClose}}"
               on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
@@ -297,9 +298,11 @@
           showOnlySavedSessions="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
           user="{{currentUser}}" userSessions="{{savedSessions}}"
           timezone="{{selectedTimezone}}"
+          timezoneNames="{{timezoneNames}}"
           fetchingUserData="{{scheduleFetchingUserData}}"
           filters="{{sessionURLFilters}}"
-          on-session-bookmark="{{toggleSaveSession}}"></io-schedule>
+          on-session-bookmark="{{toggleSaveSession}}"
+          on-session-select="{{openSession}}"></io-schedule>
       </section>
     </div>
   </section>
@@ -351,11 +354,12 @@
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = selectedSubpage;
       };
 
-      page.onTransitionDone = function(e) {
+      page.onPageTransitionDone = function(e) {
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
-          IOWA.Elements.Template.scheduleData = scheduleData;
-
-          IOWA.Schedule.generateFilters(scheduleData.tags);
+          if (!IOWA.Elements.Template.scheduleData) {
+            IOWA.Elements.Template.scheduleData = scheduleData
+            IOWA.Schedule.generateFilters(scheduleData.tags);
+          }
 
           IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
@@ -429,7 +433,8 @@
         IOWA.Elements.Nav.querySelector('#signin-settings-panel').open();
       };
 
-      IOWA.Elements.Template.openSession = function(sessionId) {
+      IOWA.Elements.Template.openSession = function(sessionIdOrDetail) {
+        var sessionId = sessionIdOrDetail.detail ? sessionIdOrDetail.detail : sessionIdOrDetail;
         this.selectedSession = this.scheduleData.sessions[sessionId];
 
         // Open paper-dialog.
