@@ -83,7 +83,7 @@
 
       <template repeat="{{speakerId in selectedSession.speakers}}">
         <div class="speaker__card" layout horizontal>
-          <div><img _src="{{scheduleData.speakers[speakerId].thumbnailUrl || 'images/touch/homescreen96.png'}}" class="profilepic"></div>
+          <div><img _src="{{scheduleData.speakers[speakerId].thumbnailUrl || 'images/schedule/profile_placeholder.png'}}" class="profilepic"></div>
           <div class="speaker__info" layout vertical flex>
             <span class="speaker__name">{{scheduleData.speakers[speakerId].name}}</span>
             <span class="speaker__title">{{scheduleData.speakers[speakerId].company}}</span>
