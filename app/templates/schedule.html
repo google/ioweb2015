@@ -303,15 +303,18 @@
     }
 
     function fetchUserData() {
-      IOWA.Elements.Template.scheduleFetchingUserData = true;
+      if (!alreadyLoadedUserSchedule) {
+        alreadyLoadedUserSchedule = true;
+        IOWA.Elements.Template.scheduleFetchingUserData = true;
 
-      // Fetch user's saved sessions.
-      IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
-        IOWA.Elements.Template.scheduleFetchingUserData = false;
-        IOWA.Elements.Template.savedSessions = savedSessions;
+        // Fetch user's saved sessions.
+        IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
+          IOWA.Elements.Template.scheduleFetchingUserData = false;
+          IOWA.Elements.Template.savedSessions = savedSessions;
 
-        updateSavedSessionsUI(savedSessions);
-      });
+          updateSavedSessionsUI(savedSessions);
+        });
+      }
     }
 
     // Page-specific JS that runs when this page is loaded for the first time.
@@ -362,8 +365,7 @@
             pageIsDeepLinked_ = true;
           }
         }).then(function() {
-          if (IOWA.Elements.GoogleSignIn.signedIn && !alreadyLoadedUserSchedule) {
-            alreadyLoadedUserSchedule = true;
+          if (IOWA.Elements.GoogleSignIn.signedIn) {
             fetchUserData();
           }
         });
@@ -372,10 +374,7 @@
       var onSigninChanged_ = function(e) {
         if (e.detail.signedIn) {
           toggleSignInCard(true);
-          if (!alreadyLoadedUserSchedule) {
-            alreadyLoadedUserSchedule = true;
-            fetchUserData();
-          }
+          fetchUserData();
         } else {
           alreadyLoadedUserSchedule = false;
           toggleSignInCard(false);
