@@ -161,14 +161,14 @@ func serveIOExtEntries(w http.ResponseWriter, r *http.Request) {
 	entries, err := ioExtEntries(c, refresh)
 	if err != nil {
 		errorf(c, "ioExtEntries: %v", err)
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 		return
 	}
 
 	body, err := json.Marshal(entries)
 	if err != nil {
 		errorf(c, "json.Marshal: %v", err)
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -197,14 +197,14 @@ func serveSocial(w http.ResponseWriter, r *http.Request) {
 	entries, err := socialEntries(c, refresh)
 	if err != nil {
 		errorf(c, "socialEntries: %v", err)
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 		return
 	}
 
 	body, err := json.Marshal(entries)
 	if err != nil {
 		errorf(c, "json.Marshal: %v", err)
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -232,14 +232,14 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 
 	c, err := authUser(c, ah)
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 	var flow struct {
 		Code string `json:"code"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&flow); err != nil {
-		writeJSONError(w, http.StatusBadRequest, fmt.Errorf("invalid JSON body: %v", err))
+		writeJSONError(c, w, http.StatusBadRequest, fmt.Errorf("invalid JSON body: %v", err))
 		return
 	}
 	err = runInTransaction(c, func(c context.Context) error {
@@ -250,7 +250,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		return storeCredentials(c, creds)
 	})
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 	}
 }
 
@@ -266,7 +266,7 @@ func serveSchedule(w http.ResponseWriter, r *http.Request) {
 	c := newContext(r)
 	data, err := getLatestEventData(c)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 		return
 	}
 	if err := json.NewEncoder(w).Encode(data); err != nil {
@@ -278,13 +278,13 @@ func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 
 	bookmarks, err := userSchedule(c, contextUser(c))
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 		return
 	}
 	if bookmarks == nil {
@@ -299,13 +299,13 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 	user := contextUser(c)
 
 	if r.URL.Path[len(r.URL.Path)-1] == '/' {
-		writeJSONError(w, http.StatusBadRequest, errors.New("invalid session ID"))
+		writeJSONError(c, w, http.StatusBadRequest, errors.New("invalid session ID"))
 		return
 	}
 
@@ -318,12 +318,12 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 	case "DELETE":
 		bookmarks, err = unbookmarkSession(c, user, sid)
 	default:
-		writeJSONError(w, http.StatusBadRequest, errors.New("invalid request method"))
+		writeJSONError(c, w, http.StatusBadRequest, errors.New("invalid request method"))
 		return
 	}
 
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -348,12 +348,12 @@ func serveUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 	data, err := getUserPushInfo(c, contextUser(c))
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 	if err := json.NewEncoder(w).Encode(data); err != nil {
@@ -367,21 +367,21 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 
 	// decode request payload into a flexible map
 	var body map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		writeJSONError(w, http.StatusBadRequest, err)
+		writeJSONError(c, w, http.StatusBadRequest, err)
 		return
 	}
 
 	// get current settings
 	data, err := getUserPushInfo(c, contextUser(c))
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -422,7 +422,7 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 	// store user configuration
 	// TODO: run in transaction with the previous getUserPushInfo()
 	if err := storeUserPushInfo(c, data); err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 
@@ -495,13 +495,14 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// handle a request with SW token
+	c := newContext(r)
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	user, ts, err := decodeSWToken(ah)
 	if err != nil {
-		writeJSONError(w, http.StatusForbidden, err)
+		writeJSONError(c, w, http.StatusForbidden, err)
 		return
 	}
-	c := context.WithValue(newContext(r), ctxKeyUser, user)
+	c = context.WithValue(c, ctxKeyUser, user)
 
 	// fetch user data in parallel with dataChanges
 	var (
@@ -520,14 +521,14 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 
 	dc, err := getChangesSince(c, ts)
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 
 	select {
 	case <-time.After(10 * time.Second):
 		errorf(c, "userSchedule/getUserPushInfo timed out")
-		writeJSONError(w, http.StatusInternalServerError, errors.New("timeout"))
+		writeJSONError(c, w, http.StatusInternalServerError, errors.New("timeout"))
 		return
 	case <-done:
 		// user data goroutine finished
@@ -536,14 +537,14 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 	// userErr indicates any error in the user data retrieval
 	if userErr != nil {
 		errorf(c, "userErr: %v", userErr)
-		writeJSONError(w, http.StatusInternalServerError, userErr)
+		writeJSONError(c, w, http.StatusInternalServerError, userErr)
 		return
 	}
 
 	filterUserChanges(dc, bookmarks, pushInfo.Pext)
 	dc.Token, err = encodeSWToken(user, dc.Updated.Add(1*time.Second))
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 	}
 	if err := json.NewEncoder(w).Encode(dc); err != nil {
 		errorf(c, "serveUserUpdates: encode resp: %v", err)
@@ -556,14 +557,14 @@ func serveSWToken(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 
 	now := time.Now()
 	token, err := encodeSWToken(contextUser(c), now)
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 	dc := &dataChanges{Token: token, Updated: now}
@@ -648,26 +649,26 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 // debugGetURL fetches a URL with service account credentials.
 // Should not be available on prod.
 func debugServiceGetURL(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
 	req, err := http.NewRequest("GET", r.FormValue("url"), nil)
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 	if req.URL.Scheme != "https" {
-		writeJSONError(w, http.StatusBadRequest, errors.New("dude, use https!"))
+		writeJSONError(c, w, http.StatusBadRequest, errors.New("dude, use https!"))
 		return
 	}
 
-	c := newContext(r)
 	hc, err := serviceAccountClient(c, "https://www.googleapis.com/auth/devstorage.read_only")
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 
 	res, err := hc.Do(req)
 	if err != nil {
-		writeJSONError(w, errStatus(err), err)
+		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
 	defer res.Body.Close()
@@ -698,7 +699,7 @@ func debugPush(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	dc := &dataChanges{}
 	if err := json.NewDecoder(r.Body).Decode(dc); err != nil {
-		writeJSONError(w, http.StatusBadRequest, err)
+		writeJSONError(c, w, http.StatusBadRequest, err)
 		return
 	}
 	if dc.Updated.IsZero() {
@@ -713,12 +714,13 @@ func debugPush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := runInTransaction(c, fn); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err)
+		writeJSONError(c, w, http.StatusInternalServerError, err)
 	}
 }
 
 // writeJSONError sets response code to 500 and writes an error message to w.
-func writeJSONError(w http.ResponseWriter, code int, err error) {
+func writeJSONError(c context.Context, w http.ResponseWriter, code int, err error) {
+	errorf(c, err.Error())
 	w.WriteHeader(code)
 	fmt.Fprintf(w, `{"error": %q}`, err.Error())
 }
