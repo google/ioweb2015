@@ -338,7 +338,7 @@
         IOWA.Elements.Template.scheduleFetchingUserData = true;
 
         // Fetch user's saved sessions.
-        IOWA.Schedule.fetchUserSchedule('api/v1/user/schedule', function(savedSessions) {
+        IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
           IOWA.Elements.Template.scheduleFetchingUserData = false;
 
           // Use existing template model.
@@ -366,7 +366,7 @@
       };
 
       page.onPageTransitionDone = function(e) {
-        IOWA.Schedule.fetchSchedule('api/v1/schedule').then(function(scheduleData) {
+        IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
           // Should already be set by the worker, but just in case
           // (or if the worker is removed), set schedule data.
           if (!IOWA.Elements.Template.scheduleData) {

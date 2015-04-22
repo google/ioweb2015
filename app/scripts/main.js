@@ -35,12 +35,22 @@
   //   // TODO
   // })
 
-  console.time('worker startup');
-  exports.worker = new Worker('scripts/worker.js');
-  console.timeEnd('worker startup');
+  var start;
+  var showMetrics = (exports.ENV === 'dev' || exports.ENV === 'stage') &&
+                    exports.performance && exports.performance.now;
+
+  if (showMetrics) {
+    start = performance.now();
+    exports.worker = new Worker('worker.js');
+    console.info('worker startup:', performance.now() - start, 'ms');
+  } else {
+    exports.worker = new Worker('worker.js');
+  }
 
   exports.worker.addEventListener('message', function(e) {
-    console.timeEnd('worker fetch data');
+    if (showMetrics) {
+      console.info('worker roundtrip:', performance.now() - start, 'ms');
+    }
 
     if (!e.data) {
       return;
@@ -57,7 +67,9 @@
     }
   });
 
-  console.time('worker fetch data');
-  exports.worker.postMessage({cmd: 'CMD_FETCH_SCHEDULE'}); // Start the worker.worker
+  if (showMetrics) {
+    start = performance.now();
+  }
+  exports.worker.postMessage({cmd: 'FETCH_SCHEDULE'});
 
 })(window);

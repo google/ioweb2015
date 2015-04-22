@@ -30,12 +30,12 @@ IOWA.Schedule = (function() {
    * Fetches the I/O schedule data.
    * @return {Promise} Resolves with response schedule data.
    */
-  function fetchSchedule(url) {
+  function fetchSchedule() {
     if (scheduleData_) {
       return Promise.resolve(scheduleData_);
     }
 
-    return IOWA.Request.xhrPromise('GET', url || SCHEDULE_ENDPOINT, false).then(function(resp) {
+    return IOWA.Request.xhrPromise('GET', SCHEDULE_ENDPOINT, false).then(function(resp) {
       scheduleData_ = resp;
       return scheduleData_;
     });
@@ -51,7 +51,7 @@ IOWA.Schedule = (function() {
    * locally in memory.
    * @param {function} callback The callback to execute when the user schedule data is available.
    */
-  function fetchUserSchedule(opt_url, callback) {
+  function fetchUserSchedule(callback) {
     if (userScheduleData_) {
       callback(userScheduleData_);
     } else {
@@ -60,7 +60,7 @@ IOWA.Schedule = (function() {
         callback(userScheduleData);
       };
 
-      IOWA.Request.cacheThenNetwork(opt_url || SCHEDULE_ENDPOINT_USERS, callback, callbackWrapper, true);
+      IOWA.Request.cacheThenNetwork(SCHEDULE_ENDPOINT_USERS, callback, callbackWrapper, true);
     }
   }
 

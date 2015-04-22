@@ -15,19 +15,19 @@
  */
 
 importScripts(
-  '../bower_components/es6-promise-2.0.1.min/index.js',
-  'helper/request.js',
-  'helper/schedule.js'
-  // 'helper/picasa.js'
+  'bower_components/es6-promise-2.0.1.min/index.js',
+  'scripts/helper/request.js',
+  'scripts/helper/schedule.js'
+  // 'scripts/helper/picasa.js'
 );
 
-var schedulePromise = IOWA.Schedule.fetchSchedule('../api/v1/schedule');
-// var userSchedulePromise = IOWA.Schedule.fetchUserSchedule('../api/v1/user/schedule');
+var schedulePromise = IOWA.Schedule.fetchSchedule();
+// var userSchedulePromise = IOWA.Schedule.fetchUserSchedule();
 
 addEventListener('message', function(e) {
 
   switch (e.data.cmd) {
-    case 'CMD_FETCH_SCHEDULE':
+    case 'FETCH_SCHEDULE':
       schedulePromise.then(function(scheduleData) {
         var tags = IOWA.Schedule.generateFilters(scheduleData.tags);
         postMessage({scheduleData: scheduleData, tags: tags});
