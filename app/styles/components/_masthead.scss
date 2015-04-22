@@ -296,7 +296,7 @@ core-drawer-panel {
   line-height: 20px;
 }
 
-experiment-fab-container, #fab {
+experiment-fab-container, .fab {
   bottom: -20px; // experiment-fab's height / 2
   right: $mobileKeyline;
   width: 56px;
@@ -310,7 +310,7 @@ paper-fab {
 }
 
 @media (max-width: $phone-breakpoint-max) {
-  experiment-fab-container, #fab {
+  experiment-fab-container, .fab {
     width: 40px;
     height: 40px;
   }
@@ -358,7 +358,7 @@ paper-fab {
     padding: 0 0 170px 0;
   }
 
-  experiment-fab-container, #fab {
+  experiment-fab-container, .fab {
     bottom: -28px; // experiment-fab's height / 2
     right: $desktopKeyline;
   }
