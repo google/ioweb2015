@@ -280,9 +280,7 @@ func slurpEventDataChunk(c context.Context, url string) (*eventData, error) {
 		s.Block = tzstart.Format("3 PM")
 		s.Start = tzstart.Format("3:04 PM")
 		s.End = s.EndTime.In(config.Schedule.Location).Format("3:04 PM")
-
-		d := s.StartTime.Sub(config.Schedule.Start)
-		s.Day = 1 + int(d/24/time.Hour)
+		s.Day = tzstart.Day()
 
 		sessions[s.Id] = s
 	}
