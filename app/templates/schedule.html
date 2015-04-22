@@ -202,16 +202,17 @@
   </section>
 
   <section id="subpage-day1" class="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{ {active: pages['schedule'].selectedSubpage == 'day1' || pages['schedule'].selectedSubpage == 'day2' || pages['schedule'].selectedSubpage == 'myschedule'} | tokenList}}">
-    <section id="signin-prompt" class="page__section page__section--top slide-up">
-      <div class="card__container card__container--top">
-
+    <section  class="page__section page__section--top slide-up">
+      <div id="signin-prompt"
+          class="card__container card__container--top {{{'prompt-hidden': currentUser} | tokenList}}"
+          hidden?="{{pages['schedule'].selectedSubpage == 'myschedule'}}">
         <div class="card js-experiment-visualizer">
           <div class="card-content">
             <h3 class="card__title">Create your custom I/O schedule</h3>
             <div>Sign in to add events to My Schedule.
               <span class="notification__feature">
                 To get notifications on this device, you need to sign in and enable notifications.
-                <p class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
+                <div class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</div>
               </span>
             </div>
           </div>
@@ -221,7 +222,44 @@
             </span>
           </div>
         </div>
-
+      </div>
+      <div class="card__container card__container--top {{{'notification__feature': currentUser} | tokenList}}">
+        <div class="card js-experiment-visualizer"
+          hidden?="{{pages['schedule'].selectedSubpage != 'myschedule'}}">
+          <div class="card-content">
+            <h3 class="card__title" hidden?="{{currentUser}}">Create your custom I/O schedule</h3>
+            <div hidden?="{{currentUser}}">
+              Sign in to add events to My Schedule.
+              <span class="notification__feature">
+                To get notifications on this device, you need to sign in and enable notifications.
+                <div class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</div>
+              </span>
+            </div>
+            <div hidden?="{{!currentUser}}" class="notification__feature">
+              <div>By default, you'll get notifications on this device when:
+                <ul>
+                  <li>Events in My Schedule are about to start</li>
+                  <li>Videos of sessions added to My Schedule are available</li>
+                </ul>
+              </div>
+              <div class="note">
+                Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.
+              </div>
+            </div>
+          </div>
+          <div class="card-content">
+            <span class="anchor-like" role="link" tabindex="0"
+                data-track-link="schedule-sign-in" on-click="{{signIn}}"
+                hidden?="{{currentUser}}">
+              Sign in
+            </span>
+            <span class="anchor-like" role="link" tabindex="0"
+                data-track-link="schedule-open-settings" on-click="{{openSettings}}"
+                hidden?="{{!currentUser}}">
+              Go to settings
+            </span>
+          </div>
+        </div>
       </div>
     </section>
     <div class="slide-up-delay">
@@ -229,15 +267,18 @@
         <span flex>
           <paper-dropdown-menu>
             <paper-dropdown class="dropdown" halign="left">
-              <core-menu class="menu" selected="0">
-                <paper-item>Filters</paper-item>
-                <template repeat="{{theme in filterThemes}}">
-                  <paper-item>{{theme}}</paper-item>
+              <core-menu class="menu" selected="Filters" valueattr="label"
+                  on-core-select="{{selectFilter}}">
+                <paper-item label="Filters">Filters</paper-item>
+                <template repeat="{{theme, i in filterThemes}}">
+                  <paper-item label="{{theme}}"
+                    class="{{ {'paper-item-separator': i === 0} | tokenList}}">{{theme}}</paper-item>
                 </template>
-                <template repeat="{{type in filterTypes}}">
-                  <paper-item>{{type}}</paper-item>
+                <template repeat="{{type, i in filterSessionTypes}}">
+                  <paper-item label="{{type}}"
+                      class="{{ {'paper-item-separator': i === 0} | tokenList}}">{{type}}</paper-item>
                 </template>
-                <paper-item>Live Streamed</paper-item>
+                <paper-item label="Live Streamed">Live Streamed</paper-item>
               </core-menu>
             </paper-dropdown>
           </paper-dropdown-menu>
@@ -278,19 +319,6 @@
     var alreadyLoadedUserSchedule = false;
 
     var ioScheduleEl = null;
-    var signinPrompt = null;
-
-    function toggleSignInCard(hide) {
-      signinPrompt = signinPrompt || IOWA.Elements.Main.querySelector('#signin-prompt');
-      if (!signinPrompt) {
-        return;
-      }
-      if (hide) {
-        signinPrompt.classList.add('prompt-hidden');
-      } else {
-        signinPrompt.classList.remove('prompt-hidden');
-      }
-    }
 
     function updateSavedSessionsUI(savedSessions) {
       //  Mark/unmarked sessions the user has bookmarked.
@@ -333,11 +361,6 @@
       };
 
       page.onPageTransitionDone = function(e) {
-        // If user is already authenticated, hide prompts.
-        if (IOWA.Elements.Template.currentUser) {
-          toggleSignInCard(true);
-        }
-
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
           if (!IOWA.Elements.Template.scheduleData) {
             IOWA.Elements.Template.scheduleData = scheduleData
@@ -373,11 +396,9 @@
 
       var onSigninChanged_ = function(e) {
         if (e.detail.signedIn) {
-          toggleSignInCard(true);
           fetchUserData();
         } else {
           alreadyLoadedUserSchedule = false;
-          toggleSignInCard(false);
           IOWA.Elements.Template.savedSessions = [];
           updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
           IOWA.Schedule.clearCachedUserSchedule();
@@ -410,9 +431,16 @@
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
       };
 
+      IOWA.Elements.Template.openSettings = function(e, detail, sender) {
+        var attr = sender.getAttribute('data-track-link');
+        if (attr) {
+          IOWA.Analytics.trackEvent('link', 'click', attr);
+        }
+        IOWA.Elements.Nav.querySelector('#signin-settings-panel').open();
+      };
+
       IOWA.Elements.Template.openSession = function(sessionIdOrDetail) {
         var sessionId = sessionIdOrDetail.detail ? sessionIdOrDetail.detail : sessionIdOrDetail;
-
         this.selectedSession = this.scheduleData.sessions[sessionId];
 
         // Open paper-dialog.
@@ -486,6 +514,13 @@
           history.replaceState({}, null, url);
         } else {
           pageIsDeepLinked_ = true;
+        }
+      };
+
+      IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
+        if (detail.isSelected) {
+          ioScheduleEl.filters = (sender.selectedIndex === 0) ? []
+              : [sender.selected];
         }
       };
 
