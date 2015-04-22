@@ -18,11 +18,9 @@ importScripts(
   'bower_components/es6-promise-2.0.1.min/index.js',
   'scripts/helper/request.js',
   'scripts/helper/schedule.js'
-  // 'scripts/helper/picasa.js'
 );
 
 var schedulePromise = IOWA.Schedule.fetchSchedule();
-// var userSchedulePromise = IOWA.Schedule.fetchUserSchedule();
 
 addEventListener('message', function(e) {
 
@@ -32,14 +30,8 @@ addEventListener('message', function(e) {
         var tags = IOWA.Schedule.generateFilters(scheduleData.tags);
         postMessage({scheduleData: scheduleData, tags: tags});
 
-        self.close(); // terminate.
+        self.close(); // Terminate worker.
       });
-
-      // IOWA.Picasa.fetchPhotos(0, function(photos) {
-      //   postMessage({photos: photos});
-      // });
-
-      //userSchedulePromise.then(postMessage);
 
       break;
 
@@ -48,5 +40,3 @@ addEventListener('message', function(e) {
   }
 
 });
-
-// self.close(); // terminate.

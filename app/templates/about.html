@@ -207,10 +207,10 @@
           if (gallery.photos.length) {
             galleryReady();
           } else {
-            // IOWA.Picasa.fetchPhotos(0, function(photos) {
-            //   gallery.photos = photos;
-            //   galleryReady();
-            // });
+            IOWA.Picasa.fetchPhotos(0, function(photos) {
+              gallery.photos = photos;
+              galleryReady();
+            });
           }
 
         } else {
