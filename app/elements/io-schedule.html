@@ -68,7 +68,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                          on-click="{{selectSession}}"
                          tabindex="0">
                       <span class="schedule-time" flex auto-vertical id="session-{{sessionId}}-time">
-                        {{sessions[sessionId].start}} - {{sessions[sessionId].end}}
+                        {{sessions[sessionId].start}}<span hidden?="{{sessionId === '__keynote__'}}"> - {{sessions[sessionId].end}}</span>
                       </span>
                       <span class="schedule-title" auto-vertical
                             flex?="{{!isPhoneSize}}" two
