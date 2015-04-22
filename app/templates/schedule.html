@@ -268,7 +268,7 @@
           <paper-dropdown-menu>
             <paper-dropdown class="dropdown" halign="left">
               <core-menu class="menu" selected="Filters" valueattr="label"
-                  on-core-select="{{selectFilter}}">
+                  on-core-activate="{{selectFilter}}">
                 <paper-item label="Filters">Filters</paper-item>
                 <template repeat="{{theme, i in filterThemes}}">
                   <paper-item label="{{theme}}"
@@ -518,6 +518,7 @@
       };
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
+        e.stopPropagation();
         if (detail.isSelected) {
           ioScheduleEl.filters = (sender.selectedIndex === 0) ? []
               : [sender.selected];
