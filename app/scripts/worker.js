@@ -29,10 +29,10 @@ addEventListener('message', function(e) {
   switch (e.data.cmd) {
     case 'CMD_FETCH_SCHEDULE':
       schedulePromise.then(function(scheduleData) {
-
         var tags = IOWA.Schedule.generateFilters(scheduleData.tags);
-
         postMessage({scheduleData: scheduleData, tags: tags});
+
+        self.close(); // terminate.
       });
 
       // IOWA.Picasa.fetchPhotos(0, function(photos) {
@@ -40,6 +40,7 @@ addEventListener('message', function(e) {
       // });
 
       //userSchedulePromise.then(postMessage);
+
       break;
 
     default:

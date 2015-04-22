@@ -147,6 +147,8 @@ IOWA.Elements = (function() {
     template.offsiteMarkerResults = [];
     template.countdownEnded = false;
     template.isIOS = IOWA.Util.isIOS();
+    template.scheduleData = null;
+    template.savedSessions = [];
 
     // Sign-in defaults.
     template.isSignedIn = false;

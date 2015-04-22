@@ -58,6 +58,6 @@
   });
 
   console.time('worker fetch data');
-  worker.postMessage({cmd: 'CMD_FETCH_SCHEDULE'}); // Start the worker.worker
+  exports.worker.postMessage({cmd: 'CMD_FETCH_SCHEDULE'}); // Start the worker.worker
 
 })(window);

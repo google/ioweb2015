@@ -338,9 +338,13 @@
         IOWA.Elements.Template.scheduleFetchingUserData = true;
 
         // Fetch user's saved sessions.
-        IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
+        IOWA.Schedule.fetchUserSchedule('api/v1/user/schedule', function(savedSessions) {
           IOWA.Elements.Template.scheduleFetchingUserData = false;
-          IOWA.Elements.Template.savedSessions = savedSessions;
+
+          // Use existing template model.
+          if (!IOWA.Elements.Template.savedSessions) {
+            IOWA.Elements.Template.savedSessions = savedSessions;
+          }
           updateSavedSessionsUI(savedSessions);
         });
       }
@@ -362,7 +366,9 @@
       };
 
       page.onPageTransitionDone = function(e) {
-        IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
+        IOWA.Schedule.fetchSchedule('api/v1/schedule').then(function(scheduleData) {
+          // Should already be set by the worker, but just in case
+          // (or if the worker is removed), set schedule data.
           if (!IOWA.Elements.Template.scheduleData) {
             IOWA.Elements.Template.scheduleData = scheduleData
             IOWA.Schedule.generateFilters(scheduleData.tags);
@@ -409,8 +415,6 @@
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
-        IOWA.Elements.Template.scheduleData = null;
-        IOWA.Elements.Template.savedSessions = [];
         IOWA.Elements.Template.scheduleFetchingUserData = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
