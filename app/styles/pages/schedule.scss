@@ -87,6 +87,7 @@ $name: 'page-schedule';
     .card {
       transform: translateY(-150px);
       opacity: 0;
+      margin-bottom: 0;
     }
   }
 
@@ -253,8 +254,15 @@ core-icon[icon="schedule"] {
   .card__container {
     @include shadow-z1();
   }
+
+  #signin-prompt {
+    .card {
+      margin-bottom: 0;
+    }
+  }
+
   .card {
-    margin-bottom: 0;
+    margin-bottom: $mobileKeyline;
     @include shadow-z1();
   }
   .card-content:first-child {
@@ -264,9 +272,6 @@ core-icon[icon="schedule"] {
 }
 
 @media (min-width: $tablet-breakpoint-min) {
-  .page__section {
-    padding-bottom: $desktopKeyline;
-  }
   .session__detail {
     .card__photo {
       height: 430px;

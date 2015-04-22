@@ -212,7 +212,7 @@
             <div>Sign in to add events to My Schedule.
               <span class="notification__feature">
                 To get notifications on this device, you need to sign in and enable notifications.
-                <p class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
+                <div class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</div>
               </span>
             </div>
           </div>
@@ -232,19 +232,19 @@
               Sign in to add events to My Schedule.
               <span class="notification__feature">
                 To get notifications on this device, you need to sign in and enable notifications.
-                <p class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
+                <div class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</div>
               </span>
             </div>
             <div hidden?="{{!currentUser}}" class="notification__feature">
-              <p>By default, you'll get Chrome notifications on this device when:
+              <div>By default, you'll get notifications on this device when:
                 <ul>
                   <li>Events in My Schedule are about to start</li>
                   <li>Videos of sessions added to My Schedule are available</li>
                 </ul>
-              </p>
-              <p class="note">
-                Note: Chrome notifications are activated per device, on desktop and Android only. To get notifications on multiple devices, sign in using Chrome on each device. All device notifications can be turned on/off at any time in the settings panel.
-              </p>
+              </div>
+              <div class="note">
+                Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.
+              </div>
             </div>
           </div>
           <div class="card-content">
@@ -254,7 +254,7 @@
               Sign in
             </span>
             <span class="anchor-like" role="link" tabindex="0"
-                data-track-link="schedule-sign-in" on-click="{{openSettings}}"
+                data-track-link="schedule-open-settings" on-click="{{openSettings}}"
                 hidden?="{{!currentUser}}">
               Go to settings
             </span>
@@ -430,6 +430,7 @@
       };
 
       IOWA.Elements.Template.openSettings = function() {
+        IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
         IOWA.Elements.Nav.querySelector('#signin-settings-panel').open();
       };
 
