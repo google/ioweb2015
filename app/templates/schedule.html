@@ -229,15 +229,18 @@
         <span flex>
           <paper-dropdown-menu>
             <paper-dropdown class="dropdown" halign="left">
-              <core-menu class="menu" selected="0">
-                <paper-item>Filters</paper-item>
-                <template repeat="{{theme in filterThemes}}">
-                  <paper-item>{{theme}}</paper-item>
+              <core-menu class="menu" selected="Filters" valueattr="label"
+                  on-core-select="{{selectFilter}}">
+                <paper-item label="Filters">Filters</paper-item>
+                <template repeat="{{theme, i in filterThemes}}">
+                  <paper-item label="{{theme}}"
+                    class="{{ {'paper-item-separator': i === 0} | tokenList}}">{{theme}}</paper-item>
                 </template>
-                <template repeat="{{type in filterTypes}}">
-                  <paper-item>{{type}}</paper-item>
+                <template repeat="{{type, i in filterSessionTypes}}">
+                  <paper-item label="{{type}}"
+                      class="{{ {'paper-item-separator': i === 0} | tokenList}}">{{type}}</paper-item>
                 </template>
-                <paper-item>Live Streamed</paper-item>
+                <paper-item label="Live Streamed">Live Streamed</paper-item>
               </core-menu>
             </paper-dropdown>
           </paper-dropdown-menu>
@@ -487,6 +490,14 @@
           history.replaceState({}, null, url);
         } else {
           pageIsDeepLinked_ = true;
+        }
+      };
+
+      IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
+        console.log('select filter', sender.selected, ioScheduleEl)
+        if (detail.isSelected) {
+          ioScheduleEl.filters = (sender.selected === 'Filters') ? []
+              : [sender.selected];
         }
       };
 
