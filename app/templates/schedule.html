@@ -494,7 +494,6 @@
       };
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
-        console.log('select filter', sender.selected, ioScheduleEl)
         if (detail.isSelected) {
           ioScheduleEl.filters = (sender.selected === 'Filters') ? []
               : [sender.selected];
