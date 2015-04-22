@@ -164,17 +164,18 @@ Fired when sign in fails for some reason.
 
       if (this.signedIn) {
         if (this.oneTimeCode) {
-          this.sendCodeToServer(this.oneTimeCode);
+          this.sendCodeToServer(this.oneTimeCode, function() {
+            var profile = this.currentUser.getBasicProfile();
+            this.user = {
+              id: profile.getId(),
+              name: profile.getName(),
+              picture: profile.getImageUrl(),
+              email: profile.getEmail(),
+              tokenResponse: token
+            };
+            this.fire('signin-change', {signedIn: true, user: this.user});
+          }.bind(this));
           this.oneTimeCode = null;
-        }
-
-        var profile = this.currentUser.getBasicProfile();
-        this.user = {
-          id: profile.getId(),
-          name: profile.getName(),
-          picture: profile.getImageUrl(),
-          email: profile.getEmail(),
-          tokenResponse: token
         }
 
         // Refresh the token 15 min before expiration time. This is important
@@ -188,9 +189,8 @@ Fired when sign in fails for some reason.
         this.user = null;
         this.signedIn = false;
         // this.cancelAsync(this.refreshTokenHandle_);
+        this.fire('signin-change', {signedIn: false, user: null});
       }
-
-      this.fire('signin-change', {signedIn: signedIn, user: this.user});
     },
 
     sendCodeToServer: function(oneTimeCode, opt_callback) {
