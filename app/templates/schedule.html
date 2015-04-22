@@ -430,7 +430,10 @@
       };
 
       IOWA.Elements.Template.openSettings = function(e, detail, sender) {
-        IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+        var attr = sender.getAttribute('data-track-link');
+        if (attr) {
+          IOWA.Analytics.trackEvent('link', 'click', attr);
+        }
         IOWA.Elements.Nav.querySelector('#signin-settings-panel').open();
       };
 
