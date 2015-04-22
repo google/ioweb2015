@@ -25,24 +25,23 @@ IOWA.Auth = IOWA.Auth || (function() {
   var DB_NAME = 'push-notification-updates';
   var UPDATES_ENDPOINT = 'api/v1/user/updates';
 
-  var tokenResponse_ = null;
   var pendingResolutions = [];
 
   function getTokenResponse_() {
-    return tokenResponse_;
+    var user = IOWA.Elements.GoogleSignIn.auth2.currentUser.get();
+    if (user.isSignedIn()) {
+      return user.getAuthResponse();
+    }
+    return null;
   }
 
   function setUserUI(user) {
-    tokenResponse_ = user.tokenResponse;
-
     var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     drawerProfilePic.src = user.picture;
     drawerProfilePic.hidden = false;
   }
 
   function clearUserUI() {
-    tokenResponse_ = null;
-
     var drawerProfilePic = IOWA.Elements.Drawer.querySelector('.profilepic');
     drawerProfilePic.hidden = true;
 
@@ -143,7 +142,7 @@ IOWA.Auth = IOWA.Auth || (function() {
     message = message || 'Please sign in';
 
     // If we're already signed in, return a Promise that resolves immediately.
-    if (tokenResponse_) {
+    if (getTokenResponse_()) {
       return Promise.resolve();
     }
 

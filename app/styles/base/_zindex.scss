@@ -27,7 +27,7 @@ paper-fab {
   z-index: 2;
 }
 
-experiment-fab-container, #fab {
+experiment-fab-container, .fab {
   z-index: 3;
 }
 
@@ -66,5 +66,5 @@ io-gallery {
 
 experiment-fab-container[playmode="playing"],
 experiment-fab-container[playmode="paused"] {
-  z-index: 100002; // highest when playing
+  z-index: 100002 !important; // highest when playing
 }

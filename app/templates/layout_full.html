@@ -230,11 +230,8 @@ limitations under the License.
 
     <template is="auto-binding" id="t">
 
-      <!-- <google-signin clientId="{% .ClientID %}"
-                     scopes="https://www.googleapis.com/auth/drive.appfolder"
-                     user="{{currentUser}}"></google-signin> -->
       <google-signin clientId="{% .ClientID %}"
-                     scopes="profile email https://www.googleapis.com/auth/drive.appfolder"
+                     scopes="https://www.googleapis.com/auth/drive.appfolder"
                      user="{{currentUser}}" load></google-signin>
 
       <!-- Responsive handlers -->
@@ -323,7 +320,7 @@ limitations under the License.
                   </div>
                   <div class="card-content" layout horizontal justified>
                     <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blank">Terms of Service</a>
-                    <span class="anchor-like" data-track-link="login-signout" on-tap="{{signOut}}">Sign-out</span>
+                    <span class="anchor-like" data-track-link="login-signout" on-tap="{{signOut}}">Sign out</span>
                   </div>
                 </paper-dropdown>
               </paper-menu-button>
@@ -361,8 +358,11 @@ limitations under the License.
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
-        <experiment-fab-container id="fab" mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}"></experiment-fab-container>
-        <!-- <paper-fab id="fab" icon="event" hidden?="{{selectedPage === 'home'}}"></paper-fab> -->
+        <experiment-fab-container class="fab" mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}" hidden?="{{selectedPage !== 'home'}}"></experiment-fab-container>
+        <a href="schedule#myschedule" data-ajax-link data-track-link="fab-myschedule"
+           hidden?="{{selectedPage === 'home'}}">
+          <paper-fab class="fab" icon="event" title="My Schedule" mini?="{{isPhoneSize}}"></paper-fab>
+        </a>
       </header>
 
       <!-- <div id="iolive" hidden?="{{selectedPage != 'home'}}" fit>
@@ -413,7 +413,7 @@ limitations under the License.
 
         <div class="footer-content footer-logos" layout horizontal justified>
           <div><img src="images/google-logo.svg" alt="Google Logo"></div>
-          <!-- <a href="https://play.google.com/store/apps/details?id=com.google.samples.apps.iosched" target="_blank" data-track-link="footer-iosched"><img src="images/google_play_45.png" alt="Get the Google I/O Android app on Google Play" title="Get the Google I/O Android app on Google Play"></a> -->
+          <a href="https://play.google.com/store/apps/details?id=com.google.samples.apps.iosched" target="_blank" data-track-link="footer-iosched"><img src="images/google_play_45.png" alt="Get the Google I/O Android app on Google Play" title="Get the Google I/O Android app on Google Play"></a>
         </div>
       </footer>
 
