@@ -495,7 +495,7 @@
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
         if (detail.isSelected) {
-          ioScheduleEl.filters = (sender.selected === 'Filters') ? []
+          ioScheduleEl.filters = (sender.selectedIndex === 0) ? []
               : [sender.selected];
         }
       };
