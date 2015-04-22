@@ -212,7 +212,7 @@ IOWA.Router = (function() {
 
   /**
    * Runs custom page handlers for load and unload, if present.
-   * @param {string} funcName 'load', 'unload' or'onTransitionDone'.
+   * @param {string} funcName 'load', 'unload' or 'onPageTransitionDone'.
    * @param {pageName} pageName Page that owns the handler.
    * @return {Promise}
    * @private
@@ -330,8 +330,8 @@ IOWA.Router = (function() {
       .then(function() {
         // End transition.
         IOWA.Elements.Template.fire('page-transition-done');
-        // Run page's custom onTransitionDone handlers.
-        router.runPageHandler('onTransitionDone', router.state.current.page);
+        // Run page's custom onPageTransitionDone handlers.
+        router.runPageHandler('onPageTransitionDone', router.state.current.page);
       });
   };
 
