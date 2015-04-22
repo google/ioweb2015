@@ -62,9 +62,9 @@ IOWA.Elements = (function() {
         IOWA.PageAnimation.pageFirstRender(subpage), function() {
           // Fire event when the page transitions are final.
           IOWA.Elements.Template.fire('page-transition-done');
-          // Run page's custom onTransitionDone handlers, if present.
-          if (tpl.pages[tpl.selectedPage].onTransitionDone) {
-            tpl.pages[tpl.selectedPage].onTransitionDone();
+          // Run page's custom onPageTransitionDone handlers, if present.
+          if (tpl.pages[tpl.selectedPage].onPageTransitionDone) {
+            tpl.pages[tpl.selectedPage].onPageTransitionDone();
           }
           optionallyLaunchExperiment();
           IOWA.ServiceWorkerRegistration.register();
@@ -269,7 +269,8 @@ IOWA.Elements = (function() {
         return;
       }
       var list = tagList.map(function(tag) {
-        return this.scheduleData.tags[tag].name;
+        tag = this.scheduleData.tags[tag];
+        return tag ? tag.name : '';
       }, this);
       return list.join(', ');
     };
