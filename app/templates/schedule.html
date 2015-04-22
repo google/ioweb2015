@@ -331,7 +331,9 @@
     }
 
     function fetchUserData() {
-      if (!alreadyLoadedUserSchedule) {
+      // Don't fetch user's data if we haven't fetched the schedule yet, or
+      // it's already been fetched.
+      if (IOWA.Elements.Template.scheduleData && !alreadyLoadedUserSchedule) {
         alreadyLoadedUserSchedule = true;
         IOWA.Elements.Template.scheduleFetchingUserData = true;
 
