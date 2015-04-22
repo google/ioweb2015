@@ -362,7 +362,7 @@
             pageIsDeepLinked_ = true;
           }
         }).then(function() {
-          if (IOWA.Elements.GoogleSignIn.signedIn) {
+          if (IOWA.Elements.GoogleSignIn.signedIn && !alreadyLoadedUserSchedule) {
             alreadyLoadedUserSchedule = true;
             fetchUserData();
           }
