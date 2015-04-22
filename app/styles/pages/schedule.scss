@@ -58,6 +58,10 @@ $name: 'page-schedule';
       font-size: inherit;
     }
   }
+
+  .paper-item-separator {
+    border-top: 1px solid $color-light-grey-border;
+  }
 }
 
 .page__section {
