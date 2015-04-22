@@ -163,32 +163,27 @@ Fired when sign in fails for some reason.
       var token = this.currentUser.getAuthResponse();
 
       if (this.signedIn) {
+        var profile = this.currentUser.getBasicProfile();
+        this.user = {
+          id: profile.getId(),
+          name: profile.getName(),
+          picture: profile.getImageUrl(),
+          email: profile.getEmail(),
+          tokenResponse: token
+        };
+
         if (this.oneTimeCode) {
           this.sendCodeToServer(this.oneTimeCode, function() {
-            var profile = this.currentUser.getBasicProfile();
-            this.user = {
-              id: profile.getId(),
-              name: profile.getName(),
-              picture: profile.getImageUrl(),
-              email: profile.getEmail(),
-              tokenResponse: token
-            };
             this.fire('signin-change', {signedIn: true, user: this.user});
           }.bind(this));
           this.oneTimeCode = null;
+        } else {
+          this.fire('signin-change', {signedIn: true, user: this.user});
         }
 
-        // Refresh the token 15 min before expiration time. This is important
-        // if the user has the page open for a long period of time. The token
-        // should remain valid without a page reload.
-        // TODO: figure out if this is still need for Signin 2.0. The token may
-        // refresh itself.
-        //var refreshTokenMsTimeout_ = (new Date(token.expires_at) - new Date()) - (15 * 60 * 1000);
-        // this.refreshTokenHandle_ = this.async(this.onLoadAuth, null, refreshTokenMsTimeout_);
       } else {
         this.user = null;
         this.signedIn = false;
-        // this.cancelAsync(this.refreshTokenHandle_);
         this.fire('signin-change', {signedIn: false, user: null});
       }
     },
