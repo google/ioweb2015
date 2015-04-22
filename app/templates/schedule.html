@@ -429,7 +429,7 @@
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
       };
 
-      IOWA.Elements.Template.openSettings = function() {
+      IOWA.Elements.Template.openSettings = function(e, detail, sender) {
         IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
         IOWA.Elements.Nav.querySelector('#signin-settings-panel').open();
       };
