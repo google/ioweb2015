@@ -336,9 +336,10 @@
         }
 
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
-          IOWA.Elements.Template.scheduleData = scheduleData;
-
-          IOWA.Schedule.generateFilters(scheduleData.tags);
+          if (!IOWA.Elements.Template.scheduleData) {
+            IOWA.Elements.Template.scheduleData = scheduleData
+            IOWA.Schedule.generateFilters(scheduleData.tags);
+          }
 
           IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
