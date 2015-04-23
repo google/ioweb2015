@@ -16,11 +16,11 @@
       </paper-tab>
       <paper-tab label="day1" role="">
         <a href="#day1" data-track-link="schedule-day1" data-ajax-link
-                        layout horizontal center-center>May {{days.day1}}</a>
+                        layout horizontal center-center>{{dayTitles.day1}}</a>
       </paper-tab>
       <paper-tab label="day2" role="">
         <a href="#day2" data-track-link="schedule-day2" data-ajax-link
-                        layout horizontal center-center>May {{days.day2}}</a>
+                        layout horizontal center-center>{{dayTitles.day2}}</a>
       </paper-tab>
       <paper-tab label="myschedule" role="">
         <a href="#myschedule" data-track-link="schedule-mysched" data-ajax-link
@@ -367,6 +367,12 @@
         'day2': parseInt(GMTDay1.add(1, 'days').format('D'), 10)
       };
 
+      IOWA.Elements.Template.dayTitles = {
+        'day1': GMTDay1.format('MMMM D'),
+        'day2': GMTDay1.add(1, 'days').format('MMMM D')
+      };
+
+
       page.onSubpageTransitionDone = function() {
         var selectedSubpage = IOWA.Elements.Template.pages['schedule'].selectedSubpage;
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = selectedSubpage;
@@ -544,6 +550,8 @@
       IOWA.Elements.Template.selectTimezone = function(e, detail, sender) {
         this.days.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('D');
         this.days.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('D');
+        this.dayTitles.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('MMMM D');
+        this.dayTitles.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('MMMM D');
       };
 
       page.load(); // Run load callback on page load.
