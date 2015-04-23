@@ -748,7 +748,7 @@ func TestFirstSyncEventData(t *testing.T) {
 		Room:      "Community Lounge",
 		StartTime: startDate,
 		EndTime:   startDate.Add(1 * time.Hour),
-		Day:       1,
+		Day:       28,
 		Block:     "3 PM",
 		Start:     "3:00 PM",
 		End:       "4:00 PM",

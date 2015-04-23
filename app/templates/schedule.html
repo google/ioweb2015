@@ -16,11 +16,11 @@
       </paper-tab>
       <paper-tab label="day1" role="">
         <a href="#day1" data-track-link="schedule-day1" data-ajax-link
-                        layout horizontal center-center>Day 1</a>
+                        layout horizontal center-center>{{dayTitles.day1}}</a>
       </paper-tab>
       <paper-tab label="day2" role="">
         <a href="#day2" data-track-link="schedule-day2" data-ajax-link
-                        layout horizontal center-center>Day 2</a>
+                        layout horizontal center-center>{{dayTitles.day2}}</a>
       </paper-tab>
       <paper-tab label="myschedule" role="">
         <a href="#myschedule" data-track-link="schedule-mysched" data-ajax-link
@@ -29,7 +29,7 @@
     </paper-tabs>
     <paper-dropdown-menu hidden?="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
       <paper-dropdown class="dropdown" halign="right" duration="200">
-        <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
+        <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label" on-core-select="{{selectTimezone}}">
           <template repeat="{{zone in timezones}}">
             <paper-item label="{{zone}}">{{zone}}</paper-item>
           </template>
@@ -293,9 +293,8 @@
           </paper-dropdown>
         </paper-dropdown-menu>
       </div>
-
       <section class="page__section">
-        <io-schedule day="{{subpageToDayMap[pages[selectedPage].selectedSubpage]}}"
+        <io-schedule day="{{days[pages[selectedPage].selectedSubpage]}}"
           sessions="{{scheduleData.sessions}}" sessionThemes="{{filterThemes}}"
           sessionTypes="{{filterSessionTypes}}"
           showOnlySavedSessions="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
@@ -305,7 +304,8 @@
           fetchingUserData="{{scheduleFetchingUserData}}"
           filters="{{sessionURLFilters}}"
           on-session-bookmark="{{toggleSaveSession}}"
-          on-session-select="{{openSession}}"></io-schedule>
+          on-session-select="{{openSession}}"
+          gmtDayOne="{{GMTDay1}}"></io-schedule>
       </section>
     </div>
   </section>
@@ -391,7 +391,7 @@
           }
 
           template.sessionURLFilters = filters;
-          template.selectedTimezone = 'GMT-08:00'; // PDT timezone.
+          template.selectedTimezone = 'GMT-07:00'; // PDT timezone.
 
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
@@ -425,6 +425,7 @@
         IOWA.Elements.Template.scheduleFetchingUserData = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
+        IOWA.Elements.Template.selectTimezone();
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
@@ -532,6 +533,15 @@
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
         e.stopPropagation();
         ioScheduleEl.filters = sender.selectedIndex ? [sender.selected] : [];
+      };
+
+      IOWA.Elements.Template.selectTimezone = function(e, detail, sender) {
+        this.days = {};
+        this.dayTitles = {};
+        this.days.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('D');
+        this.days.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('D');
+        this.dayTitles.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('MMMM D');
+        this.dayTitles.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('MMMM D');
       };
 
       page.load(); // Run load callback on page load.
