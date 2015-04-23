@@ -37,22 +37,26 @@ Fired when the mode changes.
       <paper-fab icon="picture-in-picture" aria-label="My schedule" title="My schedule" on-click="{{onFabClick}}"></paper-fab>
     </div>
 
-    <template if="{{mode === _MODES.LIVE}}">
-      <div class="fullvideo__container" fit>
-        <!-- <img src="{{''}}images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch I/O Live" fit> -->
-        <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
-                        autohide="1" controls="2" modestbranding="1" showinfo="0"
-                        iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
-      </div>
-    </template>
+    <div id="livecontainer">
 
-    <template if="{{mode === _MODES.PRE}}">
-      <countdown-timer role="timer" bgcolor="#00BCD4" date="[[date]]"
-          easeintime="490" waittime="100" easeouttime="400"
-          value="{{countdownValue}}" autoStart
-          aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O">
-      </countdown-timer>
-    </template>
+      <template if="{{mode === _MODES.LIVE}}">
+        <div class="fullvideo__container" fit>
+          <!-- <img src="{{''}}images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch I/O Live" fit> -->
+          <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
+                          autohide="1" controls="2" modestbranding="1" showinfo="0"
+                          iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
+        </div>
+      </template>
+
+      <template if="{{mode === _MODES.PRE}}">
+        <countdown-timer role="timer" bgcolor="#00BCD4" date="{{date}}"
+            easeintime="490" waittime="100" easeouttime="400"
+            value="{{countdownValue}}" autoStart fit
+            aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O">
+        </countdown-timer>
+      </template>
+
+    </div>
 
   </template>
   <script>
@@ -83,20 +87,45 @@ Fired when the mode changes.
        */
       mode: {
         value: '', reflect: true
-      }
+      },
+
+      /**
+       * The mode of operation for the live embed. 'pre' is before the event
+       * starts (e.g. before `date`) and a countdown is shown leading up to the
+       * event. 'live' signifies the event has already started and the live
+       * stream video mode should be shown.
+       *
+       * @property showCountdown
+       * @type bool
+       * @default false
+       */
+      showCountdown: false
     },
 
     eventDelegates: {
       'click': 'toggleVideo'
     },
 
-    domReady: function() {
+    attached: function() {
       var now = new Date();
       var eventStart = new Date(this.date);
       if (now > eventStart) {
         this.mode = this._MODES.LIVE;
       } else {
         this.mode = 'pre';
+      }
+    },
+
+    showCountdownChanged: function() {
+      var countdown = this.$.livecontainer.querySelector('countdown-timer');
+      if (countdown) {
+        if (this.showCountdown) {
+          countdown.start();
+          countdown.show();
+        } else {
+          countdown.stop();
+          countdown.style.opacity = 0;
+        }
       }
     },
 

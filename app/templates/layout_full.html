@@ -360,25 +360,25 @@ limitations under the License.
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
-        <experiment-fab-container class="fab" mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}" hidden?="{{selectedPage !== 'home'}}"></experiment-fab-container>
+         <!-- <experiment-fab-container class="fab" mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}" hidden?="{{selectedPage !== 'home'}}"></experiment-fab-container> -->
         <a href="schedule#myschedule" data-ajax-link data-track-link="fab-myschedule"
-           hidden?="{{selectedPage === 'home'}}">
+           hidden?="{{selectedPage === 'home'}}"-->
           <paper-fab class="fab" icon="event" title="My Schedule" mini?="{{isPhoneSize}}"></paper-fab>
         </a>
       </header>
 
-      <!-- <div id="iolive" hidden?="{{selectedPage != 'home'}}" fit>
+      <div id="iolive" hidden?="{{selectedPage !== 'home'}}" fit>
         <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}" fit>
           <h2>I/O is starting soon. #io15</h2>
         </io-live>
-      </div> -->
+      </div>
 
       <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}">
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
       </main>
 
-      <footer layout vertical>
-      <!-- <footer layout vertical hidden?="{{selectedPage === 'home'}}"> -->
+      <!-- <footer layout vertical> -->
+      <footer layout vertical hidden?="{{selectedPage === 'home'}}">
 
         <i18n-msg id="share-text" msgid="share-text" hidden>#io15 brings together devs to explore the next generation of tech and mobile. Join us online or in person May 28-29: https://google.com/io</i18n-msg>
 

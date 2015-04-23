@@ -16,8 +16,12 @@
 
 @import '_elements';
 
+
+$ytVideoControlsHeight: $desktopKeyline;
+
 :host {
   display: block;
+  background-color: $color-cyan-500;
 }
 
 countdown-timer {
@@ -30,12 +34,12 @@ countdown-timer {
 .bottom__bar {
   position: absolute;
   left: 0;
-  bottom: 0;
+  bottom: $ytVideoControlsHeight;
   box-sizing: border-box;
   z-index: 5; // same as #navbar
   width: 100%;
 
-  padding: $mobileKeyline;
+  padding: $mobileKeyline $mobileKeyline 0 $mobileKeyline;
 
   ::content h2 {
     color: inherit;
@@ -76,13 +80,15 @@ countdown-timer {
 
 @media (min-width: $tablet-breakpoint-min) {
   .bottom__bar {
-    padding: $desktopKeyline;
+    padding: $desktopKeyline $desktopKeyline 0 $desktopKeyline;
+    bottom: $ytVideoControlsHeight + $desktopKeyline;
   }
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
   .bottom__bar {
-    padding: $largeKeyline;
+    padding: $largeKeyline $largeKeyline 0 $largeKeyline;
+    bottom: $ytVideoControlsHeight + $largeKeyline;
   }
 }
 

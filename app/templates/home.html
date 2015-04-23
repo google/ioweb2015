@@ -3,7 +3,7 @@
 {% define "mastheadBgClass" %}bg-cyan{% end %}
 
 {% define "masthead" %}
-<div id="countdown-container" class="photo__masthead--fullbleed" fit>
+<!-- <div id="countdown-container" class="photo__masthead--fullbleed" fit>
   <countdown-timer bgcolor="#00BCD4"
       date="{% .StartDateStr %}"
       easeintime="490" waittime="100"
@@ -12,11 +12,12 @@
       aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O"
       role="timer">
   </countdown-timer>
-</div>
+</div> -->
 {% end %}
 
 {% define "content" %}
-  <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
+
+ <!--  <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video" tabindex="{{fullscreenVideoActive ? 0 : -1}}"></paper-icon-button>
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
   </core-toolbar>
@@ -140,7 +141,7 @@
                       autohide="1" controls="2" modestbranding="1" showinfo="0"
                       iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
     </div>
-  </template>
+  </template> -->
 
   <script>
   (function() {
@@ -193,10 +194,26 @@
         IOWA.Elements.Template.webglSupported = true;
       };
 
+      function showCountdownTimer() {
+        var countdownEl = document.querySelector('countdown-timer');
+        if (countdownEl) {
+          countdownEl.show();
+        }
+        // I/O live countdown.
+        var live = document.querySelector('io-live');
+        if (live) {
+          live.showCountdown = true;
+        }
+      }
+
       page.unload = function() {
         if (updateSocialPostsTimeout) {
           window.clearTimeout(updateSocialPostsTimeout);
           updateSocialPostsTimeout = null;
+        }
+        var live = document.querySelector('io-live');
+        if (live) {
+          live.showCountdown = false;
         }
       };
 
