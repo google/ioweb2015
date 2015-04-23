@@ -168,7 +168,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/elements/webgl-globe/shaders/*.{frag,vert}',
     APP_DIR + '/elements/webgl-globe/textures/*.{jpg,png}',
     APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js',
-    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js'
+    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
     DIST_EXPERIMENT_DIR + '/**/*'
   ], {base: './'});
 
