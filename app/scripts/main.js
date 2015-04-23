@@ -37,26 +37,29 @@
 
   var MAX_WORKER_TIMEOUT_ = 3000;
 
-  var showMetrics = (exports.ENV === 'dev' || exports.ENV === 'stage') &&
-                     exports.performance && exports.performance.now;
+  var doMetrics = exports.performance && exports.performance.now;
 
-  if (showMetrics) {
+  if (doMetrics) {
     var workerStartTime = exports.performance.now();
     exports.worker = new Worker('data-worker.js');
-    var totalTime = exports.performance.now() - workerStartTime;
+    var total = exports.performance.now() - workerStartTime;
 
-    console.info('worker startup:', totalTime, 'ms');
-    IOWA.Analytics.trackPerf('worker', 'creation', Math.ceil(totalTime),
+    if (exports.ENV !== 'prod') {
+      console.info('worker startup:', total, 'ms');
+    }
+    IOWA.Analytics.trackPerf('worker', 'creation', Math.ceil(total),
                              null, MAX_WORKER_TIMEOUT_);
   } else {
     exports.worker = new Worker('data-worker.js');
   }
 
   exports.worker.addEventListener('message', function(e) {
-    if (showMetrics) {
-      var totalTime = exports.performance.now() - workerRoundTripTime;
-      console.info('worker fetch:', totalTime, 'ms');
-      IOWA.Analytics.trackPerf('worker', 'data fetch', Math.ceil(totalTime),
+    if (doMetrics) {
+      var total = exports.performance.now() - workerFetchTime;
+      if (exports.ENV !== 'prod') {
+        console.info('worker fetch:', total, 'ms');
+      }
+      IOWA.Analytics.trackPerf('worker', 'data fetch', Math.ceil(total),
                                null, MAX_WORKER_TIMEOUT_);
     }
 
@@ -77,9 +80,9 @@
     exports.worker = null;
   });
 
-  var workerRoundTripTime;
-  if (showMetrics) {
-    workerRoundTripTime = exports.performance.now();
+  var workerFetchTime;
+  if (doMetrics) {
+    workerFetchTime = exports.performance.now();
   }
   exports.worker.postMessage({cmd: 'FETCH_SCHEDULE'});
 
