@@ -158,12 +158,6 @@ IOWA.Elements = (function() {
     template.videoList = [];
     template.filteredVideoList = [];
 
-    template.subpageToDayMap = {
-      'day1': 1,
-      'day2': 2,
-      'myschedule': null
-    };
-
     template.rippleColors = {
       'bg-cyan': '#00BCD4',
       'bg-medium-grey': '#CFD8DC',
@@ -185,29 +179,29 @@ IOWA.Elements = (function() {
         'title': 'Hawaii-Aleutian Standard Time',
         'GMTOffset': -10 * 60
       },
-      'GMT-09:00': {
+      'GMT-08:00': {
         'name': 'US/Alaska',
         'title': 'Alaska Daylight Time',
-        'GMTOffset': -9 * 60
-      },
-      'GMT-08:00': {
-        'name': 'PST8PDT',
-        'title': 'Pacific Daylight Time, Tijuana',
         'GMTOffset': -8 * 60
       },
       'GMT-07:00': {
-        'name': 'US/Mountain',
-        'title': 'Mountain Standard Time, Chihuahua',
+        'name': 'US/Pacific',
+        'title': 'Pacific Daylight Time, Tijuana',
         'GMTOffset': -7 * 60
       },
       'GMT-06:00': {
-        'name': 'US/Central',
-        'title': 'Central Daylight Time, Mexico City',
+        'name': 'US/Mountain',
+        'title': 'Chihuahua, Mountain Daylight Time, Costa Rica, Regina',
         'GMTOffset': -6 * 60
       },
       'GMT-05:00': {
+        'name': 'US/Central',
+        'title': 'Central Daylight Time, Mexico City, Bogota',
+        'GMTOffset': -5 * 60
+      },
+      'GMT-04:00': {
         'name': 'US/Eastern',
-        'title': 'Eastern Daylight Time, Bogota',
+        'title': 'Eastern Daylight Time, Barbados, Manaus',
         'GMTOffset': -5 * 60
       },
       'GMT-04:30': {
@@ -215,20 +209,15 @@ IOWA.Elements = (function() {
         'title': 'Caracas',
         'GMTOffset': -4 * 60 + 30
       },
-      'GMT-04:00': {
-        'name': 'America/Barbados',
-        'title': 'Barbados, Halifax, Manaus, Santiago',
-        'GMTOffset': -4 * 60
-      },
-      'GMT-03:30': {
-        'name': 'Canada/Newfoundland',
-        'title': 'St. John’s',
-        'GMTOffset': -3 * 60 + 30
-      },
       'GMT-03:00': {
         'name': 'America/Buenos_Aires',
-        'title': 'São Paulo, Buenos Aires, Nuuk, Montevideo',
+        'title': 'Halifax, Santiago, São Paulo, Buenos Aires, Nuuk, Montevideo',
         'GMTOffset': -3 * 60
+      },
+      'GMT-02:30': {
+        'name': 'Canada/Newfoundland',
+        'title': 'St. John’s',
+        'GMTOffset': -2 * 60 + 30
       },
       'GMT-02:00': {
         'name': 'Atlantic/South_Georgia',
@@ -237,13 +226,88 @@ IOWA.Elements = (function() {
       },
       'GMT-01:00': {
         'name': 'Atlantic/Cape_Verde',
-        'title': 'Azores, Cape Verde',
+        'title': 'Cape Verde',
         'GMTOffset': -60
       },
       'GMT-00:00': {
-        'name': 'Africa/Casablanca',
-        'title': 'Casablanca, Lisbon, London',
+        'name': 'GMT',
+        'title': 'Azores',
         'GMTOffset': 0
+      },
+      'GMT+01:00': {
+        'name': 'Europe/London',
+        'title': 'Casablanca,Lisbon,London,Windhoek,Brazzaville',
+        'GMTOffset': 60
+      },
+      'GMT+02:00': {
+        'name': 'Europe/Amsterdam',
+        'title': 'Amsterdam,Belgrade,Brussels,Sarajevo,Cairo,Harare',
+        'GMTOffset': 2 * 60
+      },
+      'GMT+03:00': {
+        'name': 'Europe/Moscow',
+        'title': 'Amman,Athens,Beirut,Helsinki,Jerusalem,Minsk,Baghdad,Moscow,Kuwait,Nairobi',
+        'GMTOffset': 3 * 60
+      },
+      'GMT+04:00': {
+        'name': 'Europe/Moscow',
+        'title': 'Tbilisi,Yerevan,Dubai',
+        'GMTOffset': 4 * 60
+      },
+      'GMT+04:30': {
+        'name': 'Asia/Tehran',
+        'title': 'Tehran, Kabul',
+        'GMTOffset': 4 * 60 + 30
+      },
+      'GMT+05:00': {
+        'name': 'Asia/Tehran',
+        'title': 'Baku,Karachi,Oral,Yekaterinburg',
+        'GMTOffset': 5 * 60
+      },
+      'GMT+05:45': {
+        'name': 'Asia/Kathmandu',
+        'title': 'Kathmandu',
+        'GMTOffset': 5 * 60 + 45
+      },
+      'GMT+06:00': {
+        'name': 'Asia/Almaty',
+        'title': 'Almaty',
+        'GMTOffset': 6 * 60
+      },
+      'GMT+07:00': {
+        'name': 'Asia/Jakarta',
+        'title': 'Krasnoyarsk, Bangkok, Jakarta',
+        'GMTOffset': 7 * 60
+      },
+      'GMT+08:00': {
+        'name': 'Asia/Taipei',
+        'title': 'Shanghai,Hong Kong,Irkutsk,Kuala Lumpur,Perth,Taipei',
+        'GMTOffset': 8 * 60
+      },
+      'GMT+09:00': {
+        'name': 'Asia/Seoul',
+        'title': 'Seoul, Tokyo, Yakutsk',
+        'GMTOffset': 9 * 60
+      },
+      'GMT+09:30': {
+        'name': 'Australia/Darwin',
+        'title': 'Adelaide, Darwin',
+        'GMTOffset': 9 * 60 + 30
+      },
+      'GMT+10:00': {
+        'name': 'Australia/Sydney',
+        'title': 'Brisbane,Hobart,Sydney,Vladivostok,Guam,Magadan',
+        'GMTOffset': 10 * 60
+      },
+      'GMT+12:00': {
+        'name': 'Pacific/Auckland',
+        'title': 'Majuro,Auckland,Fiji',
+        'GMTOffset': 12 * 60
+      },
+      'GMT+13:00': {
+        'name': 'Pacific/Tongatapu',
+        'title': 'Tongatapu',
+        'GMTOffset': 13 * 60
       }
     };
 

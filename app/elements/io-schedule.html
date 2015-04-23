@@ -38,15 +38,15 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     <div class="card__container {{{'sidebyside': !isPhoneSize} | tokenList}}" layout
          vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
       <div flex?="{{!isPhoneSize}}" layout vertical>
-        <template repeat="{{timeBlock in timeBlocks_ | filterBlocks(day)}}">
-          <template if="{{timeBlock.dayStart && !day}}">
+        <template repeat="{{timeBlock in timeBlocks_}}">
+          <template if="{{timeBlock.dayStart && !day && (timeBlock.dayStart <= lastDay_ && timeBlock.dayStart >= firstDay_)}}">
             <div class="card day-title">
               <div class="card-content">
                 <h4>Day {{timeBlock.dayStart}}</h4>
               </div>
             </div>
           </template>
-          <template if="{{timeBlock.sessions.length}}">
+          <template if="{{(!day || timeBlock.day == day) && timeBlock.sessions.length}}">
             <div class="card">
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
@@ -68,7 +68,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                          on-click="{{selectSession}}"
                          tabindex="0">
                       <span class="schedule-time" flex auto-vertical id="session-{{sessionId}}-time">
-                        {{sessions[sessionId].start}}<span hidden?="{{sessionId === '__keynote__'}}"> - {{sessions[sessionId].end}}</span>
+                        {{sessions[sessionId].start}} <span hidden?="{{sessionId === '__keynote__'}}"> - {{sessions[sessionId].end}}</span>
                       </span>
                       <span class="schedule-title" auto-vertical
                             flex?="{{!isPhoneSize}}" two
@@ -86,7 +86,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
             </div>
           </template>
 
-          <template if="{{timeBlock.dayStart && !day && !timeBlock.sessions.length}}">
+          <template if="{{timeBlock.dayStart && !day && !timeBlock.sessions.length && (timeBlock.dayStart <= lastDay_ && timeBlock.dayStart >= firstDay_)}}">
             <div class="card">
               <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
                    vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified>
@@ -156,18 +156,18 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       for (var i = 1; i < generator.length; i++) {
         hours.push(i + ' PM');
       }
-      for (var i = 1; i < 3; i++) {
+      for (var i = 1; i < 4; i++) {
         for (var j = 0; j < hours.length; j++) {
           var timeBlock = {
             name: hours[j],
-            day: i,
+            day: 27 + i,  // 28, 29 or 30.
             sessions: []
           };
           if (j === 0) {
-            timeBlock['dayStart'] = i;
+            timeBlock['dayStart'] = timeBlock.day;
           }
           timeBlocks.push(timeBlock);
-          var timeBlockId = i + hours[j];
+          var timeBlockId = timeBlock.day + hours[j];
           timeBlocksIndex[timeBlockId] = timeBlocks.length - 1;
         }
       }
@@ -287,6 +287,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       filtersState_: {},
 
+      firstDay_: 28,  // of May, In GMT.
+
+      lastDay_: 29,  // of May, In GMT.
+
       sessionsChanged: function() {
         this.sessionsIndex_ = Object.keys(this.sessions);
       },
@@ -296,18 +300,22 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       userSessionsChanged: function() {
-        this.userSessions = this.userSessions || [];
         this.checkEmptyBlocks();
       },
 
       timezoneChanged: function() {
+        var GMTDay1 = '2015-05-28T16:00:00Z';
+        var GMTDay2 = '2015-05-29T16:00:00Z';
+        this.firstDay_ = this.getLocalizedTime(GMTDay1).format('D');
+        this.lastDay_ = this.getLocalizedTime(GMTDay2).format('D');
         for (var i = 0; i < this.sessionsIndex_.length; i++) {
           var session = this.sessions[this.sessionsIndex_[i]];
           var startTime = this.getLocalizedTime(session.startTimestamp);
-          session.block = startTime.format('h A');
-          session.start = startTime.format('h:mm A');
           var endTime = this.getLocalizedTime(session.endTimestamp);
+          session.start = startTime.format('h:mm A');
           session.end = endTime.format('h:mm A');
+          session.block = startTime.format('h A');
+          session.day = startTime.format('D');
         }
         this.checkEmptyBlocks();
       },
@@ -395,12 +403,13 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         return filtered;
       },
 
-      filterBlocks: function(items, day) {
-        return items.filter(function(item) {
-          return item.day === day || !day;
-        });
-      },
-
+      /**
+       * Converts a timestamp to a currently selected timezone.
+       *
+       * @method getLocalizedTime
+       * @param {string} dateStr Timestamp string, e.g. '2015-05-28T16:00:00Z'.
+       * @return {Object} A Moment object.
+       */
       getLocalizedTime: function(dateStr) {
         var tzId = this.timezoneNames[this.timezone].name;
         return moment(dateStr).tz(tzId);
