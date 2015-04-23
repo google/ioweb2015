@@ -275,7 +275,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type Boolean
          * @default false
          */
-        fetchingUserData: false
+        fetchingUserData: false,
+
+        /**
+         * WTimestamp for the start of the event in GMT timezone.
+         *
+         * @attribute gmtDayOne
+         * @type string
+         * @default null
+         */
+        gmtDayOne: null
 
       },
 
@@ -304,10 +313,11 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       timezoneChanged: function() {
-        var GMTDay1 = '2015-05-28T16:00:00Z';
-        var GMTDay2 = '2015-05-29T16:00:00Z';
-        this.firstDay_ = this.getLocalizedTime(GMTDay1).format('D');
-        this.lastDay_ = this.getLocalizedTime(GMTDay2).format('D');
+        var localFirstDay = this.getLocalizedTime(this.gmtDayOne);
+        var localLastDay = localFirstDay.add(1, 'days');
+
+        this.firstDay_ = localFirstDay.format('D');
+        this.lastDay_ = localLastDay.format('D');
         for (var i = 0; i < this.sessionsIndex_.length; i++) {
           var session = this.sessions[this.sessionsIndex_[i]];
           var startTime = this.getLocalizedTime(session.startTimestamp);

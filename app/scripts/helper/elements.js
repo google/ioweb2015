@@ -312,6 +312,9 @@ IOWA.Elements = (function() {
     };
 
     template.timezones = Object.keys(template.timezoneNames);
+    // TODO: Consider using {% .StartDateStr %}.
+    template.GMTDay1 = '2015-05-28T16:00:00Z';
+    template.GMTDay2 = '2015-05-29T16:00:00Z';
 
     template.formatSessionTimeFilter = function(dateStr) {
       var date = new Date(dateStr);

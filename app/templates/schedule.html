@@ -304,7 +304,8 @@
           fetchingUserData="{{scheduleFetchingUserData}}"
           filters="{{sessionURLFilters}}"
           on-session-bookmark="{{toggleSaveSession}}"
-          on-session-select="{{openSession}}"></io-schedule>
+          on-session-select="{{openSession}}"
+          gmtDayOne="{{GMTDay1}}"></io-schedule>
       </section>
     </div>
   </section>
@@ -539,10 +540,8 @@
       };
 
       IOWA.Elements.Template.selectTimezone = function(e, detail, sender) {
-        var GMTDay1 = '2015-05-28T16:00:00Z';
-        var GMTDay2 = '2015-05-29T16:00:00Z';
-        IOWA.Elements.Template.days.day1 = ioScheduleEl.getLocalizedTime(GMTDay1).format('D');
-        IOWA.Elements.Template.days.day2 = ioScheduleEl.getLocalizedTime(GMTDay2).format('D');
+        this.days.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('D');
+        this.days.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('D');
       };
 
       page.load(); // Run load callback on page load.
