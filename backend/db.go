@@ -11,6 +11,9 @@ import (
 	"golang.org/x/net/context"
 )
 
+// TODO: merge this with errNotModified in db_gae.go
+var errNotModified = errors.New("content not modified")
+
 // RunInTransaction runs f in a transaction.
 // It calls f with a transaction context tc that f should use for all operations.
 func runInTransaction(c context.Context, f func(tc context.Context) error) error {
@@ -55,7 +58,7 @@ func storeEventData(c context.Context, d *eventData) error {
 	return errors.New("not implemented")
 }
 
-func getLatestEventData(c context.Context) (*eventData, error) {
+func getLatestEventData(c context.Context, etags []string) (*eventData, error) {
 	return nil, errors.New("not implemented")
 }
 

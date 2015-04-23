@@ -28,6 +28,7 @@ type eventData struct {
 	// not exposed
 	rooms    map[string]*eventRoom
 	modified time.Time
+	etag     string
 }
 
 type eventSession struct {
