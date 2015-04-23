@@ -35,22 +35,29 @@
   //   // TODO
   // })
 
+  var MAX_WORKER_TIMEOUT_ = 3000;
+
   var showMetrics = (exports.ENV === 'dev' || exports.ENV === 'stage') &&
-                    exports.performance && exports.performance.now;
+                     exports.performance && exports.performance.now;
 
   if (showMetrics) {
-    var workerStartTime = performance.now();
+    var workerStartTime = exports.performance.now();
     exports.worker = new Worker('data-worker.js');
-    // TODO: record metrics to GA.
-    console.info('worker startup:', performance.now() - workerStartTime, 'ms');
+    var totalTime = exports.performance.now() - workerStartTime;
+
+    console.info('worker startup:', totalTime, 'ms');
+    IOWA.Analytics.trackPerf('worker', 'creation', Math.ceil(totalTime),
+                             null, MAX_WORKER_TIMEOUT_);
   } else {
     exports.worker = new Worker('data-worker.js');
   }
 
   exports.worker.addEventListener('message', function(e) {
     if (showMetrics) {
-      // TODO: record metrics to GA.
-      console.info('worker roundtrip:', performance.now() - workerRoundTripTime, 'ms');
+      var totalTime = exports.performance.now() - workerRoundTripTime;
+      console.info('worker fetch:', totalTime, 'ms');
+      IOWA.Analytics.trackPerf('worker', 'data fetch', Math.ceil(totalTime),
+                               null, MAX_WORKER_TIMEOUT_);
     }
 
     if (!e.data) {
@@ -72,7 +79,7 @@
 
   var workerRoundTripTime;
   if (showMetrics) {
-    workerRoundTripTime = performance.now();
+    workerRoundTripTime = exports.performance.now();
   }
   exports.worker.postMessage({cmd: 'FETCH_SCHEDULE'});
 
