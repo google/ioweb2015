@@ -167,7 +167,7 @@ Fired when sign in fails for some reason.
         this.user = {
           id: profile.getId(),
           name: profile.getName(),
-          picture: profile.getImageUrl(),
+          picture: profile.getImageUrl() || 'images/schedule/profile_placeholder.png',
           email: profile.getEmail(),
           tokenResponse: token
         };
