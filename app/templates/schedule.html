@@ -331,19 +331,21 @@
     }
 
     function fetchUserData() {
+      var template = IOWA.Elements.Template;
+
       // Don't fetch user's data if we haven't fetched the schedule yet, or
       // it's already been fetched.
-      if (IOWA.Elements.Template.scheduleData && !alreadyLoadedUserSchedule) {
+      if (template.scheduleData && !alreadyLoadedUserSchedule) {
         alreadyLoadedUserSchedule = true;
-        IOWA.Elements.Template.scheduleFetchingUserData = true;
+        template.scheduleFetchingUserData = true;
 
         // Fetch user's saved sessions.
         IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
-          IOWA.Elements.Template.scheduleFetchingUserData = false;
+          template.scheduleFetchingUserData = false;
 
           // Use existing template model.
-          if (!IOWA.Elements.Template.savedSessions) {
-            IOWA.Elements.Template.savedSessions = savedSessions;
+          if (!template.savedSessions.length) {
+            template.savedSessions = savedSessions;
           }
           updateSavedSessionsUI(savedSessions);
         });
@@ -366,46 +368,32 @@
       };
 
       page.onPageTransitionDone = function(e) {
-        IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
-          var template = IOWA.Elements.Template;
+        if (IOWA.Elements.GoogleSignIn.signedIn) {
+          fetchUserData();
+        }
 
-          // Should already be set by the worker, but just in case
-          // (or if the worker is removed), set schedule data.
-          if (!template.scheduleData) {
-            template.scheduleData = scheduleData
+        var template = IOWA.Elements.Template;
 
-            var tags = IOWA.Schedule.generateFilters(scheduleData.tags);
+        IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
-            template.filterSessionTypes = tags.filterSessionTypes;
-            template.filterThemes = tags.filterThemes;
-            template.filterTopics = tags.filterTopics;
-          }
+        // Deep link into schedule tab.
+        var filters = [];
+        var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
+        if (parsedUrl.params.filters) {
+          filters = parsedUrl.params.filters.split(',');
+        }
 
-          IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
+        template.sessionURLFilters = filters;
+        template.selectedTimezone = 'GMT-07:00'; // PDT timezone.
 
-          // Deep link into schedule tab.
-          var filters = [];
-          var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
-          if (parsedUrl.params.filters) {
-            filters = parsedUrl.params.filters.split(',');
-          }
-
-          template.sessionURLFilters = filters;
-          template.selectedTimezone = 'GMT-07:00'; // PDT timezone.
-
-          // Deep link into session.
-          var sessionId = parsedUrl.resourceId;
-          if (sessionId) {
-            pageIsDeepLinked_ = false;
-            template.openSession(sessionId);
-          } else {
-            pageIsDeepLinked_ = true;
-          }
-        }).then(function() {
-          if (IOWA.Elements.GoogleSignIn.signedIn) {
-            fetchUserData();
-          }
-        });
+        // Deep link into session.
+        var sessionId = parsedUrl.resourceId;
+        if (sessionId) {
+          pageIsDeepLinked_ = false;
+          template.openSession(sessionId);
+        } else {
+          pageIsDeepLinked_ = true;
+        }
       };
 
       var onSigninChanged_ = function(e) {
