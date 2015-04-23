@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -16,18 +17,15 @@ const (
 	defaultTitle = "Google I/O 2015"
 	// descDefault is the default site description
 	descDefault = "Google I/O 2015 brings together developers for an immersive," +
-    " two-day experience focused on exploring the next generation of " +
-    "technology, mobile and beyond. Join us online or in person May 28-29, " +
-    "2015. #io15"
+		" two-day experience focused on exploring the next generation of " +
+		"technology, mobile and beyond. Join us online or in person May 28-29, " +
+		"2015. #io15"
 	// descExperiment is used when users share an experiment link on social.
 	descExperiment = "Make music with instruments inspired by material design " +
 		"for #io15. Play, record and share."
 	// images for og:image meta tag
 	ogImageDefault    = "io15-color.png"
 	ogImageExperiment = "io15-experiment.png"
-
-	// layout for templateData.StartDateStr
-	timeISO8601 = "Jan 02 2006 15:04:05 GMT-0700 (MST)"
 
 	// templatesDir is the templates directory path relative to config.Dir.
 	templatesDir = "templates"
@@ -80,7 +78,7 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	data.Title = pageTitle(tpl)
 	data.Slug = name
 	data.Prefix = config.Prefix
-	data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(timeISO8601)
+	data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(time.RFC3339)
 	if data.Desc == "" {
 		data.Desc = descDefault
 	}
