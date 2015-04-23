@@ -50,7 +50,7 @@ type eventSession struct {
 	Filters map[string]bool `json:"filters"`
 
 	// Update is used only when diff-ing
-	Update string `json:"update"`
+	Update string `json:"update,omitempty"`
 }
 
 type eventSpeaker struct {
