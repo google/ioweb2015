@@ -424,6 +424,9 @@
         IOWA.Elements.Template.selectedSession = null;
         IOWA.Elements.Template.scheduleFetchingUserData = false;
 
+        ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
+        IOWA.Elements.Template.selectTimezone();
+
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
           // Wait for signed-in state to fetch user's schedule.
@@ -540,9 +543,6 @@
         this.dayTitles.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('MMMM D');
         this.dayTitles.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('MMMM D');
       };
-
-      var ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
-      IOWA.Elements.Template.selectTimezone();
 
       page.load(); // Run load callback on page load.
       page.hasBeenLoaded = true;
