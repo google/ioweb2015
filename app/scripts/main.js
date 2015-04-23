@@ -35,21 +35,22 @@
   //   // TODO
   // })
 
-  var start;
   var showMetrics = (exports.ENV === 'dev' || exports.ENV === 'stage') &&
                     exports.performance && exports.performance.now;
 
   if (showMetrics) {
-    start = performance.now();
-    exports.worker = new Worker('worker.js');
-    console.info('worker startup:', performance.now() - start, 'ms');
+    var workerStartTime = performance.now();
+    exports.worker = new Worker('data-worker.js');
+    // TODO: record metrics to GA.
+    console.info('worker startup:', performance.now() - workerStartTime, 'ms');
   } else {
-    exports.worker = new Worker('worker.js');
+    exports.worker = new Worker('data-worker.js');
   }
 
   exports.worker.addEventListener('message', function(e) {
     if (showMetrics) {
-      console.info('worker roundtrip:', performance.now() - start, 'ms');
+      // TODO: record metrics to GA.
+      console.info('worker roundtrip:', performance.now() - workerRoundTripTime, 'ms');
     }
 
     if (!e.data) {
@@ -59,16 +60,19 @@
     var template = IOWA.Elements.Template;
 
     var data = e.data;
-    if ('scheduleData' in data) {
+    if (data.scheduleData) {
       template.scheduleData = data.scheduleData;
       template.filterSessionTypes = data.tags.filterSessionTypes;
       template.filterThemes = data.tags.filterThemes;
       template.filterTopics = data.tags.filterTopics;
     }
+
+    exports.worker = null;
   });
 
+  var workerRoundTripTime;
   if (showMetrics) {
-    start = performance.now();
+    workerRoundTripTime = performance.now();
   }
   exports.worker.postMessage({cmd: 'FETCH_SCHEDULE'});
 

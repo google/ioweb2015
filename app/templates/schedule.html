@@ -367,11 +367,18 @@
 
       page.onPageTransitionDone = function(e) {
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
+          var template = IOWA.Elements.Template;
+
           // Should already be set by the worker, but just in case
           // (or if the worker is removed), set schedule data.
-          if (!IOWA.Elements.Template.scheduleData) {
-            IOWA.Elements.Template.scheduleData = scheduleData
-            IOWA.Schedule.generateFilters(scheduleData.tags);
+          if (!template.scheduleData) {
+            template.scheduleData = scheduleData
+
+            var tags = IOWA.Schedule.generateFilters(scheduleData.tags);
+
+            template.filterSessionTypes = tags.filterSessionTypes;
+            template.filterThemes = tags.filterThemes;
+            template.filterTopics = tags.filterTopics;
           }
 
           IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
@@ -383,14 +390,14 @@
             filters = parsedUrl.params.filters.split(',');
           }
 
-          IOWA.Elements.Template.sessionURLFilters = filters;
-          IOWA.Elements.Template.selectedTimezone = 'GMT-08:00'; // PDT timezone.
+          template.sessionURLFilters = filters;
+          template.selectedTimezone = 'GMT-08:00'; // PDT timezone.
 
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
           if (sessionId) {
             pageIsDeepLinked_ = false;
-            IOWA.Elements.Template.openSession(sessionId);
+            template.openSession(sessionId);
           } else {
             pageIsDeepLinked_ = true;
           }
