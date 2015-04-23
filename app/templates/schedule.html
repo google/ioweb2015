@@ -360,19 +360,6 @@
 
       IOWA.Elements.Template.dontAutoSubscribe = false;
 
-      var GMTDay1 = moment(IOWA.Elements.Template.GMTDay1);
-
-      IOWA.Elements.Template.days = {
-        'day1': parseInt(GMTDay1.format('D'), 10),
-        'day2': parseInt(GMTDay1.add(1, 'days').format('D'), 10)
-      };
-
-      IOWA.Elements.Template.dayTitles = {
-        'day1': GMTDay1.format('MMMM D'),
-        'day2': GMTDay1.add(1, 'days').format('MMMM D')
-      };
-
-
       page.onSubpageTransitionDone = function() {
         var selectedSubpage = IOWA.Elements.Template.pages['schedule'].selectedSubpage;
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = selectedSubpage;
@@ -436,8 +423,6 @@
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
         IOWA.Elements.Template.scheduleFetchingUserData = false;
-
-        ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
@@ -548,11 +533,16 @@
       };
 
       IOWA.Elements.Template.selectTimezone = function(e, detail, sender) {
+        this.days = {};
+        this.dayTitles = {};
         this.days.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('D');
         this.days.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('D');
         this.dayTitles.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('MMMM D');
         this.dayTitles.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('MMMM D');
       };
+
+      var ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
+      IOWA.Elements.Template.selectTimezone();
 
       page.load(); // Run load callback on page load.
       page.hasBeenLoaded = true;

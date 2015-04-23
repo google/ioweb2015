@@ -146,8 +146,14 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
     var timeBlocks = [];
     var timeBlocksIndex = {};
+    var populatedTimeBlocks_ = false;
 
-    function populateTimeBlocks() {
+    function populateTimeBlocks(gmtDayOne) {
+      if (populatedTimeBlocks_) {
+        return;
+      }
+      populatedTimeBlocks_ = true;
+      var blocksStartDay = parseInt(moment(gmtDayOne).format('D'), 10);
       var hours = [];
       var generator = new Array(13);
       for (var i = 1; i < generator.length; i++) {
@@ -156,11 +162,11 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       for (var i = 1; i < generator.length; i++) {
         hours.push(i + ' PM');
       }
-      for (var i = 1; i < 4; i++) {
+      for (var i = 0; i < 3; i++) {
         for (var j = 0; j < hours.length; j++) {
           var timeBlock = {
             name: hours[j],
-            day: 27 + i,  // 28, 29 or 30.
+            day: blocksStartDay + i,
             sessions: []
           };
           if (j === 0) {
@@ -172,7 +178,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         }
       }
     }
-    populateTimeBlocks();
+
 
 
     Polymer({
@@ -299,6 +305,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       firstDay_: 28,  // of May, In GMT.
 
       lastDay_: 29,  // of May, In GMT.
+
+      ready: function() {
+        populateTimeBlocks(this.gmtDayOne);
+      },
 
       sessionsChanged: function() {
         this.sessionsIndex_ = Object.keys(this.sessions);
