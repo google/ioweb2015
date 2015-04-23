@@ -35,4 +35,55 @@
   //   // TODO
   // })
 
+  var MAX_WORKER_TIMEOUT_ = 3000;
+
+  var doMetrics = exports.performance && exports.performance.now;
+
+  if (doMetrics) {
+    var workerStartTime = exports.performance.now();
+    exports.worker = new Worker('data-worker.js');
+    var total = exports.performance.now() - workerStartTime;
+
+    if (exports.ENV !== 'prod') {
+      console.info('worker startup:', total, 'ms');
+    }
+    IOWA.Analytics.trackPerf('worker', 'creation', Math.ceil(total),
+                             null, MAX_WORKER_TIMEOUT_);
+  } else {
+    exports.worker = new Worker('data-worker.js');
+  }
+
+  exports.worker.addEventListener('message', function(e) {
+    if (doMetrics) {
+      var total = exports.performance.now() - workerFetchTime;
+      if (exports.ENV !== 'prod') {
+        console.info('worker fetch:', total, 'ms');
+      }
+      IOWA.Analytics.trackPerf('worker', 'data fetch', Math.ceil(total),
+                               null, MAX_WORKER_TIMEOUT_);
+    }
+
+    if (!e.data) {
+      return;
+    }
+
+    var template = IOWA.Elements.Template;
+
+    var data = e.data;
+    if (data.scheduleData) {
+      template.scheduleData = data.scheduleData;
+      template.filterSessionTypes = data.tags.filterSessionTypes;
+      template.filterThemes = data.tags.filterThemes;
+      template.filterTopics = data.tags.filterTopics;
+    }
+
+    exports.worker = null;
+  });
+
+  var workerFetchTime;
+  if (doMetrics) {
+    workerFetchTime = exports.performance.now();
+  }
+  exports.worker.postMessage({cmd: 'FETCH_SCHEDULE'});
+
 })(window);

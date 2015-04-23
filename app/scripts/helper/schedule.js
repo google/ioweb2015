@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-window.IOWA = window.IOWA || {};
+self.IOWA = self.IOWA || {};
 
 IOWA.Schedule = (function() {
 
@@ -119,9 +119,11 @@ IOWA.Schedule = (function() {
       }
     }
 
-    IOWA.Elements.Template.filterSessionTypes = filterSessionTypes;
-    IOWA.Elements.Template.filterThemes = filterThemes;
-    IOWA.Elements.Template.filterTopics = filterTopics;
+    return {
+      filterSessionTypes: filterSessionTypes,
+      filterThemes: filterThemes,
+      filterTopics: filterTopics
+    };
   }
 
   function clearCachedUserSchedule() {

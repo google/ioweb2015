@@ -28,7 +28,7 @@
       </paper-tab>
     </paper-tabs>
     <paper-dropdown-menu hidden?="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
-      <paper-dropdown class="dropdown" halign="right">
+      <paper-dropdown class="dropdown" halign="right" duration="200">
         <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
           <template repeat="{{zone in timezones}}">
             <paper-item label="{{zone}}">{{zone}}</paper-item>
@@ -58,7 +58,7 @@
   </div>
   <div class="session__info__section">
     <h2 class="session__title">{{selectedSession.title}}</h2>
-    <h5 class="session__time">Day {{selectedSession.day}}: {{selectedSession.startTimestamp | formatSessionDateFilter}} / {{selectedSession.start}} - {{selectedSession.end}} / {{selectedSession.room}}</h5>
+    <h5 class="session__time">Day {{selectedSession.day}}: {{selectedSession.startTimestamp | formatSessionDateFilter}} / {{selectedSession.start}}<span hidden?="{{selectedSession.id === '__keynote__'}}"> - {{selectedSession.end}}</span> / {{selectedSession.room}}</h5>
     <h5 class="session__categories">{{selectedSession.tags | formatSessionTagsFilter}}</h5>
     <div class="session__desc">{{selectedSession.description}}</div>
     <div class="session__social" layout horizontal>
@@ -145,7 +145,7 @@
                     <span class="schedule-title" flex auto-vertical>Badge pick-up</span>
                   </div>
                   <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
-                    <span class="schedule-time">9:30 AM - 11:00 AM</span>
+                    <span class="schedule-time">9:30 AM</span>
                     <span class="schedule-title" flex auto-vertical>Keynote</span>
                   </div>
                   <div class="schedule-row" layout vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
@@ -266,9 +266,9 @@
       <div class="page__filters" layout horizontal hidden?="{{!isPhoneSize || pages[selectedPage].selectedSubpage === 'myschedule'}}">
         <span flex>
           <paper-dropdown-menu>
-            <paper-dropdown class="dropdown" halign="left">
+            <paper-dropdown class="dropdown" halign="left" duration="200">
               <core-menu class="menu" selected="Filters" valueattr="label"
-                  on-core-select="{{selectFilter}}">
+                  on-core-activate="{{selectFilter}}">
                 <paper-item label="Filters">Filters</paper-item>
                 <template repeat="{{theme, i in filterThemes}}">
                   <paper-item label="{{theme}}"
@@ -284,7 +284,7 @@
           </paper-dropdown-menu>
         </span>
         <paper-dropdown-menu>
-          <paper-dropdown class="dropdown" halign="right">
+          <paper-dropdown class="dropdown" halign="right" duration="200">
             <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
               <template repeat="{{zone in timezones}}">
                 <paper-item label="{{zone}}">{{zone}}</paper-item>
@@ -331,15 +331,20 @@
     }
 
     function fetchUserData() {
-      if (!alreadyLoadedUserSchedule) {
+      // Don't fetch user's data if we haven't fetched the schedule yet, or
+      // it's already been fetched.
+      if (IOWA.Elements.Template.scheduleData && !alreadyLoadedUserSchedule) {
         alreadyLoadedUserSchedule = true;
         IOWA.Elements.Template.scheduleFetchingUserData = true;
 
         // Fetch user's saved sessions.
         IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
           IOWA.Elements.Template.scheduleFetchingUserData = false;
-          IOWA.Elements.Template.savedSessions = savedSessions;
 
+          // Use existing template model.
+          if (!IOWA.Elements.Template.savedSessions) {
+            IOWA.Elements.Template.savedSessions = savedSessions;
+          }
           updateSavedSessionsUI(savedSessions);
         });
       }
@@ -362,9 +367,18 @@
 
       page.onPageTransitionDone = function(e) {
         IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
-          if (!IOWA.Elements.Template.scheduleData) {
-            IOWA.Elements.Template.scheduleData = scheduleData
-            IOWA.Schedule.generateFilters(scheduleData.tags);
+          var template = IOWA.Elements.Template;
+
+          // Should already be set by the worker, but just in case
+          // (or if the worker is removed), set schedule data.
+          if (!template.scheduleData) {
+            template.scheduleData = scheduleData
+
+            var tags = IOWA.Schedule.generateFilters(scheduleData.tags);
+
+            template.filterSessionTypes = tags.filterSessionTypes;
+            template.filterThemes = tags.filterThemes;
+            template.filterTopics = tags.filterTopics;
           }
 
           IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
@@ -376,14 +390,14 @@
             filters = parsedUrl.params.filters.split(',');
           }
 
-          IOWA.Elements.Template.sessionURLFilters = filters;
-          IOWA.Elements.Template.selectedTimezone = 'GMT-08:00'; // PDT timezone.
+          template.sessionURLFilters = filters;
+          template.selectedTimezone = 'GMT-08:00'; // PDT timezone.
 
           // Deep link into session.
           var sessionId = parsedUrl.resourceId;
           if (sessionId) {
             pageIsDeepLinked_ = false;
-            IOWA.Elements.Template.openSession(sessionId);
+            template.openSession(sessionId);
           } else {
             pageIsDeepLinked_ = true;
           }
@@ -408,8 +422,6 @@
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
-        IOWA.Elements.Template.scheduleData = null;
-        IOWA.Elements.Template.savedSessions = [];
         IOWA.Elements.Template.scheduleFetchingUserData = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
@@ -518,10 +530,8 @@
       };
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
-        if (detail.isSelected) {
-          ioScheduleEl.filters = (sender.selectedIndex === 0) ? []
-              : [sender.selected];
-        }
+        e.stopPropagation();
+        ioScheduleEl.filters = sender.selectedIndex ? [sender.selected] : [];
       };
 
       page.load(); // Run load callback on page load.
