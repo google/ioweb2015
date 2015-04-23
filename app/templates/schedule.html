@@ -360,9 +360,11 @@
 
       IOWA.Elements.Template.dontAutoSubscribe = false;
 
+      var GMTDay1 = moment(IOWA.Elements.Template.GMTDay1);
+
       IOWA.Elements.Template.days = {
-        'day1': 28,
-        'day2': 29
+        'day1': parseInt(GMTDay1.format('D'), 10),
+        'day2': parseInt(GMTDay1.add(1, 'days').format('D'), 10)
       };
 
       page.onSubpageTransitionDone = function() {
