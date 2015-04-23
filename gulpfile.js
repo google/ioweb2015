@@ -159,6 +159,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/clear_cache.html',
     APP_DIR + '/embed.html',
     APP_DIR + '/sitemap.xml',
+    APP_DIR + '/data-worker.js',
     APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
     APP_DIR + '/styles/pages/permissions.css',
@@ -167,8 +168,7 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/elements/webgl-globe/shaders/*.{frag,vert}',
     APP_DIR + '/elements/webgl-globe/textures/*.{jpg,png}',
     APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js',
-    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
-    APP_DIR + '/temporary_api/*.json',
+    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js'
     DIST_EXPERIMENT_DIR + '/**/*'
   ], {base: './'});
 
