@@ -256,22 +256,38 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 
 func serveSchedule(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c := newContext(r)
 	// respond with stubbed JSON entries in dev mode
 	if isDev() {
 		f := filepath.Join(config.Dir, "temporary_api", "schedule.json")
+		fi, err := os.Stat(f)
+		if err != nil {
+			writeJSONError(c, w, errStatus(err), err)
+			return
+		}
+		w.Header().Set("etag", fmt.Sprintf(`"%d-%d"`, fi.Size(), fi.ModTime().UnixNano()))
 		http.ServeFile(w, r, f)
 		return
 	}
 
-	c := newContext(r)
-	data, err := getLatestEventData(c)
-	if err != nil {
-		writeJSONError(c, w, http.StatusInternalServerError, err)
+	data, err := getLatestEventData(c, r.Header["If-None-Match"])
+	if err == errNotModified {
+		w.Header().Set("etag", `"`+data.etag+`"`)
+		w.WriteHeader(http.StatusNotModified)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(data); err != nil {
-		errorf(c, "serveSchedule: %v", err)
+	if err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
 	}
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+	w.Header().Set("etag", `"`+data.etag+`"`)
+	w.Write(b)
 }
 
 func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
@@ -445,7 +461,7 @@ func syncEventData(w http.ResponseWriter, r *http.Request) {
 
 	c := newContext(r)
 	err := runInTransaction(c, func(c context.Context) error {
-		oldData, err := getLatestEventData(c)
+		oldData, err := getLatestEventData(c, nil)
 		if err != nil {
 			return err
 		}

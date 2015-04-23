@@ -4,10 +4,12 @@ package main
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"golang.org/x/net/context"
@@ -20,6 +22,9 @@ const (
 	kindEventData   = "EventData"
 	kindChanges     = "Changes"
 )
+
+// TODO: merge this with errNotModified in db.go
+var errNotModified = errors.New("content not modified")
 
 // RunInTransaction runs f in a transaction.
 // It calls f with a transaction context tc that f should use for all operations.
@@ -120,9 +125,15 @@ func storeEventData(c context.Context, d *eventData) error {
 	return err
 }
 
-// getLatestEventData fetches most recent version of eventData
-// previously saved with storeEventData().
-func getLatestEventData(c context.Context) (*eventData, error) {
+// getLatestEventData fetches most recent version of eventData previously saved with storeEventData().
+//
+// etags adheres to rfc7232 semantics. If one of etags matches etag of the entity,
+// an empty eventData with only etag and modified fields set is returned
+// along with errNotModified error.
+//
+// This func guarantees for the returned eventData to have a non-zero value etag,
+// unless no entities exist in the datastore.
+func getLatestEventData(c context.Context, etags []string) (*eventData, error) {
 	q := datastore.NewQuery(kindEventData).
 		Ancestor(eventDataParent(c)).
 		Order("-ts").
@@ -132,7 +143,8 @@ func getLatestEventData(c context.Context) (*eventData, error) {
 		Timestamp time.Time `datastore:"ts"`
 		Bytes     []byte    `datastore:"data"`
 	}
-	if _, err := q.GetAll(c, &res); err != nil {
+	keys, err := q.GetAll(c, &res)
+	if err != nil {
 		return nil, err
 	}
 
@@ -140,9 +152,14 @@ func getLatestEventData(c context.Context) (*eventData, error) {
 	if len(res) == 0 {
 		return data, nil
 	}
-	err := gob.NewDecoder(bytes.NewReader(res[0].Bytes)).Decode(data)
+	data.etag = fmt.Sprintf("%x", md5.Sum([]byte(keys[0].String())))
 	data.modified = res[0].Timestamp
-	return data, err
+	for _, t := range etags {
+		if data.etag == strings.Trim(t, `"`) {
+			return data, errNotModified
+		}
+	}
+	return data, gob.NewDecoder(bytes.NewReader(res[0].Bytes)).Decode(data)
 }
 
 // storeChanges saves d in the datastore with auto-generated ID

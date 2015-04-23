@@ -44,6 +44,98 @@ func TestServeSocialStub(t *testing.T) {
 	}
 }
 
+func TestServeScheduleStub(t *testing.T) {
+	defer resetTestState(t)
+	defer preserveConfig()
+	config.Env = "dev"
+
+	r := newTestRequest(t, "GET", "/api/v1/schedule", nil)
+	w := httptest.NewRecorder()
+	serveSchedule(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want %d", w.Code, http.StatusOK)
+	}
+	etag := w.Header().Get("etag")
+	if etag == "" || etag == `""` {
+		t.Fatalf("etag = %q; want non-empty", etag)
+	}
+
+	r = newTestRequest(t, "GET", "/api/v1/schedule", nil)
+	r.Header.Set("if-none-match", etag)
+	w = httptest.NewRecorder()
+	serveSchedule(w, r)
+
+	if w.Code != http.StatusNotModified {
+		t.Errorf("w.Code = %d; want %d", w.Code, http.StatusNotModified)
+	}
+}
+
+func TestServeSchedule(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()
+	config.Env = "prod"
+	r := newTestRequest(t, "GET", "/api/v1/schedule", nil)
+	c := newContext(r)
+
+	checkRes := func(n int, w *httptest.ResponseRecorder, code int, hasEtag bool) string {
+		if w.Code != code {
+			t.Errorf("%d: w.Code = %d; want %d", n, w.Code, code)
+		}
+		etag := w.Header().Get("etag")
+		if hasEtag && (etag == "" || etag == `""`) {
+			t.Errorf("%d: etag = %q; want non-empty", n, etag)
+		}
+		if !hasEtag && etag != `""` {
+			t.Errorf("%d: etag = %q; want %q", n, etag, `""`)
+		}
+		return etag
+	}
+
+	// no etag
+	w := httptest.NewRecorder()
+	serveSchedule(w, r)
+	checkRes(1, w, http.StatusOK, false)
+
+	// first etag
+	if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
+		t.Fatal(err)
+	}
+	w = httptest.NewRecorder()
+	serveSchedule(w, r)
+	etag := checkRes(2, w, http.StatusOK, true)
+
+	r.Header.Set("if-none-match", etag)
+	w = httptest.NewRecorder()
+	serveSchedule(w, r)
+	checkRes(3, w, http.StatusNotModified, true)
+
+	// new etag
+	if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
+		t.Fatal(err)
+	}
+	w = httptest.NewRecorder()
+	serveSchedule(w, r)
+	etag = checkRes(4, w, http.StatusOK, true)
+
+	w = httptest.NewRecorder()
+	r.Header.Set("if-none-match", etag)
+	serveSchedule(w, r)
+	checkRes(5, w, http.StatusNotModified, true)
+
+	// star etag
+	w = httptest.NewRecorder()
+	r.Header.Set("if-none-match", "*")
+	serveSchedule(w, r)
+	lastEtag := checkRes(5, w, http.StatusOK, true)
+	if lastEtag != etag {
+		t.Errorf("lastEtag = %q; want %q", lastEtag, etag)
+	}
+}
+
 func TestServeTemplate(t *testing.T) {
 	defer resetTestState(t)
 	const ctype = "text/html;charset=utf-8"
@@ -805,7 +897,7 @@ func TestFirstSyncEventData(t *testing.T) {
 		t.Fatalf("slurp never happened")
 	}
 
-	data, err := getLatestEventData(newContext(r))
+	data, err := getLatestEventData(newContext(r), nil)
 	if err != nil {
 		t.Fatalf("getLatestEventData: %v", err)
 	}
@@ -932,7 +1024,7 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 		t.Fatalf("slurp never happened")
 	}
 
-	data, err := getLatestEventData(c)
+	data, err := getLatestEventData(c, nil)
 	if err != nil {
 		t.Fatalf("getLatestEventData: %v", err)
 	}
