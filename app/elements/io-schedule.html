@@ -42,7 +42,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           <template if="{{timeBlock.dayStart && !day && (timeBlock.dayStart <= lastDay_ && timeBlock.dayStart >= firstDay_)}}">
             <div class="card day-title">
               <div class="card-content">
-                <h4>Day {{timeBlock.dayStart}}</h4>
+                <h4>May {{timeBlock.dayStart}}</h4>
               </div>
             </div>
           </template>
@@ -91,7 +91,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
               <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
                    vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified>
                 <span class="no-sessions">Add more events for this day</span>
-                <a href="#day{{timeBlock.day}}" data-subpage-link>Browse events</a>
+                <a href="#day{{(timeBlock.dayStart % firstDay_) + 1}}" data-subpage-link>Browse events</a>
               </div>
               <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
             </div>
