@@ -160,6 +160,8 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/embed.html',
     APP_DIR + '/sitemap.xml',
     APP_DIR + '/data-worker.js',
+    APP_DIR + '/scripts/helper/request.js', // TODO: remove when github.com/GoogleChrome/ioweb2015/issues/1162 lands.
+    APP_DIR + '/scripts/helper/schedule.js', // TODO: remove when github.com/GoogleChrome/ioweb2015/issues/1162 lands.
     APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
     APP_DIR + '/styles/pages/permissions.css',
