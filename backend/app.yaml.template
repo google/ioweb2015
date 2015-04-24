@@ -5,6 +5,9 @@ threadsafe: yes
 # cache all static assets for at most 1 day.
 default_expiration: 1d
 
+inbound_services:
+- warmup
+
 handlers:
 
 - url: $PREFIX$/manifest\.json$
@@ -112,6 +115,10 @@ handlers:
     Access-Control-Allow-Origin: "*"
 
 # All other requests are routed to the backend
+
+- url: /_ah/warmup
+  script: _go_app
+
 - url: /.*
   script: _go_app
   secure: always

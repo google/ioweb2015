@@ -33,6 +33,8 @@ $GCLOUD_BIN auth activate-service-account $SRV_ACCOUNT \
 gulp decrypt --pass $CFG_PASSPHRASE
 # build prod version to deploy, with "stage" app env
 gulp --env stage
+# make sure we have the right config file
+cp backend/server.config.stage dist/backend/server.config
 # deploy the app to a version the original git push was made to
 $GCLOUD_BIN preview app deploy dist/backend \
   --project $PROJECT_ID \

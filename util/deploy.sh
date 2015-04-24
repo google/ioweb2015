@@ -11,6 +11,7 @@ fi
 # Build it.
 echo "Building IOWA: $deployVersion"
 gulp --env prod
+cp backend/server.config.prod dist/backend/server.config
 
 echo "Deploying IOWA: $deployVersion"
 gcloud preview app deploy dist/backend --project io-webapp \

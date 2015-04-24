@@ -53,6 +53,11 @@ func registerHandlers() {
 		}
 		http.Handle("/", redirect)
 	}
+	// warmup, can't use prefix
+	http.HandleFunc("/_ah/warmup", func(w http.ResponseWriter, r *http.Request) {
+		c := newContext(r)
+		logf(c, "warmup: env = %s", config.Env)
+	})
 }
 
 // handle registers a handle function fn for the pattern prefixed

@@ -574,11 +574,20 @@ function generateServerConfig(dest, prefix, env) {
   prefix = prefix || URL_PREFIX;
   env = env || argv.env || 'dev';
 
-  // source template
-  var src = BACKEND_DIR + '/server.config.' + env;
-  // use server.config.template if server.config.<env> doesn't exist
-  if (!fs.existsSync(src)) {
-    src = BACKEND_DIR + '/server.config.template';
+  var files = [
+    BACKEND_DIR + '/server.config',
+    BACKEND_DIR + '/server.config.dev',
+    BACKEND_DIR + '/server.config.template'
+  ];
+  var src;
+  for (var i = 0, f; f = files[i]; i++) {
+    if (fs.existsSync(f)) {
+      src = f;
+      break;
+    }
+  }
+  if (!src) {
+    throw new Error('generateServerConfig: unable to find config template');
   }
 
   var cfg = JSON.parse(fs.readFileSync(src, 'utf8'));
