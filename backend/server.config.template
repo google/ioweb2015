@@ -9,6 +9,7 @@
     "manifest": "https://storage.googleapis.com/io2015-data.appspot.com/manifest_v1.json"
   },
   "ioExtFeedUrl": "https://spreadsheets.google.com/feeds/list/SHEET/WORKSHEET/private/full",
+  "extPingUrl": "",
   "secret": "a very long secret used in /api/v1/user/updates",
   "synct": "any-secure-random-string-will-do",
   "google": {

@@ -20,7 +20,7 @@ type appFolderData struct {
 	// id indicates whether the file exists
 	id string
 
-	GCMKey    string   `json:"gcm_key"`
+	ExtKey    string   `json:"gcm_key"`
 	Bookmarks []string `json:"starred_sessions"`
 	Videos    []string `json:"viewed_videos"`
 	Feedback  []string `json:"feedback_submitted_sessions"`
@@ -139,7 +139,10 @@ func storeAppFolderData(c context.Context, cred *oauth2Credentials, data *appFol
 		return errors.New("storeAppFolderData: " + res.Status)
 	}
 
-	// TODO: ping iosched about updated file
+	// notify extra parties
+	if err := pingExtPartyAsync(c, data.ExtKey); err != nil {
+		errorf(c, "storeAppFolderData: %v", err)
+	}
 	return nil
 }
 

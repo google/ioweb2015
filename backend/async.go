@@ -19,3 +19,8 @@ func notifySubscribersAsync(c context.Context, d *dataChanges) error {
 func pingUserAsync(c context.Context, uid string, skeys []string) error {
 	return errors.New("not implemented")
 }
+
+// pingExtPartyAsync notifies extra parties at config.ExtPingURL about data updates.
+func pingExtPartyAsync(c context.Context, key string) error {
+	return errors.New("not implemented")
+}
