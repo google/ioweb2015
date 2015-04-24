@@ -56,7 +56,7 @@
 
       var data = e.data;
       if (data.scheduleData) {
-        IOWA.Schedule.setScheduleData(data.scheduleData); // needed by worker has a different cached copy.
+        IOWA.Schedule.setScheduleData(data.scheduleData); // needed since the worker has a different cached copy.
         template.scheduleData = data.scheduleData;
         template.filterSessionTypes = data.tags.filterSessionTypes;
         template.filterThemes = data.tags.filterThemes;
