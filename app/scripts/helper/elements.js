@@ -44,9 +44,6 @@ IOWA.Elements = (function() {
   function updateElements() {
     var ioLogo = document.querySelector('io-logo');
     ioLogo.addEventListener('io-logo-animation-done', function(e) {
-      // Loading auth is delayed until logo animation is done.
-      // IOWA.Elements.GoogleSignIn.load = true;
-
       // Deep link into a subpage.
       var tpl = IOWA.Elements.Template;
       var parsedUrl = IOWA.Router.parseUrl(window.location.href);
@@ -60,6 +57,11 @@ IOWA.Elements = (function() {
 
       IOWA.PageAnimation.play(
         IOWA.PageAnimation.pageFirstRender(subpage), function() {
+          // // Load auth after page transitions are done. This helps timing with
+          // // fetching user's schdule and makes sure the worker has returned
+          // // the main schedule data.
+          // IOWA.Elements.GoogleSignIn.load = true;
+
           // Fire event when the page transitions are final.
           IOWA.Elements.Template.fire('page-transition-done');
           // Run page's custom onPageTransitionDone handlers, if present.

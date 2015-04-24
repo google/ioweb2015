@@ -318,41 +318,8 @@
   (function() {
 
     var SUBTAB_SELECTOR = '#subpage-tabs a';
-
     var pageIsDeepLinked_ = true;
-    var alreadyLoadedUserSchedule = false;
-
     var ioScheduleEl = null;
-
-    function updateSavedSessionsUI(savedSessions) {
-      //  Mark/unmarked sessions the user has bookmarked.
-      if (IOWA.Elements.Template.scheduleData) {
-        var sessions = IOWA.Elements.Template.scheduleData.sessions;
-        for (var id in sessions) {
-          sessions[id].saved = savedSessions.indexOf(id) !== -1;
-        }
-      }
-    }
-
-    function fetchUserData() {
-      // Don't fetch user's data if we haven't fetched the schedule yet, or
-      // it's already been fetched.
-      if (IOWA.Elements.Template.scheduleData && !alreadyLoadedUserSchedule) {
-        alreadyLoadedUserSchedule = true;
-        IOWA.Elements.Template.scheduleFetchingUserData = true;
-
-        // Fetch user's saved sessions.
-        IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
-          IOWA.Elements.Template.scheduleFetchingUserData = false;
-
-          // Use existing template model.
-          if (!IOWA.Elements.Template.savedSessions) {
-            IOWA.Elements.Template.savedSessions = savedSessions;
-          }
-          updateSavedSessionsUI(savedSessions);
-        });
-      }
-    }
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
@@ -370,56 +337,27 @@
       };
 
       page.onPageTransitionDone = function(e) {
-        IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
-          var template = IOWA.Elements.Template;
+        var template = IOWA.Elements.Template;
 
-          // Should already be set by the worker, but just in case
-          // (or if the worker is removed), set schedule data.
-          if (!template.scheduleData) {
-            template.scheduleData = scheduleData
+        IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
-            var tags = IOWA.Schedule.generateFilters(scheduleData.tags);
+        // Deep link into schedule tab.
+        var filters = [];
+        var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
+        if (parsedUrl.params.filters) {
+          filters = parsedUrl.params.filters.split(',');
+        }
 
-            template.filterSessionTypes = tags.filterSessionTypes;
-            template.filterThemes = tags.filterThemes;
-            template.filterTopics = tags.filterTopics;
-          }
+        template.sessionURLFilters = filters;
+        template.selectedTimezone = 'GMT-07:00'; // PDT timezone.
 
-          IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
-
-          // Deep link into schedule tab.
-          var filters = [];
-          var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
-          if (parsedUrl.params.filters) {
-            filters = parsedUrl.params.filters.split(',');
-          }
-
-          template.sessionURLFilters = filters;
-          template.selectedTimezone = 'GMT-07:00'; // PDT timezone.
-
-          // Deep link into session.
-          var sessionId = parsedUrl.resourceId;
-          if (sessionId) {
-            pageIsDeepLinked_ = false;
-            template.openSession(sessionId);
-          } else {
-            pageIsDeepLinked_ = true;
-          }
-        }).then(function() {
-          if (IOWA.Elements.GoogleSignIn.signedIn) {
-            fetchUserData();
-          }
-        });
-      };
-
-      var onSigninChanged_ = function(e) {
-        if (e.detail.signedIn) {
-          fetchUserData();
+        // Deep link into session.
+        var sessionId = parsedUrl.resourceId;
+        if (sessionId) {
+          pageIsDeepLinked_ = false;
+          template.openSession(sessionId);
         } else {
-          alreadyLoadedUserSchedule = false;
-          IOWA.Elements.Template.savedSessions = [];
-          updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
-          IOWA.Schedule.clearCachedUserSchedule();
+          pageIsDeepLinked_ = true;
         }
       };
 
@@ -433,13 +371,6 @@
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
-          // Wait for signed-in state to fetch user's schedule.
-          if (!IOWA.Elements.GoogleSignIn.signedIn) {
-            // Note: don't need to remove a listener each nav as per:
-            // developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Multiple_identical_event_listeners
-            document.addEventListener('signin-change', onSigninChanged_);
-          }
-
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
       };
