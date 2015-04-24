@@ -314,43 +314,8 @@
   (function() {
 
     var SUBTAB_SELECTOR = '#subpage-tabs a';
-
     var pageIsDeepLinked_ = true;
-    var alreadyLoadedUserSchedule = false;
-
     var ioScheduleEl = null;
-
-    function updateSavedSessionsUI(savedSessions) {
-      //  Mark/unmarked sessions the user has bookmarked.
-      if (IOWA.Elements.Template.scheduleData) {
-        var sessions = IOWA.Elements.Template.scheduleData.sessions;
-        for (var id in sessions) {
-          sessions[id].saved = savedSessions.indexOf(id) !== -1;
-        }
-      }
-    }
-
-    function fetchUserData() {
-      var template = IOWA.Elements.Template;
-
-      // Don't fetch user's data if we haven't fetched the schedule yet, or
-      // it's already been fetched.
-      if (template.scheduleData && !alreadyLoadedUserSchedule) {
-        alreadyLoadedUserSchedule = true;
-        template.scheduleFetchingUserData = true;
-
-        // Fetch user's saved sessions.
-        IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
-          template.scheduleFetchingUserData = false;
-
-          // Use existing template model.
-          if (!template.savedSessions.length) {
-            template.savedSessions = savedSessions;
-          }
-          updateSavedSessionsUI(savedSessions);
-        });
-      }
-    }
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
@@ -368,10 +333,6 @@
       };
 
       page.onPageTransitionDone = function(e) {
-        if (IOWA.Elements.GoogleSignIn.signedIn) {
-          fetchUserData();
-        }
-
         var template = IOWA.Elements.Template;
 
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
@@ -396,17 +357,6 @@
         }
       };
 
-      var onSigninChanged_ = function(e) {
-        if (e.detail.signedIn) {
-          fetchUserData();
-        } else {
-          alreadyLoadedUserSchedule = false;
-          IOWA.Elements.Template.savedSessions = [];
-          updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
-          IOWA.Schedule.clearCachedUserSchedule();
-        }
-      };
-
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
@@ -417,13 +367,6 @@
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
-          // Wait for signed-in state to fetch user's schedule.
-          if (!IOWA.Elements.GoogleSignIn.signedIn) {
-            // Note: don't need to remove a listener each nav as per:
-            // developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Multiple_identical_event_listeners
-            document.addEventListener('signin-change', onSigninChanged_);
-          }
-
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
       };

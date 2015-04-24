@@ -18,10 +18,66 @@
   // Polyfill Promise() in browsers that don't support it natively.
   ES6Promise.polyfill();
 
+  function initWorker() {
+    var MAX_WORKER_TIMEOUT_ = 7000;
+    var worker;
+
+    var doMetrics = window.performance && window.performance.now;
+
+    if (doMetrics) {
+      var workerStartTime = window.performance.now();
+      worker = new Worker('data-worker.js');
+      var total = window.performance.now() - workerStartTime;
+
+      if (window.ENV !== 'prod') {
+        console.info('worker startup:', total, 'ms');
+      }
+      IOWA.Analytics.trackPerf('worker', 'creation', Math.ceil(total),
+                               null, MAX_WORKER_TIMEOUT_);
+    } else {
+      worker = new Worker('data-worker.js');
+    }
+
+    worker.addEventListener('message', function(e) {
+      if (doMetrics) {
+        var total = window.performance.now() - workerFetchTime;
+        if (window.ENV !== 'prod') {
+          console.info('worker fetch:', total, 'ms');
+        }
+        IOWA.Analytics.trackPerf('worker', 'data fetch', Math.ceil(total),
+                                 null, MAX_WORKER_TIMEOUT_);
+      }
+
+      if (!e.data) {
+        return;
+      }
+
+      var template = IOWA.Elements.Template;
+
+      var data = e.data;
+      if (data.scheduleData) {
+        IOWA.Schedule.setScheduleData(data.scheduleData); // needed by worker has a different cached copy.
+        template.scheduleData = data.scheduleData;
+        template.filterSessionTypes = data.tags.filterSessionTypes;
+        template.filterThemes = data.tags.filterThemes;
+        template.filterTopics = data.tags.filterTopics;
+      }
+    });
+
+    var workerFetchTime;
+    if (doMetrics) {
+      workerFetchTime = window.performance.now();
+    }
+
+    worker.postMessage({cmd: 'FETCH_SCHEDULE'});
+  }
+
   function afterImports() {
     IOWA.Elements.init();
     IOWA.Router.init(IOWA.Elements.Template);
     IOWA.Notifications.init();
+
+    initWorker();
 
     CoreStyle.g.paperInput.labelColor = '#008094';
     CoreStyle.g.paperInput.focusedColor = '#008094';
@@ -60,6 +116,29 @@
   window.addEventListener('resize', function() {
     IOWA.Util.resizeRipple(IOWA.Elements.Ripple);
     IOWA.Elements.Drawer.closeDrawer();
+  });
+
+  // Watch for sign-in changes to fetch user schedule, update UI, etc.
+  window.addEventListener('signin-change', function(e) {
+    var template = IOWA.Elements.Template;
+
+    if (e.detail.signedIn) {
+      template.scheduleFetchingUserData = true;
+
+      // Fetch user's saved sessions.
+      IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
+        template.scheduleFetchingUserData = false;
+        // Use existing template model.
+        if (!template.savedSessions.length) {
+          template.savedSessions = savedSessions;
+        }
+        IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);
+      });
+    } else {
+      template.savedSessions = [];
+      IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);
+      IOWA.Schedule.clearCachedUserSchedule();
+    }
   });
 
   if (IOWA.Util.supportsHTMLImports) {

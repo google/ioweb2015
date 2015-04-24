@@ -24,7 +24,7 @@ IOWA.Schedule = (function() {
   var SCHEDULE_ENDPOINT_USERS = 'api/v1/user/schedule';
 
   var scheduleData_ = null;
-  var userScheduleData_ = null;
+  var userSavedSessions_ = [];
 
   /**
    * Fetches the I/O schedule data.
@@ -46,18 +46,16 @@ IOWA.Schedule = (function() {
    * If this is the first time it's been called, then uses the cache-then-network strategy to
    * first try to read the data stored in the Cache Storage API, and invokes the callback with that
    * response. It then tries to fetch a fresh copy of the data from the network, saves the response
-   * locally in memory, and invokes callback with that response.
-   * If this has been previously called, then invokes the callback with the previous response cached
-   * locally in memory.
+   * locally in memory, and resolves the promise with that response.
    * @param {function} callback The callback to execute when the user schedule data is available.
    */
   function fetchUserSchedule(callback) {
-    if (userScheduleData_) {
-      callback(userScheduleData_);
+    if (userSavedSessions_.length) {
+      callback(userSavedSessions_);
     } else {
-      var callbackWrapper = function(userScheduleData) {
-        userScheduleData_ = userScheduleData || [];
-        callback(userScheduleData);
+      var callbackWrapper = function(userSavedSessions) {
+        userSavedSessions_ = userSavedSessions || [];
+        callback(userSavedSessions_);
       };
 
       IOWA.Request.cacheThenNetwork(SCHEDULE_ENDPOINT_USERS, callback, callbackWrapper, true);
@@ -126,8 +124,22 @@ IOWA.Schedule = (function() {
     };
   }
 
+  function updateSavedSessionsUI(savedSessions) {
+    //  Mark/unmarked sessions the user has bookmarked.
+    if (savedSessions.length) {
+      var sessions = IOWA.Elements.Template.scheduleData.sessions;
+      for (var id in sessions) {
+        sessions[id].saved = savedSessions.indexOf(id) !== -1;
+      }
+    }
+  }
+
   function clearCachedUserSchedule() {
-    userScheduleData_ = null;
+    userSavedSessions_ = [];
+  }
+
+  function setScheduleData(scheduleData) {
+    scheduleData_ = scheduleData;
   }
 
   return {
@@ -135,7 +147,9 @@ IOWA.Schedule = (function() {
     fetchSchedule: fetchSchedule,
     fetchUserSchedule: fetchUserSchedule,
     saveSession: saveSession,
-    generateFilters: generateFilters
+    generateFilters: generateFilters,
+    updateSavedSessionsUI: updateSavedSessionsUI,
+    setScheduleData: setScheduleData
   };
 
 })();
