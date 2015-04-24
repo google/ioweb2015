@@ -47,7 +47,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 @param {Object} detail
   @param {bool} detail.error True if webgl could not be initialized.
 -->
-<polymer-element name="webgl-globe" on-tap="{{handleTap}}" attributes="attractLoop cameraDistance fov location locationTarget markers noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration webglSupported">
+<polymer-element name="webgl-globe" attributes="attractLoop cameraDistance fov location locationTarget markers noDraw noInit noInteractive offsetY scrollTarget scrollTriggered transitionDuration webglSupported">
   <template>
     <style>
       :host {
@@ -135,7 +135,13 @@ Fired when the globe's webgl context has been initialized or it failed to initia
      * Temporary vec4 Float32Array used for mouse picking.
      * @type {!Float32Array}
      */
-    var tmpPicking4Vec = new Float32Array(4);
+    var tmpPicking4Vec0 = new Float32Array(4);
+
+    /**
+     * Temporary vec4 Float32Array used for mouse picking.
+     * @type {!Float32Array}
+     */
+    var tmpPicking4Vec1 = new Float32Array(4);
 
     // Trigger es6-promise
     ES6Promise.polyfill();
@@ -163,6 +169,16 @@ Fired when the globe's webgl context has been initialized or it failed to initia
        * @default false
        */
       noInit: false,
+
+      /**
+       * If true, disables mouse/touch interaction for manipulating the view of
+       * the globe.
+       *
+       * @attribute noInteractive
+       * @type bool
+       * @default false
+       */
+      noInteractive: false,
 
       /**
        * If true, puts the globe in an attract loop (automatically changing its
@@ -276,9 +292,9 @@ Fired when the globe's webgl context has been initialized or it failed to initia
        *
        * @property scrollThreshold_
        * @type number
-       * @default 1.7976931348623157e+308
+       * @default -1.7976931348623157e+308
        */
-      scrollThreshold_: Number.MAX_VALUE,
+      scrollThreshold_: -Number.MAX_VALUE,
 
       /**
        * Whether WebGL initialization has been started.
@@ -539,56 +555,106 @@ Fired when the globe's webgl context has been initialized or it failed to initia
       canvasHeight_: 150,
 
       /**
-       * Whether the mouse was clicked on the globe since the last update.
-       * @property mouseClicked_
+       * Whether a mousedown or touchstart was started on the globe since the
+       * last update.
+       * @property pointerGoingDown_
        * @type bool
        * @default false
        */
-      mouseClicked_: false,
+      pointerGoingDown_: false,
 
       /**
-       * The x coordinate of the last mouse click, relative to the top left of
-       * the `webgl-globe` element.
-       * @property lastClickX_
-       * @type number
-       * @default -1
-       */
-      lastClickX_: -1,
-
-      /**
-       * The y coordinate of the last mouse click, relative to the top left of
-       * the `webgl-globe` element.
-       * @property lastClickY_
-       * @type number
-       * @default -1
-       */
-      lastClickY: -1,
-
-      /**
-       * Whether the mouse is currently over the globe canvas.
-       * @property mouseOver_
+       * Whether the mouse is down or a touch is in progress.
+       * @property pointerDown_
        * @type bool
        * @default false
        */
-      mouseOver_: false,
+      pointerDown_: false,
 
       /**
-       * The x coordinate of the last mouse over event, relative to the top left
-       * of the `webgl-globe` element.
-       * @property lastOverX_
+       * Whether the mouse or a touch is currently over the globe canvas.
+       * @property pointerOver_
+       * @type bool
+       * @default false
+       */
+      pointerOver_: false,
+
+      /**
+       * Whether a mouseup or touchend was started on the globe since the
+       * last update.
+       * @property pointerGoingUp_
+       * @type bool
+       * @default false
+       */
+      pointerGoingUp_: false,
+
+      /**
+       * The pointer x coordinate, relative to the top left of the `webgl-globe`
+       * element.
+       * @property pointerX_
        * @type number
        * @default -1
        */
-      lastOverX_: -1,
+      pointerX_: -1,
 
       /**
-       * The y coordinate of the last mouse over event, relative to the top left
-       * of the `webgl-globe` element.
-       * @property lastOverY_
+       * The pointer y coordinate, relative to the top left of the `webgl-globe`
+       * element.
+       * @property pointerY_
        * @type number
        * @default -1
        */
-      lastOverY_: -1,
+      pointerY_: -1,
+
+      /**
+       * The index of the marker the pointer was over when it first registered
+       * as down.
+       * @property pointerDownMarkerIndex_
+       * @type number
+       * @default -1
+       */
+      pointerDownMarkerIndex_: -1,
+
+      /**
+       * The point on the the canonical globe where the pointer was registered
+       * as down.
+       * @property pointerDownPickedPoint_
+       * @type Float32Array
+       * @default [0, 0, 0]
+       */
+      pointerDownPickedPoint_: new Float32Array(3),
+
+      /**
+       * handleMouseDown_ bound to this object.
+       * @property boundHandleMouseDown
+       * @type function
+       * @default null
+       */
+      boundHandleMouseDown_: null,
+
+      /**
+       * handleMouseMove_ bound to this object.
+       * @property boundHandleMouseMove_
+       * @type function
+       * @default null
+       */
+      boundHandleMouseMove_: null,
+
+      /**
+       * handleMouseOut_ bound to this object.
+       * @property boundHandleMouseOut_
+       * @type function
+       * @default null
+       */
+      boundHandleMouseOut_: null,
+
+      /**
+       * handleMouseUp_ bound to this object.
+       * @property boundHandleMouseUp_
+       * @type function
+       * @default null
+       */
+      boundHandleMouseUp_: null,
 
       /**
        * The index of the marker hovered over by the mouse in the last frame, or
@@ -639,6 +705,11 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
         this.resizeCallback_ = this.canvasResized.bind(this);
         this.boundUpdate_ = this.update_.bind(this);
+
+        this.boundHandleMouseDown_ = this.handleMouseDown_.bind(this);
+        this.boundHandleMouseMove_ = this.handleMouseMove_.bind(this);
+        this.boundHandleMouseOut_ = this.handleMouseOut_.bind(this);
+        this.boundHandleMouseUp_ = this.handleMouseUp_.bind(this);
       },
 
       attached: function() {
@@ -681,6 +752,37 @@ Fired when the globe's webgl context has been initialized or it failed to initia
           this.updateRequestId_ = 0;
         } else {
           this.async(this.scheduleUpdate_);
+        }
+      },
+
+      addPointerHandlers_: function() {
+        var canvas = this.$.canvas;
+        // TODO(bckenny): touchevents
+        canvas.addEventListener('mousedown', this.boundHandleMouseDown_);
+        canvas.addEventListener('mousemove', this.boundHandleMouseMove_);
+        canvas.addEventListener('mouseout', this.boundHandleMouseOut_);
+        canvas.addEventListener('mouseup', this.boundHandleMouseUp_);
+      },
+
+      removePointerHanders_: function() {
+        var canvas = this.$.canvas;
+        // TODO(bckenny): touchevents
+
+        // If not interactive and no markers are present, remove listeners.
+        // TODO(bckenny): unfortunate to have to enumerate guards here
+        if (this.noInteractive && !this.markers) {
+          canvas.removeEventListener('mousedown', this.boundHandleMouseDown_);
+          canvas.removeEventListener('mousemove', this.boundHandleMouseMove_);
+          canvas.removeEventListener('mouseout', this.boundHandleMouseOut_);
+          canvas.removeEventListener('mouseup', this.boundHandleMouseUp_);
+        }
+      },
+
+      noInteractiveChanged: function() {
+        if (!this.noInteractive) {
+          this.addPointerHandlers_();
+        } else {
+          this.removePointerHanders_();
         }
       },
 
@@ -971,16 +1073,19 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         var endTime = nowish();
         IOWA.Analytics.trackPerf('globe', 'marker creation',
             Math.ceil(endTime - startTime), null, this.MAX_PERF_TIMEOUT_);
-
-        // Add listeners for marker hover.
-        this.$.canvas.addEventListener('mousemove', this.handleMouseMove_.bind(this));
-        this.$.canvas.addEventListener('mouseout', this.handleMouseOut_.bind(this));
       },
 
       markersChanged: function() {
-        // If webgl isn't initialized yet, initWebgl_ will handle marker init.
-        if (this.webglReady_) {
-          this.initMarkers_();
+        // Add listeners for marker hover and click.
+        if (this.markers) {
+          this.addPointerHandlers_();
+
+          // If webgl isn't initialized yet, initWebgl_ will handle marker init.
+          if (this.webglReady_) {
+            this.initMarkers_();
+          }
+        } else {
+          this.removePointerHanders_();
         }
       },
 
@@ -1086,7 +1191,6 @@ Fired when the globe's webgl context has been initialized or it failed to initia
           this.resize_();
         }
         if (timestamp - this.transitionStart_ < this.getTransitionTime_()) {
-          // TODO(bckenny): set animate_ = false when this is finished?
           this.interpolateLocation_(timestamp);
         } else if (this.attractLoop) {
           if (this.restartAttractLoop_) {
@@ -1095,6 +1199,40 @@ Fired when the globe's webgl context has been initialized or it failed to initia
           }
           if (!this.attractLoopCancelled_) {
             this.iterateAttractLoop();
+          }
+        }
+        this.updateRequestId_ = 0;
+        this.scheduleUpdate_();
+
+        // Handle pointer interaction with globe.
+        var pointerWentDown = false;
+        var pointerWentUp = false;
+        var pointerOnGlobe = false;
+        var pickedPoint = tmpPicking4Vec0;
+        if (this.pointerOver_) {
+          // Find where the pointer intersects the unrotated globe.
+          pointerOnGlobe = this.pickPoint(pickedPoint, this.pointerX_,
+              this.pointerY_);
+
+          if (pointerOnGlobe) {
+            // up -> down
+            if (this.pointerGoingDown_) {
+              this.pointerGoingDown_ = false;
+              pointerWentDown = true;
+              this.pointerDown_ = true;
+              this.pointerDownPickedPoint_[0] = pickedPoint[0];
+              this.pointerDownPickedPoint_[1] = pickedPoint[1];
+              this.pointerDownPickedPoint_[2] = pickedPoint[2];
+              // TODO(bckenny): cancel animations?
+            } else if (this.pointerDown_) {
+              // mouse down stuff
+            }
+          }
+
+          if (this.pointerGoingUp_) {
+            this.pointerGoingUp_ = false;
+            pointerWentUp = true;
+            this.pointerDown_ = false;
           }
         }
 
@@ -1107,6 +1245,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
           .rotateY(rotY * Math.PI / 180);
 
         // Lighting is done in globe space, so figure out camera position there.
+        // TODO(bckenny): still needed?
         var inverseWorld = tmpTransform1.invertAffine(worldTransform);
         var cameraPosition = tmp3Vec1;
         cameraPosition[0] = inverseWorld.getElement(0, 3);
@@ -1121,33 +1260,33 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
         this.renderGlobe_(mvpTransform, cameraPosition, sunDirection);
 
-        // Render markers (if set) and handle mouse events on them.
-        var clickedMarkerIndex = -1;
+        // Render markers and handle pointer events on them.
         if (this.markerDrawCount_ > 0) {
-          // Handle hover first.
-          // Find the hover position on the globe (if any).
-          var newHoverIndex = -1;
-          if (this.mouseOver_) {
-            var hoverPoint = this.pickPoint(tmp3Vec2, this.lastOverX_,
-                this.lastOverY_, inverseWorld, cameraPosition);
-            if (hoverPoint) {
-              newHoverIndex = this.markerTree_.nearestNeighbor(hoverPoint[0],
-                  hoverPoint[1], hoverPoint[2],
-                  this.markerSize_ * this.markerHoverScale_);
-            }
-          }
+          var clickedMarkerIndex = -1;
+          var pointerOverMarkerIndex = -1;
 
-          if (this.mouseClicked_) {
-            this.mouseClicked_ = false;
-            // Find the click position on the globe (if any).
-            var pickedPoint = this.pickPoint(tmp3Vec2, this.lastClickX_,
-                this.lastClickY_, inverseWorld, cameraPosition);
-            if (pickedPoint) {
-              // Find the marker clicked on (if any).
-              var nearest = this.markerTree_.nearestNeighbor(pickedPoint[0],
-                  pickedPoint[1], pickedPoint[2],
-                  this.markerSize_ * this.markerHoverScale_);
-              clickedMarkerIndex = nearest;
+          // Handle pointer events on markers, if any.
+          if (pointerOnGlobe) {
+            // Find the point relative to the rotated globe.
+            pickedPoint[3] = 0;
+            var globePickPoint = tmpPicking4Vec1;
+            inverseWorld.transformVec4(globePickPoint, pickedPoint);
+
+            // Determine if point is over a marker.
+            pointerOverMarkerIndex = this.markerTree_.nearestNeighbor(
+                globePickPoint[0], globePickPoint[1], globePickPoint[2],
+                this.markerSize_ * this.markerHoverScale_);
+
+            if (pointerWentDown) {
+              // TODO(bckenny): technically should do this on last frame's globe...
+              this.pointerDownMarkerIndex_ = pointerOverMarkerIndex;
+            }
+            if (pointerWentUp) {
+              // TODO(bckenny): add pointer drag to cancel click
+              // If not dragging and over the same marker as pointerDown, click!
+              if (this.pointerDownMarkerIndex_ === pointerOverMarkerIndex) {
+                clickedMarkerIndex = pointerOverMarkerIndex;
+              }
             }
           }
 
@@ -1157,12 +1296,11 @@ Fired when the globe's webgl context has been initialized or it failed to initia
               this.markerIndexBuffer_, this.markerDrawCount_);
 
           // Render hovered marker, if any.
-          if (newHoverIndex > -1) {
-            var hoveredMarker = this.markers_[newHoverIndex];
-            worldTransform
+          if (pointerOverMarkerIndex > -1) {
+            var hoveredMarker = this.markers_[pointerOverMarkerIndex];
+            mvpTransform
               .rotateY(hoveredMarker.lng * Math.PI / 180)
               .rotateX(-hoveredMarker.lat * Math.PI / 180);
-            mvpTransform.product(this.projectionTransform_, worldTransform);
 
             this.renderMarkers_(mvpTransform, this.markerHoverArrayBuffer_,
                 this.markerHoverIndexBuffer_, 6);
@@ -1170,19 +1308,16 @@ Fired when the globe's webgl context has been initialized or it failed to initia
           this.gl.disable(this.gl.BLEND);
 
           // If entering or exiting hovering, toggle a pointer cursor.
-          if (this.lastHoveredIndex_ === -1 && newHoverIndex !== -1) {
+          if (this.lastHoveredIndex_ === -1 && pointerOverMarkerIndex !== -1) {
             this.$.canvas.classList.add('markerHovered');
-          } else if (this.lastHoveredIndex_ !== -1 && newHoverIndex === -1) {
+          } else if (this.lastHoveredIndex_ !== -1 && pointerOverMarkerIndex === -1) {
             this.$.canvas.classList.remove('markerHovered');
           }
-          this.lastHoveredIndex_ = newHoverIndex;
-        }
+          this.lastHoveredIndex_ = pointerOverMarkerIndex;
 
-        this.updateRequestId_ = 0;
-        this.scheduleUpdate_();
-
-        if (clickedMarkerIndex > -1) {
-          this.fire('marker-click', {markerIndex: clickedMarkerIndex});
+          if (clickedMarkerIndex > -1) {
+            this.fire('marker-click', {markerIndex: clickedMarkerIndex});
+          }
         }
       },
 
@@ -1280,33 +1415,64 @@ Fired when the globe's webgl context has been initialized or it failed to initia
       handleMouseMove_: function(e) {
         e.stopPropagation();
 
-        this.mouseOver_ = true;
+        this.pointerOver_ = true;
         if (e.offsetX) {
-          this.lastOverX_ = e.offsetX;
-          this.lastOverY_ = e.offsetY;
+          this.pointerX_ = e.offsetX;
+          this.pointerY_ = e.offsetY;
         } else {
-          this.lastOverX_ = e.layerX;
-          this.lastOverY_ = e.layerY;
+          this.pointerX_ = e.layerX;
+          this.pointerY_ = e.layerY;
         }
       },
 
       handleMouseOut_: function(e) {
         e.stopPropagation();
 
-        this.mouseOver_ = false;
+        this.pointerOver_ = false;
       },
 
-      handleTap: function(e) {
-        this.mouseClicked_ = true;
-        var rect = this.$.canvas.getBoundingClientRect();
-        this.lastClickX_ = e.x - rect.left;
-        this.lastClickY_ = e.y - rect.top;
+      handleMouseDown_: function(e) {
+        e.stopPropagation();
 
-        // If not animating anymore, need to trigger a draw to pick.
-        this.scheduleUpdate_();
+        if (e.offsetX) {
+          this.pointerX_ = e.offsetX;
+          this.pointerY_ = e.offsetY;
+        } else {
+          this.pointerX_ = e.layerX;
+          this.pointerY_ = e.layerY;
+        }
+        this.pointerGoingDown_ = true;
       },
 
-      pickPoint: function(destVec, canvasX, canvasY, inverseWorld, cameraPosition) {
+      handleMouseUp_: function(e) {
+        e.stopPropagation();
+
+        if (e.offsetX) {
+          this.pointerX_ = e.offsetX;
+          this.pointerY_ = e.offsetY;
+        } else {
+          this.pointerX_ = e.layerX;
+          this.pointerY_ = e.layerY;
+        }
+        this.pointerGoingUp_ = true;
+      },
+
+      /**
+       * Pick a point on the globe based on the pixel coordinate (canvasX,
+       * canvasY). Returns true if a point on the globe was intersected; point
+       * coordinate is in destVec (in canonical globe space). Returns false if
+       * pixel does not intersect globe; destVec then contains the closest point
+       * on the globe to the ray through the specified pixel coordinate.
+       * @param {Array<number>|Float64Array|Float32Array} destVec
+       * @param {number} canvasX
+       * @param {number} canvasY
+       * @return {boolean}
+       */
+      pickPoint: function(destVec, canvasX, canvasY) {
+        var cameraX = 0;
+        var cameraY = -this.offsetY;
+        var cameraZ = this.cameraDistance;
+
         var aspectRatio = this.canvasWidth_ / this.canvasHeight_;
         var ndcX = 2 * canvasX / this.canvasWidth_ - 1;
         var ndcY = 1 - 2 * canvasY / this.canvasHeight_;
@@ -1318,54 +1484,43 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         }
         var near = -1 / Math.tan(this.fov / 2);
 
-        // Find a point along click ray in camera space.
-        var cameraClick = tmpPicking4Vec;
-        cameraClick[0] = ndcX;
-        cameraClick[1] = ndcY;
-        cameraClick[2] = near;
-        cameraClick[3] = 1;
+        // Find unit vector from camera through pixel.
+        var length = Math.sqrt(ndcX * ndcX + ndcY * ndcY + near * near);
+        var clickRayX = ndcX / length;
+        var clickRayY = ndcY / length;
+        var clickRayZ = near / length;
 
-        // Transform point back to globe space to find click direction there.
-        var globeClick = inverseWorld.transformVec4(cameraClick, cameraClick);
-        var globeRayX = globeClick[0] - cameraPosition[0];
-        var globeRayY = globeClick[1] - cameraPosition[1];
-        var globeRayZ = globeClick[2] - cameraPosition[2];
-        var length = Math.sqrt(globeRayX * globeRayX + globeRayY * globeRayY +
-            globeRayZ * globeRayZ);
-        globeRayX /= length;
-        globeRayY /= length;
-        globeRayZ /= length;
-
-        // Find intersection (if any) with globe.
         // Project camera->globe ray onto click ray.
-        var s = -(cameraPosition[0] * globeRayX +
-            cameraPosition[1] * globeRayY +
-            cameraPosition[2] * globeRayZ);
+        var s = -(cameraX * clickRayX + cameraY * clickRayY +
+            cameraZ * clickRayZ);
         if (s < 0) {
-          // Sphere is behind camera, so can't intersect.
-          // TODO(bckenny): Can never happen in our case
-          return null;
+          // Sphere is behind camera, so can't intersect. Can never happen while
+          // canvasX, canvasY is within bounds of fov.
+          throw new Error('Invalid canvasX, canvasY coordinates');
         }
-        var cameraSqDistance = cameraPosition[0] * cameraPosition[0] +
-            cameraPosition[1] * cameraPosition[1] +
-            cameraPosition[2] * cameraPosition[2];
+        var cameraSqDistance = cameraX * cameraX + cameraY * cameraY +
+            cameraZ * cameraZ;
         // Shortest distance from globe center to click ray.
         var m2 = cameraSqDistance - s * s;
-        if (m2 > 1) {
-          // Ray passes outside the sphere's radius, so can't intersect.
-          return null;
+
+        // If m2 <= 1, ray passes inside the sphere's radius, so adjust
+        // projected distance to find intersection point.
+        if (m2 <= 1) {
+          var t = s - Math.sqrt(1 - m2);
+          destVec[0] = cameraX + t * clickRayX;
+          destVec[1] = cameraY + t * clickRayY;
+          destVec[2] = cameraZ + t * clickRayZ;
+
+          return true;
         }
-        var q = Math.sqrt(1 - m2);
-        // Camera is guaranteed to be outside of sphere, so closer intersection.
-        var t = s - q;
 
-        // Find intersect coordinates, t distance along globeRay from camera.
-        var clickRay = destVec;
-        clickRay[0] = cameraPosition[0] + t * globeRayX;
-        clickRay[1] = cameraPosition[1] + t * globeRayY;
-        clickRay[2] = cameraPosition[2] + t * globeRayZ;
+        // Otherwise, take closest point on clickRay and project on to globe.
+        var height = Math.sqrt(m2);
+        destVec[0] = (cameraX + s * clickRayX) / height;
+        destVec[1] = (cameraY + s * clickRayY) / height;
+        destVec[2] = (cameraZ + s * clickRayZ) / height;
 
-        return clickRay;
+        return false;
       },
 
       getNearestMarker: function(latitude, longitude) {
