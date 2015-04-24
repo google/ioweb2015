@@ -42,7 +42,7 @@ type appConfig struct {
 	Whitelist []string
 	// I/O Extended events feed
 	IoExtFeedURL string `json:"ioExtFeedUrl"`
-	// External/extra parties to ping about certain updates
+	// Endpoint to ping external/extra parties about certain updates
 	// Currently it is only user schedule
 	ExtPingURL string `json:"extPingUrl"`
 	// used for SW tokens

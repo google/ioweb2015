@@ -676,7 +676,7 @@ func handlePingExt(w http.ResponseWriter, r *http.Request) {
 	c := newContext(r)
 	retry, err := strconv.Atoi(r.Header.Get("X-AppEngine-TaskExecutionCount"))
 	if err != nil {
-		errorf(c, "handlePingExt: X-AppEngine-TaskExecutionCount header not found")
+		errorf(c, "handlePingExt: invalid X-AppEngine-TaskExecutionCount: %v", err)
 		return
 	}
 	if retry > 2 {
