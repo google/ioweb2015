@@ -205,11 +205,11 @@
     </div>
   </section>
 
-  <section id="subpage-day1" class="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{ {active: pages['schedule'].selectedSubpage == 'day1' || pages['schedule'].selectedSubpage == 'day2' || pages['schedule'].selectedSubpage == 'myschedule'} | tokenList}}">
+  <section id="subpage-day1" class="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{ {active: pages['schedule'].selectedSubpage != 'agenda'} | tokenList}}">
     <section  class="page__section page__section--top slide-up">
       <div id="signin-prompt"
-          class="card__container card__container--top {{{'prompt-hidden': currentUser} | tokenList}}"
-          hidden?="{{pages['schedule'].selectedSubpage == 'myschedule'}}">
+          class="card__container card__container--top {{ {'prompt-hidden': currentUser} | tokenList}}"
+          hidden?="{{pages['schedule'].selectedSubpage === 'myschedule'}}">
         <div class="card js-experiment-visualizer">
           <div class="card-content">
             <h3 class="card__title">Create your custom I/O schedule</h3>
@@ -227,44 +227,48 @@
           </div>
         </div>
       </div>
-      <div class="card__container card__container--top {{{'notification__feature': currentUser} | tokenList}}">
-        <div class="card js-experiment-visualizer"
-          hidden?="{{pages['schedule'].selectedSubpage != 'myschedule'}}">
-          <div class="card-content">
-            <h3 class="card__title" hidden?="{{currentUser}}">Create your custom I/O schedule</h3>
-            <div hidden?="{{currentUser}}">
-              Sign in to add events to My Schedule.
-              <span class="notification__feature">
-                To get notifications on this device, you need to sign in and enable notifications.
-                <div class="note">Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</div>
-              </span>
+
+      <div class="card__container card__container--top" hidden?="{{pages['schedule'].selectedSubpage !== 'myschedule'}}">
+        <div class="card js-experiment-visualizer">
+
+          <template if="{{!currentUser}}">
+            <div class="card-content">
+              <h3 class="card__title">Create your custom I/O schedule</h3>
+              <div>
+                Sign in to add events to My Schedule.
+                <span class="notification__feature">
+                  To get notifications on this device, you need to sign in and enable notifications.
+                  <p class="note">Note: Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.</p>
+                </span>
+              </div>
             </div>
-            <div hidden?="{{!currentUser}}" class="notification__feature">
+            <div class="card-content">
+              <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-sign-in"
+                    on-click="{{signIn}}">Sign in</span>
+            </div>
+          </template>
+
+          <template if="{{currentUser}}">
+            <div class="card-content notification__feature">
               <div>By default, you'll get notifications on this device when:
                 <ul>
                   <li>Events in My Schedule are about to start</li>
                   <li>Videos of sessions added to My Schedule are available</li>
                 </ul>
               </div>
-              <div class="note">
-                Note:  Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.
-              </div>
+              <p class="note">
+                Note: Notifications are activated per device. If you want to receive notifications on multiple devices, make sure to sign in on each device. All device notifications can be turned on/off at any time in the settings panel.
+              </p>
             </div>
-          </div>
-          <div class="card-content">
-            <span class="anchor-like" role="link" tabindex="0"
-                data-track-link="schedule-sign-in" on-click="{{signIn}}"
-                hidden?="{{currentUser}}">
-              Sign in
-            </span>
-            <span class="anchor-like" role="link" tabindex="0"
-                data-track-link="schedule-open-settings" on-click="{{openSettings}}"
-                hidden?="{{!currentUser}}">
-              Go to settings
-            </span>
-          </div>
+            <div class="card-content notification__feature">
+              <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-open-settings"
+                    on-click="{{openSettings}}">Go to settings</span>
+            </div>
+          </template>
+
         </div>
       </div>
+
     </section>
     <div class="slide-up-delay">
       <div class="page__filters" layout horizontal hidden?="{{!isPhoneSize || pages[selectedPage].selectedSubpage === 'myschedule'}}">
