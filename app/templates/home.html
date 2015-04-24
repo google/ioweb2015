@@ -180,14 +180,7 @@
         IOWA.Elements.Template.socialPosts = socialPosts.slice(0, 3);
       }
 
-      // TODO: Move to use page.onPageTransitionDone.
-      function onPageTransitionDone_() {
-        document.removeEventListener('page-transition-done', onPageTransitionDone_);
-        showCountdownTimer();
-      }
-
       page.load = function() {
-        document.addEventListener('page-transition-done', onPageTransitionDone_);
         IOWA.Request.cacheThenNetwork(socialPostsEndpoint, processSocialPosts, processSocialPosts);
         // Set a timeout to fetch new posts after 30 seconds.
         updateSocialPostsTimeout = window.setTimeout(updateSocialPosts, socialPostUpdateInterval);
@@ -198,16 +191,6 @@
         IOWA.Elements.Template.fullscreenVideoActive = false;
         IOWA.Elements.Template.webglSupported = true;
       };
-
-      function showCountdownTimer() {
-
-        var countdownEl = document.querySelector('countdown-timer');
-
-        if (!countdownEl)
-          return;
-
-        countdownEl.show();
-      }
 
       page.unload = function() {
         if (updateSocialPostsTimeout) {
