@@ -19,7 +19,7 @@
   ES6Promise.polyfill();
 
   function initWorker() {
-    var MAX_WORKER_TIMEOUT_ = 7000;
+    var MAX_WORKER_TIMEOUT_ = 10 * 1000; // 10s
     var worker;
 
     var doMetrics = window.performance && window.performance.now;
@@ -61,6 +61,11 @@
         template.filterSessionTypes = data.tags.filterSessionTypes;
         template.filterThemes = data.tags.filterThemes;
         template.filterTopics = data.tags.filterTopics;
+
+        // If user is signed in by this point, fetch their schedule.
+        if (IOWA.Elements.GoogleSignIn.signedIn) {
+          fetchUserSchedule();
+        }
       }
     });
 
@@ -81,6 +86,19 @@
 
     CoreStyle.g.paperInput.labelColor = '#008094';
     CoreStyle.g.paperInput.focusedColor = '#008094';
+  }
+
+  function fetchUserSchedule() {
+    var template = IOWA.Elements.Template;
+
+    template.scheduleFetchingUserData = true;
+
+    // Fetch user's saved sessions.
+    IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
+      template.scheduleFetchingUserData = false;
+      template.savedSessions = savedSessions;
+      IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);
+    });
   }
 
   window.addEventListener('core-media-change', function(e) {
@@ -123,17 +141,11 @@
     var template = IOWA.Elements.Template;
 
     if (e.detail.signedIn) {
-      template.scheduleFetchingUserData = true;
-
-      // Fetch user's saved sessions.
-      IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
-        template.scheduleFetchingUserData = false;
-        // Use existing template model.
-        if (!template.savedSessions.length) {
-          template.savedSessions = savedSessions;
-        }
-        IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);
-      });
+      // User is logged in. Only fetch their schedule if the worker has
+      // responded with the master schedule.
+      if (template.scheduleData) {
+        fetchUserSchedule();
+      }
     } else {
       template.savedSessions = [];
       IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);

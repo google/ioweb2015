@@ -57,10 +57,10 @@ IOWA.Elements = (function() {
 
       IOWA.PageAnimation.play(
         IOWA.PageAnimation.pageFirstRender(subpage), function() {
-          // Load aut after page transitions are done. This helps timing with
-          // fetching user's schdule and makes sure the worker has returned
-          // the main schedule data.
-          IOWA.Elements.GoogleSignIn.load = true;
+          // // Load auth after page transitions are done. This helps timing with
+          // // fetching user's schdule and makes sure the worker has returned
+          // // the main schedule data.
+          // IOWA.Elements.GoogleSignIn.load = true;
 
           // Fire event when the page transitions are final.
           IOWA.Elements.Template.fire('page-transition-done');
