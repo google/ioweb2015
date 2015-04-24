@@ -39,3 +39,16 @@ func pingUserAsync(c context.Context, uid string, skeys []string) error {
 	_, err := taskqueue.Add(c, t, "")
 	return err
 }
+
+// pingExtPartyAsync notifies extra parties at config.ExtPingURL about data updates.
+func pingExtPartyAsync(c context.Context, key string) error {
+	if key == "" || config.ExtPingURL == "" {
+		return nil
+	}
+	p := path.Join(config.Prefix, "/task/ping-ext")
+	t := taskqueue.NewPOSTTask(p, url.Values{
+		"key": {key},
+	})
+	_, err := taskqueue.Add(c, t, "")
+	return err
+}

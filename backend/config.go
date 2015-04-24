@@ -42,6 +42,9 @@ type appConfig struct {
 	Whitelist []string
 	// I/O Extended events feed
 	IoExtFeedURL string `json:"ioExtFeedUrl"`
+	// External/extra parties to ping about certain updates
+	// Currently it is only user schedule
+	ExtPingURL string `json:"extPingUrl"`
 	// used for SW tokens
 	Secret string `json:"secret"`
 	// A shared secret to identify requests from GCS and gdrive

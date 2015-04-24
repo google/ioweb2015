@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -40,6 +42,7 @@ func registerHandlers() {
 	handle("/sync/gcs", syncEventData)
 	handle("/task/notify-subscribers", handleNotifySubscribers)
 	handle("/task/ping-user", handlePingUser)
+	handle("/task/ping-ext", handlePingExt)
 	// debug handlers; not available in prod
 	if !isProd() {
 		handle("/debug/srvget", debugServiceGetURL)
@@ -664,6 +667,50 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		errorf(c, "handlePingUser: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+// handlePingExt sends a "ping" POST request to config.ExtPingURL.
+// On GAE, it will retry at least 3 times before giving up.
+func handlePingExt(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	retry, err := strconv.Atoi(r.Header.Get("X-AppEngine-TaskExecutionCount"))
+	if err != nil {
+		errorf(c, "handlePingExt: X-AppEngine-TaskExecutionCount header not found")
+		return
+	}
+	if retry > 2 {
+		errorf(c, "handlePingExt: retry = %d; giving up.", retry)
+		return
+	}
+
+	key := r.FormValue("key")
+	if key == "" {
+		errorf(c, "handlePingExt: key value is zero")
+		return
+	}
+	p := strings.NewReader(`{"sync_jitter": 0}`)
+	req, err := http.NewRequest("POST", config.ExtPingURL, p)
+	if err != nil {
+		errorf(c, "handlePingExt: %v", err)
+		return
+	}
+
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("authorization", "key="+key)
+	res, err := httpClient(c).Do(req)
+
+	if err != nil {
+		errorf(c, "handlePingExt: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		b, _ := ioutil.ReadAll(res.Body)
+		errorf(c, "handlePingExt: remote says %q\nResponse: %s", res.Status, b)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
 

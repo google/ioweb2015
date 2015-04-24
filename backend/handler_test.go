@@ -1213,6 +1213,50 @@ func TestServeUserUpdates(t *testing.T) {
 	}
 }
 
+func TestHandlePingExt(t *testing.T) {
+	defer preserveConfig()()
+
+	done := make(chan struct{}, 1)
+	ping := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() { done <- struct{}{} }()
+		if ah := r.Header.Get("Authorization"); ah != "key=a-key" {
+			t.Errorf("ah = %q; want 'a-key'", ah)
+		}
+		var body map[string]interface{}
+		d := json.NewDecoder(r.Body)
+		d.UseNumber()
+		if err := d.Decode(&body); err != nil {
+			t.Error(err)
+		}
+		v, ok := body["sync_jitter"].(json.Number)
+		if !ok {
+			t.Errorf("body: %+v, sync_jitter: %v (%T); want json.Number", body, v, body["sync_jitter"])
+			return
+		}
+		if n, err := v.Int64(); n != 0 {
+			t.Errorf("v.Int64() = %d, %v; want 0", n, err)
+		}
+	}))
+	defer ping.Close()
+	config.ExtPingURL = ping.URL
+
+	r := newTestRequest(t, "POST", "/task/ping-ext?key=a-key", nil)
+	r.Header.Set("X-AppEngine-TaskExecutionCount", "0")
+	w := httptest.NewRecorder()
+	handlePingExt(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	select {
+	case <-done:
+		// passed
+	default:
+		t.Errorf("ping never happened")
+	}
+}
+
 func fetchFirstSWToken(t *testing.T, auth string) string {
 	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
 	r.Header.Set("authorization", bearerHeader+testIDToken)
