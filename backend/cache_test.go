@@ -49,6 +49,29 @@ func TestMemoryCacheMiss(t *testing.T) {
 	}
 }
 
+func TestMemoryCacheInc(t *testing.T) {
+	mc := newMemoryCache()
+	c := context.Background()
+
+	table := []struct {
+		delta   int64
+		initVal uint64
+		res     uint64
+	}{
+		{3, 1, 4}, {1, 0, 5}, {-5, 0, 0}, {10, 0, 10}, {-100, 0, 0},
+	}
+
+	for i, test := range table {
+		v, err := mc.inc(c, "test", test.delta, test.initVal)
+		if err != nil {
+			t.Fatalf("%d: inc(%d, %d)", i, test.delta, test.initVal)
+		}
+		if v != test.res {
+			t.Errorf("%d: inc(%d, %d) = %d; want %d", i, test.delta, test.initVal, v, test.res)
+		}
+	}
+}
+
 func TestMemoryCacheFlush(t *testing.T) {
 	mc := newMemoryCache()
 	c := context.Background()
