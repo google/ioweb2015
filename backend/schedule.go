@@ -100,8 +100,12 @@ func fetchEventData(c context.Context, urlStr string, lastSync time.Time) (*even
 	if err != nil {
 		return nil, err
 	}
+	hc, err := serviceAccountClient(c, gcsReadOnlyScope)
+	if err != nil {
+		return nil, fmt.Errorf("fetchEventData: %v", err)
+	}
 
-	files, lastMod, err := fetchEventManifest(c, u.String(), lastSync)
+	files, lastMod, err := fetchEventManifest(c, hc, u.String(), lastSync)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +127,7 @@ func fetchEventData(c context.Context, urlStr string, lastSync time.Time) (*even
 		wg.Add(1)
 		go func(u string) {
 			defer wg.Done()
-			res, err := slurpEventDataChunk(c, u)
+			res, err := slurpEventDataChunk(c, hc, u)
 			mu.Lock()
 			defer mu.Unlock()
 			if err != nil {
@@ -187,13 +191,9 @@ func fetchEventData(c context.Context, urlStr string, lastSync time.Time) (*even
 // url should point to the manifest.json file.
 // Returned Time is the timestamp of last modification.
 // If data hasn't changed since lastSync, both returned values are nil.
-func fetchEventManifest(c context.Context, url string, lastSync time.Time) ([]string, time.Time, error) {
+func fetchEventManifest(c context.Context, hc *http.Client, url string, lastSync time.Time) ([]string, time.Time, error) {
 	logf(c, "fetching manifest from %s", url)
 	mod := time.Now()
-	hc, err := serviceAccountClient(c, gcsReadOnlyScope)
-	if err != nil {
-		return nil, mod, fmt.Errorf("fetchEventManifest: %v", err)
-	}
 
 	r, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -235,12 +235,8 @@ func fetchEventManifest(c context.Context, url string, lastSync time.Time) ([]st
 
 // slurpEventDataChunk retrieves a chunk of event data at url
 // any, all or none of the returned *eventData fields can be non-empty.
-func slurpEventDataChunk(c context.Context, url string) (*eventData, error) {
+func slurpEventDataChunk(c context.Context, hc *http.Client, url string) (*eventData, error) {
 	logf(c, "slurping %s", url)
-	hc, err := serviceAccountClient(c, gcsReadOnlyScope)
-	if err != nil {
-		return nil, fmt.Errorf("slurpEventDataChunk: %v", err)
-	}
 	res, err := hc.Get(url)
 	if err != nil {
 		return nil, err

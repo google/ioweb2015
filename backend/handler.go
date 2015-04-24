@@ -17,6 +17,10 @@ import (
 	"golang.org/x/net/context"
 )
 
+// syncGCSCacheKey guards GCS sync task against choking
+// when requests coming too fast.
+const syncGCSCacheKey = "sync:gcs"
+
 // wrapHandler is the last in a handler chain call,
 // which wraps all app handlers.
 // GAE and standalone servers have different wrappers, hence a variable.
@@ -451,16 +455,25 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 // diffs the changes with a previous version, stores those changes
 // and spawns up workers to send push notifications to interested parties.
 func syncEventData(w http.ResponseWriter, r *http.Request) {
-	// allow only cron jobs, task qeueus and GCS
-	if r.Header.Get("x-appengine-cron") != "true" &&
-		r.Header.Get("x-appengine-taskname") == "" &&
-		r.Header.Get("x-goog-channel-token") != config.SyncToken {
-		w.WriteHeader(http.StatusUnauthorized)
+	c := newContext(r)
+	// allow only cron jobs, task queues and GCS but don't tell them that
+	tque := r.Header.Get("x-appengine-cron") == "true" || r.Header.Get("x-appengine-taskname") != ""
+	if t := r.Header.Get("x-goog-channel-token"); t != config.SyncToken && !tque {
+		logf(c, "NOT performing sync: x-goog-channel-token = %q", t)
 		return
 	}
 
-	c := newContext(r)
-	err := runInTransaction(c, func(c context.Context) error {
+	i, err := cache.inc(c, syncGCSCacheKey, 1, 0)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	if i > 1 {
+		logf(c, "GCS sync: already running")
+		return
+	}
+
+	err = runInTransaction(c, func(c context.Context) error {
 		oldData, err := getLatestEventData(c, nil)
 		if err != nil {
 			return err
@@ -491,6 +504,10 @@ func syncEventData(w http.ResponseWriter, r *http.Request) {
 		}
 		return nil
 	})
+
+	if _, err := cache.inc(c, syncGCSCacheKey, -1000, 0); err != nil {
+		errorf(c, err.Error())
+	}
 
 	if err != nil {
 		errorf(c, "syncEventSchedule: %v", err)
