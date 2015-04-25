@@ -284,7 +284,6 @@ gulp.task('generate-data-worker-dist', function() {
     APP_DIR + '/scripts/helper/schedule.js',
     APP_DIR + '/data-worker.js'
   ])
-    .pipe(reload({stream: true, once: true}))
     .pipe($.concat('data-worker-scripts.js'))
     .pipe($.uglify({preserveComments: 'some'}).on('error', function () {}))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR))
@@ -511,6 +510,12 @@ function watch() {
   gulp.watch([APP_DIR + '/scripts/**/*.js'], ['jshint']);
   gulp.watch([APP_DIR + '/images/**/*'], reload);
   gulp.watch([APP_DIR + '/bower.json'], ['bower']);
+  gulp.watch([
+    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
+    APP_DIR + '/scripts/helper/request.js',
+    APP_DIR + '/scripts/helper/schedule.js',
+    APP_DIR + '/data-worker.js'
+  ], ['generate-data-worker-dev']);
 }
 
 // Build experiment and place inside app.
