@@ -27,8 +27,22 @@ IOWA.Schedule = (function() {
   var scheduleData_ = null;
   var userSavedSessions_ = [];
 
+  var scheduleDeferred = IOWA.Util.createDeferred();
+  var resolveSchedulePromise = scheduleDeferred.resolve;
+  var scheduleDeferredPromise = scheduleDeferred.promise.then(function(data) {
+    scheduleData_ = data.scheduleData;
+    IOWA.Elements.Template.scheduleData = data.scheduleData;
+    IOWA.Elements.Template.filterSessionTypes = data.tags.filterSessionTypes;
+    IOWA.Elements.Template.filterThemes = data.tags.filterThemes;
+    IOWA.Elements.Template.filterTopics = data.tags.filterTopics;
+
+    return scheduleData_;
+  });
+
   /**
-   * Fetches the I/O schedule data.
+   * Fetches the I/O schedule data. If the schedule has not been loaded yet, a
+   * network request is kicked off. To wait on the schedule without causing a
+   * triggering a request for it, use `schedulePromise`.
    * @return {Promise} Resolves with response schedule data.
    */
   function fetchSchedule() {
@@ -40,6 +54,14 @@ IOWA.Schedule = (function() {
       scheduleData_ = resp;
       return scheduleData_;
     });
+  }
+
+  /**
+   * Returns a promise fulfilled when the master schedule is loaded.
+   * @return {!Promise} Resolves with response schedule data.
+   */
+  function schedulePromise() {
+    return scheduleDeferredPromise;
   }
 
   /**
@@ -210,6 +232,8 @@ IOWA.Schedule = (function() {
   return {
     clearCachedUserSchedule: clearCachedUserSchedule,
     fetchSchedule: fetchSchedule,
+    schedulePromise: schedulePromise,
+    resolveSchedulePromise: resolveSchedulePromise,
     fetchUserSchedule: fetchUserSchedule,
     saveSession: saveSession,
     generateFilters: generateFilters,

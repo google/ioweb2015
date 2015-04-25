@@ -135,7 +135,7 @@
     // Remove listener. We don't want this code running on other pages' transition end.
     document.removeEventListener('page-transition-done', onPageTransitionDone_);
 
-    IOWA.Schedule.fetchSchedule().then(function(scheduleData) {
+    IOWA.Schedule.schedulePromise().then(function(scheduleData) {
       var lib = scheduleData.video_library;
       if (lib) {
         var videos = Object.keys(lib).map(function(key) { return lib[key]; });
