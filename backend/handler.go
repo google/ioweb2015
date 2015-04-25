@@ -293,7 +293,7 @@ func serveSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b, err := json.Marshal(data)
+	b, err := json.Marshal(toAPISchedule(data))
 	if err != nil {
 		writeJSONError(c, w, errStatus(err), err)
 		return
@@ -828,6 +828,58 @@ func errStatus(err error) int {
 	default:
 		return http.StatusInternalServerError
 	}
+}
+
+// toAPISchedule converts eventData to /api/v1/schedule response format.
+func toAPISchedule(d *eventData) interface{} {
+	sessions := make([]*eventSession, 0, len(d.Sessions))
+	for _, s := range d.Sessions {
+		sessions = append(sessions, s)
+	}
+	sort.Sort(sortedSessionsList(sessions))
+	return &struct {
+		Sessions []*eventSession          `json:"sessions,omitempty"`
+		Speakers map[string]*eventSpeaker `json:"speakers,omitempty"`
+		Videos   map[string]*eventVideo   `json:"video_library,omitempty"`
+		Tags     map[string]*eventTag     `json:"tags,omitempty"`
+	}{
+		Sessions: sessions,
+		Speakers: d.Speakers,
+		Videos:   d.Videos,
+		Tags:     d.Tags,
+	}
+
+}
+
+// sortedSessionsList implements sort.Sort ordering items by:
+//   - start time
+//   - end time
+//   - title
+type sortedSessionsList []*eventSession
+
+func (l sortedSessionsList) Len() int {
+	return len(l)
+}
+
+func (l sortedSessionsList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
+}
+
+func (l sortedSessionsList) Less(i, j int) bool {
+	a, b := l[i], l[j]
+	if a.StartTime.Before(b.StartTime) {
+		return true
+	}
+	if a.StartTime.After(b.StartTime) {
+		return false
+	}
+	if a.EndTime.Before(b.EndTime) {
+		return true
+	}
+	if a.EndTime.After(b.EndTime) {
+		return false
+	}
+	return a.Title < b.Title
 }
 
 // ctxKey is a custom type for context.Context values.
