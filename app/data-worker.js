@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-importScripts(
-  'bower_components/es6-promise-2.0.1.min/index.js',
-  'scripts/helper/request.js',
-  'scripts/helper/schedule.js'
-);
-
 var schedulePromise = IOWA.Schedule.fetchSchedule();
 
 addEventListener('message', function(e) {

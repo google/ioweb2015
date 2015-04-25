@@ -26,7 +26,7 @@
 
     if (doMetrics) {
       var workerStartTime = window.performance.now();
-      worker = new Worker('data-worker.js');
+      worker = new Worker('data-worker-scripts.js');
       var total = window.performance.now() - workerStartTime;
 
       if (window.ENV !== 'prod') {
@@ -35,7 +35,7 @@
       IOWA.Analytics.trackPerf('worker', 'creation', Math.ceil(total),
                                null, MAX_WORKER_TIMEOUT_);
     } else {
-      worker = new Worker('data-worker.js');
+      worker = new Worker('data-worker-scripts.js');
     }
 
     worker.addEventListener('message', function(e) {
