@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-importScripts(
-  'bower_components/es6-promise-2.0.1.min/index.js',
-  'scripts/helper/request.js',
-  'scripts/helper/schedule.js'
-);
+// Scripts required for execution (included by generate-data-worker gulp tasks):
+// bower_components/es6-promise-2.0.1.min/index.js
+// scripts/helper/request.js
+// scripts/helper/schedule.js
 
 var schedulePromise = IOWA.Schedule.fetchSchedule();
 

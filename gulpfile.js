@@ -39,7 +39,15 @@ var reload = function() {
 };
 
 // openUrl is a noop unless '--open' cmd line arg is specified.
-var openUrl = function() {}
+var openUrl = function() {};
+
+// Scripts required for the data-fetching worker.
+var dataWorkerScripts = [
+  APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
+  APP_DIR + '/scripts/helper/request.js',
+  APP_DIR + '/scripts/helper/schedule.js',
+  APP_DIR + '/data-worker.js'
+];
 
 if (argv.reload) {
   reload = browserSync.reload;
@@ -53,7 +61,11 @@ gulp.task('clear', function (done) {
 
 // TODO(ericbidelman): also remove generated .css files.
 gulp.task('clean', ['clear'], function(cleanCallback) {
-  del([DIST_STATIC_DIR, DIST_EXPERIMENT_DIR], cleanCallback);
+  del([
+    DIST_STATIC_DIR,
+    DIST_EXPERIMENT_DIR,
+    APP_DIR + '/data-worker-scripts.js'
+  ], cleanCallback);
 });
 
 gulp.task('sass', function() {
@@ -159,9 +171,6 @@ gulp.task('copy-assets', function() {
     APP_DIR + '/clear_cache.html',
     APP_DIR + '/embed.html',
     APP_DIR + '/sitemap.xml',
-    APP_DIR + '/data-worker.js',
-    APP_DIR + '/scripts/helper/request.js', // TODO: remove when github.com/GoogleChrome/ioweb2015/issues/1162 lands.
-    APP_DIR + '/scripts/helper/schedule.js', // TODO: remove when github.com/GoogleChrome/ioweb2015/issues/1162 lands.
     APP_DIR + '/styles/**.css',
     APP_DIR + '/styles/pages/upgrade.css',
     APP_DIR + '/styles/pages/permissions.css',
@@ -262,6 +271,23 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
     .pipe($.size({title: 'concat-and-uglify-js'}));
 });
 
+// Concat scripts for the data-fetching worker.
+gulp.task('generate-data-worker-dev', function() {
+  return gulp.src(dataWorkerScripts)
+    .pipe($.concat('data-worker-scripts.js'))
+    .pipe(gulp.dest(APP_DIR))
+    .pipe($.size({title: 'data-worker-dev'}));
+});
+
+// Concat and crush scripts for the data-fetching worker for dist.
+gulp.task('generate-data-worker-dist', function() {
+  return gulp.src(dataWorkerScripts)
+    .pipe($.concat('data-worker-scripts.js'))
+    .pipe($.uglify({preserveComments: 'some'}).on('error', function () {}))
+    .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR))
+    .pipe($.size({title: 'data-worker-dist'}));
+});
+
 // Optimize Images
 gulp.task('images', function() {
   return gulp.src([
@@ -290,7 +316,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 // App environment is 'dev' by default. Change with '--env=prod'.
-gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 'generate-page-metadata'], function() {
+gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 'generate-page-metadata', 'generate-data-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var start = spawn.bind(null, 'bin/server',
@@ -332,10 +358,10 @@ gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev', 'generate-page-metadata'], function(callback) {
+gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev', 'generate-page-metadata', 'generate-data-worker-dev'], function(callback) {
   var watchFiles = argv.watch !== false;
   generateGaeConfig(BACKEND_DIR, URL_PREFIX, function() {
-    startGaeBackend(BACKEND_DIR, watchFiles, callback)
+    startGaeBackend(BACKEND_DIR, watchFiles, callback);
   });
 });
 
@@ -390,7 +416,7 @@ gulp.task('backend:test', ['backend:config'], function(cb) {
     } else {
       proc.on('close', cb);
     }
-  }
+  };
 
   if (argv.gae) {
     gaeSdkDir(function(dir) {
@@ -404,7 +430,8 @@ gulp.task('backend:test', ['backend:config'], function(cb) {
 gulp.task('default', ['clean'], function(cb) {
   runSequence('copy-experiment-to-site', 'sass', 'vulcanize',
               ['concat-and-uglify-js', 'images', 'copy-assets', 'copy-backend'],
-              'generate-service-worker-dist', 'sitemap', cb);
+              'generate-service-worker-dist', 'generate-data-worker-dist',
+              'sitemap', cb);
 });
 
 gulp.task('bower', function(cb) {
@@ -481,6 +508,7 @@ function watch() {
   gulp.watch([APP_DIR + '/scripts/**/*.js'], ['jshint']);
   gulp.watch([APP_DIR + '/images/**/*'], reload);
   gulp.watch([APP_DIR + '/bower.json'], ['bower']);
+  gulp.watch(dataWorkerScripts, ['generate-data-worker-dev']);
 }
 
 // Build experiment and place inside app.
