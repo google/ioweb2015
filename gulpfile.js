@@ -41,6 +41,14 @@ var reload = function() {
 // openUrl is a noop unless '--open' cmd line arg is specified.
 var openUrl = function() {};
 
+// Scripts required for the data-fetching worker.
+var dataWorkerScripts = [
+  APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
+  APP_DIR + '/scripts/helper/request.js',
+  APP_DIR + '/scripts/helper/schedule.js',
+  APP_DIR + '/data-worker.js'
+];
+
 if (argv.reload) {
   reload = browserSync.reload;
   openUrl = opn;
@@ -265,12 +273,7 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
 
 // Concat scripts for the data-fetching worker.
 gulp.task('generate-data-worker-dev', function() {
-  return gulp.src([
-    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
-    APP_DIR + '/scripts/helper/request.js',
-    APP_DIR + '/scripts/helper/schedule.js',
-    APP_DIR + '/data-worker.js'
-  ])
+  return gulp.src(dataWorkerScripts)
     .pipe($.concat('data-worker-scripts.js'))
     .pipe(gulp.dest(APP_DIR))
     .pipe($.size({title: 'data-worker-dev'}));
@@ -278,12 +281,7 @@ gulp.task('generate-data-worker-dev', function() {
 
 // Concat and crush scripts for the data-fetching worker for dist.
 gulp.task('generate-data-worker-dist', function() {
-  return gulp.src([
-    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
-    APP_DIR + '/scripts/helper/request.js',
-    APP_DIR + '/scripts/helper/schedule.js',
-    APP_DIR + '/data-worker.js'
-  ])
+  return gulp.src(dataWorkerScripts)
     .pipe($.concat('data-worker-scripts.js'))
     .pipe($.uglify({preserveComments: 'some'}).on('error', function () {}))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR))
@@ -510,12 +508,7 @@ function watch() {
   gulp.watch([APP_DIR + '/scripts/**/*.js'], ['jshint']);
   gulp.watch([APP_DIR + '/images/**/*'], reload);
   gulp.watch([APP_DIR + '/bower.json'], ['bower']);
-  gulp.watch([
-    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
-    APP_DIR + '/scripts/helper/request.js',
-    APP_DIR + '/scripts/helper/schedule.js',
-    APP_DIR + '/data-worker.js'
-  ], ['generate-data-worker-dev']);
+  gulp.watch(dataWorkerScripts, ['generate-data-worker-dev']);
 }
 
 // Build experiment and place inside app.
