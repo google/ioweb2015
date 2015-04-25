@@ -36,4 +36,4 @@ sitemap.xml
 # This should be generated as part of the gulp build process.
 app/service-worker.js
 app/scripts/pages.js
-app/scripts/data-worker-scripts.js
+app/data-worker-scripts.js
