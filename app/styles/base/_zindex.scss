@@ -68,3 +68,6 @@ experiment-fab-container[playmode="playing"],
 experiment-fab-container[playmode="paused"] {
   z-index: 100002 !important; // highest when playing
 }
+experiment-fab-container[playmode="paused"][mode="pre"] {
+  z-index: auto !important;
+}

@@ -293,6 +293,8 @@ Fired when loading animation is complete.
             this.fab.style.transform = 'none'; // Remove transform.
             if (this.fab.localName === 'experiment-fab-container') {
               this.fab.style.zIndex = 'auto';
+            } else {
+              this.fab.style.zIndex = '3';
             }
             el.parentElement.removeChild(el);
             this.fire('io-logo-animation-done');
@@ -300,6 +302,8 @@ Fired when loading animation is complete.
         } else {
           if (this.fab.localName === 'experiment-fab-container') {
             this.fab.style.zIndex = 'auto';
+          } else {
+            this.fab.style.zIndex = '3';
           }
           el.parentElement.removeChild(el);
           this.fire('io-logo-animation-done');
