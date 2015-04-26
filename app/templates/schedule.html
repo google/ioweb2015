@@ -16,11 +16,11 @@
       </paper-tab>
       <paper-tab label="day1" role="">
         <a href="#day1" data-track-link="schedule-day1" data-ajax-link
-                        layout horizontal center-center>{{dayTitles.day1}}</a>
+                        layout horizontal center-center>{{days.day1.tabTitle}}</a>
       </paper-tab>
       <paper-tab label="day2" role="">
         <a href="#day2" data-track-link="schedule-day2" data-ajax-link
-                        layout horizontal center-center>{{dayTitles.day2}}</a>
+                        layout horizontal center-center>{{days.day2.tabTitle}}</a>
       </paper-tab>
       <paper-tab label="myschedule" role="">
         <a href="#myschedule" data-track-link="schedule-mysched" data-ajax-link
@@ -29,7 +29,7 @@
     </paper-tabs>
     <paper-dropdown-menu hidden?="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
       <paper-dropdown class="dropdown" halign="right" duration="200">
-        <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label" on-core-select="{{selectTimezone}}">
+        <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label" on-core-activate="{{selectTimezone}}">
           <template repeat="{{zone in timezones}}">
             <paper-item label="{{zone}}">{{zone}}</paper-item>
           </template>
@@ -80,7 +80,6 @@
   <div class="session__info__section session__speakers" hidden?="{{!selectedSession.speakers.length}}">
     <h4>Speakers</h4>
     <div layout horizontal wrap>
-
       <template repeat="{{speakerId in selectedSession.speakers}}">
         <div class="speaker__card" layout horizontal>
           <div><img _src="{{scheduleData.speakers[speakerId].thumbnailUrl || 'images/schedule/profile_placeholder.png'}}" class="profilepic"></div>
@@ -250,7 +249,7 @@
 
           <template if="{{currentUser}}">
             <div class="card-content notification__feature">
-              <div>By default, you'll get notifications on this device when:
+              <div>If you have notifications enabled, you'll be notified on this device when:
                 <ul>
                   <li>Events in My Schedule are about to start</li>
                   <li>Videos of sessions added to My Schedule are available</li>
@@ -305,7 +304,6 @@
         <io-schedule day="{{days[pages[selectedPage].selectedSubpage]}}"
           sessions="{{scheduleData.sessions}}" sessionThemes="{{filterThemes}}"
           sessionTypes="{{filterSessionTypes}}"
-          showOnlySavedSessions="{{pages[selectedPage].selectedSubpage === 'myschedule'}}"
           user="{{currentUser}}" userSessions="{{savedSessions}}"
           timezone="{{selectedTimezone}}"
           timezoneNames="{{timezoneNames}}"
@@ -313,7 +311,7 @@
           filters="{{sessionURLFilters}}"
           on-session-bookmark="{{toggleSaveSession}}"
           on-session-select="{{openSession}}"
-          gmtDayOne="{{GMTDay1}}"></io-schedule>
+          gmtDayOne="{% .StartDateStr %}"></io-schedule>
       </section>
     </div>
   </section>
@@ -336,8 +334,7 @@
       IOWA.Elements.Template.dontAutoSubscribe = false;
 
       page.onSubpageTransitionDone = function() {
-        var selectedSubpage = IOWA.Elements.Template.pages['schedule'].selectedSubpage;
-        IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = selectedSubpage;
+        IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
       };
 
       page.onPageTransitionDone = function(e) {
@@ -359,7 +356,7 @@
         var sessionId = parsedUrl.resourceId;
         if (sessionId) {
           pageIsDeepLinked_ = false;
-          template.openSession(sessionId);
+          template.openSession(IOWA.Schedule.getSessionById(sessionId));
         } else {
           pageIsDeepLinked_ = true;
         }
@@ -371,7 +368,7 @@
         IOWA.Elements.Template.scheduleFetchingUserData = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
-        IOWA.Elements.Template.selectTimezone();
+        IOWA.Elements.Template.selectTimezone(); // sets day sub tabs.
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
@@ -383,17 +380,8 @@
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
       };
 
-      IOWA.Elements.Template.openSettings = function(e, detail, sender) {
-        var attr = sender.getAttribute('data-track-link');
-        if (attr) {
-          IOWA.Analytics.trackEvent('link', 'click', attr);
-        }
-        IOWA.Elements.Nav.querySelector('#signin-settings-panel').open();
-      };
-
-      IOWA.Elements.Template.openSession = function(sessionIdOrDetail) {
-        var sessionId = sessionIdOrDetail.detail ? sessionIdOrDetail.detail : sessionIdOrDetail;
-        this.selectedSession = this.scheduleData.sessions[sessionId];
+      IOWA.Elements.Template.openSession = function(sessionOrDetail) {
+        this.selectedSession = sessionOrDetail.detail ? sessionOrDetail.detail.session : sessionOrDetail;
 
         // Open paper-dialog.
         var panel = IOWA.Elements.Main.querySelector('.session__detail');
@@ -403,9 +391,11 @@
       IOWA.Elements.Template.toggleSaveSession = function(e, detail, sender) {
         e.stopPropagation();
 
-        // Toggle bookmarking came from <io-schedule> event.
-        if (detail && detail.sessionId) {
-          this.selectedSession = this.scheduleData.sessions[detail.sessionId];
+        // Bookmarking came from <io-schedule> event. We're passed a session object.
+        // Otherwise, there's a session detail card up and this.selectedSession
+        // is already set.
+        if (detail && detail.session) {
+          this.selectedSession = detail.session;
         }
 
         var selectedSession = this.selectedSession;
@@ -415,7 +405,7 @@
           IOWA.Elements.Template.scheduleFetchingUserData = false;
           selectedSession.saved = saved;
 
-          ioScheduleEl.checkEmptyBlocks();
+          ioScheduleEl.updateTimeBlocks(); // TODO(ericbidelman): check if this is necessary.
 
           if (saved) {
             // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
@@ -475,12 +465,22 @@
       };
 
       IOWA.Elements.Template.selectTimezone = function(e, detail, sender) {
-        this.days = {};
-        this.dayTitles = {};
-        this.days.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('D');
-        this.days.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('D');
-        this.dayTitles.day1 = ioScheduleEl.getLocalizedTime(this.GMTDay1).format('MMMM D');
-        this.dayTitles.day2 = ioScheduleEl.getLocalizedTime(this.GMTDay2).format('MMMM D');
+        var day1LocalizedTime = ioScheduleEl.getLocalizedTime(ioScheduleEl.gmtDayOne);
+        var day2LocalizedTime = moment(day1LocalizedTime).add(1, 'day');
+
+        this.days = {
+          day1: {
+            value: parseInt(day1LocalizedTime.format('D')),
+            tabTitle: day1LocalizedTime.format('MMMM D')
+          },
+          day2: {
+            value: parseInt(day2LocalizedTime.format('D')),
+            tabTitle: day2LocalizedTime.format('MMMM D')
+          },
+          myschedule: {
+            value: 'myschedule'
+          }
+        };
       };
 
       page.load(); // Run load callback on page load.

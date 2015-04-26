@@ -314,9 +314,6 @@ IOWA.Elements = (function() {
     };
 
     template.timezones = Object.keys(template.timezoneNames);
-    // TODO: Consider using {% .StartDateStr %}.
-    template.GMTDay1 = '2015-05-28T16:00:00Z';
-    template.GMTDay2 = '2015-05-29T16:00:00Z';
 
     template.formatSessionTimeFilter = function(dateStr) {
       var date = new Date(dateStr);
@@ -543,6 +540,14 @@ IOWA.Elements = (function() {
         window.open(url, 'share', winOptions);
       });
 
+    };
+
+    template.openSettings = function(e, detail, sender) {
+      var attr = sender.getAttribute('data-track-link');
+      if (attr) {
+        IOWA.Analytics.trackEvent('link', 'click', attr);
+      }
+      IOWA.Elements.Nav.querySelector('#signin-settings-panel').open();
     };
 
     template.setSelectedPageToHome = function() {
