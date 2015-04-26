@@ -35,69 +35,119 @@ The `<io-schedule>` element renders a schedule for a given day(s).
     <core-media-query query="(min-width:1136px)"
                       queryMatches="{{isDesktopSize}}"></core-media-query>
 
-    <div class="card__container {{{'sidebyside': !isPhoneSize} | tokenList}}" layout
+    <div class="card__container {{{sidebyside: !isPhoneSize} | tokenList}}" layout
          vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
       <div flex?="{{!isPhoneSize}}" layout vertical>
-        <template repeat="{{timeBlock in timeBlocks_}}">
-          <template if="{{timeBlock.dayStart && !day && (timeBlock.dayStart <= lastDay_ && timeBlock.dayStart >= firstDay_)}}">
-            <div class="card day-title">
-              <div class="card-content">
-                <h4>May {{timeBlock.dayStart}}</h4>
+
+        <template repeat="{{timeBlock in timeBlocks_}}" if="{{day.value === 'myschedule'}}" >
+
+          <div hidden?="{{!(timeBlock.day >= firstDay_ && timeBlock.day <= lastDay_)}}">
+
+            <div hidden?="{{!timeBlock.dayStart}}">
+              <div class="card day-title">
+                <div class="card-content">
+                  <h4>May {{timeBlock.dayStart}}</h4>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
+                     vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified>
+                  <span class="no-sessions">Add more events for this day</span>
+                  <a href="#day{{(timeBlock.dayStart % firstDay_) + 1}}" data-subpage-link>Browse events</a>
+                </div>
+                <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
               </div>
             </div>
-          </template>
-          <template if="{{(!day || timeBlock.day == day) && timeBlock.sessions.length}}">
-            <div class="card">
+
+            <div class="card" hidden?="{{!timeBlock.sessions.length}}">
               <div class="card-content">
                 <h4>{{timeBlock.name}}</h4>
               </div>
               <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
-              <div class="card-content schedule-rows"
-                   layout vertical hidden?="{{!timeBlock.sessions.length}}">
-                <template repeat="{{sessionId in timeBlock.sessions}}">
+              <div class="card-content schedule-rows" layout vertical>
+                <template repeat="{{session in timeBlock.sessions}}">
                   <div class="schedule-row" layout horizontal
-                       center?="{{isDesktopSize}}"
-                       hidden?="{{sessions[sessionId].hide}}">
-                    <io-radio-button
-                        on-change="{{onToggleSaveSession}}"
-                        toggles checked?="{{sessions[sessionId].saved}}"
-                        disabled?="{{showOnlySavedSessions}}"
-                        aria-labelledby="session-{{sessionId}}-time session-{{sessionId}}-title"></io-radio-button>
+                       center?="{{isDesktopSize}}">
+                    <io-radio-button aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
+                                     checked disabled></io-radio-button>
                     <div layout vertical?="{{!isDesktopSize}}"
-                         horizontal?="{{isDesktopSize}}" flex
-                         on-click="{{selectSession}}"
-                         tabindex="0">
-                      <span class="schedule-time" flex auto-vertical id="session-{{sessionId}}-time">
-                        {{sessions[sessionId].start}} <span hidden?="{{sessionId === '__keynote__'}}"> - {{sessions[sessionId].end}}</span>
+                         horizontal?="{{isDesktopSize}}" flex tabindex="0"
+                         on-click="{{selectSession}}">
+                      <span id="session-{{session.id}}-time" class="schedule-time" flex auto-vertical>
+                        {{session.start}} <span hidden?="{{session.id === '__keynote__'}}"> - {{session.end}}</span>
                       </span>
-                      <span class="schedule-title" auto-vertical
-                            flex?="{{!isPhoneSize}}" two
-                            title="{{sessions[sessionId].title}}"
-                            id="session-{{sessionId}}-title">
-                        {{sessions[sessionId].title}}
-                        <core-icon class="schedule-livestream"
-                            icon="io:videocam"
-                            hidden?="{{!sessions[sessionId].isLivestream}}"></core-icon>
+                      <span id="session-{{session.id}}-title" class="schedule-title"
+                            auto-vertical flex?="{{!isPhoneSize}}" two
+                            title="{{session.title}}">
+                        {{session.title}}
+                        <core-icon icon="io:videocam" class="schedule-livestream"
+                                   hidden?="{{!session.isLivestream}}"></core-icon>
                       </span>
                     </div>
                   </div>
                 </template>
               </div>
             </div>
-          </template>
 
-          <template if="{{timeBlock.dayStart && !day && !timeBlock.sessions.length && (timeBlock.dayStart <= lastDay_ && timeBlock.dayStart >= firstDay_)}}">
-            <div class="card">
-              <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
-                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified>
-                <span class="no-sessions">Add more events for this day</span>
-                <a href="#day{{(timeBlock.dayStart % firstDay_) + 1}}" data-subpage-link>Browse events</a>
-              </div>
-              <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
+          </div>
+
+        </template>
+
+        <template if="{{day.value !== 'myschedule'}}">
+
+          <div class="card day-title">
+            <div class="card-content">
+              <h4>May {{day.value}}</h4>
             </div>
+          </div>
+
+          <template repeat="{{timeBlock in timeBlocks_}}">
+
+            <template if="{{timeBlock.day == day.value && timeBlock.sessions.length}}">
+
+              <div class="card">
+                <div class="card-content">
+                  <h4>{{timeBlock.name}}</h4>
+                </div>
+
+                <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
+
+                <div class="card-content schedule-rows" layout vertical>
+
+                  <template repeat="{{session in timeBlock.sessions}}">
+
+                    <div class="schedule-row" layout horizontal center?="{{isDesktopSize}}"
+                         hidden?="{{session.hide}}">
+                      <io-radio-button aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
+                          toggles checked?="{{session.saved}}"
+                          on-change="{{onToggleSaveSession}}"></io-radio-button>
+                      <div layout vertical?="{{!isDesktopSize}}"
+                           horizontal?="{{isDesktopSize}}" flex tabindex="0"
+                           on-click="{{selectSession}}">
+                        <span id="session-{{session.id}}-time" class="schedule-time" flex auto-vertical>
+                          {{session.start}} <span hidden?="{{session.id === '__keynote__'}}"> - {{session.end}}</span>
+                        </span>
+                        <span id="session-{{session.id}}-title" class="schedule-title"
+                              auto-vertical flex?="{{!isPhoneSize}}" two
+                              title="{{session.title}}">
+                          {{session.title}}
+                          <core-icon icon="io:videocam" class="schedule-livestream"
+                                     hidden?="{{!session.isLivestream}}"></core-icon>
+                        </span>
+                      </div>
+                    </div>
+
+                  </template>
+
+                </div>
+              </div>
+
+            </template>
+
           </template>
 
         </template>
+
       </div>
 
       <div class="card__container" layout vertical>
@@ -146,22 +196,17 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
     var timeBlocks = [];
     var timeBlocksIndex = {};
-    var populatedTimeBlocks_ = false;
 
     function populateTimeBlocks(gmtDayOne) {
-      if (populatedTimeBlocks_) {
-        return;
-      }
-      populatedTimeBlocks_ = true;
-      var blocksStartDay = parseInt(moment(gmtDayOne).format('D'), 10);
+      // Generate hours array from "12 AM" -> "11 PM".
       var hours = [];
-      var generator = new Array(13);
-      for (var i = 1; i < generator.length; i++) {
-        hours.push(i + ' AM');
+      for (var i = 0; i < 24; ++i) {
+        var hour = (i % 12) || 12;
+        hours.push(hour + (i < 12 ? ' AM' : ' PM'));
       }
-      for (var i = 1; i < generator.length; i++) {
-        hours.push(i + ' PM');
-      }
+
+      var blocksStartDay = parseInt(moment(gmtDayOne).format('D'), 10);
+
       for (var i = 0; i < 3; i++) {
         for (var j = 0; j < hours.length; j++) {
           var timeBlock = {
@@ -170,7 +215,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
             sessions: []
           };
           if (j === 0) {
-            timeBlock['dayStart'] = timeBlock.day;
+            timeBlock.dayStart = timeBlock.day;
           }
           timeBlocks.push(timeBlock);
           var timeBlockId = timeBlock.day + hours[j];
@@ -179,8 +224,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       }
     }
 
-
-
     Polymer({
 
       publish: {
@@ -188,7 +231,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * Optional day to filter the sessions, e.g. 'day1'.
          *
          * @attribute day
-         * @type number
+         * @type string
          * @default null
          */
         day: null,
@@ -200,7 +243,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type array
          * @default []
          */
-        sessionThemes: [],
+        sessionThemes: null,
 
         /**
          * Array of session types.
@@ -209,7 +252,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type array
          * @default []
          */
-        sessionTypes: [],
+        sessionTypes: null,
 
         /**
          * Array of applied filters.
@@ -218,7 +261,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type array
          * @default []
          */
-        filters: [],
+        filters: null,
 
         /**
          * Timezone for the schedule times.
@@ -236,7 +279,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type array
          * @default []
          */
-        timezoneNames: [],
+        timezoneNames: null,
 
         /**
          * Array of scheduled sessions.
@@ -245,7 +288,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type array
          * @default []
          */
-        sessions: [],
+        sessions: null,
 
         /**
          * User's list of saved sessions.
@@ -254,16 +297,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @type array
          * @default []
          */
-        userSessions: [],
-
-        /**
-         * Whether to show only saved sessions for any day.
-         *
-         * @attribute showOnlySavedSessions
-         * @type Boolean
-         * @default false
-         */
-        showOnlySavedSessions: false,
+        userSessions: null,
 
         /**
          * Logged in user.
@@ -291,45 +325,43 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @default null
          */
         gmtDayOne: null
-
       },
 
-      timeBlocks_: timeBlocks,
-
-      timeBlocksIndex_: timeBlocksIndex,
-
-      sessionsIndex_: [],
-
-      filtersState_: {},
-
-      firstDay_: 28,  // of May, In GMT.
-
+      firstDay_: 28, // of May, In GMT.
       lastDay_: 29,  // of May, In GMT.
 
-      ready: function() {
-        populateTimeBlocks(this.gmtDayOne);
-      },
+      created: function() {
+        populateTimeBlocks(this.gmtDayOne || this.getAttribute('gmtDayOne'));
 
-      sessionsChanged: function() {
-        this.sessionsIndex_ = Object.keys(this.sessions);
+        this.timeBlocks_ = timeBlocks;
+        this.timeBlocksIndex_ = timeBlocksIndex;
+        this.timezoneNames = [];
+        this.sessions = [];
+        this.userSessions = [];
+        this.filters = [];
+        this.sessionTypes = [];
+        this.sessionThemes = [];
+        this.filtersState_ = {};
       },
 
       dayChanged: function() {
-        this.checkEmptyBlocks();
+        this.updateTimeBlocks();
       },
 
       userSessionsChanged: function() {
-        this.checkEmptyBlocks();
+        if (this.userSessions.length) {
+          this.updateTimeBlocks();
+        }
       },
 
       timezoneChanged: function() {
         var localFirstDay = this.getLocalizedTime(this.gmtDayOne);
-        var localLastDay = localFirstDay.add(1, 'days');
+        var localLastDay = moment(localFirstDay).add(1, 'days');
 
-        this.firstDay_ = localFirstDay.format('D');
-        this.lastDay_ = localLastDay.format('D');
-        for (var i = 0; i < this.sessionsIndex_.length; i++) {
-          var session = this.sessions[this.sessionsIndex_[i]];
+        this.firstDay_ = parseInt(localFirstDay.format('D'));
+        this.lastDay_ = parseInt(localLastDay.format('D'));
+
+        for (var i = 0, session; session = this.sessions[i]; ++i) {
           var startTime = this.getLocalizedTime(session.startTimestamp);
           var endTime = this.getLocalizedTime(session.endTimestamp);
           session.start = startTime.format('h:mm A');
@@ -337,7 +369,8 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           session.block = startTime.format('h A');
           session.day = startTime.format('D');
         }
-        this.checkEmptyBlocks();
+
+        this.updateTimeBlocks();
       },
 
       isFilterSelected: function(filterName) {
@@ -354,15 +387,20 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         }
       },
 
-      filtersChanged: function() {
+      filtersChanged: function(oldVal, newVal) {
+        if (!oldVal.length && !newVal.length) {
+          return;
+        }
+
         this.filtersState_ = {};
         for (var i = 0; i < this.filters.length; i++) {
           this.filtersState_[this.filters[i]] = true;
         }
-        for (var i = 0; i < this.sessions.length; i++) {
-          sessions[i].hide = !this.matchesFilters(sessions[i]);
+        for (var i = 0, session; session = this.sessions[i]; ++i) {
+          session.hide = !this.matchesFilters(session);
         }
-        this.checkEmptyBlocks();
+
+        this.updateTimeBlocks();
 
         var filters = this.filters.join(',');
         var filterParam = '';
@@ -381,46 +419,40 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         if (!this.filters.length) {
           return true;
         }
-        for (var i = 0; i < this.filters.length; i++) {
-          if (session.filters[this.filters[i]]) {
+        for (var i = 0, filter; filter = this.filters[i]; ++i) {
+          if (session.filters[filter]) {
             return true;
           }
         }
         return false;
       },
 
-      checkEmptyBlocks: function() {
-        for (var i = 0; i < this.timeBlocks_.length; i++) {
-          this.timeBlocks_[i].sessions = [];
+      updateTimeBlocks: function() {
+        if (!this.day) {
+          return;
         }
-        for (var i = 0; i < this.sessionsIndex_.length; i++) {
-          var session = this.sessions[this.sessionsIndex_[i]];
+
+        for (var i = 0, timeBlock; timeBlock = this.timeBlocks_[i]; ++i) {
+          timeBlock.sessions = [];
+        }
+
+        for (var i = 0, session; session = this.sessions[i]; ++i) {
           var block = session.day + session.block;
-          if (this.timeBlocks_[this.timeBlocksIndex_[block]]) {
+          var timeBlock = this.timeBlocks_[this.timeBlocksIndex_[block]];
+
+          if (timeBlock) {
             var isValidSession = this.matchesFilters(session) &&
-              (!this.showOnlySavedSessions ||
-               (this.showOnlySavedSessions && session.saved));
+                (this.day.value !== 'myschedule' ||
+                (this.day.value == 'myschedule' && session.saved));
             if (isValidSession) {
-              this.timeBlocks_[this.timeBlocksIndex_[block]].sessions.push(
-                this.sessionsIndex_[i]);
-            };
+              timeBlock.sessions.push(session);
+            }
           }
         }
       },
 
       selectSession: function(e, detail, sender) {
-        this.fire('session-select', sender.templateInstance.model.sessionId);
-      },
-
-      filterSessions: function(items, day, block) {
-        var filtered = [];
-        for (var i = 0; i < items.length; i++) {
-          var session = this.sessions[items[i]];
-          if (session.day === day && session.block === block) {
-            filtered.push(items[i]);
-          }
-        }
-        return filtered;
+        this.fire('session-select', {session: sender.templateInstance.model.session});
       },
 
       /**
@@ -439,7 +471,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         e.stopPropagation();
 
         this.fire('session-bookmark', {
-          sessionId: sender.templateInstance.model.sessionId,
+          session: sender.templateInstance.model.session,
           save: e.target.checked
         });
       }

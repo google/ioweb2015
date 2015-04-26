@@ -128,8 +128,9 @@ IOWA.Schedule = (function() {
     //  Mark/unmarked sessions the user has bookmarked.
     if (savedSessions.length) {
       var sessions = IOWA.Elements.Template.scheduleData.sessions;
-      for (var id in sessions) {
-        sessions[id].saved = savedSessions.indexOf(id) !== -1;
+      for (var i = 0; i < sessions.length; ++i) {
+        var session = sessions[i];
+        session.saved = savedSessions.indexOf(session.id) !== -1;
       }
     }
   }
@@ -142,14 +143,25 @@ IOWA.Schedule = (function() {
     scheduleData_ = scheduleData;
   }
 
+  function getSessionById(sessionId) {
+    for (var i = 0; i < scheduleData_.session.length; ++i) {
+      var session = sessions[i];
+      if (session.id === sessionId) {
+        return session;
+      }
+    }
+    return null;
+  }
+
   return {
     clearCachedUserSchedule: clearCachedUserSchedule,
     fetchSchedule: fetchSchedule,
     fetchUserSchedule: fetchUserSchedule,
     saveSession: saveSession,
     generateFilters: generateFilters,
+    getSessionById: getSessionById,
     updateSavedSessionsUI: updateSavedSessionsUI,
-    setScheduleData: setScheduleData
+    setScheduleData: setScheduleData,
   };
 
 })();

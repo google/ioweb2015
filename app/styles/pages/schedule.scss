@@ -116,6 +116,7 @@ core-icon[icon="schedule"] {
   .note {
     color: $color-heading;
     font-size: 14px;
+    margin-bottom: 0;
   }
 }
 
@@ -136,6 +137,8 @@ core-icon[icon="schedule"] {
 
   color: $color-link-grey;
   font-size: 14px;
+
+  top: 0;
 
   paper-fab {
     background: #fff;
