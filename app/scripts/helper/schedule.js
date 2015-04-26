@@ -74,7 +74,7 @@ IOWA.Schedule = (function() {
    */
   function schedulePromise() {
     if (!scheduleDeferredPromise) {
-      createScheduleDeferred();
+      createScheduleDeferred_();
     }
 
     return scheduleDeferredPromise;
@@ -86,7 +86,7 @@ IOWA.Schedule = (function() {
    */
   function resolveSchedulePromise(data) {
     if (!scheduleDeferredPromiseResolver) {
-      createScheduleDeferred();
+      createScheduleDeferred_();
     }
 
     scheduleDeferredPromiseResolver(data);
