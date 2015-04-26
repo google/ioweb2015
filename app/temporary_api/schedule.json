@@ -1,68 +1,6 @@
 {
   "sessions": [
     {
-      "id": "b3171348-82dc-e411-b87f-00155d5066d7",
-      "title": "Network Performance & Tooling",
-      "description": "In a mobile world, everything is about getting data off the servers, and into your device, as fast as possible. But that's easier said than done. \n\nIn this talk, we'll walk through the zen of networking performance, some tools you should be using to optimize your usage, and some common pitfalls that you should avoid during development.",
-      "startTimestamp": "2014-06-25T00:00:00Z",
-      "endTimestamp": "2014-06-25T00:00:00Z",
-      "isLivestream": false,
-      "tags": [
-        "THEME_DEVELOP&DESIGN",
-        "TOPIC_ANDROID",
-        "TOPIC_TOOLS&APIS",
-        "TYPE_SANDBOXTALKS"
-      ],
-      "speakers": [
-        "74ccda3c-bbd4-e411-b87f-00155d5066d7"
-      ],
-      "room": "",
-      "photoUrl": "https://storage.googleapis.com/io2015-data-dev.google.com.a.appspot.com/images/sessions/__w-200-400-600-800-1000__/b3171348-82dc-e411-b87f-00155d5066d7.jpg",
-      "day": 24,
-      "block": "5 PM",
-      "start": "5:00 PM",
-      "end": "5:00 PM",
-      "filters": {
-        "Android": true,
-        "Develop & Design": true,
-        "Live Streamed": false,
-        "Sandbox Talks": true,
-        "Tools & APIs": true
-      }
-    },
-    {
-      "id": "bf8c9f91-b6d4-e411-b87f-00155d5066d7",
-      "title": "Re-engagement: A dive into push notifications",
-      "description": "In this talk, we do a deep dive in to how to implement push notifications to re-engage your web app users.",
-      "startTimestamp": "2014-06-25T00:00:00Z",
-      "endTimestamp": "2014-06-25T00:00:00Z",
-      "isLivestream": false,
-      "tags": [
-        "THEME_ENGAGE&EARN",
-        "TOPIC_ACCESSIBILITY",
-        "TOPIC_TOOLS&APIS",
-        "TOPIC_AUDIENCEGROWTH",
-        "TYPE_SANDBOXTALKS"
-      ],
-      "speakers": [
-        "9ad01e5a-49dd-e411-b87f-00155d5066d7"
-      ],
-      "room": "",
-      "photoUrl": "https://storage.googleapis.com/io2015-data-dev.google.com.a.appspot.com/images/sessions/__w-200-400-600-800-1000__/bf8c9f91-b6d4-e411-b87f-00155d5066d7.jpg",
-      "day": 24,
-      "block": "5 PM",
-      "start": "5:00 PM",
-      "end": "5:00 PM",
-      "filters": {
-        "Accessibility": true,
-        "Audience Growth": true,
-        "Engage & Earn": true,
-        "Live Streamed": false,
-        "Sandbox Talks": true,
-        "Tools & APIs": true
-      }
-    },
-    {
       "id": "__keynote__",
       "title": "Keynote",
       "description": "Google I/O's much-anticipated kickoff event will make you among the first developers to see what we've been working on here at Google. If you're not joining us at Moscone, grab some popcorn, kick back and enjoy the show directly from your Android powered device.",

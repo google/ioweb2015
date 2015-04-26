@@ -269,7 +269,7 @@ func slurpEventDataChunk(c context.Context, hc *http.Client, url string) (*event
 
 	sessions := make(map[string]*eventSession, len(body.Sessions))
 	for _, s := range body.Sessions {
-		if s.Id == "" {
+		if s.Id == "" || s.StartTime.Before(config.Schedule.Start) {
 			continue
 		}
 
