@@ -39,7 +39,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
       <div flex?="{{!isPhoneSize}}" layout vertical>
 
-        <template if="{{day.value === 'myschedule'}}" repeat="{{timeBlock in timeBlocks_}}">
+        <template repeat="{{timeBlock in timeBlocks_}}" if="{{day.value === 'myschedule'}}" >
 
           <div hidden?="{{!(timeBlock.day >= firstDay_ && timeBlock.day <= lastDay_)}}">
 
@@ -325,11 +325,9 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @default null
          */
         gmtDayOne: null
-
       },
 
-      firstDay_: 28,  // of May, In GMT.
-
+      firstDay_: 28, // of May, In GMT.
       lastDay_: 29,  // of May, In GMT.
 
       created: function() {
@@ -371,6 +369,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           session.block = startTime.format('h A');
           session.day = startTime.format('D');
         }
+
         this.updateTimeBlocks();
       },
 
@@ -389,6 +388,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       filtersChanged: function(oldVal, newVal) {
+        if (!oldVal.length && !newVal.length) {
+          return;
+        }
+
         this.filtersState_ = {};
         for (var i = 0; i < this.filters.length; i++) {
           this.filtersState_[this.filters[i]] = true;
@@ -396,6 +399,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         for (var i = 0, session; session = this.sessions[i]; ++i) {
           session.hide = !this.matchesFilters(session);
         }
+
         this.updateTimeBlocks();
 
         var filters = this.filters.join(',');
@@ -427,8 +431,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         if (!this.day) {
           return;
         }
-
-  console.log('updateTimeBlocks');
 
         for (var i = 0, timeBlock; timeBlock = this.timeBlocks_[i]; ++i) {
           timeBlock.sessions = [];
