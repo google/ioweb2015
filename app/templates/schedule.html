@@ -41,7 +41,7 @@
 
 {% define "content" %}
 <!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
-<paper-dialog class="session__detail" transition="paper-dialog-transition-bottom"
+<paper-dialog class="session__detail" transition="core-transition-center"
               layered="false" backdrop?="{{!isIOS}}"
               on-core-overlay-close-completed="{{onSessionDetailsClose}}"
               on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
@@ -445,7 +445,7 @@
       };
 
       IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail, sender) {
-        sender.updateTargetDimensions();
+        // sender.updateTargetDimensions();
 
         // Update URL with deep link if we're not from a deep link page load.
         if (pageIsDeepLinked_) {
