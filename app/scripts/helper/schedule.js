@@ -128,7 +128,8 @@ IOWA.Schedule = (function() {
     //  Mark/unmarked sessions the user has bookmarked.
     if (savedSessions.length) {
       var sessions = IOWA.Elements.Template.scheduleData.sessions;
-      for (var i = 0, session; session = sessions[i]; ++i) {
+      for (var i = 0; i < sessions.length; ++i) {
+        var session = sessions[i];
         session.saved = savedSessions.indexOf(session.id) !== -1;
       }
     }
@@ -143,7 +144,8 @@ IOWA.Schedule = (function() {
   }
 
   function getSessionById(sessionId) {
-    for (var i = 0, session; session = scheduleData_.sessions[i]; ++i) {
+    for (var i = 0; i < scheduleData_.session.length; ++i) {
+      var session = sessions[i];
       if (session.id === sessionId) {
         return session;
       }
