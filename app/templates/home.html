@@ -17,7 +17,8 @@
 
 {% define "content" %}
 
- <!--  <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
+<!--
+  <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video" tabindex="{{fullscreenVideoActive ? 0 : -1}}"></paper-icon-button>
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
   </core-toolbar>
@@ -114,9 +115,7 @@
           </a>
         </div>
 
-        <!-- <a href="//www.google.com/?#q=%23io15" target="_blank" data-track-link="about-hashtag-search"> -->
-          <div class="io__hash" aria-label="I/O hash tag"></div>
-        <!-- </a> -->
+        <div class="io__hash" aria-label="I/O hash tag"></div>
 
         <template if="{{socialPosts.length >= 3}}">
           <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
@@ -141,7 +140,9 @@
                       autohide="1" controls="2" modestbranding="1" showinfo="0"
                       iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
     </div>
-  </template> -->
+  </template>
+
+-->
 
   <script>
   (function() {
@@ -194,26 +195,10 @@
         IOWA.Elements.Template.webglSupported = true;
       };
 
-      function showCountdownTimer() {
-        var countdownEl = document.querySelector('countdown-timer');
-        if (countdownEl) {
-          countdownEl.show();
-        }
-        // I/O live countdown.
-        var live = document.querySelector('io-live');
-        if (live) {
-          live.showCountdown = true;
-        }
-      }
-
       page.unload = function() {
         if (updateSocialPostsTimeout) {
           window.clearTimeout(updateSocialPostsTimeout);
           updateSocialPostsTimeout = null;
-        }
-        var live = document.querySelector('io-live');
-        if (live) {
-          live.showCountdown = false;
         }
       };
 

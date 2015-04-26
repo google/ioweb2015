@@ -367,7 +367,7 @@ limitations under the License.
         </a>
       </header>
 
-      <div id="iolive" hidden?="{{selectedPage !== 'home'}}" fit>
+      <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
         <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}" fit>
           <h2>I/O is starting soon. #io15</h2>
         </io-live>
