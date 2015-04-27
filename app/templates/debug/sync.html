@@ -1,0 +1,98 @@
+<!--
+Copyright 2015 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Debug sync</title>
+  <style>
+    .ok { color: #1B5E20; }
+    .err { color: #B71C1C; }
+  </style>
+</head>
+<body>
+  <h1>Debug sync</h1>
+  <p>
+    Synchronze locally stored schedule data with remote.
+  </p>
+  <p>
+    Environment: <strong>{{.Env}}</strong><br>
+    Manifest: <a href="{{.Manifest}}" target="_blank">{{.Manifest}}</a>
+  </p>
+  <p>
+    <label><input type="checkbox" id="force"> force sync</label><br>
+    aka 'first sync', clears EventData entities and never sends push notifications.
+  </p>
+  <p><button id="sync">synchronize</button></p>
+  <div id="result"></div>
+
+  <script>
+    var syncBtn = document.querySelector('#sync');
+    var force = document.querySelector('#force');
+    var result = document.querySelector('#result');
+
+    syncBtn.addEventListener('click', function sendChanges() {
+      syncBtn.disabled = true;
+      result.textContent = '';
+
+      var p;
+      if (force.checked) {
+        p = clearEventData().then(doSync);
+      } else {
+        p = doSync();
+      }
+
+      p.then(function() {
+        result.textContent = 'ok. check the logs.';
+        result.className = 'ok';
+        syncBtn.disabled = false;
+      }).catch(function(err) {
+        console.log(err);
+        result.textContent = err || 'error. check the logs.';
+        result.className = 'err';
+        syncBtn.disabled = false;
+      });
+    });
+
+    function doSync(callback) {
+      return fetch({{.Prefix}} + '/sync/gcs', {
+        method: 'POST',
+        headers: {'X-Goog-Channel-Token': {{.SyncToken}} || 'any'},
+        credentials: 'include'
+      }).then(function(res) {
+        if (res.status == 200) {
+          return;
+        }
+        console.error(res);
+        throw res.text() || res.statusText;
+      });
+    }
+
+    function clearEventData() {
+      return fetch(location.pathname, {
+        method: 'DELETE',
+        credentials: 'include'
+      }).then(function(res) {
+        if (res.status == 200) {
+          return;
+        }
+        console.error(res);
+        throw 'Error: ' + res.status + ' ' + res.statusText;
+      });
+    }
+  </script>
+</body>
+</html>
+

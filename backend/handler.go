@@ -52,6 +52,7 @@ func registerHandlers() {
 	if !isProd() {
 		handle("/debug/srvget", debugServiceGetURL)
 		handle("/debug/push", debugPush)
+		handle("/debug/sync", debugSync)
 	}
 	// setup root redirect if we're prefixed
 	if config.Prefix != "/" {
@@ -517,8 +518,8 @@ func syncEventData(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 
-	if _, err := cache.inc(c, syncGCSCacheKey, -1000, 0); err != nil {
-		errorf(c, err.Error())
+	if _, cerr := cache.inc(c, syncGCSCacheKey, -1000, 0); cerr != nil {
+		errorf(c, cerr.Error())
 	}
 
 	if err != nil {
@@ -881,6 +882,40 @@ func debugPush(w http.ResponseWriter, r *http.Request) {
 
 	if err := runInTransaction(c, fn); err != nil {
 		writeJSONError(c, w, http.StatusInternalServerError, err)
+	}
+}
+
+// debugSync updates locally stored EventData with staging or prod data.
+// Should not be available on prod.
+func debugSync(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+
+	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "text/html;charset=utf-8")
+		t, err := template.ParseFiles(filepath.Join(config.Dir, templatesDir, "debug", "sync.html"))
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+		data := struct {
+			Env       string
+			Prefix    string
+			Manifest  string
+			SyncToken string
+		}{
+			config.Env,
+			config.Prefix,
+			config.Schedule.ManifestURL,
+			config.SyncToken,
+		}
+		if err := t.Execute(w, &data); err != nil {
+			errorf(c, err.Error())
+		}
+		return
+	}
+
+	if err := clearEventData(c); err != nil {
+		writeError(w, err)
 	}
 }
 
