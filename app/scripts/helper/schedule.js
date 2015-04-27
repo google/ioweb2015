@@ -178,12 +178,12 @@ IOWA.Schedule = (function() {
       }).then(function() {
         if (replayPromises.length) {
           return Promise.all(replayPromises).then(function() {
-            IOWA.Elements.Toast.showMessage('My Schedule was updated with queued changes.');
+            IOWA.Elements.Toast.showMessage('My Schedule was updated with offline changes.');
           });
         }
       });
     }).catch(function() {
-      IOWA.Elements.Toast.showMessage('Queued changes could not be applied to My Schedule.');
+      IOWA.Elements.Toast.showMessage('Offline changes could not be applied to My Schedule.');
     });
   }
 
