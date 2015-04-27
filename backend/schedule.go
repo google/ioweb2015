@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	liveStreamedText = "Live Streamed"
+	liveStreamedText = "Live streamed"
 	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
 )
 
@@ -43,6 +43,9 @@ type eventSession struct {
 	Room      string    `json:"room"`
 	Photo     string    `json:"photoUrl,omitempty"`
 	YouTube   string    `json:"youtubeUrl,omitempty"`
+	Related   []*struct {
+		Id string `json:"id"`
+	} `json:"relatedContent,omitempty"`
 
 	Day     int             `json:"day"`
 	Block   string          `json:"block"`
@@ -180,6 +183,10 @@ func fetchEventData(c context.Context, urlStr string, lastSync time.Time) (*even
 					s.Filters[tag.Name] = true
 				}
 			}
+			for _, r := range s.Related {
+				s.Filters[r.Id] = true
+			}
+			s.Related = nil
 			data.Sessions[id] = s
 		}
 	}
