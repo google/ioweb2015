@@ -154,10 +154,8 @@
       // notifications in the current browser.
       if (window.Notification.permissions !== 'denied') {
         IOWA.Notifications.isNotifyEnabledPromise().then(function(isGlobalNotificationsEnabled) {
-          console.log('isGlobalNotificationsEnabled', isGlobalNotificationsEnabled);
           if (isGlobalNotificationsEnabled) {
             IOWA.Notifications.isExistingSubscriptionPromise().then(function(isLocalSubscription) {
-              console.log('isLocalSubscription', isLocalSubscription);
               if (!isLocalSubscription) {
                 IOWA.Notifications.subscribePromise();
               }
