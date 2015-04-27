@@ -144,8 +144,8 @@ IOWA.Schedule = (function() {
   }
 
   function getSessionById(sessionId) {
-    for (var i = 0; i < scheduleData_.session.length; ++i) {
-      var session = sessions[i];
+    for (var i = 0; i < scheduleData_.sessions.length; ++i) {
+      var session = scheduleData_.sessions[i];
       if (session.id === sessionId) {
         return session;
       }
