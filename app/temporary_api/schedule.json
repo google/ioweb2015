@@ -19,7 +19,7 @@
       "start": "9:30 AM",
       "end": "11:30 AM",
       "filters": {
-        "Live Streamed": true
+        "Live streamed": true
       }
     },
     {
@@ -49,7 +49,7 @@
       "filters": {
         "Accessibility": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -82,7 +82,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -112,7 +112,7 @@
       "end": "1:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true,
@@ -144,7 +144,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true
       }
@@ -173,7 +173,7 @@
       "end": "1:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -203,7 +203,7 @@
       "filters": {
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -232,7 +232,7 @@
       "end": "1:00 PM",
       "filters": {
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -261,7 +261,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -288,10 +288,17 @@
       "start": "12:30 PM",
       "end": "1:00 PM",
       "filters": {
+        "67fa8734-8be4-e411-b87f-00155d5066d7": true,
+        "7a6f806c-8ae4-e411-b87f-00155d5066d7": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
-        "Tools & APIs": true
+        "Tools & APIs": true,
+        "a18c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "b58c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "b658a197-b6d4-e411-b87f-00155d5066d7": true,
+        "f37a6899-89e4-e411-b87f-00155d5066d7": true,
+        "fa7d85ce-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -318,12 +325,18 @@
       "start": "1:00 PM",
       "end": "1:30 PM",
       "filters": {
+        "1a3da45a-83e7-e411-b87f-00155d5066d7": true,
+        "7a6f806c-8ae4-e411-b87f-00155d5066d7": true,
         "Accessibility": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
-        "Tools & APIs": true
+        "Tools & APIs": true,
+        "ac58a197-b6d4-e411-b87f-00155d5066d7": true,
+        "b658a197-b6d4-e411-b87f-00155d5066d7": true,
+        "c058a197-b6d4-e411-b87f-00155d5066d7": true,
+        "f37a6899-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -357,7 +370,7 @@
         "Engage & Earn": true,
         "Games": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -384,7 +397,7 @@
       "end": "1:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -416,7 +429,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -447,7 +460,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -477,7 +490,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -509,7 +522,7 @@
         "Accessibility": true,
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -538,7 +551,7 @@
       "end": "1:30 PM",
       "filters": {
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -569,7 +582,7 @@
       "end": "2:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -601,7 +614,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -624,7 +637,7 @@
       "end": "5:00 PM",
       "filters": {
         "Code Labs": true,
-        "Live Streamed": false
+        "Live streamed": false
       }
     },
     {
@@ -654,7 +667,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -687,7 +700,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Wearables": true
       }
@@ -717,7 +730,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -745,7 +758,7 @@
       "end": "2:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -775,7 +788,7 @@
       "filters": {
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -806,7 +819,7 @@
         "Android": true,
         "Auto": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -834,7 +847,7 @@
       "end": "2:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -863,7 +876,7 @@
       "end": "2:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -894,7 +907,7 @@
       "filters": {
         "Android": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -924,7 +937,7 @@
       "end": "2:00 PM",
       "filters": {
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "Tools & APIs": true
@@ -955,7 +968,7 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -988,7 +1001,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -1020,7 +1033,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1048,7 +1061,7 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1082,7 +1095,7 @@
         "Auto": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1114,7 +1127,7 @@
         "Audience Growth": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true
       }
@@ -1144,7 +1157,7 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -1172,7 +1185,7 @@
       "start": "2:00 PM",
       "end": "2:30 PM",
       "filters": {
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "What's Next": true
@@ -1205,7 +1218,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "Wearables": true
@@ -1238,7 +1251,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1271,7 +1284,7 @@
         "Audience Growth": true,
         "Earn": true,
         "Engage & Earn": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -1304,7 +1317,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -1336,7 +1349,7 @@
         "Audience Growth": true,
         "Earn": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1369,7 +1382,7 @@
         "Android": true,
         "Audience Growth": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1401,7 +1414,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -1431,7 +1444,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1462,7 +1475,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Games": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -1492,7 +1505,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "Wearables": true
@@ -1521,10 +1534,15 @@
       "start": "2:30 PM",
       "end": "3:00 PM",
       "filters": {
+        "7a6f806c-8ae4-e411-b87f-00155d5066d7": true,
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": false,
-        "Sandbox Talks": true
+        "Live streamed": false,
+        "Sandbox Talks": true,
+        "a18c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "c058a197-b6d4-e411-b87f-00155d5066d7": true,
+        "f37a6899-89e4-e411-b87f-00155d5066d7": true,
+        "fa7d85ce-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -1551,7 +1569,7 @@
       "end": "3:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -1586,7 +1604,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "Wearables": true
@@ -1618,7 +1636,7 @@
       "end": "3:00 PM",
       "filters": {
         "Android": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true,
@@ -1648,7 +1666,7 @@
       "end": "3:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1680,7 +1698,7 @@
         "Audience Growth": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -1709,7 +1727,7 @@
       "end": "3:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -1742,7 +1760,7 @@
         "Android": true,
         "Audience Growth": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1776,7 +1794,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1807,7 +1825,7 @@
       "filters": {
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1834,9 +1852,12 @@
       "end": "3:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
-        "Tools & APIs": true
+        "Tools & APIs": true,
+        "a18c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "ac58a197-b6d4-e411-b87f-00155d5066d7": true,
+        "fa7d85ce-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -1864,7 +1885,7 @@
       "filters": {
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1894,7 +1915,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -1925,7 +1946,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "Wearables": true
@@ -1955,7 +1976,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -1991,7 +2012,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Location": true,
         "Search": true,
         "Sessions": true,
@@ -2025,7 +2046,7 @@
       "filters": {
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -2057,7 +2078,7 @@
         "Android": true,
         "Auto": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2086,7 +2107,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2117,7 +2138,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "Tools & APIs": true
@@ -2149,7 +2170,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2179,7 +2200,7 @@
       "filters": {
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -2209,7 +2230,7 @@
       "filters": {
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2239,7 +2260,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2269,7 +2290,7 @@
       "filters": {
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2299,7 +2320,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -2331,7 +2352,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "Tools & APIs": true
@@ -2359,7 +2380,7 @@
       "end": "4:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2389,7 +2410,7 @@
       "filters": {
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2419,7 +2440,7 @@
       "end": "4:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -2454,7 +2475,7 @@
         "Android": true,
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true
       }
     },
@@ -2491,7 +2512,7 @@
         "Earn": true,
         "Games": true,
         "Google Play": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true
       }
     },
@@ -2536,7 +2557,7 @@
         "Develop & Design": true,
         "Games": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Office Hours": true,
         "Search": true,
@@ -2570,7 +2591,7 @@
       "filters": {
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true
       }
     },
@@ -2599,7 +2620,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2631,7 +2652,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2661,7 +2682,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2684,7 +2705,7 @@
       "start": "6:00 PM",
       "end": "10:00 PM",
       "filters": {
-        "Live Streamed": false,
+        "Live streamed": false,
         "Misc": true
       }
     },
@@ -2716,7 +2737,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true,
@@ -2754,7 +2775,7 @@
         "Chrome / Web": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2789,7 +2810,7 @@
         "Audience Growth": true,
         "Earn": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2820,7 +2841,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2851,7 +2872,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2882,7 +2903,7 @@
       "filters": {
         "Develop & Design": true,
         "Games": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -2913,7 +2934,7 @@
       "end": "9:30 AM",
       "filters": {
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "Tools & APIs": true
@@ -2945,7 +2966,7 @@
       "filters": {
         "Earn": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -2974,7 +2995,7 @@
       "end": "9:30 AM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3001,7 +3022,7 @@
       "end": "9:30 AM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3032,7 +3053,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3066,7 +3087,7 @@
         "Audience Growth": true,
         "Earn": true,
         "Engage & Earn": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -3102,7 +3123,7 @@
         "Chrome / Web": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -3137,7 +3158,7 @@
       "filters": {
         "Audience Growth": true,
         "Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true,
         "What's Next": true
@@ -3161,7 +3182,7 @@
       "end": "5:00 PM",
       "filters": {
         "Code Labs": true,
-        "Live Streamed": false
+        "Live streamed": false
       }
     },
     {
@@ -3190,7 +3211,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3224,7 +3245,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3254,7 +3275,7 @@
       "filters": {
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -3284,7 +3305,7 @@
       "filters": {
         "Audience Growth": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3316,7 +3337,7 @@
       "filters": {
         "Develop & Design": true,
         "Games": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -3346,7 +3367,7 @@
       "end": "10:00 AM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3377,7 +3398,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3409,7 +3430,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "TV & Living Room": true
@@ -3440,7 +3461,7 @@
       "filters": {
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -3470,7 +3491,7 @@
       "filters": {
         "Android": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3502,7 +3523,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3534,7 +3555,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3565,7 +3586,7 @@
       "filters": {
         "Accessibility": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3595,7 +3616,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3628,7 +3649,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -3657,7 +3678,7 @@
       "end": "10:30 AM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -3688,7 +3709,7 @@
       "filters": {
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3718,7 +3739,7 @@
       "end": "10:30 AM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -3747,7 +3768,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -3779,7 +3800,7 @@
       "end": "11:00 AM",
       "filters": {
         "Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true,
         "What's Next": true
@@ -3809,7 +3830,7 @@
       "end": "11:00 AM",
       "filters": {
         "Audience Growth": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "What's Next": true
       }
@@ -3837,7 +3858,7 @@
       "end": "11:00 AM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3869,7 +3890,7 @@
         "Accessibility": true,
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3899,7 +3920,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3927,10 +3948,13 @@
       "start": "10:30 AM",
       "end": "11:00 AM",
       "filters": {
+        "67fa8734-8be4-e411-b87f-00155d5066d7": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
-        "Tools & APIs": true
+        "Tools & APIs": true,
+        "c058a197-b6d4-e411-b87f-00155d5066d7": true,
+        "f37a6899-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -3959,7 +3983,7 @@
       "filters": {
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -3989,7 +4013,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -4024,7 +4048,7 @@
         "Engage & Earn": true,
         "Games": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4053,7 +4077,7 @@
       "end": "11:00 AM",
       "filters": {
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4085,7 +4109,7 @@
         "Accessibility": true,
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4116,7 +4140,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4148,7 +4172,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -4179,7 +4203,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Wearables": true
       }
@@ -4210,7 +4234,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4241,7 +4265,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "Tools & APIs": true
@@ -4269,7 +4293,7 @@
       "end": "11:30 AM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4299,7 +4323,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true
       }
@@ -4328,7 +4352,7 @@
       "end": "11:30 AM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4358,7 +4382,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4390,7 +4414,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -4420,7 +4444,7 @@
       "end": "12:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -4451,7 +4475,7 @@
       "filters": {
         "Audience Growth": true,
         "Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "What's Next": true
       }
@@ -4481,7 +4505,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4512,7 +4536,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -4541,7 +4565,7 @@
       "end": "12:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4573,7 +4597,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -4608,7 +4632,7 @@
         "Android": true,
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "Tools & APIs": true
@@ -4639,7 +4663,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4669,7 +4693,7 @@
       "end": "12:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -4702,7 +4726,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "Wearables": true
@@ -4733,8 +4757,13 @@
       "filters": {
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": false,
-        "Sandbox Talks": true
+        "Live streamed": false,
+        "Sandbox Talks": true,
+        "a18c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "b658a197-b6d4-e411-b87f-00155d5066d7": true,
+        "c058a197-b6d4-e411-b87f-00155d5066d7": true,
+        "f37a6899-89e4-e411-b87f-00155d5066d7": true,
+        "fa7d85ce-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -4766,7 +4795,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "Wearables": true
@@ -4799,7 +4828,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -4831,7 +4860,7 @@
         "Audience Growth": true,
         "Earn": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4858,7 +4887,7 @@
       "start": "12:00 PM",
       "end": "12:30 PM",
       "filters": {
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "What's Next": true
@@ -4889,7 +4918,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -4920,7 +4949,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "Wearables": true
@@ -4949,7 +4978,7 @@
       "end": "12:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -4981,7 +5010,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true,
         "Wearables": true
@@ -5010,10 +5039,17 @@
       "start": "12:00 PM",
       "end": "12:30 PM",
       "filters": {
+        "67fa8734-8be4-e411-b87f-00155d5066d7": true,
+        "7a6f806c-8ae4-e411-b87f-00155d5066d7": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
-        "Tools & APIs": true
+        "Tools & APIs": true,
+        "a18c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "b58c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "b658a197-b6d4-e411-b87f-00155d5066d7": true,
+        "c058a197-b6d4-e411-b87f-00155d5066d7": true,
+        "fa7d85ce-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -5043,7 +5079,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5071,7 +5107,7 @@
       "end": "1:00 PM",
       "filters": {
         "Audience Growth": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "What's Next": true
       }
@@ -5100,12 +5136,18 @@
       "start": "12:30 PM",
       "end": "1:00 PM",
       "filters": {
+        "1a3da45a-83e7-e411-b87f-00155d5066d7": true,
+        "7a6f806c-8ae4-e411-b87f-00155d5066d7": true,
         "Accessibility": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
-        "Tools & APIs": true
+        "Tools & APIs": true,
+        "ac58a197-b6d4-e411-b87f-00155d5066d7": true,
+        "b658a197-b6d4-e411-b87f-00155d5066d7": true,
+        "c058a197-b6d4-e411-b87f-00155d5066d7": true,
+        "f37a6899-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -5135,7 +5177,7 @@
         "Android": true,
         "Auto": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5169,7 +5211,7 @@
         "Auto": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5201,7 +5243,7 @@
         "Audience Growth": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -5229,7 +5271,7 @@
       "end": "1:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -5257,7 +5299,7 @@
       "end": "1:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5288,7 +5330,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5318,7 +5360,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5349,7 +5391,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Games": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -5379,7 +5421,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5411,7 +5453,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5444,7 +5486,7 @@
         "Android": true,
         "Audience Growth": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5474,7 +5516,7 @@
       "end": "1:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -5505,7 +5547,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5534,7 +5576,7 @@
       "end": "1:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -5566,7 +5608,7 @@
       "filters": {
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5598,7 +5640,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5629,7 +5671,7 @@
       "end": "1:30 PM",
       "filters": {
         "Android": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true,
@@ -5663,7 +5705,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true
       }
     },
@@ -5694,7 +5736,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "TV & Living Room": true
       }
@@ -5727,7 +5769,7 @@
       "filters": {
         "Accessibility": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true
       }
     },
@@ -5762,7 +5804,7 @@
         "Chrome / Web": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5797,7 +5839,7 @@
         "Audience Growth": true,
         "Earn": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5829,7 +5871,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "TV & Living Room": true
@@ -5860,7 +5902,7 @@
       "filters": {
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5892,7 +5934,7 @@
         "Android": true,
         "Audience Growth": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5923,7 +5965,7 @@
       "filters": {
         "Earn": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5952,7 +5994,7 @@
       "end": "2:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -5980,7 +6022,7 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6010,7 +6052,7 @@
       "filters": {
         "Audience Growth": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6038,7 +6080,7 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6072,7 +6114,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6101,7 +6143,7 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6132,7 +6174,7 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true,
@@ -6163,9 +6205,12 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
-        "Tools & APIs": true
+        "Tools & APIs": true,
+        "b58c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "c058a197-b6d4-e411-b87f-00155d5066d7": true,
+        "f37a6899-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -6197,7 +6242,7 @@
         "Audience Growth": true,
         "Engage & Earn": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6227,7 +6272,7 @@
       "filters": {
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6257,7 +6302,7 @@
       "end": "2:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
@@ -6291,7 +6336,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Wearables": true
       }
@@ -6324,7 +6369,7 @@
         "Accessibility": true,
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -6360,7 +6405,7 @@
         "Engage & Earn": true,
         "Games": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true
       }
     },
@@ -6390,7 +6435,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6422,7 +6467,7 @@
         "Android": true,
         "Auto": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6454,7 +6499,7 @@
         "Audience Growth": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true
       }
@@ -6488,7 +6533,7 @@
         "Android": true,
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "Tools & APIs": true
@@ -6519,7 +6564,7 @@
       "filters": {
         "Chrome / Web": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6546,10 +6591,13 @@
       "start": "2:30 PM",
       "end": "3:00 PM",
       "filters": {
+        "1a3da45a-83e7-e411-b87f-00155d5066d7": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
-        "Tools & APIs": true
+        "Tools & APIs": true,
+        "a18c9f91-b6d4-e411-b87f-00155d5066d7": true,
+        "fa7d85ce-89e4-e411-b87f-00155d5066d7": true
       }
     },
     {
@@ -6577,7 +6625,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6605,7 +6653,7 @@
       "end": "3:00 PM",
       "filters": {
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6638,7 +6686,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Sandbox Talks": true,
         "Tools & APIs": true,
@@ -6670,7 +6718,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6701,7 +6749,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6735,7 +6783,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6766,7 +6814,7 @@
       "filters": {
         "Develop & Design": true,
         "Games": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -6801,7 +6849,7 @@
         "Android": true,
         "Design": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6830,7 +6878,7 @@
       "end": "3:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6859,7 +6907,7 @@
       "end": "3:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -6890,7 +6938,7 @@
       "filters": {
         "Audience Growth": true,
         "Engage & Earn": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Search": true,
         "Tools & APIs": true
@@ -6920,7 +6968,7 @@
       "end": "4:00 PM",
       "filters": {
         "Audience Growth": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "What's Next": true
       }
@@ -6949,7 +6997,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "Tools & APIs": true
       }
@@ -6979,7 +7027,7 @@
       "end": "4:00 PM",
       "filters": {
         "Audience Growth": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "What's Next": true
       }
@@ -7007,7 +7055,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -7035,7 +7083,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -7065,7 +7113,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -7093,7 +7141,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -7122,7 +7170,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -7158,7 +7206,7 @@
         "Engage & Earn": true,
         "Games": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -7190,7 +7238,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -7218,7 +7266,7 @@
       "end": "4:00 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -7250,7 +7298,7 @@
       "filters": {
         "Android": true,
         "Develop & Design": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sandbox Talks": true,
         "Tools & APIs": true
       }
@@ -7282,7 +7330,7 @@
       "filters": {
         "Develop & Design": true,
         "Games": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -7313,7 +7361,7 @@
       "end": "4:30 PM",
       "filters": {
         "Develop & Design": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Sandbox Talks": true,
         "TV & Living Room": true,
         "Tools & APIs": true
@@ -7359,7 +7407,7 @@
         "Develop & Design": true,
         "Games": true,
         "Google Play": true,
-        "Live Streamed": false,
+        "Live streamed": false,
         "Location": true,
         "Office Hours": true,
         "Search": true,
@@ -7393,7 +7441,7 @@
       "end": "5:00 PM",
       "filters": {
         "Audience Growth": true,
-        "Live Streamed": true,
+        "Live streamed": true,
         "Sessions": true,
         "What's Next": true
       }
