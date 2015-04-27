@@ -102,8 +102,11 @@
         </template>
 
         <div class="action__links" layout vertical>
-          <template if="{{extendedMapActive && didExtendedSearch && !offsiteMarkerResults.length}}">
+          <template if="{{extendedMapActive && didExtendedSearch && !politicalAreaSearch && !offsiteMarkerResults.length}}">
             <h4>There are no events near that location. Try another search or check back later to find new events.</h4>
+          </template>
+          <template if="{{extendedMapActive && didExtendedSearch && politicalAreaSearch}}">
+            <h4>These are the closest results to your search.</h4>
           </template>
 
           <!-- <paper-button data-track-link="offsite-notify-me">
@@ -114,7 +117,7 @@
           </paper-button>
           <div class="search__map" layout horizontal center self-center relative hidden?="{{!webglSupported}}">
             <core-icon icon="io:search"></core-icon>
-            <paper-input id="autocomplete" label="Search for a location" on-keydown="{{onPlacesSearchKeydown}}"></paper-input>
+            <paper-input id="autocomplete" label="Search for a city" on-keydown="{{onPlacesSearchKeydown}}"></paper-input>
           </div>
         </div>
         <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}"
@@ -282,6 +285,7 @@
         IOWA.Elements.Template.offsiteGlobeVisible = false;
         IOWA.Elements.Template.fullscreenVideoActive = false;
         IOWA.Elements.Template.extendedMapActive = false;
+        IOWA.Elements.Template.politicalAreaSearch = false;
         IOWA.Elements.Template.didExtendedSearch = false;
         IOWA.Elements.Template.webglSupported = true;
         IOWA.Elements.Template.offsiteMarkerResults= [];
@@ -304,7 +308,7 @@
 
       page.onPageTransitionDone = function() {
         this.scrollToJoin();
-      }
+      };
 
       IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
         runVideoSectionAnimation();
@@ -391,32 +395,41 @@
             return;
           }
 
+          IOWA.Elements.Template.didExtendedSearch = true;
           var location = place.geometry.location;
 
-          // Find all offsite events within a search radius and put in card.
-          var nearestMarkers = globe.getMarkersWithinDistance(location.lat(),
-              location.lng(), this.offsiteSearchRadius);
-          this.offsiteMarkerResults = [];
-          for (var i = 0; i < nearestMarkers.length; i++) {
-            this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i]]);
+          // If place searched for is a higher-level entity (like a country or
+          // state) don't try to find markers for it.
+          if (place.types.indexOf('continent') !== -1 ||
+              place.types.indexOf('country') !== -1 ||
+              place.types.indexOf('administrative_area_level_1') !== -1) {
+            IOWA.Elements.Template.politicalAreaSearch = true;
+          } else {
+            IOWA.Elements.Template.politicalAreaSearch = false;
+
+            // Find all offsite events within a search radius and put in card.
+            var nearestMarkers = globe.getMarkersWithinDistance(location.lat(),
+                location.lng(), this.offsiteSearchRadius);
+            this.offsiteMarkerResults = [];
+            for (var i = 0; i < nearestMarkers.length; i++) {
+              this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i]]);
+            }
+
+            // Wait a rAF so marker cards are stamped.
+            this.async(function() {
+              // Only add .show "closest match" message to the first card.
+              var closest = IOWA.Elements.Main.querySelector('.marker-card--closest');
+              if (closest) {
+                closest.classList.add('show');
+              }
+              IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
+            });
           }
 
           globe.location = {
             lat: location.lat(),
             lng: location.lng()
           };
-
-          IOWA.Elements.Template.didExtendedSearch = true;
-
-          // Wait a rAF so marker cards are stamped.
-          this.async(function() {
-            // Only add .show "closest match" message to the first card.
-            var closest = IOWA.Elements.Main.querySelector('.marker-card--closest');
-            if (closest) {
-              closest.classList.add('show');
-            }
-            IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
-          });
 
           IOWA.Analytics.trackEvent('globe', 'place select', place.name);
         }.bind(this));
