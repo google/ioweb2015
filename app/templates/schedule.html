@@ -57,7 +57,7 @@
     <paper-progress indeterminate hidden?="{{!currentUser || (savedSessions && !scheduleFetchingUserData)}}"></paper-progress>
   </div>
   <div class="session__info__section">
-    <h2 class="session__title">{{selectedSession.title}}</h2>
+    <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
     <h5 class="session__time">May {{selectedSession.day}} / {{selectedSession.start}}<span hidden?="{{selectedSession.id === '__keynote__'}}"> - {{selectedSession.end}}</span> / {{selectedSession.room}}</h5>
     <h5 class="session__categories">{{selectedSession.tags | formatSessionTagsFilter}}</h5>
     <div class="session__desc">{{selectedSession.description}}</div>
@@ -446,6 +446,7 @@
 
       IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail, sender) {
         // sender.updateTargetDimensions();
+        sender.querySelector('.session__title').focus();
 
         // Update URL with deep link if we're not from a deep link page load.
         if (pageIsDeepLinked_) {
