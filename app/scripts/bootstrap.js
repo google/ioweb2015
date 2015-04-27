@@ -142,11 +142,14 @@
     var template = IOWA.Elements.Template;
 
     if (e.detail.signedIn) {
-      // User is logged in. Only fetch their schedule if the worker has
-      // responded with the master schedule.
-      if (template.scheduleData) {
-        fetchUserSchedule();
-      }
+      // Check to see if there are any failed session modification requests, and if so, replay them.
+      IOWA.Schedule.replayQueuedRequests().then(function() {
+        // Only fetch their schedule if the worker has responded with the master schedule.
+        // Wait until after any replay requests have completed first.
+        if (template.scheduleData) {
+          fetchUserSchedule();
+        }
+      });
     } else {
       template.savedSessions = [];
       IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);
