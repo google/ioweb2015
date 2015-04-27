@@ -80,7 +80,10 @@ IOWA.Schedule = (function() {
         .then(clearCachedUserSchedule)
         .catch(function(error) {
           IOWA.Elements.Template.scheduleFetchingUserData = false;
-          if ('serviceWorker' in navigator) {
+          // error will be an XMLHttpRequestProgressEvent if the xhrPromise() was rejected due to
+          // a network error. Otherwise, error will be a Error object.
+          if ('serviceWorker' in navigator && XMLHttpRequestProgressEvent &&
+              error instanceof XMLHttpRequestProgressEvent) {
             IOWA.Elements.Toast.showMessage('Unable to modify My Schedule. The change will be retried on your next visit.');
           } else {
             IOWA.Elements.Toast.showMessage('Unable to modify My Schedule.');
