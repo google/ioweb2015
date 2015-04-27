@@ -4,6 +4,7 @@ package main
 
 import (
 	"errors"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -18,6 +19,15 @@ func notifySubscribersAsync(c context.Context, d *dataChanges) error {
 // TODO: add ioext support
 func pingUserAsync(c context.Context, uid string, skeys []string) error {
 	return errors.New("not implemented")
+}
+
+// pingDevicesAsync schedules len(endpoints) tasks of /ping-device.
+// If scheduling fails for some endpoints, those will be in returned values
+// along with a non-nil error.
+// d specifies the duration the tasker must wait before executing the task.
+// TODO: regs are going away with Chrome 44.
+func pingDevicesAsync(c context.Context, uid string, regs, endpoints []string, d time.Duration) ([]string, []string, error) {
+	return nil, nil, errors.New("not implemented")
 }
 
 // pingExtPartyAsync notifies extra parties at config.ExtPingURL about data updates.

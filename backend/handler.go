@@ -46,6 +46,7 @@ func registerHandlers() {
 	handle("/sync/gcs", syncEventData)
 	handle("/task/notify-subscribers", handleNotifySubscribers)
 	handle("/task/ping-user", handlePingUser)
+	handle("/task/ping-device", handlePingDevice)
 	handle("/task/ping-ext", handlePingExt)
 	// debug handlers; not available in prod
 	if !isProd() {
@@ -406,57 +407,57 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get current settings
-	data, err := getUserPushInfo(c, contextUser(c))
-	if err != nil {
-		writeJSONError(c, w, http.StatusInternalServerError, err)
-		return
-	}
-
-	// patch settings according to the payload
-	if v, ok := body["notify"].(bool); ok {
-		data.Enabled = v
-	}
-	if sub, ok := body["subscriber"].(string); ok {
-		url, ok := body["endpoint"].(string)
-		if !ok || url == "" {
-			url = config.Google.GCM.Endpoint
+	var data *userPush
+	terr := runInTransaction(c, func(c context.Context) error {
+		// get current settings
+		data, err = getUserPushInfo(c, contextUser(c))
+		if err != nil {
+			return err
 		}
-		var exists bool
-		for _, s := range data.Subscribers {
-			if s == sub {
-				exists = true
-				break
+
+		// patch settings according to the payload
+		if v, ok := body["notify"].(bool); ok {
+			data.Enabled = v
+		}
+		if sub, ok := body["subscriber"].(string); ok {
+			url, ok := body["endpoint"].(string)
+			if !ok || url == "" {
+				url = config.Google.GCM.Endpoint
+			}
+			var exists bool
+			for _, s := range data.Subscribers {
+				if s == sub {
+					exists = true
+					break
+				}
+			}
+			if !exists {
+				data.Subscribers = append(data.Subscribers, sub)
+				data.Endpoints = append(data.Endpoints, url)
 			}
 		}
-		if !exists {
-			data.Subscribers = append(data.Subscribers, sub)
-			data.Endpoints = append(data.Endpoints, url)
+		if v, exists := body["ioext"]; exists {
+			if v == nil {
+				data.Ext.Enabled = false
+				data.Pext = nil
+			} else if v, ok := v.(map[string]interface{}); ok {
+				data.Ext.Enabled = true
+				data.Ext.Name, _ = v["name"].(string)
+				data.Ext.Lat, _ = v["lat"].(float64)
+				data.Ext.Lng, _ = v["lng"].(float64)
+				data.Pext = &data.Ext
+			}
 		}
-	}
-	if v, exists := body["ioext"]; exists {
-		if v == nil {
-			data.Ext.Enabled = false
-			data.Pext = nil
-		} else if v, ok := v.(map[string]interface{}); ok {
-			data.Ext.Enabled = true
-			data.Ext.Name, _ = v["name"].(string)
-			data.Ext.Lat, _ = v["lat"].(float64)
-			data.Ext.Lng, _ = v["lng"].(float64)
-			data.Pext = &data.Ext
-		}
-	}
 
-	// store user configuration
-	// TODO: run in transaction with the previous getUserPushInfo()
-	if err := storeUserPushInfo(c, data); err != nil {
-		writeJSONError(c, w, errStatus(err), err)
+		// store user configuration
+		return storeUserPushInfo(c, data)
+	})
+
+	if terr != nil {
+		writeJSONError(c, w, errStatus(terr), err)
 		return
 	}
-
-	if err := json.NewEncoder(w).Encode(data); err != nil {
-		errorf(c, "patchUserNotifySettings: %v", err)
-	}
+	json.NewEncoder(w).Encode(data)
 }
 
 // syncEventData updates event data stored in a persistent DB,
@@ -644,7 +645,7 @@ func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handlePingUser sends a GCM "ping" to user devices based on certain conditions.
+// handlePingUser schedules a GCM "ping" to user devices based on certain conditions.
 func handlePingUser(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("x-appengine-taskname") == "" {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -653,21 +654,30 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 
 	c := newContext(r)
 	user := r.FormValue("uid")
-	sessions := strings.Split(r.FormValue("sessions"), " ")
+	pi, err := getUserPushInfo(c, user)
+	if err != nil {
+		errorf(c, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	if !pi.Enabled {
+		logf(c, "notifications not enabled")
+		return
+	}
+
 	// TODO: add ioext conditions
+	sessions := strings.Split(r.FormValue("sessions"), " ")
+	sort.Strings(sessions)
 	if user == "" || len(sessions) == 0 {
-		errorf(c, "handleMaybePingUser: invalid params user = %q; session = %v", user, sessions)
+		errorf(c, "invalid params user = %q; session = %v", user, sessions)
 		return
 	}
 
 	bookmarks, err := userSchedule(c, user)
 	if err != nil {
-		errorf(c, "handlePingUser: %v", err)
+		errorf(c, "%v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	sort.Strings(sessions)
-
 	var matched bool
 	for _, id := range bookmarks {
 		i := sort.SearchStrings(sessions, id)
@@ -680,9 +690,77 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = pingUser(c, user)
+	// retry scheduling of /task/ping-device n times in case of errors,
+	// pausing i seconds on each iteration where i ranges from 0 to n.
+	// currently this will total to about 15sec latency in the worst successful case.
+	nr := 5
+	regs, endpoints := pi.Subscribers, pi.Endpoints
+	for i := 0; i < nr+1; i++ {
+		regs, endpoints, err = pingDevicesAsync(c, user, regs, endpoints, 0)
+		if err == nil {
+			break
+		}
+		errorf(c, "couldn't schedule ping for %d of %d devices; retry = %d/%d",
+			len(regs), len(pi.Subscribers), i, nr)
+		time.Sleep(time.Duration(i) * time.Second)
+	}
+}
+
+// handlePingDevices handles a request to notify a single user device.
+func handlePingDevice(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("x-appengine-taskname") == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	c := newContext(r)
+	uid := r.FormValue("uid")
+	rid := r.FormValue("rid")
+	endpoint := r.FormValue("endpoint")
+	if uid == "" || rid == "" || endpoint == "" {
+		errorf(c, "invalid params: uid = %q; rid = %q; endpoint = %q", uid, rid, endpoint)
+		return
+	}
+
+	nreg, err := pingDevice(c, rid, endpoint)
+	if err == nil {
+		if nreg != "" {
+			terr := runInTransaction(c, func(c context.Context) error {
+				return updateSubscriber(c, uid, rid, nreg)
+			})
+			// no worries if this errors out, we'll do it next time
+			if terr != nil {
+				errorf(c, terr.Error())
+			}
+		}
+		return
+	}
+
+	errorf(c, "%v", err)
+	pe, ok := err.(*pushError)
+	if !ok {
+		// unrecoverable error
+		return
+	}
+
+	if pe.remove {
+		terr := runInTransaction(c, func(c context.Context) error {
+			return deleteSubscriber(c, uid, rid)
+		})
+		if terr != nil {
+			errorf(c, terr.Error())
+		}
+		// pe.remove also means no retry is necessary
+		return
+	}
+
+	if !pe.retry {
+		return
+	}
+	// schedule a new task according to Retry-After
+	_, _, err = pingDevicesAsync(c, uid, []string{rid}, []string{endpoint}, pe.after)
 	if err != nil {
-		errorf(c, "handlePingUser: %v", err)
+		// scheduling didn't work: retry the whole thing
+		errorf(c, err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
