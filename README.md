@@ -133,7 +133,7 @@ status code, content-type header and the content.
 
 Useful for browsing original CMS data on staging GCS bucket:
 
-https://io-webapp-staging.appspot.com/io2015/debug/srvget?url=https://storage.googleapis.com/io2015-data-dev.google.com.a.appspot.com/manifest_v1.json
+[go/iowastaging/debug/srvget?url=https://storage.googleapis.com/io2015-data-dev.google.com.a.appspot.com/manifest_v1.json](http://go/iowastaging/debug/srvget?url=https://storage.googleapis.com/io2015-data-dev.google.com.a.appspot.com/manifest_v1.json)
 
 
 ### List contents of Google Drive AppFolder.
@@ -149,5 +149,15 @@ http://HOST/io2015/debug/push
 
 Follow instructions on that page.
 
-On staging server this is https://io-webapp-staging.appspot.com/io2015/debug/push
+On staging server this is [go/iowastaging/debug/push](http://go/iowastaging/debug/push)
+
+
+### Re-sync local datastore with remote
+
+```
+http://HOST/io2015/debug/sync
+```
+
+* dev server: [localhost:3000/io2015/debug/sync](http://localhost:3000/io2015/debug/sync)
+* staging: [go/iowastaging/debug/sync](http://go/iowastaging/debug/sync)
 

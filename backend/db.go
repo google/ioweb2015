@@ -72,6 +72,11 @@ func storeEventData(c context.Context, d *eventData) error {
 	return errors.New("not implemented")
 }
 
+// clearEventData deletes all EventData entities.
+func clearEventData(c context.Context) error {
+	return errors.New("not implemented")
+}
+
 func getLatestEventData(c context.Context, etags []string) (*eventData, error) {
 	return nil, errors.New("not implemented")
 }

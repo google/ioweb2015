@@ -160,6 +160,18 @@ func storeEventData(c context.Context, d *eventData) error {
 	return err
 }
 
+// clearEventData deletes all EventData entities.
+func clearEventData(c context.Context) error {
+	q := datastore.NewQuery(kindEventData).
+		Ancestor(eventDataParent(c)).
+		KeysOnly()
+	keys, err := q.GetAll(c, nil)
+	if err != nil {
+		return fmt.Errorf("clearEventData: %v", err)
+	}
+	return datastore.DeleteMulti(c, keys)
+}
+
 // getLatestEventData fetches most recent version of eventData previously saved with storeEventData().
 //
 // etags adheres to rfc7232 semantics. If one of etags matches etag of the entity,
