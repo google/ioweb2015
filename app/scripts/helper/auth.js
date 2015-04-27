@@ -113,6 +113,9 @@ IOWA.Auth = IOWA.Auth || (function() {
       if (navigator.serviceWorker && navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage('clear-cached-user-data');
       }
+
+      // Delete any queued schedule modifications.
+      IOWA.Schedule.clearQueuedRequests();
     }
   });
 

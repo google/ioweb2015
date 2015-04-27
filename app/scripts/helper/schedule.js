@@ -187,6 +187,16 @@ IOWA.Schedule = (function() {
     });
   }
 
+  /**
+   * Deletes the IndexedDB database used to queue up failed requests.
+   * Useful when, e.g., the user has logged out.
+   *
+   * @return {Promise} Resolves once the IndexedDB database is deleted.
+   */
+  function clearQueuedRequests() {
+    return simpleDB.delete(QUEUED_SESSION_UPDATES_DB_NAME);
+  }
+
   return {
     clearCachedUserSchedule: clearCachedUserSchedule,
     fetchSchedule: fetchSchedule,
@@ -196,7 +206,8 @@ IOWA.Schedule = (function() {
     getSessionById: getSessionById,
     updateSavedSessionsUI: updateSavedSessionsUI,
     setScheduleData: setScheduleData,
-    replayQueuedRequests: replayQueuedRequests
+    replayQueuedRequests: replayQueuedRequests,
+    clearQueuedRequests: clearQueuedRequests
   };
 
 })();
