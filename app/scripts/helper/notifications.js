@@ -37,21 +37,6 @@ IOWA.Notifications = IOWA.Notifications || (function() {
   };
 
   /**
-   * Passes along the browser's push subscription id and endpoint value to the backend.
-   * Does not change the notify value, so push notifications might be disabled globally for the
-   * current user.
-   * @param {string} subscriptionId The subscription.subscriptionId value.
-   * @param {string} endpoint The subscription.endpoint value.
-   * @return {Promise} Resolves with response body, or rejects with an error on HTTP failure.
-   */
-  var updateSubscriptionInfoPromise_ = function(subscriptionId, endpoint) {
-    return IOWA.Request.xhrPromise('PUT', NOTIFY_ENDPOINT, true, {
-      subscriber: subscriptionId,
-      endpoint: endpoint
-    });
-  };
-
-  /**
    * Disables push notifications globally for the current user.
    * @return {Promise} Resolves with response body, or rejects with an error on HTTP failure.
    */
@@ -78,9 +63,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
   };
 
   /**
-   * Checks whether the current browser already has a push subscription. If it does, the
-   * the subscription id and endpoint value are passed along to the backend to ensure they're
-   * up to date.
+   * Checks whether the current browser already has a push subscription.
    * @return {Promise} Resolves with true if there's an existing subscription, or false otherwise.
    */
   var isExistingSubscriptionPromise = function() {
@@ -88,14 +71,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
       return registration.pushManager.getSubscription();
     }).then(function(subscription) {
       if (subscription && subscription.subscriptionId) {
-        // Send the latest subscription id to the server, just in case it's changed.
-        return updateSubscriptionInfoPromise_(subscription.subscriptionId, subscription.endpoint).then(function() {
-          return true;
-        }).catch(function() {
-          // Return true even if the request to send the subscription id to the server fails, since
-          // the user is subscribed.
-          return true;
-        });
+        return true;
       } else {
         return false;
       }
