@@ -5,13 +5,14 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/net/context"
@@ -22,6 +23,27 @@ const (
 	updateVideo   = "video"
 	updateStart   = "start"
 )
+
+// pushError is used in methods that communicate with Push services like GCM.
+//  - msg: error message
+//  - retry: whether the caller should retry
+//  - after: try again after this duration, unless retry == false
+//  - remove: the caller should remove the subscription ID. Implies retry == false.
+type pushError struct {
+	msg    string
+	retry  bool
+	remove bool
+	after  time.Duration
+}
+
+func (pe *pushError) Error() string {
+	return pe.msg
+}
+
+func (pe *pushError) String() string {
+	return fmt.Sprintf("<pushError: retry=%v; remove=%v; after=%v; %s>",
+		pe.retry, pe.remove, pe.after, pe.msg)
+}
 
 //  userPush is user notification configuration.
 type userPush struct {
@@ -106,51 +128,67 @@ func filterUserChanges(dc *dataChanges, bks []string, ext *ioExtPush) {
 	}
 }
 
-// pingUser sends a "ping" push message to all user devices
-func pingUser(c context.Context, uid string) error {
-	pi, err := getUserPushInfo(c, uid)
+// pingDevice sends a "ping" message to device subscribed to endpoint.
+// In a case where GCM did not accept push request the return error
+// will be of type *pushError with RetryAfter >= 0.
+// If returned string value is not zero, it contains a canonical reg ID.
+// TODO: Chrome 44 deprecates reg.
+func pingDevice(c context.Context, reg, endpoint string) (string, error) {
+	data := url.Values{"registration_id": {reg}}
+	r, err := http.NewRequest("POST", endpoint, strings.NewReader(data.Encode()))
 	if err != nil {
-		return fmt.Errorf("pingUser: %v", err)
+		return "", fmt.Errorf("pingDevice: %v", err)
 	}
-	if !pi.Enabled {
-		return nil
+	r.Header.Set("content-type", "application/x-www-form-urlencoded")
+	// don't send GCM auth key to anyone except Google
+	if strings.HasPrefix(endpoint, config.Google.GCM.Endpoint) {
+		r.Header.Set("authorization", "key="+config.Google.GCM.Key)
 	}
 
-	params := struct {
-		RIDs []string `json:"registration_ids"`
-	}{
-		RIDs: make([]string, 0, len(pi.Subscribers)),
+	logf(c, "DEBUG: posting to %q: %v", endpoint, data)
+	resp, err := httpClient(c).Do(r)
+	if err != nil {
+		return "", &pushError{msg: fmt.Sprintf("pingDevice: %v", err), retry: true}
 	}
-	for i, id := range pi.Subscribers {
-		if pi.Endpoints[i] != config.Google.GCM.Endpoint {
-			logf(c, "pingUser: unknown endpoint %q; reg = %s", pi.Endpoints[i], id)
-			continue
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", &pushError{msg: fmt.Sprintf("pingDevice: %v", err), retry: true}
+	}
+	logf(c, "pingDevice: response:%s\n%s", resp.Status, body)
+
+	q, err := url.ParseQuery(string(body))
+	if err != nil {
+		errorf(c, "%v: %s", err, body)
+		q = url.Values{}
+	}
+	errorStr := q.Get("Error")
+	retry, _ := strconv.Atoi(resp.Header.Get("retry-after"))
+	after := time.Duration(retry) * time.Second
+	if after < time.Second {
+		after = 10 * time.Second
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", &pushError{
+			msg:   fmt.Sprintf("pingDevice: %s: %s", resp.Status, body),
+			retry: resp.StatusCode >= 500,
+			after: after,
 		}
-		params.RIDs = append(params.RIDs, id)
 	}
-	b, err := json.Marshal(&params)
-	if err != nil {
-		return fmt.Errorf("pingUser: %v", err)
+	if errorStr == "" {
+		return q.Get("registration_id"), nil
 	}
-	logf(c, "DEBUG: posting to %q:\n%s", config.Google.GCM.Endpoint, b)
-	r, err := http.NewRequest("POST", config.Google.GCM.Endpoint, bytes.NewReader(b))
-	if err != nil {
-		return fmt.Errorf("pingUser: %v", err)
+	pe := &pushError{
+		msg:   "pingDevice: " + errorStr,
+		after: after,
 	}
-	r.Header.Set("content-type", "application/json")
-	r.Header.Set("authorization", "key="+config.Google.GCM.Key)
-
-	res, err := httpClient(c).Do(r)
-	if err != nil {
-		return fmt.Errorf("pingUser: %v", err)
+	switch errorStr {
+	case "NotRegistered":
+		pe.remove = true
+	case "Unavailable", "InternalServerError", "DeviceMessageRateExceeded":
+		pe.retry = true
 	}
-	defer res.Body.Close()
-	if b, err = ioutil.ReadAll(res.Body); err != nil {
-		return fmt.Errorf("pingUser: %v", err)
-	}
-	logf(c, "pingUser: response:\n%s", b)
-	// TODO: handle GCM errors in b
-	return nil
+	return "", pe
 }
 
 // swTokenSep is SW token separator used in encode/decodeSWToken.

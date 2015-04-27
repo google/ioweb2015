@@ -68,6 +68,41 @@ func storeUserPushInfo(c context.Context, p *userPush) error {
 	return err
 }
 
+// updateSubscriber replaces old registration rid with nreg.
+// It must be run in a transactional context.
+// TODO: rid will be replaced with endpoint after Chrome 44.
+func updateSubscriber(c context.Context, uid, rid, nreg string) error {
+	pi, err := getUserPushInfo(c, uid)
+	if err != nil {
+		return err
+	}
+	for i, id := range pi.Subscribers {
+		if id == rid {
+			pi.Subscribers[i] = nreg
+			return storeUserPushInfo(c, pi)
+		}
+	}
+	return nil
+}
+
+// deleteSubscriber removes registration rid from a list of user uid.
+// It must be run in a transactional context.
+// TODO: rid will be replaced with endpoint after Chrome 44.
+func deleteSubscriber(c context.Context, uid, rid string) error {
+	pi, err := getUserPushInfo(c, uid)
+	if err != nil {
+		return err
+	}
+	for i, id := range pi.Subscribers {
+		if id == rid {
+			pi.Subscribers = append(pi.Subscribers[:i], pi.Subscribers[i+1:]...)
+			pi.Endpoints = append(pi.Endpoints[:i], pi.Endpoints[i+1:]...)
+			return storeUserPushInfo(c, pi)
+		}
+	}
+	return nil
+}
+
 // getUserPushInfo fetches user push configuration from a persistent DB.
 // If the configuration does not exist yet, a default one is returned.
 // Default configuration has all notification settings disabled.

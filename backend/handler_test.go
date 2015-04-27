@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"reflect"
 	"strings"
 	"testing"
@@ -734,18 +735,18 @@ func TestStoreUserPushConfig(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &p1); err != nil {
 		t.Errorf("json.Unmarshal: %v", err)
 	}
-	// these are not exposed in the API response
-	p1.userID = expected.userID
-	p1.Endpoints = expected.Endpoints
 	if p1.Pext != nil {
 		p1.Pext.Enabled = true
-		p1.Ext = *p1.Pext
-	}
-	if !reflect.DeepEqual(&p1, expected) {
-		t.Errorf("p1 = %+v; want %+v", p1, expected)
 	}
 	if !reflect.DeepEqual(p1.Pext, expected.Pext) {
-		t.Errorf("p1.Pext = %+v; want %+v", p1.Pext, expected.Pext)
+		t.Errorf("p1.Pext = %+v; want %+v\nResponse: %s", p1.Pext, expected.Pext, w.Body.String())
+	}
+	p1.userID = expected.userID
+	p1.Endpoints = expected.Endpoints
+	p1.Pext = expected.Pext
+	p1.Ext = expected.Ext
+	if !reflect.DeepEqual(&p1, expected) {
+		t.Errorf("p1 = %+v; want %+v\nResponse: %s", p1, expected, w.Body.String())
 	}
 
 	p2, err := getUserPushInfo(newContext(r), testUserID)
@@ -1214,6 +1215,7 @@ func TestServeUserUpdates(t *testing.T) {
 }
 
 func TestHandlePingExt(t *testing.T) {
+	defer resetTestState(t)
 	defer preserveConfig()()
 
 	done := make(chan struct{}, 1)
@@ -1272,4 +1274,133 @@ func fetchFirstSWToken(t *testing.T, auth string) string {
 		t.Fatal(err)
 	}
 	return sw.Token
+}
+
+func TestHandlePingDevice(t *testing.T) {
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	done := make(chan struct{}, 1)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if ah := r.Header.Get("authorization"); ah != "key=test-key" {
+			t.Errorf("ah = %q; want 'key=test-key'", ah)
+		}
+		if reg := r.FormValue("registration_id"); reg != "reg-123" {
+			t.Errorf("reg = %q; want 'reg-123'", reg)
+		}
+		fmt.Fprintf(w, "id=message-id-123")
+		done <- struct{}{}
+	}))
+	defer ts.Close()
+
+	config.Google.GCM.Endpoint = ts.URL
+	config.Google.GCM.Key = "test-key"
+
+	r := newTestRequest(t, "POST", "/task/ping-device", nil)
+	r.Form = url.Values{
+		"uid":      {testUserID},
+		"rid":      {"reg-123"},
+		"endpoint": {ts.URL},
+	}
+	r.Header.Set("x-appengine-taskname", "dummy-task")
+	w := httptest.NewRecorder()
+	handlePingDevice(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	select {
+	case <-done:
+		// passed
+	default:
+		t.Errorf("GCM request never happened")
+	}
+}
+
+func TestHandlePingDeviceDelete(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Error=NotRegistered")
+	}))
+
+	r := newTestRequest(t, "POST", "/task/ping-device", nil)
+	r.Form = url.Values{
+		"uid":      {testUserID},
+		"rid":      {"reg-123"},
+		"endpoint": {ts.URL},
+	}
+	r.Header.Set("x-appengine-taskname", "dummy-task")
+
+	c := newContext(r)
+	storeUserPushInfo(c, &userPush{
+		userID:      testUserID,
+		Enabled:     true,
+		Subscribers: []string{"reg-123"},
+		Endpoints:   []string{ts.URL},
+	})
+
+	w := httptest.NewRecorder()
+	handlePingDevice(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	pi, err := getUserPushInfo(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pi.Subscribers) != 0 || len(pi.Endpoints) != 0 {
+		t.Errorf("pi.Subscrbers=%v pi.Endpoints=%v; want []", pi.Subscribers, pi.Endpoints)
+	}
+}
+
+func TestHandlePingDeviceReplace(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "id=msg-id&registration_id=new-reg-id")
+	}))
+
+	r := newTestRequest(t, "POST", "/task/ping-device", nil)
+	r.Form = url.Values{
+		"uid":      {testUserID},
+		"rid":      {"reg-123"},
+		"endpoint": {ts.URL},
+	}
+	r.Header.Set("x-appengine-taskname", "dummy-task")
+
+	c := newContext(r)
+	storeUserPushInfo(c, &userPush{
+		userID:      testUserID,
+		Enabled:     true,
+		Subscribers: []string{"reg-123"},
+		Endpoints:   []string{ts.URL},
+	})
+
+	w := httptest.NewRecorder()
+	handlePingDevice(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	pi, err := getUserPushInfo(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v := []string{"new-reg-id"}; !reflect.DeepEqual(pi.Subscribers, v) {
+		t.Errorf("pi.Subscribers = %v; want %v", pi.Subscribers, v)
+	}
+	if v := []string{ts.URL}; !reflect.DeepEqual(pi.Endpoints, v) {
+		t.Errorf("pi.Endpoints = %v; want %v", pi.Endpoints, v)
+	}
 }
