@@ -22,6 +22,7 @@ IOWA.Schedule = (function() {
 
   var SCHEDULE_ENDPOINT = 'api/v1/schedule';
   var SCHEDULE_ENDPOINT_USERS = 'api/v1/user/schedule';
+  var QUEUED_SESSION_UPDATES_DB_NAME = 'shed-offline-session-updates';
 
   var scheduleData_ = null;
   var userSavedSessions_ = [];
@@ -79,7 +80,14 @@ IOWA.Schedule = (function() {
         .then(clearCachedUserSchedule)
         .catch(function(error) {
           IOWA.Elements.Template.scheduleFetchingUserData = false;
-          IOWA.Elements.Toast.showMessage('Unable to modify My Schedule.');
+          // error will be an XMLHttpRequestProgressEvent if the xhrPromise() was rejected due to
+          // a network error. Otherwise, error will be a Error object.
+          if ('serviceWorker' in navigator && XMLHttpRequestProgressEvent &&
+              error instanceof XMLHttpRequestProgressEvent) {
+            IOWA.Elements.Toast.showMessage('Unable to modify My Schedule. The change will be retried on your next visit.');
+          } else {
+            IOWA.Elements.Toast.showMessage('Unable to modify My Schedule.');
+          }
           throw error;
         });
     });
@@ -153,6 +161,45 @@ IOWA.Schedule = (function() {
     return null;
   }
 
+  /**
+   * Checks to see if there are any failed schedule update requests queued in IndexedDB, and if so,
+   * replays them. Should only be called when auth is available, i.e. after login.
+   *
+   * @return {Promise} Resolves once the replay attempts are done, whether or not they succeeded.
+   */
+  function replayQueuedRequests() {
+    return simpleDB.open(QUEUED_SESSION_UPDATES_DB_NAME).then(function(db) {
+      var replayPromises = [];
+      // forEach is a special method implemented by SimpleDB, and isn't the normal Array.forEach.
+      return db.forEach(function(url, method) {
+        var replayPromise = IOWA.Request.xhrPromise(method, url, true).then(function() {
+          return db.delete(url).then(function() {
+            return true;
+          });
+        });
+        replayPromises.push(replayPromise);
+      }).then(function() {
+        if (replayPromises.length) {
+          return Promise.all(replayPromises).then(function() {
+            IOWA.Elements.Toast.showMessage('My Schedule was updated with offline changes.');
+          });
+        }
+      });
+    }).catch(function() {
+      IOWA.Elements.Toast.showMessage('Offline changes could not be applied to My Schedule.');
+    });
+  }
+
+  /**
+   * Deletes the IndexedDB database used to queue up failed requests.
+   * Useful when, e.g., the user has logged out.
+   *
+   * @return {Promise} Resolves once the IndexedDB database is deleted.
+   */
+  function clearQueuedRequests() {
+    return simpleDB.delete(QUEUED_SESSION_UPDATES_DB_NAME);
+  }
+
   return {
     clearCachedUserSchedule: clearCachedUserSchedule,
     fetchSchedule: fetchSchedule,
@@ -162,6 +209,8 @@ IOWA.Schedule = (function() {
     getSessionById: getSessionById,
     updateSavedSessionsUI: updateSavedSessionsUI,
     setScheduleData: setScheduleData,
+    replayQueuedRequests: replayQueuedRequests,
+    clearQueuedRequests: clearQueuedRequests
   };
 
 })();
