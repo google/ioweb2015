@@ -147,6 +147,24 @@
       if (template.scheduleData) {
         fetchUserSchedule();
       }
+
+      // If the user hasn't denied notifications permission in the current browser,
+      // and the user has notifications turned on globally (i.e. in at least one other browser),
+      // and there isn't already a subscription in the current browser, then try to enable
+      // notifications in the current browser.
+      if (window.Notification.permissions !== 'denied') {
+        IOWA.Notifications.isNotifyEnabledPromise().then(function(isGlobalNotificationsEnabled) {
+          console.log('isGlobalNotificationsEnabled', isGlobalNotificationsEnabled);
+          if (isGlobalNotificationsEnabled) {
+            IOWA.Notifications.isExistingSubscriptionPromise().then(function(isLocalSubscription) {
+              console.log('isLocalSubscription', isLocalSubscription);
+              if (!isLocalSubscription) {
+                IOWA.Notifications.subscribePromise();
+              }
+            });
+          }
+        });
+      }
     } else {
       template.savedSessions = [];
       IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);
