@@ -367,11 +367,13 @@ limitations under the License.
         </a>
       </header>
 
-      <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
-        <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}" fit>
-          <h2>I/O is starting soon. #io15</h2>
-        </io-live>
-      </div>
+      <template if="{{selectedPage === 'home'}}">
+        <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
+          <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}" fit>
+            <h2>I/O is starting soon. #io15</h2>
+          </io-live>
+        </div>
+      </template>
 
       <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}">
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>

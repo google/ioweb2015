@@ -107,6 +107,10 @@
       if (template.extendedMapActive) {
         template.closeExtendedMapSection();
       }
+      var live = document.querySelector('io-live.open');
+      if (live) {
+        live.open = false;
+      }
     }
   });
 

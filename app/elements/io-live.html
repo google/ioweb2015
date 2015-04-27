@@ -13,6 +13,8 @@ limitations under the License.
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-youtube/google-youtube.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
 
 <!--
 The `<io-live>` provides the Google I/O live stream experience.
@@ -34,7 +36,41 @@ Fired when the mode changes.
           <content></content>
         </template>
       </div>
-      <paper-fab icon="picture-in-picture" aria-label="My schedule" title="My schedule" on-click="{{onFabClick}}"></paper-fab>
+
+      <paper-fab id="schedfab" icon="picture-in-picture" aria-label="My schedule"
+                 title="My schedule" on-tap="{{onFabClick}}"></paper-fab>
+
+      <div id="livewidget" on-transitionend="{{onFabTransition}}">
+        <div class="bg-dark-grey" layout vertical>
+
+          <div class="widget-nav" layout horizontal center self-end>
+            <paper-icon-button icon="close" on-tap="{{closeFab}}"></paper-icon-button>
+          </div>
+
+          <paper-tabs class="white" valueattr="label" selected="{{selectedTab}}">
+            <paper-tab label="live" role="">I/O Live</paper-tab>
+            <paper-tab label="schedule" role="">Live schedule</paper-tab>
+            <paper-tab label="hash" role="">#io15</paper-tab>
+          </paper-tabs>
+
+          <core-animated-pages transitions="cross-fade" fit>
+            <section>
+              <div cross-fade layout vertical>
+                <div>
+                  <img src="../images/videos/keynote.jpg">
+                </div>
+                <div class="card">
+                  <div class="card-content">Our 8th annual Google I/O developer conference will kick-off with a keynote hosted by our Senior Vice-President of Products, Sundar Pichai.</div>
+                </div>
+              </div>
+            </section>
+            <section>
+              <div cross-fade layout vertical>Page 2</div>
+            </section>
+          </core-animated-pages>
+
+        </div>
+      </div>
     </div>
 
     <div id="livecontainer">
@@ -90,20 +126,26 @@ Fired when the mode changes.
       },
 
       /**
-       * The mode of operation for the live embed. 'pre' is before the event
-       * starts (e.g. before `date`) and a countdown is shown leading up to the
-       * event. 'live' signifies the event has already started and the live
-       * stream video mode should be shown.
+       * If in live mode, the FAB is open when true.
        *
-       * @property showCountdown
+       * @property open
        * @type bool
        * @default false
        */
-      showCountdown: false
+      open: false,
+
+      /**
+       * The selected nav tab.
+       *
+       * @property selectedTab
+       * @type string
+       * @default 'live'
+       */
+      selectedTab: 'live',
     },
 
     eventDelegates: {
-      'click': 'toggleVideo'
+      'dblclick': 'toggleVideo'
     },
 
     attached: function() {
@@ -116,30 +158,42 @@ Fired when the mode changes.
       }
     },
 
-    showCountdownChanged: function() {
-      var countdown = this.$.livecontainer.querySelector('countdown-timer');
-      if (countdown) {
-        if (this.showCountdown) {
-          countdown.start();
-          countdown.show();
-        } else {
-          countdown.stop();
-          countdown.style.opacity = 0;
-        }
-      }
+    openChanged: function() {
+      this.$.livewidget.classList.toggle('open', this.open);
     },
 
     modeChanged: function() {
       this.fire('io-live-mode', {mode: this.mode});
     },
 
-    toggleVideo: function(e, detail, sender) {
-      this.mode = this._MODES.LIVE;
+toggleVideo: function(e, detail, sender) {
+  this.mode = this._MODES.LIVE;
+},
+
+    onFabTransition: function(e, detail, sender) {
+      e.stopPropagation();
+      sender.classList.remove('transitioning');
+      if (!this.open) {
+        this.$.schedfab.style.visibility = 'visible';
+      }
     },
 
     onFabClick: function(e, detail, sender) {
       e.stopPropagation();
-    }
+      this.$.schedfab.style.visibility = 'hidden';
+      this.$.livewidget.classList.add('transitioning');
+      this.open = true;
+    },
+
+    closeFab: function(e, detail, sender) {
+      e && e.stopPropagation();
+      this.$.livewidget.classList.add('transitioning');
+      this.open = false;
+    },
+
+onTabClick: function(e, detail, sender) {
+  e.stopPropagation();
+}
   });
   </script>
 </polymer-element>
