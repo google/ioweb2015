@@ -114,6 +114,7 @@ Current notification state. Response body sample:
 {
   "notify": true,
   "subscribers": ["123456789", "987654321"],
+  "iostart": true,
   "ioext": {
     "name": "Amsterdam",
     "lat": 52.37607,
@@ -131,13 +132,20 @@ Current notification state. Response body sample:
 
 * Toggle global notification state on/off: `notify`.
 * Add to the subscriber IDs list of a user: `subscriber` and `endpoint`.
+* Receive a notification about the start of I/O: `iostart`.
 * Subscribe/unsubscribe from "I/O Extended events near me": `ioext`.
+
+The start of I/O reminder is 1 day before the date.
+Session reminders are 10 min before the start time.
+Notifications about I/O Extended and any changes to the bookmarked sessions,
+including added videos, are sent immediately.
 
 ```json
 {
   "notify": true,
   "subscriber": "subscriber ID",
   "endpoint": "https://push/notifications/endpoint",
+  "iostart": true,
   "ioext": {
     "name": "Amsterdam",
     "lat": 52.37607,

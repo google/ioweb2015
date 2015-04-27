@@ -50,6 +50,7 @@ type userPush struct {
 	userID string
 
 	Enabled     bool     `json:"notify" datastore:"on"`
+	IOStart     bool     `json:"iostart" datastore:"io"`
 	Subscribers []string `json:"subscribers,omitempty" datastore:"subs,noindex"`
 	Endpoints   []string `json:"-" datastore:"urls,noindex"`
 
