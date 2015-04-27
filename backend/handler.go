@@ -419,6 +419,9 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 		if v, ok := body["notify"].(bool); ok {
 			data.Enabled = v
 		}
+		if v, ok := body["iostart"].(bool); ok {
+			data.IOStart = v
+		}
 		if sub, ok := body["subscriber"].(string); ok {
 			url, ok := body["endpoint"].(string)
 			if !ok || url == "" {

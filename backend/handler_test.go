@@ -701,6 +701,7 @@ func TestStoreUserPushConfig(t *testing.T) {
     "notify": true,
     "subscriber": "sub-id",
     "endpoint": "https://test",
+    "iostart": true,
     "ioext": {
       "name": "Amsterdam",
       "lat": 52.37607,
@@ -712,6 +713,7 @@ func TestStoreUserPushConfig(t *testing.T) {
 		Enabled:     true,
 		Subscribers: []string{"sub-id"},
 		Endpoints:   []string{"https://test"},
+		IOStart:     true,
 		Ext: ioExtPush{
 			Enabled: true,
 			Name:    "Amsterdam",
