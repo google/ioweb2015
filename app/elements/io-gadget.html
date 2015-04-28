@@ -19,6 +19,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="social-post.html">
 
+<script src="../bower_components/moment/min/moment.min.js"></script>
 <script src="../scripts/analytics.js"></script>
 <script src="../scripts/helper/request.js"></script>
 
@@ -150,6 +151,21 @@ The `<io-gadget>` element renders a youtube video + social feed.
   <script>
   (function() {
 
+    var interval_ = null;
+
+    // setTimeout's delay cannot be greater than 2147483647.
+    // See developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setTimeout
+    function setLongTimeout(callback, timeout) {
+      var MAX_SET_TIMEOUT = 2147483647;
+      if (timeout > MAX_SET_TIMEOUT) {
+        interval_ = setTimeout(function() {
+          setLongTimeout(callback, timeout - MAX_SET_TIMEOUT);
+        }, MAX_SET_TIMEOUT);
+       } else {
+        interval_ = setTimeout(callback, timeout);
+      }
+    }
+
     var VIEWS_ = {BEFORE: 0, LIVE: 1, BETWEEN: 2, AFTER: 3};
 
     Polymer({
@@ -180,7 +196,16 @@ The `<io-gadget>` element renders a youtube video + social feed.
          * @type bool
          * @default false
          */
-        noVideo: false
+        noVideo: false,
+
+        /**
+         * The start date of the event.
+         *
+         * @property startDate
+         * @type string
+         * @default null
+         */
+        startDate: null,
       },
 
       /**
@@ -264,7 +289,9 @@ The `<io-gadget>` element renders a youtube video + social feed.
          // Set a timeout to fetch new posts after 30 seconds.
         this.updateSocialPostsTimeout_ = window.setTimeout(
             this.updateSocialPosts.bind(this), this.socialPostUpdateInterval);
+      },
 
+      startDateChanged: function(oldVal, newVal) {
         this.setView();
       },
 
@@ -341,40 +368,32 @@ The `<io-gadget>` element renders a youtube video + social feed.
       },
 
       setView: function() {
-        var day1Start = new Date('May 28 2015 08:30:00 GMT-0700 (PDT)');
-        var day1End = new Date('May 28 2015 17:00:00 GMT-0700 (PDT)');
-        var day2Start = new Date('May 29 2015 08:30:00 GMT-0700 (PDT)');
-        var day2End = new Date('May 29 2015 17:00:00 GMT-0700 (PDT)');
+        var today = moment();
+        var day1Start = moment(this.startDate).subtract(30, 'minutes');
+        var day1End = moment(day1Start).hours(17).minutes(0);
+        var day2Start = moment(day1Start).add(1, 'days');
+        var day2End = moment(day2Start).hours(17).minutes(0);
 
-        var now = new Date();
         var offset = 50;
 
-        if (now < day1Start) {
+        if (today.isBefore(day1Start)) {
           this.view = this.VIEWS_.BEFORE;
-          var timeout = (day1Start - now) + offset;
-          if (timeout > 0) {
-            setTimeout(this.setView.bind(this), timeout); // refresh view when I/O starts.
-          }
-        } else if (now > day1Start && now < day1End ||
-                   now > day2Start && now < day2End) {
+          var timeout = (day1Start - today) + offset;
+          setLongTimeout(this.setView.bind(this), timeout); // refresh view when I/O starts.
+        } else if (today.isBetween(day1Start, day1End)) {
           this.view = this.VIEWS_.LIVE;
-          var timeout = (day2Start - (day1End - now)) + offset;
-          if (timeout > 0) {
-            setTimeout(this.setView.bind(this), timeout); // refresh view when day 1 ends.
-          }
-        } else if (now > day1End && now < day2Start) {
+          var timeout = (day1End - today) + offset;
+          setTimeout(this.setView.bind(this), timeout); // refresh view when day 1 ends.
+        } else if (today.isBetween(day2Start, day2End)) {
+          this.view = this.VIEWS_.LIVE;
+          var timeout = (day2End - today) + offset;
+          setTimeout(this.setView.bind(this), timeout); // refresh view when day 2 ends.
+        } else if (today.isBetween(day1End, day2Start)) {
           this.view = this.VIEWS_.BETWEEN;
-          var timeout = (day2Start - now) + offset;
-          if (timeout > 0) {
-            setTimeout(this.setView.bind(this), timeout); // refresh view when day2 starts.
-          }
-        } else if (now > day2End) {
+          var timeout = (day2Start - today) + offset;
+          setTimeout(this.setView.bind(this), timeout); // refresh view when day2 starts.
+        } else if (today.isAfter(day2End)) {
           this.view = this.VIEWS_.AFTER;
-          var timeout = (day2End - now) + offset;
-          if (timeout > 0) {
-            console.log(timeout)
-            setTimeout(this.setView.bind(this), timeout); // refresh view when day2 ends.
-          }
         }
       }
 

@@ -31,9 +31,6 @@ html, body {
 .anchor-like {
   @include typo-button();
   white-space: nowrap;
-}
-
-.anchor-like {
   color: $color-cyan-A700;
   cursor: pointer;
 }
