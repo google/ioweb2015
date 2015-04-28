@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -662,6 +663,7 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		errorf(c, err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	if !pi.Enabled {
 		logf(c, "notifications not enabled")
@@ -677,6 +679,10 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bookmarks, err := userSchedule(c, user)
+	if ue, ok := err.(*url.Error); ok && (ue.Err == errAuthInvalid || ue.Err == errAuthMissing) {
+		errorf(c, "unrecoverable: %v", err)
+		return
+	}
 	if err != nil {
 		errorf(c, "%v", err)
 		w.WriteHeader(http.StatusInternalServerError)

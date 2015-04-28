@@ -144,15 +144,21 @@ func TestAuthUser(t *testing.T) {
 }
 
 func TestTokenRefresher(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
 	defer resetTestState(t)
 	defer preserveConfig()()
-	config.Google.Auth.Client = "my-client"
-	config.Google.Auth.Secret = "my-secret"
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
 	cred := &oauth2Credentials{
 		userID:       "uid-123",
 		Expiry:       time.Now(),
 		AccessToken:  "dummy-access",
 		RefreshToken: "dummy-refresh",
+	}
+	if err := storeCredentials(c, cred); err != nil {
+		t.Fatal(err)
 	}
 
 	done := make(chan struct{}, 1)
@@ -172,17 +178,18 @@ func TestTokenRefresher(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{
-      "access_token":"new-access-token",
-      "expires_in":3600,
-      "token_type":"Bearer"
-    }`))
+			"access_token":"new-access-token",
+			"expires_in":3600,
+			"token_type":"Bearer"
+		}`))
 
 		done <- struct{}{}
 	}))
 	defer ts.Close()
 	config.Google.TokenURL = ts.URL
+	config.Google.Auth.Client = "my-client"
+	config.Google.Auth.Secret = "my-secret"
 
-	c := newContext(newTestRequest(t, "GET", "/", nil))
 	tok, err := cred.tokenSource(c).Token()
 	if err != nil {
 		t.Fatalf("cred.tokenSource().Token: %v", err)
@@ -214,9 +221,67 @@ func TestTokenRefresher(t *testing.T) {
 
 	cred2, err := getCredentials(c, "uid-123")
 	if err != nil {
-		t.Fatalf("getCredentials: %v", err)
+		t.Fatal(err)
 	}
 	if reflect.DeepEqual(cred2, cred) {
 		t.Errorf("cred2 = %+v; want %+v", cred2, cred)
+	}
+}
+
+func TestTokenRefresherRevoked(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	cred := &oauth2Credentials{
+		userID:       "uid-123",
+		Expiry:       time.Now(),
+		AccessToken:  "dummy-access",
+		RefreshToken: "dummy-refresh",
+	}
+	if err := storeCredentials(c, cred); err != nil {
+		t.Fatal(err)
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error": "invalid_grant"}`))
+	}))
+	defer ts.Close()
+	config.Google.TokenURL = ts.URL
+
+	_, err := cred.tokenSource(c).Token()
+	if err != errAuthInvalid {
+		t.Errorf("err = %v; want errAuthInvalid", err)
+	}
+
+	cred2, err := getCredentials(c, "uid-123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cred2.RefreshToken != "" {
+		t.Errorf("cred2.RefreshToken = %q; want ''", cred2.RefreshToken)
+	}
+}
+
+func TestTokenRefresherMissing(t *testing.T) {
+	defer resetTestState(t)
+
+	cred := &oauth2Credentials{
+		userID:       "uid-123",
+		Expiry:       time.Now(),
+		AccessToken:  "dummy-access",
+		RefreshToken: "",
+	}
+
+	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
+	tok, err := cred.tokenSource(c).Token()
+
+	if err != errAuthMissing {
+		t.Errorf("err = %v, tok = %v; want errAuthMissing", tok, err)
 	}
 }

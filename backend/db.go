@@ -28,6 +28,12 @@ func storeCredentials(c context.Context, cred *oauth2Credentials) error {
 	return nil
 }
 
+// updateCredentials patches existing Cred entity with the provided new ncred credentials
+// in a transaction.
+func updateCredentials(c context.Context, ncred *oauth2Credentials) error {
+	return errors.New("not implemented")
+}
+
 // getCredentials fetches user credentials from a persistent DB.
 func getCredentials(c context.Context, uid string) (*oauth2Credentials, error) {
 	// TODO: implement
