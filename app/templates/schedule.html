@@ -97,9 +97,9 @@
 
     </div>
   </div>
-  <!-- <div class="session__info__section session__info__links card-content">
-    <a href="#" data-track-link="schedule-detail-related" core-overlay-toggle>View related sessions</a>
-  </div> -->
+  <div class="session__info__section session__info__links card-content" hidden?="{{!selectedSession.relatedContent}}">
+    <span class="anchor-like" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related" core-overlay-toggle>View related content</span>
+  </div>
 </paper-dialog>
 
 <div class="subpage__container">
@@ -463,6 +463,14 @@
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
         e.stopPropagation();
         ioScheduleEl.filters = sender.selectedIndex ? [sender.selected] : [];
+      };
+
+      IOWA.Elements.Template.onRelatedContent = function(e, detail, sender) {
+        e.stopPropagation();
+        if (sender && sender.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+        }
+        ioScheduleEl.filters = [this.selectedSession.id];
       };
 
       IOWA.Elements.Template.selectTimezone = function(e, detail, sender) {
