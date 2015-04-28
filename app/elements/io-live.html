@@ -15,6 +15,11 @@ limitations under the License.
 <link rel="import" href="../bower_components/google-youtube/google-youtube.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
+<link rel="import" href="../bower_components/core-animated-pages/transitions/slide-from-right.html">
+
+<link rel="import" href="../bower_components/core-label/core-label.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="io-radio-button.html">
 
 <!--
 The `<io-live>` provides the Google I/O live stream experience.
@@ -32,13 +37,13 @@ Fired when the mode changes.
 
     <div class="bottom__bar" layout horizontal end justified>
       <div>
-        <template if="{{mode === _MODES.PRE}}">
+        <template if="{{mode === _MODES.BEFORE}}">
           <content></content>
         </template>
       </div>
 
-      <paper-fab id="schedfab" icon="picture-in-picture" aria-label="My schedule"
-                 title="My schedule" on-tap="{{onFabClick}}"></paper-fab>
+      <paper-fab id="schedfab" icon="picture-in-picture"
+                 aria-label="My schedule" title="My schedule" on-tap="{{onFabClick}}"></paper-fab>
 
       <div id="livewidget" on-transitionend="{{onFabTransition}}">
         <div class="bg-dark-grey" layout vertical>
@@ -53,19 +58,45 @@ Fired when the mode changes.
             <paper-tab label="hash" role="">#io15</paper-tab>
           </paper-tabs>
 
-          <core-animated-pages transitions="cross-fade" fit>
-            <section>
-              <div cross-fade layout vertical>
-                <div>
-                  <img src="../images/videos/keynote.jpg">
-                </div>
+          <core-animated-pages transitions="slide-from-right" selected="{{selectedTab}}" valueattr="label" fit>
+            <section label="live" layout vertical>
+              <div layout vertical flex>
+                <div class="card__photo card__photo--live" flex></div>
                 <div class="card">
                   <div class="card-content">Our 8th annual Google I/O developer conference will kick-off with a keynote hosted by our Senior Vice-President of Products, Sundar Pichai.</div>
                 </div>
               </div>
             </section>
-            <section>
-              <div cross-fade layout vertical>Page 2</div>
+            <section class="schedule__content" label="schedule" layout vertical>
+
+              <div class="card-content schedule-rows" layout vertical>
+                <template repeat="{{session in sessions | filterSessionsByDay(currentDay)}}">
+                  <div class="schedule-row" layout horizontal>
+                    <io-radio-button aria-labelledby="session-{{session.id}}-title" toggles checked?="{{session.saved}}"></io-radio-button>
+                    <div layout vertical flex tabindex="0">
+                      <span id="session-{{session.id}}-title" class="schedule-title"
+                            auto-vertical flex?="{{!isPhoneSize}}" two
+                            title="{{session.title}}">
+                        {{session.title}}
+                      </span>
+                      <div class="schedule-speakers">{{session.speakers | speakerIdsToNameString}}</div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <div class="card card__bottom-links">
+                <paper-progress indeterminate hidden?="{{!fetchingUserData}}" fit></paper-progress>
+
+                <div class="card-content" layout horizontal justified>
+                  <a href="schedule#day{{dayView}}" data-ajax-link data-track-link="live-fullschedule">Full schedule</a>
+                  <a href="{{'schedule#myschedule'}}" data-ajax-link data-track-link="live-myschedule">My schedule</a>
+                </div>
+              </div>
+
+            </section>
+            <section label="hash">
+              <div layout vertical>hash</div>
             </section>
           </core-animated-pages>
 
@@ -84,7 +115,7 @@ Fired when the mode changes.
         </div>
       </template>
 
-      <template if="{{mode === _MODES.PRE}}">
+      <template if="{{mode === _MODES.BEFORE}}">
         <countdown-timer role="timer" bgcolor="#00BCD4" date="{{date}}"
             easeintime="490" waittime="100" easeouttime="400"
             value="{{countdownValue}}" autoStart fit
@@ -98,7 +129,7 @@ Fired when the mode changes.
   <script>
   Polymer({
 
-    _MODES: {LIVE: 'live', PRE: 'pre'},
+    _MODES: {LIVE: 'live', BEFORE: 'before', AFTER: 'after'},
 
     publish: {
       /**
@@ -112,14 +143,14 @@ Fired when the mode changes.
       date: 'May 28 2015 09:30:00 GMT-0700 (PDT)',
 
       /**
-       * The mode of operation for the live embed. 'pre' is before the event
+       * The mode of operation for the live embed. 'before' is before the event
        * starts (e.g. before `date`) and a countdown is shown leading up to the
        * event. 'live' signifies the event has already started and the live
-       * stream video mode should be shown.
+       * stream video mode should be shown. 'after' is after the event.
        *
        * @attribute mode
        * @type string
-       * @default ''
+       * @default null
        */
       mode: {
         value: '', reflect: true
@@ -128,11 +159,11 @@ Fired when the mode changes.
       /**
        * If in live mode, the FAB is open when true.
        *
-       * @property open
+       * @property openWidget
        * @type bool
        * @default false
        */
-      open: false,
+      openWidget: false,
 
       /**
        * The selected nav tab.
@@ -142,24 +173,102 @@ Fired when the mode changes.
        * @default 'live'
        */
       selectedTab: 'live',
+
+      /**
+       * The list of schedule sessions.
+       *
+       * @property sessions
+       * @type array
+       * @default []
+       */
+      sessions: null,
+
+      /**
+       * User's list of saved sessions.
+       *
+       * @attribute userSessions
+       * @type array
+       * @default []
+       */
+      userSessions: null,
+
+      /**
+       * Speaker info.
+       *
+       * @property speakers
+       * @type object
+       * @default {}
+       */
+      speakers: null,
+
+      /**
+       * Current day to display schedule information for. This calculated from
+       * the `date` property. For example, "May 28 2015 09:00:00 GMT-0700 (PDT)"
+       * would be 1.
+       *
+       * @property currentDay
+       * @type number
+       * @default 1
+       */
+      currentDay: null,
+
+      /**
+       * Whether fetching user data is in progress.
+       *
+       * @attribute fetchingUserData
+       * @type Boolean
+       * @default false
+       */
+      fetchingUserData: false,
     },
 
-    eventDelegates: {
-      'dblclick': 'toggleVideo'
+  eventDelegates: {
+    'dblclick': 'toggleVideo'
+  },
+
+    created: function() {
+      this.sessions = [];
+      this.userSessions = [];
+      this.speakers = {};
     },
 
-    attached: function() {
-      var now = new Date();
-      var eventStart = new Date(this.date);
-      if (now > eventStart) {
-        this.mode = this._MODES.LIVE;
+    // attached: function() {
+    //   var now = new Date();
+    //   var eventStart = new Date(this.date);
+    //   if (now > eventStart) {
+    //     this.mode = this._MODES.LIVE;
+    //   } else {
+    //     this.mode = this._MODES.BEFORE;
+    //   }
+    // },
+
+    dateChanged: function() {
+      this.day1Start = moment(this.date);
+      this.day1End = moment(this.day1Start).hours(17);
+      this.day2Start = moment(this.day1Start).add(1, 'days');
+      this.day2End = moment(this.day2Start).hours(17);
+
+      // If we're before the start day of I/O, set current day to the start day
+      // of I/O. Otherwise, set it to the current day of the show.
+      var today = moment();
+      if (today < this.day1Start) {
+        this.currentDay = parseInt(this.day1Start.format('D'));
+        this.mode = this._MODES.BEFORE;
+      } else if (today > this.day2End) {
+        this.currentDay = parseInt(this.day2End.format('D')); // max out on day 2.
+        this.mode = this._MODES.AFTER;
       } else {
-        this.mode = 'pre';
+        this.currentDay = parseInt(today.format('D'));
+        this.mode = this._MODES.LIVE;
       }
+
+      // May 27 -> 1, May 28 -> 1, May 29 -> 2
+      this.dayView = this.currentDay % parseInt(this.day1Start.format('D')) + 1;
     },
 
-    openChanged: function() {
-      this.$.livewidget.classList.toggle('open', this.open);
+    openWidgetChanged: function() {
+      this.$.livewidget.classList.toggle('open', this.openWidget);
+      this.$.livewidget.classList.add('transitioning');
     },
 
     modeChanged: function() {
@@ -173,7 +282,7 @@ toggleVideo: function(e, detail, sender) {
     onFabTransition: function(e, detail, sender) {
       e.stopPropagation();
       sender.classList.remove('transitioning');
-      if (!this.open) {
+      if (!this.openWidget) {
         this.$.schedfab.style.visibility = 'visible';
       }
     },
@@ -181,19 +290,29 @@ toggleVideo: function(e, detail, sender) {
     onFabClick: function(e, detail, sender) {
       e.stopPropagation();
       this.$.schedfab.style.visibility = 'hidden';
-      this.$.livewidget.classList.add('transitioning');
-      this.open = true;
+      this.openWidget = true;
     },
 
     closeFab: function(e, detail, sender) {
       e && e.stopPropagation();
-      this.$.livewidget.classList.add('transitioning');
-      this.open = false;
+      this.openWidget = false;
     },
 
-onTabClick: function(e, detail, sender) {
-  e.stopPropagation();
-}
+    speakerIdsToNameString: function(speakers) {
+      if (!speakers) {
+        return '';
+      }
+      return speakers.map(function(speakerId) {
+        return this.speakers[speakerId].name;
+      }.bind(this)).join(', ');
+    },
+
+    filterSessionsByDay: function(sessions, day) {
+      return sessions.filter(function(session) {
+        return session.day === day;
+      });
+    }
+
   });
   </script>
 </polymer-element>
