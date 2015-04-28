@@ -45,6 +45,25 @@ func storeCredentials(c context.Context, cred *oauth2Credentials) error {
 	return err
 }
 
+// updateCredentials patches existing Cred entity with the provided new ncred credentials
+// in a transaction.
+func updateCredentials(c context.Context, ncred *oauth2Credentials) error {
+	return runInTransaction(c, func(c context.Context) error {
+		cred, err := getCredentials(c, ncred.userID)
+		if err != nil {
+			return fmt.Errorf("updateCredentials: %v", err)
+		}
+		cred.AccessToken = ncred.AccessToken
+		cred.Expiry = ncred.Expiry
+		cred.RefreshToken = ncred.RefreshToken
+		err = storeCredentials(c, cred)
+		if err != nil {
+			err = fmt.Errorf("updateCredentials: %v", err)
+		}
+		return err
+	})
+}
+
 // getCredentials fetches user credentials from a persistent DB.
 func getCredentials(c context.Context, uid string) (*oauth2Credentials, error) {
 	key := datastore.NewKey(c, kindCredentials, uid, 0, nil)

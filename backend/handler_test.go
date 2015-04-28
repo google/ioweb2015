@@ -1289,21 +1289,87 @@ func TestHandlePingExt(t *testing.T) {
 	}
 }
 
-func fetchFirstSWToken(t *testing.T, auth string) string {
-	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
-	r.Header.Set("authorization", bearerHeader+testIDToken)
-	w := httptest.NewRecorder()
-	serveSWToken(w, r)
-	if w.Code != http.StatusOK {
-		t.Fatalf("w.Code = %d; want 200")
+func TestHandlePingUserMissingToken(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
-	var sw struct {
-		Token string `json:"token"`
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	// just in case: we want valid but not real API URLs
+	config.Google.TokenURL = "http://example.org/"
+	config.Google.Drive.FilesURL = "http://example.org/"
+
+	r := newTestRequest(t, "POST", "/task/ping-user", nil)
+	r.Form = url.Values{
+		"uid":      {testUserID},
+		"sessions": {"one"},
 	}
-	if err := json.Unmarshal(w.Body.Bytes(), &sw); err != nil {
+	r.Header.Set("x-appengine-taskname", "dummy")
+	c := newContext(r)
+
+	if err := storeUserPushInfo(c, &userPush{userID: testUserID, Enabled: true}); err != nil {
 		t.Fatal(err)
 	}
-	return sw.Token
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:       testUserID,
+		Expiry:       time.Now(),
+		AccessToken:  "dummy-access",
+		RefreshToken: "",
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handlePingUser(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+}
+
+func TestHandlePingUserRefokedToken(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	r := newTestRequest(t, "POST", "/task/ping-user", nil)
+	r.Form = url.Values{
+		"uid":      {testUserID},
+		"sessions": {"one"},
+	}
+	r.Header.Set("x-appengine-taskname", "dummy")
+	c := newContext(r)
+
+	if err := storeUserPushInfo(c, &userPush{userID: testUserID, Enabled: true}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:       testUserID,
+		Expiry:       time.Now(),
+		AccessToken:  "dummy-access",
+		RefreshToken: "revoked",
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error": "invalid_grant"}`))
+	}))
+	defer ts.Close()
+	config.Google.TokenURL = ts.URL
+	config.Google.Drive.FilesURL = "http://example.org/"
+
+	w := httptest.NewRecorder()
+	handlePingUser(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
 }
 
 func TestHandlePingDevice(t *testing.T) {
@@ -1433,4 +1499,21 @@ func TestHandlePingDeviceReplace(t *testing.T) {
 	if v := []string{ts.URL}; !reflect.DeepEqual(pi.Endpoints, v) {
 		t.Errorf("pi.Endpoints = %v; want %v", pi.Endpoints, v)
 	}
+}
+
+func fetchFirstSWToken(t *testing.T, auth string) string {
+	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
+	r.Header.Set("authorization", bearerHeader+testIDToken)
+	w := httptest.NewRecorder()
+	serveSWToken(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200")
+	}
+	var sw struct {
+		Token string `json:"token"`
+	}
+	if err := json.Unmarshal(w.Body.Bytes(), &sw); err != nil {
+		t.Fatal(err)
+	}
+	return sw.Token
 }

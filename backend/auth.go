@@ -59,11 +59,12 @@ type tokenRefresher struct {
 // Token returns a new access token using tr.cred.RefreshToken
 // It also updates its tr.cred and stores new token with storeCredentials().
 func (tr *tokenRefresher) Token() (*oauth2.Token, error) {
-	if tr.cred.RefreshToken == "" {
-		return nil, errors.New("tokenRefresher: refresh token is not set")
-	}
 	tr.cred.Lock()
 	defer tr.cred.Unlock()
+	if tr.cred.RefreshToken == "" {
+		errorf(tr.ctx, "tokenRefresher: refresh token is not set")
+		return nil, errAuthMissing
+	}
 
 	params := url.Values{
 		"client_id":     {config.Google.Auth.Client},
@@ -80,7 +81,21 @@ func (tr *tokenRefresher) Token() (*oauth2.Token, error) {
 	if err != nil {
 		return nil, fmt.Errorf("tokenRefresher: %v", err)
 	}
+
 	if res.StatusCode != http.StatusOK {
+		var errRes struct {
+			Error string `json:"error"`
+		}
+		if err := json.Unmarshal(body, &errRes); err != nil {
+			errorf(tr.ctx, "error resp: %v", err)
+		}
+		if errRes.Error == "invalid_grant" {
+			// most likely refresh token is expired
+			tr.cred.RefreshToken = ""
+			updateCredentials(tr.ctx, tr.cred)
+			return nil, errAuthInvalid
+		}
+		// oauth2 server error. may succeed later.
 		return nil, fmt.Errorf("tokenRefresher: %s; %s", res.Status, body)
 	}
 
@@ -94,7 +109,7 @@ func (tr *tokenRefresher) Token() (*oauth2.Token, error) {
 
 	tr.cred.AccessToken = t.Token
 	tr.cred.Expiry = time.Now().Add(time.Duration(t.Expiry) * time.Second)
-	if err := storeCredentials(tr.ctx, tr.cred); err != nil {
+	if err := updateCredentials(tr.ctx, tr.cred); err != nil {
 		errorf(tr.ctx, "tokenRefresher: %v", err)
 	}
 	return &oauth2.Token{
