@@ -93,7 +93,7 @@ countdown-timer {
   min-height: 440px;
   width: 360px;
   // @include shadow-z1();
-// z-index: 3;
+  overflow: hidden;
   opacity: 0;
   pointer-events: none;
 
@@ -158,12 +158,24 @@ core-animated-pages {
 
 .schedule__content {
   .schedule-rows {
-    padding: $mobileKeyline;
     overflow: auto;
 
-    .schedule-row {
+    .card-content {
       flex-shrink: 0;
-      margin-bottom: $mobileKeyline;
+      padding: $tabletKeyline $mobileKeyline;
+      border-top: 1px solid $color-light-grey-border;
+    }
+
+    h4 {
+      font-size: 20px;
+      line-height: 24px;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    .schedule-row {
+      padding: $tabletKeyline/2 $mobileKeyline;
+      flex-shrink: 0;
     }
   }
 

@@ -69,8 +69,11 @@ Fired when the mode changes.
             </section>
             <section class="schedule__content" label="schedule" layout vertical>
 
-              <div class="card-content schedule-rows" layout vertical>
+              <div class="card schedule-rows" layout vertical>
                 <template repeat="{{session in sessions | filterSessionsByDay(currentDay)}}">
+                  <div class="card-content" hidden?="{{!session.firstOfBlock}}">
+                    <h4>{{session.block}}</h4>
+                  </div>
                   <div class="schedule-row" layout horizontal>
                     <io-radio-button aria-labelledby="session-{{session.id}}-title" toggles checked?="{{session.saved}}"></io-radio-button>
                     <div layout vertical flex tabindex="0">

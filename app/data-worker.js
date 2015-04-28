@@ -27,6 +27,16 @@ addEventListener('message', function(e) {
     case 'FETCH_SCHEDULE':
       schedulePromise.then(function(scheduleData) {
         var tags = IOWA.Schedule.generateFilters(scheduleData.tags);
+
+        // Mark the first session in each block.
+        var currentBlock;
+        for (var i = 0, session; session = scheduleData.sessions[i]; ++i) {
+          if (session.block !== currentBlock) {
+            session.firstOfBlock = true;
+            currentBlock = session.block;
+          }
+        }
+
         postMessage({scheduleData: scheduleData, tags: tags});
 
         self.close(); // Terminate worker.
