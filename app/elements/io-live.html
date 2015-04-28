@@ -70,7 +70,7 @@ Fired when the mode changes.
             <section class="schedule__content" label="schedule" layout vertical>
 
               <div class="card schedule-rows" layout vertical>
-                <template repeat="{{session in sessions | filterSessionsByDay(currentDay)}}">
+                <template repeat="{{session in sessions | filterLiveSessionsByDay(currentDay)}}">
                   <div class="card-content" hidden?="{{!session.firstOfBlock}}">
                     <h4>{{session.block}}</h4>
                   </div>
@@ -310,9 +310,9 @@ toggleVideo: function(e, detail, sender) {
       }.bind(this)).join(', ');
     },
 
-    filterSessionsByDay: function(sessions, day) {
+    filterLiveSessionsByDay: function(sessions, day) {
       return sessions.filter(function(session) {
-        return session.day === day;
+        return session.day === day && session.isLivestream;
       });
     }
 
