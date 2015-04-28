@@ -12,6 +12,7 @@ limitations under the License.
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
 <link rel="import" href="../bower_components/core-media-query/core-media-query.html">
 <link rel="import" href="../bower_components/google-youtube/google-youtube.html">
 <link rel="import" href="../bower_components/paper-dropdown/paper-dropdown.html">
@@ -101,7 +102,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
               <div>
                 <paper-dropdown-menu label="Switch channel">
                   <paper-dropdown valign="bottom" halign="right" class="dropdown">
-                    <core-menu class="menu" valueattr="videoid" selected="{{selectedVideoId}}}">
+                    <core-menu class="menu" valueattr="videoid" selected="{{selectedVideoId}}">
                       <template repeat="{{video,i in videoIds}}">
                         <template if="{{i === 0}}">
                           <paper-item videoid="{{video}}">Keynote</paper-item>
