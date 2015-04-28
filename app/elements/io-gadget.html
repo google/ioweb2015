@@ -380,21 +380,24 @@ The `<io-gadget>` element renders a youtube video + social feed.
           this.view = this.VIEWS_.BEFORE;
           var timeout = (day1Start - today) + offset;
           setLongTimeout(this.setView.bind(this), timeout); // refresh view when I/O starts.
+
+          return;
         } else if (today.isBetween(day1Start, day1End)) {
           this.view = this.VIEWS_.LIVE;
-          var timeout = (day1End - today) + offset;
-          setTimeout(this.setView.bind(this), timeout); // refresh view when day 1 ends.
+          var timeout = (day1End - today) + offset;  // refresh view when day 1 ends.
         } else if (today.isBetween(day2Start, day2End)) {
           this.view = this.VIEWS_.LIVE;
-          var timeout = (day2End - today) + offset;
-          setTimeout(this.setView.bind(this), timeout); // refresh view when day 2 ends.
+          var timeout = (day2End - today) + offset;  // refresh view when day 2 ends.
         } else if (today.isBetween(day1End, day2Start)) {
           this.view = this.VIEWS_.BETWEEN;
-          var timeout = (day2Start - today) + offset;
-          setTimeout(this.setView.bind(this), timeout); // refresh view when day2 starts.
+          var timeout = (day2Start - today) + offset;  // refresh view when day2 starts.
         } else if (today.isAfter(day2End)) {
           this.view = this.VIEWS_.AFTER;
+
+          return; // don't refresh view.
         }
+
+        interval_ = setTimeout(this.setView.bind(this), timeout);
       }
 
     });
