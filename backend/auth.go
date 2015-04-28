@@ -18,8 +18,9 @@ import (
 )
 
 var (
-	errAuthMissing = errors.New("authorization required")
-	errAuthInvalid = errors.New("mismatched or malformed authorization")
+	errAuthMissing   = errors.New("authorization required")
+	errAuthInvalid   = errors.New("mismatched or malformed authorization")
+	errAuthTokenType = errors.New("invalid token type")
 )
 
 const (
@@ -212,7 +213,7 @@ func fetchCredentials(c context.Context, code string) (*oauth2Credentials, error
 	}
 
 	if body.RefreshToken == "" && cred.RefreshToken == "" {
-		return nil, errors.New("fetchCredentials: not offline; refresh token is not set")
+		return nil, errAuthTokenType
 	}
 
 	// reuse tokens if none provided in exchange

@@ -146,14 +146,7 @@ Fired when sign in fails for some reason.
     },
 
     signOut: function() {
-      this.auth2.signOut().then(function() {
-        // Note: disconnect() revokes the user's token include the backend's
-        // refresh token. This means other signed in devices/browsers would
-        // be invalidated, resulting in the user never receiving notifications
-        // on those devices :(.
-        // this.auth2.disconnect(); // revoke oauth scopes.
-
-      }.bind(this), this.onSignInError);
+      this.auth2.signOut().then(undefined, this.onSignInError.bind(this));
     },
 
     signinChangedHandler: function(signedIn) {
@@ -202,14 +195,19 @@ Fired when sign in fails for some reason.
         if (e.target.status === 200) {
           opt_callback && opt_callback();
         } else {
-          // TODO: signin in -> sign out -> sign in not working because the
-          // server is responding with "fetchCredentials: not offline; refresh token is not set"}
-          // and doesn't get a RT token. Not sure why.
-          // TODO: call disconnect because token could not be saved?
           this.signOut(); // One-time token could not be saved in backend. Log user out.
 
+          // handle a special case where the server does not possess an offline token anymore
+          // and so the whole auth flow should be retried again.
+          if (e.target.status === 498) {
+            // we could do this.auth2.disconnect().then(this.signIn.bind(this))
+            // but chrome blocks the popup window. so, just let the user tap
+            // on 'sign in' button again.
+            this.auth2.disconnect();
+          }
+
           this.fire('signin-fail', {
-            error: 'One-time token was not sent to server',
+            error: 'Server-side auth failed with ' + e.target.status,
             oneTimeCodeFail: true
           });
         }

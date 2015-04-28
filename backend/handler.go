@@ -941,6 +941,8 @@ func errStatus(err error) int {
 		return http.StatusUnauthorized
 	case errAuthInvalid:
 		return http.StatusForbidden
+	case errAuthTokenType:
+		return 498
 	default:
 		return http.StatusInternalServerError
 	}
