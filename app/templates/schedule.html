@@ -97,7 +97,7 @@
 
     </div>
   </div>
-  <div class="session__info__section session__info__links card-content" hidden?="{{!selectedSession.relatedContent}}">
+  <div class="session__info__section session__info__links card-content" hidden?="{{!selectedSession.hasRelated}}">
     <span class="anchor-like" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related" core-overlay-toggle>View related content</span>
   </div>
 </paper-dialog>
