@@ -325,6 +325,34 @@ func TestHandleAuth(t *testing.T) {
 	}
 }
 
+func TestHandleAuthNoRefresh(t *testing.T) {
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{
+			"access_token": "new-access-token",
+			"id_token": %q,
+			"expires_in": 3600
+		}`, testIDToken)
+	}))
+	defer ts.Close()
+	config.Google.TokenURL = ts.URL
+
+	r := newTestRequest(t, "POST", "/api/v1/auth", strings.NewReader(`{"code": "one-off"}`))
+	r.Header.Set("Authorization", "Bearer "+testIDToken)
+	w := httptest.NewRecorder()
+
+	c := newContext(r)
+	cache.flush(c)
+	handleAuth(w, r)
+
+	if w.Code != 498 {
+		t.Errorf("w.Code = %d; want 498\nResponse: %s", w.Code, w.Body.String())
+	}
+}
+
 func TestServeUserScheduleExpired(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)

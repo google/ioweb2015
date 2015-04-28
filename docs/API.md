@@ -28,6 +28,14 @@ Content-Type: application/json
 
 This completes the authentication flow.
 
+If the server responds with a status code other than 200 OK, the client must
+sign the user out and retry authentication, 'lite re-signin'.
+
+There's one specific case where the server responds with 498 error status code.
+It is borrowed from other systems to indicate that the client should revoke
+all tokens and retry authentication starting from scratch - the permissions grant dialog -
+as opposed to 'lite re-signin'.
+
 
 ## Handling responses
 
