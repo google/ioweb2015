@@ -16,11 +16,11 @@
       </paper-tab>
       <paper-tab label="day1" role="">
         <a href="#day1" data-track-link="schedule-day1" data-ajax-link
-                        layout horizontal center-center>{{days.day1.tabTitle}}</a>
+                        layout horizontal center-center>Day 1</a>
       </paper-tab>
       <paper-tab label="day2" role="">
         <a href="#day2" data-track-link="schedule-day2" data-ajax-link
-                        layout horizontal center-center>{{days.day2.tabTitle}}</a>
+                        layout horizontal center-center>Day 2</a>
       </paper-tab>
       <paper-tab label="myschedule" role="">
         <a href="#myschedule" data-track-link="schedule-mysched" data-ajax-link
@@ -479,12 +479,10 @@
 
         this.days = {
           day1: {
-            value: parseInt(day1LocalizedTime.format('D')),
-            tabTitle: day1LocalizedTime.format('MMMM D')
+            value: parseInt(day1LocalizedTime.format('D'))
           },
           day2: {
-            value: parseInt(day2LocalizedTime.format('D')),
-            tabTitle: day2LocalizedTime.format('MMMM D')
+            value: parseInt(day2LocalizedTime.format('D'))
           },
           myschedule: {
             value: 'myschedule'
