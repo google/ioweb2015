@@ -39,57 +39,66 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          vertical?="{{isPhoneSize}}" horizontal?="{{!isPhoneSize}}">
       <div flex?="{{!isPhoneSize}}" layout vertical>
 
-        <template repeat="{{timeBlock in timeBlocks_}}" if="{{day.value === 'myschedule'}}" >
+          <template if="{{day.value === 'myschedule'}}">
 
-          <div hidden?="{{!(timeBlock.day >= firstDay_ && timeBlock.day <= lastDay_)}}">
-
-            <div hidden?="{{!timeBlock.dayStart}}">
-              <div class="card day-title">
-                <div class="card-content">
-                  <h4>May {{timeBlock.dayStart}}</h4>
-                </div>
-              </div>
-              <div class="card">
-                <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
-                     vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified>
-                  <span class="no-sessions">Add more events for this day</span>
-                  <a href="#day{{(timeBlock.dayStart % firstDay_) + 1}}" data-subpage-link>Browse events</a>
-                </div>
-                <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
-              </div>
-            </div>
-
-            <div class="card" hidden?="{{!timeBlock.sessions.length}}">
-              <div class="card-content">
-                <h4>{{timeBlock.name}}</h4>
+            <div class="card">
+              <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
+                   vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified>
+                <span class="no-sessions">Add more events</span>
+                <a href="#day1" data-subpage-link>Browse events</a>
               </div>
               <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
-              <div class="card-content schedule-rows" layout vertical>
-                <template repeat="{{session in timeBlock.sessions}}">
-                  <div class="schedule-row" layout horizontal
-                       center?="{{isDesktopSize}}">
-                    <io-radio-button aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
-                                     checked disabled></io-radio-button>
-                    <div layout vertical?="{{!isDesktopSize}}"
-                         horizontal?="{{isDesktopSize}}" flex tabindex="0"
-                         on-click="{{onSaveClick}}" on-keyup="{{onSaveKeyUp}}">
-                      <span id="session-{{session.id}}-time" class="schedule-time" flex auto-vertical>
-                        {{session.start}} <span hidden?="{{session.id === '__keynote__'}}"> - {{session.end}}</span>
-                      </span>
-                      <span id="session-{{session.id}}-title" class="schedule-title"
-                            auto-vertical flex?="{{!isPhoneSize}}" two
-                            title="{{session.title}}">
-                        {{session.title}}
-                        <core-icon icon="io:videocam" class="schedule-livestream"
-                                   hidden?="{{!session.isLivestream}}"></core-icon>
-                      </span>
-                    </div>
-                  </div>
-                </template>
-              </div>
             </div>
 
-          </div>
+            <template repeat="{{timeBlock in timeBlocks_}}">
+
+              <!-- <div hidden?="{{!timeBlock.dayStart}}">
+                <div class="card day-title">
+                  <div class="card-content">
+                    <h4>May {{timeBlock.dayStart}}</h4>
+                  </div>
+                </div>
+                <div class="card" hidden?="{{timeBlock.day > lastDay_}}">
+                  <div class="card-content" layout horizontal?="{{!isPhoneSize}}"
+                       vertical?="{{isPhoneSize}}" center?="{{!isPhoneSize}}" justified>
+                    <span class="no-sessions">Add more events for this day</span>
+                    <a href="#day{{(timeBlock.dayStart % firstDay_) + 1}}" data-subpage-link>Browse events</a>
+                  </div>
+                  <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
+                </div>
+              </div> -->
+
+              <div class="card" hidden?="{{!timeBlock.sessions.length}}">
+                <div class="card-content">
+                  <h4>May {{timeBlock.day}}, {{timeBlock.name}}</h4>
+                </div>
+                <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
+                <div class="card-content schedule-rows" layout vertical>
+                  <template repeat="{{session in timeBlock.sessions}}">
+                    <div class="schedule-row" layout horizontal
+                         center?="{{isDesktopSize}}">
+                      <io-radio-button aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
+                                       checked disabled></io-radio-button>
+                      <div layout vertical?="{{!isDesktopSize}}"
+                           horizontal?="{{isDesktopSize}}" flex tabindex="0"
+                           on-click="{{onSaveClick}}" on-keyup="{{onSaveKeyUp}}">
+                        <span id="session-{{session.id}}-time" class="schedule-time" flex auto-vertical>
+                          {{session.start}} <span hidden?="{{session.id === '__keynote__'}}"> - {{session.end}}</span>
+                        </span>
+                        <span id="session-{{session.id}}-title" class="schedule-title"
+                              auto-vertical flex?="{{!isPhoneSize}}" two
+                              title="{{session.title}}">
+                          {{session.title}}
+                          <core-icon icon="io:videocam" class="schedule-livestream"
+                                     hidden?="{{!session.isLivestream}}"></core-icon>
+                        </span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+          </template>
 
         </template>
 
@@ -103,11 +112,14 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
           <template repeat="{{timeBlock in timeBlocks_}}">
 
-            <template if="{{timeBlock.day == day.value && timeBlock.sessions.length}}">
+            <!-- Show sessions for the current day. If a timezone is selected
+                 and this is the last day tab, also show sessions that spill over
+                 into the next day. -->
+            <template if="{{(timeBlock.day == day.value || (timeBlock.day > lastDay_ && day.value == lastDay_)) && timeBlock.sessions.length}}">
 
               <div class="card">
                 <div class="card-content">
-                  <h4>{{timeBlock.name}}</h4>
+                  <h4><span hidden?="{{timeBlock.day <= lastDay_}}">May {{timeBlock.day}}, </span> {{timeBlock.name}}</h4>
                 </div>
 
                 <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
