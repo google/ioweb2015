@@ -32,18 +32,19 @@ type eventData struct {
 }
 
 type eventSession struct {
-	Id        string    `json:"id"`
-	Title     string    `json:"title"`
-	Desc      string    `json:"description"`
-	StartTime time.Time `json:"startTimestamp"`
-	EndTime   time.Time `json:"endTimestamp"`
-	IsLive    bool      `json:"isLivestream"`
-	Tags      []string  `json:"tags"`
-	Speakers  []string  `json:"speakers"`
-	Room      string    `json:"room"`
-	Photo     string    `json:"photoUrl,omitempty"`
-	YouTube   string    `json:"youtubeUrl,omitempty"`
-	Related   []*struct {
+	Id         string    `json:"id"`
+	Title      string    `json:"title"`
+	Desc       string    `json:"description"`
+	StartTime  time.Time `json:"startTimestamp"`
+	EndTime    time.Time `json:"endTimestamp"`
+	IsLive     bool      `json:"isLivestream"`
+	Tags       []string  `json:"tags"`
+	Speakers   []string  `json:"speakers"`
+	Room       string    `json:"room"`
+	Photo      string    `json:"photoUrl,omitempty"`
+	YouTube    string    `json:"youtubeUrl,omitempty"`
+	HasRelated bool      `json:"hasRelated"`
+	Related    []*struct {
 		Id string `json:"id"`
 	} `json:"relatedContent,omitempty"`
 
@@ -186,6 +187,7 @@ func fetchEventData(c context.Context, urlStr string, lastSync time.Time) (*even
 			for _, r := range s.Related {
 				s.Filters[r.Id] = true
 			}
+			s.HasRelated = len(s.Related) > 0
 			s.Related = nil
 			data.Sessions[id] = s
 		}
