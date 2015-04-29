@@ -294,7 +294,6 @@ IOWA.Schedule = (function() {
     generateFilters: generateFilters,
     getSessionById: getSessionById,
     updateSavedSessionsUI: updateSavedSessionsUI,
-    setScheduleData: setScheduleData,
     replayQueuedRequests: replayQueuedRequests,
     clearQueuedRequests: clearQueuedRequests,
     clearUserSchedule: clearUserSchedule

@@ -117,6 +117,8 @@
 
   // Watch for sign-in changes to fetch user schedule, update UI, etc.
   window.addEventListener('signin-change', function(e) {
+    var template = IOWA.Elements.Template;
+
     if (e.detail.signedIn) {
       // Check to see if there are any failed session modification requests, and if so, replay them.
       IOWA.Schedule.replayQueuedRequests().then(function() {
