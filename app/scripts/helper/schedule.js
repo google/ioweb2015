@@ -168,26 +168,33 @@ IOWA.Schedule = (function() {
    * @return {Promise} Resolves once the replay attempts are done, whether or not they succeeded.
    */
   function replayQueuedRequests() {
-    return simpleDB.open(QUEUED_SESSION_UPDATES_DB_NAME).then(function(db) {
-      var replayPromises = [];
-      // forEach is a special method implemented by SimpleDB, and isn't the normal Array.forEach.
-      return db.forEach(function(url, method) {
-        var replayPromise = IOWA.Request.xhrPromise(method, url, true).then(function() {
-          return db.delete(url).then(function() {
-            return true;
+    // Only bother checking for queued requests if we're on a browser with service worker support,
+    // since they can't be queued otherwise. This has a side effect of working around a bug in
+    // Safari triggered by the simpleDB library.
+    if ('serviceWorker' in navigator) {
+      return simpleDB.open(QUEUED_SESSION_UPDATES_DB_NAME).then(function(db) {
+        var replayPromises = [];
+        // forEach is a special method implemented by SimpleDB, and isn't the normal Array.forEach.
+        return db.forEach(function(url, method) {
+          var replayPromise = IOWA.Request.xhrPromise(method, url, true).then(function() {
+            return db.delete(url).then(function() {
+              return true;
+            });
           });
+          replayPromises.push(replayPromise);
+        }).then(function() {
+          if (replayPromises.length) {
+            return Promise.all(replayPromises).then(function() {
+              IOWA.Elements.Toast.showMessage('My Schedule was updated with offline changes.');
+            });
+          }
         });
-        replayPromises.push(replayPromise);
-      }).then(function() {
-        if (replayPromises.length) {
-          return Promise.all(replayPromises).then(function() {
-            IOWA.Elements.Toast.showMessage('My Schedule was updated with offline changes.');
-          });
-        }
+      }).catch(function() {
+        IOWA.Elements.Toast.showMessage('Offline changes could not be applied to My Schedule.');
       });
-    }).catch(function() {
-      IOWA.Elements.Toast.showMessage('Offline changes could not be applied to My Schedule.');
-    });
+    } else {
+      return Promise.resolve();
+    }
   }
 
   /**
