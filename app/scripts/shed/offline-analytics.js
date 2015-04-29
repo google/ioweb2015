@@ -2,7 +2,7 @@ var DB_NAME = 'shed-offline-analytics';
 var EXPIRATION_TIME_DELTA = 86400000; // One day, in milliseconds.
 var ORIGIN = /https?:\/\/((www|ssl)\.)?google-analytics\.com/;
 
-function replayQueuedRequests() {
+function replayQueuedAnalyticsRequests() {
   simpleDB.open(DB_NAME).then(function(db) {
     db.forEach(function(url, originalTimestamp) {
       var timeDelta = Date.now() - originalTimestamp;
@@ -33,7 +33,7 @@ function replayQueuedRequests() {
   });
 }
 
-function queueFailedRequest(request) {
+function queueFailedAnalyticsRequest(request) {
   console.log('Queueing failed request:', request);
 
   simpleDB.open(DB_NAME).then(function(db) {
@@ -51,11 +51,11 @@ function handleAnalyticsCollectionRequest(request) {
       return response;
     }
   }).catch(function() {
-    queueFailedRequest(request);
+    queueFailedAnalyticsRequest(request);
   });
 }
 
 shed.router.get('/collect', handleAnalyticsCollectionRequest, {origin: ORIGIN});
 shed.router.get('/analytics.js', shed.networkFirst, {origin: ORIGIN});
 
-replayQueuedRequests();
+replayQueuedAnalyticsRequests();
