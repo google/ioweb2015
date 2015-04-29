@@ -60,7 +60,8 @@
     "es6-promise-2.0.1.min": "https://es6-promises.s3.amazonaws.com/es6-promise-2.0.1.min.js",
     "web-animations-js": "web-animations/web-animations-js#^1.0.7",
     "moment": "~2.10.2",
-    "moment-timezone": "~0.3.1"
+    "moment-timezone": "~0.3.1",
+    "elevator": "tholman/elevator.js"
   },
   "resolutions": {
     "web-animations-js": "1.0.7",
