@@ -27,15 +27,17 @@
         <div class="card-content">
           <h3><i18n-msg msgid="io-description">Google I/O is for developers—the creative coders who are building what's next. Together we'll explore the latest in tech, mobile &amp; beyond.</i18n-msg></h3>
         </div>
+        <div relative><paper-progress indeterminate fit hidden?="{{!scheduleFetchingUserData}}"></paper-progress></div>
         <div class="card-content link-spacing">
           <a href="about" data-ajax-link data-transition="hero-card-transition"
              data-track-link="home-learn-more-about-io">
               <i18n-msg msgid="learnmore">Learn more about I/O</i18n-msg>
           </a>
-          <!-- <a href="#" data-ajax-link data-transition="hero-card-transition"
-             data-track-link="home-set-reminder" class="notification__feature">
+          <a href="#" data-ajax-link data-transition="home-set-reminder"
+             data-track-link="home-set-reminder" class="notification__feature"
+             on-click="{{onSetReminder}}">
             <core-icon icon="io:notifications-none"></core-icon> Set a reminder
-          </a> -->
+          </a>
         </div>
         <div class="ripple">
           <div class="ripple__content"></div>
@@ -209,6 +211,44 @@
       IOWA.Elements.Template.onArrivedAtGlobePin = function(e, detail, sender) {
         e.stopPropagation();
         IOWA.Elements.Main.querySelector('.globe-marker').classList.remove('up');
+      };
+
+      IOWA.Elements.Template.onSetReminder = function(e, detail, sender) {
+        e.preventDefault();
+
+        var template = this;
+        template.scheduleFetchingUserData = true;
+
+        IOWA.Schedule.saveSession('__keynote__', true).then(function() {
+          template.scheduleFetchingUserData = false;
+
+          if (template.savedSessions.length) {
+            IOWA.Schedule.updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
+          }
+
+          // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
+          // add the session without attempting to auto-subscribe.
+          return IOWA.Notifications.subscribePromise(template.dontAutoSubscribe).then(function() {
+            template.dontAutoSubscribe = false;
+            IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll be reminded when I/O starts.");
+          }).catch(function(error) {
+            template.dontAutoSubscribe = true;
+            if (error && error.name === 'AbortError') {
+              // AbortError indicates that the subscription couldn't be completed due to the page
+              // permissions for notifications being set to denied.
+              IOWA.Elements.Toast.showMessage(
+                "You'll be reminded when I/O starts. Want to enable notifications?", null, 'Learn how',
+                function() {
+                  window.open('permissions', '_blank');
+                }
+              );
+            } else {
+              // If the subscription failed for some other reason, like because we're not
+              // auto-subscribing, show the normal toast.
+              IOWA.Elements.Toast.showMessage('Added to My Schedule.');
+            }
+          });
+        });
       };
 
       page.load(); // Run load callback on page load.
