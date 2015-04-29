@@ -20,6 +20,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-label/core-label.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="io-radio-button.html">
+<link rel="import" href="social-post.html">
 
 <!--
 The `<io-live>` provides the Google I/O live stream experience.
@@ -33,7 +34,16 @@ Fired when the mode changes.
 -->
 <polymer-element name="io-live">
   <template>
-    <link rel="stylesheet" href="io-live.css">
+    <link rel="stylesheet" href="io-live.css" no-shim>
+    <style>
+      social-post::shadow header {
+        margin-bottom: 8px;
+      }
+      social-post::shadow .timestamp,
+      social-post::shadow a {
+        font-size: 14px;
+      }
+    </style>
 
     <div class="bottom__bar" layout horizontal end justified>
       <div>
@@ -98,8 +108,20 @@ Fired when the mode changes.
               </div>
 
             </section>
-            <section label="hash">
-              <div layout vertical>hash</div>
+            <section id="hashtab" label="hash">
+              <div class="card">
+                <div class="card-content social__feed" layout vertical>
+                  <template repeat="{{post in socialPosts}}">
+                    <social-post kind="{{post.kind}}"
+                                 author="{{post.author}}"
+                                 url="{{post.url}}"
+                                 text="{{post.text}}"
+                                 when="{{post.when}}"
+                                 media="{{post.media}}">
+                    </social-post>
+                  </template>
+                </div>
+              </div>
             </section>
           </core-animated-pages>
 
@@ -223,6 +245,15 @@ Fired when the mode changes.
        * @default false
        */
       fetchingUserData: false,
+
+      /**
+       * Social posts.
+       *
+       * @attribute socialPosts
+       * @type array
+       * @default []
+       */
+      socialPosts: null
     },
 
   eventDelegates: {
@@ -232,6 +263,7 @@ Fired when the mode changes.
     created: function() {
       this.sessions = [];
       this.userSessions = [];
+      this.socialPosts = [];
       this.speakers = {};
     },
 

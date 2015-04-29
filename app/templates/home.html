@@ -119,7 +119,7 @@
 
         <template if="{{socialPosts.length >= 3}}">
           <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-            <template repeat="{{socialPost in socialPosts}}">
+            <template repeat="{{socialPost in socialPosts | limit(3)}}">
               <social-post kind="{{socialPost.kind}}"
                            author="{{socialPost.author}}"
                            url="{{socialPost.url}}"
@@ -151,7 +151,7 @@
     function initPage() {
       var page = IOWA.Elements.Template.pages['home'];
       var socialPostsEndpoint = 'api/v1/social';
-      var socialPostUpdateInterval = 30000; // 30 seconds
+      var socialPostUpdateInterval = 30 * 1000; // 30 seconds
       var updateSocialPostsTimeout;
 
       if (page.hasBeenLoaded) {
@@ -180,7 +180,7 @@
 
       function processSocialPosts(socialPosts) {
         // Only show the first 3 posts.
-        IOWA.Elements.Template.socialPosts = socialPosts.slice(0, 3);
+        IOWA.Elements.Template.socialPosts = socialPosts;
       }
 
       page.load = function() {

@@ -351,6 +351,10 @@ IOWA.Elements = (function() {
       return list.join(', ');
     };
 
+    template.limit = function(array, howMany) {
+      return array.slice(0, howMany);
+    };
+
     template.scrollLock = function(enable) {
       document.body.classList.toggle('noscroll', enable);
     };

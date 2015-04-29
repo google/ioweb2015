@@ -27,6 +27,12 @@ a {
   font-weight: 400;
 }
 
+.social-photo {
+  max-width: 100%;
+  margin-top: $mobileKeyline / 2;
+  border-radius: 2px;
+}
+
 @media (min-width: $tablet-breakpoint-min) {
   header {
     margin-bottom: $tabletKeyline;

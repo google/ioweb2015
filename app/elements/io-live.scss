@@ -23,7 +23,7 @@ $ytVideoControlsHeight: $desktopKeyline;
   display: block;
   background-color: $color-cyan-500;
   @include typo-body();
-  font-size: 14px;
+  font-size: 16px;
 }
 
 countdown-timer {
@@ -179,12 +179,9 @@ core-animated-pages {
     }
   }
 
-  .schedule-title {
-    font-size: 16px;
-  }
-
   .schedule-speakers {
     color: $color-link-grey;
+    font-size: 14px;
   }
 
   io-radio-button {
@@ -195,6 +192,14 @@ core-animated-pages {
 
 paper-progress {
   width: 100%;
+}
+
+#hashtab {
+  overflow: auto;
+
+  social-post {
+    margin-bottom: $tabletKeyline;
+  }
 }
 
 .card__bottom-links {

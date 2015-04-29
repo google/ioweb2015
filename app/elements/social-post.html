@@ -25,7 +25,7 @@ Displays information about a social post, and linkifies certain URLs in the text
 
 @element social-post
 -->
-<polymer-element name="social-post" attributes="kind author url text when hideAuthor">
+<polymer-element name="social-post" attributes="kind author url text when hideAuthor media">
   <template>
     <link rel="stylesheet" href="social-post.css">
     <header>
@@ -35,6 +35,12 @@ Displays information about a social post, and linkifies certain URLs in the text
       </div>
     </header>
     <div id="postContent"></div>
+    <template if="{{media}}">
+      <a href="{{media[0].expanded_url}}" target="_blank">
+        <img _src="{{media[0].media_url_https}}" class="social-photo"
+             style="width:{{media[0].sizes.smasll.w}}px;height:{{media[0].sizes.smasll.h}}px">
+      </a>
+    </template>
   </template>
   <script>
   Polymer({
@@ -92,7 +98,17 @@ Displays information about a social post, and linkifies certain URLs in the text
        * @type bool
        * @default false
        */
-      hideAuthor: false
+      hideAuthor: false,
+
+      /**
+       * Media-like object as returned by the twitter API.
+       * See dev.twitter.com/overview/api/entities-in-twitter-objects
+       *
+       * @attribute media
+       * @type object
+       * @default null
+       */
+      media: null,
     },
 
     // All URLs shared via Twitter are shortened to the form http(s)://t.co/...
