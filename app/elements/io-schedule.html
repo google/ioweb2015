@@ -81,7 +81,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                                        checked disabled></io-radio-button>
                       <div layout vertical?="{{!isDesktopSize}}"
                            horizontal?="{{isDesktopSize}}" flex tabindex="0"
-                           on-click="{{onSaveClick}}" on-keyup="{{onSaveKeyUp}}">
+                           on-click="{{onSessionSelect}}" on-keyup="{{onSessionKeyUp}}">
                         <span id="session-{{session.id}}-time" class="schedule-time" flex auto-vertical>
                           {{session.start}} <span hidden?="{{session.id === '__keynote__'}}"> - {{session.end}}</span>
                         </span>
@@ -135,7 +135,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                           on-change="{{onToggleSaveSession}}"></io-radio-button>
                       <div layout vertical?="{{!isDesktopSize}}"
                            horizontal?="{{isDesktopSize}}" flex tabindex="0"
-                           on-click="{{onSaveClick}}" on-keyup="{{onSaveKeyUp}}">
+                           on-click="{{onSessionSelect}}" on-keyup="{{onSessionKeyUp}}">
                         <span id="session-{{session.id}}-time" class="schedule-time" flex auto-vertical>
                           {{session.start}} <span hidden?="{{session.id === '__keynote__'}}"> - {{session.end}}</span>
                         </span>
@@ -454,11 +454,11 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         }
       },
 
-      onSaveClick: function(e, detail, sender) {
+      onSessionSelect: function(e, detail, sender) {
         this.selectSession(sender.templateInstance.model.session);
       },
 
-      onSaveKeyUp: function(e, detail, sender) {
+      onSessionKeyUp: function(e, detail, sender) {
         // enter or ctrl+alt+space (voice over click)
         if (e.keyCode === 13 || e.altKey && e.ctrlKey && e.keyCode === 32) {
           this.selectSession(sender.templateInstance.model.session);

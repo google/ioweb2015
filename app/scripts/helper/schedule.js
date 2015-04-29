@@ -141,7 +141,7 @@ IOWA.Schedule = (function() {
    * @return {Promise} Resolves with the server's response.
    */
   function saveSession(sessionId, save) {
-    IOWA.Analytics.trackEvent('session', 'bookmark', save);
+    IOWA.Analytics.trackEvent('session', 'bookmark', save ? 'save' : 'remove');
 
     return IOWA.Auth.waitForSignedIn('Sign in to add events to My Schedule').then(function() {
       IOWA.Elements.Template.scheduleFetchingUserData = true;

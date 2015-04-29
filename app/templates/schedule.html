@@ -380,8 +380,8 @@
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
       };
 
-      IOWA.Elements.Template.openSession = function(sessionOrDetail) {
-        this.selectedSession = sessionOrDetail.detail ? sessionOrDetail.detail.session : sessionOrDetail;
+      IOWA.Elements.Template.openSession = function(sessionOrEvent) {
+        this.selectedSession = sessionOrEvent.detail ? sessionOrEvent.detail.session : sessionOrEvent;
 
         // Open paper-dialog.
         var panel = IOWA.Elements.Main.querySelector('.session__detail');
@@ -458,6 +458,9 @@
         } else {
           pageIsDeepLinked_ = true;
         }
+
+        // Report session detail as pageview in GA.
+        IOWA.Analytics.trackPageView(location.pathname + location.hash);
       };
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
