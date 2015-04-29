@@ -204,12 +204,10 @@ IOWA.Schedule = (function() {
 
   function updateSavedSessionsUI(savedSessions) {
     //  Mark/unmarked sessions the user has bookmarked.
-    if (savedSessions.length) {
-      var sessions = IOWA.Elements.Template.scheduleData.sessions;
-      for (var i = 0; i < sessions.length; ++i) {
-        var session = sessions[i];
-        session.saved = savedSessions.indexOf(session.id) !== -1;
-      }
+    var sessions = IOWA.Elements.Template.scheduleData.sessions;
+    for (var i = 0; i < sessions.length; ++i) {
+      var session = sessions[i];
+      session.saved = savedSessions.indexOf(session.id) !== -1;
     }
   }
 
