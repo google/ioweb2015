@@ -26,6 +26,10 @@ type appFolderData struct {
 	Feedback  []string `json:"feedback_submitted_sessions"`
 }
 
+var defaultAppData = &appFolderData{
+	Bookmarks: []string{"__keynote__"},
+}
+
 func fetchAppFolderData(c context.Context, cred *oauth2Credentials) (*appFolderData, error) {
 	// list files in 'appfolder' with title 'user_data.json'
 	// TODO: cache appdata file ID so not to query every time.
@@ -71,20 +75,17 @@ func fetchAppFolderData(c context.Context, cred *oauth2Credentials) (*appFolderD
 			fileURL = item.DownloadURL
 		}
 	}
-
-	// get the file contents or return an empty if none exists
-	data := &appFolderData{}
-
 	if fileURL == "" {
 		logf(c, "fetchAppFolderData: file not found")
-		return data, nil
+		var d appFolderData = *defaultAppData
+		return &d, nil
 	}
 
 	if res, err = hc.Get(fileURL); err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
-	data.id = fileID
+	data := &appFolderData{id: fileID}
 	return data, json.NewDecoder(res.Body).Decode(data)
 }
 
