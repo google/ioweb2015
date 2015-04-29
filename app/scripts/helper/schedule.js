@@ -27,8 +27,34 @@ IOWA.Schedule = (function() {
   var scheduleData_ = null;
   var userSavedSessions_ = [];
 
+  // A promise fulfilled by the loaded schedule.
+  var scheduleDeferredPromise = null;
+
+  // The resolve function for scheduleDeferredPromise;
+  var scheduleDeferredPromiseResolver = null;
+
   /**
-   * Fetches the I/O schedule data.
+   * Create the deferred schedule-fetching promise `scheduleDeferredPromise`.
+   * @private
+   */
+  function createScheduleDeferred_() {
+    var scheduleDeferred = IOWA.Util.createDeferred();
+    scheduleDeferredPromiseResolver = scheduleDeferred.resolve;
+    scheduleDeferredPromise = scheduleDeferred.promise.then(function(data) {
+      scheduleData_ = data.scheduleData;
+      IOWA.Elements.Template.scheduleData = data.scheduleData;
+      IOWA.Elements.Template.filterSessionTypes = data.tags.filterSessionTypes;
+      IOWA.Elements.Template.filterThemes = data.tags.filterThemes;
+      IOWA.Elements.Template.filterTopics = data.tags.filterTopics;
+
+      return scheduleData_;
+    });
+  }
+
+  /**
+   * Fetches the I/O schedule data. If the schedule has not been loaded yet, a
+   * network request is kicked off. To wait on the schedule without causing a
+   * triggering a request for it, use `schedulePromise`.
    * @return {Promise} Resolves with response schedule data.
    */
   function fetchSchedule() {
@@ -40,6 +66,30 @@ IOWA.Schedule = (function() {
       scheduleData_ = resp;
       return scheduleData_;
     });
+  }
+
+  /**
+   * Returns a promise fulfilled when the master schedule is loaded.
+   * @return {!Promise} Resolves with response schedule data.
+   */
+  function schedulePromise() {
+    if (!scheduleDeferredPromise) {
+      createScheduleDeferred_();
+    }
+
+    return scheduleDeferredPromise;
+  }
+
+  /**
+   * Resolves the schedule-fetching promise.
+   * @param {{scheduleData, tags}} data
+   */
+  function resolveSchedulePromise(data) {
+    if (!scheduleDeferredPromiseResolver) {
+      createScheduleDeferred_();
+    }
+
+    scheduleDeferredPromiseResolver(data);
   }
 
   /**
@@ -61,6 +111,26 @@ IOWA.Schedule = (function() {
 
       IOWA.Request.cacheThenNetwork(SCHEDULE_ENDPOINT_USERS, callback, callbackWrapper, true);
     }
+  }
+
+  /**
+   * Wait for the master schedule to have loaded, then use `fetchUserSchedule`
+   * to fetch the user's schedule and finally bind it for display.
+   */
+  function loadUserSchedule() {
+    // Only fetch their schedule if the worker has responded with the master
+    // schedule and the user is signed in.
+    schedulePromise().then(IOWA.Auth.waitForSignedIn).then(function() {
+      IOWA.Elements.Template.scheduleFetchingUserData = true;
+
+      // Fetch user's saved sessions.
+      fetchUserSchedule(function(savedSessions) {
+        var template = IOWA.Elements.Template;
+        template.scheduleFetchingUserData = false;
+        template.savedSessions = savedSessions;
+        updateSavedSessionsUI(template.savedSessions);
+      });
+    });
   }
 
   /**
@@ -134,12 +204,10 @@ IOWA.Schedule = (function() {
 
   function updateSavedSessionsUI(savedSessions) {
     //  Mark/unmarked sessions the user has bookmarked.
-    if (savedSessions.length) {
-      var sessions = IOWA.Elements.Template.scheduleData.sessions;
-      for (var i = 0; i < sessions.length; ++i) {
-        var session = sessions[i];
-        session.saved = savedSessions.indexOf(session.id) !== -1;
-      }
+    var sessions = IOWA.Elements.Template.scheduleData.sessions;
+    for (var i = 0; i < sessions.length; ++i) {
+      var session = sessions[i];
+      session.saved = savedSessions.indexOf(session.id) !== -1;
     }
   }
 
@@ -147,8 +215,14 @@ IOWA.Schedule = (function() {
     userSavedSessions_ = [];
   }
 
-  function setScheduleData(scheduleData) {
-    scheduleData_ = scheduleData;
+  /**
+   * Clear all user schedule data from display.
+   */
+  function clearUserSchedule() {
+    var template = IOWA.Elements.Template;
+    template.savedSessions = [];
+    updateSavedSessionsUI(template.savedSessions);
+    clearCachedUserSchedule();
   }
 
   function getSessionById(sessionId) {
@@ -210,14 +284,17 @@ IOWA.Schedule = (function() {
   return {
     clearCachedUserSchedule: clearCachedUserSchedule,
     fetchSchedule: fetchSchedule,
+    schedulePromise: schedulePromise,
+    resolveSchedulePromise: resolveSchedulePromise,
     fetchUserSchedule: fetchUserSchedule,
+    loadUserSchedule: loadUserSchedule,
     saveSession: saveSession,
     generateFilters: generateFilters,
     getSessionById: getSessionById,
     updateSavedSessionsUI: updateSavedSessionsUI,
-    setScheduleData: setScheduleData,
     replayQueuedRequests: replayQueuedRequests,
-    clearQueuedRequests: clearQueuedRequests
+    clearQueuedRequests: clearQueuedRequests,
+    clearUserSchedule: clearUserSchedule
   };
 
 })();

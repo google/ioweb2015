@@ -20,6 +20,25 @@ IOWA.Util = IOWA.Util || (function() {
 
   "use strict";
 
+  /**
+   * Create a deferred object, allowing a Promise to be fulfilled at a later
+   * time.
+   * @return {{promise: !Promise, resolve: function(), reject: function()}}
+   */
+  function createDeferred() {
+    var resolveFn;
+    var rejectFn;
+    var promise = new Promise(function(resolve, reject) {
+      resolveFn = resolve;
+      rejectFn = reject;
+    });
+    return {
+      promise: promise,
+      resolve: resolveFn,
+      reject: rejectFn
+    };
+  }
+
   // From http://en.wikipedia.org/wiki/Smoothstep
   function smoothStep(start, end, point) {
     if (point <= start) {
@@ -175,6 +194,7 @@ IOWA.Util = IOWA.Util || (function() {
   };
 
   return {
+    createDeferred: createDeferred,
     isFF: isFF,
     isIE: isIE,
     isIOS: isIOS,

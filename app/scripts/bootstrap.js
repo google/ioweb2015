@@ -57,16 +57,7 @@
                                    null, MAX_WORKER_TIMEOUT_);
         }
 
-        IOWA.Schedule.setScheduleData(data.scheduleData); // needed since the worker has a different cached copy.
-        template.scheduleData = data.scheduleData;
-        template.filterSessionTypes = data.tags.filterSessionTypes;
-        template.filterThemes = data.tags.filterThemes;
-        template.filterTopics = data.tags.filterTopics;
-
-        // If user is signed in by this point, fetch their schedule.
-        if (IOWA.Elements.GoogleSignIn.signedIn) {
-          fetchUserSchedule();
-        }
+        IOWA.Schedule.resolveSchedulePromise(data);
       }
     });
 
@@ -87,19 +78,6 @@
 
     CoreStyle.g.paperInput.labelColor = '#008094';
     CoreStyle.g.paperInput.focusedColor = '#008094';
-  }
-
-  function fetchUserSchedule() {
-    var template = IOWA.Elements.Template;
-
-    template.scheduleFetchingUserData = true;
-
-    // Fetch user's saved sessions.
-    IOWA.Schedule.fetchUserSchedule(function(savedSessions) {
-      template.scheduleFetchingUserData = false;
-      template.savedSessions = savedSessions;
-      IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);
-    });
   }
 
   window.addEventListener('core-media-change', function(e) {
@@ -142,14 +120,9 @@
     var template = IOWA.Elements.Template;
 
     if (e.detail.signedIn) {
-      // Check to see if there are any failed session modification requests, and if so, replay them.
-      IOWA.Schedule.replayQueuedRequests().then(function() {
-        // Only fetch their schedule if the worker has responded with the master schedule.
-        // Wait until after any replay requests have completed first.
-        if (template.scheduleData) {
-          fetchUserSchedule();
-        }
-      });
+      // Check to see if there are any failed session modification requests, and
+      // if so, replay them before fetching the user schedule.
+      IOWA.Schedule.replayQueuedRequests().then(IOWA.Schedule.loadUserSchedule);
 
       // If the user hasn't denied notifications permission in the current browser,
       // and the user has notifications turned on globally (i.e. in at least one other browser),
@@ -166,10 +139,9 @@
           }
         });
       }
+
     } else {
-      template.savedSessions = [];
-      IOWA.Schedule.updateSavedSessionsUI(template.savedSessions);
-      IOWA.Schedule.clearCachedUserSchedule();
+      IOWA.Schedule.clearUserSchedule();
     }
   });
 
