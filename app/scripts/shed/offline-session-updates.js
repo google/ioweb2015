@@ -1,6 +1,6 @@
 var QUEUED_SESSION_UPDATES_DB_NAME = 'shed-offline-session-updates';
 
-function queueFailedRequest(request) {
+function queueFailedSessionUpdateRequest(request) {
   console.log('Queueing failed request:', request);
 
   simpleDB.open(QUEUED_SESSION_UPDATES_DB_NAME).then(function(db) {
@@ -13,7 +13,7 @@ function queueFailedRequest(request) {
   });
 }
 
-function handleQueueableRequest(request) {
+function handleSessionUpdateRequest(request) {
   return fetch(request).then(function(response) {
     if (response.status >= 500) {
       // This will cause the promise to reject, triggering the .catch() function.
@@ -23,9 +23,9 @@ function handleQueueableRequest(request) {
       return response;
     }
   }).catch(function() {
-    queueFailedRequest(request);
+    queueFailedSessionUpdateRequest(request);
   });
 }
 
-shed.router.put('/(.+)api/v1/user/schedule/(.+)', handleQueueableRequest);
-shed.router.delete('/(.+)api/v1/user/schedule/(.+)', handleQueueableRequest);
+shed.router.put('/(.+)api/v1/user/schedule/(.+)', handleSessionUpdateRequest);
+shed.router.delete('/(.+)api/v1/user/schedule/(.+)', handleSessionUpdateRequest);
