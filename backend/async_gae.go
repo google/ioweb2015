@@ -64,10 +64,6 @@ func pingDevicesAsync(c context.Context, uid string, regs, endpoints []string, d
 	}
 
 	_, err := taskqueue.AddMulti(c, jobs, "")
-
-	if err == nil {
-		return nil, nil, nil
-	}
 	merr, mok := err.(appengine.MultiError)
 	if !mok {
 		return nil, nil, err
@@ -80,6 +76,9 @@ func pingDevicesAsync(c context.Context, uid string, regs, endpoints []string, d
 		}
 		errRegs = append(errRegs, regs[i])
 		errEndpoints = append(errEndpoints, endpoints[i])
+	}
+	if len(errRegs) == 0 {
+		return nil, nil, nil
 	}
 	return errRegs, errEndpoints, fmt.Errorf("pingDevicesAsync: %v", err)
 }
