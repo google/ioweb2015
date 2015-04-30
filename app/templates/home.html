@@ -225,28 +225,8 @@
             IOWA.Schedule.updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
           }
 
-          // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
-          // add the session without attempting to auto-subscribe.
-          return IOWA.Notifications.subscribePromise(template.dontAutoSubscribe).then(function() {
-            template.dontAutoSubscribe = false;
-            IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll be reminded when I/O starts.");
-          }).catch(function(error) {
-            template.dontAutoSubscribe = true;
-            if (error && error.name === 'AbortError') {
-              // AbortError indicates that the subscription couldn't be completed due to the page
-              // permissions for notifications being set to denied.
-              IOWA.Elements.Toast.showMessage(
-                "You'll be reminded when I/O starts. Want to enable notifications?", null, 'Learn how',
-                function() {
-                  window.open('permissions', '_blank');
-                }
-              );
-            } else {
-              // If the subscription failed for some other reason, like because we're not
-              // auto-subscribing, show the normal toast.
-              IOWA.Elements.Toast.showMessage('Added to My Schedule.');
-            }
-          });
+          IOWA.Schedule.bookmarkSessionNotification(
+              true, "You'll be reminded when I/O starts.")
         });
       };
 
