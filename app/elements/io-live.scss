@@ -118,6 +118,11 @@ countdown-timer {
   width: 100%;
   height: 100%;
 
+  paper-progress {
+    position: absolute;
+    bottom: 0;
+  }
+
   paper-fab {
     background: #fff;
     color: inherit;

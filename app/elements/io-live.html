@@ -72,13 +72,12 @@ Fired when the mode changes.
                         sizing="cover" preload fade fit></core-image>
             <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}" mini
                        class="{{ {active: selectedSession.saved} | tokenList }}"
-                       on-up="{{toggleSaveSession}}"
-                       disabled?="{{scheduleFetchingUserData}}"></paper-fab>
-            <paper-progress indeterminate hidden?="{{!currentUser || (savedSessions && !scheduleFetchingUserData)}}"></paper-progress>
+                       on-up="{{onToggleSaveSession}}"
+                       disabled?="{{fetchingUserData}}"></paper-fab>
+            <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
           </div>
           <div class="session__info__section">
             <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
-            <!-- <h5 class="session__time">May {{selectedSession.day}} / {{selectedSession.start}}<span hidden?="{{selectedSession.id === '__keynote__'}}"> - {{selectedSession.end}}</span> / {{selectedSession.room}}</h5> -->
             <div class="session__desc">{{selectedSession.description}}</div>
           </div>
           <div class="session__info__section session__speakers" hidden?="{{!selectedSession.speakers.length}}">
@@ -407,15 +406,24 @@ toggleVideo: function(e, detail, sender) {
       this.openWidget = false;
     },
 
-    toggleSaveSession: function(e, detail, sender) {
+    onToggleSaveSession: function(e, detail, sender) {
       e.stopPropagation();
 
-      // var saved = !this.selectedSession.saved;
+      var session = sender.templateInstance.model.session;
+      if (session) {
+        this.selectedSession = session;
+      }
 
-      // IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
-      //   IOWA.Schedule.bookmarkSessionNotification(this, saved);
-      //   // ioScheduleEl.updateTimeBlocks(); // Needed for My Schedule to update.
-      // }.bind(this));
+      var saved = !this.selectedSession.saved;
+
+      IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
+        this.selectedSession = saved;
+        this.fetchingUserData = false;
+        IOWA.Schedule.bookmarkSessionNotification(this, saved);
+        // ioScheduleEl.updateTimeBlocks(); // Needed for My Schedule to update.
+      }.bind(this)).catch(function(e) {
+        this.fetchingUserData = false;
+      }.bind(this));
     },
 
     onSessionDetailsOpen: function(e, detail, sender) {
