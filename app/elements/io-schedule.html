@@ -335,8 +335,10 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         this.updateTimeBlocks();
       },
 
-      userSessionsChanged: function() {
-        if (this.userSessions.length) {
+      userSessionsChanged: function(oldVal, newVal) {
+        // Update blocks if we have user sessions or the user session list
+        // is now empty (e.g. user logged out).
+        if (this.userSessions.length || (oldVal.length && !newVal.length)) {
           this.updateTimeBlocks();
         }
       },
