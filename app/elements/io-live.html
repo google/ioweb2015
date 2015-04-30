@@ -13,12 +13,15 @@ limitations under the License.
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-youtube/google-youtube.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
 <link rel="import" href="../bower_components/core-animated-pages/transitions/slide-from-right.html">
-
+<link rel="import" href="../bower_components/core-icon/core-icon.html">
 <link rel="import" href="../bower_components/core-label/core-label.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog-transition.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="io-radio-button.html">
 <link rel="import" href="social-post.html">
 
@@ -43,6 +46,9 @@ Fired when the mode changes.
       social-post::shadow a {
         font-size: 14px;
       }
+      #sessiondetails::shadow #scroller {
+        padding: 0;
+      }
     </style>
 
     <div class="bottom__bar" layout horizontal end justified>
@@ -56,6 +62,50 @@ Fired when the mode changes.
                  aria-label="My schedule" title="My schedule" on-tap="{{onFabClick}}"></paper-fab>
 
       <div id="livewidget" on-transitionend="{{onFabTransition}}">
+
+      <paper-dialog id="sessiondetails" transition="paper-dialog-transition-bottom" layered="false"
+                    on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
+          <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
+          <div class="card__photo" relative>
+            <core-image src="{{selectedSession.photoUrl || 'images/schedule/session_placeholder.jpg'}}"
+                        placeholder="images/io15-color.png"
+                        sizing="cover" preload fade fit></core-image>
+            <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}" mini
+                       class="{{ {active: selectedSession.saved} | tokenList }}"
+                       on-up="{{toggleSaveSession}}"
+                       disabled?="{{scheduleFetchingUserData}}"></paper-fab>
+            <paper-progress indeterminate hidden?="{{!currentUser || (savedSessions && !scheduleFetchingUserData)}}"></paper-progress>
+          </div>
+          <div class="session__info__section">
+            <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
+            <!-- <h5 class="session__time">May {{selectedSession.day}} / {{selectedSession.start}}<span hidden?="{{selectedSession.id === '__keynote__'}}"> - {{selectedSession.end}}</span> / {{selectedSession.room}}</h5> -->
+            <div class="session__desc">{{selectedSession.description}}</div>
+          </div>
+          <div class="session__info__section session__speakers" hidden?="{{!selectedSession.speakers.length}}">
+            <h3>Speakers</h3>
+            <div layout horizontal wrap>
+              <template repeat="{{speakerId in selectedSession.speakers}}">
+                <div class="speaker__card" layout horizontal>
+                  <div><img _src="{{speakers[speakerId].thumbnailUrl || 'images/schedule/profile_placeholder.png'}}" class="profilepic"></div>
+                  <div class="speaker__info" layout vertical flex>
+                    <span class="speaker__name">{{speakers[speakerId].name}}</span>
+                    <span class="speaker__title">{{speakers[speakerId].company}}</span>
+                    <div class="speaker__desc">{{speakers[speakerId].bio}}</div>
+                    <div class="session__social" layout horizontal>
+                      <a href="{{speakers[speakerId].plusoneUrl}}" target="_blank" class="share-icon" hidden?="{{!speakers[speakerId].plusoneUrl}}"><core-icon icon="io:post-gplus"></core-icon></a>
+                      <a href="{{speakers[speakerId].twitterUrl}}" target="_blank" class="share-icon" hidden?="{{!speakers[speakerId].twitterUrl}}"><core-icon icon="io:post-twitter"></core-icon></a>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+            </div>
+          </div>
+          <div class="session__info__section session__info__links card-content" hidden?="{{!selectedSession.hasRelated}}">
+            <span class="anchor-like" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related" core-overlay-toggle>View related content</span>
+          </div>
+        </paper-dialog>
+
         <div class="bg-dark-grey" layout vertical>
 
           <div class="widget-nav" layout horizontal center self-end>
@@ -85,11 +135,14 @@ Fired when the mode changes.
                     <h4>{{session.block}}</h4>
                   </div>
                   <div class="schedule-row" layout horizontal>
-                    <io-radio-button aria-labelledby="session-{{session.id}}-title" toggles checked?="{{session.saved}}"></io-radio-button>
+                    <io-radio-button aria-labelledby="session-{{session.id}}-title"
+                                     toggles checked?="{{session.saved}}"
+                                     on-change="{{onToggleSaveSession}}"></io-radio-button>
                     <div layout vertical flex tabindex="0">
                       <span id="session-{{session.id}}-title" class="schedule-title"
                             auto-vertical flex?="{{!isPhoneSize}}" two
-                            title="{{session.title}}">
+                            title="{{session.title}}"
+                            on-click="{{openSession}}">
                         {{session.title}}
                       </span>
                       <div class="schedule-speakers">{{session.speakers | speakerIdsToNameString}}</div>
@@ -100,7 +153,6 @@ Fired when the mode changes.
 
               <div class="card card__bottom-links">
                 <paper-progress indeterminate hidden?="{{!fetchingUserData}}" fit></paper-progress>
-
                 <div class="card-content" layout horizontal justified>
                   <a href="schedule#day{{dayView}}" data-ajax-link data-track-link="live-fullschedule">Full schedule</a>
                   <a href="{{'schedule#myschedule'}}" data-ajax-link data-track-link="live-myschedule">My schedule</a>
@@ -188,7 +240,7 @@ Fired when the mode changes.
        * @type bool
        * @default false
        */
-      openWidget: false,
+      openWidget: {value: false, reflect: true},
 
       /**
        * The selected nav tab.
@@ -253,7 +305,16 @@ Fired when the mode changes.
        * @type array
        * @default []
        */
-      socialPosts: null
+      socialPosts: null,
+
+      /**
+       * Selected session to see details for.
+       *
+       * @attribute selectedSession
+       * @type object
+       * @default null
+       */
+      selectedSession: null
     },
 
   eventDelegates: {
@@ -310,6 +371,19 @@ Fired when the mode changes.
       this.fire('io-live-mode', {mode: this.mode});
     },
 
+    openSession: function(e, detail, sender) {
+      this.selectedSession = sender.templateInstance.model.session;
+
+      // TODO: global pollution
+      // Report session detail as pageview in GA. Should be the same as what
+      // the schedule page reports as a deep link page view.
+      var path = window.PREFIX + '/schedule#day' + this.dayView + '/' +
+                 this.selectedSession.id;
+      IOWA.Analytics.trackPageView(path);
+
+      this.$.sessiondetails.open();
+    },
+
 toggleVideo: function(e, detail, sender) {
   this.mode = this._MODES.LIVE;
 },
@@ -331,6 +405,21 @@ toggleVideo: function(e, detail, sender) {
     closeFab: function(e, detail, sender) {
       e && e.stopPropagation();
       this.openWidget = false;
+    },
+
+    toggleSaveSession: function(e, detail, sender) {
+      e.stopPropagation();
+
+      // var saved = !this.selectedSession.saved;
+
+      // IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
+      //   IOWA.Schedule.bookmarkSessionNotification(this, saved);
+      //   // ioScheduleEl.updateTimeBlocks(); // Needed for My Schedule to update.
+      // }.bind(this));
+    },
+
+    onSessionDetailsOpen: function(e, detail, sender) {
+      sender.querySelector('.session__title').focus();
     },
 
     speakerIdsToNameString: function(speakers) {

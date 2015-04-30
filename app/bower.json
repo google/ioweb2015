@@ -23,6 +23,7 @@
     "tests"
   ],
   "dependencies": {
+    "core-a11y-keys": "Polymer/core-a11y-keys#^0.5.5",
     "core-animated-pages": "Polymer/core-animated-pages#^0.5.5",
     "core-ajax": "Polymer/core-ajax#^0.5.5",
     "core-drawer-panel": "Polymer/core-drawer-panel#^0.5.5",

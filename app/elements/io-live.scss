@@ -90,7 +90,7 @@ countdown-timer {
   clip-path: circle(32px at center);
   transition: -webkit-clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: white;
-  min-height: 440px;
+  min-height: 500px;
   width: 360px;
   // @include shadow-z1();
   overflow: hidden;
@@ -104,8 +104,107 @@ countdown-timer {
   &.open {
     opacity: 1;
     pointer-events: all;
-    -webkit-clip-path: circle(300px at center);
-    clip-path: circle(32px at center);
+    -webkit-clip-path: circle(400px at center);
+    clip-path: circle(400px at center);
+  }
+}
+
+#sessiondetails {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+
+  paper-fab {
+    background: #fff;
+    color: inherit;
+    position: absolute;
+    right: 16px;
+    bottom: calc(-40px/2); // fab size / 2
+
+    &.active {
+      color: white;
+      background-color: $color-cyan-400;
+    }
+
+    &[disabled] {
+      background-color: $color-light-grey-border;
+      color: $color-gray;
+    }
+  }
+
+  paper-icon-button {
+    position: absolute;
+    z-index: 10;
+    top: $mobileKeyline / 2;
+    left: $mobileKeyline / 2;
+  }
+
+  .card__photo {
+    height: 200px;
+  }
+
+  .session__info__section {
+    padding: $tabletKeyline;
+  }
+  .session__desc {
+    font-size: 14px;
+    margin-top: $tabletKeyline;
+  }
+  .session__title {
+    @include typo-heading-2();
+    line-height: 32px;
+    font-weight: 300;
+    margin: 0;
+  }
+  .speaker__info {
+    .speaker__name {
+      color: #000;
+      font-size: 16px;
+    }
+    .speaker__title {
+      color: $color-link-grey;
+      font-size: 14px;
+    }
+    .speaker__desc {
+      font-size: 14px;
+      padding: $mobileKeyline 0;
+    }
+  }
+  .session__social {
+    line-height: 32px;
+
+    a {
+      color: inherit;
+    }
+    .share-icon {
+      margin-right: 12px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+  .session__speakers {
+    border-top: 1px solid $color-light-grey-border;
+
+    h3 {
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .profilepic {
+      height: 56px;
+      width: 56px;
+      margin-right: $tabletKeyline;
+      border-radius: 50%;
+    }
+
+    .speaker__card {
+      margin-top: $tabletKeyline;
+    }
   }
 }
 
