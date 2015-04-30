@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -491,14 +492,15 @@ func TestHandleUserSchedulePut(t *testing.T) {
 		}
 	}
 
+	expBookmarks := append(defaultAppData.Bookmarks, "new-session-id")
 	checkMedia := func(r io.Reader) {
 		var data appFolderData
 		if err := json.NewDecoder(r).Decode(&data); err != nil {
 			t.Errorf("checkMedia: %v", err)
 			return
 		}
-		if len(data.Bookmarks) != 1 || data.Bookmarks[0] != "new-session-id" {
-			t.Errorf("checkMedia: data.Bookmarks = %v; want ['new-session-id']", data.Bookmarks)
+		if !compareStringSlices(data.Bookmarks, expBookmarks) {
+			t.Errorf("checkMedia: data.Bookmarks = %v; want %v", data.Bookmarks, expBookmarks)
 		}
 	}
 
@@ -586,8 +588,8 @@ func TestHandleUserSchedulePut(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
 		t.Fatalf("Unmarshal(response): %v", err)
 	}
-	if len(list) != 1 || list[0] != "new-session-id" {
-		t.Errorf("list = %v; want ['new-session-id']", list)
+	if !compareStringSlices(list, expBookmarks) {
+		t.Errorf("list = %v; want %v", list, expBookmarks)
 	}
 }
 
@@ -686,6 +688,48 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 	}
 	if len(list) != 1 || list[0] != "two-session" {
 		t.Errorf("list = %v; want ['two-session']", list)
+	}
+}
+
+func TestServeScheduleDefault(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	gdrive := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"items":[]}`))
+	}))
+	defer gdrive.Close()
+	config.Google.Drive.FilesURL = gdrive.URL + "/"
+
+	r := newTestRequest(t, "GET", "/api/v1/user/schedule", nil)
+	r.Header.Set("authorization", bearerHeader+testIDToken)
+	c := newContext(r)
+
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}); err != nil {
+		t.Fatalf("storeCredentials: %v", err)
+	}
+
+	w := httptest.NewRecorder()
+	serveUserSchedule(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+
+	var list []string
+	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+		t.Fatalf("Unmarshal(response): %v", err)
+	}
+	if !compareStringSlices(list, defaultAppData.Bookmarks) {
+		t.Errorf("list = %v; want %v", list, defaultAppData.Bookmarks)
 	}
 }
 
@@ -1516,4 +1560,10 @@ func fetchFirstSWToken(t *testing.T, auth string) string {
 		t.Fatal(err)
 	}
 	return sw.Token
+}
+
+func compareStringSlices(a, b []string) bool {
+	sort.Strings(a)
+	sort.Strings(b)
+	return reflect.DeepEqual(a, b)
 }
