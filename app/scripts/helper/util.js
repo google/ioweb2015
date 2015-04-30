@@ -124,7 +124,8 @@ IOWA.Util = IOWA.Util || (function() {
    * https://events.google.com/io2015/about -> https://events.google.com/io2015/
    */
   function getStaticBaseURL() {
-    return location.href.substring(0, location.href.lastIndexOf('/') + 1);
+    var url = location.href.replace(location.hash, '');
+    return url.substring(0, url.lastIndexOf('/') + 1);
   }
 
   /**
