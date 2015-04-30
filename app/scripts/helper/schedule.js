@@ -165,6 +165,7 @@ IOWA.Schedule = (function() {
 
   /**
    * Shows a notification when bookmarking/removing a session.
+   * @param {Boolean} saved True if the session was saved. False if it was removed.
    */
   function bookmarkSessionNotification(saved) {
     var template = IOWA.Elements.Template;
