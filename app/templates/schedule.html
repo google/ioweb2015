@@ -398,44 +398,15 @@
           this.selectedSession = detail.session;
         }
 
-        var selectedSession = this.selectedSession;
-        var saved = !selectedSession.saved;
+        var saved = !this.selectedSession.saved;
 
-        IOWA.Schedule.saveSession(selectedSession.id, saved).then(function() {
-          IOWA.Elements.Template.scheduleFetchingUserData = false;
-          selectedSession.saved = saved;
-
-          ioScheduleEl.updateTimeBlocks(); // TODO(ericbidelman): check if this is necessary.
-
-          if (saved) {
-            // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
-            // add the session without attempting to auto-subscribe.
-            return IOWA.Notifications.subscribePromise(IOWA.Elements.Template.dontAutoSubscribe).then(function() {
-              IOWA.Elements.Template.dontAutoSubscribe = false;
-              IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification when it starts.");
-            }).catch(function(error) {
-              IOWA.Elements.Template.dontAutoSubscribe = true;
-              if (error && error.name === 'AbortError') {
-                // AbortError indicates that the subscription couldn't be completed due to the page
-                // persmissions for notifications being set to denied.
-                IOWA.Elements.Toast.showMessage('Added to My Schedule. Want to enable notifications?', null, 'Learn how', function() {
-                  window.open('permissions', '_blank');
-                });
-              } else {
-                // If the subscription failed for some other reason, like because we're not
-                // auto-subscribing, show the normal toast.
-                IOWA.Elements.Toast.showMessage('Added to My Schedule.');
-              }
-            });
-          } else {
-            IOWA.Elements.Toast.showMessage('Removed from My Schedule');
-          }
+        IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
+          IOWA.Schedule.bookmarkSessionNotification(IOWA.Elements.Template, saved);
+          ioScheduleEl.updateTimeBlocks(); // Needed for My Schedule to update.
         });
       };
 
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
-        this.selectedSession = null;
-
         // Remove session id hash from URL.
         var url = IOWA.Router.composeUrl(
             this.selectedPage, this.pages[this.selectedPage].selectedSubpage,

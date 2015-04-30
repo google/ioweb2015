@@ -163,6 +163,40 @@ IOWA.Schedule = (function() {
     });
   }
 
+  /**
+   * Shows a notification when bookmarking/removing a session.
+   * @param {HTMLElement} parent The host element of the data model to update.
+   * @param {Boolean} saved True if the session was saved. False if it was removed.
+   */
+  function bookmarkSessionNotification(parent, saved) {
+    parent.scheduleFetchingUserData = false;
+    parent.selectedSession.saved = saved;
+
+    if (saved) {
+      // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
+      // add the session without attempting to auto-subscribe.
+      return IOWA.Notifications.subscribePromise(parent.dontAutoSubscribe).then(function() {
+        parent.dontAutoSubscribe = false;
+        IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification when it starts.");
+      }).catch(function(error) {
+        parent.dontAutoSubscribe = true;
+        if (error && error.name === 'AbortError') {
+          // AbortError indicates that the subscription couldn't be completed due to the page
+          // persmissions for notifications being set to denied.
+          IOWA.Elements.Toast.showMessage('Added to My Schedule. Want to enable notifications?', null, 'Learn how', function() {
+            window.open('permissions', '_blank');
+          });
+        } else {
+          // If the subscription failed for some other reason, like because we're not
+          // auto-subscribing, show the normal toast.
+          IOWA.Elements.Toast.showMessage('Added to My Schedule.');
+        }
+      });
+    } else {
+      IOWA.Elements.Toast.showMessage('Removed from My Schedule');
+    }
+  }
+
   function generateFilters(tags) {
     var filterSessionTypes = [];
     var filterThemes = [];
@@ -282,6 +316,7 @@ IOWA.Schedule = (function() {
   }
 
   return {
+    bookmarkSessionNotification: bookmarkSessionNotification,
     clearCachedUserSchedule: clearCachedUserSchedule,
     fetchSchedule: fetchSchedule,
     schedulePromise: schedulePromise,
