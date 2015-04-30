@@ -30,7 +30,10 @@ html, body {
 ##{$name} {
 
 countdown-timer {
-  width: 400px;
+  width: 500px;
+  height: 200px;
+  margin-left: -160px;
+  overflow: hidden;
 }
 
 @media (max-width: $phone-breakpoint-max) {
@@ -57,7 +60,10 @@ html, body {
 ##{$name} {
 
 countdown-timer {
-  width: 400px;
+  height: 200px;
+  width: 550px;
+  margin-left: -160px;
+  overflow: hidden;
 }
 
 @media (max-width: $phone-breakpoint-max) {
