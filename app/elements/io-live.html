@@ -417,7 +417,7 @@ toggleVideo: function(e, detail, sender) {
       var saved = !this.selectedSession.saved;
 
       IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
-        this.selectedSession = saved;
+        this.selectedSession.saved = saved;
         this.fetchingUserData = false;
         IOWA.Schedule.bookmarkSessionNotification(saved);
       }.bind(this)).catch(function(e) {
