@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var DB_KEY = 'token';
-var DB_NAME = 'push-notification-updates';
+var NOTIFICATION_UPDATES_DB_KEY = 'token';
+var NOTIFICATION_UPDATES_DB_NAME = 'push-notification-updates';
 var DEFAULT_ICON = 'images/touch/homescreen192.png';
 var SCHEDULE_ENDPOINT = 'api/v1/schedule';
 var UPDATES_ENDPOINT = 'api/v1/user/updates';
@@ -31,8 +31,8 @@ var UTM_SOURCE_PARAM = 'utm_source=notification';
  * @return {Promise} Resolves with the token, or null if there isn't one.
  */
 function loadToken() {
-  return simpleDB.open(DB_NAME).then(function(db) {
-    return db.get(DB_KEY).then(function(token) {
+  return simpleDB.open(NOTIFICATION_UPDATES_DB_NAME).then(function(db) {
+    return db.get(NOTIFICATION_UPDATES_DB_KEY).then(function(token) {
       return token;
     });
   });
@@ -151,8 +151,8 @@ function generateSessionNotification(updatedSessions) {
  * @return {Promise} Resolves if the token is written successfully, and rejects otherwise.
  */
 function saveToken(token) {
-  return simpleDB.open(DB_NAME).then(function(db) {
-    return db.set(DB_KEY, token);
+  return simpleDB.open(NOTIFICATION_UPDATES_DB_NAME).then(function(db) {
+    return db.set(NOTIFICATION_UPDATES_DB_KEY, token);
   });
 }
 
