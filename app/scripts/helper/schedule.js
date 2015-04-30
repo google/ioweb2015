@@ -118,9 +118,8 @@ IOWA.Schedule = (function() {
    * to fetch the user's schedule and finally bind it for display.
    */
   function loadUserSchedule() {
-    // Only fetch their schedule if the worker has responded with the master
-    // schedule and the user is signed in.
-    schedulePromise().then(IOWA.Auth.waitForSignedIn).then(function() {
+    // Only fetch their schedule if the worker has responded with the master schedule.
+    schedulePromise().then(function() {
       IOWA.Elements.Template.scheduleFetchingUserData = true;
 
       // Fetch user's saved sessions.
