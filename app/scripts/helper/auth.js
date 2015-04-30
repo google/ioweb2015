@@ -28,9 +28,13 @@ IOWA.Auth = IOWA.Auth || (function() {
   var pendingResolutions = [];
 
   function getTokenResponse_() {
-    var user = IOWA.Elements.GoogleSignIn.auth2.currentUser.get();
-    if (user.isSignedIn()) {
-      return user.getAuthResponse();
+    if (IOWA.Elements.GoogleSignIn.auth2) {
+      var user = IOWA.Elements.GoogleSignIn.auth2.currentUser.get();
+      if (user.isSignedIn()) {
+        return user.getAuthResponse();
+      }
+    } else if (gapi.auth) {
+      return gapi.auth.getToken();
     }
     return null;
   }
