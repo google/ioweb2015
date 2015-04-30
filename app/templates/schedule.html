@@ -401,9 +401,13 @@
         var saved = !this.selectedSession.saved;
 
         IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
-          IOWA.Schedule.bookmarkSessionNotification(IOWA.Elements.Template, saved);
+          this.scheduleFetchingUserData = false;
+          this.selectedSession.saved = saved;
+
+          IOWA.Schedule.bookmarkSessionNotification(saved);
+
           ioScheduleEl.updateTimeBlocks(); // Needed for My Schedule to update.
-        });
+        }.bind(this));
       };
 
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {

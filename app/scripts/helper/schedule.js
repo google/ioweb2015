@@ -165,21 +165,17 @@ IOWA.Schedule = (function() {
 
   /**
    * Shows a notification when bookmarking/removing a session.
-   * @param {HTMLElement} parent The host element of the data model to update.
-   * @param {Boolean} saved True if the session was saved. False if it was removed.
    */
-  function bookmarkSessionNotification(parent, saved) {
-    parent.scheduleFetchingUserData = false;
-    parent.selectedSession.saved = saved;
-
+  function bookmarkSessionNotification(saved) {
+    var template = IOWA.Elements.Template;
     if (saved) {
       // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
       // add the session without attempting to auto-subscribe.
-      return IOWA.Notifications.subscribePromise(parent.dontAutoSubscribe).then(function() {
-        parent.dontAutoSubscribe = false;
+      return IOWA.Notifications.subscribePromise(template.dontAutoSubscribe).then(function() {
+        template.dontAutoSubscribe = false;
         IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification when it starts.");
       }).catch(function(error) {
-        parent.dontAutoSubscribe = true;
+        template.dontAutoSubscribe = true;
         if (error && error.name === 'AbortError') {
           // AbortError indicates that the subscription couldn't be completed due to the page
           // persmissions for notifications being set to denied.
