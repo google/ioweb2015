@@ -556,7 +556,19 @@ IOWA.Elements = (function() {
 
     template.backToTop = function(e, detail, sender) {
       e.preventDefault();
-      IOWA.Util.smoothScroll(IOWA.Elements.Nav, 250);
+
+      // Audio from BenSound (http://www.bensound.com/) - Creative Commons.
+      var prefix = IOWA.Util.getStaticBaseURL() + 'bower_components/elevator/demo/music/';
+      var mainAudio = new Audio(prefix + 'elevator-music.mp3');
+      var endAudio = new Audio(prefix + 'ding.mp3');
+
+      mainAudio.play();
+
+      IOWA.Util.smoothScroll(IOWA.Elements.Nav, 5000, function() {
+        mainAudio.pause();
+        endAudio.play();
+      });
+
       IOWA.A11y.focusNavigation();
     };
 
