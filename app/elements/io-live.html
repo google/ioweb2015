@@ -419,8 +419,7 @@ toggleVideo: function(e, detail, sender) {
       IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
         this.selectedSession = saved;
         this.fetchingUserData = false;
-        IOWA.Schedule.bookmarkSessionNotification(this, saved);
-        // ioScheduleEl.updateTimeBlocks(); // Needed for My Schedule to update.
+        IOWA.Schedule.bookmarkSessionNotification(saved);
       }.bind(this)).catch(function(e) {
         this.fetchingUserData = false;
       }.bind(this));
