@@ -166,15 +166,19 @@ IOWA.Schedule = (function() {
   /**
    * Shows a notification when bookmarking/removing a session.
    * @param {Boolean} saved True if the session was saved. False if it was removed.
+   * @param {string=} opt_message Optional override message for the
+   * "Added to My Schedule" toast.
    */
-  function bookmarkSessionNotification(saved) {
+  function bookmarkSessionNotification(saved, opt_message) {
+    var message = opt_message || "You'll get a notification when it starts.";
     var template = IOWA.Elements.Template;
+
     if (saved) {
       // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
       // add the session without attempting to auto-subscribe.
       return IOWA.Notifications.subscribePromise(template.dontAutoSubscribe).then(function() {
         template.dontAutoSubscribe = false;
-        IOWA.Elements.Toast.showMessage("Added to My Schedule. You'll get a notification when it starts.");
+        IOWA.Elements.Toast.showMessage("Added to My Schedule. " + message);
       }).catch(function(error) {
         template.dontAutoSubscribe = true;
         if (error && error.name === 'AbortError') {
