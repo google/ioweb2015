@@ -190,6 +190,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                 </template>
               </div>
               <div class="filter-rows filter-section">
+                <template repeat="{{topic in sessionTopics}}">
+                  <core-label center horizontal layout aria-labelledby="filters-header">
+                    <div flex>{{topic}}</div>
+                    <io-checkbox on-change="{{applyFilter}}"
+                        checked?="{{filtersState_[topic]}}"
+                        name="{{topic}}" for></io-checkbox>
+                  </core-label>
+                </template>
+              </div>
+              <div class="filter-rows filter-section">
                 <core-label center horizontal layout aria-labelledby="filters-header">
                   <div flex>Live streamed</div>
                   <io-checkbox on-change="{{applyFilter}}"
@@ -265,6 +275,15 @@ The `<io-schedule>` element renders a schedule for a given day(s).
          * @default []
          */
         sessionTypes: null,
+
+        /**
+         * Array of session topic names.
+         *
+         * @attribute sessionTopics
+         * @type array
+         * @default []
+         */
+        sessionTopics: null,
 
         /**
          * Array of applied filters.
@@ -343,6 +362,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         this.userSessions = [];
         this.filters = [];
         this.sessionTypes = [];
+        this.sessionTopics = [];
         this.sessionThemes = [];
         this.filtersState_ = {};
       },
