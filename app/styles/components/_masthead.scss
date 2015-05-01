@@ -335,6 +335,9 @@ paper-fab {
     .io-logo {
       display: none;
     }
+    [focused] {
+      background: transparent;
+    }
   }
 
   .card__signin-intro {
