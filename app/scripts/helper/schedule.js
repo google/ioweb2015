@@ -116,6 +116,8 @@ IOWA.Schedule = (function() {
   /**
    * Wait for the master schedule to have loaded, then use `fetchUserSchedule`
    * to fetch the user's schedule and finally bind it for display.
+   * loadUserSchedule() doesn't wait for the user to be signed in, so ensure that there is a
+   * signed-in user before calling this function.
    */
   function loadUserSchedule() {
     // Only fetch their schedule if the worker has responded with the master schedule.
