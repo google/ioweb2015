@@ -349,18 +349,21 @@ IOWA.Router = (function() {
     var newSubpage = IOWA.Elements.Main.querySelector(
         '.subpage-' + this.state.end.subpage);
     var router = this;
-    // Play exit sequence.
-    IOWA.PageAnimation.playSectionSlideOut(oldSubpage)
-      .then(function() {
-        // Update current state of the page in Router and Template.
-        router.state.current = router.parseUrl(router.state.end.href);
-        // Update UI state based on the router's state.
-        router.updateUIstate();
-      })
-      // Play entry sequence.
-      .then(IOWA.PageAnimation.playSectionSlideIn.bind(null, newSubpage))
-      .then(this.runPageHandler.bind(
-          this, 'onSubpageTransitionDone', router.state.current.page));
+    // Run subpage transition if both subpages exist.
+    if (oldSubpage && newSubpage) {
+      // Play exit sequence.
+      IOWA.PageAnimation.playSectionSlideOut(oldSubpage)
+        .then(function() {
+          // Update current state of the page in Router and Template.
+          router.state.current = router.parseUrl(router.state.end.href);
+          // Update UI state based on the router's state.
+          router.updateUIstate();
+        })
+        // Play entry sequence.
+        .then(IOWA.PageAnimation.playSectionSlideIn.bind(null, newSubpage))
+        .then(this.runPageHandler.bind(
+            this, 'onSubpageTransitionDone', router.state.current.page));
+    }
   };
 
   /**
