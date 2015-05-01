@@ -1,9 +1,9 @@
-var DB_NAME = 'shed-offline-analytics';
+var OFFLINE_ANALYTICS_DB_NAME = 'shed-offline-analytics';
 var EXPIRATION_TIME_DELTA = 86400000; // One day, in milliseconds.
 var ORIGIN = /https?:\/\/((www|ssl)\.)?google-analytics\.com/;
 
 function replayQueuedAnalyticsRequests() {
-  simpleDB.open(DB_NAME).then(function(db) {
+  simpleDB.open(OFFLINE_ANALYTICS_DB_NAME).then(function(db) {
     db.forEach(function(url, originalTimestamp) {
       var timeDelta = Date.now() - originalTimestamp;
       // See https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#qt
@@ -36,7 +36,7 @@ function replayQueuedAnalyticsRequests() {
 function queueFailedAnalyticsRequest(request) {
   console.log('Queueing failed request:', request);
 
-  simpleDB.open(DB_NAME).then(function(db) {
+  simpleDB.open(OFFLINE_ANALYTICS_DB_NAME).then(function(db) {
     db.set(request.url, Date.now());
   });
 }
