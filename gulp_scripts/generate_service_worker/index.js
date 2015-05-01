@@ -37,7 +37,8 @@ module.exports = function(rootDir, handleFetch, importScripts, callback) {
       rootDir + '/styles/**/*.css',
       rootDir + '/manifest.json',
       rootDir + '/humans.txt',
-      rootDir + '/favicon.ico'
+      rootDir + '/favicon.ico',
+      rootDir + '/data-worker-scripts.js'
     ],
     stripPrefix: rootDir + '/'
   };
