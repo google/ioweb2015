@@ -115,6 +115,10 @@
     IOWA.Elements.Drawer.closeDrawer();
   });
 
+  window.addEventListener('offline', function(e) {
+    IOWA.Elements.Toast.showMessage('Offline. Changes you make to My Schedule will be saved for later.');
+  });
+
   // Watch for sign-in changes to fetch user schedule, update UI, etc.
   window.addEventListener('signin-change', function(e) {
     var template = IOWA.Elements.Template;
