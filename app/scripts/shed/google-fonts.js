@@ -1,1 +1,3 @@
-shed.router.get('/(.+)', shed.cacheFirst, {origin: /https?:\/\/fonts.+/});
+(function(global) {
+  global.shed.router.get('/(.+)', global.shed.cacheFirst, {origin: /https?:\/\/fonts.+/});
+})(self);
