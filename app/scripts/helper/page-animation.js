@@ -393,6 +393,7 @@ IOWA.PageAnimation = (function() {
    * while sliding out the content.
    */
   function playHeroTransitionStart(startPage, endPage, e, sourceEl) {
+    var touchData = (e.type == 'touchstart') ? e.touches[0] : e;
     return new Promise(function(resolve, reject) {
       var t = IOWA.Elements.Template;
       var endBgClass = t.pages[endPage].mastheadBgClass;
@@ -408,7 +409,7 @@ IOWA.PageAnimation = (function() {
         }
       }
       play(pageCardTakeoverOut(
-          card, e.pageX, e.pageY, 300, rippleColor), resolve);
+          card, touchData.pageX, touchData.pageY, 300, rippleColor), resolve);
     });
   }
 
