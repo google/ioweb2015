@@ -1,1 +1,3 @@
-shed.router.get('/js/api.js', shed.networkFirst, {origin: 'https://apis.google.com'});
+(function(global) {
+  global.shed.router.get('/js/api.js', global.shed.networkFirst, {origin: 'https://apis.google.com'});
+})(self);
