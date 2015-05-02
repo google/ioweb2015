@@ -335,7 +335,7 @@ paper-fab {
     .io-logo {
       display: none;
     }
-    [focused] {
+    paper-icon-button[focused] {
       background: transparent;
     }
   }
