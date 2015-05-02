@@ -441,6 +441,7 @@
         if (closest) {
           closest.classList.remove('show');
         }
+        document.querySelector('#offsite-globe').highlightedMarker = -1;
         document.querySelector('.page__section--attend #autocomplete').value = null;
         IOWA.Elements.Template.didExtendedSearch = false;
       };
@@ -454,7 +455,8 @@
           closest.classList.remove('show');
         }
 
-        var centerLocation = this.offsiteLocations[e.detail.markerIndex];
+        var markerIndex = e.detail.markerIndex;
+        var centerLocation = this.offsiteLocations[markerIndex];
 
         function focusLocation() {
           IOWA.Elements.Main.querySelector('.marker-results').classList.add('active');
@@ -463,6 +465,7 @@
             lat: centerLocation.lat,
             lng: centerLocation.lng
           };
+          globe.highlightedMarker = markerIndex;
 
           // Find all offsite events within a search radius around this marker and put in card.
           var nearestMarkers = globe.getMarkersWithinDistance(
