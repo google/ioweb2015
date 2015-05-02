@@ -4,9 +4,10 @@ precision mediump float;
 
 const float RADIUS = 0.75;
 const float FILTER_PIXEL_WIDTH = 1.4142135623730951;
-const vec3 MARKER_COLOR = vec3(0.933, 1., .255);
 
 const float FILTER_WIDTH_FALLBACK = 0.1;
+
+uniform vec3 markerColor;
 
 varying vec2 localCoord;
 
@@ -28,5 +29,5 @@ void main() {
         dist);
   #endif
 
-  gl_FragColor = vec4(MARKER_COLOR, 1) * alpha;
+  gl_FragColor = vec4(markerColor, 1) * alpha;
 }

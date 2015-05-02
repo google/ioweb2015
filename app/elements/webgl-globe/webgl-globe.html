@@ -47,7 +47,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 @param {Object} detail
   @param {bool} detail.error True if webgl could not be initialized.
 -->
-<polymer-element name="webgl-globe" on-tap="{{handleTap}}" attributes="attractLoop cameraDistance fov location locationTarget markers noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration webglSupported">
+<polymer-element name="webgl-globe" on-tap="{{handleTap}}" attributes="attractLoop cameraDistance fov location locationTarget markers highlightedMarker noDraw noInit offsetY scrollTarget scrollTriggered transitionDuration webglSupported">
   <template>
     <style>
       :host {
@@ -87,6 +87,9 @@ Fired when the globe's webgl context has been initialized or it failed to initia
     var KdTree = IOWA.WebglGlobe.KdTree;
 
     var IS_IOS = (/(iPhone|iPad|iPod)/gi).test(navigator.platform);
+
+    var MARKER_COLOR = new Float32Array([0.933, 1, 0.255]);
+    var HIGHLIGHTED_MARKER_COLOR = new Float32Array([0, 0.898, 1]);
 
     /**
      * Polyfilled performance.now. Only good for relative timing, not absolute.
@@ -195,9 +198,22 @@ Fired when the globe's webgl context has been initialized or it failed to initia
       /**
        * An array of locations, each with `lat` and `lng` properties, for
        * plotting on the globe.
+       *
+       * @attribute markers
        * @type Array<{lat: number, lng: number}>
+       * @default null
        */
       markers: null,
+
+      /**
+       * An index into the `markers` array of a marker to highlight, or -1 if no
+       * highlight is desired.
+       *
+       * @attribute highlightedMarker
+       * @type number
+       * @default -1
+       */
+      highlightedMarker: -1,
 
       /**
        * The distance from the camera to the center of the globe, in multiples
@@ -966,7 +982,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             gl.FLOAT, false, 28, 16);
 
         // Create acceleration structure for nearest-neighbor queries.
-        this.markerTree_ = new KdTree(this.markers_);
+        this.markerTree_ = new KdTree(this.markers);
 
         var endTime = nowish();
         IOWA.Analytics.trackPerf('globe', 'marker creation',
@@ -1157,16 +1173,31 @@ Fired when the globe's webgl context has been initialized or it failed to initia
               this.markerIndexBuffer_, this.markerDrawCount_);
 
           // Render hovered marker, if any.
+          var markerTransform = tmpTransform0;
           if (newHoverIndex > -1) {
-            var hoveredMarker = this.markers_[newHoverIndex];
-            worldTransform
+            var hoveredMarker = this.markers[newHoverIndex];
+            markerTransform.identity()
               .rotateY(hoveredMarker.lng * Math.PI / 180)
               .rotateX(-hoveredMarker.lat * Math.PI / 180);
-            mvpTransform.product(this.projectionTransform_, worldTransform);
+            markerTransform.product(mvpTransform, markerTransform);
 
-            this.renderMarkers_(mvpTransform, this.markerHoverArrayBuffer_,
+            this.renderMarkers_(markerTransform, this.markerHoverArrayBuffer_,
                 this.markerHoverIndexBuffer_, 6);
           }
+
+          // Render highlighted marker, if any.
+          var highlightIndex = this.highlightedMarker;
+          if (highlightIndex > -1 && highlightIndex < this.markers.length) {
+            var highlightMarker = this.markers[highlightIndex];
+            markerTransform.identity()
+              .rotateY(highlightMarker.lng * Math.PI / 180)
+              .rotateX(-highlightMarker.lat * Math.PI / 180);
+            markerTransform.product(mvpTransform, markerTransform);
+
+            this.renderMarkers_(markerTransform, this.markerHoverArrayBuffer_,
+                this.markerHoverIndexBuffer_, 6, HIGHLIGHTED_MARKER_COLOR);
+          }
+
           this.gl.disable(this.gl.BLEND);
 
           // If entering or exiting hovering, toggle a pointer cursor.
@@ -1207,7 +1238,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
             0);
       },
 
-      renderMarkers_: function(mvpTransform, arrayBuffer, indexBuffer, count) {
+      renderMarkers_: function(mvpTransform, arrayBuffer, indexBuffer, count, opt_color) {
         var gl = this.gl;
 
         this.markerProgram_.use();
@@ -1220,6 +1251,9 @@ Fired when the globe's webgl context has been initialized or it failed to initia
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 
         this.markerProgram_.uniforms.mvpMatrix(mvpTransform.m_);
+
+        var markerColor = opt_color ? opt_color : MARKER_COLOR;
+        this.markerProgram_.uniforms.markerColor(markerColor);
 
         gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT,
             0);
