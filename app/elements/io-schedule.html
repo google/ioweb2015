@@ -62,7 +62,8 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                     <div class="schedule-row" layout horizontal
                          center?="{{isDesktopSize}}">
                       <io-radio-button aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
-                                       checked disabled></io-radio-button>
+                                       toggles checked?="{{session.saved}}"
+                                       on-change="{{onToggleSaveSession}}"></io-radio-button>
                       <div layout vertical?="{{!isDesktopSize}}"
                            horizontal?="{{isDesktopSize}}" flex tabindex="0"
                            on-click="{{onSessionSelect}}" on-keyup="{{onSessionKeyUp}}">
