@@ -1252,8 +1252,7 @@ Fired when the globe's webgl context has been initialized or it failed to initia
 
         this.markerProgram_.uniforms.mvpMatrix(mvpTransform.m_);
 
-        var markerColor = opt_color ? opt_color : MARKER_COLOR;
-        this.markerProgram_.uniforms.markerColor(markerColor);
+        this.markerProgram_.uniforms.markerColor(opt_color || MARKER_COLOR);
 
         gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT,
             0);
