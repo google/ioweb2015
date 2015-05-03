@@ -41,7 +41,7 @@ Fired when sign in fails for some reason.
 @param {Object} detail
 @param {Object} detail.error The reason for sign in failure.
 -->
-<polymer-element name="google-signin" attributes="clientId scopes signedIn load" hidden>
+<!-- <polymer-element name="google-signin" attributes="clientId scopes signedIn load" hidden>
 <template>
   <template if="{{load}}">
     <google-js-api on-js-api-load="{{onLoadAuth}}"></google-js-api>
@@ -223,7 +223,7 @@ Fired when sign in fails for some reason.
 
 })();
 </script>
-</polymer-element>
+</polymer-element> -->
 
 
  <!--
@@ -252,7 +252,7 @@ Fired when sign in fails for some reason.
 @param {Object} detail
 @param {Object} detail.error The reason for sign in failure.
 -->
-<!-- <polymer-element name="google-signin" attributes="clientId scopes signedIn load">
+<polymer-element name="google-signin" attributes="clientId scopes signedIn load">
 <template>
   <style>
     :host {
@@ -454,4 +454,4 @@ Fired when sign in fails for some reason.
   });
 })();
 </script>
-</polymer-element> -->
+</polymer-element>
