@@ -358,6 +358,8 @@ Fired when sign in fails for some reason.
       this.signedIn = false;
       this.user = null;
 
+      this.cancelAsync(this.refreshTokenHandle_);
+
       this.fire('signin-change', {signedIn: false, user: null});
     },
 
@@ -391,6 +393,7 @@ Fired when sign in fails for some reason.
           case 'user_signed_out':
             this.signedIn = false;
             this.user = null;
+            this.cancelAsync(this.refreshTokenHandle_);
             break;
           case 'immediate_failed':
             break;
@@ -410,6 +413,13 @@ Fired when sign in fails for some reason.
           this.user = resp;
           this.user.tokenResponse = gapi.auth.getToken();
           this.user.picture = this.user.picture || 'images/schedule/profile_placeholder.png';
+
+          // Refresh the token 15 min before expiration time. This is important
+          // if the user has the page open for a long period of time. The token
+          // should remain valid without a page reload.
+          var expiresIn = parseInt(this.user.tokenResponse.expires_at + '000'); // Need to pad + parse API result :\
+          var refreshTokenMsTimeout_ = (new Date(expiresIn) - new Date()) - (15 * 60 * 1000);
+          this.refreshTokenHandle_ = this.async(this.onLoadAuth, null, refreshTokenMsTimeout_);
 
           this.fire('signin-change', {signedIn: true, user: this.user});
 
