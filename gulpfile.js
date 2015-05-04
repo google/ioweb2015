@@ -317,7 +317,7 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 // App environment is 'dev' by default. Change with '--env=prod'.
-gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 'generate-page-metadata', 'generate-data-worker-dev'], function() {
+gulp.task('serve', ['backend', 'backend:config', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
   var start = spawn.bind(null, 'bin/server',
@@ -359,7 +359,7 @@ gulp.task('serve', ['backend', 'backend:config', 'generate-service-worker-dev', 
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['backend:config', 'generate-service-worker-dev', 'generate-page-metadata', 'generate-data-worker-dev'], function(callback) {
+gulp.task('serve:gae', ['backend:config', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function(callback) {
   var watchFiles = argv.watch !== false;
   generateGaeConfig(BACKEND_DIR, URL_PREFIX, function() {
     startGaeBackend(BACKEND_DIR, watchFiles, callback);
@@ -431,7 +431,7 @@ gulp.task('backend:test', ['backend:config'], function(cb) {
 gulp.task('default', ['clean'], function(cb) {
   runSequence('copy-experiment-to-site', 'sass', 'vulcanize',
               ['concat-and-uglify-js', 'images', 'copy-assets', 'copy-backend'],
-              'generate-service-worker-dist', 'generate-data-worker-dist',
+              'generate-data-worker-dist', 'generate-service-worker-dist',
               'sitemap', cb);
 });
 
