@@ -62,7 +62,7 @@
   function parseResponseJSON(response) {
     if (response.status >= 400) {
       throw Error('The request to ' + response.url + ' failed: ' +
-      response.statusText + ' (' + response.status + ')');
+                  response.statusText + ' (' + response.status + ')');
     }
     return response.json();
   }
@@ -74,15 +74,10 @@
    *                   Rejects if there are any errors displaying notifications.
    */
   function processResponse(body) {
-    var notification = generateSessionNotification(body.sessions) || {
-        // If for some reason we weren't able to parse out notification details from body.sessions, then
-        // generate a default, "dummy" notification. Otherwise, Chrome 42/43 on Android will crash if
-        // there's a push event and no notification is shown.
-        title: 'Some events in My Schedule have been updated',
-        body: '',
-        icon: DEFAULT_ICON,
-        tag: 'session-details'
-      };
+    var notification = generateSessionNotification(body.sessions);
+    if (!notification) {
+      throw Error('Unable to generate notification details.');
+    }
 
     return global.registration.showNotification(notification.title, notification).then(function() {
       return body.token;
@@ -166,14 +161,31 @@
         .then(saveToken)
         .catch(function(error) {
           console.error('Unable to handle event', event, 'due to error', error);
+          var notification = {
+            title: 'Some events in My Schedule have been updated',
+            body: '',
+            icon: DEFAULT_ICON,
+            tag: error.toString()
+          };
+          return global.registration.showNotification(notification.title, notification);
         })
     );
   });
 
   global.addEventListener('notificationclick', function(event) {
-    var relativeUrl = TAG_TO_DESTINATION_URL[event.notification.tag] || '/';
-    var url = new URL(relativeUrl, location.href);
+    var relativeUrl = TAG_TO_DESTINATION_URL[event.notification.tag];
+
+    // If the tag is unknown, it's most likely because it's being used to track an error that
+    // led to a default notification. Put that error info into a URL parameter, and take the
+    // use to the home page.
+    if (!relativeUrl) {
+      // The URL constructor will handle escaping/URL encoding.
+      relativeUrl = './?utm_content=' + event.notification.tag;
+    }
+
+    var url = new URL(relativeUrl, global.location.href);
     url.search += (url.search ? '&' : '') + UTM_SOURCE_PARAM;
+
     global.clients.openWindow(url.toString());
   });
 })(self);
