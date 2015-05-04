@@ -180,7 +180,7 @@
     // use to the home page.
     if (!relativeUrl) {
       // The URL constructor will handle escaping/URL encoding.
-      relativeUrl = './?utm_content=' + event.notification.tag;
+      relativeUrl = './?utm_error=' + event.notification.tag;
     }
 
     var url = new URL(relativeUrl, global.location.href);

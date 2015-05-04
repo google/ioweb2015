@@ -49,6 +49,12 @@ IOWA.Analytics = IOWA.Analytics || (function(exports) {
 
     this.trackNotificationPermission();
 
+    var matches = exports.location.search.match(/utm_error=([^&]+)/);
+    if (matches) {
+      // Assume that the only time we'll be setting utm_error= is from the notification code.
+      this.trackError('notification', decodeURIComponent(matches[1]));
+    }
+
     /**
      * A collection of timing categories, each a collection of start times.
      * @private {!Object<string, Object<string, ?number>}
