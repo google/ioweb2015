@@ -27,7 +27,7 @@
         <div class="card-content">
           <h3><i18n-msg msgid="io-description">Google I/O is for developers—the creative coders who are building what's next. Together we'll explore the latest in tech, mobile &amp; beyond.</i18n-msg></h3>
         </div>
-        <div relative><paper-progress indeterminate fit hidden?="{{!scheduleFetchingUserData}}"></paper-progress></div>
+        <div relative><paper-progress indeterminate fit hidden?="{{!settingsIOReminder}}"></paper-progress></div>
         <div class="card-content link-spacing">
           <a href="about" data-ajax-link data-transition="hero-card-transition"
              data-track-link="home-learn-more-about-io">
@@ -216,10 +216,10 @@
         e.preventDefault();
 
         var template = this;
-        template.scheduleFetchingUserData = true;
+        template.settingsIOReminder = true;
 
         IOWA.Schedule.saveSession('__keynote__', true).then(function() {
-          template.scheduleFetchingUserData = false;
+          template.settingsIOReminder = false;
 
           if (template.savedSessions.length) {
             IOWA.Schedule.updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
