@@ -327,6 +327,8 @@ Fired when sign in fails for some reason.
     },
 
     onLoadAuth: function(e, detail, sender) {
+      this.cancelAsync(this.refreshTokenHandle_);
+
       // gapi.auth.authorize() doesn't do popup.
       gapi.auth.authorize({
         client_id: this.clientId,
