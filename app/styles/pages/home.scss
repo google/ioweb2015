@@ -120,6 +120,17 @@ $name: 'page-home';
   .masthead-meta--corner {
     display: none;
   }
+  .card__container--top {
+    .link-spacing {
+      > a {
+        margin-right: $mobileKeyline;
+
+        &:last-of-type {
+          margin-right: 0;
+        }
+      }
+    }
+  }
   name-cycler {
     min-width: 160px;
   }
