@@ -395,20 +395,20 @@
             return;
           }
 
-          IOWA.Elements.Template.didExtendedSearch = true;
-          var location = place.geometry.location;
-
+          this.didExtendedSearch = true;
+          this.politicalAreaSearch = false;
           this.offsiteMarkerResults = []; // clear previous results.
+
+          var location = place.geometry.location;
 
           // If place searched for is a higher-level entity (like a country or
           // state) don't try to find markers for it.
           if (place.types.indexOf('continent') !== -1 ||
               place.types.indexOf('country') !== -1 ||
               place.types.indexOf('administrative_area_level_1') !== -1) {
-            IOWA.Elements.Template.politicalAreaSearch = true;
-          } else {
-            IOWA.Elements.Template.politicalAreaSearch = false;
+            this.politicalAreaSearch = true;
 
+          } else {
             // Find all offsite events within a search radius and put in card.
             var nearestMarkers = globe.getMarkersWithinDistance(location.lat(),
                 location.lng(), this.offsiteSearchRadius);
@@ -444,7 +444,9 @@
         }
         document.querySelector('#offsite-globe').highlightedMarker = -1;
         document.querySelector('.page__section--attend #autocomplete').value = null;
-        IOWA.Elements.Template.didExtendedSearch = false;
+
+        this.didExtendedSearch = false;
+        this.politicalAreaSearch = false;
       };
 
       IOWA.Elements.Template.onMarkerCardClick = function(e, detail, sender) {
@@ -480,10 +482,12 @@
           };
           globe.highlightedMarker = markerIndex;
 
+          this.offsiteMarkerResults = [];
+          this.politicalAreaSearch = false;
+
           // Find all offsite events within a search radius around this marker and put in card.
           var nearestMarkers = globe.getMarkersWithinDistance(
               centerLocation.lat, centerLocation.lng, this.offsiteSearchRadius);
-          this.offsiteMarkerResults = [];
           for (var i = 0; i < nearestMarkers.length; i++) {
             this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i]]);
           }
