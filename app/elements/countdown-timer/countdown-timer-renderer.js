@@ -825,9 +825,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
     var start = Date.now();
 
-    if (!rippleColor) {
+    if (typeof rippleColor === 'undefined') {
       rippleColor = {
-        background: '#FFFFFF',
+        background: {h:360,s:100,l:100,a:1},
         alphaStart: 0.2,
         alphaEnd: 0,
         setBackgroundOnComplete: false,
