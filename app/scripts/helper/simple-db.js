@@ -6,7 +6,7 @@
   var STORE = 'store';
 
   // Chrome iOS has window.indexeDB, but it is null.
-  if (!!!(window.indexedDB && indexedDB.open)) {
+  if (!(window.indexedDB && indexedDB.open)) {
     return;
   }
 
