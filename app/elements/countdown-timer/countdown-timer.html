@@ -247,10 +247,11 @@ Creates a countdown timer to a specific date.
         if (!this.timer)
           return;
 
-        this.timer.resizeRenderer();
+        this.style.opacity = 0;
 
         // Fade in the countdown timer
         this.async(function() {
+          this.timer.resizeRenderer();
           this.style.opacity = 1;
         }, null, 600);
       },
