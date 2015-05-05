@@ -124,6 +124,11 @@ google-youtube {
 
     .card-content {
       padding: $mobileKeyline;
+      cursor: pointer;
+
+      &.active {
+        background-color: #eee;
+      }
 
       .card__title {
         padding-bottom: $mobileKeyline / 2;
