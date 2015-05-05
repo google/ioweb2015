@@ -5,6 +5,11 @@
   var DB_PREFIX = '$SimpleDB$';
   var STORE = 'store';
 
+  // Chrome iOS has window.indexeDB, but it is null.
+  if (!!!(window.indexedDB && indexedDB.open)) {
+    return;
+  }
+
   function SimpleDBFactory(secret) {
     if (secret !== SECRET) throw TypeError('Invalid constructor');
   }
