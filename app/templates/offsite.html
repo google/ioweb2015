@@ -84,7 +84,7 @@
           <div class="card marker-card">
             <paper-icon-button icon="io:close" class="close-button" on-tap="{{resetExtendedSearch}}"></paper-icon-button>
             <template repeat="{{marker in offsiteMarkerResults}}">
-              <div class="card-content">
+              <div class="card-content {{ {active: marker.active} | tokenList}}" on-tap="{{onMarkerCardClick}}">
                 <h4 class="card__title">{{marker.name}}</h4>
                 <div layout horizontal center justified>
                   <span><a href="//www.google.com/maps/place/{{marker.lat}},{{marker.lng}}" target="_blank">View in Google Maps</a></span>
@@ -398,6 +398,8 @@
           IOWA.Elements.Template.didExtendedSearch = true;
           var location = place.geometry.location;
 
+          this.offsiteMarkerResults = []; // clear previous results.
+
           // If place searched for is a higher-level entity (like a country or
           // state) don't try to find markers for it.
           if (place.types.indexOf('continent') !== -1 ||
@@ -410,7 +412,6 @@
             // Find all offsite events within a search radius and put in card.
             var nearestMarkers = globe.getMarkersWithinDistance(location.lat(),
                 location.lng(), this.offsiteSearchRadius);
-            this.offsiteMarkerResults = [];
             for (var i = 0; i < nearestMarkers.length; i++) {
               this.offsiteMarkerResults.push(this.offsiteLocations[nearestMarkers[i]]);
             }
@@ -444,6 +445,18 @@
         document.querySelector('#offsite-globe').highlightedMarker = -1;
         document.querySelector('.page__section--attend #autocomplete').value = null;
         IOWA.Elements.Template.didExtendedSearch = false;
+      };
+
+      IOWA.Elements.Template.onMarkerCardClick = function(e, detail, sender) {
+        for (var i = 0; i < this.offsiteMarkerResults.length; i++) {
+          this.offsiteMarkerResults[i].active = false;
+        }
+
+        var marker = sender.templateInstance.model.marker;
+        marker.active = true;
+
+        var globe = document.querySelector('#offsite-globe')
+        globe.highlightedMarker = this.offsiteLocations.indexOf(marker);
       };
 
       IOWA.Elements.Template.onMarkerClick = function(e, detail, sender) {
