@@ -1094,13 +1094,19 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     this.ctx_.strokeStyle = 'rgba(0,0,0,0.3)';
     this.ctx_.fillStyle = '#000';
 
+    // The freeze count is based on a full complement of units, so
+    // if we haven't got that we need to adjust.
+    var toFreeze = this.freezeCount_;
+    var toFreezeAdjustment = (4 - this.unitCount_) * 3;
+    toFreeze -= toFreezeAdjustment;
+
     // Characters
     for (var i = 0; i < valueAsString.length; i++) {
 
       // Reset the time and set it to 1 if the character is frozen.
       characterTime = time;
 
-      if (i < this.freezeCount_)
+      if (i < toFreeze)
         characterTime = 1;
 
       this.ctx_.save();
