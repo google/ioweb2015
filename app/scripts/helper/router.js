@@ -246,10 +246,8 @@ IOWA.Router = (function() {
     if (this.state.current.page !== this.state.start.page) {
       document.body.id = 'page-' + pageName;
       document.title = pageMeta.title || 'Google I/O 2015';
-      var metaTheme = document.documentElement.querySelector('meta[name="theme-color"]');
-      if (metaTheme) {
-        metaTheme.content = IOWA.Elements.Template.rippleColors[pageMeta.mastheadBgClass];
-      }
+      IOWA.Util.setMetaThemeColor(
+          IOWA.Elements.Template.rippleColors[pageMeta.mastheadBgClass]);
 
       // This cannot be updated via data binding, because the masthead
       // is visible before the binding happens.

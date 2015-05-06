@@ -178,10 +178,8 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
-    var metaTheme = document.documentElement.querySelector('meta[name="theme-color"]');
-    if (metaTheme) {
-      metaTheme.content = template.rippleColors[template.mastheadBgClass];
-    }
+    IOWA.Util.setMetaThemeColor(
+        template.rippleColors[template.mastheadBgClass]);
 
     template.timezoneNames = {
       'GMT-11:00': {

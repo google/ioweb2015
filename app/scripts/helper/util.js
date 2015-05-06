@@ -120,6 +120,17 @@ IOWA.Util = IOWA.Util || (function() {
   }
 
   /**
+   * Sets the <meta name="theme-color"> to the specified value.
+   * @param {string} color Color hex value.
+   */
+  function setMetaThemeColor(color) {
+    var metaTheme = document.documentElement.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.content = color;
+    }
+  }
+
+  /**
    * Returns the static base URL of the running app.
    * https://events.google.com/io2015/about -> https://events.google.com/io2015/
    */
@@ -201,6 +212,7 @@ IOWA.Util = IOWA.Util || (function() {
     isIOS: isIOS,
     isSafari: isSafari,
     isTouchScreen: isTouchScreen,
+    setMetaThemeColor: setMetaThemeColor,
     supportsHTMLImports: 'import' in document.createElement('link'),
     smoothScroll: smoothScroll,
     shortenURL: shortenURL,
