@@ -178,7 +178,7 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
-    var metaTheme = document.documentElement.querySelector('meta[name="theme-color"]')
+    var metaTheme = document.documentElement.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
       metaTheme.content = template.rippleColors[template.mastheadBgClass];
     }
