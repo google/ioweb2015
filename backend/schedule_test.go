@@ -3,6 +3,7 @@ package main
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestSubslice(t *testing.T) {
@@ -33,5 +34,36 @@ func TestUnique(t *testing.T) {
 		if !reflect.DeepEqual(out, test.out) {
 			t.Errorf("%d: unique(%v) = %v; want %v", i, test.in, out, test.out)
 		}
+	}
+}
+
+func TestDiffEventData(t *testing.T) {
+	a := &eventData{
+		Sessions: map[string]*eventSession{
+			"__keynote__": &eventSession{
+				Title:     "Keynote",
+				StartTime: time.Date(2015, 5, 28, 9, 30, 0, 0, time.UTC),
+				Tags:      []string{"FLAG_KEYNOTE"},
+				Filters:   map[string]bool{"Live streamed": true},
+			},
+		},
+	}
+
+	b := &eventData{
+		Sessions: map[string]*eventSession{
+			"__keynote__": &eventSession{
+				Title:     "Keynote",
+				StartTime: time.Date(2015, 5, 28, 9, 30, 0, 0, time.UTC),
+				Tags:      []string{"FLAG_KEYNOTE"},
+				Filters:   map[string]bool{"Live streamed": true},
+				Speakers:  []string{},
+			},
+		},
+	}
+
+	dc := diffEventData(a, b)
+
+	if l := len(dc.Sessions); l != 0 {
+		t.Errorf("len(dc.Sessions) = %d; want 0", l)
 	}
 }
