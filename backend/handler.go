@@ -336,7 +336,7 @@ func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 
 func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 	if m := r.Header.Get("x-http-method-override"); m != "" {
-		r.Method = m
+		r.Method = strings.ToUpper(m)
 	}
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
