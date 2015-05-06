@@ -339,6 +339,15 @@
 
       IOWA.Elements.Template.dontAutoSubscribe = false;
 
+      var getFiltersFromURL = function(opt_parsedUrl) {
+        var parsedUrl = opt_parsedUrl || IOWA.Router.parseUrl(window.location.toString());
+        var filters = [];
+        if (parsedUrl.params.filters) {
+          filters = parsedUrl.params.filters.split(',');
+        }
+        return filters;
+      }
+
       page.onSubpageTransitionDone = function() {
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
       };
@@ -349,13 +358,8 @@
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
 
         // Deep link into schedule tab.
-        var filters = [];
         var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
-        if (parsedUrl.params.filters) {
-          filters = parsedUrl.params.filters.split(',');
-        }
-
-        template.sessionURLFilters = filters;
+        template.sessionURLFilters = getFiltersFromURL(parsedUrl);
         template.selectedTimezone = 'GMT-07:00'; // PDT timezone.
 
         // Deep link into session.
@@ -380,10 +384,12 @@
         IOWA.Elements.Template.async(function() {
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
+        window.addEventListener('popstate', sessionDetailsPopstateHandler);
       };
 
       page.unload = function() {
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
+        window.removeEventListener('popstate', sessionDetailsPopstateHandler);
       };
 
       IOWA.Elements.Template.openSession = function(sessionOrEvent) {
@@ -419,6 +425,16 @@
         }.bind(this));
       };
 
+      var sessionDetailsPopstateHandler = function(e) {
+        var panel = IOWA.Elements.Main.querySelector('.session__detail');
+        ioScheduleEl.filters = getFiltersFromURL();
+        if (!panel.opened && IOWA.Elements.Template.selectedSession) {
+          panel.open();
+        } else {
+          panel.close();
+        }
+      };
+
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
         // Remove session id hash from URL.
         var url = IOWA.Router.composeUrl(
@@ -436,8 +452,7 @@
           var url = IOWA.Router.composeUrl(
               this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
               this.selectedSession.id, window.location.search);
-
-          history.replaceState({}, null, url);
+          history.pushState({}, null, url);
         } else {
           pageIsDeepLinked_ = true;
         }
