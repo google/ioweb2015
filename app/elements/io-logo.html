@@ -205,6 +205,20 @@ Fired when loading animation is complete.
       this.destination = document.querySelector('[iologodestination]');
       this.fab = document.querySelector('.fab:not([hidden])');
 
+      // If for some reason these animation elements are not in the DOM at this
+      // point, wait for the auto-binding template to stamp them and retry.
+      // Use the cached FAB var as an indicator the template has stamped.
+      if (!(this.destination && this.fab && this.masthead)) {
+        var observer = new PathObserver(IOWA.Elements, 'FAB');
+        observer.open(function(fab, oldValue) {
+          if (fab) {
+            this.moveLogo();
+          }
+        }.bind(this));
+
+        return;
+      }
+
       var current = this.getBoundingClientRect();
       var dest = this.destination.getBoundingClientRect();
       var mast = this.masthead.getBoundingClientRect();
