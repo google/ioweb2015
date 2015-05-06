@@ -43,16 +43,7 @@ IOWA.ServiceWorkerRegistration = (function() {
               // TODO: How do we handle i18n of these strings?
               switch (installingWorker.state) {
                 case 'installed':
-                  if (navigator.serviceWorker.controller) {
-                    // Define a handler that will be used for the next io-toast tap, at which point it
-                    // be automatically removed.
-                    var tapHandler = function() {
-                      window.location.reload();
-                    };
-
-                    IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest content.',
-                      tapHandler);
-                  } else {
+                  if (!navigator.serviceWorker.controller) {
                     IOWA.Elements.Toast.showMessage('Caching complete! Future visits will work offline.');
                   }
                   break;
@@ -70,13 +61,21 @@ IOWA.ServiceWorkerRegistration = (function() {
     }
   };
 
-  // If we're already controlled by a service worker, then register as early as possible to get
-  // updates about a new service worker installation. This makes it more likely that we'll be able
-  // to detect when there's new content available and display the toast.
-  // TODO (jeffposnick): There is still a potential race condition if the browser has already
-  // detected the updated Service Worker before this code runs.
+  // Check to see if the service worker controlling the page at initial load
+  // has become redundant, since this implies there's a new service worker with fresh content.
   if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-    register();
+    navigator.serviceWorker.controller.onstatechange = function(event) {
+      if (event.target.state === 'redundant') {
+        // Define a handler that will be used for the next io-toast tap, at which point it
+        // be automatically removed.
+        var tapHandler = function() {
+          window.location.reload();
+        };
+
+        IOWA.Elements.Toast.showMessage('Tap here or refresh the page for the latest content.',
+          tapHandler);
+      }
+    };
   }
 
   return {
