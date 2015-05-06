@@ -39,6 +39,7 @@ IOWA.Elements = (function() {
       signinIntroEl.opened = true;
     } else {
       signinIntroEl.parentElement.removeChild(signinIntroEl);
+      IOWA.Elements.Toast.autoCloseDisabled = false;
     }
   }
 
