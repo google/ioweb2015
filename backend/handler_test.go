@@ -1448,7 +1448,7 @@ func TestHandlePingExt(t *testing.T) {
 	config.ExtPingURL = ping.URL
 
 	r := newTestRequest(t, "POST", "/task/ping-ext?key=a-key", nil)
-	r.Header.Set("X-AppEngine-TaskExecutionCount", "0")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 	w := httptest.NewRecorder()
 	handlePingExt(w, r)
 
@@ -1480,7 +1480,7 @@ func TestHandlePingUserMissingToken(t *testing.T) {
 		"uid":      {testUserID},
 		"sessions": {"one"},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 	c := newContext(r)
 
 	if err := storeUserPushInfo(c, &userPush{userID: testUserID, Enabled: true}); err != nil {
@@ -1515,7 +1515,7 @@ func TestHandlePingUserRefokedToken(t *testing.T) {
 		"uid":      {testUserID},
 		"sessions": {"one"},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 	c := newContext(r)
 
 	if err := storeUserPushInfo(c, &userPush{userID: testUserID, Enabled: true}); err != nil {
@@ -1573,7 +1573,7 @@ func TestHandlePingDevice(t *testing.T) {
 		"rid":      {"reg-123"},
 		"endpoint": {ts.URL},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy-task")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 	w := httptest.NewRecorder()
 	handlePingDevice(w, r)
 
@@ -1605,7 +1605,7 @@ func TestHandlePingDeviceDelete(t *testing.T) {
 		"rid":      {"reg-123"},
 		"endpoint": {ts.URL},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy-task")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 
 	c := newContext(r)
 	storeUserPushInfo(c, &userPush{
@@ -1647,7 +1647,7 @@ func TestHandlePingDeviceReplace(t *testing.T) {
 		"rid":      {"reg-123"},
 		"endpoint": {ts.URL},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy-task")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 
 	c := newContext(r)
 	storeUserPushInfo(c, &userPush{
