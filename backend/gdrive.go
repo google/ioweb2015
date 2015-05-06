@@ -28,10 +28,11 @@ type appFolderData struct {
 	Feedback  []string `json:"feedback_submitted_sessions" datastore:"-"`
 }
 
-// getAppFolderData returns user_data.json file saved in gdrive AppFolder
-// either from a local storage or network (using drive API).
-// If the file doesn't exist already, the returned value will have zero FileID, zero Etag
-// and a copy of defaultBookmarks.
+// getAppFolderData returns appfolder data of cred.userID, previously uploaded
+// to user_data.json file in gdrive AppFolder.
+// The metadata are fetched from either a local storage or network.
+// Resulting appFolderData will have zero-valued FileID, zero-valued Etag
+// and a copy of defaultBookmarks if the file doesn't exist yet.
 func getAppFolderData(c context.Context, cred *oauth2Credentials, fresh bool) (*appFolderData, error) {
 	perr := prefixedErr("getAppFolderData")
 	hc := oauth2Client(c, cred.tokenSource(c))
@@ -57,7 +58,7 @@ func getAppFolderData(c context.Context, cred *oauth2Credentials, fresh bool) (*
 		return data, nil
 	}
 
-	// fetch the actual contents of user_data file
+	// fetch the actual contents of user_data.json file
 	req, err := http.NewRequest("GET", config.Google.Drive.FilesURL, nil)
 	if err != nil {
 		return nil, perr(err)
@@ -129,7 +130,7 @@ func fetchAppFolderMeta(hc *http.Client) (*appFolderData, error) {
 
 	data := &appFolderData{}
 	if idx < 0 {
-		// default appdata if not exist yet
+		// use default bookmarks if appdata doesn't exist yet
 		data.Bookmarks = append([]string{}, defaultBookmarks...)
 	} else {
 		data.FileID = body.Items[idx].ID
@@ -153,11 +154,11 @@ func storeAppFolderData(c context.Context, cred *oauth2Credentials, data *appFol
 		return err
 	}
 
-	// store locally new etag
+	// save new etag locally for next requests
 	if err := storeLocalAppFolderMeta(c, cred.userID, data); err != nil {
-		// if the fails, don't return the error because drive API succeeded
-		// worst case scenario is we'll have an outdated etag which we'll update
-		// on the next round trip.
+		// if this fails, don't return the error: drive API call already succeeded,
+		// which is our primary goal here. worst case scenario is we'll have
+		// an outdated etag which we'll update on the next round trip.
 		errorf(c, err.Error())
 	}
 
