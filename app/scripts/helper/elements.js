@@ -178,6 +178,9 @@ IOWA.Elements = (function() {
     template.mastheadBgClass = template.pages[template.selectedPage].mastheadBgClass;
     template.navBgClass = template.mastheadBgClass;
 
+    IOWA.Util.setMetaThemeColor(
+        template.rippleColors[template.mastheadBgClass]);
+
     template.timezoneNames = {
       'GMT-11:00': {
         'name': 'US/Samoa',
