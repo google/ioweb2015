@@ -17,12 +17,6 @@ import (
 	"golang.org/x/oauth2/jwt"
 )
 
-var (
-	errAuthMissing   = errors.New("authorization required")
-	errAuthInvalid   = errors.New("mismatched or malformed authorization")
-	errAuthTokenType = errors.New("invalid token type")
-)
-
 const (
 	// Authorization header prefix
 	bearerHeader    = "bearer "

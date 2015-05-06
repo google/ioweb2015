@@ -21,10 +21,8 @@ const (
 	kindUserPush    = "Push"
 	kindEventData   = "EventData"
 	kindChanges     = "Changes"
+	kindAppFolder   = "AppFolder"
 )
-
-// TODO: merge this with errNotModified in db.go
-var errNotModified = errors.New("content not modified")
 
 // RunInTransaction runs f in a transaction.
 // It calls f with a transaction context tc that f should use for all operations.
@@ -158,6 +156,20 @@ func listUsersWithPush(c context.Context) ([]string, error) {
 		users = append(users, k.StringID())
 	}
 	return users, nil
+}
+
+// storeLocalAppFolderMeta saves data.FileID and data.Etag in a local db under key of user uid.
+func storeLocalAppFolderMeta(c context.Context, uid string, data *appFolderData) error {
+	key := datastore.NewKey(c, kindAppFolder, uid, 0, nil)
+	_, err := datastore.Put(c, key, data)
+	return err
+}
+
+// getLocalAppFolderMeta returns appFolderData of user uid with only FileID and Etag set.
+func getLocalAppFolderMeta(c context.Context, uid string) (*appFolderData, error) {
+	key := datastore.NewKey(c, kindAppFolder, uid, 0, nil)
+	data := &appFolderData{}
+	return data, datastore.Get(c, key, data)
 }
 
 // storeEventData saves d in the datastore with auto-generated ID

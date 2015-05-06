@@ -276,6 +276,16 @@ Add a session to the bookmarks list. Response is the altered bookmarks list:
 ]
 ```
 
+To batch multiple session IDs in a single request, provide an array in the body:
+
+```
+PUT /api/v1/user/schedule
+
+["session-one", "session-two"]
+```
+
+If both URL path and request body are used to specify session IDs, the latter takes precedence.
+
 
 ### DELETE /api/v1/user/schedule/:session_id
 
@@ -289,6 +299,19 @@ Delete a session from the list. Response is the altered bookmarks list:
 ]
 ```
 
+To batch multiple session IDs in a single request, provide an array in the body:
+
+```
+PUT /api/v1/user/schedule
+X-HTTP-Method-Override: DELETE
+
+["session-one", "session-two"]
+```
+
+Some clients and/or server environments may not support request body for `DELETE` method.
+A workaround is to provide `X-HTTP-Method-Override` header with the actual HTTP method.
+
+If both URL path and request body are used to specify session IDs, the latter takes precedence.
 
 
 [signin-guide]: https://developers.google.com/identity/sign-in/web/server-side-flow

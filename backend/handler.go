@@ -40,8 +40,8 @@ func registerHandlers() {
 	handle("/api/v1/social", serveSocial)
 	handle("/api/v1/auth", handleAuth)
 	handle("/api/v1/schedule", serveSchedule)
-	handle("/api/v1/user/schedule", serveUserSchedule)
-	handle("/api/v1/user/schedule/", handleUserBookmarks)
+	handle("/api/v1/user/schedule", handleUserSchedule)
+	handle("/api/v1/user/schedule/", handleUserSchedule)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
 	handle("/api/v1/user/updates", serveUserUpdates)
 	handle("/sync/gcs", syncEventData)
@@ -305,6 +305,14 @@ func serveSchedule(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
+func handleUserSchedule(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		serveUserSchedule(w, r)
+		return
+	}
+	handleUserBookmarks(w, r)
+}
+
 func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
@@ -327,6 +335,9 @@ func serveUserSchedule(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
+	if m := r.Header.Get("x-http-method-override"); m != "" {
+		r.Method = strings.ToUpper(m)
+	}
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	c, err := authUser(newContext(r), r.Header.Get("authorization"))
 	if err != nil {
@@ -335,19 +346,27 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 	}
 	user := contextUser(c)
 
-	if r.URL.Path[len(r.URL.Path)-1] == '/' {
-		writeJSONError(c, w, http.StatusBadRequest, errors.New("invalid session ID"))
-		return
+	// get session IDs from either request body or URL path
+	// the former has precedence
+	var ids []string
+	err = json.NewDecoder(r.Body).Decode(&ids)
+	if err != nil || len(ids) == 0 {
+		ids = []string{path.Base(r.URL.Path)}
+	}
+	for _, id := range ids {
+		if id == "" || id == "schedule" {
+			writeJSONError(c, w, http.StatusBadRequest, errors.New("invalid session ID"))
+			return
+		}
+		// TODO: check whether the session ID actually exists?
 	}
 
-	// TODO: check whether the session ID actually exists?
-	sid := path.Base(r.URL.Path)
 	var bookmarks []string
 	switch r.Method {
 	case "PUT":
-		bookmarks, err = bookmarkSession(c, user, sid)
+		bookmarks, err = bookmarkSessions(c, user, ids...)
 	case "DELETE":
-		bookmarks, err = unbookmarkSession(c, user, sid)
+		bookmarks, err = unbookmarkSessions(c, user, ids...)
 	default:
 		writeJSONError(c, w, http.StatusBadRequest, errors.New("invalid request method"))
 		return
