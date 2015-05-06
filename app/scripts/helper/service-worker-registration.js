@@ -46,7 +46,7 @@ IOWA.ServiceWorkerRegistration = (function() {
                   if (!navigator.serviceWorker.controller) {
                     IOWA.Elements.Toast.showMessage('Caching complete! Future visits will work offline.');
                   }
-                break;
+                  break;
 
                 case 'redundant':
                   throw 'The installing service worker became redundant.';
