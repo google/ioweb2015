@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"net/textproto"
 	"time"
 
 	"golang.org/x/net/context"
@@ -61,4 +62,10 @@ func serviceAccountClient(c context.Context, scopes ...string) (*http.Client, er
 		return nil, err
 	}
 	return oauth2Client(c, cred), nil
+}
+
+func typeMimeHeader(contentType string) textproto.MIMEHeader {
+	h := make(textproto.MIMEHeader)
+	h.Set("Content-Type", contentType)
+	return h
 }

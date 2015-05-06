@@ -24,27 +24,6 @@ const (
 	updateStart   = "start"
 )
 
-// pushError is used in methods that communicate with Push services like GCM.
-//  - msg: error message
-//  - retry: whether the caller should retry
-//  - after: try again after this duration, unless retry == false
-//  - remove: the caller should remove the subscription ID. Implies retry == false.
-type pushError struct {
-	msg    string
-	retry  bool
-	remove bool
-	after  time.Duration
-}
-
-func (pe *pushError) Error() string {
-	return pe.msg
-}
-
-func (pe *pushError) String() string {
-	return fmt.Sprintf("<pushError: retry=%v; remove=%v; after=%v; %s>",
-		pe.retry, pe.remove, pe.after, pe.msg)
-}
-
 //  userPush is user notification configuration.
 type userPush struct {
 	userID string

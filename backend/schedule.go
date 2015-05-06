@@ -361,57 +361,89 @@ func userSchedule(c context.Context, uid string) ([]string, error) {
 		return nil, err
 	}
 	var data *appFolderData
-	if data, err = fetchAppFolderData(c, cred); err != nil {
+	if data, err = getAppFolderData(c, cred, false); err != nil {
 		return nil, err
 	}
 	return data.Bookmarks, nil
 }
 
-// bookmarkSession adds session sid to the bookmarks of user uid.
-func bookmarkSession(c context.Context, uid, sid string) ([]string, error) {
+// bookmarkSessions adds session IDs ids to the bookmarks of user uid.
+func bookmarkSessions(c context.Context, uid string, ids ...string) ([]string, error) {
 	cred, err := getCredentials(c, uid)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("bookmarkSessions: %v", err)
 	}
+
 	var data *appFolderData
-	if data, err = fetchAppFolderData(c, cred); err != nil {
-		return nil, err
-	}
-
-	// check for duplicates
-	sort.Strings(data.Bookmarks)
-	i := sort.SearchStrings(data.Bookmarks, sid)
-	if i < len(data.Bookmarks) && data.Bookmarks[i] == sid {
-		return data.Bookmarks, nil
-	}
-
-	data.Bookmarks = append(data.Bookmarks, sid)
-	return data.Bookmarks, storeAppFolderData(c, cred, data)
-}
-
-// unbookmarkSession is the opposite of bookmarkSession.
-func unbookmarkSession(c context.Context, uid, sid string) ([]string, error) {
-	cred, err := getCredentials(c, uid)
-	if err != nil {
-		return nil, err
-	}
-	var data *appFolderData
-	if data, err = fetchAppFolderData(c, cred); err != nil {
-		return nil, err
-	}
-
-	// remove id in question w/o sorting
-	list := data.Bookmarks[:0]
-	for _, item := range data.Bookmarks {
-		if item != sid {
-			list = append(list, item)
+	for _, fresh := range []bool{false, true} {
+		data, err = getAppFolderData(c, cred, fresh)
+		if err != nil {
+			break
+		}
+		data.Bookmarks = unique(append(data.Bookmarks, ids...))
+		err = storeAppFolderData(c, cred, data)
+		if err != errConflict {
+			break
 		}
 	}
-	// no need to make a roundtrip if id wasn't in the list
-	if len(list) == len(data.Bookmarks) {
-		return data.Bookmarks, nil
+
+	if err != nil {
+		return nil, fmt.Errorf("bookmarkSessions: %v", err)
+	}
+	return data.Bookmarks, nil
+}
+
+// unbookmarkSessions is the opposite of bookmarkSessions.
+func unbookmarkSessions(c context.Context, uid string, ids ...string) ([]string, error) {
+	cred, err := getCredentials(c, uid)
+	if err != nil {
+		return nil, fmt.Errorf("unbookmarkSessions: %v", err)
 	}
 
-	data.Bookmarks = list
-	return data.Bookmarks, storeAppFolderData(c, cred, data)
+	var data *appFolderData
+	for _, fresh := range []bool{false, true} {
+		data, err = getAppFolderData(c, cred, fresh)
+		if err != nil {
+			break
+		}
+		data.Bookmarks = subslice(data.Bookmarks, ids...)
+		err = storeAppFolderData(c, cred, data)
+		if err != errConflict {
+			break
+		}
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("unbookmarkSessions: %v", err)
+	}
+	return data.Bookmarks, nil
+}
+
+// unique removes duplicates from slice.
+// Original arg is not modified.
+func unique(items []string) []string {
+	seen := make(map[string]bool, len(items))
+	res := make([]string, 0, len(items))
+	for _, s := range items {
+		if !seen[s] {
+			res = append(res, s)
+			seen[s] = true
+		}
+	}
+	return res
+}
+
+// subslice returns a subset of src which does not contain items.
+// Returned slice may have an order of elements different from src.
+func subslice(src []string, items ...string) []string {
+	res := make([]string, len(src))
+	copy(res, src)
+	sort.Strings(res)
+	for _, s := range items {
+		i := sort.SearchStrings(res, s)
+		if i < len(res) && res[i] == s {
+			res = append(res[:i], res[i+1:]...)
+		}
+	}
+	return res
 }

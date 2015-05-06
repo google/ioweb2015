@@ -11,9 +11,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-// TODO: merge this with errNotModified in db_gae.go
-var errNotModified = errors.New("content not modified")
-
 // RunInTransaction runs f in a transaction.
 // It calls f with a transaction context tc that f should use for all operations.
 func runInTransaction(c context.Context, f func(tc context.Context) error) error {
@@ -71,6 +68,16 @@ func getUserPushInfo(c context.Context, uid string) (*userPush, error) {
 
 // listUsersWithPush returns user IDs which have userPush.Enabled == true.
 func listUsersWithPush(c context.Context) ([]string, error) {
+	return nil, errors.New("not implemented")
+}
+
+// storeLocalAppFolderMeta saves data.FileID and data.Etag in a local db under key of user uid.
+func storeLocalAppFolderMeta(c context.Context, uid string, data *appFolderData) error {
+	return errors.New("not implemented")
+}
+
+// getLocalAppFolderMeta returns appFolderData of user uid with only FileID and Etag set.
+func getLocalAppFolderMeta(c context.Context, uid string) (*appFolderData, error) {
 	return nil, errors.New("not implemented")
 }
 
