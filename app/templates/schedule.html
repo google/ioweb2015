@@ -339,8 +339,8 @@
 
       IOWA.Elements.Template.dontAutoSubscribe = false;
 
-      var getFiltersFromURL = function(parsedUrl) {
-        parsedUrl = parsedUrl || IOWA.Router.parseUrl(window.location.toString());
+      var getFiltersFromURL = function(opt_parsedUrl) {
+        var parsedUrl = opt_parsedUrl || IOWA.Router.parseUrl(window.location.toString());
         var filters = [];
         if (parsedUrl.params.filters) {
           filters = parsedUrl.params.filters.split(',');
@@ -384,10 +384,12 @@
         IOWA.Elements.Template.async(function() {
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
+        window.addEventListener('popstate', sessionDetailsPopstateHandler);
       };
 
       page.unload = function() {
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
+        window.removeEventListener('popstate', sessionDetailsPopstateHandler);
       };
 
       IOWA.Elements.Template.openSession = function(sessionOrEvent) {
@@ -437,8 +439,6 @@
             '', window.location.search);
         history.replaceState({}, null, url);
       };
-
-      window.addEventListener('popstate', sessionDetailsPopstateHandler);
 
       IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail, sender) {
         // sender.updateTargetDimensions();
