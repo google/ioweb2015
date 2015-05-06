@@ -393,30 +393,35 @@ func TestServeUserScheduleExpired(t *testing.T) {
 			t.Errorf("gdrive %s: authorization = %q; want new-access", r.URL.Path, ah)
 		}
 
-		if r.URL.Path == "/download" {
+		if r.URL.Path == "/file-id" {
+			if r.FormValue("alt") != "media" {
+				t.Errorf("alt = %q; want 'media'", r.FormValue("alt"))
+			}
 			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(`{"starred_sessions": ["dummy-session-id"]}`))
 			return
 		}
 
-		q := "'appfolder' in parents and title = 'user_data.json' and trashed = false"
-		if v := r.FormValue("q"); v != q {
-			t.Errorf("q = %q; want %q", v, q)
+		if r.URL.Path != "/" {
+			t.Errorf("r.URL.Path = %q; want '/'", r.URL.Path)
+		}
+
+		q := "'appfolder' in parents and title = 'user_data.json'"
+		if r.FormValue("q") != q {
+			t.Errorf("q = %q; want %q\nForm: %v", r.FormValue("q"), q, r.Form)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{"items": [
-      {
-        "id": "not-this-one",
-        "modifiedDate": "2015-04-10T12:12:46.034Z",
-        "downloadUrl": "http://not-this-url"
-      },
-      {
-        "id": "file-id",
-        "modifiedDate": "2015-04-11T12:12:46.034Z",
-        "downloadUrl": %q
-      }
-    ]}`, gdrive.URL+"/download")
+			{
+				"id": "not-this-one",
+				"modifiedDate": "2015-04-10T12:12:46.034Z"
+			},
+			{
+				"id": "file-id",
+				"modifiedDate": "2015-04-11T12:12:46.034Z"
+			}
+		]}`)
 	}))
 	defer gdrive.Close()
 	config.Google.Drive.FilesURL = gdrive.URL + "/"
@@ -426,7 +431,7 @@ func TestServeUserScheduleExpired(t *testing.T) {
 	r := newTestRequest(t, "GET", "/api/v1/user/schedule", nil)
 	r.Header.Set("Authorization", "Bearer "+testIDToken)
 
-	serveUserSchedule(w, r)
+	handleUserSchedule(w, r)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("w.Code = %d; want 200", w.Code)
@@ -492,7 +497,7 @@ func TestHandleUserSchedulePut(t *testing.T) {
 		}
 	}
 
-	expBookmarks := append(defaultAppData.Bookmarks, "new-session-id")
+	expBookmarks := append(defaultBookmarks, "new-session-id")
 	checkMedia := func(r io.Reader) {
 		var data appFolderData
 		if err := json.NewDecoder(r).Decode(&data); err != nil {
@@ -516,6 +521,10 @@ func TestHandleUserSchedulePut(t *testing.T) {
 	upload := make(chan struct{}, 1)
 	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		checkAutHeader("upload", r.Header.Get("authorization"))
+
+		if v, ok := r.Header["If-Match"]; ok {
+			t.Errorf("if-match = %q; want none", v)
+		}
 
 		mediaType, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 		if err != nil {
@@ -550,6 +559,9 @@ func TestHandleUserSchedulePut(t *testing.T) {
 			t.Errorf("num. of parts = %d; want 2", count)
 		}
 
+		w.Header().Set("etag", `"new-etag"`)
+		fmt.Fprint(w, `{"id": "new-file-id"}`)
+
 		upload <- struct{}{}
 	}))
 	defer up.Close()
@@ -569,10 +581,10 @@ func TestHandleUserSchedulePut(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	r := newTestRequest(t, "PUT", "/api/v1/user/schedule/new-session-id", nil)
+	r := newTestRequest(t, "PUT", "/api/v1/user/schedule/new-session-id", strings.NewReader(""))
 	r.Header.Set("Authorization", "Bearer "+testIDToken)
 
-	handleUserBookmarks(w, r)
+	handleUserSchedule(w, r)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("w.Code = %d; want 200", w.Code)
@@ -591,6 +603,17 @@ func TestHandleUserSchedulePut(t *testing.T) {
 	if !compareStringSlices(list, expBookmarks) {
 		t.Errorf("list = %v; want %v", list, expBookmarks)
 	}
+
+	data, err := getLocalAppFolderMeta(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if data.FileID != "new-file-id" {
+		t.Errorf("data.FileID = %q; want 'new-file-id'", data.FileID)
+	}
+	if data.Etag != "new-etag" {
+		t.Errorf("data.Etag = %q; want 'new-etag'", data.Etag)
+	}
 }
 
 func TestHandleUserScheduleDelete(t *testing.T) {
@@ -600,26 +623,24 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 	defer resetTestState(t)
 	defer preserveConfig()()
 
-	// drive download file server
-	down := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"starred_sessions": ["one-session", "two-session"]}`))
-	}))
-	defer down.Close()
-
 	// drive search files server
 	files := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		q := "'appfolder' in parents and title = 'user_data.json' and trashed = false"
-		if v := r.FormValue("q"); v != q {
-			t.Errorf("q = %q; want %q", v, q)
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.URL.Path == "/file-id" {
+			w.Write([]byte(`{"starred_sessions": ["one-session", "two-session"]}`))
+			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
+		q := "'appfolder' in parents and title = 'user_data.json'"
+		if v := r.FormValue("q"); v != q {
+			t.Errorf("q = %q; want %q\nForm: %v", v, q, r.Form)
+		}
 		fmt.Fprintf(w, `{"items": [{
+			"etag": "\"some-etag\"",
       "id": "file-id",
-      "modifiedDate": "2015-04-11T12:12:46.034Z",
-      "downloadUrl": %q
-    }]}`, down.URL)
+      "modifiedDate": "2015-04-11T12:12:46.034Z"
+    }]}`)
 	}))
 	defer files.Close()
 
@@ -627,28 +648,18 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 	upload := make(chan struct{}, 1)
 	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() { upload <- struct{}{} }()
-
-		_, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-		if err != nil {
-			t.Fatalf("mime.ParseMediaType: %v", err)
-		}
-
-		mr := multipart.NewReader(r.Body, params["boundary"])
-		if _, err := mr.NextPart(); err != nil {
-			t.Fatalf("0: mr.NextPart: %v", err)
-		}
-
-		p, err := mr.NextPart()
-		if err != nil {
-			t.Fatalf("1: mr.NextPart: %v", err)
+		if v := r.Header.Get("if-match"); v != `"some-etag"` {
+			t.Errorf(`if-match = %q; want "\"some-etag\""`, v)
 		}
 		var data appFolderData
-		if err := json.NewDecoder(p).Decode(&data); err != nil {
-			t.Fatalf("Decode(mr.NextPart): %v", err)
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			t.Fatal(err)
 		}
 		if len(data.Bookmarks) != 1 || data.Bookmarks[0] != "two-session" {
 			t.Errorf("data.Bookmarks = %v; want ['two-session']", data.Bookmarks)
 		}
+		w.Header().Set("etag", `"new-etag"`)
+		w.WriteHeader(http.StatusOK)
 	}))
 	defer up.Close()
 
@@ -667,10 +678,10 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	r := newTestRequest(t, "DELETE", "/api/v1/user/schedule/one-session", nil)
+	r := newTestRequest(t, "DELETE", "/api/v1/user/schedule/one-session", strings.NewReader(""))
 	r.Header.Set("Authorization", "Bearer "+testIDToken)
 
-	handleUserBookmarks(w, r)
+	handleUserSchedule(w, r)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("w.Code = %d; want 200", w.Code)
@@ -688,6 +699,126 @@ func TestHandleUserScheduleDelete(t *testing.T) {
 	}
 	if len(list) != 1 || list[0] != "two-session" {
 		t.Errorf("list = %v; want ['two-session']", list)
+	}
+
+	data, err := getLocalAppFolderMeta(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if data.FileID != "file-id" {
+		t.Errorf("data.FileID = %q; want 'file-id'", data.FileID)
+	}
+	if data.Etag != "new-etag" {
+		t.Errorf("data.Etag = %q; want 'new-etag'", data.Etag)
+	}
+}
+
+func TestHandleUserScheduleConflict(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	// drive search files server
+	files := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			fmt.Fprintf(w, `{"items": [
+				{
+					"etag": "\"new-etag\"",
+					"id": "new-file-id",
+					"modifiedDate": "2015-04-11T12:12:46.034Z"
+				}
+			]}`)
+			return
+		}
+
+		if r.URL.Path == "/file-id" {
+			w.Write([]byte(`{"starred_sessions": ["a"]}`))
+			return
+		}
+
+		if r.URL.Path != "/new-file-id" {
+			t.Errorf("r.URL.Path = %q; want /new-file-id", r.URL.Path)
+		}
+		w.Write([]byte(`{"starred_sessions": ["a", "b"]}`))
+	}))
+	defer files.Close()
+
+	// drive upload server
+	upcount := 0
+	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() { upcount += 1 }()
+
+		if r.Header.Get("if-match") == `"some-etag"` {
+			w.WriteHeader(http.StatusPreconditionFailed)
+			return
+		}
+
+		if v := r.Header.Get("if-match"); v != `"new-etag"` {
+			t.Errorf("if-match = %q; want new-etag", v)
+		}
+		var data appFolderData
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			t.Fatal(err)
+		}
+		if v := []string{"a", "b", "c"}; !reflect.DeepEqual(data.Bookmarks, v) {
+			t.Errorf("data.Bookmarks = %v; want %v", data.Bookmarks, v)
+		}
+		w.Header().Set("etag", `"even-newer-etag"`)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer up.Close()
+
+	config.Google.Drive.FilesURL = files.URL + "/"
+	config.Google.Drive.UploadURL = up.URL + "/"
+	config.Google.Drive.Filename = "user_data.json"
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeLocalAppFolderMeta(c, testUserID, &appFolderData{
+		FileID: "file-id",
+		Etag:   "some-etag",
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	r := newTestRequest(t, "PUT", "/api/v1/user/schedule", strings.NewReader(`["b", "c"]`))
+	r.Header.Set("Authorization", "Bearer "+testIDToken)
+
+	handleUserSchedule(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+	if upcount != 2 {
+		t.Errorf("upcount = %d; want 2", upcount)
+	}
+
+	var list []string
+	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+		t.Fatalf("Unmarshal(%s): %v", w.Body.String(), err)
+	}
+	if v := []string{"a", "b", "c"}; !reflect.DeepEqual(list, v) {
+		t.Errorf("list = %v; want %v", list, v)
+	}
+
+	data, err := getLocalAppFolderMeta(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if data.FileID != "new-file-id" {
+		t.Errorf("data.FileID = %q; want new-file-id", data.FileID)
+	}
+	if data.Etag != "even-newer-etag" {
+		t.Errorf("data.Etag = %q; want even-newer-etag", data.Etag)
 	}
 }
 
@@ -718,7 +849,7 @@ func TestServeScheduleDefault(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	serveUserSchedule(w, r)
+	handleUserSchedule(w, r)
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
@@ -728,8 +859,8 @@ func TestServeScheduleDefault(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
 		t.Fatalf("Unmarshal(response): %v", err)
 	}
-	if !compareStringSlices(list, defaultAppData.Bookmarks) {
-		t.Errorf("list = %v; want %v", list, defaultAppData.Bookmarks)
+	if !compareStringSlices(list, defaultBookmarks) {
+		t.Errorf("list = %v; want %v", list, defaultBookmarks)
 	}
 }
 
@@ -1317,7 +1448,7 @@ func TestHandlePingExt(t *testing.T) {
 	config.ExtPingURL = ping.URL
 
 	r := newTestRequest(t, "POST", "/task/ping-ext?key=a-key", nil)
-	r.Header.Set("X-AppEngine-TaskExecutionCount", "0")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 	w := httptest.NewRecorder()
 	handlePingExt(w, r)
 
@@ -1340,16 +1471,16 @@ func TestHandlePingUserMissingToken(t *testing.T) {
 	defer resetTestState(t)
 	defer preserveConfig()()
 
-	// just in case: we want valid but not real API URLs
-	config.Google.TokenURL = "http://example.org/"
-	config.Google.Drive.FilesURL = "http://example.org/"
+	// just in case a request breaks out
+	config.Google.TokenURL = "http://token-should-not-be-used/"
+	config.Google.Drive.FilesURL = "http://drive-should-not-be-used/"
 
 	r := newTestRequest(t, "POST", "/task/ping-user", nil)
 	r.Form = url.Values{
 		"uid":      {testUserID},
 		"sessions": {"one"},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 	c := newContext(r)
 
 	if err := storeUserPushInfo(c, &userPush{userID: testUserID, Enabled: true}); err != nil {
@@ -1384,7 +1515,7 @@ func TestHandlePingUserRefokedToken(t *testing.T) {
 		"uid":      {testUserID},
 		"sessions": {"one"},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 	c := newContext(r)
 
 	if err := storeUserPushInfo(c, &userPush{userID: testUserID, Enabled: true}); err != nil {
@@ -1442,7 +1573,7 @@ func TestHandlePingDevice(t *testing.T) {
 		"rid":      {"reg-123"},
 		"endpoint": {ts.URL},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy-task")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 	w := httptest.NewRecorder()
 	handlePingDevice(w, r)
 
@@ -1474,7 +1605,7 @@ func TestHandlePingDeviceDelete(t *testing.T) {
 		"rid":      {"reg-123"},
 		"endpoint": {ts.URL},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy-task")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 
 	c := newContext(r)
 	storeUserPushInfo(c, &userPush{
@@ -1516,7 +1647,7 @@ func TestHandlePingDeviceReplace(t *testing.T) {
 		"rid":      {"reg-123"},
 		"endpoint": {ts.URL},
 	}
-	r.Header.Set("x-appengine-taskname", "dummy-task")
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
 
 	c := newContext(r)
 	storeUserPushInfo(c, &userPush{

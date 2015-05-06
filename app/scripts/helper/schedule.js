@@ -178,7 +178,6 @@ IOWA.Schedule = (function() {
       // If IOWA.Elements.Template.dontAutoSubscribe is true, this promise will reject immediately, and we'll just
       // add the session without attempting to auto-subscribe.
       return IOWA.Notifications.subscribePromise(template.dontAutoSubscribe).then(function() {
-        template.dontAutoSubscribe = false;
         IOWA.Elements.Toast.showMessage("Added to My Schedule. " + message);
       }).catch(function(error) {
         template.dontAutoSubscribe = true;

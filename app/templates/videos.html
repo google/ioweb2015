@@ -74,7 +74,7 @@
     <paper-dropdown-menu label="Filter" class="card--filters" hidden?="{{!isPhoneSize}}">
       <paper-dropdown valign="top" halign="left" class="dropdown">
         <core-menu class="menu" selected="0">
-          <paper-item>DevByte</paper-item>
+          <paper-item>DevBytes</paper-item>
           <paper-item disabled>Sessions</paper-item>
         </core-menu>
       </paper-dropdown>
@@ -88,8 +88,8 @@
 
         <div class="filter-rows">
           <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
-            <paper-radio-button layout horizontal center name="DevByte" label="DevByte" checked></paper-radio-button>
-            <paper-radio-button layout horizontal center name="Session" label="Session" disabled></paper-radio-button>
+            <paper-radio-button layout horizontal center name="DevBytes" label="DevBytes" checked></paper-radio-button>
+            <paper-radio-button layout horizontal center name="Sessions" label="Sessions" disabled></paper-radio-button>
           </paper-radio-group>
         </div>
 
@@ -103,6 +103,7 @@
 
         <div class="filter-rows">
           <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
+            <paper-radio-button layout horizontal center name="All" label="All"></paper-radio-button>
             <template repeat="{{topic in filterTopics}}">
               <paper-radio-button layout horizontal center name="{{topic}}" label="{{topic}}"></paper-radio-button>
             </template>
@@ -142,11 +143,7 @@
         IOWA.Elements.Template.videoList = videos;
         IOWA.Elements.Template.filteredVideoList = videos;
       }
-
-      IOWA.Schedule.generateFilters(scheduleData.tags);
-      IOWA.Elements.Template.filterTopics.unshift('All');
     });
-
   }
 
   // Page-specific JS that runs when this page is loaded for the first time.

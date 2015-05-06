@@ -7,8 +7,7 @@ module.exports = function(rootDir, handleFetch, importScripts, callback) {
   var templateDir = rootDir + '/templates/';
   var dynamicUrlToDependencies = {
     './': [templateDir + 'layout_full.html', templateDir + 'home.html'],
-    './?partial': [templateDir + 'layout_partial.html', templateDir + 'home.html'],
-    './upgrade': [rootDir + '/upgrade.html']
+    './?partial': [templateDir + 'layout_partial.html', templateDir + 'home.html']
   };
 
   // This isn't pretty, but it works for our dynamic URL mapping.

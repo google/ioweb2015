@@ -25,6 +25,13 @@ IOWA.Elements = (function() {
         e.stopPropagation();
         localStorage.setItem('showSigninIntro', JSON.stringify(true));
 
+        // Allow taps on the toast/off the toast to dismiss it. Also re-establish
+        // the reload handler for the "Tap to refresh content" toast.
+        IOWA.Elements.Toast.autoCloseDisabled = false;
+        IOWA.Elements.Toast.tapHandler_ = function() {
+          window.location.reload();
+        };
+
         signinIntroEl.parentElement.removeChild(signinIntroEl);
         signinIntroEl = null;
       });
@@ -32,6 +39,7 @@ IOWA.Elements = (function() {
       signinIntroEl.opened = true;
     } else {
       signinIntroEl.parentElement.removeChild(signinIntroEl);
+      IOWA.Elements.Toast.autoCloseDisabled = false;
     }
   }
 
@@ -607,7 +615,9 @@ IOWA.Elements = (function() {
       if (sender.checked) {
         // subscribePromise() handles registering a subscription with the browser's push manager
         // and toggling the notify state to true in the backend via an API call.
-        IOWA.Notifications.subscribePromise().catch(function(error) {
+        IOWA.Notifications.subscribePromise().then(function() {
+          IOWA.Elements.Template.dontAutoSubscribe = false;
+        }).catch(function(error) {
           if (error && error.name === 'AbortError') {
             IOWA.Elements.Toast.showMessage('Please update your notification permissions', null, 'Learn how', function() {
               window.open('permissions', '_blank');

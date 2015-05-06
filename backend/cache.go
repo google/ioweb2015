@@ -15,6 +15,7 @@ var (
 	// initialized by the standalone server's main() or server_gae.
 	cache cacheInterface
 
+	// TODO: rename this to errNotFound and move to errors.go
 	errCacheMiss = errors.New("cache: miss")
 )
 
