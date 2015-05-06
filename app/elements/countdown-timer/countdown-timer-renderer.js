@@ -14,6 +14,7 @@ IOWA.CountdownTimer.NumberRenderer = function(el) {
   this.letterPadding_ = 6;
   this.linePadding_ = 32;
   this.freezeCount_ = 0;
+  this.skippedUnits_ = 0;
 
   this.colorSet_ = IOWA.CountdownTimer.Colors.Rundown[0];
   this.targetColorSet_ = this.colorSet_;
@@ -888,6 +889,8 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     var unitsLeftToAdd = this.unitCount_;
     var skipLeadingZeroValues = true;
 
+    this.skippedUnits_ = 0;
+
     for (var v = 0; v < valuesAsArray.length; v++) {
 
       // Don't skip zero values when we need to fill out
@@ -895,8 +898,10 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       if (v >= valuesAsArray.length - this.unitCount_)
         skipLeadingZeroValues = false;
 
-      if (skipLeadingZeroValues && valuesAsArray[v] === '00')
+      if (skipLeadingZeroValues && valuesAsArray[v] === '00') {
+        this.skippedUnits_++;
         continue;
+      }
 
       // As soon as we find a non-zero value we stop skipping.
       skipLeadingZeroValues = false;
@@ -1097,7 +1102,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     // The freeze count is based on a full complement of units, so
     // if we haven't got that we need to adjust.
     var toFreeze = this.freezeCount_;
-    var toFreezeAdjustment = (4 - this.unitCount_) * 3;
+    var toFreezeAdjustment = this.skippedUnits_ * 3;
     toFreeze -= toFreezeAdjustment;
 
     // Characters
