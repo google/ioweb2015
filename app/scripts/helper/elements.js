@@ -25,6 +25,13 @@ IOWA.Elements = (function() {
         e.stopPropagation();
         localStorage.setItem('showSigninIntro', JSON.stringify(true));
 
+        // Allow taps on the toast/off the toast to dismiss it. Also re-establish
+        // the reload handler for the "Tap to refresh content" toast.
+        IOWA.Elements.Toast.autoCloseDisabled = false;
+        IOWA.Elements.Toast.tapHandler_ = function() {
+          window.location.reload();
+        };
+
         signinIntroEl.parentElement.removeChild(signinIntroEl);
         signinIntroEl = null;
       });
