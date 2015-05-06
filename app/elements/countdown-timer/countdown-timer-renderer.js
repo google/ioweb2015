@@ -14,10 +14,12 @@ IOWA.CountdownTimer.NumberRenderer = function(el) {
   this.letterPadding_ = 6;
   this.linePadding_ = 32;
   this.freezeCount_ = 0;
+  this.skippedUnits_ = 0;
 
+  this.colorSet_ = IOWA.CountdownTimer.Colors.Rundown[0];
+  this.targetColorSet_ = this.colorSet_;
   this.nextRippleColor_ = 0;
   this.ripples_ = [];
-  this.backgroundColor_ = IOWA.CountdownTimer.Colors.Background;
 
   this.addEventListeners_();
 };
@@ -75,11 +77,22 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     window.removeEventListener('resize', this.resizeHandler);
   },
 
+  convertHSLObjectToString_: function(hslObj) {
+    return 'hsla(' +
+        hslObj.h + ', ' +
+        hslObj.s + '%, ' +
+        hslObj.l + '%, ' +
+        hslObj.a + ')';
+  },
+
   drawLine_: function(color, xStart, yStart, xEnd, yEnd) {
+
+    if (!color.str)
+      color.str = this.convertHSLObjectToString_(color);
 
     this.ctx_.save();
     this.ctx_.translate(0.5, 0.5);
-    this.ctx_.strokeStyle = color;
+    this.ctx_.strokeStyle = color.str;
     this.ctx_.beginPath();
     this.ctx_.moveTo(xStart, yStart);
     this.ctx_.lineTo(xEnd, yEnd);
@@ -94,7 +107,10 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     if (radius < 0)
       return;
 
-    this.ctx_.fillStyle = color;
+    if (!color.str)
+      color.str = this.convertHSLObjectToString_(color);
+
+    this.ctx_.fillStyle = color.str;
     this.ctx_.beginPath();
     this.ctx_.arc(x, y, radius, 0, Math.PI * 2);
     this.ctx_.closePath();
@@ -106,7 +122,10 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     if (radius < 0)
       return;
 
-    this.ctx_.fillStyle = color;
+    if (!color.str)
+      color.str = this.convertHSLObjectToString_(color);
+
+    this.ctx_.fillStyle = color.str;
     this.ctx_.beginPath();
     this.ctx_.arc(x, y, radius, startAngle, startAngle + Math.PI);
     this.ctx_.closePath();
@@ -118,7 +137,10 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     if (width < 0 || height < 0)
       return;
 
-    this.ctx_.fillStyle = color;
+    if (!color.str)
+      color.str = this.convertHSLObjectToString_(color);
+
+    this.ctx_.fillStyle = color.str;
     this.ctx_.beginPath();
 
     this.ctx_.save();
@@ -139,27 +161,6 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     this.ctx_.closePath();
     this.ctx_.fill();
     this.ctx_.restore();
-  },
-
-  drawBox_: function(color, x, y, width, height) {
-
-    this.ctx_.fillStyle = color;
-    this.ctx_.fillRect(x, y, width, height);
-
-  },
-
-  drawCover_: function(time) {
-
-    return;
-
-    this.ctx_.globalAlpha = (1 - time);
-    this.setShadow_('', 0, 0);
-
-    this.drawBox_(IOWA.CountdownTimer.Colors.Background,
-        -this.letterPadding_,
-        -this.letterPadding_,
-        this.baseNumberWidth_ + this.letterPadding_ * 2,
-        this.baseNumberHeight_ + this.letterPadding_ * 2);
   },
 
   setShadow_: function(color, blur, offsetY) {
@@ -184,7 +185,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * semiCircleBottomYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 2,
           time * semiCircleBottomYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawSemiCircle_(this.colorSet_.medium,
           64, 64, 64, 0);
       this.ctx_.restore();
 
@@ -193,13 +194,13 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * semiCircleTopYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 14,
           time * semiCircleTopYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 64, 64, 64,
+      this.drawSemiCircle_(this.colorSet_.dark, 64, 64, 64,
           -Math.PI);
       this.ctx_.restore();
 
       this.ctx_.globalAlpha = (1 - time);
       this.setShadow_('', 0, 0);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.Background, 64, 64, 66);
+      this.drawCircle_(this.colorSet_.background, 64, 64, 66);
 
     }
 
@@ -210,13 +211,13 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       // Circle Bottom
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 2,
           time * semiCircleBottomYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.MediumBlue, 64,
+      this.drawSemiCircle_(this.colorSet_.medium, 64,
           64 + (1 - circleBottomTime) * 32, circleBottomTime * 64, 0);
 
       // Circle Top
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 14,
           time * semiCircleTopYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 64,
+      this.drawSemiCircle_(this.colorSet_.dark, 64,
           64 - (1 - time) * 32, time * 64, -Math.PI);
 
     }
@@ -247,7 +248,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rhomboidYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 8,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawRhomboid_(this.colorSet_.light,
           16, 0, 40, 126, 0, 0);
       this.ctx_.restore();
 
@@ -255,10 +256,8 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * circleYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 14, 20, 20);
+      this.drawCircle_(this.colorSet_.dark, 14, 20, 20);
       this.ctx_.restore();
-
-      this.drawCover_(time);
 
     }
 
@@ -266,12 +265,12 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 8,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue, 16,
+      this.drawRhomboid_(this.colorSet_.light, 16,
           (1 - time) * 64, 40, time * 126, 0, 0);
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * circleYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 14, 20,
+      this.drawCircle_(this.colorSet_.dark, 14, 20,
           time * 20);
 
     }
@@ -303,7 +302,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * semiCircleYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 4,
           time * semiCircleYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawSemiCircle_(this.colorSet_.medium,
           40, 48, 48, -Math.PI * 0.5);
       this.ctx_.restore();
 
@@ -312,7 +311,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rhomboidYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 8,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue, 0, 94, 88,
+      this.drawRhomboid_(this.colorSet_.light, 0, 94, 88,
           32, 0, 0);
       this.ctx_.restore();
 
@@ -321,10 +320,8 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * circleYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 19, 20, 20);
+      this.drawCircle_(this.colorSet_.dark, 19, 20, 20);
       this.ctx_.restore();
-
-      this.drawCover_(time);
     }
 
     function out_() {
@@ -334,18 +331,18 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 4,
           time * semiCircleYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawSemiCircle_(this.colorSet_.medium,
           40 + (1 - semiCircleTime) * 24, 48,
           semiCircleTime * 48, -Math.PI * 0.5);
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 8,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawRhomboid_(this.colorSet_.light,
           (1 - rhomboidTime) * 49, 94, rhomboidTime * 88, 32, 0, 0);
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * circleYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 19, 20, time * 20);
+      this.drawCircle_(this.colorSet_.dark, 19, 20, time * 20);
     }
 
     if (direction === IOWA.CountdownTimer.Animation.In)
@@ -376,7 +373,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * semiCircleBottomYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 2,
           time * semiCircleBottomYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawSemiCircle_(this.colorSet_.medium,
           34, 86, 42, -Math.PI * 0.5);
       this.ctx_.restore();
 
@@ -385,7 +382,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * semiCircleTopYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 8,
           time * semiCircleTopYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawSemiCircle_(this.colorSet_.light,
           34, 32, 32, -Math.PI * 0.5);
       this.ctx_.restore();
 
@@ -394,7 +391,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleTopYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 8,
           time * circleTopYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawCircle_(this.colorSet_.medium,
           13, 20, time * 20);
       this.ctx_.restore();
 
@@ -403,11 +400,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleBottomYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * circleBottomYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue,
+      this.drawCircle_(this.colorSet_.dark,
           13, 108, time * 20);
       this.ctx_.restore();
-
-      this.drawCover_(time);
 
     }
 
@@ -419,27 +414,27 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       // Semi-circle Bottom
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 2,
           time * semiCircleBottomYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawSemiCircle_(this.colorSet_.medium,
           34 + ((1 - semiCircleBottomTime) * 21), 86,
           semiCircleBottomTime * 42, -Math.PI * 0.5);
 
       // Semi-circle Top
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 8,
           time * semiCircleTopYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawSemiCircle_(this.colorSet_.light,
           34 + ((1 - semiCircleTopTime) * 16), 32,
           semiCircleTopTime * 32, -Math.PI * 0.5);
 
       // Circle Top
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 8,
           time * circleTopYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawCircle_(this.colorSet_.medium,
           13, 20, time * 20);
 
       // Circle Bottom
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * circleBottomYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue,
+      this.drawCircle_(this.colorSet_.dark,
           13, 108, time * 20);
 
     }
@@ -470,7 +465,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rhomboidYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue, 0, 0,
+      this.drawRhomboid_(this.colorSet_.light, 0, 0,
           40, 80, 0, .01);
       this.ctx_.restore();
 
@@ -479,11 +474,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rectangleYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 2,
           time * rectangleYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.MediumBlue, 48, 0,
+      this.drawRhomboid_(this.colorSet_.medium, 48, 0,
           40, 128, 0, 0);
       this.ctx_.restore();
-
-      this.drawCover_(time);
     }
 
     function out_() {
@@ -492,13 +485,13 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue, 0,
+      this.drawRhomboid_(this.colorSet_.light, 0,
           0 + (1 - time) * 44, 40, time * 80, 0, .01);
 
       // Right rectangle.
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 2,
           time * rectangleYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.MediumBlue, 48,
+      this.drawRhomboid_(this.colorSet_.medium, 48,
           (1 - rectangleTime) * 64, 40, rectangleTime * 128, 0, 0);
     }
 
@@ -529,7 +522,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * semiCircleYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 4,
           time * semiCircleYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.LightBlue, 51, 80,
+      this.drawSemiCircle_(this.colorSet_.light, 51, 80,
           48, -Math.PI * 0.5);
       this.ctx_.restore();
 
@@ -538,7 +531,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rhomboidYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 10,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.MediumBlue, 4, 0, 88, 32,
+      this.drawRhomboid_(this.colorSet_.medium, 4, 0, 88, 32,
           0, 0);
       this.ctx_.restore();
 
@@ -547,10 +540,8 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * circleYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 24, 56, 24);
+      this.drawCircle_(this.colorSet_.dark, 24, 56, 24);
       this.ctx_.restore();
-
-      this.drawCover_(time);
 
     }
 
@@ -561,18 +552,18 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 4,
           time * semiCircleYOffset);
-      this.drawSemiCircle_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawSemiCircle_(this.colorSet_.light,
           51 + (1 - semiCircleTime) * 24, 80, semiCircleTime * 48,
           -Math.PI * 0.5);
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 10,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawRhomboid_(this.colorSet_.medium,
           4 + (1 - rhomboidTime) * 44, 0, rhomboidTime * 88, 32, 0, 0);
 
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * circleYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 24, 56, time * 24);
+      this.drawCircle_(this.colorSet_.dark, 24, 56, time * 24);
 
     }
 
@@ -602,7 +593,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 4,
           time * circleYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.MediumBlue, 54, 80, 48);
+      this.drawCircle_(this.colorSet_.medium, 54, 80, 48);
       this.ctx_.restore();
 
       // Rhomboid
@@ -610,11 +601,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rhomboidYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.DarkBlue, 6, 0,
+      this.drawRhomboid_(this.colorSet_.dark, 6, 0,
           40, 80, 0, 0.01);
       this.ctx_.restore();
-
-      this.drawCover_(time);
 
     }
 
@@ -625,13 +614,13 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       // Circle
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 4,
           time * circleYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.MediumBlue, 54, 80,
+      this.drawCircle_(this.colorSet_.medium, 54, 80,
           circleTime * 48);
 
       // Rhomboid
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 12,
           time * rhomboidYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.DarkBlue,
+      this.drawRhomboid_(this.colorSet_.dark,
           6 + (1 - time) * 20, 0, time * 40, 80, 0, 0.01);
 
     }
@@ -662,7 +651,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rhomboidRightYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 2,
           time * rhomboidRightYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawRhomboid_(this.colorSet_.medium,
           57, 6, 40, 120, 0, 0.01);
       this.ctx_.restore();
 
@@ -671,11 +660,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rhomboidTopYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow,
           time * 12, time * rhomboidTopYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawRhomboid_(this.colorSet_.light,
           0, 0, 88, 40, 0, 0.01);
       this.ctx_.restore();
-
-      this.drawCover_(time);
     }
 
     function out_() {
@@ -685,14 +672,14 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       // Rhomboid Right
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow,
           time * 2, time * rhomboidRightYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawRhomboid_(this.colorSet_.medium,
           57 + (1 - rhomboidTopTime) * 20.5, 6,
           rhomboidTopTime * 40, 120, 0, 0);
 
       // Rhomboid Top
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow,
           time * 12, time * rhomboidTopYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawRhomboid_(this.colorSet_.light,
           (1 - time) * 38.5, 0, time * 88, 40, 0, 0);
 
     }
@@ -723,7 +710,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleBottomYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time,
           time * circleBottomYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.MediumBlue, 48, 80, 48);
+      this.drawCircle_(this.colorSet_.medium, 48, 80, 48);
       this.ctx_.restore();
 
       // Circle Top
@@ -731,10 +718,8 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleTopYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time * 14,
           time * circleTopYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 48, 36, 36);
+      this.drawCircle_(this.colorSet_.dark, 48, 36, 36);
       this.ctx_.restore();
-
-      this.drawCover_(time);
 
     }
 
@@ -745,13 +730,13 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       // Circle Bottom
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, time,
           time * circleBottomYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.MediumBlue, 48, 80,
+      this.drawCircle_(this.colorSet_.medium, 48, 80,
           circleBottomTime * 48);
 
       // Circle Top
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow,
           time * 14, time * circleTopYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.DarkBlue, 48, 36, time * 36);
+      this.drawCircle_(this.colorSet_.dark, 48, 36, time * 36);
 
     }
 
@@ -782,7 +767,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * circleTopYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow,
           time, time * circleTopYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.MediumBlue, 48, 48, 48);
+      this.drawCircle_(this.colorSet_.medium, 48, 48, 48);
       this.ctx_.restore();
 
       // Rhomboid Right
@@ -790,11 +775,9 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       this.ctx_.translate(0, (1 - time) * rhomboidRightYOffset);
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow,
           time * 8, time * rhomboidRightYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawRhomboid_(this.colorSet_.light,
           56, 6, 41, 120, 0, 0);
       this.ctx_.restore();
-
-      this.drawCover_(time);
 
     }
 
@@ -805,13 +788,13 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       // Circle Top
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow, circleTopTime,
           circleTopTime * circleTopYOffset);
-      this.drawCircle_(IOWA.CountdownTimer.Colors.MediumBlue,
+      this.drawCircle_(this.colorSet_.medium,
           48, 48, circleTopTime * 48);
 
       // Rhomboid Right
       this.setShadow_(IOWA.CountdownTimer.Colors.Shadow,
           time * 8, time * rhomboidRightYOffset);
-      this.drawRhomboid_(IOWA.CountdownTimer.Colors.LightBlue,
+      this.drawRhomboid_(this.colorSet_.light,
           56 + (1 - time) * 20.5, 6, time * 41, 120, 0, 0);
 
     }
@@ -827,16 +810,38 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
 
   clear: function() {
 
-    this.ctx_.fillStyle = this.backgroundColor_;
+    if (!this.colorSet_.background.str) {
+      this.colorSet_.background.str = this.convertHSLObjectToString_(
+          this.colorSet_.background);
+    }
+
+    this.ctx_.fillStyle = this.colorSet_.background.str;
     this.ctx_.fillRect(0, 0, this.width_, this.height_);
     this.drawX_ = 0;
     this.drawY_ = 0;
 
   },
 
-  ripple: function() {
+  ripple: function(rippleColor) {
 
     var start = Date.now();
+
+    if (typeof rippleColor === 'undefined') {
+      rippleColor = {
+        background: {h:360,s:100,l:100,a:1},
+        alphaStart: 0.2,
+        alphaEnd: 0,
+        setBackgroundOnComplete: false,
+        updateColorSetOnRipple: false
+      }
+    }
+
+    // Default to the ripple's colors taking over on complete.
+    if (typeof rippleColor.setBackgroundOnComplete === 'undefined')
+      rippleColor.setBackgroundOnComplete = true;
+
+    if (typeof rippleColor.updateColorSetOnRipple === 'undefined')
+      rippleColor.updateColorSetOnRipple = true;
 
     var x = (this.width_ + this.baseNumberWidth_) * 0.5;
 
@@ -862,9 +867,7 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       end: start + 2800,
       x: x,
       y: this.height_ * 0.5,
-      color: '#FFFFFF',
-      alphaStart: 0.2,
-      alphaEnd: 0
+      color: rippleColor
     });
 
   },
@@ -886,6 +889,8 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     var unitsLeftToAdd = this.unitCount_;
     var skipLeadingZeroValues = true;
 
+    this.skippedUnits_ = 0;
+
     for (var v = 0; v < valuesAsArray.length; v++) {
 
       // Don't skip zero values when we need to fill out
@@ -893,8 +898,10 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       if (v >= valuesAsArray.length - this.unitCount_)
         skipLeadingZeroValues = false;
 
-      if (skipLeadingZeroValues && valuesAsArray[v] === '00')
+      if (skipLeadingZeroValues && valuesAsArray[v] === '00') {
+        this.skippedUnits_++;
         continue;
+      }
 
       // As soon as we find a non-zero value we stop skipping.
       skipLeadingZeroValues = false;
@@ -965,6 +972,48 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     }
   },
 
+  easeColorSetValues_: function() {
+
+    var numEasing = 0.07;
+
+    this.colorSet_.dark.h +=
+        (this.targetColorSet_.dark.h - this.colorSet_.dark.h) * numEasing;
+    this.colorSet_.dark.s +=
+        (this.targetColorSet_.dark.s - this.colorSet_.dark.s) * numEasing;
+    this.colorSet_.dark.l +=
+        (this.targetColorSet_.dark.l - this.colorSet_.dark.l) * numEasing;
+    this.colorSet_.dark.a +=
+        (this.targetColorSet_.dark.a - this.colorSet_.dark.a) * numEasing;
+
+    // Update the string version.
+    this.colorSet_.dark.str =
+        this.convertHSLObjectToString_(this.colorSet_.dark);
+
+    this.colorSet_.medium.h +=
+        (this.targetColorSet_.medium.h - this.colorSet_.medium.h) * numEasing;
+    this.colorSet_.medium.s +=
+        (this.targetColorSet_.medium.s - this.colorSet_.medium.s) * numEasing;
+    this.colorSet_.medium.l +=
+        (this.targetColorSet_.medium.l - this.colorSet_.medium.l) * numEasing;
+    this.colorSet_.medium.a +=
+        (this.targetColorSet_.medium.a - this.colorSet_.medium.a) * numEasing;
+
+    this.colorSet_.medium.str =
+        this.convertHSLObjectToString_(this.colorSet_.medium);
+
+    this.colorSet_.light.h +=
+        (this.targetColorSet_.light.h - this.colorSet_.light.h) * numEasing;
+    this.colorSet_.light.s +=
+        (this.targetColorSet_.light.s - this.colorSet_.light.s) * numEasing;
+    this.colorSet_.light.l +=
+        (this.targetColorSet_.light.l - this.colorSet_.light.l) * numEasing;
+    this.colorSet_.light.a +=
+        (this.targetColorSet_.light.a - this.colorSet_.light.a) * numEasing;
+
+    this.colorSet_.light.str =
+        this.convertHSLObjectToString_(this.colorSet_.light);
+  },
+
   draw: function(value, time, direction) {
 
     if (this.width_ === 0 && this.height_ === 0)
@@ -997,6 +1046,18 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       ripple = this.ripples_[r];
 
       if (now > ripple.end) {
+
+        if (ripple.color.setBackgroundOnComplete) {
+
+          this.colorSet_.background.h = ripple.color.background.h;
+          this.colorSet_.background.s = ripple.color.background.s;
+          this.colorSet_.background.l = ripple.color.background.l;
+          this.colorSet_.background.a = ripple.color.background.a;
+
+          this.colorSet_.background.str =
+              this.convertHSLObjectToString_(this.colorSet_.background);
+        }
+
         this.ripples_.splice(r--, 1);
       }
 
@@ -1005,15 +1066,30 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
       rippleTimeNormalized = Math.min(1, rippleTime / rippleDuration);
       rippleRadius = IOWA.CountdownTimer.Easing(rippleTimeNormalized) *
           this.maxRippleRadius_;
-      rippleAlpha = ripple.alphaStart +
+      rippleAlpha = ripple.color.alphaStart +
           IOWA.CountdownTimer.Easing(rippleTimeNormalized) *
-          (ripple.alphaEnd - ripple.alphaStart)
+          (ripple.color.alphaEnd - ripple.color.alphaStart);
+
+      // If we don't set a ripple alpha assume 1.
+      if (typeof ripple.color.alphaStart === 'undefined') {
+        rippleAlpha = 1;
+      }
+
+      // Only update the color set once.
+      if (ripple.color.updateColorSetOnRipple) {
+        ripple.color.updateColorSetOnRipple = false;
+
+        this.targetColorSet_ = ripple.color;
+      }
 
       this.ctx_.save();
       this.ctx_.globalAlpha = rippleAlpha;
-      this.drawCircle_(ripple.color, ripple.x, ripple.y, rippleRadius);
+      this.drawCircle_(ripple.color.background,
+          ripple.x, ripple.y, rippleRadius);
       this.ctx_.restore();
     }
+
+    this.easeColorSetValues_();
 
     this.drawX_ = Math.round((this.width_ - metrics.width) * 0.5);
     this.drawY_ = Math.round((this.height_ - metrics.height) * 0.5);
@@ -1023,13 +1099,19 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
     this.ctx_.strokeStyle = 'rgba(0,0,0,0.3)';
     this.ctx_.fillStyle = '#000';
 
+    // The freeze count is based on a full complement of units, so
+    // if we haven't got that we need to adjust.
+    var toFreeze = this.freezeCount_;
+    var toFreezeAdjustment = this.skippedUnits_ * 3;
+    toFreeze -= toFreezeAdjustment;
+
     // Characters
     for (var i = 0; i < valueAsString.length; i++) {
 
       // Reset the time and set it to 1 if the character is frozen.
       characterTime = time;
 
-      if (i < this.freezeCount_)
+      if (i < toFreeze)
         characterTime = 1;
 
       this.ctx_.save();
@@ -1055,6 +1137,13 @@ IOWA.CountdownTimer.NumberRenderer.prototype = {
   },
 
   setNextValueForFreezing: function(value, freezeValue) {
+
+    // If it's the zero value, just call it.
+    if (value.days ===  0 && value.hours === 0 &&
+        value.minutes === 0 && value.seconds === 0) {
+      this.freezeCount_ = Number.MAX_VALUE;
+      return;
+    }
 
     var daysValueAsString =
         this.convertNumberToStringAndPadIfNeeded_(value.days);

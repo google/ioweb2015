@@ -96,7 +96,6 @@ IOWA.CountdownTimer.Element.prototype = {
 
       if (this.countdownTargetReached_()) {
         this.dispatchThresholdEventIfNeeded_("Ended");
-        return;
       }
 
       animationValue = 1 - ((now - this.animationEaseOutStartTime_) /
@@ -147,8 +146,8 @@ IOWA.CountdownTimer.Element.prototype = {
 
     this.needToFreezeDigits_ = false;
 
-    var milliseconds = this.targetDate_ - Date.now() -
-        this.easeOutTime_ - this.waitTime_;
+    var milliseconds = Math.max(0, this.targetDate_ - Date.now() -
+        this.easeOutTime_ - this.waitTime_);
 
     this.convertMillisecondsAndSetObjectValues_(milliseconds,
         this.nextCountdownValue_);
@@ -187,7 +186,7 @@ IOWA.CountdownTimer.Element.prototype = {
 
   setDayMonthMinutesAndSecondValues_: function() {
 
-    var millisecondsToTarget = this.targetDate_ - Date.now();
+    var millisecondsToTarget = Math.max(0, this.targetDate_ - Date.now());
 
     this.lastDrawnValue_.days = this.currentCountdownValue.days;
     this.lastDrawnValue_.hours = this.currentCountdownValue.hours;
@@ -202,10 +201,51 @@ IOWA.CountdownTimer.Element.prototype = {
 
   scheduleRendererRippleIfNeeded_: function() {
 
+    // Only ripple if something has changed.
+    if (this.lastDrawnValue_.days === this.currentCountdownValue.days &&
+        this.lastDrawnValue_.hours === this.currentCountdownValue.hours &&
+        this.lastDrawnValue_.minutes === this.currentCountdownValue.minutes &&
+        this.lastDrawnValue_.seconds === this.currentCountdownValue.seconds)
+      return;
+
+    if (this.currentCountdownValue.days === 0 &&
+        this.currentCountdownValue.hours === 0 &&
+        this.currentCountdownValue.minutes === 0) {
+
+      if (this.lastDrawnValue_.minutes === 1) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[1]);
+      } else if (this.crossedThreshold_(30)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[2]);
+      } else if (this.crossedThreshold_(20)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[3]);
+      } else if (this.crossedThreshold_(10)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[4]);
+      } else if (this.crossedThreshold_(8)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[5]);
+      } else if (this.crossedThreshold_(6)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[6]);
+      } else if (this.crossedThreshold_(4)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[7]);
+      } else if (this.crossedThreshold_(3)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[8]);
+      } else if (this.crossedThreshold_(2)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[9]);
+      } else if (this.crossedThreshold_(1)) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[10]);
+      } else if (this.currentCountdownValue.seconds === 0) {
+        this.renderer_.ripple(IOWA.CountdownTimer.Colors.Rundown[11]);
+      }
+
+      return;
+    }
+
     if (this.currentCountdownValue.minutes !== this.lastDrawnValue_.minutes)
       this.renderer_.ripple();
+  },
 
-    // TODO(paullewis) Add more cases here.
+  crossedThreshold_: function(threshold) {
+    return this.lastDrawnValue_.seconds > threshold &&
+        this.currentCountdownValue.seconds <= threshold;
   },
 
   convertMillisecondsAndSetObjectValues_: function(milliseconds, target) {
