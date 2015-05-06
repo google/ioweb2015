@@ -387,6 +387,9 @@
       };
 
       IOWA.Elements.Template.openSession = function(sessionOrEvent) {
+        if (!sessionOrEvent) {
+          return;
+        }
         this.selectedSession = sessionOrEvent.detail ? sessionOrEvent.detail.session : sessionOrEvent;
 
         // Open paper-dialog.
