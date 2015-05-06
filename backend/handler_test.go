@@ -1124,6 +1124,73 @@ func TestFirstSyncEventData(t *testing.T) {
 	}
 }
 
+func TestSyncEventDataEmtpyDiff(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	const scheduleFile = `{
+		"sessions":[
+			{
+				"id":"__keynote__",
+				"url":"https://events.google.com/io2015/",
+				"title":"Keynote",
+				"description":"DESCRIPTION",
+				"startTimestamp":"2015-05-28T22:00:00Z",
+				"endTimestamp":"2015-05-28T23:00:00Z",
+				"isLivestream":true,
+				"tags":["FLAG_KEYNOTE"],
+				"speakers":[],
+				"room":"room-id",
+				"photoUrl": "http://example.org/photo",
+				"youtubeUrl": "http://example.org/video"
+			}
+		]
+	}`
+
+	times := []time.Time{time.Now().UTC(), time.Now().Add(10 * time.Second).UTC()}
+	mcount, scount := 0, 0
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/manifest.json" {
+			w.Header().Set("last-modified", times[mcount].Format(http.TimeFormat))
+			w.Write([]byte(`{"data_files": ["schedule.json"]}`))
+			mcount += 1
+			return
+		}
+		w.Write([]byte(scheduleFile))
+		scount += 1
+	}))
+	defer ts.Close()
+
+	config.Schedule.ManifestURL = ts.URL + "/manifest.json"
+	config.Schedule.Start = time.Date(2015, 5, 28, 9, 30, 0, 0, time.UTC)
+
+	r := newTestRequest(t, "POST", "/sync/gcs", nil)
+	r.Header.Set("x-goog-channel-token", "sync-token")
+	w := httptest.NewRecorder()
+	c := newContext(r)
+
+	for i := 1; i < 3; i += 1 {
+		syncEventData(w, r)
+		if w.Code != http.StatusOK {
+			t.Errorf("w.Code = %d; want 200", w.Code)
+		}
+		if mcount != i || scount != i {
+			t.Errorf("mcount = %d, scount = %d; want both %d", mcount, scount, i)
+		}
+
+		dc, err := getChangesSince(c, times[0].Add(-10*time.Second))
+		if err != nil {
+			t.Fatalf("getChangesSince: %v", err)
+		}
+		if l := len(dc.Sessions); l != 0 {
+			t.Errorf("len(dc.Sessions) = %d; want 0\ndc.Sessions: %v", l, dc.Sessions)
+		}
+	}
+}
+
 func TestSyncEventDataWithDiff(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)

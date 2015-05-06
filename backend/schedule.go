@@ -288,6 +288,13 @@ func slurpEventDataChunk(c context.Context, hc *http.Client, url string) (*event
 		s.End = s.EndTime.In(config.Schedule.Location).Format("3:04 PM")
 		s.Day = tzstart.Day()
 
+		if len(s.Speakers) == 0 {
+			s.Speakers = nil
+		}
+		if len(s.Tags) == 0 {
+			s.Tags = nil
+		}
+
 		sessions[s.Id] = s
 	}
 
@@ -319,6 +326,8 @@ func slurpEventDataChunk(c context.Context, hc *http.Client, url string) (*event
 // diffEventData looks for changes in existing items of b comparing to a.
 // It compares only Sessions, Speakers and Videos of eventData.
 // The result is a subset of b or nil if a is empty.
+// Side effects: Update field of b.Session elements may be modified;
+// Tags and Speakers fields will be assigned nil if len() == 0.
 func diffEventData(a, b *eventData) *dataChanges {
 	if isEmptyEventData(a) {
 		return nil
@@ -332,7 +341,23 @@ func diffEventData(a, b *eventData) *dataChanges {
 		},
 	}
 	for id, bs := range b.Sessions {
-		if as, ok := a.Sessions[id]; ok && !reflect.DeepEqual(as, bs) {
+		as, ok := a.Sessions[id]
+		if !ok {
+			continue
+		}
+		if len(as.Speakers) == 0 {
+			as.Speakers = nil
+		}
+		if len(as.Tags) == 0 {
+			as.Tags = nil
+		}
+		if len(bs.Speakers) == 0 {
+			bs.Speakers = nil
+		}
+		if len(bs.Tags) == 0 {
+			bs.Tags = nil
+		}
+		if !reflect.DeepEqual(as, bs) {
 			dc.Sessions[id] = bs
 			bs.Update = updateDetails
 			if as.YouTube != bs.YouTube && bs.YouTube != "" {
