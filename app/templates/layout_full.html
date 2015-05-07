@@ -208,7 +208,7 @@ limitations under the License.
           </a>
         </paper-item>
         <paper-item label="schedule">
-          <a href="schedule" data-ajax-link data-anim-drawer data-track-link="nav-drawer-schedule">
+          <a href="schedule#day1" data-ajax-link data-anim-drawer data-track-link="nav-drawer-schedule">
             <i18n-msg msgid="schedule">Schedule</i18n-msg>
           </a>
         </paper-item>
@@ -267,7 +267,7 @@ limitations under the License.
               </a>
             </paper-tab>
             <paper-tab label="schedule" role="">
-              <a href="schedule" data-ajax-link data-track-link="nav-schedule" data-transition="masthead-ripple-transition" layout horizontal center>
+              <a href="schedule#day1" data-ajax-link data-track-link="nav-schedule" data-transition="masthead-ripple-transition" layout horizontal center>
                 <i18n-msg msgid="schedule">Schedule</i18n-msg>
               </a>
             </paper-tab>
@@ -348,7 +348,7 @@ limitations under the License.
             </div>
           </div>
           <div class="card-content" layout horizontal justified>
-            <span class="anchor-like" data-track-link="signin-intro-signin" on-click="{{signIn}}" core-overlay-toggle>Sign in</span>
+            <span class="anchor-like" role="link" tabindex="0" data-track-link="signin-intro-signin" on-click="{{signIn}}" core-overlay-toggle>Sign in</span>
             <a href="#" data-track-link="signin-intro-later" core-overlay-toggle>Maybe later</a>
           </div>
         </paper-dialog>
