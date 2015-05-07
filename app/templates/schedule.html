@@ -360,7 +360,8 @@
         // Deep link into schedule tab.
         var parsedUrl = IOWA.Router.parseUrl(window.location.toString());
         template.sessionURLFilters = getFiltersFromURL(parsedUrl);
-        template.selectedTimezone = 'GMT-07:00'; // PDT timezone.
+        template.selectedTimezone = 'GMT' + moment().format('Z'); // Local timezone.
+        template.selectTimezone();
 
         // Deep link into session.
         var sessionId = parsedUrl.resourceId;
