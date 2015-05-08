@@ -95,7 +95,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
       if (subscription && subscription.endpoint) {
         // See https://groups.google.com/a/chromium.org/d/msg/blink-dev/CK13omVO5ds/fR6sdPxsaasJ
         var endpoint = subscription.endpoint;
-        if ('subscriptionId' in subscription && !endpoint.includes(subscription.subscriptionId)) {
+        if (subscription.subscriptionId && !endpoint.includes(subscription.subscriptionId)) {
           endpoint += '/' + subscription.subscriptionId;
         }
         // If subscribing succeeds, send the subscription to the server. Return a resolved promise.
