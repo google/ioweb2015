@@ -3,7 +3,7 @@
 {% define "mastheadBgClass" %}bg-cyan{% end %}
 
 {% define "masthead" %}
-<div id="countdown-container" class="photo__masthead--fullbleed" fit>
+<!-- <div id="countdown-container" class="photo__masthead--fullbleed" fit>
   <countdown-timer bgcolor="#00BCD4"
       date="{% .StartDateStr %}"
       easeintime="490" waittime="100"
@@ -12,10 +12,12 @@
       aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O"
       role="timer">
   </countdown-timer>
-</div>
+</div> -->
 {% end %}
 
 {% define "content" %}
+
+<!--
   <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video" tabindex="{{fullscreenVideoActive ? 0 : -1}}"></paper-icon-button>
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
@@ -113,13 +115,11 @@
           </a>
         </div>
 
-        <!-- <a href="//www.google.com/?#q=%23io15" target="_blank" data-track-link="about-hashtag-search"> -->
-          <div class="io__hash" aria-label="I/O hash tag"></div>
-        <!-- </a> -->
+        <div class="io__hash" aria-label="I/O hash tag"></div>
 
         <template if="{{socialPosts.length >= 3}}">
           <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-            <template repeat="{{socialPost in socialPosts}}">
+            <template repeat="{{socialPost in socialPosts | limit(3)}}">
               <social-post kind="{{socialPost.kind}}"
                            author="{{socialPost.author}}"
                            url="{{socialPost.url}}"
@@ -142,6 +142,8 @@
     </div>
   </template>
 
+-->
+
   <script>
   (function() {
 
@@ -149,7 +151,7 @@
     function initPage() {
       var page = IOWA.Elements.Template.pages['home'];
       var socialPostsEndpoint = 'api/v1/social';
-      var socialPostUpdateInterval = 30000; // 30 seconds
+      var socialPostUpdateInterval = 30 * 1000; // 30 seconds
       var updateSocialPostsTimeout;
 
       if (page.hasBeenLoaded) {
@@ -178,7 +180,7 @@
 
       function processSocialPosts(socialPosts) {
         // Only show the first 3 posts.
-        IOWA.Elements.Template.socialPosts = socialPosts.slice(0, 3);
+        IOWA.Elements.Template.socialPosts = socialPosts;
       }
 
       page.load = function() {
