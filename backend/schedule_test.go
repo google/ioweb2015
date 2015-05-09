@@ -13,6 +13,7 @@ func TestSubslice(t *testing.T) {
 		{[]string{"a", "b", "c"}, []string{"d"}, []string{"a", "b", "c"}},
 		{[]string{"b", "c"}, []string{"a", "c"}, []string{"b"}},
 		{[]string{"a", "b", "c"}, []string{}, []string{"a", "b", "c"}},
+		{[]string{"abc", "def"}, []string{"ab"}, []string{"abc", "def"}},
 	}
 	for i, test := range table {
 		out := subslice(test.in, test.items...)

@@ -44,17 +44,15 @@ func storeUserPushInfo(c context.Context, p *userPush) error {
 	return nil
 }
 
-// updateSubscriber replaces old registration rid with nreg.
+// updatePushEndpoint replaces old endpoint with the new URL nurl.
 // It must be run in a transactional context.
-// TODO: rid will be replaced with endpoint after Chrome 44.
-func updateSubscriber(c context.Context, uid, rid, nreg string) error {
+func updatePushEndpoint(c context.Context, uid, endpoint, nurl string) error {
 	return errors.New("not implemented")
 }
 
-// deleteSubscriber removes registration rid from a list of user uid.
+// deletePushEndpoint removes endpoint from the list of push endpoints of user uid.
 // It must be run in a transactional context.
-// TODO: rid will be replaced with endpoint after Chrome 44.
-func deleteSubscriber(c context.Context, uid, rid string) error {
+func deletePushEndpoint(c context.Context, uid, endpoint string) error {
 	return errors.New("not implemented")
 }
 
