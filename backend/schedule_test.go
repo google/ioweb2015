@@ -67,3 +67,18 @@ func TestDiffEventData(t *testing.T) {
 		t.Errorf("len(dc.Sessions) = %d; want 0", l)
 	}
 }
+
+func TestThumbURL(t *testing.T) {
+	table := []struct{ in, out string }{
+		{"http://example.org/image.jpg", "http://example.org/image.jpg"},
+		{"http://example.org/images/__w/img.jpg", "http://example.org/images/__w/img.jpg"},
+		{"http://example.org/images/__w-400-600/img.jpg", "http://example.org/images/w400/img.jpg"},
+		{"http://example.org/__w-200-400-600-800-1000/img.jpg", "http://example.org/w200/img.jpg"},
+	}
+	for _, test := range table {
+		out := thumbURL(test.in)
+		if out != test.out {
+			t.Errorf("thumbURL(%q) = %q; want %q", test.in, out, test.out)
+		}
+	}
+}
