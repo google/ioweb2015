@@ -989,12 +989,16 @@ func taskRetryCount(r *http.Request) (int, error) {
 }
 
 // toAPISchedule converts eventData to /api/v1/schedule response format.
+// Original d elements may be modified.
 func toAPISchedule(d *eventData) interface{} {
 	sessions := make([]*eventSession, 0, len(d.Sessions))
 	for _, s := range d.Sessions {
 		sessions = append(sessions, s)
 	}
 	sort.Sort(sortedSessionsList(sessions))
+	for _, s := range d.Speakers {
+		s.Thumb = thumbURL(s.Thumb)
+	}
 	return &struct {
 		Sessions []*eventSession          `json:"sessions,omitempty"`
 		Speakers map[string]*eventSpeaker `json:"speakers,omitempty"`

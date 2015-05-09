@@ -18,6 +18,9 @@ import (
 const (
 	liveStreamedText = "Live streamed"
 	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
+	// imageURLSizeMarker is used by thumbURL
+	imageURLSizeMarker    = "__w-"
+	imageURLSizeMarkerLen = len(imageURLSizeMarker)
 )
 
 type eventData struct {
@@ -471,4 +474,26 @@ func subslice(src []string, items ...string) []string {
 		}
 	}
 	return res
+}
+
+// thumbURL converts turl to a smaller image URL.
+// turl must include specially formatted path part which starts with "__w-",
+// followed by available sizes, e.g. "__w-200-400-600-800-1000".
+// If turl doesn't have the "__w-" format, the returned value is turl.
+func thumbURL(turl string) string {
+	i := strings.Index(turl, imageURLSizeMarker)
+	if i < 0 || len(turl) < i+imageURLSizeMarkerLen+1 {
+		return turl
+	}
+	j := strings.IndexRune(turl[i+imageURLSizeMarkerLen+1:], '-')
+	if j < 0 {
+		return turl
+	}
+	j += i + imageURLSizeMarkerLen + 1
+	k := strings.Index(turl[j:], "/")
+	if k < 0 {
+		return turl
+	}
+	k += j
+	return turl[:i] + "w" + turl[i+imageURLSizeMarkerLen:j] + turl[k:]
 }
