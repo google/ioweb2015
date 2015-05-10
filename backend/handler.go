@@ -56,6 +56,7 @@ func registerHandlers() {
 	handle("/task/ping-user", handlePingUser)
 	handle("/task/ping-device", handlePingDevice)
 	handle("/task/ping-ext", handlePingExt)
+	handle("/task/clock", handleClock)
 	// debug handlers; not available in prod
 	if !isProd() {
 		handle("/debug/srvget", debugServiceGetURL)
@@ -841,6 +842,60 @@ func handlePingExt(w http.ResponseWriter, r *http.Request) {
 		errorf(c, "handlePingExt: remote says %q\nResponse: %s", res.Status, b)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+}
+
+// handleClock compares time.Now() to each session and notifies users about starting sessions.
+// It must be run frequently, every minute or so.
+func handleClock(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	retry, err := taskRetryCount(r)
+	if err != nil || retry > 0 {
+		errorf(c, "retry = %d, err: %v", retry, err)
+		return
+	}
+
+	data, err := getLatestEventData(c, nil)
+	if err != nil {
+		errorf(c, "%v", err)
+		return
+	}
+	sessions := make([]*eventSession, 0, len(data.Sessions))
+	for _, s := range data.Sessions {
+		sessions = append(sessions, s)
+	}
+	now := time.Now()
+	sessions = dueSessions(now, sessions)
+	if len(sessions) == 0 {
+		return
+	}
+
+	terr := runInTransaction(c, func(c context.Context) error {
+		due, err := filterStoredDueSessions(c, sessions)
+		if err != nil {
+			return err
+		}
+		if len(due) == 0 {
+			return nil
+		}
+		logf(c, "found %d due sessions", len(due))
+		dc := &dataChanges{
+			Updated:   now,
+			eventData: eventData{Sessions: make(map[string]*eventSession, len(due))},
+		}
+		for _, s := range due {
+			dc.Sessions[s.Id] = s
+		}
+		if err := storeDueSessions(c, due); err != nil {
+			return err
+		}
+		if err := storeChanges(c, dc); err != nil {
+			return err
+		}
+		return notifySubscribersAsync(c, dc)
+	})
+	if terr != nil {
+		errorf(c, "txn err: %v", terr)
 	}
 }
 

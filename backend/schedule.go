@@ -17,11 +17,20 @@ import (
 
 const (
 	liveStreamedText = "Live streamed"
-	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
+
+	// dueSessions
+	dueTimeoutSoon  = 24 * time.Hour
+	dueTimeoutStart = 10 * time.Minute
+
 	// imageURLSizeMarker is used by thumbURL
 	imageURLSizeMarker    = "__w-"
 	imageURLSizeMarkerLen = len(imageURLSizeMarker)
+
+	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
 )
+
+// session IDs to compare dueTimeoutSoon to.
+var soonSessionIDs = []string{"__keynote__"}
 
 type eventData struct {
 	Sessions map[string]*eventSession `json:"sessions,omitempty"`
@@ -57,7 +66,7 @@ type eventSession struct {
 	End     string          `json:"end"`
 	Filters map[string]bool `json:"filters"`
 
-	// Update is used only when diff-ing
+	// Update is used only api/user/updates
 	Update string `json:"update,omitempty"`
 }
 
@@ -379,6 +388,29 @@ func diffEventData(a, b *eventData) *dataChanges {
 		}
 	}
 	return dc
+}
+
+// dueSessions returns a subset of items which have their StartTime field
+// close to dueTimeoutStart or dueTimeoutSoon.
+// It also sets Update field of the returned elements to updateStart or updateSoon respectively.
+func dueSessions(now time.Time, items []*eventSession) []*eventSession {
+	sort.Strings(soonSessionIDs)
+	res := make([]*eventSession, 0)
+	for _, s := range items {
+		t := s.StartTime.Sub(now)
+		i := sort.SearchStrings(soonSessionIDs, s.Id)
+		doSoon := i < len(soonSessionIDs) && soonSessionIDs[i] == s.Id
+		switch {
+		default:
+			continue
+		case t < dueTimeoutStart:
+			s.Update = updateStart
+		case doSoon && t < dueTimeoutSoon:
+			s.Update = updateSoon
+		}
+		res = append(res, s)
+	}
+	return res
 }
 
 // userSchedule returns a slice of session IDs bookmarked by a user.

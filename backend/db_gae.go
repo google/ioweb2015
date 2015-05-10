@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
 
@@ -22,6 +23,7 @@ const (
 	kindEventData   = "EventData"
 	kindChanges     = "Changes"
 	kindAppFolder   = "AppFolder"
+	kindDue         = "Due"
 )
 
 // RunInTransaction runs f in a transaction.
@@ -304,6 +306,48 @@ func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
 	return changes, nil
 }
 
+// storeDueSessions saves keys of items under kindDue entity kind,
+// keyed by "sessionID:eventSession.Update".
+func storeDueSessions(c context.Context, items []*eventSession) error {
+	pkey := dueSessionParent(c)
+	keys := make([]*datastore.Key, len(items))
+	for i, s := range items {
+		id := s.Id + ":" + s.Update
+		keys[i] = datastore.NewKey(c, kindDue, id, 0, pkey)
+	}
+	zeros := make([]struct{}, len(keys))
+	_, err := datastore.PutMulti(c, keys, zeros)
+	return err
+}
+
+// filterStoredDueSessions queries kindDue entities and returns only those items
+// which are not present in the datastore.
+func filterStoredDueSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
+	pkey := dueSessionParent(c)
+	keys := make([]*datastore.Key, len(items))
+	for i, s := range items {
+		id := s.Id + ":" + s.Update
+		keys[i] = datastore.NewKey(c, kindDue, id, 0, pkey)
+	}
+	zeros := make([]struct{}, len(keys))
+	err := datastore.GetMulti(c, keys, zeros)
+	merr, ok := err.(appengine.MultiError)
+	if !ok && err != nil {
+		return nil, err
+	}
+	res := make([]*eventSession, 0, len(keys))
+	for i, e := range merr {
+		if e == nil {
+			continue
+		}
+		if e != datastore.ErrNoSuchEntity {
+			return nil, err
+		}
+		res = append(res, items[i])
+	}
+	return res, nil
+}
+
 // eventDataParent returns a common ancestor for all kindEventData entities.
 func eventDataParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindEventData, "root", 0, nil)
@@ -312,4 +356,9 @@ func eventDataParent(c context.Context) *datastore.Key {
 // changesParent returns a common ancestor for all kindChanges entities.
 func changesParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindChanges, "root", 0, nil)
+}
+
+// dueSessionParent returns a common ancestor for all kindDue session entities.
+func dueSessionParent(c context.Context) *datastore.Key {
+	return datastore.NewKey(c, kindDue, "session", 0, nil)
 }

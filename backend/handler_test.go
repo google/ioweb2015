@@ -1743,9 +1743,137 @@ func TestHandlePingDeviceReplace(t *testing.T) {
 	}
 }
 
+func TestHandleClockDueSessions(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	now := time.Now()
+	swToken := fetchFirstSWToken(t, testIDToken)
+	if swToken == "" {
+		t.Fatal("no swToken")
+	}
+
+	// gdrive stub
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/file-id" {
+			w.Write([]byte(`{"starred_sessions": ["start", "__keynote__", "too-early"]}`))
+			return
+		}
+		fmt.Fprintf(w, `{"items": [{
+			"id": "file-id",
+			"modifiedDate": "2015-04-11T12:12:46.034Z"
+		}]}`)
+	}))
+	defer ts.Close()
+	config.Google.Drive.FilesURL = ts.URL + "/"
+	config.Google.Drive.Filename = "user_data.json"
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "access-token",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeUserPushInfo(c, &userPush{userID: testUserID}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeDueSessions(c, []*eventSession{
+		&eventSession{Id: "already-clocked", Update: updateStart},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"start": &eventSession{
+			Id:        "start",
+			StartTime: now.Add(dueTimeoutStart - time.Second),
+		},
+		"__keynote__": &eventSession{
+			Id:        "__keynote__",
+			StartTime: now.Add(dueTimeoutSoon - time.Second),
+		},
+		"already-clocked": &eventSession{
+			Id:        "already-clocked",
+			StartTime: now.Add(dueTimeoutStart - time.Second),
+		},
+		"too-early": &eventSession{ // because it's not in soonSessionIDs
+			Id:        "too-early",
+			StartTime: now.Add(dueTimeoutSoon - time.Second),
+		},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	due := map[string]string{
+		"start":       updateStart,
+		"__keynote__": updateSoon,
+	}
+	checkUpdates := func(dc *dataChanges, what string) {
+		if len(dc.Sessions) != len(due) {
+			t.Errorf("%s: dc.Sessions = %v; want %v", what, dc.Sessions, due)
+		}
+		for id, v := range due {
+			s, ok := dc.Sessions[id]
+			if !ok {
+				t.Errorf("%s: %q not in %v", what, id, dc.Sessions)
+				continue
+			}
+			if s.Update != v {
+				t.Errorf("%s: s.Update = %q; want %q", what, s.Update, v)
+			}
+		}
+	}
+
+	r := newTestRequest(t, "POST", "/task/clock", nil)
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
+	w := httptest.NewRecorder()
+	handleClock(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200", w.Code)
+	}
+
+	undue, err := filterStoredDueSessions(c, []*eventSession{
+		&eventSession{Id: "__keynote__", Update: updateSoon},
+		&eventSession{Id: "start", Update: updateStart},
+		&eventSession{Id: "too-early", Update: "too-early"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(undue) != 1 {
+		t.Fatalf("undue = %v; want [too-early]", toSessionIDs(undue))
+	}
+	if undue[0].Id != "too-early" {
+		t.Fatalf("Id = %q; want 'too-early'", undue[0].Id)
+	}
+
+	dc, err := getChangesSince(c, now.Add(-time.Second))
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkUpdates(dc, "getChangesSince")
+
+	r = newTestRequest(t, "GET", "/api/v1/user/updates", nil)
+	r.Header.Set("authorization", swToken)
+	w = httptest.NewRecorder()
+	serveUserUpdates(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+	dc = &dataChanges{}
+	if err := json.Unmarshal(w.Body.Bytes(), dc); err != nil {
+		t.Fatal(err)
+	}
+	checkUpdates(dc, "api")
+}
+
 func fetchFirstSWToken(t *testing.T, auth string) string {
 	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
-	r.Header.Set("authorization", bearerHeader+testIDToken)
+	r.Header.Set("authorization", bearerHeader+auth)
 	w := httptest.NewRecorder()
 	serveSWToken(w, r)
 	if w.Code != http.StatusOK {
