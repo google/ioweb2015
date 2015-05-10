@@ -236,6 +236,7 @@ Response body sample:
 * `details`: any/all session fields have changed.
 * `video`: `youtubeUrl` field is changed.
 * `start`: the session is about to start. this includes the keynote.
+* `soon`: the session starts in about 24 hours. currently only __keynote__.
 
 `videos` section contains other videos, potentially not related to sessions, e.g. dev bytes.
 
