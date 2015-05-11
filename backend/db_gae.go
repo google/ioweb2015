@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
 
@@ -22,6 +23,7 @@ const (
 	kindEventData   = "EventData"
 	kindChanges     = "Changes"
 	kindAppFolder   = "AppFolder"
+	kindNext        = "Next"
 )
 
 // RunInTransaction runs f in a transaction.
@@ -304,6 +306,49 @@ func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
 	return changes, nil
 }
 
+// storeNextSessions saves IDs of items under kindNext entity kind,
+// keyed by "sessionID:eventSession.Update".
+func storeNextSessions(c context.Context, items []*eventSession) error {
+	pkey := nextSessionParent(c)
+	keys := make([]*datastore.Key, len(items))
+	for i, s := range items {
+		id := s.Id + ":" + s.Update
+		keys[i] = datastore.NewKey(c, kindNext, id, 0, pkey)
+	}
+	zeros := make([]struct{}, len(keys))
+	_, err := datastore.PutMulti(c, keys, zeros)
+	return err
+}
+
+// filterNextSessions queries kindNext entities and returns a subset of items
+// containing only the elements not present in the datastore, previously saved with
+// storeNextSessions().
+func filterNextSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
+	pkey := nextSessionParent(c)
+	keys := make([]*datastore.Key, len(items))
+	for i, s := range items {
+		id := s.Id + ":" + s.Update
+		keys[i] = datastore.NewKey(c, kindNext, id, 0, pkey)
+	}
+	zeros := make([]struct{}, len(keys))
+	err := datastore.GetMulti(c, keys, zeros)
+	merr, ok := err.(appengine.MultiError)
+	if !ok && err != nil {
+		return nil, err
+	}
+	res := make([]*eventSession, 0, len(keys))
+	for i, e := range merr {
+		if e == nil {
+			continue
+		}
+		if e != datastore.ErrNoSuchEntity {
+			return nil, err
+		}
+		res = append(res, items[i])
+	}
+	return res, nil
+}
+
 // eventDataParent returns a common ancestor for all kindEventData entities.
 func eventDataParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindEventData, "root", 0, nil)
@@ -312,4 +357,9 @@ func eventDataParent(c context.Context) *datastore.Key {
 // changesParent returns a common ancestor for all kindChanges entities.
 func changesParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindChanges, "root", 0, nil)
+}
+
+// nextSessionParent returns a common ancestor for all kindNext session entities.
+func nextSessionParent(c context.Context) *datastore.Key {
+	return datastore.NewKey(c, kindNext, "session", 0, nil)
 }

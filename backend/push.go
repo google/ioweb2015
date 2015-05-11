@@ -19,9 +19,11 @@ import (
 )
 
 const (
+	// eventSession.Update field
 	updateDetails = "details"
 	updateVideo   = "video"
 	updateStart   = "start"
+	updateSoon    = "soon"
 )
 
 //  userPush is user notification configuration.

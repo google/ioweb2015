@@ -157,3 +157,11 @@ func jwsTestKey(notBefore, notAfter time.Time) (pemKey []byte, pemCert []byte) {
 
 	return pemKey, pemCert
 }
+
+func toSessionIDs(a []*eventSession) []string {
+	res := make([]string, len(a))
+	for i, s := range a {
+		res[i] = s.Id
+	}
+	return res
+}
