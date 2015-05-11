@@ -117,7 +117,7 @@ func filterUserChanges(dc *dataChanges, bks []string, ext *ioExtPush) {
 //
 // In a case where endpoint did not accept push request the return error
 // will be of type *pushError with RetryAfter >= 0.
-// If returned string value is non-zero value, it contains a new endpoint
+// If returned string value is non-zero, it contains a new endpoint
 // to be used instead of the old one from now on.
 func pingDevice(c context.Context, endpoint string) (string, error) {
 	if u := config.Google.GCM.Endpoint; u != "" && strings.HasPrefix(endpoint, u) {
