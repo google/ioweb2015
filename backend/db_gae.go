@@ -281,7 +281,7 @@ func getLatestEventData(c context.Context, etags []string) (*eventData, error) {
 	return data, gob.NewDecoder(bytes.NewReader(res.Bytes)).Decode(data)
 }
 
-// getSessionByID returns the session from getLtestEventData() if it exists,
+// getSessionByID returns the session from getLatestEventData() if it exists,
 // otherwise an error.
 func getSessionByID(c context.Context, id string) (*eventSession, error) {
 	d, err := getLatestEventData(c, nil)
@@ -417,6 +417,8 @@ func nextSessionParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindNext, "session", 0, nil)
 }
 
+// hexKey returns a representation of a key k in base 16.
+// Useful for etags.
 func hexKey(k *datastore.Key) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(k.String())))
 }
