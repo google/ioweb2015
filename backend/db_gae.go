@@ -365,11 +365,6 @@ func changesParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindChanges, "root", 0, nil)
 }
 
-// nextSessionParent returns a common ancestor for all kindNext session entities.
-func nextSessionParent(c context.Context) *datastore.Key {
-	return datastore.NewKey(c, kindNext, "session", 0, nil)
-}
-
 // hexKey returns a representation of a key k in base 16.
 // Useful for etags.
 func hexKey(k *datastore.Key) string {
