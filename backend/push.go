@@ -222,11 +222,11 @@ func pushEndpointURL(reg string, endpoint string) string {
 	if reg == "" && endpoint == "" {
 		return ""
 	}
-	if endpoint == "" {
-		endpoint = config.Google.GCM.Endpoint
-	}
 	if reg == "" {
 		return endpoint
+	}
+	if endpoint == "" {
+		endpoint = config.Google.GCM.Endpoint
 	}
 	endpoint = strings.TrimRight(endpoint, "/")
 	reg = strings.TrimLeft(reg, "/")
