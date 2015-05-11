@@ -97,53 +97,54 @@ func TestServeSchedule(t *testing.T) {
 		return etag
 	}
 
-	// no etag
-	w := httptest.NewRecorder()
-	serveSchedule(w, r)
-	checkRes(1, w, http.StatusOK, false)
+	// 0: cache miss; 1: cache hit
+	for i := 0; i < 2; i += 1 {
+		// no etag, unless cached
+		w := httptest.NewRecorder()
+		serveSchedule(w, r)
+		checkRes(1, w, http.StatusOK, i > 0)
 
-	// first etag
-	if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
-		t.Fatal(err)
-	}
-	w = httptest.NewRecorder()
-	serveSchedule(w, r)
-	etag := checkRes(2, w, http.StatusOK, true)
+		// first etag
+		if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
+			t.Fatal(err)
+		}
+		w = httptest.NewRecorder()
+		serveSchedule(w, r)
+		etag := checkRes(2, w, http.StatusOK, true)
 
-	r.Header.Set("if-none-match", etag)
-	w = httptest.NewRecorder()
-	serveSchedule(w, r)
-	checkRes(3, w, http.StatusNotModified, true)
+		r.Header.Set("if-none-match", etag)
+		w = httptest.NewRecorder()
+		serveSchedule(w, r)
+		checkRes(3, w, http.StatusNotModified, true)
 
-	// new etag
-	if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
-		t.Fatal(err)
-	}
-	w = httptest.NewRecorder()
-	serveSchedule(w, r)
-	etag = checkRes(4, w, http.StatusOK, true)
+		// new etag
+		if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
+			t.Fatal(err)
+		}
+		w = httptest.NewRecorder()
+		serveSchedule(w, r)
+		etag = checkRes(4, w, http.StatusOK, true)
 
-	w = httptest.NewRecorder()
-	r.Header.Set("if-none-match", etag)
-	serveSchedule(w, r)
-	checkRes(5, w, http.StatusNotModified, true)
+		w = httptest.NewRecorder()
+		r.Header.Set("if-none-match", etag)
+		serveSchedule(w, r)
+		checkRes(5, w, http.StatusNotModified, true)
 
-	// star etag
-	w = httptest.NewRecorder()
-	r.Header.Set("if-none-match", "*")
-	serveSchedule(w, r)
-	lastEtag := checkRes(5, w, http.StatusOK, true)
-	if lastEtag != etag {
-		t.Errorf("lastEtag = %q; want %q", lastEtag, etag)
+		// star etag
+		w = httptest.NewRecorder()
+		r.Header.Set("if-none-match", "*")
+		serveSchedule(w, r)
+		lastEtag := checkRes(5, w, http.StatusOK, true)
+		if lastEtag != etag {
+			t.Errorf("lastEtag = %q; want %q", lastEtag, etag)
+		}
 	}
 }
 
 func TestServeTemplate(t *testing.T) {
 	defer resetTestState(t)
+	defer preserveConfig()()
 	const ctype = "text/html;charset=utf-8"
-
-	revert := preserveConfig()
-	defer revert()
 	config.Prefix = "/root"
 
 	table := []struct{ path, slug, canonical string }{
@@ -222,6 +223,60 @@ func TestServeTemplate404(t *testing.T) {
 	}
 	if v := w.Header().Get("Cache-Control"); v != "" {
 		t.Errorf("don't want Cache-Control: %q", v)
+	}
+}
+
+func TestServeSessionTemplate(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+
+	c := newContext(newTestRequest(t, "GET", "/dummmy", nil))
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"123": &eventSession{
+			Title: "Session",
+			Desc:  "desc",
+			Photo: "http://image.jpg",
+		},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	table := []*struct{ p, title, desc, image string }{
+		{"/schedule", "Schedule", descDefault, config.Prefix + "/" + ogImageDefault},
+		{"/schedule?sid=not-there", "Schedule", descDefault, config.Prefix + "/" + ogImageDefault},
+		{"/schedule?sid=123", "Session", "desc", "http://image.jpg"},
+	}
+
+	for i, test := range table {
+		lookup := []string{
+			`<meta itemprop="name" content="` + test.title + `">`,
+			`<meta itemprop="description" content="` + test.desc + `">`,
+			`<meta itemprop="image" content="` + test.image + `">`,
+			`<meta name="twitter:title" content="` + test.title + `">`,
+			`<meta name="twitter:description" content="` + test.desc + `">`,
+			`<meta name="twitter:image:src" content="` + test.image + `">`,
+			`<meta property="og:title" content="` + test.title + `">`,
+			`<meta property="og:description" content="` + test.desc + `">`,
+			`<meta property="og:image" content="` + test.image + `">`,
+		}
+		r := newTestRequest(t, "GET", test.p, nil)
+		w := httptest.NewRecorder()
+		serveTemplate(w, r)
+		if w.Code != http.StatusOK {
+			t.Errorf("%d: w.Code = %d; want 200", i, w.Code)
+		}
+		miss := 0
+		for _, s := range lookup {
+			if !strings.Contains(w.Body.String(), s) {
+				t.Errorf("%d: missing %s", i, s)
+				miss += 1
+			}
+		}
+		if miss > 0 {
+			t.Errorf("%d: %d meta tags are missing in layout:\n%s", i, miss, w.Body.String())
+		}
 	}
 }
 
@@ -822,7 +877,7 @@ func TestHandleUserScheduleConflict(t *testing.T) {
 	}
 }
 
-func TestServeScheduleDefault(t *testing.T) {
+func TestServeUserScheduleDefault(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
