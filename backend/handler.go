@@ -865,28 +865,25 @@ func handleClock(w http.ResponseWriter, r *http.Request) {
 		sessions = append(sessions, s)
 	}
 	now := time.Now()
-	sessions = dueSessions(now, sessions)
-	if len(sessions) == 0 {
-		return
-	}
+	upsess := upcomingSessions(now, sessions)
 
 	terr := runInTransaction(c, func(c context.Context) error {
-		due, err := filterStoredDueSessions(c, sessions)
+		upsess, err = filterNextSessions(c, upsess)
 		if err != nil {
 			return err
 		}
-		if len(due) == 0 {
+		if len(upsess) == 0 {
 			return nil
 		}
-		logf(c, "found %d due sessions", len(due))
+		logf(c, "found %d upcoming sessions", len(upsess))
 		dc := &dataChanges{
 			Updated:   now,
-			eventData: eventData{Sessions: make(map[string]*eventSession, len(due))},
+			eventData: eventData{Sessions: make(map[string]*eventSession, len(upsess))},
 		}
-		for _, s := range due {
+		for _, s := range upsess {
 			dc.Sessions[s.Id] = s
 		}
-		if err := storeDueSessions(c, due); err != nil {
+		if err := storeNextSessions(c, upsess); err != nil {
 			return err
 		}
 		if err := storeChanges(c, dc); err != nil {

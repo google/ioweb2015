@@ -18,9 +18,9 @@ import (
 const (
 	liveStreamedText = "Live streamed"
 
-	// dueSessions
-	dueTimeoutSoon  = 24 * time.Hour
-	dueTimeoutStart = 10 * time.Minute
+	// upcomingSessions
+	timeoutSoon  = 24 * time.Hour
+	timeoutStart = 10 * time.Minute
 
 	// imageURLSizeMarker is used by thumbURL
 	imageURLSizeMarker    = "__w-"
@@ -29,7 +29,7 @@ const (
 	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
 )
 
-// session IDs to compare dueTimeoutSoon to.
+// session IDs to compare timeoutSoon to.
 var soonSessionIDs = []string{"__keynote__"}
 
 type eventData struct {
@@ -390,10 +390,10 @@ func diffEventData(a, b *eventData) *dataChanges {
 	return dc
 }
 
-// dueSessions returns a subset of items which have their StartTime field
-// close to dueTimeoutStart or dueTimeoutSoon.
+// upcomingSessions returns a subset of items which have their StartTime field
+// close to timeoutStart or timeoutSoon.
 // It also sets Update field of the returned elements to updateStart or updateSoon respectively.
-func dueSessions(now time.Time, items []*eventSession) []*eventSession {
+func upcomingSessions(now time.Time, items []*eventSession) []*eventSession {
 	sort.Strings(soonSessionIDs)
 	res := make([]*eventSession, 0)
 	for _, s := range items {
@@ -403,9 +403,9 @@ func dueSessions(now time.Time, items []*eventSession) []*eventSession {
 		switch {
 		default:
 			continue
-		case t < dueTimeoutStart:
+		case t < timeoutStart:
 			s.Update = updateStart
-		case doSoon && t < dueTimeoutSoon:
+		case doSoon && t < timeoutSoon:
 			s.Update = updateSoon
 		}
 		res = append(res, s)

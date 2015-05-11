@@ -104,7 +104,7 @@ func TestStoreGetChanges(t *testing.T) {
 	}
 }
 
-func TestStoreDueSessions(t *testing.T) {
+func TestStoreNextSessions(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
@@ -116,11 +116,11 @@ func TestStoreDueSessions(t *testing.T) {
 		&eventSession{Id: "one", Update: updateStart},
 		&eventSession{Id: "two", Update: updateStart},
 	}
-	if err := storeDueSessions(c, sessions); err != nil {
+	if err := storeNextSessions(c, sessions); err != nil {
 		t.Fatal(err)
 	}
 	sessions = append(sessions, &eventSession{Id: "new", Update: updateStart})
-	items, err := filterStoredDueSessions(c, sessions)
+	items, err := filterNextSessions(c, sessions)
 	if err != nil {
 		t.Fatal(err)
 	}

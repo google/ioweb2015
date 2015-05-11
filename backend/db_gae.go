@@ -23,7 +23,7 @@ const (
 	kindEventData   = "EventData"
 	kindChanges     = "Changes"
 	kindAppFolder   = "AppFolder"
-	kindDue         = "Due"
+	kindNext        = "Next"
 )
 
 // RunInTransaction runs f in a transaction.
@@ -306,28 +306,29 @@ func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
 	return changes, nil
 }
 
-// storeDueSessions saves keys of items under kindDue entity kind,
+// storeNextSessions saves IDs of items under kindNext entity kind,
 // keyed by "sessionID:eventSession.Update".
-func storeDueSessions(c context.Context, items []*eventSession) error {
-	pkey := dueSessionParent(c)
+func storeNextSessions(c context.Context, items []*eventSession) error {
+	pkey := nextSessionParent(c)
 	keys := make([]*datastore.Key, len(items))
 	for i, s := range items {
 		id := s.Id + ":" + s.Update
-		keys[i] = datastore.NewKey(c, kindDue, id, 0, pkey)
+		keys[i] = datastore.NewKey(c, kindNext, id, 0, pkey)
 	}
 	zeros := make([]struct{}, len(keys))
 	_, err := datastore.PutMulti(c, keys, zeros)
 	return err
 }
 
-// filterStoredDueSessions queries kindDue entities and returns only those items
-// which are not present in the datastore.
-func filterStoredDueSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
-	pkey := dueSessionParent(c)
+// filterNextSessions queries kindNext entities and returns a subset of items
+// containing only the elements not present in the datastore, previously saved with
+// storeNextSessions().
+func filterNextSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
+	pkey := nextSessionParent(c)
 	keys := make([]*datastore.Key, len(items))
 	for i, s := range items {
 		id := s.Id + ":" + s.Update
-		keys[i] = datastore.NewKey(c, kindDue, id, 0, pkey)
+		keys[i] = datastore.NewKey(c, kindNext, id, 0, pkey)
 	}
 	zeros := make([]struct{}, len(keys))
 	err := datastore.GetMulti(c, keys, zeros)
@@ -358,7 +359,7 @@ func changesParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindChanges, "root", 0, nil)
 }
 
-// dueSessionParent returns a common ancestor for all kindDue session entities.
-func dueSessionParent(c context.Context) *datastore.Key {
-	return datastore.NewKey(c, kindDue, "session", 0, nil)
+// nextSessionParent returns a common ancestor for all kindNext session entities.
+func nextSessionParent(c context.Context) *datastore.Key {
+	return datastore.NewKey(c, kindNext, "session", 0, nil)
 }

@@ -108,14 +108,15 @@ func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
 	return nil, errors.New("not implemented")
 }
 
-// storeDueSessions saves keys of items under kindDue entity kind,
+// storeNextSessions saves IDs of items under kindNext entity kind,
 // keyed by "sessionID:eventSession.Update".
-func storeDueSessions(c context.Context, items []*eventSession) error {
+func storeNextSessions(c context.Context, items []*eventSession) error {
 	return errors.New("not implemented")
 }
 
-// filterStoredDueSessions queries kindDue entities and returns only those items
-// which are not present in the datastore.
-func filterStoredDueSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
+// filterNextSessions queries kindNext entities and returns a subset of items
+// containing only the elements not present in the datastore, previously saved with
+// storeNextSessions().
+func filterNextSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
 	return nil, errors.New("not implemented")
 }

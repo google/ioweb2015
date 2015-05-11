@@ -1743,7 +1743,7 @@ func TestHandlePingDeviceReplace(t *testing.T) {
 	}
 }
 
-func TestHandleClockDueSessions(t *testing.T) {
+func TestHandleClockNextSessions(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
@@ -1782,7 +1782,7 @@ func TestHandleClockDueSessions(t *testing.T) {
 	if err := storeUserPushInfo(c, &userPush{userID: testUserID}); err != nil {
 		t.Fatal(err)
 	}
-	if err := storeDueSessions(c, []*eventSession{
+	if err := storeNextSessions(c, []*eventSession{
 		&eventSession{Id: "already-clocked", Update: updateStart},
 	}); err != nil {
 		t.Fatal(err)
@@ -1790,33 +1790,33 @@ func TestHandleClockDueSessions(t *testing.T) {
 	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
 		"start": &eventSession{
 			Id:        "start",
-			StartTime: now.Add(dueTimeoutStart - time.Second),
+			StartTime: now.Add(timeoutStart - time.Second),
 		},
 		"__keynote__": &eventSession{
 			Id:        "__keynote__",
-			StartTime: now.Add(dueTimeoutSoon - time.Second),
+			StartTime: now.Add(timeoutSoon - time.Second),
 		},
 		"already-clocked": &eventSession{
 			Id:        "already-clocked",
-			StartTime: now.Add(dueTimeoutStart - time.Second),
+			StartTime: now.Add(timeoutStart - time.Second),
 		},
 		"too-early": &eventSession{ // because it's not in soonSessionIDs
 			Id:        "too-early",
-			StartTime: now.Add(dueTimeoutSoon - time.Second),
+			StartTime: now.Add(timeoutSoon - time.Second),
 		},
 	}}); err != nil {
 		t.Fatal(err)
 	}
 
-	due := map[string]string{
+	upsess := map[string]string{
 		"start":       updateStart,
 		"__keynote__": updateSoon,
 	}
 	checkUpdates := func(dc *dataChanges, what string) {
-		if len(dc.Sessions) != len(due) {
-			t.Errorf("%s: dc.Sessions = %v; want %v", what, dc.Sessions, due)
+		if len(dc.Sessions) != len(upsess) {
+			t.Errorf("%s: dc.Sessions = %v; want %v", what, dc.Sessions, upsess)
 		}
-		for id, v := range due {
+		for id, v := range upsess {
 			s, ok := dc.Sessions[id]
 			if !ok {
 				t.Errorf("%s: %q not in %v", what, id, dc.Sessions)
@@ -1836,7 +1836,7 @@ func TestHandleClockDueSessions(t *testing.T) {
 		t.Fatalf("w.Code = %d; want 200", w.Code)
 	}
 
-	undue, err := filterStoredDueSessions(c, []*eventSession{
+	unclocked, err := filterNextSessions(c, []*eventSession{
 		&eventSession{Id: "__keynote__", Update: updateSoon},
 		&eventSession{Id: "start", Update: updateStart},
 		&eventSession{Id: "too-early", Update: "too-early"},
@@ -1844,11 +1844,11 @@ func TestHandleClockDueSessions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(undue) != 1 {
-		t.Fatalf("undue = %v; want [too-early]", toSessionIDs(undue))
+	if len(unclocked) != 1 {
+		t.Fatalf("unclocked = %v; want [too-early]", toSessionIDs(unclocked))
 	}
-	if undue[0].Id != "too-early" {
-		t.Fatalf("Id = %q; want 'too-early'", undue[0].Id)
+	if unclocked[0].Id != "too-early" {
+		t.Fatalf("Id = %q; want 'too-early'", unclocked[0].Id)
 	}
 
 	dc, err := getChangesSince(c, now.Add(-time.Second))
