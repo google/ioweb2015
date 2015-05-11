@@ -140,6 +140,50 @@ IOWA.Util = IOWA.Util || (function() {
   }
 
   /**
+   * Removes a param from the search part of a URL.
+   * @param {string} search Search part of a URL, e.g. location.search.
+   * @param {string} name Param name.
+   * @return {string} Modified search.
+   */
+  function removeSearchParam(search, name) {
+    if (search[0] === '?') {
+      search = search.substring(1);
+    }
+    var parts = search.split('&');
+    var res = [];
+    for (var i = 0; i < parts.length; i++) {
+      var pair = parts[i].split('=');
+      if (pair[0] === name) {
+        continue;
+      }
+      res.push(parts[i]);
+    }
+    search = res.join('&');
+    if (search.length > 0) {
+      search = '?' + search;
+    }
+    return search;
+  }
+
+  /**
+   * Adds a new or replaces existing param of the search part of a URL.
+   * @param {string} search Search part of a URL, e.g. location.search.
+   * @param {string} name Param name.
+   * @param {string} value Param value.
+   * @return {string} Modified search.
+   */
+  function setSearchParam(search, name, value) {
+    search = removeSearchParam(search, name);
+    if (search === '') {
+      search = '?';
+    }
+    if (search.length > 1) {
+      search += '&';
+    }
+    return search + name + '=' + encodeURIComponent(value);
+  }
+
+  /**
    * Use Google's URL shortener to compress an URL for social.
    * @param {string} url - The full url.
    * @return {Promise}
@@ -217,6 +261,8 @@ IOWA.Util = IOWA.Util || (function() {
     smoothScroll: smoothScroll,
     shortenURL: shortenURL,
     getStaticBaseURL: getStaticBaseURL,
+    setSearchParam: setSearchParam,
+    removeSearchParam: removeSearchParam,
     resizeRipple: resizeRipple,
     reportError: reportError
   };
