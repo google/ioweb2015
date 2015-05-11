@@ -369,12 +369,14 @@ limitations under the License.
 
       <template if="{{selectedPage === 'home'}}">
         <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
+          <!-- TODO: update to template list of video ids from server. -->
           <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}"
                    sessions="{{scheduleData.sessions}}"
                    speakers="{{scheduleData.speakers}}"
                    userSessions="{{savedSessions}}"
                    fetchingUserData="{{scheduleFetchingUserData}}"
-                   socialPosts="{{socialPosts}}" fit>
+                   socialPosts="{{socialPosts}}"
+                   videoIds="['eiCgUr9m9CI','sjC7d4o0zfA','tfTq9oItsDU','cguxCaleQjA']" fit>
             <h2>I/O is starting soon. #io15</h2>
           </io-live>
         </div>

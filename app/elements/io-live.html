@@ -17,10 +17,12 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-animated-pages/transitions/slide-from-right.html">
 <link rel="import" href="../bower_components/core-icon/core-icon.html">
 <link rel="import" href="../bower_components/core-label/core-label.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog-transition.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="io-radio-button.html">
 <link rel="import" href="social-post.html">
@@ -119,18 +121,48 @@ Fired when the mode changes.
 
           <core-animated-pages transitions="slide-from-right" selected="{{selectedTab}}" valueattr="label" fit>
             <section label="live" layout vertical>
-              <div layout vertical flex>
+              <!-- <div layout vertical flex>
                 <div class="card__photo card__photo--live" flex></div>
                 <div class="card">
                   <div class="card-content">Our 8th annual Google I/O developer conference will kick-off with a keynote hosted by our Senior Vice-President of Products, Sundar Pichai.</div>
                 </div>
-              </div>
+              </div -->
+              <!-- <core-menu id="live-channel-menu" valueattr="videoid" selected="{{selectedVideoId}}">
+                <template repeat="{{video,i in videoIds}}">
+                  <paper-item videoid="{{video}}">
+                    <span flex>Channel {{i + 1}}</span>
+                    <core-icon icon="{{selectedVideoId === video ? 'io:play-circle-fill' : 'io:play-circle-outline'}}"></core-icon>
+                  </paper-item>
+                </template>
+              </core-menu> -->
+
+              <core-menu id="live-channel-menu" class="schedule__content"
+                         valueattr="videoid" selected="{{selectedVideoId}}">
+                <div class="card schedule-rows" layout vertical>
+                  <template repeat="{{session in sessions | filterLiveSessionsByDay(currentDay)}}">
+                    <div class="schedule-row" layout horizontal tabindex="0">
+                      <div>
+                        <img _src="{{speakers[session.speakers[0]].thumbnailUrl || 'images/schedule/profile_placeholder.png'}}" class="profilepic">
+                      </div>
+                      <div class="session__detail" layout vertical flex>
+                        <span class="session__title" auto-vertical flex?="{{!isPhoneSize}}" two
+                              title="{{session.title}}">
+                          {{session.title}}
+                        </span>
+                        <div class="schedule-speakers">{{session.speakers | speakerIdsToNameString}}</div>
+                      </div>
+                      <core-icon icon="{{selectedVideoId === video ? 'io:play-circle-fill' : 'io:play-circle-outline'}}" self-center></core-icon>
+                    </div>
+                  </template>
+                </div>
+              </core-menu>
+
             </section>
             <section class="schedule__content" label="schedule" layout vertical>
 
               <div class="card schedule-rows" layout vertical>
                 <template repeat="{{session in sessions | filterLiveSessionsByDay(currentDay)}}">
-                  <div class="card-content" hidden?="{{!session.firstOfBlock}}">
+                  <div class="card-content" hidden?="{{!session.firstOfBlockForLivestream}}">
                     <h4>{{session.block}}</h4>
                   </div>
                   <div class="schedule-row" layout horizontal>
@@ -184,10 +216,13 @@ Fired when the mode changes.
 
       <template if="{{mode === _MODES.LIVE}}">
         <div class="fullvideo__container" fit>
+          <h2 class="video__title">{{videoTitle}}</h2>
           <!-- <img src="{{''}}images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch I/O Live" fit> -->
-          <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
+          <google-youtube videoid="{{selectedVideoId}}" height="100%" width="100%" fit
                           autohide="1" controls="2" modestbranding="1" showinfo="0"
-                          iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
+                          iv_load_policy="3" rel="0" autoplay="1"
+                          on-google-youtube-ready="{{onVideoReady}}"
+                          on-google-youtube-state-change="{{onStateChange}}"></google-youtube>
         </div>
       </template>
 
@@ -315,7 +350,34 @@ Fired when the mode changes.
        * @type object
        * @default null
        */
-      selectedSession: null
+      selectedSession: null,
+
+      /**
+       * The selected video from the list of videoIds
+       *
+       * @property selectedVideoId
+       * @type string
+       * @default null
+       */
+      selectedVideoId: null,
+
+      /**
+       * List of live stream YT video ids.
+       *
+       * @attribute videoIds
+       * @type Array
+       * @default null
+       */
+      videoIds: null,
+
+      /**
+       * The title of the current playing video, as returned by the YT API.
+       *
+       * @attribute videoTitle
+       * @type string
+       * @default ''
+       */
+      videoTitle: ''
     },
 
     created: function() {
@@ -323,6 +385,11 @@ Fired when the mode changes.
       this.userSessions = [];
       this.socialPosts = [];
       this.speakers = {};
+      this.videoIds = [];
+    },
+
+    videoIdsChanged: function() {
+      this.selectedVideoId = this.videoIds[0];
     },
 
     dateChanged: function() {
@@ -356,6 +423,38 @@ Fired when the mode changes.
 
     modeChanged: function() {
       this.fire('io-live-mode', {mode: this.mode});
+    },
+
+    onVideoReady: function(e, detail, sender) {
+      this.updateVideoInfo();
+    },
+
+    onStateChange: function(e, detail) {
+      var video = this.$.livecontainer.querySelector('google-youtube');
+
+      switch (detail.data) {
+        case YT.PlayerState.CUED:
+          this.wasPaused_ = false;
+          // video.play();
+          break;
+        case YT.PlayerState.PAUSED:
+          this.wasPaused_ = true;
+          break;
+        case YT.PlayerState.PLAYING:
+          this.updateVideoInfo();
+          if (!this.wasPaused_) {
+            IOWA.Analytics.trackEvent('live', 'channel-select', this.selectedVideoId);
+          }
+          this.wasPaused_ = false;
+          break;
+      }
+    },
+
+    updateVideoInfo: function() {
+      var video = this.$.livecontainer.querySelector('google-youtube');
+      var meta = video.player.getVideoData();
+      this.videoTitle = meta.title;
+      // this.videoAuthor = meta.author;
     },
 
     openSession: function(e, detail, sender) {
