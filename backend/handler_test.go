@@ -1837,7 +1837,7 @@ func TestHandlePingDeviceGCMReplace(t *testing.T) {
 		t.Fatal(err)
 	}
 	if v := []string{ts.URL + "/new-reg-id"}; !reflect.DeepEqual(pi.Endpoints, v) {
-		t.Errorf("pi.Subscribers = %v; want %v", pi.Subscribers, v)
+		t.Errorf("pi.Endpoints = %v; want %v", pi.Endpoints, v)
 	}
 	if l := len(pi.Subscribers); l != 0 {
 		t.Errorf("len(pi.Subscribers) = %d; want 0", l)
