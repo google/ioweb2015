@@ -279,7 +279,7 @@ func getLatestEventData(c context.Context, etags []string) (*eventData, error) {
 	return data, gob.NewDecoder(bytes.NewReader(res.Bytes)).Decode(data)
 }
 
-// getSessionByID returns the session from getLtestEventData() if it exists,
+// getSessionByID returns the session from getLatestEventData() if it exists,
 // otherwise an error.
 func getSessionByID(c context.Context, id string) (*eventSession, error) {
 	d, err := getLatestEventData(c, nil)

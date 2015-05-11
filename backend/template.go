@@ -153,7 +153,7 @@ func canonicalURL(p string) string {
 // resourceURL returns absolute path to a resource referenced by parts.
 // For instance, given config.Prefix = "/myprefix", resourceURL("images", "img.jpg")
 // returns "/myprefix/images/img.jpg".
-// If first part starts with http(s)://, it is returns as is.
+// If the first part starts with http(s)://, it is the returned value.
 func resourceURL(parts ...string) string {
 	lp := strings.ToLower(parts[0])
 	if strings.HasPrefix(lp, "http://") || strings.HasPrefix(lp, "https://") {
