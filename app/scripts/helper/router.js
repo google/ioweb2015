@@ -438,6 +438,41 @@ IOWA.Router = (function() {
         '#', subpage || '', '/', resourceId || ''].join('');
   };
 
+  /**
+   * Adds a new or replaces existing param of the search part of a URL.
+   * @param {string} search Search part of a URL, e.g. location.search.
+   * @param {string} name Param name.
+   * @param {string} value Param value.
+   * @return {string} Modified search.
+   */
+  Router.prototype.setSearchParam = function(search, name, value) {
+    search = this.removeSearchParam(search, name);
+    if (search === '') {
+      search = '?';
+    }
+    if (search.length > 1) {
+      search += '&';
+    }
+    return search + name + '=' + encodeURIComponent(value);
+  };
+
+  /**
+   * Removes a param from the search part of a URL.
+   * @param {string} search Search part of a URL, e.g. location.search.
+   * @param {string} name Param name.
+   * @return {string} Modified search.
+   */
+  Router.prototype.removeSearchParam = function(search, name) {
+    search = search.replace(new RegExp(name + '=[^&]*(&|$)', 'g'), '');
+    if (search[search.length - 1] === '&') {
+      search = search.substring(0, search.length - 1);
+    }
+    if (search === '?') {
+      search = '';
+    }
+    return search;
+  };
+
   return new Router();
 
 })();

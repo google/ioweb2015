@@ -48,7 +48,7 @@ func TestRenderTemplateData(t *testing.T) {
 	subs := []string{
 		`window.ENV = "prod"`,
 		`window.PREFIX = "/root"`,
-		`<meta property="og:image" content="/root/images/some-image.png">`,
+		`<meta property="og:image" content="/root/some-image.png">`,
 		`<meta property="og:description" content="dummy description">`,
 		`google-signin clientId="dummy-client-id"`,
 	}
