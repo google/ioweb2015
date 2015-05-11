@@ -413,14 +413,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         this.updateTimeBlocks();
 
         var filters = this.filters.join(',');
-        var filterParam = '';
+        var search = window.location.search;
         if (filters.length) {
-          filterParam = '?filters=' + encodeURIComponent(filters);
+          search = IOWA.Util.setSearchParam(search, 'filters', filters);
+        } else {
+          search = IOWA.Util.removeSearchParam(search, 'filters');
         }
         history.replaceState({}, '', [
           window.location.origin,
           window.location.pathname,
-          filterParam,
+          search,
           window.location.hash
         ].join(''));
       },
