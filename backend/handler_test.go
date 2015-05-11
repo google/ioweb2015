@@ -2005,7 +2005,7 @@ func TestHandleClockNextSessions(t *testing.T) {
 	}
 
 	r := newTestRequest(t, "POST", "/task/clock", nil)
-	r.Header.Set("x-appengine-taskexecutioncount", "1")
+	r.Header.Set("x-appengine-cron", "true")
 	w := httptest.NewRecorder()
 	handleClock(w, r)
 	if w.Code != http.StatusOK {

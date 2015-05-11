@@ -867,8 +867,8 @@ func handlePingExt(w http.ResponseWriter, r *http.Request) {
 func handleClock(w http.ResponseWriter, r *http.Request) {
 	c := newContext(r)
 	retry, err := taskRetryCount(r)
-	if err != nil || retry > 0 {
-		errorf(c, "retry = %d, err: %v", retry, err)
+	if h := r.Header.Get("x-appengine-cron"); h != "true" && err == nil && retry > 0 {
+		errorf(c, "cron = %s, retry = %d, err: %v", h, retry, err)
 		return
 	}
 

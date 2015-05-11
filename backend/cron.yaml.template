@@ -10,4 +10,4 @@ cron:
   schedule: every 30 minutes
 - description: sessions start notifications
   url: $PREFIX$/task/clock
-  schedule: every 1 min
+  schedule: every 1 minutes
