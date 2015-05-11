@@ -36,6 +36,17 @@ func (pe *pushError) String() string {
 		pe.retry, pe.remove, pe.after, pe.msg)
 }
 
+// apiError is an error used by API handlers
+type apiError struct {
+	err  error
+	code int
+	msg  string
+}
+
+func (ae *apiError) Error() string {
+	return ae.msg
+}
+
 // prefixedErr returns a func that creates errors with the given prefix.
 func prefixedErr(prefix string) func(interface{}) error {
 	return func(err interface{}) error {

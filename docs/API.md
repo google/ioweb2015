@@ -52,7 +52,7 @@ and may contain the following body:
 ```
 
 
-## API endpoints
+## V1 API endpoints
 
 Unless specified, endpoints do not require authentication.
 
@@ -312,6 +312,85 @@ Some clients and/or server environments may not support request body for `DELETE
 A workaround is to provide `X-HTTP-Method-Override` header with the actual HTTP method.
 
 If both URL path and request body are used to specify session IDs, the latter takes precedence.
+
+
+## V2 API endpoints
+
+For missing endpoints use the previous version, v1.
+
+
+### GET /api/v2/user/notify
+
+*Requires authentication*
+
+Current notification state. Response body sample:
+
+```json
+{
+  "notify": true,
+  "endpoints": ["https://one", "https://two"],
+  "iostart": true,
+  "ioext": {
+    "name": "Amsterdam",
+    "lat": 52.37607,
+    "lng": 4.886114
+  }
+}
+```
+
+`ioext` will be `null` or not present at all if I/O Extended notifications are not enabled.
+
+
+### PUT /api/v2/user/notify
+
+*Requires authentication*
+
+* Toggle global notification state on/off: `notify`.
+* Add to the user's push subscription IDs list: `endpoint`.
+* Receive a notification about the start of I/O: `iostart`.
+* Subscribe/unsubscribe from "I/O Extended events near me": `ioext`.
+
+The start of I/O reminder is 1 day before the date.
+Session reminders are 10 min before the start time.
+Notifications about I/O Extended and any changes to the bookmarked sessions,
+including added videos, are sent immediately.
+
+```json
+{
+  "notify": true,
+  "endpoint": "https://push/notifications/endpoint",
+  "iostart": true,
+  "ioext": {
+    "name": "Amsterdam",
+    "lat": 52.37607,
+    "lng": 4.886114
+  }
+}
+```
+
+All fields are optional. Missing fields will remain unchanged.
+
+Endpoint is usually obtained from the [PushRegistration][push-api-reg].
+In a case of deprecated `registration_id` usage, it must be 'concatenated' with `endpoint`
+in the following way:
+
+If `registration_id` starts with `http(s)://...`, use it instead of endpoint.
+Otherwise:
+
+1. Append slash `/` to the URL path of `endpoint` if it doesn't end with one.
+2. Let `registration_id` be a relative URL, removing leading slash `/` if present.
+3. Resolve it using the URL obtained in the step 1 as the base.
+
+`ioext` will notify users about I/O Extended events happening within 80km of the specified location.
+To turn off these notifications, nullify the `ioext` field:
+
+```json
+{"ioext": null}
+```
+
+Note that `notify` always refers to the global notification state scoped to a user,
+not a specific `endpoint`.
+
 
 
 [signin-guide]: https://developers.google.com/identity/sign-in/web/server-side-flow
