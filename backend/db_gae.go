@@ -201,10 +201,8 @@ func storeEventData(c context.Context, d *eventData) error {
 		return perr(err)
 	}
 	ent.Etag = hexKey(key)
-	if err := cacheEventData(c, ent); err != nil {
-		errorf(c, "%v", perr(err))
-	}
-	return nil
+	// better safe than sorry
+	return cacheEventData(c, ent)
 }
 
 // clearEventData deletes all EventData entities and flushes cache.
