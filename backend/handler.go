@@ -139,10 +139,23 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := &templateData{}
-	if experimentShare {
+	switch {
+	case experimentShare:
 		data.OgTitle = defaultTitle
 		data.OgImage = ogImageExperiment
 		data.Desc = descExperiment
+	case !wantsPartial && r.URL.Path == "/schedule":
+		sid := r.FormValue("sid")
+		if sid == "" {
+			break
+		}
+		s, err := getSessionByID(c, sid)
+		if err != nil {
+			break
+		}
+		data.OgTitle = s.Title
+		data.OgImage = s.Photo
+		data.Desc = s.Desc
 	}
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")

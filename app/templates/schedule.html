@@ -437,9 +437,9 @@
 
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
         // Remove session id hash from URL.
+        var search = IOWA.Router.removeSearchParam(window.location.search, 'sid');
         var url = IOWA.Router.composeUrl(
-            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
-            '', window.location.search);
+            this.selectedPage, this.pages[this.selectedPage].selectedSubpage, '', search);
         history.replaceState({}, null, url);
       };
 
@@ -449,9 +449,11 @@
 
         // Update URL with deep link if we're not from a deep link page load.
         if (pageIsDeepLinked_) {
+          var search = IOWA.Router.setSearchParam(
+              window.location.search, 'sid', this.selectedSession.id);
           var url = IOWA.Router.composeUrl(
               this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
-              this.selectedSession.id, window.location.search);
+              this.selectedSession.id, search);
           history.pushState({}, null, url);
         } else {
           pageIsDeepLinked_ = true;

@@ -92,6 +92,10 @@ func getLatestEventData(c context.Context, etags []string) (*eventData, error) {
 	return nil, errors.New("not implemented")
 }
 
+func getSessionByID(c context.Context, id string) (*eventSession, error) {
+	return nil, errors.New("not implemented")
+}
+
 func storeChanges(c context.Context, d *dataChanges) error {
 	return errors.New("not implemented")
 }
