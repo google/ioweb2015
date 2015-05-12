@@ -35,6 +35,7 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
       }
       core-image {
         width: 100%;
+        max-width: 820px;
         height: 50vh;
         background-color: #00BCD4;
       }
@@ -47,42 +48,97 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
       }
     </style>
     <div layout horizontal center-center fit>
-      <core-list data="{{photos}}" selectionEnabled="false" layout horizontal>
+      <core-list id="list" data="{{renderList}}" selectionEnabled="false" height="{{height}}">
         <template>
-           <div class="item">
-             <core-image _src="{{model.media.image.url}}" load?="{{!!model}}"
-                          sizing="cover" preload placeholder="images/io15-color.png" fade></core-image>
+           <div class="item" layout horizontal center-center>
+             <core-image _src="{{model.src}}" load?="{{!!model}}"
+                         sizing="cover" preload placeholder="images/io15-color.png" fade></core-image>
            </div>
         </template>
       </core-list>
     </div>
   </template>
   <script>
-  Polymer({
+  (function() {
+    "use strict";
 
-    publish: {
-      /**
-       * The list of photos for the gallery.
-       *
-       * @property photos
-       * @type Array
-       * @default []
-       */
-      photos: {value: null},
-
-      /**
-       * True if on mobile.
-       *
-       * @property mobile
-       * @type bool
-       * @default false
-       */
-      mobile: {value: false, reflect: true}
-    },
-
-    created: function() {
-      this.photos = [];
+    // Converts an object path the value in the object that references the path
+    // e.g. 'obj.a.b.c' -> obj.a.b.c
+    function _ref(obj, str) {
+      if (!str) {
+        return obj;
+      }
+      return str.split('.').reduce(function(o, x) { return o[x] }, obj);
     }
-  });
+
+    Polymer({
+
+      publish: {
+        /**
+         * The list of items for the gallery.
+         *
+         * @property items
+         * @type Array
+         * @default []
+         */
+        items: {value: null},
+
+        /**
+         * True if on mobile.
+         *
+         * @property mobile
+         * @type bool
+         * @default false
+         */
+        mobile: {value: false, reflect: true},
+
+        /**
+         * Path into each item in the items array where the image URL lives.
+         *
+         * @property imagePath
+         * @type string
+         * @default null
+         */
+         imagePath: null,
+
+        /**
+         * True when the gallery is being shown.
+         *
+         * @property active
+         * @type bool
+         * @default false
+         */
+        active: false,
+
+        /**
+         * Average height of an item in the lists
+         *
+         * @property height
+         * @type number
+         * @default 200
+        */
+        height: 200
+      },
+
+      created: function() {
+        this.items = [];
+      },
+
+      itemsChanged: function() {
+        var list = [];
+        for (var i = 0, item; item = this.items[i]; ++i) {
+          list.push({src: _ref(item, this.imagePath)});
+        }
+        this.renderList = list;
+      },
+
+      activeChanged: function() {
+        if (this.active) {
+          this.$.list.updateSize();
+        }
+      }
+    });
+
+  })();
   </script>
 </polymer-element>

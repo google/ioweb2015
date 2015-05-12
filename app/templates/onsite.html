@@ -21,12 +21,19 @@
 
 {% define "content" %}
 
+<core-toolbar class="navbar__overlay navbar__overlay--map" aria-hidden="{{!mapGalleryActive}}" fit>
+  <paper-icon-button icon="arrow-back" on-tap="{{closeMapGallery}}" aria-label="Close map" tabindex="{{mapGalleryActive ? 0 : -1}}"></paper-icon-button>
+  <span flex>Venue map</span>
+</core-toolbar>
+
+<io-gallery items='["images/onsite/map/io_floor1_label.jpg", "images/onsite/map/io_floor2_label.jpg", "images/onsite/map/io_floor3_label.jpg"]' hidden?="{{!mapGalleryActive}}" active="{{mapGalleryActive}}"
+            mobile="{{isPhoneSize}}" height="515" fit></io-gallery>
+
 <div class="subpage__container">
 
-  <section
-      class="subpage-event subpage__content {{ {active: pages['onsite'].selectedSubpage == 'event'} | tokenList}}">
+  <section class="subpage-event subpage__content {{ {active: pages['onsite'].selectedSubpage == 'event'} | tokenList}}">
 
-    <div class="card__container card__container--top slide-up">
+    <!-- <div class="card__container card__container--top slide-up">
       <div class="card js-experiment-visualizer">
         <div class="card-content">
           <h3 class="card__title">Tips for Attendees</h3>
@@ -38,6 +45,30 @@
          <div class="ripple">
           <div class="ripple__content"></div>
         </div>
+      </div>
+    </div> -->
+
+    <div class="card__container card__container--top sidebyside slide-up" layout horizontal vertical?="{{isPhoneSize}}" relative>
+      <div class="card js-experiment-visualizer" layout vertical auto-vertical flex>
+        <div class="card-content" flex?="{{!isPhoneSize}}">
+          <h3 class="card__title">Venue map</h3>
+          <!-- <div>TODO</div> -->
+        </div>
+        <div class="card-content anchor-like">
+          <span role="link" tabindex="0" data-track-link="onsite-venue-map" on-tap="{{toggleMapGallery}}">See venue map</span>
+        </div>
+      </div>
+      <div class="card js-experiment-visualizer" auto-vertical flex>
+        <div class="card-content">
+          <h3 class="card__title">Tips for Attendees</h3>
+          <div>Learn everything you need to know about Google I/O. Find out how to best navigate the conference, organize your schedule, and get the most from the event.</div>
+        </div>
+        <div class="card-content">
+          <a href="faq" data-track-link="onsite-faq" data-ajax-link data-transition="hero-card-transition">View faq</a>
+        </div>
+      </div>
+      <div class="ripple">
+        <div class="ripple__content"></div>
       </div>
     </div>
 
@@ -187,6 +218,30 @@
 </div>
 <script>
   (function() {
+    function runMapGalleryAnimation(opt_reverse, opt_callback) {
+      var navOverlay = document.querySelector('.navbar__overlay--map');
+
+      var reverse = opt_reverse || false;
+
+      var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+      var galleryAnimation = new Animation(gallery, [
+        {opacity: 0}, {opacity: 1}
+      ], {
+        duration: 500,
+        fill: 'forwards',
+        direction: reverse ? 'reverse' : 'normal',
+        easing: 'cubic-bezier(0.4,0,0.2,1)'
+      });
+
+      IOWA.PageAnimation.play(galleryAnimation, opt_callback);
+
+      if (reverse) {
+        navOverlay.classList.remove('active');
+      } else {
+        navOverlay.classList.add('active');
+      }
+    }
+
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages['onsite'];
@@ -196,7 +251,17 @@
         return;
       }
 
+      var onPageTransitionDone_ = function(e) {
+        IOWA.Elements.Template.toggleMapGallery(e);
+      };
+
       page.load = function() {
+        IOWA.Elements.Template.mapGalleryActive = false;
+
+        if (location.hash.substring(1) == 'map') {
+          document.addEventListener('page-transition-done', onPageTransitionDone_);
+        }
+
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
@@ -204,7 +269,37 @@
       };
 
       page.unload = function() {
+        // Remove listeners. We don't want this code running on other pages' transition end.
+        document.removeEventListener('page-transition-done', onPageTransitionDone_);
         IOWA.A11y.removeFocusStates(SUBTAB_SELECTOR);
+      };
+
+      IOWA.Elements.Template.closeMapGallery = function(e, detail, sender) {
+
+        runMapGalleryAnimation(true, function() {
+          IOWA.Elements.Template.mapGalleryActive = false;
+        });
+
+        history.replaceState({}, null, location.pathname); // Remove #map hash from URL.
+      };
+
+      IOWA.Elements.Template.toggleMapGallery = function(e, detail, sender) {
+        e.preventDefault();
+
+        if (sender && sender.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'link', 'click', sender.getAttribute('data-track-link'));
+        } else {
+          IOWA.Analytics.trackEvent('link', 'click', 'onsite-venue-map-deeplink');
+        }
+
+        if (!IOWA.Elements.Template.mapGalleryActive) {
+          IOWA.Elements.Template.mapGalleryActive = true;
+          runMapGalleryAnimation();
+        } else {
+          runMapGalleryAnimation(true); // reverse animation when gallery is open.
+          IOWA.Elements.Template.mapGalleryActive = false;
+        }
       };
 
       page.load(); // Run load callback on page load.
