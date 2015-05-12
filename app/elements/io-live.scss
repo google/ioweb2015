@@ -93,7 +93,7 @@ countdown-timer {
   background-color: white;
   min-height: 500px;
   width: 360px;
-  @include shadow-z2();
+  // @include shadow-z2();
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -273,6 +273,7 @@ paper-tabs {
 core-animated-pages {
   margin-top: $paperTabsHeight * 2;
   overflow: hidden;
+  z-index: 1; // force layer so no rendering artifacts.
 }
 
 .schedule__content {
@@ -281,7 +282,7 @@ core-animated-pages {
 
     .card-content {
       flex-shrink: 0;
-      padding: $tabletKeyline $mobileKeyline;
+      padding: $mobileKeyline;
       border-top: 1px solid $color-light-grey-border;
     }
 
@@ -381,9 +382,6 @@ paper-progress {
   .schedule-row {
     cursor: default;
 
-    // .schedule-row--spacer {
-    //   margin-left: $tabletKeyline + $profilepicSize;
-    // }
     &[active] {
       core-icon {
         opacity: 1;

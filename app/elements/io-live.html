@@ -167,7 +167,7 @@ Fired when the mode changes.
                 <core-menu id="live-channel-menu" class="schedule__content"
                            valueattr="videoid" selected="{{selectedVideoId}}">
                   <template repeat="{{session in currentLiveSessions}}" if="{{!duringKeynote}}">
-                    <div class="schedule-row" layout horizontal videoid="{{session.youtubeUrl}}">
+                    <div class="schedule-row" layout horizontal center videoid="{{session.youtubeUrl}}">
                       <div>
                         <img _src="{{session | generateSpeakerImage}}" class="profilepic">
                       </div>
@@ -182,8 +182,10 @@ Fired when the mode changes.
                     </div>
                   </template>
                   <template repeat="{{channel in missingChannels}}">
-                    <div class="schedule-row" layout horizontal videoid="{{channel.videoId}}">
-                      <div class="schedule-row--spacer"></div>
+                    <div class="schedule-row" layout horizontal center videoid="{{channel.videoId}}">
+                      <div>
+                        <img src="{{'images/schedule/profile_placeholder.png'}}" class="profilepic">
+                      </div>
                       <div class="session__detail" layout vertical flex>
                         <span class="session__title" auto-vertical flex?="{{!isPhoneSize}}" two
                               title="Channel {{channel.label}}">
