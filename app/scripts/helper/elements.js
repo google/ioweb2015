@@ -358,7 +358,7 @@ IOWA.Elements = (function() {
       if (!youtubeUrl) {
         return youtubeUrl;
       }
-      return youtubeUrl.replace(/https?:\/\/youtu.be\//, '');
+      return youtubeUrl.replace(/https?:\/\/youtu\.be\//, '');
     };
 
     template.limit = function(array, howMany) {
