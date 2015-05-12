@@ -33,3 +33,8 @@ func pingDevicesAsync(c context.Context, uid string, endpoints []string, d time.
 func pingExtPartyAsync(c context.Context, key string) error {
 	return errors.New("not implemented")
 }
+
+// submitSessionSurveyAsync schedules an async job to submit feedback survey s for session sid.
+func submitSessionSurveyAsync(c context.Context, sid string, s *sessionSurvey) error {
+	return errors.New("not implemented")
+}

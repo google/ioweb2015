@@ -53,6 +53,8 @@ func registerHandlers() {
 	handle("/api/v1/user/schedule/", handleUserSchedule)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
 	handle("/api/v1/user/updates", serveUserUpdates)
+	handle("/api/v1/user/survey", handleUserSurvey)
+	handle("/api/v1/user/survey/", handleUserSurvey)
 	// API v2
 	handle("/api/v2/user/notify", handleUserNotifySettings)
 	// background jobs
@@ -664,6 +666,90 @@ func serveSWToken(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleUserSurvey is the entry point for /api/v1/user/survey
+func handleUserSurvey(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		serveUserSurvey(w, r)
+		return
+	}
+	submitUserSurvey(w, r)
+}
+
+// serveUserSurvey responds with the session IDs
+// a user has already submitted feedback for.
+func serveUserSurvey(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+	sessions, err := submittedSurveySessions(c, contextUser(c))
+	if err != nil {
+		writeJSONError(c, w, http.StatusInternalServerError, err)
+		return
+	}
+	if sessions == nil {
+		sessions = []string{}
+	}
+	if err := json.NewEncoder(w).Encode(sessions); err != nil {
+		errorf(c, "encode(%v): %v", sessions, err)
+	}
+}
+
+// submitUserSurvey submits survey responses for a specific session or a batch.
+func submitUserSurvey(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+
+	survey := &sessionSurvey{}
+	if err := json.NewDecoder(r.Body).Decode(survey); err != nil {
+		writeJSONError(c, w, http.StatusBadRequest, err)
+		return
+	}
+	if !survey.valid() {
+		writeJSONError(c, w, http.StatusBadRequest, "invalid data")
+		return
+	}
+
+	sid := path.Base(r.URL.Path)
+	s, err := getSessionByID(c, sid)
+	if err != nil {
+		writeJSONError(c, w, http.StatusNotFound, err)
+		return
+	}
+	// don't allow early submissions on prod
+	if isProd() && s.StartTime.After(time.Now()) {
+		writeJSONError(c, w, http.StatusBadRequest, "too early")
+		return
+	}
+
+	data, err := addSessionSurvey(c, contextUser(c), sid)
+	if err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+	err = submitSessionSurvey(c, sid, survey)
+	if err != nil {
+		errorf(c, err.Error())
+		// try async if it didn't work right away; at most 3 retries
+		for i := 0; i < 4 && err != nil; i += 1 {
+			time.Sleep(time.Duration(i) * time.Second)
+			err = submitSessionSurveyAsync(c, sid, survey)
+		}
+	}
+	if err != nil {
+		// we could still recover feedback data from the logs in the worst case
+		errorf(c, "could not submit feedback for %s: %s", sid, survey)
+	}
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(data)
+}
+
 // TODO: add ioext params
 func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
 	c := newContext(r)
@@ -1088,6 +1174,10 @@ func errStatus(err error) int {
 		return http.StatusForbidden
 	case errAuthTokenType:
 		return 498
+	case errBadData:
+		return http.StatusBadRequest
+	case errNotFound:
+		return http.StatusNotFound
 	default:
 		return http.StatusInternalServerError
 	}

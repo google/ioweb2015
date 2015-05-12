@@ -315,6 +315,56 @@ A workaround is to provide `X-HTTP-Method-Override` header with the actual HTTP 
 If both URL path and request body are used to specify session IDs, the latter takes precedence.
 
 
+### GET /api/v1/user/survey
+
+*Requires authentication*
+
+Retrieve session IDs which the user has already submitted the feedback survey for.
+
+```json
+[
+  "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+  "05012279-E037-46D1-AD91-C0892277B01B"
+]
+```
+
+
+### PUT /api/v1/user/survey/:session_id
+
+*Requires authentication*
+
+Submit session feedback survey.
+
+```json
+{
+  "overall": 5,
+  "relevance": 4,
+  "content": 4,
+  "speaker": 5,
+  "comment": "free text comment"
+}
+```
+
+Response is a list of all session IDs the user has submitted feedback for,
+including `:session_id`.
+
+```json
+[
+  "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+  "05012279-E037-46D1-AD91-C0892277B01B",
+  "newly-submitted-id"
+]
+```
+
+All integer fields should be in the range from 1 to 5 where 5 is the highest rating.
+Feedback data for a session with the start timestamp greater than the request time will not be accepted.
+
+Successful submission is indicated by `201` response code.
+If the responses have already been submitted for the session, the backend responds
+with `400` status code. Such requests should not be retried by the client.
+
+
+
 ## V2 API endpoints
 
 For missing endpoints use the previous version, v1.

@@ -3,7 +3,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
@@ -90,5 +92,23 @@ func pingExtPartyAsync(c context.Context, key string) error {
 		"key": {key},
 	})
 	_, err := taskqueue.Add(c, t, "")
+	return err
+}
+
+// submitSessionSurveyAsync schedules an async job to submit feedback survey s for session sid.
+func submitSessionSurveyAsync(c context.Context, sid string, s *sessionSurvey) error {
+	payload, err := json.Marshal(s)
+	if err != nil {
+		return err
+	}
+	h := make(http.Header)
+	h.Set("Content-Type", "application/json")
+	t := &taskqueue.Task{
+		Path:    path.Join(config.Prefix, "/task/survey", sid),
+		Payload: payload,
+		Header:  h,
+		Method:  "POST",
+	}
+	_, err = taskqueue.Add(c, t, "")
 	return err
 }

@@ -919,6 +919,201 @@ func TestServeUserScheduleDefault(t *testing.T) {
 	}
 }
 
+func TestServeUserSurvey(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	gdrive := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"feedback_submitted_sessions": ["id-1", "id-2"]}`))
+	}))
+	defer gdrive.Close()
+	config.Google.Drive.FilesURL = gdrive.URL
+
+	r := newTestRequest(t, "GET", "/api/v1/user/survey", nil)
+	r.Header.Set("authorization", bearerHeader+testIDToken)
+	c := newContext(r)
+
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeLocalAppFolderMeta(c, testUserID, &appFolderData{
+		FileID: "file-123",
+		Etag:   "xxx",
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handleUserSurvey(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+
+	var list []string
+	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+		t.Fatal(err)
+	}
+	ids := []string{"id-1", "id-2"}
+	if !compareStringSlices(list, ids) {
+		t.Errorf("list = %v; want %v", list, ids)
+	}
+}
+
+func TestSubmitUserSurvey(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeLocalAppFolderMeta(c, testUserID, &appFolderData{
+		FileID: "file-123",
+		Etag:   "xxx",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"ok":             &eventSession{Id: "ok", StartTime: time.Now().Add(-10 * time.Minute)},
+		"submitted":      &eventSession{Id: "submitted", StartTime: time.Now().Add(-10 * time.Minute)},
+		"not-bookmarked": &eventSession{Id: "not-bookmarked", StartTime: time.Now().Add(-10 * time.Minute)},
+		"too-early":      &eventSession{Id: "too-early", StartTime: time.Now().Add(10 * time.Minute)},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	// Google Drive API endpoint
+	feedbackIDs := []string{"submitted", "ok"}
+	gdrive := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method == "GET" {
+			w.Write([]byte(`{
+				"starred_sessions": ["submitted", "ok", "too-early"],
+				"feedback_submitted_sessions": ["submitted"]
+			}`))
+			return
+		}
+		data := &appFolderData{}
+		if err := json.NewDecoder(r.Body).Decode(data); err != nil {
+			t.Error(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if v := []string{"submitted", "ok", "too-early"}; !compareStringSlices(data.Bookmarks, v) {
+			t.Errorf("data.Bookmarks = %v; want %v", data.Bookmarks, v)
+		}
+		if !compareStringSlices(data.Survey, feedbackIDs) {
+			t.Errorf("data.Survey = %v; want %v", data.Survey, feedbackIDs)
+		}
+	}))
+	defer gdrive.Close()
+
+	// Survey API endpoint
+	submitted := false
+	ep := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() { submitted = true }()
+		if h := r.Header.Get("code"); h != "ep-code" {
+			t.Errorf("code = %q; want 'ep-code'", h)
+		}
+		if h := r.Header.Get("apikey"); h != "ep-key" {
+			t.Errorf("apikey = %q; want 'ep-key'", h)
+		}
+		if err := r.ParseForm(); err != nil {
+			t.Errorf("r.ParseForm: %v", err)
+			return
+		}
+		params := url.Values{
+			"surveyId":      {"io-survey"},
+			"objectid":      {"ok"},
+			"registrantKey": {"registrant"},
+			"q1":            {"5"},
+			"q2":            {"4"},
+			"q3":            {"3"},
+			"q4":            {"2"},
+			"q5":            {"test"},
+		}
+		if !reflect.DeepEqual(r.Form, params) {
+			t.Errorf("r.Form = %v; want %v", r.Form, params)
+		}
+	}))
+	defer ep.Close()
+
+	config.Env = "prod"
+	config.Google.Drive.FilesURL = gdrive.URL
+	config.Google.Drive.UploadURL = gdrive.URL
+	config.Survey.Endpoint = ep.URL + "/"
+	config.Survey.ID = "io-survey"
+	config.Survey.Reg = "registrant"
+	config.Survey.Key = "ep-key"
+	config.Survey.Code = "ep-code"
+
+	const feedback = `{
+		"overall": 5,
+		"relevance": 4,
+		"content": 3,
+		"speaker": 2,
+		"comment": "test"
+	}`
+
+	table := []*struct {
+		sid  string
+		code int
+	}{
+		{"ok", http.StatusCreated},
+		{"not-bookmarked", http.StatusNotFound},
+		{"not-there", http.StatusNotFound},
+		{"submitted", http.StatusBadRequest},
+		{"too-early", http.StatusBadRequest},
+		{"", http.StatusNotFound},
+	}
+
+	for i, test := range table {
+		submitted = false
+		r := newTestRequest(t, "PUT", "/api/v1/user/survey/"+test.sid, strings.NewReader(feedback))
+		r.Header.Set("authorization", bearerHeader+testIDToken)
+		w := httptest.NewRecorder()
+		handleUserSurvey(w, r)
+
+		if w.Code != test.code {
+			t.Fatalf("%d: w.Code = %d; want %d\nResponse: %s", i, w.Code, test.code, w.Body.String())
+		}
+		if test.code > 299 {
+			if submitted {
+				t.Errorf("%d: did not want feedback submission", i)
+			}
+			continue
+		}
+
+		var list []string
+		if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+			t.Fatalf("%d: %v", i, err)
+		}
+		if !compareStringSlices(list, feedbackIDs) {
+			t.Errorf("%d: list = %v; want %v", i, list, feedbackIDs)
+		}
+
+		if !submitted {
+			t.Errorf("%d: want feedback to be submitted", i)
+		}
+	}
+}
+
 func TestGetUserDefaultPushConfig(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)

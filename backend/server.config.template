@@ -8,6 +8,13 @@
     "timezone": "America/Los_Angeles",
     "manifest": "https://storage.googleapis.com/io2015-data.appspot.com/manifest_v1.json"
   },
+  "survey": {
+    "id": "survey-id",
+    "reg": "registrant-id",
+    "key": "api-key",
+    "code": "event-code",
+    "endpoint": "https://api.eventpoint.com/2.3/eval/submitsurvey"
+  },
   "ioExtFeedUrl": "https://spreadsheets.google.com/feeds/list/SHEET/WORKSHEET/private/full",
   "extPingUrl": "",
   "secret": "a very long secret used in /api/v1/user/updates",

@@ -94,6 +94,15 @@ type appConfig struct {
 		Location    *time.Location
 		ManifestURL string `json:"manifest"`
 	} `json:"schedule"`
+
+	// Feedback survey settings
+	Survey struct {
+		ID       string `json:"id"`
+		Endpoint string `json:"endpoint"`
+		Key      string `json:"key"`
+		Code     string `json:"code"`
+		Reg      string `json:"reg"`
+	} `json:"survey"`
 }
 
 // initConfig reads server config file into the config global var.
