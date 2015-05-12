@@ -212,6 +212,25 @@ core-icon[icon="schedule"] {
       }
     }
   }
+  .play__button__container {
+    height: 100%;
+    z-index: 1;
+    position: absolute;
+    background-position: 50% 45%;
+    cursor: pointer;
+    h4 {
+      position: relative;
+      top: 50px;
+    }
+  }
+  core-image,
+  .play__button__container {
+    transition: opacity 350ms cubic-bezier(0,0,0.2,1);
+  }
+  .fadeout {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 .session__speakers {

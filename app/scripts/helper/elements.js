@@ -354,6 +354,13 @@ IOWA.Elements = (function() {
       return list.join(', ');
     };
 
+    template.toVideoIdFilter = function(youtubeUrl) {
+      if (!youtubeUrl) {
+        return youtubeUrl;
+      }
+      return youtubeUrl.replace(/https?:\/\/youtu\.be\//, '');
+    };
+
     template.limit = function(array, howMany) {
       return array.slice(0, howMany);
     };

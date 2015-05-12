@@ -22,7 +22,7 @@
      <google-youtube videoid="A-bjrru5bLU" height="100%" width="100%" fit
                      autohide="1" controls="2" modestbranding="1" showinfo="0"
                      iv_load_policy="3" rel="0" autoplay="1"
-                     on-google-youtube-ready="{{onVideoReady}}"></google-youtube>
+                     on-google-youtube-ready="{{onOffsiteVideoReady}}"></google-youtube>
     </div>
   </template>
 
@@ -310,7 +310,7 @@
         this.scrollToJoin();
       };
 
-      IOWA.Elements.Template.onVideoReady = function(e, detail, sender) {
+      IOWA.Elements.Template.onOffsiteVideoReady = function(e, detail, sender) {
         runVideoSectionAnimation();
       };
 
