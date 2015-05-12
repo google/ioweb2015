@@ -107,6 +107,9 @@
       if (template.extendedMapActive) {
         template.closeExtendedMapSection();
       }
+      if (template.mapGalleryActive) {
+        template.closeMapGallery();
+      }
       var live = document.querySelector('io-live[openWidget]');
       if (live) {
         live.openWidget = false;

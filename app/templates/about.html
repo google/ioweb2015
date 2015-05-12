@@ -17,7 +17,7 @@
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
   </core-toolbar>
 
-  <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}" fit></io-gallery>
+  <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}" imagePath="media.image.url" fit></io-gallery>
 
   <div class="active">
     <div class="card__container card__container--top slide-up">
@@ -204,11 +204,11 @@
 
           var gallery = IOWA.Elements.Main.querySelector('io-gallery');
           // Use cached photos.
-          if (gallery.photos.length) {
+          if (gallery.items.length) {
             galleryReady();
           } else {
             IOWA.Picasa.fetchPhotos(0, function(photos) {
-              gallery.photos = photos;
+              gallery.items = photos;
               galleryReady();
             });
           }
