@@ -114,6 +114,20 @@ paper-tabs.white {
   }
 }
 
+// phase 3 -----
+#page-about {
+  .pics__section {
+    core-image::shadow #placeholder {
+      background-size: 15% !important;
+      opacity: 0.5;
+      &.fadein {
+        opacity: 0;
+      }
+    }
+  }
+}
+// -----
+
 .card__photo core-image::shadow #placeholder {
   background-color: $color-cyan-500;
   background-size: contain !important;

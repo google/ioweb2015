@@ -36,7 +36,7 @@ main {
 }
 
 .pics__section {
-  height: 310px;
+  // height: 310px; // phase 3
   padding: 0;
 
   paper-button {
@@ -80,11 +80,31 @@ main {
   background-size: cover;
 }
 
+// phase 3
+#join {
+  h2 {
+    max-width: 230px;
+  }
+
+  .join__social {
+    a {
+      margin-bottom: 15px;
+    }
+
+    core-icon {
+      margin-left: 5px;
+    }
+  }
+}
+// ----
+
+// phase2/4 -----
 @media (min-width: $tablet-breakpoint-min) {
   .pics__section {
     height: 745px;
+
     margin-top: -134px;
-    margin-bottom: -50px;
+    margin-bottom: -50px; // phase 3
 
     > div {
       min-height: 745px;
@@ -99,6 +119,48 @@ main {
     padding-top: 297px;
   }
 }
+
+// phase3 -----
+@media (min-width: $tablet-breakpoint-min) {
+  .pics__section {
+    height: 1050px;
+    margin-top: -134px;
+
+    > div {
+      min-height: 600px;
+    }
+    .second__row {
+      min-height: 400px;
+    }
+
+    .pics__section--under {
+      min-height: 640px; // FF
+    }
+  }
+  #hashtag {
+    margin-top: -295px;
+    padding-top: 297px;
+  }
+
+  #join {
+    position: relative;
+
+    .join__social {
+      position: absolute;
+      top: $desktopKeyline;
+      right: $desktopKeyline;
+    }
+  }
+}
+// ----
+
+$cyan1: $color-cyan-500;
+$cyan2: #00ACC1;
+$cyan3: #B2EBF2;
+$cyan4: #4DD0E1;
+$cyan5: #80DEEA;
+$cyan5: #26C6DA;
+
 
 @media (min-width: $tablet-breakpoint-mid) {
   .pics__section {
@@ -125,6 +187,20 @@ main {
     margin-top: -319px;
     padding-top: 319px;
   }
+
+  // phase 3
+  #join {
+    h2 {
+      max-width: 300px;
+    }
+
+    .join__social {
+      right: $largeKeyline;
+      top: $largeKeyline;
+    }
+  }
+  // ----
+
 }
 
 @media (min-width: $desktop-breakpoint-max) {
