@@ -179,7 +179,7 @@ limitations under the License.
 
 <!-- Intro animation background is outside of Polymer to reduce perceived latency in polyfilled browsers. -->
 <div class="io-logo-container">
-  <io-logo width="312" height="165" page="{% .Slug %}" class="{% template "mastheadBgClass" .%}"></io-logo>
+  <io-logo width="312" height="165" page="{% .Slug %}" class="{% template "mastheadBgClass" .%}" hideMasthead></io-logo>
   <div class="{% template "mastheadBgClass" .%}" iologobackground></div>
 </div>
 
@@ -369,12 +369,17 @@ limitations under the License.
 
       <template if="{{selectedPage === 'home'}}">
         <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
+          <!-- TODO: update to liveStreamChannelIds to use server template when
+               it is available. First time should be channel1, followed by 2, and
+               and 3. The keynote should be excluded because it is treated separately. -->
           <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}"
                    sessions="{{scheduleData.sessions}}"
                    speakers="{{scheduleData.speakers}}"
                    userSessions="{{savedSessions}}"
                    fetchingUserData="{{scheduleFetchingUserData}}"
-                   socialPosts="{{socialPosts}}" fit>
+                   socialPosts="{{socialPosts}}"
+                   liveStreamChannelIds="['Lj-plmzhyVA','5WI_lCmBKE8','tfTq9oItsDU']"
+                   autoOpenFab="{{pageTransitionDone}}" fit>
             <h2>I/O is starting soon. #io15</h2>
           </io-live>
         </div>

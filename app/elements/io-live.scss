@@ -93,7 +93,7 @@ countdown-timer {
   background-color: white;
   min-height: 500px;
   width: 360px;
-  // @include shadow-z1();
+  // @include shadow-z2();
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -201,17 +201,17 @@ countdown-timer {
       font-weight: 400;
     }
 
-    .profilepic {
-      height: 56px;
-      width: 56px;
-      margin-right: $tabletKeyline;
-      border-radius: 50%;
-    }
-
     .speaker__card {
       margin-top: $tabletKeyline;
     }
   }
+}
+
+.profilepic {
+  height: 56px;
+  width: 56px;
+  margin-right: $tabletKeyline;
+  border-radius: 50%;
 }
 
 .widget-nav {
@@ -254,11 +254,26 @@ paper-tabs {
 
 .card__photo--live {
   background-image: url(../images/videos/keynote.jpg);
+
+  img {
+    height: 48px;
+    width: 48px;
+  }
+
+  h4 {
+    color: white;
+    text-shadow: .5px .5px 1px rgba(0,0,0,0.25);
+    position: relative;
+    top: 16px;
+    margin: 0;
+    font-weight: normal;
+  }
 }
 
 core-animated-pages {
   margin-top: $paperTabsHeight * 2;
   overflow: hidden;
+  z-index: 1; // force layer so no rendering artifacts.
 }
 
 .schedule__content {
@@ -267,7 +282,7 @@ core-animated-pages {
 
     .card-content {
       flex-shrink: 0;
-      padding: $tabletKeyline $mobileKeyline;
+      padding: $mobileKeyline;
       border-top: 1px solid $color-light-grey-border;
     }
 
@@ -297,6 +312,7 @@ core-animated-pages {
 
 paper-progress {
   width: 100%;
+  height: 2px;
 }
 
 #hashtab {
@@ -329,6 +345,52 @@ paper-progress {
   //     pointer-events: none;
   //   }
   // }
+
+  .video__title {
+    position: absolute;
+    left: $desktopKeyline;
+    bottom: $ytVideoControlsHeight + $desktopKeyline;
+    z-index: 1;
+    color: white;
+    @include typo-heading-2();
+    margin: 0;
+    font-weight: 300;
+  }
+}
+
+#live-channel-menu {
+  $profilepicSize: 40px;
+
+  margin: 0;
+  overflow: auto;
+
+  .profilepic {
+    width: $profilepicSize;
+    height: $profilepicSize;
+  }
+
+  .session__detail {
+    margin-right: $tabletKeyline;
+    .session__title,
+    .schedule-speakers {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+
+  .schedule-row {
+    cursor: default;
+
+    &[active] {
+      core-icon {
+        opacity: 1;
+      }
+    }
+    core-icon {
+      opacity: 0.32;
+    }
+  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
