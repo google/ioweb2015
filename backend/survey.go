@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sort"
-	"strconv"
 	"strings"
 
 	"golang.org/x/net/context"
@@ -111,22 +110,24 @@ func submitSessionSurvey(c context.Context, sid string, s *sessionSurvey) error 
 	if err != nil {
 		return perr(err)
 	}
-	q := r.URL.Query()
-	setQ := func(n string, v *int) {
-		if v == nil {
-			q.Set(n, "")
-			return
-		}
-		q.Set(n, strconv.Itoa(*v))
+	if v, ok := config.Survey.Smap[sid]; ok {
+		sid = v
 	}
-	q.Set("objectid", sid)
+	v := func(a []string, v *int) string {
+		if v == nil || *v < 1 && *v > len(a) {
+			return ""
+		}
+		return a[*v-1]
+	}
+	q := r.URL.Query()
+	q.Set(config.Survey.Qmap.Q1.Name, v(config.Survey.Qmap.Q1.Answers, s.Overall))
+	q.Set(config.Survey.Qmap.Q2.Name, v(config.Survey.Qmap.Q2.Answers, s.Relevance))
+	q.Set(config.Survey.Qmap.Q3.Name, v(config.Survey.Qmap.Q3.Answers, s.Content))
+	q.Set(config.Survey.Qmap.Q4.Name, v(config.Survey.Qmap.Q4.Answers, s.Speaker))
+	q.Set(config.Survey.Qmap.Q5.Name, s.Comment)
 	q.Set("surveyId", config.Survey.ID)
 	q.Set("registrantKey", config.Survey.Reg)
-	setQ("q10", s.Overall)
-	setQ("q20", s.Relevance)
-	setQ("q30", s.Content)
-	setQ("q40", s.Speaker)
-	q.Set("q50", s.Comment)
+	q.Set("objectid", sid)
 	r.URL.RawQuery = q.Encode()
 	r.Header.Set("apikey", config.Survey.Key)
 	r.Header.Set("code", config.Survey.Code)

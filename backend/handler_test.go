@@ -1040,13 +1040,13 @@ func TestSubmitUserSurvey(t *testing.T) {
 		}
 		params := url.Values{
 			"surveyId":      {"io-survey"},
-			"objectid":      {"ok"},
+			"objectid":      {"ok-mapped"},
 			"registrantKey": {"registrant"},
-			"q10":           {"5"},
-			"q20":           {"4"},
-			"q30":           {"3"},
-			"q40":           {"2"},
-			"q50":           {""},
+			"q1-param":      {"five"},
+			"q2-param":      {"four"},
+			"q3-param":      {"three"},
+			"q4-param":      {"two"},
+			"q5-param":      {""},
 		}
 		if !reflect.DeepEqual(r.Form, params) {
 			t.Errorf("r.Form = %v; want %v", r.Form, params)
@@ -1062,6 +1062,18 @@ func TestSubmitUserSurvey(t *testing.T) {
 	config.Survey.Reg = "registrant"
 	config.Survey.Key = "ep-key"
 	config.Survey.Code = "ep-code"
+	config.Survey.Smap = map[string]string{
+		"ok": "ok-mapped",
+	}
+	config.Survey.Qmap.Q1.Name = "q1-param"
+	config.Survey.Qmap.Q1.Answers = []string{"", "", "", "", "five"}
+	config.Survey.Qmap.Q2.Name = "q2-param"
+	config.Survey.Qmap.Q2.Answers = []string{"", "", "", "four", ""}
+	config.Survey.Qmap.Q3.Name = "q3-param"
+	config.Survey.Qmap.Q3.Answers = []string{"", "", "three", "", ""}
+	config.Survey.Qmap.Q4.Name = "q4-param"
+	config.Survey.Qmap.Q4.Answers = []string{"", "two", "", "", ""}
+	config.Survey.Qmap.Q5.Name = "q5-param"
 
 	const feedback = `{
 		"overall": 5,
