@@ -10,6 +10,7 @@ var (
 	errAuthInvalid   = errors.New("mismatched or malformed authorization")
 	errAuthMissing   = errors.New("authorization required")
 	errAuthTokenType = errors.New("invalid token type")
+	errBadData       = errors.New("malformed or otherwise invalid data")
 	errConflict      = errors.New("precondition or data conflict")
 	errNotFound      = errors.New("data not found")
 	errNotModified   = errors.New("content not modified")

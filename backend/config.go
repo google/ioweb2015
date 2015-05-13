@@ -94,6 +94,39 @@ type appConfig struct {
 		Location    *time.Location
 		ManifestURL string `json:"manifest"`
 	} `json:"schedule"`
+
+	// Feedback survey settings
+	Survey struct {
+		ID       string `json:"id"`
+		Endpoint string `json:"endpoint"`
+		Key      string `json:"key"`
+		Code     string `json:"code"`
+		Reg      string `json:"reg"`
+		// Session IDs map
+		Smap map[string]string
+		// Question answers map
+		Qmap struct {
+			Q1 struct {
+				Name    string
+				Answers []string
+			}
+			Q2 struct {
+				Name    string
+				Answers []string
+			}
+			Q3 struct {
+				Name    string
+				Answers []string
+			}
+			Q4 struct {
+				Name    string
+				Answers []string
+			}
+			Q5 struct {
+				Name string
+			}
+		}
+	} `json:"survey"`
 }
 
 // initConfig reads server config file into the config global var.

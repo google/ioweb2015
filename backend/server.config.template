@@ -47,6 +47,59 @@
     "timelineUrl": "https://api.twitter.com/1.1/statuses/user_timeline.json"
   },
   "admins": [],
-  "whitelist": [ ]
+  "whitelist": [],
+  "survey": {
+    "id": "survey-id",
+    "reg": "registrant-id",
+    "key": "api-key",
+    "code": "event-code",
+    "endpoint": "https://api.eventpoint.com/2.3/eval/submitsurvey",
+    "smap": {},
+    "qmap": {
+      "q1": {
+        "name": "q10",
+        "answers": [
+          "a-11",
+          "a-12",
+          "a-13",
+          "a-14",
+          "a-15"
+        ]
+      },
+      "q2": {
+        "name": "q20",
+        "answers": [
+          "a-21",
+          "a-22",
+          "a-23",
+          "a-24",
+          "a-25"
+        ]
+      },
+      "q3": {
+        "name": "q30",
+        "answers": [
+          "a-31",
+          "a-32",
+          "a-33",
+          "a-34",
+          "a-35"
+        ]
+      },
+      "q4": {
+        "name": "q40",
+        "answers": [
+          "a-41",
+          "a-42",
+          "a-43",
+          "a-44",
+          "a-45"
+        ]
+      },
+      "q5": {
+        "name": "q50"
+      }
+    }
+  }
 }
 
