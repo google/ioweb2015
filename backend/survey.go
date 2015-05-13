@@ -12,11 +12,11 @@ import (
 )
 
 type sessionSurvey struct {
-	Overall   *int    `json:"overall"`
-	Relevance *int    `json:"relevance"`
-	Content   *int    `json:"content"`
-	Speaker   *int    `json:"speaker"`
-	Comment   *string `json:"comment"`
+	Overall   *int   `json:"overall"`
+	Relevance *int   `json:"relevance"`
+	Content   *int   `json:"content"`
+	Speaker   *int   `json:"speaker"`
+	Comment   string `json:"comment"`
 }
 
 // valid validates sessionSurvey data.
@@ -44,9 +44,7 @@ func (s *sessionSurvey) String() string {
 		}
 		res = append(res, fmt.Sprintf("%s=%d", k, i))
 	}
-	if s.Comment != nil {
-		res = append(res, *s.Comment)
-	}
+	res = append(res, s.Comment)
 	return strings.Join(res, " ")
 }
 
@@ -116,6 +114,7 @@ func submitSessionSurvey(c context.Context, sid string, s *sessionSurvey) error 
 	q := r.URL.Query()
 	setQ := func(n string, v *int) {
 		if v == nil {
+			q.Set(n, "")
 			return
 		}
 		q.Set(n, strconv.Itoa(*v))
@@ -123,13 +122,11 @@ func submitSessionSurvey(c context.Context, sid string, s *sessionSurvey) error 
 	q.Set("objectid", sid)
 	q.Set("surveyId", config.Survey.ID)
 	q.Set("registrantKey", config.Survey.Reg)
-	setQ("q1", s.Overall)
-	setQ("q2", s.Relevance)
-	setQ("q3", s.Content)
-	setQ("q4", s.Speaker)
-	if s.Comment != nil {
-		q.Set("q5", *s.Comment)
-	}
+	setQ("q10", s.Overall)
+	setQ("q20", s.Relevance)
+	setQ("q30", s.Content)
+	setQ("q40", s.Speaker)
+	q.Set("q50", s.Comment)
 	r.URL.RawQuery = q.Encode()
 	r.Header.Set("apikey", config.Survey.Key)
 	r.Header.Set("code", config.Survey.Code)

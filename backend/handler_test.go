@@ -1042,11 +1042,11 @@ func TestSubmitUserSurvey(t *testing.T) {
 			"surveyId":      {"io-survey"},
 			"objectid":      {"ok"},
 			"registrantKey": {"registrant"},
-			"q1":            {"5"},
-			"q2":            {"4"},
-			"q3":            {"3"},
-			"q4":            {"2"},
-			"q5":            {"test"},
+			"q10":           {"5"},
+			"q20":           {"4"},
+			"q30":           {"3"},
+			"q40":           {"2"},
+			"q50":           {""},
 		}
 		if !reflect.DeepEqual(r.Form, params) {
 			t.Errorf("r.Form = %v; want %v", r.Form, params)
@@ -1067,8 +1067,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 		"overall": 5,
 		"relevance": 4,
 		"content": 3,
-		"speaker": 2,
-		"comment": "test"
+		"speaker": 2
 	}`
 
 	table := []*struct {
