@@ -356,7 +356,8 @@ including `:session_id`.
 ]
 ```
 
-All integer fields should be in the range from 1 to 5 where 5 is the highest rating.
+All fields are optional.
+Integer fields should be in the range from 1 to 5 where 5 is the highest rating.
 Feedback data for a session with the start timestamp greater than the request time will not be accepted.
 
 Successful submission is indicated by `201` response code.
