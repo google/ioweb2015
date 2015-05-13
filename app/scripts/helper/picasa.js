@@ -21,9 +21,7 @@ IOWA.Picasa = (function() {
   "use strict";
 
   var GDEVELOPER_USER_ID = '111395306401981598462';
-  var ALBUM_ID = '6029456067262589905';
-  // var GDEVELOPER_USER_ID = '104338422186783795762';
-  // var ALBUM_ID = '6148086646522932881';
+  var ALBUM_ID = '6148448302499535601';
 
   var lang = document.documentElement.lang;
   var viewPortWidth = document.documentElement.clientWidth;
