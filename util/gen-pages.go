@@ -33,7 +33,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		if fi.IsDir() && fi.Name() == "debug" {
+		if fi.IsDir() && (fi.Name() == "debug" || fi.Name() == "admin") {
 			return filepath.SkipDir
 		}
 		if p == *templatesRoot || fi.IsDir() {

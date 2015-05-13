@@ -926,6 +926,30 @@ func handleClock(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleAdmin renders admin home page on 'GET' requests,
+// and modifies config otherwise.
+// It is accessible only to config.Admins.
+func handleAdmin(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+
+	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "text/html;charset=utf-8")
+		tfile := "home"
+		if r.URL.Path[len(r.URL.Path)-1] != '/' {
+			tfile = path.Base(r.URL.Path)
+		}
+		t, err := template.ParseFiles(filepath.Join(config.Dir, templatesDir, "admin", tfile+".html"))
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+		if err := t.Execute(w, nil); err != nil {
+			errorf(c, "handleAdmin: %v", err)
+		}
+		return
+	}
+}
+
 // debugGetURL fetches a URL with service account credentials.
 // Should not be available on prod.
 func debugServiceGetURL(w http.ResponseWriter, r *http.Request) {

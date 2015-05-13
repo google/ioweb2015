@@ -40,6 +40,8 @@ type appConfig struct {
 
 	// User emails allowed in staging
 	Whitelist []string
+	// App admins
+	Admins []string
 	// I/O Extended events feed
 	IoExtFeedURL string `json:"ioExtFeedUrl"`
 	// Endpoint to ping external/extra parties about certain updates
@@ -115,12 +117,17 @@ func initConfig(configPath, addr string) error {
 		config.Prefix = "/" + config.Prefix
 	}
 	sort.Strings(config.Whitelist)
+	sort.Strings(config.Admins)
 	return nil
 }
 
 // isWhitelisted returns true if either email or its domain
 // is in the config.Whitelist.
+// All admins are whitelisted.
 func isWhitelisted(email string) bool {
+	if isAdmin(email) {
+		return true
+	}
 	i := sort.SearchStrings(config.Whitelist, email)
 	if i < len(config.Whitelist) && config.Whitelist[i] == email {
 		return true
@@ -133,4 +140,15 @@ func isWhitelisted(email string) bool {
 	}
 	// check the @domain of this email
 	return isWhitelisted(email[i:])
+}
+
+// isAdmin returns true if email is in config.Admins.
+// It doesn't test for email's @domain address; only complete emails will match.
+// All users are admins on dev server.
+func isAdmin(email string) bool {
+	if isDev() {
+		return true
+	}
+	i := sort.SearchStrings(config.Admins, email)
+	return i < len(config.Admins) && config.Admins[i] == email
 }
