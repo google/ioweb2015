@@ -13,6 +13,19 @@ limitations under the License.
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-youtube/google-youtube.html">
+<link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
+<link rel="import" href="../bower_components/core-animated-pages/transitions/slide-from-right.html">
+<link rel="import" href="../bower_components/core-icon/core-icon.html">
+<link rel="import" href="../bower_components/core-label/core-label.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog-transition.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="io-radio-button.html">
+<link rel="import" href="social-post.html">
 
 <!--
 The `<io-live>` provides the Google I/O live stream experience.
@@ -26,39 +39,249 @@ Fired when the mode changes.
 -->
 <polymer-element name="io-live">
   <template>
-    <link rel="stylesheet" href="io-live.css">
+    <link rel="stylesheet" href="io-live.css" no-shim>
+    <style>
+      social-post::shadow header {
+        margin-bottom: 8px;
+      }
+      social-post::shadow .timestamp,
+      social-post::shadow a {
+        font-size: 14px;
+      }
+      #sessiondetails::shadow #scroller {
+        padding: 0;
+      }
+    </style>
 
     <div class="bottom__bar" layout horizontal end justified>
       <div>
-        <template if="{{mode === _MODES.PRE}}">
+        <template if="{{mode === _MODES.BEFORE}}">
           <content></content>
         </template>
       </div>
-      <paper-fab icon="picture-in-picture" aria-label="My schedule" title="My schedule" on-click="{{onFabClick}}"></paper-fab>
+
+      <paper-fab id="schedfab" icon="picture-in-picture"
+                 aria-label="My schedule" title="My schedule" on-tap="{{onFabClick}}"></paper-fab>
+
+      <div id="livewidget" on-transitionend="{{onFabTransition}}">
+
+      <paper-dialog id="sessiondetails" transition="paper-dialog-transition-bottom" layered="false"
+                    on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
+          <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
+          <div class="card__photo" relative>
+            <core-image src="{{selectedSession.photoUrl || 'images/schedule/session_placeholder.jpg'}}"
+                        placeholder="images/io15-color.png"
+                        sizing="cover" preload fade fit></core-image>
+            <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}" mini
+                       class="{{ {active: selectedSession.saved} | tokenList }}"
+                       on-up="{{onToggleSaveSession}}"
+                       disabled?="{{fetchingUserData}}"></paper-fab>
+            <paper-progress indeterminate hidden?="{{!fetchingUserData}}"></paper-progress>
+          </div>
+          <div class="session__info__section">
+            <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
+            <div class="session__desc">{{selectedSession.description}}</div>
+          </div>
+          <div class="session__info__section session__speakers" hidden?="{{!selectedSession.speakers.length}}">
+            <h3>Speakers</h3>
+            <div layout horizontal wrap>
+              <template repeat="{{speakerId in selectedSession.speakers}}">
+                <div class="speaker__card" layout horizontal>
+                  <div><img _src="{{speakers[speakerId].thumbnailUrl || 'images/schedule/profile_placeholder.png'}}" class="profilepic"></div>
+                  <div class="speaker__info" layout vertical flex>
+                    <span class="speaker__name">{{speakers[speakerId].name}}</span>
+                    <span class="speaker__title">{{speakers[speakerId].company}}</span>
+                    <div class="speaker__desc">{{speakers[speakerId].bio}}</div>
+                    <div class="session__social" layout horizontal>
+                      <a href="{{speakers[speakerId].plusoneUrl}}" target="_blank" class="share-icon" hidden?="{{!speakers[speakerId].plusoneUrl}}"><core-icon icon="io:post-gplus"></core-icon></a>
+                      <a href="{{speakers[speakerId].twitterUrl}}" target="_blank" class="share-icon" hidden?="{{!speakers[speakerId].twitterUrl}}"><core-icon icon="io:post-twitter"></core-icon></a>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+            </div>
+          </div>
+          <div class="session__info__section session__info__links card-content" hidden?="{{!selectedSession.hasRelated}}">
+            <span class="anchor-like" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related" core-overlay-toggle>View related content</span>
+          </div>
+        </paper-dialog>
+
+        <div class="bg-dark-grey" layout vertical>
+
+          <div class="widget-nav" layout horizontal center self-end>
+            <paper-icon-button icon="close" on-tap="{{closeFab}}"></paper-icon-button>
+          </div>
+
+          <paper-tabs class="white" valueattr="label" selected="{{selectedTab}}">
+            <paper-tab label="live" role="">I/O Live</paper-tab>
+            <paper-tab label="schedule" role="">Live schedule</paper-tab>
+            <paper-tab label="hash" role="">#io15</paper-tab>
+          </paper-tabs>
+
+          <core-animated-pages transitions="slide-from-right" selected="{{selectedTab}}" valueattr="label" fit>
+            <section class="schedule__content" label="live" layout vertical>
+
+              <template if="{{mode === _MODES.BEFORE}}">
+                <div layout vertical flex>
+                  <div class="card__photo card__photo--live" flex></div>
+                  <div class="card">
+                    <div class="card-content">Our 8th annual Google I/O developer conference will kick-off with a keynote hosted by our Senior Vice-President of Products, Sundar Pichai.</div>
+                  </div>
+                </div>
+              </template>
+
+              <template if="{{duringKeynote}}">
+                <div layout vertical flex>
+                  <div class="card__photo card__photo--live" flex layout vertical center-center>
+                    <img src="../images/play-video-button.png">
+                    <h4>Keynote in progress</h4>
+                  </div>
+                </div>
+              </template>
+
+              <template if="{{mode === _MODES.LIVE && !currentLiveSessions.length}}">
+                <div layout vertical>
+                  <div class="card">
+                    <div class="card-content">
+                      <h2>I/O Live will resume soon</h2>
+                      <div>In the meantime, browse the live schedule and create your own I/O Live playlist.</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <template if="{{mode === _MODES.AFTER}}">
+                <div layout vertical flex>
+                  <div class="card">
+                    <div class="card-content">
+                      <h2>Thanks for watching I/O 2015</h2>
+                      <div>Missed a session? No worries! You'll be able to watch all of the recorded sessions soon.</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <div class="card schedule-rows" layout vertical>
+
+                <core-menu id="live-channel-menu" class="schedule__content"
+                           valueattr="videoid" selected="{{selectedVideoId}}">
+                  <template repeat="{{session in currentLiveSessions}}" if="{{!duringKeynote}}">
+                    <div class="schedule-row" layout horizontal center videoid="{{session.youtubeUrl}}">
+                      <div>
+                        <img _src="{{session | generateSpeakerImage}}" class="profilepic">
+                      </div>
+                      <div class="session__detail" layout vertical flex>
+                        <span class="session__title" auto-vertical flex?="{{!isPhoneSize}}" two
+                              title="{{session.title}}">
+                          {{session.title}}
+                        </span>
+                        <div class="schedule-speakers">{{session.speakers | speakerIdsToNameString}}</div>
+                      </div>
+                      <core-icon icon="{{selectedVideoId === session.youtubeUrl ? 'io:play-circle-fill' : 'io:play-circle-outline'}}" self-center></core-icon>
+                    </div>
+                  </template>
+                  <template repeat="{{channel in missingChannels}}">
+                    <div class="schedule-row" layout horizontal center videoid="{{channel.videoId}}">
+                      <div>
+                        <img src="images/schedule/channel{{channel.label}}.png" class="profilepic">
+                      </div>
+                      <div class="session__detail" layout vertical flex>
+                        <span class="session__title" auto-vertical flex?="{{!isPhoneSize}}" two
+                              title="Channel {{channel.label}}">
+                          Channel {{channel.label}}
+                        </span>
+                      </div>
+                      <core-icon icon="{{selectedVideoId === channel.videoId ? 'io:play-circle-fill' : 'io:play-circle-outline'}}" self-center></core-icon>
+                    </div>
+                  </template>
+                </core-menu>
+              </div>
+
+            </section>
+            <section class="schedule__content" label="schedule" layout vertical>
+
+              <div class="card schedule-rows" layout vertical>
+                <template repeat="{{session in todaysSessions}}">
+                  <div class="card-content" hidden?="{{!session.firstOfBlockForLivestream}}">
+                    <h4>{{session.block}}</h4>
+                  </div>
+                  <div class="schedule-row" layout horizontal>
+                    <io-radio-button aria-labelledby="session-{{session.id}}-title"
+                                     toggles checked?="{{session.saved}}"
+                                     on-change="{{onToggleSaveSession}}"></io-radio-button>
+                    <div layout vertical flex tabindex="0">
+                      <span id="session-{{session.id}}-title" class="schedule-title"
+                            auto-vertical flex?="{{!isPhoneSize}}" two
+                            title="{{session.title}}"
+                            on-click="{{openSession}}">
+                        {{session.title}}
+                      </span>
+                      <div class="schedule-speakers">{{session.speakers | speakerIdsToNameString}}</div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <div class="card card__bottom-links">
+                <paper-progress indeterminate hidden?="{{!fetchingUserData}}" fit></paper-progress>
+                <div class="card-content" layout horizontal justified>
+                  <a href="schedule#day{{dayView}}" data-ajax-link data-track-link="live-fullschedule">Full schedule</a>
+                  <a href="{{'schedule#myschedule'}}" data-ajax-link data-track-link="live-myschedule">My schedule</a>
+                </div>
+              </div>
+
+            </section>
+            <section id="hashtab" label="hash">
+              <div class="card">
+                <div class="card-content social__feed" layout vertical>
+                  <template repeat="{{post in socialPosts}}">
+                    <social-post kind="{{post.kind}}"
+                                 author="{{post.author}}"
+                                 url="{{post.url}}"
+                                 text="{{post.text}}"
+                                 when="{{post.when}}"
+                                 media="{{post.media}}">
+                    </social-post>
+                  </template>
+                </div>
+              </div>
+            </section>
+          </core-animated-pages>
+
+        </div>
+      </div>
     </div>
 
-    <template if="{{mode === _MODES.LIVE}}">
-      <div class="fullvideo__container" fit>
-        <!-- <img src="{{''}}images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch I/O Live" fit> -->
-        <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
-                        autohide="1" controls="2" modestbranding="1" showinfo="0"
-                        iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
-      </div>
-    </template>
+    <div id="livecontainer">
 
-    <template if="{{mode === _MODES.PRE}}">
-      <countdown-timer role="timer" bgcolor="#00BCD4" date="[[date]]"
-          easeintime="490" waittime="100" easeouttime="400"
-          value="{{countdownValue}}" autoStart
-          aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O">
-      </countdown-timer>
-    </template>
+      <template if="{{mode === _MODES.LIVE}}">
+        <div class="fullvideo__container" fit>
+          <google-youtube videoid="{{selectedVideoId}}" height="100%" width="100%" fit
+                          autohide="1" controls="2" modestbranding="1" showinfo="0"
+                          iv_load_policy="3" rel="0" autoplay="1"
+                          on-google-youtube-ready="{{onVideoReady}}"
+                          on-google-youtube-state-change="{{onStateChange}}"></google-youtube>
+        </div>
+      </template>
+
+      <template if="{{mode === _MODES.BEFORE}}">
+        <countdown-timer role="timer" bgcolor="#00BCD4" date="{{date}}"
+            easeintime="490" waittime="100" easeouttime="400"
+            value="{{countdownValue}}" autoStart fit
+            aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O"
+            on-timerthreshold="{{onCountdownTimerThreshold}}"
+            on-transitionend="{{onCountdownFaded}}">
+        </countdown-timer>
+      </template>
+
+    </div>
 
   </template>
   <script>
   Polymer({
 
-    _MODES: {LIVE: 'live', PRE: 'pre'},
+    _MODES: {LIVE: 'live', BEFORE: 'before', AFTER: 'after'},
 
     publish: {
       /**
@@ -72,45 +295,402 @@ Fired when the mode changes.
       date: 'May 28 2015 09:30:00 GMT-0700 (PDT)',
 
       /**
-       * The mode of operation for the live embed. 'pre' is before the event
+       * The mode of operation for the live embed. 'before' is before the event
        * starts (e.g. before `date`) and a countdown is shown leading up to the
        * event. 'live' signifies the event has already started and the live
-       * stream video mode should be shown.
+       * stream video mode should be shown. 'after' is after the event.
        *
        * @attribute mode
        * @type string
-       * @default ''
+       * @default null
        */
       mode: {
         value: '', reflect: true
-      }
+      },
+
+      /**
+       * If in live mode, the FAB is open when true.
+       *
+       * @property openWidget
+       * @type bool
+       * @default false
+       */
+      openWidget: {value: false, reflect: true},
+
+      /**
+       * The selected nav tab.
+       *
+       * @property selectedTab
+       * @type string
+       * @default 'live'
+       */
+      selectedTab: 'live',
+
+      /**
+       * The list of schedule sessions.
+       *
+       * @property sessions
+       * @type array
+       * @default []
+       */
+      sessions: null,
+
+      /**
+       * User's list of saved sessions.
+       *
+       * @attribute userSessions
+       * @type array
+       * @default []
+       */
+      userSessions: null,
+
+      /**
+       * Speaker info.
+       *
+       * @property speakers
+       * @type object
+       * @default {}
+       */
+      speakers: null,
+
+      /**
+       * Current day to display schedule information for. This calculated from
+       * the `date` property. For example, "May 28 2015 09:00:00 GMT-0700 (PDT)"
+       * would be 1.
+       *
+       * @property currentDay
+       * @type number
+       * @default 1
+       */
+      currentDay: null,
+
+      /**
+       * Whether fetching user data is in progress.
+       *
+       * @attribute fetchingUserData
+       * @type Boolean
+       * @default false
+       */
+      fetchingUserData: false,
+
+      /**
+       * Social posts.
+       *
+       * @attribute socialPosts
+       * @type array
+       * @default []
+       */
+      socialPosts: null,
+
+      /**
+       * Selected session to see details for.
+       *
+       * @attribute selectedSession
+       * @type object
+       * @default null
+       */
+      selectedSession: null,
+
+      /**
+       * The selected video from the list of current live streaming videos.
+       *
+       * @property selectedVideoId
+       * @type string
+       * @default null
+       */
+      selectedVideoId: null,
+
+      /**
+       * List of live stream YT video channel ids.
+       *
+       * @attribute liveStreamChannelIds
+       * @type Array
+       * @default null
+       */
+      liveStreamChannelIds: null,
+
+      /**
+       * List of currently playing live sessions.
+       *
+       * @property currentLiveSessions
+       * @type Array
+       * @default null
+       */
+      currentLiveSessions: null,
+
+      /**
+       * List of sessions happening today.
+       *
+       * @property todaysSessions
+       * @type array
+       * @default []
+       */
+      todaysSessions: null,
+
+      /**
+       * True if the current live streaming videos includes the keynote.
+       *
+       * @property duringKeynote
+       * @type Boolean
+       * @default false
+       */
+      duringKeynote: false,
+
+      /**
+       * True if the schedule FAB should auto-open when the element is loaded.
+       *
+       * @property autoOpenFab
+       * @type Boolean
+       * @default false
+       */
+      autoOpenFab: false
     },
 
-    eventDelegates: {
-      'click': 'toggleVideo'
+    created: function() {
+      this.sessions = [];
+      this.userSessions = [];
+      this.socialPosts = [];
+      this.speakers = {};
+      this.liveStreamChannelIds = [];
+      this.todaysSessions = [];
+      this.currentLiveSessions = [];
     },
 
-    domReady: function() {
-      var now = new Date();
-      var eventStart = new Date(this.date);
-      if (now > eventStart) {
-        this.mode = this._MODES.LIVE;
+    dateChanged: function() {
+      this.day1Start = moment(this.date);
+      this.day1End = moment(this.day1Start).hours(17).minutes(0);
+      this.day2Start = moment(this.day1Start).add(1, 'days');
+      this.day2End = moment(this.day2Start).hours(17).minutes(0);
+
+      // If we're before the start day of I/O, set current day to the start day
+      // of I/O. Otherwise, set it to the current day of the show.
+      var today = moment();
+      if (today < this.day1Start) {
+        this.currentDay = parseInt(this.day1Start.format('D'));
+        this.mode = this._MODES.BEFORE;
+      } else if (today > this.day2End) {
+        this.currentDay = parseInt(this.day2End.format('D')); // max out on day 2.
+        this.mode = this._MODES.AFTER;
       } else {
-        this.mode = 'pre';
+        this.currentDay = parseInt(today.format('D'));
+        this.mode = this._MODES.LIVE;
       }
+
+      // May 27 -> 1, May 28 -> 1, May 29 -> 2
+      this.dayView = this.currentDay % parseInt(this.day1Start.format('D')) + 1;
+    },
+
+    sessionsChanged: function() {
+      if (!this.sessions.length) {
+        return;
+      }
+
+      this.todaysSessions = this.filterLiveSessionsByDay(this.sessions, this.currentDay);
+
+      // TODO: update currentLiveSessions when time tricks a new hour block;
+      // this.listLiveSessionsInThisHour();
+    },
+
+    openWidgetChanged: function() {
+      this.$.livewidget.classList.toggle('open', this.openWidget);
+      this.$.livewidget.classList.add('transitioning');
     },
 
     modeChanged: function() {
-      this.fire('io-live-mode', {mode: this.mode});
+      this.asyncFire('io-live-mode', {mode: this.mode});
     },
 
-    toggleVideo: function(e, detail, sender) {
-      this.mode = this._MODES.LIVE;
+    autoOpenFabChanged: function() {
+      // Expand FAB if we're in live mode and not streaming the keynote.
+      if (this.autoOpenFab && !this.duringKeynote && this.mode != this._MODES.BEFORE) {
+        this.async(function() {
+          this.openFab();
+        }, null, 600);
+      }
+    },
+
+    selectedTabChanged: function() {
+      IOWA.Analytics.trackEvent('live', 'tab select', this.selectedTab);
+    },
+
+    onVideoReady: function(e, detail, sender) {
+      this.listLiveSessionsInThisHour();
+    },
+
+    onStateChange: function(e, detail) {
+      var video = this.$.livecontainer.querySelector('google-youtube');
+
+      switch (detail.data) {
+        case YT.PlayerState.CUED:
+          this.wasPaused_ = false;
+          break;
+        case YT.PlayerState.PAUSED:
+          this.wasPaused_ = true;
+          break;
+        case YT.PlayerState.PLAYING:
+          // this.updateVideoInfo();
+          if (!this.wasPaused_) {
+            IOWA.Analytics.trackEvent('live', 'channel select', this.selectedVideoId);
+          }
+          this.wasPaused_ = false;
+          break;
+      }
+    },
+
+    listLiveSessionsInThisHour: function() {
+      this.currentLiveSessions = this.filterCurrentTimeBlock(this.todaysSessions);
+
+      // Find any live  channels that are not streaming live content right now
+      // so we can include them in the list for users to switch. This will be
+      // recorded and other content.
+      var liveIds = this.currentLiveSessions.map(function(session) {
+        return session.youtubeUrl;
+      });
+
+      this.duringKeynote = this.currentLiveSessions.map(function(session) {
+        return session.id;
+      }).indexOf('__keynote__') !== -1;
+
+      // If currently during the keynote, set it as the playing video and exit.
+      if (this.duringKeynote) {
+        this.selectedVideoId = this.currentLiveSessions[0].youtubeUrl;
+        return;
+      }
+
+      this.missingChannels = this.liveStreamChannelIds.filter(function(channel) {
+        return liveIds.indexOf(channel) < 0;
+      }).map(function(channel) {
+        return {
+          label: this.liveStreamChannelIds.indexOf(channel) + 1,
+          videoId: channel
+        };
+      }.bind(this));
+
+      // If there are live streamed sessions in the hour, start playing the
+      // first. Otherwise select the first channel.
+      if (this.currentLiveSessions.length) {
+        this.selectedVideoId = this.currentLiveSessions[0].youtubeUrl;
+      } else {
+        this.selectedVideoId = this.liveStreamChannelIds[0];
+      }
+    },
+
+    openSession: function(e, detail, sender) {
+      this.selectedSession = sender.templateInstance.model.session;
+
+      // TODO: global pollution
+      // Report session detail as pageview in GA. Should be the same as what
+      // the schedule page reports as a deep link page view.
+      var path = window.PREFIX + '/schedule#day' + this.dayView + '/' +
+                 this.selectedSession.id;
+      IOWA.Analytics.trackPageView(path);
+
+      this.$.sessiondetails.open();
+    },
+
+    onFabTransition: function(e, detail, sender) {
+      e.stopPropagation();
+      sender.classList.remove('transitioning');
+      if (!this.openWidget) {
+        this.$.schedfab.style.visibility = 'visible';
+      }
     },
 
     onFabClick: function(e, detail, sender) {
       e.stopPropagation();
+      this.openFab();
+      IOWA.Analytics.trackEvent('live', 'fab opened', 'opened');
+    },
+
+    openFab: function() {
+      this.$.schedfab.style.visibility = 'hidden';
+      this.openWidget = true;
+    },
+
+    closeFab: function(e, detail, sender) {
+      e && e.stopPropagation();
+      this.openWidget = false;
+      IOWA.Analytics.trackEvent('live', 'fab opened', 'closed');
+    },
+
+    onToggleSaveSession: function(e, detail, sender) {
+      e.stopPropagation();
+
+      var session = sender.templateInstance.model.session;
+      if (session) {
+        this.selectedSession = session;
+      }
+
+      var saved = !this.selectedSession.saved;
+
+      IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
+        this.selectedSession.saved = saved;
+        this.fetchingUserData = false;
+        IOWA.Schedule.bookmarkSessionNotification(saved);
+      }.bind(this)).catch(function(e) {
+        this.fetchingUserData = false;
+      }.bind(this));
+    },
+
+    onSessionDetailsOpen: function(e, detail, sender) {
+      sender.querySelector('.session__title').focus();
+    },
+
+    onCountdownTimerThreshold: function(e, detail, sender) {
+      if (detail.label === 'Ended' || detail.ended) {
+        this.async(function() {
+          this.$.livecontainer.querySelector('countdown-timer').style.opacity = 0;
+        }, null, 1000);
+      }
+    },
+
+    onCountdownFaded: function(e, detail, sender) {
+      if (moment() > this.day1Start) {
+        this.mode = this._MODES.LIVE;
+      }
+    },
+
+    speakerIdsToNameString: function(speakers) {
+      if (!speakers) {
+        return '';
+      }
+      return speakers.map(function(speakerId) {
+        return this.speakers[speakerId].name;
+      }.bind(this)).join(', ');
+    },
+
+    filterLiveSessionsByDay: function(sessions, day) {
+      return sessions.filter(function(session) {
+        return session.day === day && session.isLivestream;
+      });
+    },
+
+    filterCurrentTimeBlock: function(sessions) {
+      var now = moment();
+
+      return sessions.filter(function(session) {
+        // Only keep session that fall under the current hour e.g. filter out
+        // sessions that have already happened or ones in a future hour block.
+        var sessionStart = moment(session.startTimestamp);
+        var sessionEnd = moment(session.endTimestamp);
+        if (sessionStart < now && now < sessionEnd) {
+          return true;
+        }
+        return false;
+      });
+    },
+
+    selectScheduleTab: function(e, detail, sender) {
+      e.preventDefault();
+      this.selectedTab = 'schedule';
+    },
+
+    generateSpeakerImage: function(session) {
+      var idx = Math.floor((Math.random() * session.speakers.length));
+      return this.speakers[session.speakers[idx]].thumbnailUrl ||
+             'images/schedule/profile_placeholder.png';
     }
+
   });
   </script>
 </polymer-element>
