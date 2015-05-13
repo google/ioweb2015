@@ -723,7 +723,7 @@ func submitUserSurvey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// don't allow early submissions on prod
-	if isProd() && s.StartTime.After(time.Now()) {
+	if isProd() && time.Now().Before(s.StartTime) {
 		writeJSONError(c, w, http.StatusBadRequest, "too early")
 		return
 	}
