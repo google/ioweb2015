@@ -331,7 +331,7 @@ IOWA.Elements = (function() {
       if (z && z.name) {
         return moment.tz(z.name).zoneAbbr();
       }
-      return zone
+      return zone;
     };
 
     template.formatSessionTimeFilter = function(dateStr) {
