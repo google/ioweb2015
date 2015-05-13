@@ -326,6 +326,14 @@ IOWA.Elements = (function() {
 
     template.timezones = Object.keys(template.timezoneNames);
 
+    template.prettifyTimezone = function(zone) {
+      var z = template.timezoneNames[zone];
+      if (z && z.name) {
+        return moment.tz(z.name).zoneAbbr();
+      }
+      return zone
+    };
+
     template.formatSessionTimeFilter = function(dateStr) {
       var date = new Date(dateStr);
       return date.toLocaleTimeString().replace(/:\d+ /, ' ');
