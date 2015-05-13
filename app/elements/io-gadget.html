@@ -19,6 +19,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="social-post.html">
+<link rel="import" href="social-poller.html">
 
 <script src="../bower_components/moment/min/moment.min.js"></script>
 <script src="../scripts/analytics.js"></script>
@@ -130,6 +131,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
           </div>
           <div id="post-container" class="card-content" flex>
             <div layout vertical>
+              <social-poller url="{{'api/v1/social'}}" posts="{{socialPosts}}" interval="30000"></social-poller>
               <template repeat="{{socialPost in socialPosts}}">
                 <social-post kind="{{socialPost.kind}}"
                              author="{{socialPost.author}}"
@@ -237,31 +239,14 @@ The `<io-gadget>` element renders a youtube video + social feed.
       videoTitle: '',
 
       /**
-       * API endpoint to retrieve social posts from.
-       *
-       * @property socialPostsEndpoint
-       * @type string
-       * @default 'api/v1/social'
-       */
-      socialPostsEndpoint: 'api/v1/social',
-
-      /**
-       * Interval (ms) to poll for posts.
-       *
-       * @property socialPostUpdateInterval
-       * @type number
-       * @default 30000
-       */
-      socialPostUpdateInterval: 30000,
-
-      /**
        * The view to show.
        *
        * @property view
        * @type number
        * @default 0
        */
-      view: null,
+       view: null,
+
 
       /**
        * List of API results.
@@ -270,8 +255,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
        * @type array
        * @default []
        */
-
-      updateSocialPostsTimeout_: null,
+      socialPosts: null,
 
       wasPaused_: false,
 
@@ -280,16 +264,6 @@ The `<io-gadget>` element renders a youtube video + social feed.
       created: function() {
         this.socialPosts = [];
         this.videoIds = [];
-      },
-
-      ready: function() {
-        IOWA.Request.cacheThenNetwork(
-            this.socialPostsEndpoint, this.processSocialPosts.bind(this),
-            this.processSocialPosts.bind(this));
-
-         // Set a timeout to fetch new posts after 30 seconds.
-        this.updateSocialPostsTimeout_ = window.setTimeout(
-            this.updateSocialPosts.bind(this), this.socialPostUpdateInterval);
       },
 
       startDateChanged: function(oldVal, newVal) {
@@ -337,31 +311,6 @@ The `<io-gadget>` element renders a youtube video + social feed.
         if (video && this.videoIds.indexOf(newVal) !== -1) {
           video.play(); // Start auto-playing video when new one was selected.
         }
-      },
-
-      updateSocialPosts: function() {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', this.socialPostsEndpoint);
-        // The request will be intercepted by the service worker, which will use a network-first
-        // policy to ensure that the service worker cache is initially ignored.
-        // But if the device is offline, it will return the previously cached content.
-        xhr.setRequestHeader('X-Cache-Only', 'false');
-
-        xhr.onload = function() {
-          if (xhr.status < 400) {
-            this.processSocialPosts(JSON.parse(xhr.response));
-            // Schedule another automatic update if we got a successful response back.
-            this.updateSocialPostsTimeout_ = window.setTimeout(
-                this.updateSocialPosts.bind(this),
-                this.socialPostUpdateInterval);
-          }
-        }.bind(this);
-
-        xhr.send();
-      },
-
-      processSocialPosts: function(socialPosts) {
-        this.socialPosts = socialPosts;
       },
 
       onOpenSchedule: function(e, detail, sender) {
