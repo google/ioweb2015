@@ -184,7 +184,7 @@ Fired when the mode changes.
                   <template repeat="{{channel in missingChannels}}">
                     <div class="schedule-row" layout horizontal center videoid="{{channel.videoId}}">
                       <div>
-                        <img src="{{'images/schedule/profile_placeholder.png'}}" class="profilepic">
+                        <img src="images/schedule/channel{{channel.label}}.png" class="profilepic">
                       </div>
                       <div class="session__detail" layout vertical flex>
                         <span class="session__title" auto-vertical flex?="{{!isPhoneSize}}" two
