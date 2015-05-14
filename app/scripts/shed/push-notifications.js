@@ -195,11 +195,19 @@
     var sessionsStartedTitles = formatSessionTitles(sessionsStarted);
 
     var body = '';
+    var title = '';
     if (sessionsStartingSoonTitles.length) {
+      title = 'Some events in My Schedule are starting';
       body += sessionsStartingSoonTitles.join(', ') +
               (sessionsStartingSoonTitles.length === 1 ? ' is' : ' are') + ' starting soon. ';
     }
     if (sessionsStartedTitles.length) {
+      if (title) {
+        title = 'Session reminder';
+      } else {
+        title = 'Some events in My Schedule have started';
+      }
+
       body += sessionsStartedTitles.join(', ') +
               (sessionsStartedTitles.length === 1 ? ' has' : ' have') + ' already started. ';
     }
@@ -208,7 +216,7 @@
     // tag, so there's no use sending multiple notifications with the same tag. Instead, create
     // one notification that has the list of all the sessions starting soon.
     return {
-      title: 'Session reminder',
+      title: title,
       body: body,
       icon: DEFAULT_ICON,
       tag: 'session-start'
