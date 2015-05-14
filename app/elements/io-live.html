@@ -41,6 +41,20 @@ Fired when the mode changes.
   <template>
     <link rel="stylesheet" href="io-live.css" no-shim>
     <style>
+      :host {
+        display: block;
+        background-color: #00BCD4;
+        font-size: 16px;
+      }
+      paper-tabs.white {
+        color: white;
+      }
+      paper-tabs.white::shadow #selectionBar {
+        background-color: #fff;
+      }
+      paper-tabs.white paper-tab::shadow #ink {
+        color: rgba(255,255,255,0.5);
+      }
       social-post::shadow header {
         margin-bottom: 8px;
       }
