@@ -47,6 +47,15 @@ func (s *sessionSurvey) String() string {
 	return strings.Join(res, " ")
 }
 
+// disabledSurvey returns true if sid is found in config.Survey.Disabled.
+func disabledSurvey(sid string) bool {
+	if sid == "" {
+		return true
+	}
+	i := sort.SearchStrings(config.Survey.Disabled, sid)
+	return i < len(config.Survey.Disabled) && config.Survey.Disabled[i] == sid
+}
+
 // submittedSurveySessions returns a slice of session IDs which user uid
 // has already submitted a feedback survey for.
 // It fetches data from Google Drive AppData folder.

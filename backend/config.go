@@ -104,6 +104,8 @@ type appConfig struct {
 		Reg      string `json:"reg"`
 		// Session IDs map
 		Smap map[string]string
+		// Don't accept feedback for these sessions
+		Disabled []string
 		// Question answers map
 		Qmap struct {
 			Q1 struct {
@@ -151,6 +153,10 @@ func initConfig(configPath, addr string) error {
 	}
 	sort.Strings(config.Whitelist)
 	sort.Strings(config.Admins)
+	sort.Strings(config.Survey.Disabled)
+	if config.Survey.Smap == nil {
+		config.Survey.Smap = make(map[string]string)
+	}
 	return nil
 }
 

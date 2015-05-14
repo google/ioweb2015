@@ -992,6 +992,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
 		"ok":             &eventSession{Id: "ok", StartTime: time.Now().Add(-10 * time.Minute)},
 		"submitted":      &eventSession{Id: "submitted", StartTime: time.Now().Add(-10 * time.Minute)},
+		"disabled":       &eventSession{Id: "disabled", StartTime: time.Now().Add(-10 * time.Minute)},
 		"not-bookmarked": &eventSession{Id: "not-bookmarked", StartTime: time.Now().Add(-10 * time.Minute)},
 		"too-early":      &eventSession{Id: "too-early", StartTime: time.Now().Add(10 * time.Minute)},
 	}}); err != nil {
@@ -1004,7 +1005,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		if r.Method == "GET" {
 			w.Write([]byte(`{
-				"starred_sessions": ["submitted", "ok", "too-early"],
+				"starred_sessions": ["submitted", "ok", "too-early", "disabled"],
 				"feedback_submitted_sessions": ["submitted"]
 			}`))
 			return
@@ -1015,7 +1016,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if v := []string{"submitted", "ok", "too-early"}; !compareStringSlices(data.Bookmarks, v) {
+		if v := []string{"submitted", "ok", "too-early", "disabled"}; !compareStringSlices(data.Bookmarks, v) {
 			t.Errorf("data.Bookmarks = %v; want %v", data.Bookmarks, v)
 		}
 		if !compareStringSlices(data.Survey, feedbackIDs) {
@@ -1062,6 +1063,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 	config.Survey.Reg = "registrant"
 	config.Survey.Key = "ep-key"
 	config.Survey.Code = "ep-code"
+	config.Survey.Disabled = []string{"disabled"}
 	config.Survey.Smap = map[string]string{
 		"ok": "ok-mapped",
 	}
@@ -1090,6 +1092,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 		{"not-bookmarked", http.StatusNotFound},
 		{"not-there", http.StatusNotFound},
 		{"submitted", http.StatusBadRequest},
+		{"disabled", http.StatusBadRequest},
 		{"too-early", http.StatusBadRequest},
 		{"", http.StatusNotFound},
 	}
@@ -1102,11 +1105,11 @@ func TestSubmitUserSurvey(t *testing.T) {
 		handleUserSurvey(w, r)
 
 		if w.Code != test.code {
-			t.Fatalf("%d: w.Code = %d; want %d\nResponse: %s", i, w.Code, test.code, w.Body.String())
+			t.Errorf("%d: w.Code = %d; want %d\nResponse: %s", i, w.Code, test.code, w.Body.String())
 		}
 		if test.code > 299 {
 			if submitted {
-				t.Errorf("%d: did not want feedback submission", i)
+				t.Errorf("%d: submitted = true; want false", i)
 			}
 			continue
 		}
@@ -1120,7 +1123,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 		}
 
 		if !submitted {
-			t.Errorf("%d: want feedback to be submitted", i)
+			t.Errorf("%d: submitted = false; want true", i)
 		}
 	}
 }
