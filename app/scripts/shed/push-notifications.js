@@ -29,6 +29,7 @@
     'video-available': 'schedule#myschedule'
   };
   var UTM_SOURCE_PARAM = 'utm_source=notification';
+  var SESSION_DEEPLINK_PREFIX = 'schedule?sid=';
 
   /**
    * Loads a SW token value from IndexedDB.
@@ -177,15 +178,38 @@
    * @return {object} An object with the data needed to display a notification.
    */
   function generateStartNotification(sessions) {
-    var sessionTitles = formatSessionTitles(sessions);
+    var sessionsStartingSoon = [];
+    var sessionsStarted = [];
+
+    var now = Date.now();
+    sessions.forEach(function(session) {
+      var startTime = new Date(session.startTimestamp).getTime();
+      if (startTime <= now) {
+        sessionsStarted.push(session);
+      } else {
+        sessionsStartingSoon.push(session);
+      }
+    });
+
+    var sessionsStartingSoonTitles = formatSessionTitles(sessionsStartingSoon);
+    var sessionsStartedTitles = formatSessionTitles(sessionsStarted);
+
+    var body = '';
+    if (sessionsStartingSoonTitles.length) {
+      body += sessionsStartingSoonTitles.join(', ') +
+              (sessionsStartingSoonTitles.length === 1 ? ' is' : ' are') + ' starting soon. ';
+    }
+    if (sessionsStartedTitles.length) {
+      body += sessionsStartedTitles.join(', ') +
+              (sessionsStartedTitles.length === 1 ? ' has' : ' have') + ' already started. ';
+    }
 
     // New notifications with the same tag will replace any previous notifications with the same
     // tag, so there's no use sending multiple notifications with the same tag. Instead, create
     // one notification that has the list of all the sessions starting soon.
     return {
-      title: 'Some events in My Schedule are about to start',
-      body: sessionTitles.join(', ') +
-            (sessionTitles.length === 1 ? ' is' : ' are') + ' starting soon.',
+      title: 'Some events in My Schedule are starting',
+      body: body,
       icon: DEFAULT_ICON,
       tag: 'session-start'
     };
@@ -197,22 +221,32 @@
    * @return {object} An object with the data needed to display a notification.
    */
   function generateVideoNotification(sessions) {
+    console.log(sessions);
     var sessionTitles = formatSessionTitles(sessions);
 
-    // New notifications with the same tag will replace any previous notifications with the same
-    // tag, so there's no use sending multiple notifications with the same tag. Instead, create
-    // one notification that has the list of all the sessions starting soon.
-    return {
-      title: 'Some events in My Schedule have new videos',
-      body: sessionTitles.join(', ') +
-            (sessionTitles.length === 1 ? ' has' : ' have') + ' a video.',
-      icon: DEFAULT_ICON,
-      tag: 'video-available'
-    };
+    // Special-case logic to handle the case where there's just one new video, since we can
+    // make the clickthrough go directly to the session page.
+    if (sessionTitles.length === 1) {
+      var tag = SESSION_DEEPLINK_PREFIX + sessions[0].id + '#/' + sessions[0].id;
+
+      return {
+        title: 'The video for ' + sessionTitles[0] + ' is available',
+        body: '',
+        icon: DEFAULT_ICON,
+        tag: tag
+      };
+    } else {
+      return {
+        title: 'Some events in My Schedule have new videos',
+        body: 'New videos are available for ' + sessionTitles.join(', '),
+        icon: DEFAULT_ICON,
+        tag: 'video-available'
+      };
+    }
   }
 
   /**
-   * @param {array} sessions One or more sessions.
+   * @param {Array} sessions One or more sessions.
    * @return {array} An array of all the titles for the session, surrounded by quotes.
    */
   function formatSessionTitles(sessions) {
@@ -257,8 +291,14 @@
     event.notification.close();
 
     var relativeUrl = TAG_TO_DESTINATION_URL[event.notification.tag];
+    // If the tag isn't mapped to a destination URL, check to see if it's a deep link to a session.
+    if (!relativeUrl) {
+      if (event.notification.tag.indexOf(SESSION_DEEPLINK_PREFIX) === 0) {
+        relativeUrl = event.notification.tag;
+      }
+    }
 
-    // If the tag is unknown, it's most likely because it's being used to track an error that
+    // If the tag is still unknown, it's most likely because it's being used to track an error that
     // led to a default notification. Put that error info into a URL parameter, and take the
     // use to the home page.
     if (!relativeUrl) {
