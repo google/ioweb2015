@@ -119,6 +119,9 @@ handlers:
 - url: /_ah/warmup
   script: _go_app
 
+- url: /_ah/remote_api
+  script: _go_app
+
 - url: /.*
   script: _go_app
   secure: always

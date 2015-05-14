@@ -17,12 +17,15 @@ import (
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/urlfetch"
 	"google.golang.org/appengine/user"
+
+	_ "google.golang.org/appengine/remote_api"
 )
 
 // allow requests prefixed with passthruPrefixes to bypass checkWhitelist
 var passthruPrefixes = []string{
 	"/sync",
 	"/api/v1/user",
+	"/_ah/remote_api",
 }
 
 func init() {
