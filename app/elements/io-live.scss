@@ -229,6 +229,11 @@ countdown-timer {
 paper-tabs {
   text-transform: uppercase;
   letter-spacing: 0.01em;
+
+  paper-tab[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 .card__photo {

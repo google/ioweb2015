@@ -129,7 +129,8 @@ Fired when the mode changes.
 
           <paper-tabs class="white" valueattr="label" selected="{{selectedTab}}">
             <paper-tab label="live" role="">I/O Live</paper-tab>
-            <paper-tab label="schedule" role="">Live schedule</paper-tab>
+            <paper-tab label="schedule" role=""
+                disabled?="{{mode === _MODES.AFTER}}">Live schedule</paper-tab>
             <paper-tab label="hash" role="">#io15</paper-tab>
           </paper-tabs>
 
@@ -215,8 +216,19 @@ Fired when the mode changes.
             </section>
             <section class="schedule__content" label="schedule" layout vertical>
 
+              <template if="{{mode === _MODES.LIVE && !currentLiveSessions.length}}">
+                <div layout vertical flex>
+                  <div class="card">
+                    <div class="card-content">
+                      <h2>No more sessions today</h2>
+                      <div>In the meantime, browse the the full schedule and create your own I/O Live playlist.</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
               <div class="card schedule-rows" layout vertical>
-                <template repeat="{{session in todaysSessions}}">
+                <template repeat="{{session in todaysLiveSessions | filterHappenedSessions}}">
                   <div class="card-content" hidden?="{{!session.firstOfBlockForLivestream}}">
                     <h4>{{session.block}}</h4>
                   </div>
@@ -296,6 +308,8 @@ Fired when the mode changes.
   Polymer({
 
     _MODES: {LIVE: 'live', BEFORE: 'before', AFTER: 'after'},
+
+    _refreshSessionTimeout: null,
 
     publish: {
       /**
@@ -435,11 +449,11 @@ Fired when the mode changes.
       /**
        * List of sessions happening today.
        *
-       * @property todaysSessions
+       * @property todaysLiveSessions
        * @type array
        * @default []
        */
-      todaysSessions: null,
+      todaysLiveSessions: null,
 
       /**
        * True if the current live streaming videos includes the keynote.
@@ -466,15 +480,21 @@ Fired when the mode changes.
       this.socialPosts = [];
       this.speakers = {};
       this.liveStreamChannelIds = [];
-      this.todaysSessions = [];
+      this.todaysLiveSessions = [];
       this.currentLiveSessions = [];
+    },
+
+    detached: function() {
+      if (this._refreshSessionTimeout) {
+        clearTimeout(this._refreshSessionTimeout);
+      }
     },
 
     dateChanged: function() {
       this.day1Start = moment(this.date);
-      this.day1End = moment(this.day1Start).hours(17).minutes(0);
+      this.day1End = moment(this.day1Start).hours(17).startOf('hour');
       this.day2Start = moment(this.day1Start).add(1, 'days');
-      this.day2End = moment(this.day2Start).hours(17).minutes(0);
+      this.day2End = moment(this.day2Start).hours(17).startOf('hour');
 
       // If we're before the start day of I/O, set current day to the start day
       // of I/O. Otherwise, set it to the current day of the show.
@@ -499,10 +519,7 @@ Fired when the mode changes.
         return;
       }
 
-      this.todaysSessions = this.filterLiveSessionsByDay(this.sessions, this.currentDay);
-
-      // TODO: update currentLiveSessions when time tricks a new hour block;
-      // this.listLiveSessionsInThisHour();
+      this.todaysLiveSessions = this.filterLiveSessionsByDay(this.sessions, this.currentDay);
     },
 
     openWidgetChanged: function() {
@@ -552,11 +569,11 @@ Fired when the mode changes.
     },
 
     listLiveSessionsInThisHour: function() {
-      this.currentLiveSessions = this.filterCurrentTimeBlock(this.todaysSessions);
+      this.currentLiveSessions = this.filterCurrentTimeBlock(this.todaysLiveSessions);
 
-      // Find any live  channels that are not streaming live content right now
-      // so we can include them in the list for users to switch. This will be
-      // recorded and other content.
+      // Find any live channels that are not streaming content right now and
+      // include them in the list live streaming list for users to switch to.
+      // The content will be recorded and/or other content.
       var liveIds = this.currentLiveSessions.map(function(session) {
         return session.youtubeUrl;
       });
@@ -571,22 +588,41 @@ Fired when the mode changes.
         return;
       }
 
-      this.missingChannels = this.liveStreamChannelIds.filter(function(channel) {
+      // Keynote is guaranteed to be first channel. Ignore it as a channel since
+      // we're handling it separately.
+      var liveStreamChannelIds = this.liveStreamChannelIds.slice(1);
+
+      this.missingChannels = liveStreamChannelIds.filter(function(channel) {
         return liveIds.indexOf(channel) < 0;
       }).map(function(channel) {
         return {
-          label: this.liveStreamChannelIds.indexOf(channel) + 1,
+          label: liveStreamChannelIds.indexOf(channel) + 1,
           videoId: channel
         };
       }.bind(this));
 
-      // If there are live streamed sessions in the hour, start playing the
-      // first. Otherwise select the first channel.
+      // If there are live streamed sessions happening this hour, start
+      // playing the first one. Otherwise default to the first non-streaming
+      // channel.
       if (this.currentLiveSessions.length) {
         this.selectedVideoId = this.currentLiveSessions[0].youtubeUrl;
       } else {
-        this.selectedVideoId = this.liveStreamChannelIds[0];
+        this.selectedVideoId = liveStreamChannelIds[0];
       }
+
+      // Refresh live stream views when the next timeblock hits, either at the
+      // next 30min mark or the next hour block.
+      var nextTimeMark;
+      var now = moment();
+      var remainder = (30 - now.minute()) % 30;
+      if (remainder > 0) {
+        nextTimeMark = moment(now).add(remainder, 'minutes');
+      } else {
+        nextTimeMark = moment(now).add(1, 'hours').startOf('hour');
+      }
+
+      var timeout = nextTimeMark.diff(now, 'milliseconds');
+      this._refreshSessionTimeout = setTimeout(this.listLiveSessionsInThisHour.bind(this), timeout);
     },
 
     openSession: function(e, detail, sender) {
@@ -679,18 +715,26 @@ Fired when the mode changes.
       });
     },
 
+    filterHappenedSessions: function(sessions) {
+      var now =  moment();
+      return sessions.filter(function(session) {
+        var sessionStart = moment(session.startTimestamp);
+        var sessionEnd = moment(session.endTimestamp);
+
+        var isInTheFuture = sessionStart > now;
+        var isHappeningNow = sessionStart < now && now < sessionEnd;
+        return isInTheFuture || isHappeningNow;
+      });
+    },
+
     filterCurrentTimeBlock: function(sessions) {
       var now = moment();
-
       return sessions.filter(function(session) {
         // Only keep session that fall under the current hour e.g. filter out
         // sessions that have already happened or ones in a future hour block.
         var sessionStart = moment(session.startTimestamp);
         var sessionEnd = moment(session.endTimestamp);
-        if (sessionStart < now && now < sessionEnd) {
-          return true;
-        }
-        return false;
+        return sessionStart < now && now < sessionEnd;
       });
     },
 

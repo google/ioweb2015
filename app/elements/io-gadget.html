@@ -319,7 +319,8 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
       setView: function() {
         var today = moment();
-        var day1Start = moment(this.startDate).subtract(30, 'minutes');
+        // Gadget starts showing content at 8:30am PDT.
+        var day1Start = moment(this.startDate).subtract(1, 'hours');
         var day1End = moment(day1Start).hours(17).minutes(0);
         var day2Start = moment(day1Start).add(1, 'days');
         var day2End = moment(day2Start).hours(17).minutes(0);

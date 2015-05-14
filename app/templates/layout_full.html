@@ -369,16 +369,13 @@ limitations under the License.
 
       <template if="{{selectedPage === 'home'}}">
         <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
-          <!-- TODO: update to liveStreamChannelIds to use server template when
-               it is available. First time should be channel1, followed by 2, and
-               and 3. The keynote should be excluded because it is treated separately. -->
           <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}"
                    sessions="{{scheduleData.sessions}}"
                    speakers="{{scheduleData.speakers}}"
                    userSessions="{{savedSessions}}"
                    fetchingUserData="{{scheduleFetchingUserData}}"
                    socialPosts="{{socialPosts}}"
-                   liveStreamChannelIds="['Lj-plmzhyVA','5WI_lCmBKE8','tfTq9oItsDU']"
+                   {% .LiveIDs | json | safeAttr "liveStreamChannelIds" %}
                    autoOpenFab="{{pageTransitionDone}}" fit>
             <h2>I/O is starting soon. #io15</h2>
           </io-live>
