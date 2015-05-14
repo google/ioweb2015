@@ -54,6 +54,7 @@
     "key": "api-key",
     "code": "event-code",
     "endpoint": "https://api.eventpoint.com/2.3/eval/submitsurvey",
+    "disabled": ["__afterhours__"],
     "smap": {},
     "qmap": {
       "q1": {

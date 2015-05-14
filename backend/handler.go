@@ -722,6 +722,12 @@ func submitUserSurvey(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sid := path.Base(r.URL.Path)
+	// we don't accept feedback for certain sessions
+	if disabledSurvey(sid) {
+		writeJSONError(c, w, http.StatusBadRequest, "survey feedback not allowed for this session")
+		return
+	}
+	// accept only for existing sessions
 	s, err := getSessionByID(c, sid)
 	if err != nil {
 		writeJSONError(c, w, http.StatusNotFound, err)
