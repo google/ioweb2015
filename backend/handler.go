@@ -958,11 +958,13 @@ func handlePingExt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		b, _ := ioutil.ReadAll(res.Body)
-		errorf(c, "handlePingExt: remote says %q\nResponse: %s", res.Status, b)
-		w.WriteHeader(http.StatusInternalServerError)
+	if res.StatusCode == http.StatusOK {
 		return
+	}
+	b, _ := ioutil.ReadAll(res.Body)
+	errorf(c, "handlePingExt: remote says %q\nResponse: %s", res.Status, b)
+	if res.StatusCode > 499 {
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
