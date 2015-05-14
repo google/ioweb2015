@@ -17,6 +17,7 @@ import (
 
 const (
 	liveStreamedText = "Live streamed"
+	keynoteID        = "__keynote__"
 
 	// upcomingSessions
 	timeoutSoon  = 24 * time.Hour
@@ -30,7 +31,7 @@ const (
 )
 
 // session IDs to compare timeoutSoon to.
-var soonSessionIDs = []string{"__keynote__"}
+var soonSessionIDs = []string{keynoteID}
 
 type eventData struct {
 	Sessions map[string]*eventSession `json:"sessions,omitempty"`
@@ -479,8 +480,33 @@ func unbookmarkSessions(c context.Context, uid string, ids ...string) ([]string,
 	return data.Bookmarks, nil
 }
 
+// scheduleLiveIDs returns a slice of all youtubeUrl field values where isLivestream == true.
+// Keynote element is always first, even if its youtubeUrl value is empty.
+func scheduleLiveIDs(c context.Context) ([]string, error) {
+	d, err := getLatestEventData(c, nil)
+	if err != nil {
+		return nil, err
+	}
+	if d.Sessions == nil {
+		return nil, nil
+	}
+	keyURL := ""
+	if s, ok := d.Sessions[keynoteID]; ok && s.IsLive {
+		keyURL = s.YouTube
+	}
+	res := []string{keyURL}
+	for id, s := range d.Sessions {
+		if id == keynoteID || !s.IsLive || s.YouTube == "" ||
+			strings.HasPrefix(s.YouTube, "http://") || strings.HasPrefix(s.YouTube, "https://") {
+			continue
+		}
+		res = append(res, s.YouTube)
+	}
+	return unique(res), nil
+}
+
 // unique removes duplicates from slice.
-// Original arg is not modified.
+// Original arg is not modified. Elements order is preserved.
 func unique(items []string) []string {
 	seen := make(map[string]bool, len(items))
 	res := make([]string, 0, len(items))

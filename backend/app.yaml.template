@@ -23,13 +23,6 @@ handlers:
   upload: app/sitemap\.xml$
   secure: always
 
-- url: $PREFIX$/embed.*
-  static_files: app/embed.html
-  upload: app/embed\.html$
-  secure: always
-  http_headers:
-    Access-Control-Allow-Origin: "*"
-
 - url: $PREFIX$/permissions.*
   static_files: app/permissions.html
   upload: app/permissions\.html$

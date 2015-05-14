@@ -280,6 +280,62 @@ func TestServeSessionTemplate(t *testing.T) {
 	}
 }
 
+func TestServeEmbed(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+	config.Prefix = "/pref"
+	config.Schedule.Start = time.Date(2015, 6, 30, 9, 30, 0, 0, time.UTC)
+	config.Schedule.Location = time.UTC
+
+	r := newTestRequest(t, "GET", "/embed", nil)
+	c := newContext(r)
+
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"live": &eventSession{
+			IsLive:  true,
+			YouTube: "live",
+		},
+		"recorded": &eventSession{
+			IsLive:  false,
+			YouTube: "http://recorded",
+		},
+		keynoteID: &eventSession{
+			IsLive:  true,
+			YouTube: "keynote",
+		},
+		"same-live": &eventSession{
+			IsLive:  true,
+			YouTube: "live",
+		},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	serveEmbed(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+	lookup := []string{
+		`<link rel="canonical" href="/pref/embed">`,
+		`startDate="2015-06-30T09:30:00Z"`,
+		`videoIds='["keynote","live"]'`,
+	}
+	err := false
+	for _, v := range lookup {
+		if !strings.Contains(w.Body.String(), v) {
+			err = true
+			t.Errorf("does not contain %s", v)
+		}
+	}
+	if err {
+		t.Logf("response: %s", w.Body.String())
+	}
+}
+
 func TestHandleAuth(t *testing.T) {
 	defer resetTestState(t)
 	defer preserveConfig()()
