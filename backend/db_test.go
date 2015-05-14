@@ -103,3 +103,28 @@ func TestStoreGetChanges(t *testing.T) {
 		}
 	}
 }
+
+func TestStoreNextSessions(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+
+	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
+	sessions := []*eventSession{
+		&eventSession{Id: "one", Update: updateSoon},
+		&eventSession{Id: "one", Update: updateStart},
+		&eventSession{Id: "two", Update: updateStart},
+	}
+	if err := storeNextSessions(c, sessions); err != nil {
+		t.Fatal(err)
+	}
+	sessions = append(sessions, &eventSession{Id: "new", Update: updateStart})
+	items, err := filterNextSessions(c, sessions)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(items) != 1 || items[0].Id != "new" {
+		t.Errorf("items = %v; want 'new'", items)
+	}
+}

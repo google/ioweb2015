@@ -19,19 +19,25 @@ import (
 )
 
 const (
+	// eventSession.Update field
 	updateDetails = "details"
 	updateVideo   = "video"
 	updateStart   = "start"
+	updateSoon    = "soon"
 )
 
 //  userPush is user notification configuration.
 type userPush struct {
 	userID string
 
-	Enabled     bool     `json:"notify" datastore:"on"`
-	IOStart     bool     `json:"iostart" datastore:"io"`
-	Subscribers []string `json:"subscribers,omitempty" datastore:"subs,noindex"`
-	Endpoints   []string `json:"-" datastore:"urls,noindex"`
+	Enabled   bool     `json:"notify" datastore:"on"`
+	IOStart   bool     `json:"iostart" datastore:"io"`
+	Endpoints []string `json:"endpoints" datastore:"urls,noindex"`
+	// TODO: remove this when all existing users are migrated to Endpoints.
+	// Until that is done:
+	// - len(Subscribers) may be less than len(Endpoints)
+	// - first elements of Endpoints will match Subscribers
+	Subscribers []string `json:"-" datastore:"subs,noindex"`
 
 	Ext  ioExtPush  `json:"-" datastore:"ext"`
 	Pext *ioExtPush `json:"ioext,omitempty" datastore:"-"`
@@ -108,34 +114,68 @@ func filterUserChanges(dc *dataChanges, bks []string, ext *ioExtPush) {
 	}
 }
 
-// pingDevice sends a "ping" message to device subscribed to endpoint.
-// In a case where GCM did not accept push request the return error
+// pingDevice sends a "ping" message to the subscribed device.
+// It follows HTTP Push spec https://tools.ietf.org/html/draft-thomson-webpush-http2.
+//
+// In a case where endpoint did not accept push request the return error
 // will be of type *pushError with RetryAfter >= 0.
-// If returned string value is not zero, it contains a canonical reg ID.
-// TODO: Chrome 44 deprecates reg.
-func pingDevice(c context.Context, reg, endpoint string) (string, error) {
+// If returned string value is non-zero, it contains a new endpoint
+// to be used instead of the old one from now on.
+func pingDevice(c context.Context, endpoint string) (string, error) {
+	if u := config.Google.GCM.Endpoint; u != "" && strings.HasPrefix(endpoint, u) {
+		return pingGCM(c, endpoint)
+	}
+
+	logf(c, "pinging generic endpoint: %s", endpoint)
+	req, err := http.NewRequest("PUT", endpoint, nil)
+	if err != nil {
+		// invalid endpoint URL
+		return "", &pushError{msg: fmt.Sprintf("pingDevice: %v", err), remove: true}
+	}
+
+	res, err := httpClient(c).Do(req)
+	if err != nil {
+		return "", &pushError{msg: fmt.Sprintf("pingDevice: %v", err), retry: true}
+	}
+	defer res.Body.Close()
+	if res.StatusCode == http.StatusOK {
+		return "", nil
+	}
+	b, _ := ioutil.ReadAll(res.Body)
+	perr := &pushError{
+		msg:    fmt.Sprintf("%s %s", res.Status, b),
+		remove: res.StatusCode >= 400 && res.StatusCode < 500,
+	}
+	if !perr.remove {
+		perr.retry = true
+		perr.after = 10 * time.Second
+	}
+	return "", perr
+}
+
+// pingGCM is a special case of pingDevice for GCM endpoints.
+func pingGCM(c context.Context, endpoint string) (string, error) {
+	reg, endpoint := extractGCMRegistration(endpoint)
 	data := url.Values{"registration_id": {reg}}
 	r, err := http.NewRequest("POST", endpoint, strings.NewReader(data.Encode()))
 	if err != nil {
-		return "", fmt.Errorf("pingDevice: %v", err)
+		// invalid endpoint URL
+		return "", &pushError{msg: fmt.Sprintf("pingGCM: %v", err), remove: true}
 	}
 	r.Header.Set("content-type", "application/x-www-form-urlencoded")
-	// don't send GCM auth key to anyone except Google
-	if strings.HasPrefix(endpoint, config.Google.GCM.Endpoint) {
-		r.Header.Set("authorization", "key="+config.Google.GCM.Key)
-	}
+	r.Header.Set("authorization", "key="+config.Google.GCM.Key)
 
 	logf(c, "DEBUG: posting to %q: %v", endpoint, data)
 	resp, err := httpClient(c).Do(r)
 	if err != nil {
-		return "", &pushError{msg: fmt.Sprintf("pingDevice: %v", err), retry: true}
+		return "", &pushError{msg: fmt.Sprintf("pingGCM: %v", err), retry: true}
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", &pushError{msg: fmt.Sprintf("pingDevice: %v", err), retry: true}
+		return "", &pushError{msg: fmt.Sprintf("pingGCM: %v", err), retry: true}
 	}
-	logf(c, "pingDevice: response:%s\n%s", resp.Status, body)
+	logf(c, "pingGCM: response: %s %s", resp.Status, body)
 
 	q, err := url.ParseQuery(string(body))
 	if err != nil {
@@ -150,25 +190,61 @@ func pingDevice(c context.Context, reg, endpoint string) (string, error) {
 	}
 	if resp.StatusCode != http.StatusOK {
 		return "", &pushError{
-			msg:   fmt.Sprintf("pingDevice: %s: %s", resp.Status, body),
-			retry: resp.StatusCode >= 500,
-			after: after,
+			msg:    fmt.Sprintf("pingGCM: %s %s", resp.Status, body),
+			remove: resp.StatusCode == http.StatusNotFound,
+			retry:  resp.StatusCode >= 500,
+			after:  after,
 		}
 	}
 	if errorStr == "" {
-		return q.Get("registration_id"), nil
+		return pushEndpointURL(q.Get("registration_id"), ""), nil
 	}
 	pe := &pushError{
 		msg:   "pingDevice: " + errorStr,
 		after: after,
 	}
 	switch errorStr {
-	case "NotRegistered":
+	case "NotRegistered", "MissingRegistration", "InvalidRegistration":
 		pe.remove = true
 	case "Unavailable", "InternalServerError", "DeviceMessageRateExceeded":
 		pe.retry = true
 	}
 	return "", pe
+}
+
+// extractGCMRegistration splits endpoint into registration ID and GCM endpoint URL.
+func extractGCMRegistration(endpoint string) (string, string) {
+	reg := strings.TrimPrefix(endpoint, config.Google.GCM.Endpoint)
+	return strings.TrimLeft(reg, "/"), config.Google.GCM.Endpoint
+}
+
+// pushEndpointURL does the opposite of extractGCMRegistration.
+// endpoint defaults to config.Google.GCM.Endpoint.
+func pushEndpointURL(reg string, endpoint string) string {
+	if reg == "" && endpoint == "" {
+		return ""
+	}
+	if reg == "" {
+		return endpoint
+	}
+	if endpoint == "" {
+		endpoint = config.Google.GCM.Endpoint
+	}
+	endpoint = strings.TrimRight(endpoint, "/")
+	reg = strings.TrimLeft(reg, "/")
+	return endpoint + "/" + reg
+}
+
+// upgradeSubscribers replaces registration IDs regs with GCM-based endpoint URLs
+// using pushEndpointURL() func.
+// Returned value is converted regs and non-GCM endpoints.
+// Original args remain unchanged.
+func upgradeSubscribers(regs []string, endpoints []string) []string {
+	endpoints = append([]string{}, endpoints...)
+	for _, id := range regs {
+		endpoints = append(endpoints, pushEndpointURL(id, ""))
+	}
+	return unique(subslice(endpoints, config.Google.GCM.Endpoint))
 }
 
 // swTokenSep is SW token separator used in encode/decodeSWToken.

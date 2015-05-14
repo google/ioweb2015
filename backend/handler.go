@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -40,9 +39,12 @@ var (
 
 // registerHandlers sets up all backend handle funcs, including the API.
 func registerHandlers() {
+	// HTML
 	handle("/", rootHandleFn)
+	// API v0 - pre-phase2
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
+	// API v1
 	handle("/api/v1/extended", serveIOExtEntries)
 	handle("/api/v1/social", serveSocial)
 	handle("/api/v1/auth", handleAuth)
@@ -51,11 +53,17 @@ func registerHandlers() {
 	handle("/api/v1/user/schedule/", handleUserSchedule)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
 	handle("/api/v1/user/updates", serveUserUpdates)
+	handle("/api/v1/user/survey", handleUserSurvey)
+	handle("/api/v1/user/survey/", handleUserSurvey)
+	// API v2
+	handle("/api/v2/user/notify", handleUserNotifySettings)
+	// background jobs
 	handle("/sync/gcs", syncEventData)
 	handle("/task/notify-subscribers", handleNotifySubscribers)
 	handle("/task/ping-user", handlePingUser)
 	handle("/task/ping-device", handlePingDevice)
 	handle("/task/ping-ext", handlePingExt)
+	handle("/task/clock", handleClock)
 	// debug handlers; not available in prod
 	if !isProd() {
 		handle("/debug/srvget", debugServiceGetURL)
@@ -133,10 +141,23 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := &templateData{}
-	if experimentShare {
+	switch {
+	case experimentShare:
 		data.OgTitle = defaultTitle
 		data.OgImage = ogImageExperiment
 		data.Desc = descExperiment
+	case !wantsPartial && r.URL.Path == "/schedule":
+		sid := r.FormValue("sid")
+		if sid == "" {
+			break
+		}
+		s, err := getSessionByID(c, sid)
+		if err != nil {
+			break
+		}
+		data.OgTitle = s.Title
+		data.OgImage = s.Photo
+		data.Desc = s.Desc
 	}
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
@@ -261,7 +282,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		Code string `json:"code"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&flow); err != nil {
-		writeJSONError(c, w, http.StatusBadRequest, fmt.Errorf("invalid JSON body: %v", err))
+		writeJSONError(c, w, http.StatusBadRequest, err)
 		return
 	}
 	err = runInTransaction(c, func(c context.Context) error {
@@ -362,7 +383,7 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, id := range ids {
 		if id == "" || id == "schedule" {
-			writeJSONError(c, w, http.StatusBadRequest, errors.New("invalid session ID"))
+			writeJSONError(c, w, http.StatusBadRequest, "invalid session ID")
 			return
 		}
 		// TODO: check whether the session ID actually exists?
@@ -375,7 +396,7 @@ func handleUserBookmarks(w http.ResponseWriter, r *http.Request) {
 	case "DELETE":
 		bookmarks, err = unbookmarkSessions(c, user, ids...)
 	default:
-		writeJSONError(c, w, http.StatusBadRequest, errors.New("invalid request method"))
+		writeJSONError(c, w, http.StatusBadRequest, "invalid request method")
 		return
 	}
 
@@ -450,24 +471,7 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 		if v, ok := body["iostart"].(bool); ok {
 			data.IOStart = v
 		}
-		if sub, ok := body["subscriber"].(string); ok {
-			url, ok := body["endpoint"].(string)
-			if !ok || url == "" {
-				url = config.Google.GCM.Endpoint
-			}
-			var exists bool
-			for _, s := range data.Subscribers {
-				if s == sub {
-					exists = true
-					break
-				}
-			}
-			if !exists {
-				data.Subscribers = append(data.Subscribers, sub)
-				data.Endpoints = append(data.Endpoints, url)
-			}
-		}
-		if v, exists := body["ioext"]; exists {
+		if v, ok := body["ioext"]; ok {
 			if v == nil {
 				data.Ext.Enabled = false
 				data.Pext = nil
@@ -478,6 +482,22 @@ func patchUserNotifySettings(w http.ResponseWriter, r *http.Request) {
 				data.Ext.Lng, _ = v["lng"].(float64)
 				data.Pext = &data.Ext
 			}
+		}
+		regid, _ := body["subscriber"].(string)
+		endpoint, _ := body["endpoint"].(string)
+		endpoint = pushEndpointURL(regid, endpoint)
+		if endpoint == config.Google.GCM.Endpoint {
+			return &apiError{msg: "invalid endpoint", code: http.StatusBadRequest}
+		}
+		var exists bool
+		for _, e := range data.Endpoints {
+			if e == endpoint {
+				exists = true
+				break
+			}
+		}
+		if !exists && endpoint != "" {
+			data.Endpoints = append(data.Endpoints, endpoint)
 		}
 
 		// store user configuration
@@ -601,7 +621,7 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 	select {
 	case <-time.After(10 * time.Second):
 		errorf(c, "userSchedule/getUserPushInfo timed out")
-		writeJSONError(c, w, http.StatusInternalServerError, errors.New("timeout"))
+		writeJSONError(c, w, http.StatusInternalServerError, "timeout")
 		return
 	case <-done:
 		// user data goroutine finished
@@ -619,6 +639,11 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeJSONError(c, w, http.StatusInternalServerError, err)
 	}
+	logsess := make([]string, 0, len(dc.Sessions))
+	for k := range dc.Sessions {
+		logsess = append(logsess, k)
+	}
+	logf(c, "sending %d updated sessions to user %s: %s", len(logsess), user, strings.Join(logsess, ", "))
 	if err := json.NewEncoder(w).Encode(dc); err != nil {
 		errorf(c, "serveUserUpdates: encode resp: %v", err)
 	}
@@ -644,6 +669,96 @@ func serveSWToken(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(dc); err != nil {
 		errorf(c, "serveSWToke: encode resp: %v", err)
 	}
+}
+
+// handleUserSurvey is the entry point for /api/v1/user/survey
+func handleUserSurvey(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		serveUserSurvey(w, r)
+		return
+	}
+	submitUserSurvey(w, r)
+}
+
+// serveUserSurvey responds with the session IDs
+// a user has already submitted feedback for.
+func serveUserSurvey(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+	sessions, err := submittedSurveySessions(c, contextUser(c))
+	if err != nil {
+		writeJSONError(c, w, http.StatusInternalServerError, err)
+		return
+	}
+	if sessions == nil {
+		sessions = []string{}
+	}
+	if err := json.NewEncoder(w).Encode(sessions); err != nil {
+		errorf(c, "encode(%v): %v", sessions, err)
+	}
+}
+
+// submitUserSurvey submits survey responses for a specific session or a batch.
+func submitUserSurvey(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	c, err := authUser(newContext(r), r.Header.Get("authorization"))
+	if err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+
+	survey := &sessionSurvey{}
+	if err := json.NewDecoder(r.Body).Decode(survey); err != nil {
+		writeJSONError(c, w, http.StatusBadRequest, err)
+		return
+	}
+	if !survey.valid() {
+		writeJSONError(c, w, http.StatusBadRequest, "invalid data")
+		return
+	}
+
+	sid := path.Base(r.URL.Path)
+	// we don't accept feedback for certain sessions
+	if disabledSurvey(sid) {
+		writeJSONError(c, w, http.StatusBadRequest, "survey feedback not allowed for this session")
+		return
+	}
+	// accept only for existing sessions
+	s, err := getSessionByID(c, sid)
+	if err != nil {
+		writeJSONError(c, w, http.StatusNotFound, err)
+		return
+	}
+	// don't allow early submissions on prod
+	if isProd() && time.Now().Before(s.StartTime) {
+		writeJSONError(c, w, http.StatusBadRequest, "too early")
+		return
+	}
+
+	data, err := addSessionSurvey(c, contextUser(c), sid)
+	if err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+	err = submitSessionSurvey(c, sid, survey)
+	if err != nil {
+		errorf(c, err.Error())
+		// try async if it didn't work right away; at most 3 retries
+		for i := 0; i < 4 && err != nil; i += 1 {
+			time.Sleep(time.Duration(i) * time.Second)
+			err = submitSessionSurveyAsync(c, sid, survey)
+		}
+	}
+	if err != nil {
+		// we could still recover feedback data from the logs in the worst case
+		errorf(c, "could not submit feedback for %s: %s", sid, survey)
+	}
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(data)
 }
 
 // TODO: add ioext params
@@ -687,22 +802,36 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := r.FormValue("uid")
-	pi, err := getUserPushInfo(c, user)
-	if err != nil {
-		errorf(c, err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if !pi.Enabled {
-		logf(c, "notifications not enabled")
-		return
-	}
-
 	// TODO: add ioext conditions
 	sessions := strings.Split(r.FormValue("sessions"), " ")
 	sort.Strings(sessions)
 	if user == "" || len(sessions) == 0 {
 		errorf(c, "invalid params user = %q; session = %v", user, sessions)
+		return
+	}
+
+	var pi *userPush
+	// transactional because we want to upgrade registration IDs to endpoints early
+	terr := runInTransaction(c, func(c context.Context) error {
+		pi, err = getUserPushInfo(c, user)
+		if err != nil {
+			return err
+		}
+		if len(pi.Subscribers) > 0 {
+			pi.Endpoints = upgradeSubscribers(pi.Subscribers, pi.Endpoints)
+			pi.Subscribers = nil
+			return storeUserPushInfo(c, pi)
+		}
+		return nil
+	})
+	if terr != nil {
+		errorf(c, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if !pi.Enabled {
+		logf(c, "notifications not enabled")
 		return
 	}
 
@@ -732,14 +861,14 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 	// pausing i seconds on each iteration where i ranges from 0 to n.
 	// currently this will total to about 15sec latency in the worst successful case.
 	nr := 5
-	regs, endpoints := pi.Subscribers, pi.Endpoints
+	endpoints := pi.Endpoints
 	for i := 0; i < nr+1; i++ {
-		regs, endpoints, err = pingDevicesAsync(c, user, regs, endpoints, 0)
+		endpoints, err = pingDevicesAsync(c, user, endpoints, 0)
 		if err == nil {
 			break
 		}
 		errorf(c, "couldn't schedule ping for %d of %d devices; retry = %d/%d",
-			len(regs), len(pi.Subscribers), i, nr)
+			len(endpoints), len(pi.Endpoints), i, nr)
 		time.Sleep(time.Duration(i) * time.Second)
 	}
 }
@@ -754,18 +883,17 @@ func handlePingDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	uid := r.FormValue("uid")
-	rid := r.FormValue("rid")
 	endpoint := r.FormValue("endpoint")
-	if uid == "" || rid == "" || endpoint == "" {
-		errorf(c, "invalid params: uid = %q; rid = %q; endpoint = %q", uid, rid, endpoint)
+	if uid == "" || endpoint == "" {
+		errorf(c, "invalid params: uid = %q; endpoint = %q", uid, endpoint)
 		return
 	}
 
-	nreg, err := pingDevice(c, rid, endpoint)
+	nurl, err := pingDevice(c, endpoint)
 	if err == nil {
-		if nreg != "" {
+		if nurl != "" {
 			terr := runInTransaction(c, func(c context.Context) error {
-				return updateSubscriber(c, uid, rid, nreg)
+				return updatePushEndpoint(c, uid, endpoint, nurl)
 			})
 			// no worries if this errors out, we'll do it next time
 			if terr != nil {
@@ -784,7 +912,7 @@ func handlePingDevice(w http.ResponseWriter, r *http.Request) {
 
 	if pe.remove {
 		terr := runInTransaction(c, func(c context.Context) error {
-			return deleteSubscriber(c, uid, rid)
+			return deletePushEndpoint(c, uid, endpoint)
 		})
 		if terr != nil {
 			errorf(c, terr.Error())
@@ -797,9 +925,9 @@ func handlePingDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// schedule a new task according to Retry-After
-	_, _, err = pingDevicesAsync(c, uid, []string{rid}, []string{endpoint}, pe.after)
+	_, err = pingDevicesAsync(c, uid, []string{endpoint}, pe.after)
 	if err != nil {
-		// scheduling didn't work: retry the whole thing
+		// re-scheduling didn't work: retry the whole thing
 		errorf(c, err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
@@ -836,10 +964,87 @@ func handlePingExt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		b, _ := ioutil.ReadAll(res.Body)
-		errorf(c, "handlePingExt: remote says %q\nResponse: %s", res.Status, b)
+	if res.StatusCode == http.StatusOK {
+		return
+	}
+	b, _ := ioutil.ReadAll(res.Body)
+	errorf(c, "handlePingExt: remote says %q\nResponse: %s", res.Status, b)
+	if res.StatusCode > 499 {
 		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+// handleClock compares time.Now() to each session and notifies users about starting sessions.
+// It must be run frequently, every minute or so.
+func handleClock(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	retry, err := taskRetryCount(r)
+	if h := r.Header.Get("x-appengine-cron"); h != "true" && err == nil && retry > 0 {
+		errorf(c, "cron = %s, retry = %d, err: %v", h, retry, err)
+		return
+	}
+
+	data, err := getLatestEventData(c, nil)
+	if err != nil {
+		errorf(c, "%v", err)
+		return
+	}
+	sessions := make([]*eventSession, 0, len(data.Sessions))
+	for _, s := range data.Sessions {
+		sessions = append(sessions, s)
+	}
+	now := time.Now()
+	upsess := upcomingSessions(now, sessions)
+
+	terr := runInTransaction(c, func(c context.Context) error {
+		upsess, err = filterNextSessions(c, upsess)
+		if err != nil {
+			return err
+		}
+		if len(upsess) == 0 {
+			return nil
+		}
+		logf(c, "found %d upcoming sessions", len(upsess))
+		dc := &dataChanges{
+			Updated:   now,
+			eventData: eventData{Sessions: make(map[string]*eventSession, len(upsess))},
+		}
+		for _, s := range upsess {
+			dc.Sessions[s.Id] = s
+		}
+		if err := storeNextSessions(c, upsess); err != nil {
+			return err
+		}
+		if err := storeChanges(c, dc); err != nil {
+			return err
+		}
+		return notifySubscribersAsync(c, dc)
+	})
+	if terr != nil {
+		errorf(c, "txn err: %v", terr)
+	}
+}
+
+// handleAdmin renders admin home page on 'GET' requests,
+// and modifies config otherwise.
+// It is accessible only to config.Admins.
+func handleAdmin(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+
+	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "text/html;charset=utf-8")
+		tfile := "home"
+		if r.URL.Path[len(r.URL.Path)-1] != '/' {
+			tfile = path.Base(r.URL.Path)
+		}
+		t, err := template.ParseFiles(filepath.Join(config.Dir, templatesDir, "admin", tfile+".html"))
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+		if err := t.Execute(w, nil); err != nil {
+			errorf(c, "handleAdmin: %v", err)
+		}
 		return
 	}
 }
@@ -854,7 +1059,7 @@ func debugServiceGetURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if req.URL.Scheme != "https" {
-		writeJSONError(c, w, http.StatusBadRequest, errors.New("dude, use https!"))
+		writeJSONError(c, w, http.StatusBadRequest, "dude, use https!")
 		return
 	}
 
@@ -951,10 +1156,15 @@ func debugSync(w http.ResponseWriter, r *http.Request) {
 }
 
 // writeJSONError sets response code to 500 and writes an error message to w.
-func writeJSONError(c context.Context, w http.ResponseWriter, code int, err error) {
-	errorf(c, err.Error())
+// If err is *apiError, code is overwritten by err.code.
+// TODO: remove code from the args and use only apiError.
+func writeJSONError(c context.Context, w http.ResponseWriter, code int, err interface{}) {
+	errorf(c, "%v", err)
+	if aerr, ok := err.(*apiError); ok {
+		code = aerr.code
+	}
 	w.WriteHeader(code)
-	fmt.Fprintf(w, `{"error": %q}`, err.Error())
+	fmt.Fprintf(w, `{"error": %q}`, err)
 }
 
 // writeError writes error to w as is, using errStatus() status code.
@@ -967,6 +1177,9 @@ func writeError(w http.ResponseWriter, err error) {
 // HTTP response status code.
 // Defaults to 500 Internal Server Error.
 func errStatus(err error) int {
+	if aerr, ok := err.(*apiError); ok {
+		return aerr.code
+	}
 	switch err {
 	case errAuthMissing:
 		return http.StatusUnauthorized
@@ -974,6 +1187,10 @@ func errStatus(err error) int {
 		return http.StatusForbidden
 	case errAuthTokenType:
 		return 498
+	case errBadData:
+		return http.StatusBadRequest
+	case errNotFound:
+		return http.StatusNotFound
 	default:
 		return http.StatusInternalServerError
 	}

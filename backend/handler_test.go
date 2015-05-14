@@ -97,53 +97,54 @@ func TestServeSchedule(t *testing.T) {
 		return etag
 	}
 
-	// no etag
-	w := httptest.NewRecorder()
-	serveSchedule(w, r)
-	checkRes(1, w, http.StatusOK, false)
+	// 0: cache miss; 1: cache hit
+	for i := 0; i < 2; i += 1 {
+		// no etag, unless cached
+		w := httptest.NewRecorder()
+		serveSchedule(w, r)
+		checkRes(1, w, http.StatusOK, i > 0)
 
-	// first etag
-	if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
-		t.Fatal(err)
-	}
-	w = httptest.NewRecorder()
-	serveSchedule(w, r)
-	etag := checkRes(2, w, http.StatusOK, true)
+		// first etag
+		if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
+			t.Fatal(err)
+		}
+		w = httptest.NewRecorder()
+		serveSchedule(w, r)
+		etag := checkRes(2, w, http.StatusOK, true)
 
-	r.Header.Set("if-none-match", etag)
-	w = httptest.NewRecorder()
-	serveSchedule(w, r)
-	checkRes(3, w, http.StatusNotModified, true)
+		r.Header.Set("if-none-match", etag)
+		w = httptest.NewRecorder()
+		serveSchedule(w, r)
+		checkRes(3, w, http.StatusNotModified, true)
 
-	// new etag
-	if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
-		t.Fatal(err)
-	}
-	w = httptest.NewRecorder()
-	serveSchedule(w, r)
-	etag = checkRes(4, w, http.StatusOK, true)
+		// new etag
+		if err := storeEventData(c, &eventData{modified: time.Now()}); err != nil {
+			t.Fatal(err)
+		}
+		w = httptest.NewRecorder()
+		serveSchedule(w, r)
+		etag = checkRes(4, w, http.StatusOK, true)
 
-	w = httptest.NewRecorder()
-	r.Header.Set("if-none-match", etag)
-	serveSchedule(w, r)
-	checkRes(5, w, http.StatusNotModified, true)
+		w = httptest.NewRecorder()
+		r.Header.Set("if-none-match", etag)
+		serveSchedule(w, r)
+		checkRes(5, w, http.StatusNotModified, true)
 
-	// star etag
-	w = httptest.NewRecorder()
-	r.Header.Set("if-none-match", "*")
-	serveSchedule(w, r)
-	lastEtag := checkRes(5, w, http.StatusOK, true)
-	if lastEtag != etag {
-		t.Errorf("lastEtag = %q; want %q", lastEtag, etag)
+		// star etag
+		w = httptest.NewRecorder()
+		r.Header.Set("if-none-match", "*")
+		serveSchedule(w, r)
+		lastEtag := checkRes(5, w, http.StatusOK, true)
+		if lastEtag != etag {
+			t.Errorf("lastEtag = %q; want %q", lastEtag, etag)
+		}
 	}
 }
 
 func TestServeTemplate(t *testing.T) {
 	defer resetTestState(t)
+	defer preserveConfig()()
 	const ctype = "text/html;charset=utf-8"
-
-	revert := preserveConfig()
-	defer revert()
 	config.Prefix = "/root"
 
 	table := []struct{ path, slug, canonical string }{
@@ -222,6 +223,116 @@ func TestServeTemplate404(t *testing.T) {
 	}
 	if v := w.Header().Get("Cache-Control"); v != "" {
 		t.Errorf("don't want Cache-Control: %q", v)
+	}
+}
+
+func TestServeSessionTemplate(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+
+	c := newContext(newTestRequest(t, "GET", "/dummmy", nil))
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"123": &eventSession{
+			Title: "Session",
+			Desc:  "desc",
+			Photo: "http://image.jpg",
+		},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	table := []*struct{ p, title, desc, image string }{
+		{"/schedule", "Schedule", descDefault, config.Prefix + "/" + ogImageDefault},
+		{"/schedule?sid=not-there", "Schedule", descDefault, config.Prefix + "/" + ogImageDefault},
+		{"/schedule?sid=123", "Session", "desc", "http://image.jpg"},
+	}
+
+	for i, test := range table {
+		lookup := []string{
+			`<meta itemprop="name" content="` + test.title + `">`,
+			`<meta itemprop="description" content="` + test.desc + `">`,
+			`<meta itemprop="image" content="` + test.image + `">`,
+			`<meta name="twitter:title" content="` + test.title + `">`,
+			`<meta name="twitter:description" content="` + test.desc + `">`,
+			`<meta name="twitter:image:src" content="` + test.image + `">`,
+			`<meta property="og:title" content="` + test.title + `">`,
+			`<meta property="og:description" content="` + test.desc + `">`,
+			`<meta property="og:image" content="` + test.image + `">`,
+		}
+		r := newTestRequest(t, "GET", test.p, nil)
+		w := httptest.NewRecorder()
+		serveTemplate(w, r)
+		if w.Code != http.StatusOK {
+			t.Errorf("%d: w.Code = %d; want 200", i, w.Code)
+		}
+		miss := 0
+		for _, s := range lookup {
+			if !strings.Contains(w.Body.String(), s) {
+				t.Errorf("%d: missing %s", i, s)
+				miss += 1
+			}
+		}
+		if miss > 0 {
+			t.Errorf("%d: %d meta tags are missing in layout:\n%s", i, miss, w.Body.String())
+		}
+	}
+}
+
+func TestServeEmbed(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+	config.Prefix = "/pref"
+	config.Schedule.Start = time.Date(2015, 6, 30, 9, 30, 0, 0, time.UTC)
+	config.Schedule.Location = time.UTC
+
+	r := newTestRequest(t, "GET", "/embed", nil)
+	c := newContext(r)
+
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"live": &eventSession{
+			IsLive:  true,
+			YouTube: "live",
+		},
+		"recorded": &eventSession{
+			IsLive:  false,
+			YouTube: "http://recorded",
+		},
+		keynoteID: &eventSession{
+			IsLive:  true,
+			YouTube: "keynote",
+		},
+		"same-live": &eventSession{
+			IsLive:  true,
+			YouTube: "live",
+		},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	serveTemplate(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+	lookup := []string{
+		`<link rel="canonical" href="/pref/embed">`,
+		`startDate="2015-06-30T09:30:00Z"`,
+		`videoIds='["keynote","live"]'`,
+	}
+	err := false
+	for _, v := range lookup {
+		if !strings.Contains(w.Body.String(), v) {
+			err = true
+			t.Errorf("does not contain %s", v)
+		}
+	}
+	if err {
+		t.Logf("response: %s", w.Body.String())
 	}
 }
 
@@ -822,7 +933,7 @@ func TestHandleUserScheduleConflict(t *testing.T) {
 	}
 }
 
-func TestServeScheduleDefault(t *testing.T) {
+func TestServeUserScheduleDefault(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
@@ -864,6 +975,215 @@ func TestServeScheduleDefault(t *testing.T) {
 	}
 }
 
+func TestServeUserSurvey(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	gdrive := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"feedback_submitted_sessions": ["id-1", "id-2"]}`))
+	}))
+	defer gdrive.Close()
+	config.Google.Drive.FilesURL = gdrive.URL
+
+	r := newTestRequest(t, "GET", "/api/v1/user/survey", nil)
+	r.Header.Set("authorization", bearerHeader+testIDToken)
+	c := newContext(r)
+
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeLocalAppFolderMeta(c, testUserID, &appFolderData{
+		FileID: "file-123",
+		Etag:   "xxx",
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handleUserSurvey(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+
+	var list []string
+	if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+		t.Fatal(err)
+	}
+	ids := []string{"id-1", "id-2"}
+	if !compareStringSlices(list, ids) {
+		t.Errorf("list = %v; want %v", list, ids)
+	}
+}
+
+func TestSubmitUserSurvey(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "dummy-access",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeLocalAppFolderMeta(c, testUserID, &appFolderData{
+		FileID: "file-123",
+		Etag:   "xxx",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"ok":             &eventSession{Id: "ok", StartTime: time.Now().Add(-10 * time.Minute)},
+		"submitted":      &eventSession{Id: "submitted", StartTime: time.Now().Add(-10 * time.Minute)},
+		"disabled":       &eventSession{Id: "disabled", StartTime: time.Now().Add(-10 * time.Minute)},
+		"not-bookmarked": &eventSession{Id: "not-bookmarked", StartTime: time.Now().Add(-10 * time.Minute)},
+		"too-early":      &eventSession{Id: "too-early", StartTime: time.Now().Add(10 * time.Minute)},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	// Google Drive API endpoint
+	feedbackIDs := []string{"submitted", "ok"}
+	gdrive := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method == "GET" {
+			w.Write([]byte(`{
+				"starred_sessions": ["submitted", "ok", "too-early", "disabled"],
+				"feedback_submitted_sessions": ["submitted"]
+			}`))
+			return
+		}
+		data := &appFolderData{}
+		if err := json.NewDecoder(r.Body).Decode(data); err != nil {
+			t.Error(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if v := []string{"submitted", "ok", "too-early", "disabled"}; !compareStringSlices(data.Bookmarks, v) {
+			t.Errorf("data.Bookmarks = %v; want %v", data.Bookmarks, v)
+		}
+		if !compareStringSlices(data.Survey, feedbackIDs) {
+			t.Errorf("data.Survey = %v; want %v", data.Survey, feedbackIDs)
+		}
+	}))
+	defer gdrive.Close()
+
+	// Survey API endpoint
+	submitted := false
+	ep := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() { submitted = true }()
+		if h := r.Header.Get("code"); h != "ep-code" {
+			t.Errorf("code = %q; want 'ep-code'", h)
+		}
+		if h := r.Header.Get("apikey"); h != "ep-key" {
+			t.Errorf("apikey = %q; want 'ep-key'", h)
+		}
+		if err := r.ParseForm(); err != nil {
+			t.Errorf("r.ParseForm: %v", err)
+			return
+		}
+		params := url.Values{
+			"surveyId":      {"io-survey"},
+			"objectid":      {"ok-mapped"},
+			"registrantKey": {"registrant"},
+			"q1-param":      {"five"},
+			"q2-param":      {"four"},
+			"q3-param":      {"three"},
+			"q4-param":      {"two"},
+			"q5-param":      {""},
+		}
+		if !reflect.DeepEqual(r.Form, params) {
+			t.Errorf("r.Form = %v; want %v", r.Form, params)
+		}
+	}))
+	defer ep.Close()
+
+	config.Env = "prod"
+	config.Google.Drive.FilesURL = gdrive.URL
+	config.Google.Drive.UploadURL = gdrive.URL
+	config.Survey.Endpoint = ep.URL + "/"
+	config.Survey.ID = "io-survey"
+	config.Survey.Reg = "registrant"
+	config.Survey.Key = "ep-key"
+	config.Survey.Code = "ep-code"
+	config.Survey.Disabled = []string{"disabled"}
+	config.Survey.Smap = map[string]string{
+		"ok": "ok-mapped",
+	}
+	config.Survey.Qmap.Q1.Name = "q1-param"
+	config.Survey.Qmap.Q1.Answers = []string{"", "", "", "", "five"}
+	config.Survey.Qmap.Q2.Name = "q2-param"
+	config.Survey.Qmap.Q2.Answers = []string{"", "", "", "four", ""}
+	config.Survey.Qmap.Q3.Name = "q3-param"
+	config.Survey.Qmap.Q3.Answers = []string{"", "", "three", "", ""}
+	config.Survey.Qmap.Q4.Name = "q4-param"
+	config.Survey.Qmap.Q4.Answers = []string{"", "two", "", "", ""}
+	config.Survey.Qmap.Q5.Name = "q5-param"
+
+	const feedback = `{
+		"overall": 5,
+		"relevance": 4,
+		"content": 3,
+		"speaker": 2
+	}`
+
+	table := []*struct {
+		sid  string
+		code int
+	}{
+		{"ok", http.StatusCreated},
+		{"not-bookmarked", http.StatusNotFound},
+		{"not-there", http.StatusNotFound},
+		{"submitted", http.StatusBadRequest},
+		{"disabled", http.StatusBadRequest},
+		{"too-early", http.StatusBadRequest},
+		{"", http.StatusNotFound},
+	}
+
+	for i, test := range table {
+		submitted = false
+		r := newTestRequest(t, "PUT", "/api/v1/user/survey/"+test.sid, strings.NewReader(feedback))
+		r.Header.Set("authorization", bearerHeader+testIDToken)
+		w := httptest.NewRecorder()
+		handleUserSurvey(w, r)
+
+		if w.Code != test.code {
+			t.Errorf("%d: w.Code = %d; want %d\nResponse: %s", i, w.Code, test.code, w.Body.String())
+		}
+		if test.code > 299 {
+			if submitted {
+				t.Errorf("%d: submitted = true; want false", i)
+			}
+			continue
+		}
+
+		var list []string
+		if err := json.Unmarshal(w.Body.Bytes(), &list); err != nil {
+			t.Fatalf("%d: %v", i, err)
+		}
+		if !compareStringSlices(list, feedbackIDs) {
+			t.Errorf("%d: list = %v; want %v", i, list, feedbackIDs)
+		}
+
+		if !submitted {
+			t.Errorf("%d: submitted = false; want true", i)
+		}
+	}
+}
+
 func TestGetUserDefaultPushConfig(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
@@ -894,29 +1214,67 @@ func TestGetUserDefaultPushConfig(t *testing.T) {
 	}
 }
 
-func TestStoreUserPushConfig(t *testing.T) {
+func TestStoreUserPushConfigV1(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
 	defer resetTestState(t)
+	defer preserveConfig()()
+	config.Google.GCM.Endpoint = "https://gcm"
 
+	table := []*struct{ body, endpoint string }{
+		{`{"subscriber": "reg-123", "endpoint": "https://push"}`, "https://push/reg-123"},
+		{`{"subscriber": "reg-123", "endpoint": ""}`, "https://gcm/reg-123"},
+		{`{"subscriber": "reg-123"}`, "https://gcm/reg-123"},
+	}
+
+	for i, test := range table {
+		resetTestState(t)
+		r := newTestRequest(t, "PUT", "/api/v1/user/notify", strings.NewReader(test.body))
+		r.Header.Set("Authorization", "Bearer "+testIDToken)
+		w := httptest.NewRecorder()
+
+		handleUserNotifySettings(w, r)
+
+		if w.Code != http.StatusOK {
+			t.Errorf("%d: w.Code = %d; want 200\nResponse: %s", i, w.Code, w.Body.String())
+		}
+		pi, err := getUserPushInfo(newContext(r), testUserID)
+		if err != nil {
+			t.Errorf("%d: %v", i, err)
+			continue
+		}
+		if len(pi.Endpoints) != 1 || pi.Endpoints[0] != test.endpoint {
+			t.Errorf("%d: pi.Endpoints = %v; want [%q]", i, pi.Endpoints, test.endpoint)
+		}
+		if len(pi.Subscribers) != 0 {
+			t.Errorf("%d: pi.Subscribers = %v; want []", i, pi.Subscribers)
+		}
+	}
+}
+func TestStoreUserPushConfigV2(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	config.Google.GCM.Endpoint = "https://gcm"
 	body := strings.NewReader(`{
-    "notify": true,
-    "subscriber": "sub-id",
-    "endpoint": "https://test",
-    "iostart": true,
-    "ioext": {
-      "name": "Amsterdam",
-      "lat": 52.37607,
-      "lng": 4.886114
-    }
-  }`)
+		"notify": true,
+		"endpoint": "https://gcm/reg-id",
+		"iostart": true,
+		"ioext": {
+			"name": "Amsterdam",
+			"lat": 52.37607,
+			"lng": 4.886114
+		}
+	}`)
 	expected := &userPush{
-		userID:      testUserID,
-		Enabled:     true,
-		Subscribers: []string{"sub-id"},
-		Endpoints:   []string{"https://test"},
-		IOStart:     true,
+		userID:    testUserID,
+		Enabled:   true,
+		Endpoints: []string{"https://gcm/reg-id"},
+		IOStart:   true,
 		Ext: ioExtPush{
 			Enabled: true,
 			Name:    "Amsterdam",
@@ -947,7 +1305,6 @@ func TestStoreUserPushConfig(t *testing.T) {
 		t.Errorf("p1.Pext = %+v; want %+v\nResponse: %s", p1.Pext, expected.Pext, w.Body.String())
 	}
 	p1.userID = expected.userID
-	p1.Endpoints = expected.Endpoints
 	p1.Pext = expected.Pext
 	p1.Ext = expected.Ext
 	if !reflect.DeepEqual(&p1, expected) {
@@ -1531,6 +1888,50 @@ func TestHandlePingExt(t *testing.T) {
 	}
 }
 
+func TestHandlePingUserUpgradeSubscribers(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	config.Google.GCM.Endpoint = "http://gcm"
+	r := newTestRequest(t, "POST", "/task/ping-user", nil)
+	r.Form = url.Values{
+		"uid":      {testUserID},
+		"sessions": {"s-123"},
+	}
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
+	c := newContext(r)
+
+	if err := storeUserPushInfo(c, &userPush{
+		userID:      testUserID,
+		Subscribers: []string{"gcm-1", "gcm-2"},
+		Endpoints:   []string{"http://gcm", "http://gcm/gcm-2", "http://push/endpoint"},
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handlePingUser(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	pi, err := getUserPushInfo(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pi.Subscribers) != 0 {
+		t.Errorf("pi.Subscribers = %v; want []", pi.Subscribers)
+	}
+	endpoints := []string{"http://gcm/gcm-1", "http://gcm/gcm-2", "http://push/endpoint"}
+	if !reflect.DeepEqual(pi.Endpoints, endpoints) {
+		t.Errorf("pi.Endpoints = %v; want %v", pi.Endpoints, endpoints)
+	}
+}
+
 func TestHandlePingUserMissingToken(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
@@ -1614,11 +2015,14 @@ func TestHandlePingUserRefokedToken(t *testing.T) {
 	}
 }
 
-func TestHandlePingDevice(t *testing.T) {
+func TestHandlePingDeviceGCM(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
 	defer resetTestState(t)
 	defer preserveConfig()()
 
-	done := make(chan struct{}, 1)
+	count := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if ah := r.Header.Get("authorization"); ah != "key=test-key" {
 			t.Errorf("ah = %q; want 'key=test-key'", ah)
@@ -1627,59 +2031,74 @@ func TestHandlePingDevice(t *testing.T) {
 			t.Errorf("reg = %q; want 'reg-123'", reg)
 		}
 		fmt.Fprintf(w, "id=message-id-123")
-		done <- struct{}{}
+		count += 1
 	}))
 	defer ts.Close()
 
-	config.Google.GCM.Endpoint = ts.URL
 	config.Google.GCM.Key = "test-key"
+	config.Google.GCM.Endpoint = ts.URL
+	endpoint := ts.URL + "/reg-123"
 
 	r := newTestRequest(t, "POST", "/task/ping-device", nil)
 	r.Form = url.Values{
 		"uid":      {testUserID},
-		"rid":      {"reg-123"},
-		"endpoint": {ts.URL},
+		"endpoint": {endpoint},
 	}
 	r.Header.Set("x-appengine-taskexecutioncount", "1")
+
+	c := newContext(r)
+	if err := storeUserPushInfo(c, &userPush{
+		userID:    testUserID,
+		Enabled:   true,
+		Endpoints: []string{endpoint},
+	}); err != nil {
+		t.Fatal(err)
+	}
+
 	w := httptest.NewRecorder()
 	handlePingDevice(w, r)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("w.Code = %d; want 200", w.Code)
 	}
-
-	select {
-	case <-done:
-		// passed
-	default:
-		t.Errorf("GCM request never happened")
+	if count != 1 {
+		t.Errorf("req count = %d; want 1", count)
+	}
+	pi, err := getUserPushInfo(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(pi.Endpoints, []string{endpoint}) {
+		t.Errorf("pi.Endpoints = %v; want [%q]", pi.Endpoints, endpoint)
 	}
 }
 
-func TestHandlePingDeviceDelete(t *testing.T) {
+func TestHandlePingDeviceGCMDelete(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
 	defer resetTestState(t)
+	defer preserveConfig()()
 
+	// GCM server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Error=NotRegistered")
 	}))
+	defer ts.Close()
+	config.Google.GCM.Endpoint = ts.URL
 
 	r := newTestRequest(t, "POST", "/task/ping-device", nil)
 	r.Form = url.Values{
 		"uid":      {testUserID},
-		"rid":      {"reg-123"},
-		"endpoint": {ts.URL},
+		"endpoint": {ts.URL + "/reg-123"},
 	}
 	r.Header.Set("x-appengine-taskexecutioncount", "1")
 
 	c := newContext(r)
 	storeUserPushInfo(c, &userPush{
-		userID:      testUserID,
-		Enabled:     true,
-		Subscribers: []string{"reg-123"},
-		Endpoints:   []string{ts.URL},
+		userID:    testUserID,
+		Enabled:   true,
+		Endpoints: []string{ts.URL + "/reg-123"},
 	})
 
 	w := httptest.NewRecorder()
@@ -1698,30 +2117,32 @@ func TestHandlePingDeviceDelete(t *testing.T) {
 	}
 }
 
-func TestHandlePingDeviceReplace(t *testing.T) {
+func TestHandlePingDeviceGCMReplace(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
 	defer resetTestState(t)
+	defer preserveConfig()()
 
+	// GCM server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "id=msg-id&registration_id=new-reg-id")
 	}))
+	defer ts.Close()
+	config.Google.GCM.Endpoint = ts.URL
 
 	r := newTestRequest(t, "POST", "/task/ping-device", nil)
 	r.Form = url.Values{
 		"uid":      {testUserID},
-		"rid":      {"reg-123"},
-		"endpoint": {ts.URL},
+		"endpoint": {ts.URL + "/reg-123"},
 	}
 	r.Header.Set("x-appengine-taskexecutioncount", "1")
 
 	c := newContext(r)
 	storeUserPushInfo(c, &userPush{
-		userID:      testUserID,
-		Enabled:     true,
-		Subscribers: []string{"reg-123"},
-		Endpoints:   []string{ts.URL},
+		userID:    testUserID,
+		Enabled:   true,
+		Endpoints: []string{ts.URL + "/reg-123"},
 	})
 
 	w := httptest.NewRecorder()
@@ -1735,17 +2156,220 @@ func TestHandlePingDeviceReplace(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if v := []string{"new-reg-id"}; !reflect.DeepEqual(pi.Subscribers, v) {
-		t.Errorf("pi.Subscribers = %v; want %v", pi.Subscribers, v)
-	}
-	if v := []string{ts.URL}; !reflect.DeepEqual(pi.Endpoints, v) {
+	if v := []string{ts.URL + "/new-reg-id"}; !reflect.DeepEqual(pi.Endpoints, v) {
 		t.Errorf("pi.Endpoints = %v; want %v", pi.Endpoints, v)
 	}
+	if l := len(pi.Subscribers); l != 0 {
+		t.Errorf("len(pi.Subscribers) = %d; want 0", l)
+	}
+}
+
+func TestHandlePingDevice(t *testing.T) {
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	count := 0
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if ah := r.Header.Get("authorization"); ah != "" {
+			t.Errorf("ah = %q; want ''", ah)
+		}
+		w.WriteHeader(http.StatusOK)
+		count += 1
+	}))
+	defer ts.Close()
+
+	r := newTestRequest(t, "POST", "/task/ping-device", nil)
+	r.Form = url.Values{
+		"uid":      {testUserID},
+		"endpoint": {ts.URL + "/reg-123"},
+	}
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
+	w := httptest.NewRecorder()
+	handlePingDevice(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+	if count != 1 {
+		t.Errorf("req count = %d; want 1", count)
+	}
+}
+
+func TestHandlePingDeviceDelete(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	// a push server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusGone)
+	}))
+	defer ts.Close()
+
+	r := newTestRequest(t, "POST", "/task/ping-device", nil)
+	r.Form = url.Values{
+		"uid":      {testUserID},
+		"endpoint": {ts.URL + "/reg-123"},
+	}
+	r.Header.Set("x-appengine-taskexecutioncount", "1")
+
+	c := newContext(r)
+	storeUserPushInfo(c, &userPush{
+		userID:    testUserID,
+		Enabled:   true,
+		Endpoints: []string{"http://one", ts.URL + "/reg-123", "http://two"},
+	})
+
+	w := httptest.NewRecorder()
+	handlePingDevice(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	pi, err := getUserPushInfo(c, testUserID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	endpoints := []string{"http://one", "http://two"}
+	if !reflect.DeepEqual(pi.Endpoints, endpoints) {
+		t.Errorf("pi.Endpoints=%v; want %v", pi.Endpoints, endpoints)
+	}
+}
+
+func TestHandleClockNextSessions(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	now := time.Now()
+	swToken := fetchFirstSWToken(t, testIDToken)
+	if swToken == "" {
+		t.Fatal("no swToken")
+	}
+
+	// gdrive stub
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/file-id" {
+			w.Write([]byte(`{"starred_sessions": ["start", "__keynote__", "too-early"]}`))
+			return
+		}
+		fmt.Fprintf(w, `{"items": [{
+			"id": "file-id",
+			"modifiedDate": "2015-04-11T12:12:46.034Z"
+		}]}`)
+	}))
+	defer ts.Close()
+	config.Google.Drive.FilesURL = ts.URL + "/"
+	config.Google.Drive.Filename = "user_data.json"
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "access-token",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeUserPushInfo(c, &userPush{userID: testUserID}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeNextSessions(c, []*eventSession{
+		&eventSession{Id: "already-clocked", Update: updateStart},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"start": &eventSession{
+			Id:        "start",
+			StartTime: now.Add(timeoutStart - time.Second),
+		},
+		"__keynote__": &eventSession{
+			Id:        "__keynote__",
+			StartTime: now.Add(timeoutSoon - time.Second),
+		},
+		"already-clocked": &eventSession{
+			Id:        "already-clocked",
+			StartTime: now.Add(timeoutStart - time.Second),
+		},
+		"too-early": &eventSession{ // because it's not in soonSessionIDs
+			Id:        "too-early",
+			StartTime: now.Add(timeoutSoon - time.Second),
+		},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	upsess := map[string]string{
+		"start":       updateStart,
+		"__keynote__": updateSoon,
+	}
+	checkUpdates := func(dc *dataChanges, what string) {
+		if len(dc.Sessions) != len(upsess) {
+			t.Errorf("%s: dc.Sessions = %v; want %v", what, dc.Sessions, upsess)
+		}
+		for id, v := range upsess {
+			s, ok := dc.Sessions[id]
+			if !ok {
+				t.Errorf("%s: %q not in %v", what, id, dc.Sessions)
+				continue
+			}
+			if s.Update != v {
+				t.Errorf("%s: s.Update = %q; want %q", what, s.Update, v)
+			}
+		}
+	}
+
+	r := newTestRequest(t, "POST", "/task/clock", nil)
+	r.Header.Set("x-appengine-cron", "true")
+	w := httptest.NewRecorder()
+	handleClock(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200", w.Code)
+	}
+
+	unclocked, err := filterNextSessions(c, []*eventSession{
+		&eventSession{Id: "__keynote__", Update: updateSoon},
+		&eventSession{Id: "start", Update: updateStart},
+		&eventSession{Id: "too-early", Update: "too-early"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(unclocked) != 1 {
+		t.Fatalf("unclocked = %v; want [too-early]", toSessionIDs(unclocked))
+	}
+	if unclocked[0].Id != "too-early" {
+		t.Fatalf("Id = %q; want 'too-early'", unclocked[0].Id)
+	}
+
+	dc, err := getChangesSince(c, now.Add(-time.Second))
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkUpdates(dc, "getChangesSince")
+
+	r = newTestRequest(t, "GET", "/api/v1/user/updates", nil)
+	r.Header.Set("authorization", swToken)
+	w = httptest.NewRecorder()
+	serveUserUpdates(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+	dc = &dataChanges{}
+	if err := json.Unmarshal(w.Body.Bytes(), dc); err != nil {
+		t.Fatal(err)
+	}
+	checkUpdates(dc, "api")
 }
 
 func fetchFirstSWToken(t *testing.T, auth string) string {
 	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
-	r.Header.Set("authorization", bearerHeader+testIDToken)
+	r.Header.Set("authorization", bearerHeader+auth)
 	w := httptest.NewRecorder()
 	serveSWToken(w, r)
 	if w.Code != http.StatusOK {

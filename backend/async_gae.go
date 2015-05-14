@@ -3,7 +3,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
@@ -43,21 +45,19 @@ func pingUserAsync(c context.Context, uid string, sessions []string) error {
 }
 
 // pingDevicesAsync schedules len(endpoints) tasks of /ping-device.
-// If scheduling fails for some endpoints, those will be in returned values
-// along with a non-nil error.
 // d specifies the duration the tasker must wait before executing the task.
-// TODO: regs are going away with Chrome 44.
-func pingDevicesAsync(c context.Context, uid string, regs, endpoints []string, d time.Duration) ([]string, []string, error) {
-	if len(regs) == 0 {
-		return nil, nil, nil
+// If scheduling fails for some endpoints, those will be in the returned values
+// along with a non-nil error.
+func pingDevicesAsync(c context.Context, uid string, endpoints []string, d time.Duration) ([]string, error) {
+	if len(endpoints) == 0 {
+		return nil, nil
 	}
 	p := path.Join(config.Prefix, "/task/ping-device")
 	jobs := make([]*taskqueue.Task, 0, len(endpoints))
-	for i, endpoint := range endpoints {
+	for _, endpoint := range endpoints {
 		t := taskqueue.NewPOSTTask(p, url.Values{
 			"uid":      {uid},
 			"endpoint": {endpoint},
-			"rid":      {regs[i]},
 		})
 		t.Delay = d
 		jobs = append(jobs, t)
@@ -66,21 +66,20 @@ func pingDevicesAsync(c context.Context, uid string, regs, endpoints []string, d
 	_, err := taskqueue.AddMulti(c, jobs, "")
 	merr, mok := err.(appengine.MultiError)
 	if !mok {
-		return nil, nil, err
+		return nil, err
 	}
 
-	errRegs, errEndpoints := make([]string, 0), make([]string, 0)
+	errEndpoints := make([]string, 0)
 	for i, e := range merr {
 		if e == nil {
 			continue
 		}
-		errRegs = append(errRegs, regs[i])
 		errEndpoints = append(errEndpoints, endpoints[i])
 	}
-	if len(errRegs) == 0 {
-		return nil, nil, nil
+	if len(errEndpoints) == 0 {
+		return nil, nil
 	}
-	return errRegs, errEndpoints, fmt.Errorf("pingDevicesAsync: %v", err)
+	return errEndpoints, fmt.Errorf("pingDevicesAsync: %v", err)
 }
 
 // pingExtPartyAsync notifies extra parties at config.ExtPingURL about data updates.
@@ -93,5 +92,23 @@ func pingExtPartyAsync(c context.Context, key string) error {
 		"key": {key},
 	})
 	_, err := taskqueue.Add(c, t, "")
+	return err
+}
+
+// submitSessionSurveyAsync schedules an async job to submit feedback survey s for session sid.
+func submitSessionSurveyAsync(c context.Context, sid string, s *sessionSurvey) error {
+	payload, err := json.Marshal(s)
+	if err != nil {
+		return err
+	}
+	h := make(http.Header)
+	h.Set("Content-Type", "application/json")
+	t := &taskqueue.Task{
+		Path:    path.Join(config.Prefix, "/task/survey", sid),
+		Payload: payload,
+		Header:  h,
+		Method:  "POST",
+	}
+	_, err = taskqueue.Add(c, t, "")
 	return err
 }

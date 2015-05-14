@@ -17,11 +17,21 @@ import (
 
 const (
 	liveStreamedText = "Live streamed"
-	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
+	keynoteID        = "__keynote__"
+
+	// upcomingSessions
+	timeoutSoon  = 24 * time.Hour
+	timeoutStart = 10 * time.Minute
+
 	// imageURLSizeMarker is used by thumbURL
 	imageURLSizeMarker    = "__w-"
 	imageURLSizeMarkerLen = len(imageURLSizeMarker)
+
+	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
 )
+
+// session IDs to compare timeoutSoon to.
+var soonSessionIDs = []string{keynoteID}
 
 type eventData struct {
 	Sessions map[string]*eventSession `json:"sessions,omitempty"`
@@ -57,7 +67,7 @@ type eventSession struct {
 	End     string          `json:"end"`
 	Filters map[string]bool `json:"filters"`
 
-	// Update is used only when diff-ing
+	// Update is used only api/user/updates
 	Update string `json:"update,omitempty"`
 }
 
@@ -381,6 +391,29 @@ func diffEventData(a, b *eventData) *dataChanges {
 	return dc
 }
 
+// upcomingSessions returns a subset of items which have their StartTime field
+// close to timeoutStart or timeoutSoon.
+// It also sets Update field of the returned elements to updateStart or updateSoon respectively.
+func upcomingSessions(now time.Time, items []*eventSession) []*eventSession {
+	sort.Strings(soonSessionIDs)
+	res := make([]*eventSession, 0)
+	for _, s := range items {
+		t := s.StartTime.Sub(now)
+		i := sort.SearchStrings(soonSessionIDs, s.Id)
+		doSoon := i < len(soonSessionIDs) && soonSessionIDs[i] == s.Id
+		switch {
+		default:
+			continue
+		case t < timeoutStart:
+			s.Update = updateStart
+		case doSoon && t < timeoutSoon:
+			s.Update = updateSoon
+		}
+		res = append(res, s)
+	}
+	return res
+}
+
 // userSchedule returns a slice of session IDs bookmarked by a user.
 // It fetches data from Google Drive AppData folder associated with config.Google.Auth.Client.
 func userSchedule(c context.Context, uid string) ([]string, error) {
@@ -447,8 +480,33 @@ func unbookmarkSessions(c context.Context, uid string, ids ...string) ([]string,
 	return data.Bookmarks, nil
 }
 
+// scheduleLiveIDs returns a slice of all youtubeUrl field values where isLivestream == true.
+// Keynote element is always first, even if its youtubeUrl value is empty.
+func scheduleLiveIDs(c context.Context) ([]string, error) {
+	d, err := getLatestEventData(c, nil)
+	if err != nil {
+		return nil, err
+	}
+	if d.Sessions == nil {
+		return nil, nil
+	}
+	keyURL := ""
+	if s, ok := d.Sessions[keynoteID]; ok && s.IsLive {
+		keyURL = s.YouTube
+	}
+	res := []string{keyURL}
+	for id, s := range d.Sessions {
+		if id == keynoteID || !s.IsLive || s.YouTube == "" ||
+			strings.HasPrefix(s.YouTube, "http://") || strings.HasPrefix(s.YouTube, "https://") {
+			continue
+		}
+		res = append(res, s.YouTube)
+	}
+	return unique(res), nil
+}
+
 // unique removes duplicates from slice.
-// Original arg is not modified.
+// Original arg is not modified. Elements order is preserved.
 func unique(items []string) []string {
 	seen := make(map[string]bool, len(items))
 	res := make([]string, 0, len(items))

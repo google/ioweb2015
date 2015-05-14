@@ -326,6 +326,14 @@ IOWA.Elements = (function() {
 
     template.timezones = Object.keys(template.timezoneNames);
 
+    template.prettifyTimezone = function(zone) {
+      var z = template.timezoneNames[zone];
+      if (z && z.name) {
+        return moment.tz(z.name).zoneAbbr();
+      }
+      return zone;
+    };
+
     template.formatSessionTimeFilter = function(dateStr) {
       var date = new Date(dateStr);
       return date.toLocaleTimeString().replace(/:\d+ /, ' ');
@@ -352,6 +360,13 @@ IOWA.Elements = (function() {
         return tag ? tag.name : '';
       }, this);
       return list.join(', ');
+    };
+
+    template.toVideoIdFilter = function(youtubeUrl) {
+      if (!youtubeUrl) {
+        return youtubeUrl;
+      }
+      return youtubeUrl.replace(/https?:\/\/youtu\.be\//, '');
     };
 
     template.limit = function(array, howMany) {

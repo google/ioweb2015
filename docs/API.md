@@ -52,7 +52,7 @@ and may contain the following body:
 ```
 
 
-## API endpoints
+## V1 API endpoints
 
 Unless specified, endpoints do not require authentication.
 
@@ -236,6 +236,7 @@ Response body sample:
 * `details`: any/all session fields have changed.
 * `video`: `youtubeUrl` field is changed.
 * `start`: the session is about to start. this includes the keynote.
+* `soon`: the session starts in about 24 hours. currently only __keynote__.
 
 `videos` section contains other videos, potentially not related to sessions, e.g. dev bytes.
 
@@ -312,6 +313,136 @@ Some clients and/or server environments may not support request body for `DELETE
 A workaround is to provide `X-HTTP-Method-Override` header with the actual HTTP method.
 
 If both URL path and request body are used to specify session IDs, the latter takes precedence.
+
+
+### GET /api/v1/user/survey
+
+*Requires authentication*
+
+Retrieve session IDs which the user has already submitted the feedback survey for.
+
+```json
+[
+  "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+  "05012279-E037-46D1-AD91-C0892277B01B"
+]
+```
+
+
+### PUT /api/v1/user/survey/:session_id
+
+*Requires authentication*
+
+Submit session feedback survey.
+
+```json
+{
+  "overall": 5,
+  "relevance": 4,
+  "content": 4,
+  "speaker": 5,
+  "comment": "free text comment"
+}
+```
+
+Response is a list of all session IDs the user has submitted feedback for,
+including `:session_id`.
+
+```json
+[
+  "6D752F30-3EB9-4014-8281-CBD28FD33B5A",
+  "05012279-E037-46D1-AD91-C0892277B01B",
+  "newly-submitted-id"
+]
+```
+
+All fields are optional.
+Integer fields should be in the range from 1 to 5 where 5 is the highest rating.
+Feedback data for a session with the start timestamp greater than the request time will not be accepted.
+
+Successful submission is indicated by `201` response code.
+If the responses have already been submitted for the session, the backend responds
+with `400` status code. Such requests should not be retried by the client.
+
+
+
+## V2 API endpoints
+
+For missing endpoints use the previous version, v1.
+
+
+### GET /api/v2/user/notify
+
+*Requires authentication*
+
+Current notification state. Response body sample:
+
+```json
+{
+  "notify": true,
+  "endpoints": ["https://one", "https://two"],
+  "iostart": true,
+  "ioext": {
+    "name": "Amsterdam",
+    "lat": 52.37607,
+    "lng": 4.886114
+  }
+}
+```
+
+`ioext` will be `null` or not present at all if I/O Extended notifications are not enabled.
+
+
+### PUT /api/v2/user/notify
+
+*Requires authentication*
+
+* Toggle global notification state on/off: `notify`.
+* Add to the user's push subscription IDs list: `endpoint`.
+* Receive a notification about the start of I/O: `iostart`.
+* Subscribe/unsubscribe from "I/O Extended events near me": `ioext`.
+
+The start of I/O reminder is 1 day before the date.
+Session reminders are 10 min before the start time.
+Notifications about I/O Extended and any changes to the bookmarked sessions,
+including added videos, are sent immediately.
+
+```json
+{
+  "notify": true,
+  "endpoint": "https://push/notifications/endpoint",
+  "iostart": true,
+  "ioext": {
+    "name": "Amsterdam",
+    "lat": 52.37607,
+    "lng": 4.886114
+  }
+}
+```
+
+All fields are optional. Missing fields will remain unchanged.
+
+Endpoint is usually obtained from the [PushRegistration][push-api-reg].
+In a case of deprecated `registration_id` usage, it must be 'concatenated' with `endpoint`
+in the following way:
+
+If `registration_id` starts with `http(s)://...`, use it instead of endpoint.
+Otherwise:
+
+1. Append slash `/` to the URL path of `endpoint` if it doesn't end with one.
+2. Let `registration_id` be a relative URL, removing leading slash `/` if present.
+3. Resolve it using the URL obtained in the step 1 as the base.
+
+`ioext` will notify users about I/O Extended events happening within 80km of the specified location.
+To turn off these notifications, nullify the `ioext` field:
+
+```json
+{"ioext": null}
+```
+
+Note that `notify` always refers to the global notification state scoped to a user,
+not a specific `endpoint`.
+
 
 
 [signin-guide]: https://developers.google.com/identity/sign-in/web/server-side-flow

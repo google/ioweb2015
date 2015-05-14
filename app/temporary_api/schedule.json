@@ -52,7 +52,7 @@
       "description": "One in 5 people in the U.S. will have a disability in their lives. They want to be productive, creative and of course -- use your app. Technology has made more experiences, connections, and products available to people with disabilities but there is still room for improvement. With our talk we will help you to understand the experience of your app from the perspective of a user with accessibility needs. We will share best practices, pitfalls, and a step by step guide on how to use easy UX research techniques to improve the accessibility of your application. (Note: This Sandbox talk will be offered twice throughout the event. Check the schedule to confirm timings.)",
       "startTimestamp": "2015-05-28T19:30:00Z",
       "endTimestamp": "2015-05-28T20:00:00Z",
-      "isLivestream": true,
+      "isLivestream": false,
       "tags": [
         "THEME_DEVELOP&DESIGN",
         "TOPIC_ACCESSIBILITY",
@@ -65,7 +65,7 @@
       ],
       "room": "Lounge Talk (L2)",
       "photoUrl": "https://storage.googleapis.com/io2015-data.appspot.com/images/sessions/__w-200-400-600-800-1000__/9259a197-b6d4-e411-b87f-00155d5066d7.jpg",
-      "youtubeUrl": "4ZV54aJhues",
+      "youtubeUrl": "https://youtu.be/4ZV54aJhues",
       "hasRelated": false,
       "day": 28,
       "block": "12 PM",

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
 
@@ -22,7 +23,14 @@ const (
 	kindEventData   = "EventData"
 	kindChanges     = "Changes"
 	kindAppFolder   = "AppFolder"
+	kindNext        = "Next"
 )
+
+type eventDataCache struct {
+	Etag      string    `datastore:"-"`
+	Timestamp time.Time `datastore:"ts"`
+	Bytes     []byte    `datastore:"data"`
+}
 
 // RunInTransaction runs f in a transaction.
 // It calls f with a transaction context tc that f should use for all operations.
@@ -85,35 +93,35 @@ func storeUserPushInfo(c context.Context, p *userPush) error {
 	return err
 }
 
-// updateSubscriber replaces old registration rid with nreg.
+// updatePushEndpoint replaces old endpoint with the new URL nurl.
 // It must be run in a transactional context.
-// TODO: rid will be replaced with endpoint after Chrome 44.
-func updateSubscriber(c context.Context, uid, rid, nreg string) error {
+func updatePushEndpoint(c context.Context, uid, endpoint, nurl string) error {
 	pi, err := getUserPushInfo(c, uid)
 	if err != nil {
 		return err
 	}
-	for i, id := range pi.Subscribers {
-		if id == rid {
-			pi.Subscribers[i] = nreg
+	for i, e := range pi.Endpoints {
+		if e == endpoint {
+			pi.Endpoints[i] = nurl
 			return storeUserPushInfo(c, pi)
 		}
 	}
 	return nil
 }
 
-// deleteSubscriber removes registration rid from a list of user uid.
+// deletePushEndpoint removes endpoint from the list of push endpoints of user uid.
 // It must be run in a transactional context.
-// TODO: rid will be replaced with endpoint after Chrome 44.
-func deleteSubscriber(c context.Context, uid, rid string) error {
+func deletePushEndpoint(c context.Context, uid, endpoint string) error {
 	pi, err := getUserPushInfo(c, uid)
 	if err != nil {
 		return err
 	}
-	for i, id := range pi.Subscribers {
-		if id == rid {
-			pi.Subscribers = append(pi.Subscribers[:i], pi.Subscribers[i+1:]...)
+	for i, e := range pi.Endpoints {
+		if e == endpoint {
 			pi.Endpoints = append(pi.Endpoints[:i], pi.Endpoints[i+1:]...)
+			if i < len(pi.Subscribers) {
+				pi.Subscribers = append(pi.Subscribers[:i], pi.Subscribers[i+1:]...)
+			}
 			return storeUserPushInfo(c, pi)
 		}
 	}
@@ -177,22 +185,31 @@ func getLocalAppFolderMeta(c context.Context, uid string) (*appFolderData, error
 // All fields are unindexed except for d.modified.
 // Unexported fields other than d.modified are not stored.
 func storeEventData(c context.Context, d *eventData) error {
+	perr := prefixedErr("storeEventData")
 	var b bytes.Buffer
 	if err := gob.NewEncoder(&b).Encode(d); err != nil {
-		return err
+		return perr(err)
 	}
 	// TODO: handle a case where b.Bytes() is > 1Mb
-	ent := &struct {
-		Timestamp time.Time `datastore:"ts"`
-		Bytes     []byte    `datastore:"data"`
-	}{d.modified, b.Bytes()}
+	ent := &eventDataCache{
+		Timestamp: d.modified,
+		Bytes:     b.Bytes(),
+	}
 	key := datastore.NewIncompleteKey(c, kindEventData, eventDataParent(c))
-	_, err := datastore.Put(c, key, ent)
-	return err
+	key, err := datastore.Put(c, key, ent)
+	if err != nil {
+		return perr(err)
+	}
+	ent.Etag = hexKey(key)
+	// better safe than sorry
+	return cacheEventData(c, ent)
 }
 
-// clearEventData deletes all EventData entities.
+// clearEventData deletes all EventData entities and flushes cache.
 func clearEventData(c context.Context) error {
+	if err := cache.flush(c); err != nil {
+		return err
+	}
 	q := datastore.NewQuery(kindEventData).
 		Ancestor(eventDataParent(c)).
 		KeysOnly()
@@ -201,6 +218,23 @@ func clearEventData(c context.Context) error {
 		return fmt.Errorf("clearEventData: %v", err)
 	}
 	return datastore.DeleteMulti(c, keys)
+}
+
+func getCachedEventData(c context.Context) (*eventDataCache, error) {
+	b, err := cache.get(c, kindEventData)
+	if err != nil {
+		return nil, err
+	}
+	d := &eventDataCache{}
+	return d, gob.NewDecoder(bytes.NewReader(b)).Decode(d)
+}
+
+func cacheEventData(c context.Context, d *eventDataCache) error {
+	var b bytes.Buffer
+	if err := gob.NewEncoder(&b).Encode(d); err != nil {
+		return err
+	}
+	return cache.set(c, kindEventData, b.Bytes(), 1*time.Hour)
 }
 
 // getLatestEventData fetches most recent version of eventData previously saved with storeEventData().
@@ -212,32 +246,51 @@ func clearEventData(c context.Context) error {
 // This func guarantees for the returned eventData to have a non-zero value etag,
 // unless no entities exist in the datastore.
 func getLatestEventData(c context.Context, etags []string) (*eventData, error) {
-	q := datastore.NewQuery(kindEventData).
-		Ancestor(eventDataParent(c)).
-		Order("-ts").
-		Limit(1)
-
-	var res []*struct {
-		Timestamp time.Time `datastore:"ts"`
-		Bytes     []byte    `datastore:"data"`
-	}
-	keys, err := q.GetAll(c, &res)
+	res, err := getCachedEventData(c)
 	if err != nil {
-		return nil, err
+		q := datastore.NewQuery(kindEventData).
+			Ancestor(eventDataParent(c)).
+			Order("-ts").
+			Limit(1)
+		var dbres []*eventDataCache
+		keys, err := q.GetAll(c, &dbres)
+		if err != nil {
+			return nil, err
+		}
+		if len(keys) == 0 {
+			return &eventData{}, nil
+		}
+		res = dbres[0]
+		res.Etag = hexKey(keys[0])
+		if err := cacheEventData(c, res); err != nil {
+			errorf(c, "getLatestEventData: %v", err)
+		}
 	}
 
-	data := &eventData{}
-	if len(res) == 0 {
-		return data, nil
+	data := &eventData{
+		etag:     res.Etag,
+		modified: res.Timestamp,
 	}
-	data.etag = fmt.Sprintf("%x", md5.Sum([]byte(keys[0].String())))
-	data.modified = res[0].Timestamp
 	for _, t := range etags {
 		if data.etag == strings.Trim(t, `"`) {
 			return data, errNotModified
 		}
 	}
-	return data, gob.NewDecoder(bytes.NewReader(res[0].Bytes)).Decode(data)
+	return data, gob.NewDecoder(bytes.NewReader(res.Bytes)).Decode(data)
+}
+
+// getSessionByID returns the session from getLatestEventData() if it exists,
+// otherwise an error.
+func getSessionByID(c context.Context, id string) (*eventSession, error) {
+	d, err := getLatestEventData(c, nil)
+	if err != nil {
+		return nil, err
+	}
+	s, ok := d.Sessions[id]
+	if !ok {
+		err = datastore.ErrNoSuchEntity
+	}
+	return s, err
 }
 
 // storeChanges saves d in the datastore with auto-generated ID
@@ -304,6 +357,49 @@ func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
 	return changes, nil
 }
 
+// storeNextSessions saves IDs of items under kindNext entity kind,
+// keyed by "sessionID:eventSession.Update".
+func storeNextSessions(c context.Context, items []*eventSession) error {
+	pkey := nextSessionParent(c)
+	keys := make([]*datastore.Key, len(items))
+	for i, s := range items {
+		id := s.Id + ":" + s.Update
+		keys[i] = datastore.NewKey(c, kindNext, id, 0, pkey)
+	}
+	zeros := make([]struct{}, len(keys))
+	_, err := datastore.PutMulti(c, keys, zeros)
+	return err
+}
+
+// filterNextSessions queries kindNext entities and returns a subset of items
+// containing only the elements not present in the datastore, previously saved with
+// storeNextSessions().
+func filterNextSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
+	pkey := nextSessionParent(c)
+	keys := make([]*datastore.Key, len(items))
+	for i, s := range items {
+		id := s.Id + ":" + s.Update
+		keys[i] = datastore.NewKey(c, kindNext, id, 0, pkey)
+	}
+	zeros := make([]struct{}, len(keys))
+	err := datastore.GetMulti(c, keys, zeros)
+	merr, ok := err.(appengine.MultiError)
+	if !ok && err != nil {
+		return nil, err
+	}
+	res := make([]*eventSession, 0, len(keys))
+	for i, e := range merr {
+		if e == nil {
+			continue
+		}
+		if e != datastore.ErrNoSuchEntity {
+			return nil, err
+		}
+		res = append(res, items[i])
+	}
+	return res, nil
+}
+
 // eventDataParent returns a common ancestor for all kindEventData entities.
 func eventDataParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindEventData, "root", 0, nil)
@@ -312,4 +408,15 @@ func eventDataParent(c context.Context) *datastore.Key {
 // changesParent returns a common ancestor for all kindChanges entities.
 func changesParent(c context.Context) *datastore.Key {
 	return datastore.NewKey(c, kindChanges, "root", 0, nil)
+}
+
+// nextSessionParent returns a common ancestor for all kindNext session entities.
+func nextSessionParent(c context.Context) *datastore.Key {
+	return datastore.NewKey(c, kindNext, "session", 0, nil)
+}
+
+// hexKey returns a representation of a key k in base 16.
+// Useful for etags.
+func hexKey(k *datastore.Key) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(k.String())))
 }

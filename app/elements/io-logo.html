@@ -59,7 +59,7 @@ Fired when loading animation is complete.
 
 @event io-logo-animation-done
 -->
-<polymer-element name="io-logo" attributes="height width year page">
+<polymer-element name="io-logo" attributes="height width year page hideMasthead">
   <template>
     <link rel="stylesheet" href="io-logo.css">
     <div layout horizontal style="height:100%">
@@ -156,6 +156,16 @@ Fired when loading animation is complete.
      */
     backgroundTarget: null,
 
+    /**
+     * If true, the masthead background is hidden immediacy when the "I/O"
+     * animation is done.
+     *
+     * @property hideMasthead
+     * @type Boolean
+     * @default null
+     */
+    hideMasthead: false,
+
     ready: function() {
       this.heightChanged();
       this.widthChanged();
@@ -204,6 +214,10 @@ Fired when loading animation is complete.
       this.masthead = document.querySelector('.masthead');
       this.destination = document.querySelector('[iologodestination]');
       this.fab = document.querySelector('.fab:not([hidden])');
+
+      if (this.hideMasthead) {
+        this.backgroundTarget.style.opacity = 0;
+      }
 
       // If for some reason these animation elements are not in the DOM at this
       // point, wait for the auto-binding template to stamp them and retry.

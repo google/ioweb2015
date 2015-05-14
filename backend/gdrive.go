@@ -25,7 +25,7 @@ type appFolderData struct {
 	ExtKey    string   `json:"gcm_key" datastore:"-"`
 	Bookmarks []string `json:"starred_sessions" datastore:"-"`
 	Videos    []string `json:"viewed_videos" datastore:"-"`
-	Feedback  []string `json:"feedback_submitted_sessions" datastore:"-"`
+	Survey    []string `json:"feedback_submitted_sessions" datastore:"-"`
 }
 
 // getAppFolderData returns appfolder data of cred.userID, previously uploaded

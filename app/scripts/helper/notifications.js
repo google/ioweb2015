@@ -19,19 +19,17 @@ window.IOWA = window.IOWA || {};
 IOWA.Notifications = IOWA.Notifications || (function() {
   'use strict';
 
-  var NOTIFY_ENDPOINT = 'api/v1/user/notify';
+  var NOTIFY_ENDPOINT = 'api/v2/user/notify';
 
   /**
    * Globally enables push notifications for the current user, and passes along the browser's push
    * subscription id and endpoint value to the backend.
-   * @param {string} subscriptionId The subscription.subscriptionId value.
-   * @param {string} endpoint The subscription.endpoint value.
+   * @param {string} endpoint The endpoint value.
    * @return {Promise} Resolves with response body, or rejects with an error on HTTP failure.
    */
-  var enableNotificationsPromise_ = function(subscriptionId, endpoint) {
+  var enableNotificationsPromise_ = function(endpoint) {
     return IOWA.Request.xhrPromise('PUT', NOTIFY_ENDPOINT, true, {
       notify: true,
-      subscriber: subscriptionId,
       endpoint: endpoint
     });
   };
@@ -70,7 +68,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
     return navigator.serviceWorker.ready.then(function(registration) {
       return registration.pushManager.getSubscription();
     }).then(function(subscription) {
-      if (subscription && subscription.subscriptionId) {
+      if (subscription && subscription.endpoint) {
         return true;
       } else {
         return false;
@@ -92,11 +90,16 @@ IOWA.Notifications = IOWA.Notifications || (function() {
     }
 
     return navigator.serviceWorker.ready.then(function(registration) {
-      return registration.pushManager.subscribe();
+      return registration.pushManager.subscribe({userVisible: true});
     }).then(function(subscription) {
-      if (subscription && subscription.subscriptionId) {
+      if (subscription && subscription.endpoint) {
+        // See https://groups.google.com/a/chromium.org/d/msg/blink-dev/CK13omVO5ds/fR6sdPxsaasJ
+        var endpoint = subscription.endpoint;
+        if (subscription.subscriptionId && !endpoint.includes(subscription.subscriptionId)) {
+          endpoint += '/' + subscription.subscriptionId;
+        }
         // If subscribing succeeds, send the subscription to the server. Return a resolved promise.
-        return enableNotificationsPromise_(subscription.subscriptionId, subscription.endpoint);
+        return enableNotificationsPromise_(endpoint);
       } else {
         throw Error('Unable to subscribe due to an unknown error.');
       }
@@ -111,7 +114,7 @@ IOWA.Notifications = IOWA.Notifications || (function() {
     return navigator.serviceWorker.ready.then(function(registration) {
       return registration.pushManager.getSubscription();
     }).then(function(subscription) {
-      if (subscription && subscription.subscriptionId) {
+      if (subscription && subscription.endpoint) {
         return subscription.unsubscribe();
       }
     });

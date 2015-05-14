@@ -5,10 +5,12 @@ package main
 import (
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"sync"
 	"testing"
 
 	"appengine/aetest"
+	"appengine/user"
 )
 
 var (
@@ -77,4 +79,98 @@ func aetInstance(t *testing.T) aetest.Instance {
 	}
 	aetInst[t] = inst
 	return inst
+}
+
+func TestCheckAdmin(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
+	})
+
+	config.Whitelist = []string{"white@example.org"}
+	config.Admins = []string{"admin@example.org"}
+
+	table := []struct {
+		env   string
+		email string
+		code  int
+	}{
+		{"stage", "", http.StatusFound},
+		{"stage", "dude@example.org", http.StatusForbidden},
+		{"stage", "white@example.org", http.StatusForbidden},
+		{"stage", "admin@example.org", http.StatusOK},
+		{"prod", "", http.StatusFound},
+		{"prod", "dude@example.org", http.StatusForbidden},
+		{"prod", "white@example.org", http.StatusForbidden},
+		{"prod", "admin@example.org", http.StatusOK},
+	}
+	for _, test := range table {
+		config.Env = test.env
+		w := httptest.NewRecorder()
+		r := newTestRequest(t, "GET", "/", nil)
+		if test.email != "" {
+			aetest.Login(&user.User{Email: test.email}, r)
+		}
+		checkAdmin(h).ServeHTTP(w, r)
+
+		if w.Code != test.code {
+			t.Errorf("%s: w.Code = %d; want %d %s\nResponse: %s",
+				test.email, w.Code, test.code, w.Header().Get("location"), w.Body.String())
+		}
+		if w.Code == http.StatusOK && w.Body.String() != "ok" {
+			t.Errorf("w.Body = %s; want 'ok'", w.Body.String())
+		}
+	}
+}
+
+func TestCheckWhitelist(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
+	})
+
+	config.Whitelist = []string{"white@example.org"}
+	config.Admins = []string{"admin@example.org"}
+
+	table := []struct {
+		env   string
+		email string
+		code  int
+	}{
+		{"stage", "", http.StatusFound},
+		{"stage", "dude@example.org", http.StatusForbidden},
+		{"stage", "white@example.org", http.StatusOK},
+		{"stage", "admin@example.org", http.StatusOK},
+		{"prod", "", http.StatusFound},
+		{"prod", "dude@example.org", http.StatusForbidden},
+		{"prod", "white@example.org", http.StatusOK},
+		{"prod", "admin@example.org", http.StatusOK},
+	}
+	for _, test := range table {
+		config.Env = test.env
+		w := httptest.NewRecorder()
+		r := newTestRequest(t, "GET", "/io2015/admin/", nil)
+		if test.email != "" {
+			aetest.Login(&user.User{Email: test.email}, r)
+		}
+		checkWhitelist(h).ServeHTTP(w, r)
+
+		if w.Code != test.code {
+			t.Errorf("%s: w.Code = %d; want %d %s\nResponse: %s",
+				test.email, w.Code, test.code, w.Header().Get("location"), w.Body.String())
+		}
+		if w.Code == http.StatusOK && w.Body.String() != "ok" {
+			t.Errorf("w.Body = %s; want 'ok'", w.Body.String())
+		}
+	}
 }

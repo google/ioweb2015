@@ -17,7 +17,8 @@
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
   </core-toolbar>
 
-  <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}" fit></io-gallery>
+  <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}"
+              imagePath="media.image.url" active="{{photoGalleryActive}}" fit></io-gallery>
 
   <div class="active">
     <div class="card__container card__container--top slide-up">
@@ -26,15 +27,15 @@
           <h3>Google I/O is two days of inspirational talks, hands-on learning, and a chance to hear more about Google's latest developer products.</h3>
         </div>
         <div class="card-content">
-          <span class="anchor-like" role="link" tabindex="0" data-track-link="about-view-photos-card" on-tap="{{togglePhotoGallery}}">
-            <i18n-msg msgid="see-photos-2014">See photos from I/O 2014</i18n-msg>
-          </span>
+          <span class="anchor-like" role="link" tabindex="0" data-track-link="about-view-photos-card" on-tap="{{togglePhotoGallery}}">See real-time photos I/O 2015</span>
         </div>
       </div>
     </div>
 
     <div class="slide-up-delay">
-      <section class="page__section pics__section js-experiment-instrument" layout vertical>
+
+      <!-- TODO: put back for phase 4 -->
+      <!-- <section class="page__section pics__section js-experiment-instrument" layout vertical>
         <div layout horizontal>
           <div class="photo__about" flex two?="{{isDesktopSize}}"></div>
           <div layout vertical flex>
@@ -42,10 +43,15 @@
             <div class="photo__about--bottom" flex></div>
           </div>
         </div>
+        <div layout horizontal>
+          <div class="photo__about--top" flex></div>
+          <div class="photo__about--bottom" flex></div>
+          <div class="photo__about--bottom" flex></div>
+        </div>
         <div class="pics__section--under" layout horizontal>
           <div layout vertical flex>
-            <div class="photo__about--top"flex></div>
-            <div class="photo__about--bottom"flex></div>
+            <div class="photo__about--top" flex></div>
+            <div class="photo__about--bottom" flex></div>
           </div>
           <div class="photo__about" flex two></div>
         </div>
@@ -74,6 +80,76 @@
       <section id="hashtag" class="page__section bg-cyan js-experiment-instrument">
         <a href="//www.google.com/?#q=%23io15" target="_blank" data-track-link="about-hashtag-search"><div class="io__hash"></div></a>
       </section>
+      -->
+
+      <section class="page__section pics__section js-experiment-instrument" layout vertical>
+        <div layout horizontal>
+          <div class="photo__about" flex two?="{{isDesktopSize}}" relative>
+            <core-image placeholder="images/home/io-logo@2x.png"
+                        style="background-color:#00BCD4"
+                        sizing="cover" preload fade fit></core-image>
+          </div>
+          <div layout vertical flex>
+            <div class="photo__about--top" flex relative>
+              <core-image placeholder="images/home/io-logo@2x.png"
+                          style="background-color:#00ACC1"
+                          sizing="cover" preload fade fit></core-image>
+            </div>
+            <div class="photo__about--bottom" flex relative>
+              <core-image placeholder="images/home/io-logo@2x.png"
+                          style="background-color: #B2EBF2"
+                          sizing="cover" preload fade fit></core-image>
+            </div>
+          </div>
+        </div>
+        <div class="second__row" layout horizontal>
+          <div class="photo__about--top" flex relative>
+            <core-image placeholder="images/home/io-logo@2x.png"
+                        style="background-color:#4DD0E1"
+                        sizing="cover" preload fade fit></core-image>
+          </div>
+          <div class="photo__about--bottom" flex relative>
+            <core-image placeholder="images/home/io-logo@2x.png"
+                        style="background-color:#80DEEA"
+                        sizing="cover" preload fade fit></core-image>
+          </div>
+          <div class="photo__about--bottom" flex relative>
+            <core-image placeholder="images/home/io-logo@2x.png"
+                        style="background-color:#26C6DA"
+                        sizing="cover" preload fade fit></core-image>
+          </div>
+        </div>
+      </section>
+
+      <section id="join" class="page__section js-experiment-instrument js-experiment-instrument--no-bottom-margin bg-light-grey">
+        <h2><i18n-msg msgid="join-convo">Join the conversation now at #io15</i18n-msg></h2>
+        <div class="join__social" layout vertical end hidden?="{{isPhoneSize}}">
+          <a href="https://plus.google.com/+GoogleDevelopers" data-track-link="home-social-plus-google-developers" target="_blank">
+            +googledevelopers<core-icon icon="io:post-gplus"></core-icon>
+          </a>
+          <a href="https://twitter.com/googledevs" data-track-link="home-social-twitter-google-devs" target="_blank">
+            @googledevs<core-icon icon="io:post-twitter"></core-icon>
+          </a>
+        </div>
+
+        <div class="io__hash" aria-label="I/O hash tag"></div>
+
+        <social-poller url="api/v1/social" posts="{{socialPosts}}" interval="30000"></social-poller>
+
+        <template if="{{socialPosts.length >= 3}}">
+          <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
+            <template repeat="{{socialPost in socialPosts | limit(3)}}">
+              <social-post kind="{{socialPost.kind}}"
+                           author="{{socialPost.author}}"
+                           url="{{socialPost.url}}"
+                           text="{{socialPost.text}}"
+                           when="{{socialPost.when}}">
+              </social-post>
+            </template>
+          </div>
+        </template>
+      </section>
+
     </div>
   </div>
 
@@ -156,23 +232,57 @@
         return;
       }
 
-      var onPageTransitionDone_ = function(e) {
-        IOWA.Elements.Template.togglePhotoGallery(e);
+      page.onPageTransitionDone = function(e) {
+
+        // TODO: consider calling this periodically while the page is open.
+        // Don't want to be rate limited though :\
+        var setImages = function(photos) {
+          var images = Array.prototype.slice.call(
+              IOWA.Elements.Main.querySelectorAll('.pics__section core-image'));
+
+          var usedImages = [];
+
+          var update = function(images) {
+            var image = images.pop();
+            if (image) {
+              setTimeout(function() {
+                // Get a refresh image index every time.
+                var idx;
+                do {
+                  idx = Math.floor(Math.random() * photos.length)
+                } while (usedImages.indexOf(idx) != -1);
+
+                usedImages.push(idx);
+
+                image.src = photos[idx].media.image.url;
+
+                update(images);
+              }, 300);
+            }
+          };
+
+          update(images);
+        };
+
+        var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+        if (gallery.items.length) {
+          setImages(gallery.items);
+        } else {
+          IOWA.Picasa.fetchPhotos(0, function(photos) {
+            gallery.items = photos;
+            setImages(photos);
+          });
+        }
+
+        if (location.hash.substring(1) == 'photos') {
+          IOWA.Elements.Template.togglePhotoGallery(e);
+        }
       };
 
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.photoGalleryActive = false;
         IOWA.Elements.Template.fullscreenVideoActive = false;
-
-        if (location.hash.substring(1) == 'photos') {
-          document.addEventListener('page-transition-done', onPageTransitionDone_);
-        }
-      };
-
-      page.unload = function() {
-        // Remove listener. We don't want this code running on other pages' transition end.
-        document.removeEventListener('page-transition-done', onPageTransitionDone_);
       };
 
       IOWA.Elements.Template.closePhotoGallery = function(e, detail, sender) {
@@ -186,8 +296,7 @@
 
       IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
         if (sender && sender.hasAttribute('data-track-link')) {
-          IOWA.Analytics.trackEvent(
-              'link', 'click', sender.getAttribute('data-track-link'));
+          IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
         } else {
           IOWA.Analytics.trackEvent('link', 'click', 'about-photos-deeplink');
         }
@@ -204,11 +313,11 @@
 
           var gallery = IOWA.Elements.Main.querySelector('io-gallery');
           // Use cached photos.
-          if (gallery.photos.length) {
+          if (gallery.items.length) {
             galleryReady();
           } else {
             IOWA.Picasa.fetchPhotos(0, function(photos) {
-              gallery.photos = photos;
+              gallery.items = photos;
               galleryReady();
             });
           }

@@ -10,6 +10,7 @@ var (
 	errAuthInvalid   = errors.New("mismatched or malformed authorization")
 	errAuthMissing   = errors.New("authorization required")
 	errAuthTokenType = errors.New("invalid token type")
+	errBadData       = errors.New("malformed or otherwise invalid data")
 	errConflict      = errors.New("precondition or data conflict")
 	errNotFound      = errors.New("data not found")
 	errNotModified   = errors.New("content not modified")
@@ -34,6 +35,17 @@ func (pe *pushError) Error() string {
 func (pe *pushError) String() string {
 	return fmt.Sprintf("<pushError: retry=%v; remove=%v; after=%v; %s>",
 		pe.retry, pe.remove, pe.after, pe.msg)
+}
+
+// apiError is an error used by API handlers
+type apiError struct {
+	err  error
+	code int
+	msg  string
+}
+
+func (ae *apiError) Error() string {
+	return ae.msg
 }
 
 // prefixedErr returns a func that creates errors with the given prefix.

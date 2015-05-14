@@ -31,7 +31,7 @@
       <paper-dropdown class="dropdown" halign="right" duration="200">
         <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label" on-core-activate="{{selectTimezone}}">
           <template repeat="{{zone in timezones}}">
-            <paper-item label="{{zone}}">{{zone}}</paper-item>
+            <paper-item label="{{zone}}">{{zone | prettifyTimezone}}</paper-item>
           </template>
         </core-menu>
       </paper-dropdown>
@@ -47,6 +47,16 @@
               on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
   <div class="card__photo" relative>
+    <template if="{{startScheduleVideo && !selectedSession.isLivestream && selectedSession.youtubeUrl}}">
+      <google-youtube videoid="{{selectedSession.youtubeUrl | toVideoIdFilter}}" height="100%" width="100%" fit
+                      autohide="1" controls="2" modestbranding="1" showinfo="0"
+                      iv_load_policy="3" rel="0" autoplay="1"
+                      on-google-youtube-ready="{{onScheduleVideoReady}}"></google-youtube>
+    </template>
+    <div class="play__button__container" on-click="{{onVideoPlay}}" data-track-link="{{selectedSession.youtubeUrl}}"
+         hidden?="{{selectedSession.isLivestream || !selectedSession.youtubeUrl}}" layout vertical center-center fit>
+      <h4>Watch video</h4>
+    </div>
     <core-image src="{{selectedSession.photoUrl || 'images/schedule/session_placeholder.jpg'}}"
                 placeholder="images/io15-color.png"
                 sizing="cover" preload fade fit></core-image>
@@ -298,7 +308,7 @@
           <paper-dropdown class="dropdown" halign="right" duration="200">
             <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label">
               <template repeat="{{zone in timezones}}">
-                <paper-item label="{{zone}}">{{zone}}</paper-item>
+                <paper-item label="{{zone}}">{{zone | prettifyTimezone}}</paper-item>
               </template>
             </core-menu>
           </paper-dropdown>
@@ -328,6 +338,7 @@
     var SUBTAB_SELECTOR = '#subpage-tabs a';
     var pageIsDeepLinked_ = true;
     var ioScheduleEl = null;
+    var detailsPanel = null;
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
@@ -377,8 +388,13 @@
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.selectedSession = null;
         IOWA.Elements.Template.scheduleFetchingUserData = false;
+        IOWA.Elements.Template.startScheduleVideo = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
+        detailsPanel = detailsPanel || document.querySelector('.session__detail');
+
+        detailsPanel.querySelector('core-image').classList.remove('fadeout');
+        detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
@@ -399,8 +415,7 @@
         this.selectedSession = sessionOrEvent.detail ? sessionOrEvent.detail.session : sessionOrEvent;
 
         // Open paper-dialog.
-        var panel = IOWA.Elements.Main.querySelector('.session__detail');
-        panel.open();
+        detailsPanel.open();
       };
 
       IOWA.Elements.Template.toggleSaveSession = function(e, detail, sender) {
@@ -426,21 +441,29 @@
       };
 
       var sessionDetailsPopstateHandler = function(e) {
-        var panel = IOWA.Elements.Main.querySelector('.session__detail');
         ioScheduleEl.filters = getFiltersFromURL();
-        if (!panel.opened && IOWA.Elements.Template.selectedSession) {
-          panel.open();
+        if (!detailsPanel.opened && IOWA.Elements.Template.selectedSession) {
+          detailsPanel.open();
         } else {
-          panel.close();
+          detailsPanel.close();
         }
       };
 
       IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
         // Remove session id hash from URL.
+        var search = IOWA.Util.removeSearchParam(window.location.search, 'sid');
         var url = IOWA.Router.composeUrl(
-            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
-            '', window.location.search);
+            this.selectedPage, this.pages[this.selectedPage].selectedSubpage, '', search);
         history.replaceState({}, null, url);
+
+        // Reset video state.
+        var video = sender.querySelector('google-youtube')
+        if (video) {
+          video.pause();
+        }
+        sender.querySelector('core-image').classList.remove('fadeout');
+        sender.querySelector('.play__button__container').classList.remove('fadeout');
+        this.startScheduleVideo = false;
       };
 
       IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail, sender) {
@@ -449,9 +472,11 @@
 
         // Update URL with deep link if we're not from a deep link page load.
         if (pageIsDeepLinked_) {
+          var search = IOWA.Util.setSearchParam(
+              window.location.search, 'sid', this.selectedSession.id);
           var url = IOWA.Router.composeUrl(
               this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
-              this.selectedSession.id, window.location.search);
+              this.selectedSession.id, search);
           history.pushState({}, null, url);
         } else {
           pageIsDeepLinked_ = true;
@@ -489,6 +514,22 @@
             value: 'myschedule'
           }
         };
+      };
+
+      IOWA.Elements.Template.onScheduleVideoReady = function(e, detail, sender) {
+        detailsPanel.querySelector('core-image').classList.add('fadeout');
+        detailsPanel.querySelector('.play__button__container').classList.add('fadeout');
+      };
+
+      IOWA.Elements.Template.onVideoPlay = function(e, detail, sender) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.startScheduleVideo = true;
+
+        if (sender.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent('schedule', 'video play', sender.getAttribute('data-track-link'));
+        }
       };
 
       page.load(); // Run load callback on page load.

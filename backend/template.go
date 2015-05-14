@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"path"
 	"path/filepath"
@@ -24,8 +25,8 @@ const (
 	descExperiment = "Make music with instruments inspired by material design " +
 		"for #io15. Play, record and share."
 	// images for og:image meta tag
-	ogImageDefault    = "io15-color.png"
-	ogImageExperiment = "io15-experiment.png"
+	ogImageDefault    = "images/io15-color.png"
+	ogImageExperiment = "images/io15-experiment.png"
 
 	// templatesDir is the templates directory path relative to config.Dir.
 	templatesDir = "templates"
@@ -35,7 +36,10 @@ var (
 	// tmplFunc is a map of functions available to all templates.
 	tmplFunc = template.FuncMap{
 		"safeHTML":  func(v string) template.HTML { return template.HTML(v) },
+		"safeAttr":  safeHTMLAttr,
+		"json":      jsonForTemplate,
 		"canonical": canonicalURL,
+		"r":         resourceURL,
 	}
 	// tmplCache caches HTML templates parsed in parseTemplate()
 	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
@@ -58,6 +62,8 @@ type templateData struct {
 	OgTitle      string
 	OgImage      string
 	StartDateStr string
+	// livestream youtube video IDs
+	LiveIDs []string
 }
 
 // renderTemplate executes a template found in name.html file
@@ -79,6 +85,9 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	data.Slug = name
 	data.Prefix = config.Prefix
 	data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(time.RFC3339)
+	if v, err := scheduleLiveIDs(c); err == nil {
+		data.LiveIDs = v
+	}
 	if data.Desc == "" {
 		data.Desc = descDefault
 	}
@@ -101,14 +110,16 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 func parseTemplate(name string, partial bool) (*template.Template, error) {
 	var layout string
 	switch {
+	default:
+		layout = "layout_full.html"
+	case strings.HasPrefix(name, "embed"):
+		layout = ""
 	case strings.HasPrefix(name, "error_"):
 		layout = "layout_error.html"
 	case name == "upgrade":
 		layout = "layout_bare.html"
 	case partial:
 		layout = "layout_partial.html"
-	default:
-		layout = "layout_full.html"
 	}
 
 	key := name + layout
@@ -118,10 +129,15 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 		return t, nil
 	}
 
-	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(config.Dir, templatesDir, layout),
-		filepath.Join(config.Dir, templatesDir, name+".html"),
-	)
+	name += ".html"
+	tname := name
+	tfiles := []string{filepath.Join(config.Dir, templatesDir, name)}
+	if layout != "" {
+		tname = layout
+		tfiles = append([]string{filepath.Join(config.Dir, templatesDir, layout)}, tfiles...)
+	}
+
+	t, err := template.New(tname).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(tfiles...)
 	if err != nil {
 		return nil, err
 	}
@@ -147,4 +163,41 @@ func canonicalURL(p string) string {
 		return config.Prefix + "/"
 	}
 	return path.Join(config.Prefix, p)
+}
+
+// resourceURL returns absolute path to a resource referenced by parts.
+// For instance, given config.Prefix = "/myprefix", resourceURL("images", "img.jpg")
+// returns "/myprefix/images/img.jpg".
+// If the first part starts with http(s)://, it is the returned value.
+func resourceURL(parts ...string) string {
+	lp := strings.ToLower(parts[0])
+	if strings.HasPrefix(lp, "http://") || strings.HasPrefix(lp, "https://") {
+		return parts[0]
+	}
+	p := strings.Join(parts, "/")
+	if !strings.HasPrefix(p, config.Prefix) {
+		p = config.Prefix + "/" + p
+	}
+	return path.Clean(p)
+}
+
+// jsonForTemplate converts v into a JSON string.
+// It returns zero-value string in case of an error.
+func jsonForTemplate(v interface{}) string {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return ""
+	}
+	return string(b)
+}
+
+// safeHTMLAttr returns the attribute an HTML element as k=v.
+// If v contains double quotes "", the attribute value will be wrapped
+// in single quotes '', and vice versa. Defaults to double quotes.
+func safeHTMLAttr(k, v string) template.HTMLAttr {
+	q := `"`
+	if strings.ContainsRune(v, '"') {
+		q = "'"
+	}
+	return template.HTMLAttr(k + "=" + q + v + q)
 }

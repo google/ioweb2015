@@ -44,17 +44,15 @@ func storeUserPushInfo(c context.Context, p *userPush) error {
 	return nil
 }
 
-// updateSubscriber replaces old registration rid with nreg.
+// updatePushEndpoint replaces old endpoint with the new URL nurl.
 // It must be run in a transactional context.
-// TODO: rid will be replaced with endpoint after Chrome 44.
-func updateSubscriber(c context.Context, uid, rid, nreg string) error {
+func updatePushEndpoint(c context.Context, uid, endpoint, nurl string) error {
 	return errors.New("not implemented")
 }
 
-// deleteSubscriber removes registration rid from a list of user uid.
+// deletePushEndpoint removes endpoint from the list of push endpoints of user uid.
 // It must be run in a transactional context.
-// TODO: rid will be replaced with endpoint after Chrome 44.
-func deleteSubscriber(c context.Context, uid, rid string) error {
+func deletePushEndpoint(c context.Context, uid, endpoint string) error {
 	return errors.New("not implemented")
 }
 
@@ -94,6 +92,10 @@ func getLatestEventData(c context.Context, etags []string) (*eventData, error) {
 	return nil, errors.New("not implemented")
 }
 
+func getSessionByID(c context.Context, id string) (*eventSession, error) {
+	return nil, errors.New("not implemented")
+}
+
 func storeChanges(c context.Context, d *dataChanges) error {
 	return errors.New("not implemented")
 }
@@ -105,5 +107,18 @@ func storeChanges(c context.Context, d *dataChanges) error {
 // At most 1000 changes will be returned.
 // Resulting dataChanges.Changed time will be set to the most recent one.
 func getChangesSince(c context.Context, t time.Time) (*dataChanges, error) {
+	return nil, errors.New("not implemented")
+}
+
+// storeNextSessions saves IDs of items under kindNext entity kind,
+// keyed by "sessionID:eventSession.Update".
+func storeNextSessions(c context.Context, items []*eventSession) error {
+	return errors.New("not implemented")
+}
+
+// filterNextSessions queries kindNext entities and returns a subset of items
+// containing only the elements not present in the datastore, previously saved with
+// storeNextSessions().
+func filterNextSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
 	return nil, errors.New("not implemented")
 }

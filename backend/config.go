@@ -40,6 +40,8 @@ type appConfig struct {
 
 	// User emails allowed in staging
 	Whitelist []string
+	// App admins
+	Admins []string
 	// I/O Extended events feed
 	IoExtFeedURL string `json:"ioExtFeedUrl"`
 	// Endpoint to ping external/extra parties about certain updates
@@ -92,6 +94,41 @@ type appConfig struct {
 		Location    *time.Location
 		ManifestURL string `json:"manifest"`
 	} `json:"schedule"`
+
+	// Feedback survey settings
+	Survey struct {
+		ID       string `json:"id"`
+		Endpoint string `json:"endpoint"`
+		Key      string `json:"key"`
+		Code     string `json:"code"`
+		Reg      string `json:"reg"`
+		// Session IDs map
+		Smap map[string]string
+		// Don't accept feedback for these sessions
+		Disabled []string
+		// Question answers map
+		Qmap struct {
+			Q1 struct {
+				Name    string
+				Answers []string
+			}
+			Q2 struct {
+				Name    string
+				Answers []string
+			}
+			Q3 struct {
+				Name    string
+				Answers []string
+			}
+			Q4 struct {
+				Name    string
+				Answers []string
+			}
+			Q5 struct {
+				Name string
+			}
+		}
+	} `json:"survey"`
 }
 
 // initConfig reads server config file into the config global var.
@@ -115,12 +152,21 @@ func initConfig(configPath, addr string) error {
 		config.Prefix = "/" + config.Prefix
 	}
 	sort.Strings(config.Whitelist)
+	sort.Strings(config.Admins)
+	sort.Strings(config.Survey.Disabled)
+	if config.Survey.Smap == nil {
+		config.Survey.Smap = make(map[string]string)
+	}
 	return nil
 }
 
 // isWhitelisted returns true if either email or its domain
 // is in the config.Whitelist.
+// All admins are whitelisted.
 func isWhitelisted(email string) bool {
+	if isAdmin(email) {
+		return true
+	}
 	i := sort.SearchStrings(config.Whitelist, email)
 	if i < len(config.Whitelist) && config.Whitelist[i] == email {
 		return true
@@ -133,4 +179,15 @@ func isWhitelisted(email string) bool {
 	}
 	// check the @domain of this email
 	return isWhitelisted(email[i:])
+}
+
+// isAdmin returns true if email is in config.Admins.
+// It doesn't test for email's @domain address; only complete emails will match.
+// All users are admins on dev server.
+func isAdmin(email string) bool {
+	if isDev() {
+		return true
+	}
+	i := sort.SearchStrings(config.Admins, email)
+	return i < len(config.Admins) && config.Admins[i] == email
 }

@@ -22,15 +22,19 @@ func pingUserAsync(c context.Context, uid string, skeys []string) error {
 }
 
 // pingDevicesAsync schedules len(endpoints) tasks of /ping-device.
-// If scheduling fails for some endpoints, those will be in returned values
-// along with a non-nil error.
 // d specifies the duration the tasker must wait before executing the task.
-// TODO: regs are going away with Chrome 44.
-func pingDevicesAsync(c context.Context, uid string, regs, endpoints []string, d time.Duration) ([]string, []string, error) {
-	return nil, nil, errors.New("not implemented")
+// If scheduling fails for some endpoints, those will be in the returned values
+// along with a non-nil error.
+func pingDevicesAsync(c context.Context, uid string, endpoints []string, d time.Duration) ([]string, error) {
+	return nil, errors.New("not implemented")
 }
 
 // pingExtPartyAsync notifies extra parties at config.ExtPingURL about data updates.
 func pingExtPartyAsync(c context.Context, key string) error {
+	return errors.New("not implemented")
+}
+
+// submitSessionSurveyAsync schedules an async job to submit feedback survey s for session sid.
+func submitSessionSurveyAsync(c context.Context, sid string, s *sessionSurvey) error {
 	return errors.New("not implemented")
 }
