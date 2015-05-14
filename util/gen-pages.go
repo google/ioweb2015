@@ -13,6 +13,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -22,11 +23,14 @@ var (
 
 	// metaTemplates defines which templates go into a page meta as string values.
 	metaTemplates = []string{"title", "mastheadBgClass", "defaultSubpage", "selectedSubpage"}
+	// these are treated separately
+	skipFiles = []string{"embed.html"}
 )
 
 type pageMeta map[string]interface{}
 
 func main() {
+	sort.Strings(skipFiles)
 	pages := make(map[string]pageMeta)
 
 	err := filepath.Walk(*templatesRoot, func(p string, fi os.FileInfo, err error) error {
@@ -36,7 +40,7 @@ func main() {
 		if fi.IsDir() && (fi.Name() == "debug" || fi.Name() == "admin") {
 			return filepath.SkipDir
 		}
-		if p == *templatesRoot || fi.IsDir() {
+		if p == *templatesRoot || fi.IsDir() || ignoreFile(fi.Name()) {
 			return nil
 		}
 		ext := filepath.Ext(p)
@@ -75,4 +79,9 @@ func metaFromTemplate(t *template.Template) pageMeta {
 		m[n] = b.String()
 	}
 	return m
+}
+
+func ignoreFile(name string) bool {
+	i := sort.SearchStrings(skipFiles, name)
+	return i < len(skipFiles) && skipFiles[i] == name
 }

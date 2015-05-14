@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"path"
 	"path/filepath"
@@ -35,6 +36,8 @@ var (
 	// tmplFunc is a map of functions available to all templates.
 	tmplFunc = template.FuncMap{
 		"safeHTML":  func(v string) template.HTML { return template.HTML(v) },
+		"safeAttr":  safeHTMLAttr,
+		"json":      jsonForTemplate,
 		"canonical": canonicalURL,
 		"r":         resourceURL,
 	}
@@ -59,6 +62,8 @@ type templateData struct {
 	OgTitle      string
 	OgImage      string
 	StartDateStr string
+	// livestream youtube video IDs
+	LiveIDs []string
 }
 
 // renderTemplate executes a template found in name.html file
@@ -102,14 +107,16 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 func parseTemplate(name string, partial bool) (*template.Template, error) {
 	var layout string
 	switch {
+	default:
+		layout = "layout_full.html"
+	case strings.HasPrefix(name, "embed"):
+		layout = ""
 	case strings.HasPrefix(name, "error_"):
 		layout = "layout_error.html"
 	case name == "upgrade":
 		layout = "layout_bare.html"
 	case partial:
 		layout = "layout_partial.html"
-	default:
-		layout = "layout_full.html"
 	}
 
 	key := name + layout
@@ -119,10 +126,15 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 		return t, nil
 	}
 
-	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(config.Dir, templatesDir, layout),
-		filepath.Join(config.Dir, templatesDir, name+".html"),
-	)
+	name += ".html"
+	tname := name
+	tfiles := []string{filepath.Join(config.Dir, templatesDir, name)}
+	if layout != "" {
+		tname = layout
+		tfiles = append([]string{filepath.Join(config.Dir, templatesDir, layout)}, tfiles...)
+	}
+
+	t, err := template.New(tname).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(tfiles...)
 	if err != nil {
 		return nil, err
 	}
@@ -164,4 +176,25 @@ func resourceURL(parts ...string) string {
 		p = config.Prefix + "/" + p
 	}
 	return path.Clean(p)
+}
+
+// jsonForTemplate converts v into a JSON string.
+// It returns zero-value string in case of an error.
+func jsonForTemplate(v interface{}) string {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return ""
+	}
+	return string(b)
+}
+
+// safeHTMLAttr returns the attribute an HTML element as k=v.
+// If v contains double quotes "", the attribute value will be wrapped
+// in single quotes '', and vice versa. Defaults to double quotes.
+func safeHTMLAttr(k, v string) template.HTMLAttr {
+	q := `"`
+	if strings.ContainsRune(v, '"') {
+		q = "'"
+	}
+	return template.HTMLAttr(k + "=" + q + v + q)
 }
