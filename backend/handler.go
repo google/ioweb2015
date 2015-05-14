@@ -639,6 +639,11 @@ func serveUserUpdates(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeJSONError(c, w, http.StatusInternalServerError, err)
 	}
+	logsess := make([]string, 0, len(dc.Sessions))
+	for k := range dc.Sessions {
+		logsess = append(logsess, k)
+	}
+	logf(c, "sending %d updated sessions to user %s: %s", len(logsess), user, strings.Join(logsess, ", "))
 	if err := json.NewEncoder(w).Encode(dc); err != nil {
 		errorf(c, "serveUserUpdates: encode resp: %v", err)
 	}
