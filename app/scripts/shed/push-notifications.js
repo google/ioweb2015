@@ -208,7 +208,7 @@
     // tag, so there's no use sending multiple notifications with the same tag. Instead, create
     // one notification that has the list of all the sessions starting soon.
     return {
-      title: 'Some events in My Schedule are starting',
+      title: 'Session reminder',
       body: body,
       icon: DEFAULT_ICON,
       tag: 'session-start'
