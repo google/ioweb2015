@@ -315,7 +315,7 @@ func TestServeEmbed(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	serveEmbed(w, r)
+	serveTemplate(w, r)
 	if w.Code != http.StatusOK {
 		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
 	}

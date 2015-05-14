@@ -41,7 +41,6 @@ var (
 func registerHandlers() {
 	// HTML
 	handle("/", rootHandleFn)
-	handle("/embed", serveEmbed)
 	// API v0 - pre-phase2
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
@@ -183,21 +182,6 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		errorf(c, "renderTemplate(%q): %v", tplname, err)
 	}
-}
-
-// serveEmbed responds with the embed gadget HTML.
-func serveEmbed(w http.ResponseWriter, r *http.Request) {
-	c := newContext(r)
-	data := &templateData{}
-	if v, err := scheduleLiveIDs(c); err == nil {
-		data.LiveIDs = v
-	}
-	b, err := renderTemplate(c, "embed", false, data)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-	w.Write(b)
 }
 
 // serveIOExtEntries responds with I/O extended entries in JSON format.
