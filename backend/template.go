@@ -85,6 +85,9 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	data.Slug = name
 	data.Prefix = config.Prefix
 	data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(time.RFC3339)
+	if v, err := scheduleLiveIDs(c); err == nil {
+		data.LiveIDs = v
+	}
 	if data.Desc == "" {
 		data.Desc = descDefault
 	}
