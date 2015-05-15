@@ -88,9 +88,6 @@ type eventVideo struct {
 	Topic    string `json:"topic,omitempty"`
 	Speakers string `json:"speakers,omitempty"`
 	Thumb    string `json:"thumbnailUrl,omitempty"`
-	// TODO: past_video_library has it as string,
-	//       while video_library is int.
-	Year int `json:"year"`
 }
 
 type eventRoom struct {
@@ -596,4 +593,50 @@ func thumbURL(turl string) string {
 	}
 	k += j
 	return turl[:i] + "w" + turl[i+imageURLSizeMarkerLen:j] + turl[k:]
+}
+
+// sortedSessionsList implements sort.Sort ordering items by:
+//   - start time
+//   - end time
+//   - title
+type sortedSessionsList []*eventSession
+
+func (l sortedSessionsList) Len() int {
+	return len(l)
+}
+
+func (l sortedSessionsList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
+}
+
+func (l sortedSessionsList) Less(i, j int) bool {
+	a, b := l[i], l[j]
+	if a.StartTime.Before(b.StartTime) {
+		return true
+	}
+	if a.StartTime.After(b.StartTime) {
+		return false
+	}
+	if a.EndTime.Before(b.EndTime) {
+		return true
+	}
+	if a.EndTime.After(b.EndTime) {
+		return false
+	}
+	return a.Title < b.Title
+}
+
+// sortedSessionsList implements sort.Sort ordering items by title
+type sortedVideosList []*eventVideo
+
+func (l sortedVideosList) Len() int {
+	return len(l)
+}
+
+func (l sortedVideosList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
+}
+
+func (l sortedVideosList) Less(i, j int) bool {
+	return l[i].Title < l[j].Title
 }
