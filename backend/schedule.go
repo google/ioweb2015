@@ -421,7 +421,7 @@ func compareSessions(a, b *eventSession) bool {
 		return true
 	}
 	// compare for 'video' updates, but only for past sessions
-	if time.Now().Before(b.EndTime) || ob.IsLive == a.IsLive && ob.YouTube == a.YouTube {
+	if now.Before(b.EndTime) || ob.IsLive == a.IsLive && ob.YouTube == a.YouTube {
 		return false
 	}
 	// either IsLive or YouTube is changed, or both
