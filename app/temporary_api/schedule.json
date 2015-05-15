@@ -6376,5 +6376,31 @@
       "name": "Sessions",
       "category": "TYPE"
     }
-  }
+  },
+  "video_library": [
+    {
+      "thumbnailUrl": "http://img.youtube.com/vi/naf_WbtFAlY/hqdefault.jpg",
+      "id": "naf_WbtFAlY",
+      "title": "Fullscreen Apps for Android Wear",
+      "desc": "Learn how to write beautiful apps outside the stream on Android Wear, with a focus on how users leave apps and how to design for a round screen.",
+      "topic": "Android",
+      "speakers": "Michael Kolb, Will Brown"
+    },
+    {
+      "thumbnailUrl": "http://img.youtube.com/vi/5MnhFmFDLj8/hqdefault.jpg",
+      "id": "5MnhFmFDLj8",
+      "title": "Map Up your Apps!",
+      "desc": "Interested in adding Google Maps to your mobile apps but needing inspiration? Did you know that you can now add Street View to your apps too? Come and see how incorporating maps into your app can delight your users! We'll show you some exciting uses of the Google Maps Mobile APIs and describe the functionality available in the APIs as we go.",
+      "topic": "Tools",
+      "speakers": "Megan  Boundey"
+    },
+    {
+      "thumbnailUrl": "http://img.youtube.com/vi/Eh2adsAyTKc/hqdefault.jpg",
+      "id": "Eh2adsAyTKc",
+      "title": "Succeeding in Education Technology",
+      "desc": "Inspirational ways of using technology in the classroom. Examples of great apps, cool data-visualizations, etc. Developer perspective (guest speaker i.e. CEO Socrative - 10 min block) on the nuances of developing for EDU, tips & traps.",
+      "topic": "Android",
+      "speakers": "Shazia Makhdumi"
+    }
+  ]
 }
