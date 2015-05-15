@@ -62,6 +62,7 @@ $playButtonHeightWidth: 40px;
 }
 
 core-list {
+  height: 100%;
   .item {
     padding: 0 3px; // leave space for box shadow.
   }
