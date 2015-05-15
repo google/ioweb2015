@@ -45,15 +45,15 @@
 
     <div class="videolist__wrapper" layout vertical flex two relative>
 
-      <core-list data="{{filteredVideoList}}" selectionEnabled="false" height="600" fit>
+      <core-list data="{{filteredVideoList | formatVideoTypeFilter(selectedVideoType)}}" selectionEnabled="false" height="600" fit>
         <template>
           <div class="item">
             <div class="card card__video js-experiment-visualizer"
-                 data-videoid="{{filteredVideoList[index].id}}"
-                 data-videoimg="{{filteredVideoList[index].thumbnailUrl}}"
+                 data-videoid="{{filteredVideoList[index].youtubeUrl || filteredVideoList[index].id}}"
+                 data-videoimg="{{filteredVideoList[index].thumbnailUrl || filteredVideoList[index].photoUrl}}"
                  on-tap="{{openVideo}}">
               <div class="card__photo" relative>
-                <core-image src="{{filteredVideoList[index].thumbnailUrl}}"
+                <core-image src="{{filteredVideoList[index].thumbnailUrl || filteredVideoList[index].photoUrl}}"
                             load?="{{!!filteredVideoList[index]}}" sizing="cover" preload
                             placeholder="images/io15-color.png" fade fit></core-image>
               </div>
@@ -61,7 +61,7 @@
                 <img src="images/play-video-button.png"
                      class="play__button play__button--card" title="Play video" alt="Play video">
                 <div class="video-title" title="{{filteredVideoList[index].title}}">{{filteredVideoList[index].title}}&nbsp;</div>
-                <div class="video-author" hidden?="{{!filteredVideoList[index].speakers}}">{{filteredVideoList[index].speakers}}&nbsp;</div>
+                <div class="video-author" hidden?="{{!filteredVideoList[index].speakers}}">{{filteredVideoList[index].speakers | speakerIdsToNameString}}&nbsp;</div>
               </div>
             </div>
           </div>
@@ -73,9 +73,9 @@
 
     <paper-dropdown-menu label="Filter" class="card--filters" hidden?="{{!isPhoneSize}}">
       <paper-dropdown valign="top" halign="left" class="dropdown">
-        <core-menu class="menu" selected="0">
-          <paper-item>DevBytes</paper-item>
-          <paper-item disabled>Sessions</paper-item>
+        <core-menu class="menu" selected="{{selectedVideoType}}" valueattr="label">
+          <paper-item label="DevBytes">DevBytes</paper-item>
+          <paper-item label="Sessions" disabled?="{{!hasSessionVideos}}">Sessions</paper-item>
         </core-menu>
       </paper-dropdown>
     </paper-dropdown-menu>
@@ -87,9 +87,11 @@
       <div class="card-content">
 
         <div class="filter-rows">
-          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
-            <paper-radio-button layout horizontal center name="DevBytes" label="DevBytes" checked></paper-radio-button>
-            <paper-radio-button layout horizontal center name="Sessions" label="Sessions" disabled></paper-radio-button>
+          <paper-radio-group id="filter-videotype" layout vertical selected="{{selectedVideoType}}">
+            <paper-radio-button layout horizontal center name="DevBytes"
+                                label="DevBytes"></paper-radio-button>
+            <paper-radio-button layout horizontal center name="Sessions" label="Sessions"
+                                disabled?="{{!hasSessionVideos}}"></paper-radio-button>
           </paper-radio-group>
         </div>
 
@@ -132,20 +134,6 @@
 <script>
 (function() {
 
-  function onPageTransitionDone_(e) {
-    // Remove listener. We don't want this code running on other pages' transition end.
-    document.removeEventListener('page-transition-done', onPageTransitionDone_);
-
-    IOWA.Schedule.schedulePromise().then(function(scheduleData) {
-      var lib = scheduleData.video_library;
-      if (lib) {
-        var videos = Object.keys(lib).map(function(key) { return lib[key]; });
-        IOWA.Elements.Template.videoList = videos;
-        IOWA.Elements.Template.filteredVideoList = videos;
-      }
-    });
-  }
-
   // Page-specific JS that runs when this page is loaded for the first time.
   function initPage() {
     var page = IOWA.Elements.Template.pages['videos'];
@@ -157,14 +145,35 @@
     page.load = function() {
       // Reset template variables for when revisiting the page.
       IOWA.Elements.Template.mastheadVideoActive = false;
+      IOWA.Elements.Template.hasSessionVideos = false;
+      IOWA.Elements.Template.selectedVideoType = 'DevBytes';
       IOWA.Elements.Template.filteredVideoList = IOWA.Elements.Template.videoList; // reset filter.
 
       // Bomb out early and don't re-fetch videos when navigating back to this page.
       if (IOWA.Elements.Template.videoList.length) {
         return;
       }
+    };
 
-      document.addEventListener('page-transition-done', onPageTransitionDone_);
+    page.onPageTransitionDone = function() {
+      IOWA.Schedule.schedulePromise().then(function(scheduleData) {
+        var videoList = scheduleData.sessions.filter(function(session) {
+          return !session.isLivestream && session.youtubeUrl;
+        });
+
+        IOWA.Elements.Template.hasSessionVideos = videoList.length;
+
+        var lib = scheduleData.video_library;
+        if (lib) {
+          videoList = lib.concat(videoList);
+        }
+
+        if (videoList.length) {
+          var videos = Object.keys(videoList).map(function(key) { return videoList[key]; });
+          IOWA.Elements.Template.videoList = videos;
+          IOWA.Elements.Template.filteredVideoList = videos;
+        }
+      });
     };
 
     IOWA.Elements.Template.closeMastheadVideo = function(e, detail, sender) {
@@ -180,6 +189,7 @@
 
     IOWA.Elements.Template.onVideoFilter = function(e, detail, sender) {
       e.stopPropagation();
+
       if (detail.isSelected) {
         if (sender.selected == 'All') {
           this.filteredVideoList = this.videoList;
@@ -188,7 +198,7 @@
 
         var videos = IOWA.Elements.Template.videoList;
         this.filteredVideoList = videos.filter(function(item) {
-          return item.topic === sender.selected;
+          return item.topic === sender.selected || item.filters[sender.selected];
         });
       }
     };

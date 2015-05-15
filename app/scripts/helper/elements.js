@@ -362,11 +362,36 @@ IOWA.Elements = (function() {
       return list.join(', ');
     };
 
+    template.speakerIdsToNameString = function(speakers) {
+      if (!speakers) {
+        return '';
+      }
+      if (typeof speakers === 'string') {
+        return speakers; // speakers is already a "," separated string.
+      }
+      return speakers.map(function(speakerId) {
+        return this.scheduleData.speakers[speakerId].name;
+      }.bind(this)).join(', ');
+    };
+
     template.toVideoIdFilter = function(youtubeUrl) {
       if (!youtubeUrl) {
         return youtubeUrl;
       }
       return youtubeUrl.replace(/https?:\/\/youtu\.be\//, '');
+    };
+
+    template.formatVideoTypeFilter = function(videoList, type) {
+      switch (type) {
+        case 'Sessions':
+          return videoList.filter(function(item) {
+            return item.youtubeUrl;
+          });
+        case 'DevBytes':
+          return videoList.filter(function(item) {
+            return !item.filters; // DevBytes won't have filters.
+          });
+      }
     };
 
     template.limit = function(array, howMany) {
@@ -491,7 +516,10 @@ IOWA.Elements = (function() {
       this.currentCard = sender;
       this.fullscreenVideoActive = true; // Active the placeholder template.
 
-      IOWA.Analytics.trackEvent('video', 'watch', sender.getAttribute('data-videoid'));
+      // Note: IE10 doesn't support .dataset.
+      var videoId = this.toVideoIdFilter(sender.getAttribute('data-videoid'));
+
+      IOWA.Analytics.trackEvent('video', 'watch', videoId);
 
       // Wait one rAF for template to have stamped.
       this.async(function() {
@@ -499,7 +527,7 @@ IOWA.Elements = (function() {
         var video = videoContainer.querySelector('google-youtube');
 
         video.addEventListener('google-youtube-ready', function(e) {
-          video.videoid = sender.getAttribute('data-videoid'); // IE10 doesn't support .dataset.
+          video.videoid = videoId;
           this.cardVideoTakeover(this.currentCard);
         }.bind(this));
 
