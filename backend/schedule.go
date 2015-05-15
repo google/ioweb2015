@@ -340,7 +340,6 @@ func slurpEventDataChunk(c context.Context, hc *http.Client, url string) (*event
 // It compares only Sessions, Speakers and Videos of eventData.
 // The result is a subset of b or nil if a is empty.
 // Side effects: Update field of b.Session elements may be modified;
-// Tags and Speakers fields will be assigned nil if len() == 0.
 func diffEventData(a, b *eventData) *dataChanges {
 	if isEmptyEventData(a) {
 		return nil
@@ -358,24 +357,8 @@ func diffEventData(a, b *eventData) *dataChanges {
 		if !ok {
 			continue
 		}
-		if len(as.Speakers) == 0 {
-			as.Speakers = nil
-		}
-		if len(as.Tags) == 0 {
-			as.Tags = nil
-		}
-		if len(bs.Speakers) == 0 {
-			bs.Speakers = nil
-		}
-		if len(bs.Tags) == 0 {
-			bs.Tags = nil
-		}
-		if !reflect.DeepEqual(as, bs) {
+		if compareSessions(as, bs) {
 			dc.Sessions[id] = bs
-			bs.Update = updateDetails
-			if as.YouTube != bs.YouTube && bs.YouTube != "" {
-				bs.Update = updateVideo
-			}
 		}
 	}
 	for id, bs := range b.Speakers {
@@ -389,6 +372,65 @@ func diffEventData(a, b *eventData) *dataChanges {
 		}
 	}
 	return dc
+}
+
+// compareSessions compares eventSession fields of a to those of b.
+// It returns true and modifies b.Update field if the two args have different field values.
+//
+// While most of the fields are compared with reflect.DeepEqual,
+// IsLive and YouTube fields are treated separately. They are compared
+// only when b.EndTime is in the past w.r.t. current system time.
+//
+// Side effect: a.Speakers and a.Tags will be assigned nil if their len() == 0.
+func compareSessions(a, b *eventSession) bool {
+	// save originals
+	ob := *b
+	defer func() {
+		// restore all b's field from ob except .Update
+		up := b.Update
+		*b = ob
+		b.Update = up
+	}()
+
+	// normalize slices
+	if len(a.Speakers) == 0 {
+		a.Speakers = nil
+	}
+	if len(a.Tags) == 0 {
+		a.Tags = nil
+	}
+	if len(b.Speakers) == 0 {
+		b.Speakers = nil
+	}
+	if len(b.Tags) == 0 {
+		b.Tags = nil
+	}
+
+	now := time.Now()
+	// don't care about start/end time for past sessions
+	if now.After(a.EndTime) && now.After(b.EndTime) {
+		b.StartTime = a.StartTime
+		b.EndTime = a.EndTime
+	}
+
+	// compare for 'details' update
+	b.IsLive = a.IsLive
+	b.YouTube = a.YouTube
+	if !reflect.DeepEqual(a, b) {
+		b.Update = updateDetails
+		return true
+	}
+	// compare for 'video' updates, but only for past sessions
+	if now.Before(b.EndTime) || ob.IsLive == a.IsLive && ob.YouTube == a.YouTube {
+		return false
+	}
+	// either IsLive or YouTube is changed, or both
+	if !ob.IsLive && ob.YouTube != "" {
+		b.Update = updateVideo
+		return true
+	}
+
+	return false
 }
 
 // upcomingSessions returns a subset of items which have their StartTime field
