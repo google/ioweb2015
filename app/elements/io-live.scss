@@ -84,7 +84,7 @@ countdown-timer {
 
 #livewidget {
   position: absolute;
-  right: $largeKeyline;
+  right: $mobileKeyline;
   bottom: 0;
   border-radius: 2px;
   -webkit-clip-path: circle(28px at bottom 28px right 28px);
@@ -92,7 +92,7 @@ countdown-timer {
   transition: -webkit-clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: white;
   min-height: 500px;
-  width: 360px;
+  width: calc(100% - 32px);
   // @include shadow-z2();
   overflow: hidden;
   opacity: 0;
@@ -387,6 +387,10 @@ paper-progress {
   .bottom__bar {
     padding: $desktopKeyline $desktopKeyline 0 $desktopKeyline;
     bottom: $ytVideoControlsHeight + $desktopKeyline;
+  }
+  #livewidget {
+    right: $largeKeyline;
+    width: 360px;
   }
 }
 
