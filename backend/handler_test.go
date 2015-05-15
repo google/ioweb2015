@@ -1389,7 +1389,6 @@ func TestFirstSyncEventData(t *testing.T) {
 		Id:       "video-id",
 		Title:    "Map Up your Apps!",
 		Desc:     "video desc",
-		Year:     2015,
 		Topic:    "Tools",
 		Speakers: "Some Dude",
 	}

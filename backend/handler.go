@@ -1216,49 +1216,22 @@ func toAPISchedule(d *eventData) interface{} {
 	for _, s := range d.Speakers {
 		s.Thumb = thumbURL(s.Thumb)
 	}
+	videos := make([]*eventVideo, 0, len(d.Videos))
+	for _, v := range d.Videos {
+		videos = append(videos, v)
+	}
+	sort.Sort(sortedVideosList(videos))
 	return &struct {
 		Sessions []*eventSession          `json:"sessions,omitempty"`
+		Videos   []*eventVideo            `json:"video_library,omitempty"`
 		Speakers map[string]*eventSpeaker `json:"speakers,omitempty"`
-		Videos   map[string]*eventVideo   `json:"video_library,omitempty"`
 		Tags     map[string]*eventTag     `json:"tags,omitempty"`
 	}{
 		Sessions: sessions,
+		Videos:   videos,
 		Speakers: d.Speakers,
-		Videos:   d.Videos,
 		Tags:     d.Tags,
 	}
-
-}
-
-// sortedSessionsList implements sort.Sort ordering items by:
-//   - start time
-//   - end time
-//   - title
-type sortedSessionsList []*eventSession
-
-func (l sortedSessionsList) Len() int {
-	return len(l)
-}
-
-func (l sortedSessionsList) Swap(i, j int) {
-	l[i], l[j] = l[j], l[i]
-}
-
-func (l sortedSessionsList) Less(i, j int) bool {
-	a, b := l[i], l[j]
-	if a.StartTime.Before(b.StartTime) {
-		return true
-	}
-	if a.StartTime.After(b.StartTime) {
-		return false
-	}
-	if a.EndTime.Before(b.EndTime) {
-		return true
-	}
-	if a.EndTime.After(b.EndTime) {
-		return false
-	}
-	return a.Title < b.Title
 }
 
 // ctxKey is a custom type for context.Context values.
