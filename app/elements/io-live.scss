@@ -20,10 +20,10 @@
 $ytVideoControlsHeight: $desktopKeyline;
 
 :host {
-  display: block;
-  background-color: $color-cyan-500;
+  // display: block;
+  // background-color: $color-cyan-500;
   @include typo-body();
-  font-size: 16px;
+  // font-size: 16px;
 }
 
 countdown-timer {
@@ -229,21 +229,6 @@ countdown-timer {
 paper-tabs {
   text-transform: uppercase;
   letter-spacing: 0.01em;
-
-  &.white {
-    color: white;
-    &::shadow #selectionBar {
-      background-color: #fff;
-    }
-    paper-tab::shadow {
-      // .tab-content {
-      //   opacity: 1 !important;
-      // }
-      #ink {
-        color: rgba(255,255,255,0.5);
-      }
-    }
-  }
 }
 
 .card__photo {
