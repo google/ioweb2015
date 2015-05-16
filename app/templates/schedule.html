@@ -346,7 +346,7 @@
           filters = parsedUrl.params.filters.split(',');
         }
         return filters;
-      }
+      };
 
       page.onSubpageTransitionDone = function() {
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
@@ -363,8 +363,9 @@
         template.selectedTimezone = 'GMT' + moment().format('Z'); // Local timezone.
         template.selectTimezone();
 
-        // Deep link into session.
-        var sessionId = parsedUrl.resourceId;
+        // Deep link into session. First, try to pull session id from the
+        // ?sid= param. If that isn't present, use the parsed id from the fragment.
+        var sessionId = IOWA.Util.getURLParameter('sid') || parsedUrl.resourceId;
         if (sessionId) {
           pageIsDeepLinked_ = false;
           template.openSession(IOWA.Schedule.getSessionById(sessionId));
@@ -382,6 +383,10 @@
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
+          detailsPanel = document.querySelector('.session__detail');
+          detailsPanel.querySelector('core-image').classList.remove('fadeout');
+          detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
+
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
         window.addEventListener('popstate', sessionDetailsPopstateHandler);
