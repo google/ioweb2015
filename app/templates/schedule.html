@@ -336,7 +336,7 @@
   (function() {
 
     var SUBTAB_SELECTOR = '#subpage-tabs a';
-    var pageIsDeepLinked_ = true;
+    var pageIsDeepLinked_ = false; // Flag to not double-record page view on deep linking into session.
     var ioScheduleEl = null;
     var detailsPanel = null;
 
@@ -357,7 +357,7 @@
           filters = parsedUrl.params.filters.split(',');
         }
         return filters;
-      }
+      };
 
       page.onSubpageTransitionDone = function() {
         IOWA.Elements.Masthead.querySelector('#subpage-tabs').selected = page.selectedSubpage;
@@ -374,13 +374,14 @@
         template.selectedTimezone = 'GMT' + moment().format('Z'); // Local timezone.
         template.selectTimezone();
 
-        // Deep link into session.
-        var sessionId = parsedUrl.resourceId;
+        // Deep link into session. First, try to pull session id from the
+        // ?sid= param. If that isn't present, use the parsed id from the fragment.
+        var sessionId = IOWA.Util.getURLParameter('sid') || parsedUrl.resourceId;
         if (sessionId) {
-          pageIsDeepLinked_ = false;
+          pageIsDeepLinked_ = true;
           template.openSession(IOWA.Schedule.getSessionById(sessionId));
         } else {
-          pageIsDeepLinked_ = true;
+          pageIsDeepLinked_ = false;
         }
       };
 
@@ -391,13 +392,13 @@
         IOWA.Elements.Template.startScheduleVideo = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
-        detailsPanel = detailsPanel || document.querySelector('.session__detail');
-
-        detailsPanel.querySelector('core-image').classList.remove('fadeout');
-        detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
+          detailsPanel = document.querySelector('.session__detail');
+          detailsPanel.querySelector('core-image').classList.remove('fadeout');
+          detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
+
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
         window.addEventListener('popstate', sessionDetailsPopstateHandler);
@@ -456,6 +457,9 @@
             this.selectedPage, this.pages[this.selectedPage].selectedSubpage, '', search);
         history.replaceState({}, null, url);
 
+        document.title = 'Schedule';
+        pageIsDeepLinked_ = false;
+
         // Reset video state.
         var video = sender.querySelector('google-youtube')
         if (video) {
@@ -470,20 +474,21 @@
         // sender.updateTargetDimensions();
         sender.querySelector('.session__title').focus();
 
-        // Update URL with deep link if we're not from a deep link page load.
-        if (pageIsDeepLinked_) {
-          var search = IOWA.Util.setSearchParam(
-              window.location.search, 'sid', this.selectedSession.id);
-          var url = IOWA.Router.composeUrl(
-              this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
-              this.selectedSession.id, search);
-          history.pushState({}, null, url);
-        } else {
-          pageIsDeepLinked_ = true;
-        }
+        document.title = this.selectedSession.title + ' - Google I/O Schedule';
 
-        // Report session detail as pageview in GA.
-        IOWA.Analytics.trackPageView(location.pathname + location.hash);
+        // Update URL with deep link. Always ensure sid parameter is set.
+        var search = IOWA.Util.setSearchParam(
+            window.location.search, 'sid', this.selectedSession.id);
+        var url = IOWA.Router.composeUrl(
+            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
+            this.selectedSession.id, search);
+        history.pushState({}, null, url);
+
+        // Report session detail as pageview in GA, only if we're not loading
+        // the page from a session detail deep link. Don't want to double record.
+        if (!pageIsDeepLinked_) {
+          IOWA.Analytics.trackPageView(location.pathname + location.hash);
+        }
       };
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
