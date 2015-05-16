@@ -381,19 +381,6 @@ IOWA.Elements = (function() {
       return youtubeUrl.replace(/https?:\/\/youtu\.be\//, '');
     };
 
-    template.formatVideoTypeFilter = function(videoList, type) {
-      switch (type) {
-        case 'Sessions':
-          return videoList.filter(function(item) {
-            return item.youtubeUrl;
-          });
-        case 'DevBytes':
-          return videoList.filter(function(item) {
-            return !item.filters; // DevBytes won't have filters.
-          });
-      }
-    };
-
     template.limit = function(array, howMany) {
       return array.slice(0, howMany);
     };

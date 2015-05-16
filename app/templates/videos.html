@@ -45,7 +45,8 @@
 
     <div class="videolist__wrapper" layout vertical flex two relative>
 
-      <core-list data="{{filteredVideoList | formatVideoTypeFilter(selectedVideoType)}}" selectionEnabled="false" height="600" fit>
+      <core-list data="{{filteredVideoList}}"
+                 selectionEnabled="false" height="600" fit>
         <template>
           <div class="item">
             <div class="card card__video js-experiment-visualizer"
@@ -64,8 +65,8 @@
                 <div class="video-author" hidden?="{{!filteredVideoList[index].speakers}}">{{filteredVideoList[index].speakers | speakerIdsToNameString}}&nbsp;</div>
               </div>
             </div>
+            <div class="divider"></div>
           </div>
-          <div class="divider"></div>
         </template>
       </core-list>
 
@@ -87,7 +88,8 @@
       <div class="card-content">
 
         <div class="filter-rows">
-          <paper-radio-group id="filter-videotype" layout vertical selected="{{selectedVideoType}}">
+          <paper-radio-group id="filter-videotype" layout vertical selected="{{selectedVideoType}}"
+                             on-core-select="{{onVideoFilter}}">
             <paper-radio-button layout horizontal center name="DevBytes"
                                 label="DevBytes"></paper-radio-button>
             <paper-radio-button layout horizontal center name="Sessions" label="Sessions"
@@ -104,7 +106,7 @@
         </div> -->
 
         <div class="filter-rows">
-          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
+          <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}" selected="{{selectedVideoTopic}}">
             <paper-radio-button layout horizontal center name="All" label="All"></paper-radio-button>
             <template repeat="{{topic in filterTopics}}">
               <paper-radio-button layout horizontal center name="{{topic}}" label="{{topic}}"></paper-radio-button>
@@ -134,6 +136,20 @@
 <script>
 (function() {
 
+  function formatVideoTypeFilter(videoList, type) {
+    switch (type) {
+      case 'Sessions':
+        var videos = videoList.filter(function(item) {
+          return item.youtubeUrl;
+        });
+        return videos;
+      case 'DevBytes':
+        return videoList.filter(function(item) {
+          return !item.filters; // DevBytes won't have filters.
+        });
+    }
+  }
+
   // Page-specific JS that runs when this page is loaded for the first time.
   function initPage() {
     var page = IOWA.Elements.Template.pages['videos'];
@@ -147,6 +163,7 @@
       IOWA.Elements.Template.mastheadVideoActive = false;
       IOWA.Elements.Template.hasSessionVideos = false;
       IOWA.Elements.Template.selectedVideoType = 'DevBytes';
+      IOWA.Elements.Template.selectedVideoTopic = 'All';
       IOWA.Elements.Template.filteredVideoList = IOWA.Elements.Template.videoList; // reset filter.
 
       // Bomb out early and don't re-fetch videos when navigating back to this page.
@@ -157,11 +174,13 @@
 
     page.onPageTransitionDone = function() {
       IOWA.Schedule.schedulePromise().then(function(scheduleData) {
+        var template =  IOWA.Elements.Template;
+
         var videoList = scheduleData.sessions.filter(function(session) {
           return !session.isLivestream && session.youtubeUrl;
         });
 
-        IOWA.Elements.Template.hasSessionVideos = videoList.length;
+        template.hasSessionVideos = videoList.length;
 
         var lib = scheduleData.video_library;
         if (lib) {
@@ -170,8 +189,8 @@
 
         if (videoList.length) {
           var videos = Object.keys(videoList).map(function(key) { return videoList[key]; });
-          IOWA.Elements.Template.videoList = videos;
-          IOWA.Elements.Template.filteredVideoList = videos;
+          template.videoList = videos;
+          template.filteredVideoList = formatVideoTypeFilter(videos, template.selectedVideoType);
         }
       });
     };
@@ -191,15 +210,16 @@
       e.stopPropagation();
 
       if (detail.isSelected) {
-        if (sender.selected == 'All') {
-          this.filteredVideoList = this.videoList;
-          return;
+        var videos = this.videoList;
+
+        if (this.selectedVideoTopic !== 'All') {
+          videos = videos.filter(function(item) {
+            return item.topic === this.selectedVideoTopic ||
+                   item.filters && item.filters[this.selectedVideoTopic];
+          }.bind(this));
         }
 
-        var videos = IOWA.Elements.Template.videoList;
-        this.filteredVideoList = videos.filter(function(item) {
-          return item.topic === sender.selected || item.filters[sender.selected];
-        });
+        this.filteredVideoList = formatVideoTypeFilter(videos, this.selectedVideoType);
       }
     };
 
