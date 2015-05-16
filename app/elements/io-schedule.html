@@ -70,13 +70,13 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                         <span id="session-{{session.id}}-time" class="schedule-time" flex auto-vertical>
                           {{session.start}} <span hidden?="{{session.id === '__keynote__'}}"> - {{session.end}}</span>
                         </span>
-                        <span id="session-{{session.id}}-title" class="schedule-title"
-                              auto-vertical flex?="{{!isPhoneSize}}" two
-                              title="{{session.title}}">
+                        <a href="schedule?sid={{session.id}}" id="session-{{session.id}}-title"
+                           class="schedule-title" auto-vertical flex?="{{!isPhoneSize}}" two
+                           title="{{session.title}}" on-click="{{onSessionSelect}}">
                           {{session.title}}
                           <core-icon icon="io:videocam" class="schedule-livestream"
                                      hidden?="{{!session.isLivestream}}"></core-icon>
-                        </span>
+                        </a>
                       </div>
                     </div>
                   </template>
@@ -124,13 +124,13 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                         <span id="session-{{session.id}}-time" class="schedule-time" flex auto-vertical>
                           {{session.start}} <span hidden?="{{session.id === '__keynote__'}}"> - {{session.end}}</span>
                         </span>
-                        <span id="session-{{session.id}}-title" class="schedule-title"
-                              auto-vertical flex?="{{!isPhoneSize}}" two
-                              title="{{session.title}}">
+                        <a href="schedule?sid={{session.id}}" id="session-{{session.id}}-title"
+                           class="schedule-title" auto-vertical flex?="{{!isPhoneSize}}" two
+                           title="{{session.title}}" on-click="{{onSessionSelect}}">
                           {{session.title}}
                           <core-icon icon="io:videocam" class="schedule-livestream"
                                      hidden?="{{!session.isLivestream}}"></core-icon>
-                        </span>
+                        </a>
                       </div>
                     </div>
 
@@ -464,6 +464,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       },
 
       onSessionSelect: function(e, detail, sender) {
+        e.preventDefault();
         this.selectSession(sender.templateInstance.model.session);
       },
 
