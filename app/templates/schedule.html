@@ -383,10 +383,6 @@
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
-          detailsPanel = document.querySelector('.session__detail');
-          detailsPanel.querySelector('core-image').classList.remove('fadeout');
-          detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
-
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
         window.addEventListener('popstate', sessionDetailsPopstateHandler);
@@ -449,15 +445,6 @@
 
         document.title = 'Schedule';
         pageIsDeepLinked_ = false;
-
-        // Reset video state.
-        var video = sender.querySelector('google-youtube')
-        if (video) {
-          video.pause();
-        }
-        sender.querySelector('core-image').classList.remove('fadeout');
-        sender.querySelector('.play__button__container').classList.remove('fadeout');
-        this.startScheduleVideo = false;
       };
 
       IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail, sender) {
