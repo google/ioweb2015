@@ -140,6 +140,22 @@ IOWA.Util = IOWA.Util || (function() {
   }
 
   /**
+   * Gets a param from the search part of a URL by name.
+   * @param {string} param URL parameter to look for.
+   * @return {string|undefined} undefined if the URL parameter does not exist.
+   */
+  function getURLParameter(param) {
+    if (!window.location.search) {
+      return;
+    }
+    var m = new RegExp(param + '=([^&]*)').exec(window.location.search.substring(1));
+    if (!m) {
+      return;
+    }
+    return decodeURIComponent(m[1]);
+  }
+
+  /**
    * Removes a param from the search part of a URL.
    * @param {string} search Search part of a URL, e.g. location.search.
    * @param {string} name Param name.
@@ -260,6 +276,7 @@ IOWA.Util = IOWA.Util || (function() {
     supportsHTMLImports: 'import' in document.createElement('link'),
     smoothScroll: smoothScroll,
     shortenURL: shortenURL,
+    getURLParameter: getURLParameter,
     getStaticBaseURL: getStaticBaseURL,
     setSearchParam: setSearchParam,
     removeSearchParam: removeSearchParam,
