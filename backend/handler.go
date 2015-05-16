@@ -152,7 +152,8 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		data.OgTitle = s.Title
+		data.Title = s.Title + " - Google I/O Schedule"
+		data.OgTitle = data.Title
 		data.OgImage = s.Photo
 		data.Desc = s.Desc
 	}
