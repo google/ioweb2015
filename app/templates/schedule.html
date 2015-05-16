@@ -336,7 +336,7 @@
   (function() {
 
     var SUBTAB_SELECTOR = '#subpage-tabs a';
-    var pageIsDeepLinked_ = true;
+    var pageIsDeepLinked_ = false; // Flag to not double-record page view on deep linking into session.
     var ioScheduleEl = null;
     var detailsPanel = null;
 
@@ -378,10 +378,10 @@
         // ?sid= param. If that isn't present, use the parsed id from the fragment.
         var sessionId = IOWA.Util.getURLParameter('sid') || parsedUrl.resourceId;
         if (sessionId) {
-          pageIsDeepLinked_ = false;
+          pageIsDeepLinked_ = true;
           template.openSession(IOWA.Schedule.getSessionById(sessionId));
         } else {
-          pageIsDeepLinked_ = true;
+          pageIsDeepLinked_ = false;
         }
       };
 
@@ -457,6 +457,9 @@
             this.selectedPage, this.pages[this.selectedPage].selectedSubpage, '', search);
         history.replaceState({}, null, url);
 
+        document.title = 'Schedule';
+        pageIsDeepLinked_ = false;
+
         // Reset video state.
         var video = sender.querySelector('google-youtube')
         if (video) {
@@ -471,20 +474,21 @@
         // sender.updateTargetDimensions();
         sender.querySelector('.session__title').focus();
 
-        // Update URL with deep link if we're not from a deep link page load.
-        if (pageIsDeepLinked_) {
-          var search = IOWA.Util.setSearchParam(
-              window.location.search, 'sid', this.selectedSession.id);
-          var url = IOWA.Router.composeUrl(
-              this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
-              this.selectedSession.id, search);
-          history.pushState({}, null, url);
-        } else {
-          pageIsDeepLinked_ = true;
-        }
+        document.title = this.selectedSession.title + ' - Google I/O Schedule';
 
-        // Report session detail as pageview in GA.
-        IOWA.Analytics.trackPageView(location.pathname + location.hash);
+        // Update URL with deep link. Always ensure sid parameter is set.
+        var search = IOWA.Util.setSearchParam(
+            window.location.search, 'sid', this.selectedSession.id);
+        var url = IOWA.Router.composeUrl(
+            this.selectedPage, this.pages[this.selectedPage].selectedSubpage,
+            this.selectedSession.id, search);
+        history.pushState({}, null, url);
+
+        // Report session detail as pageview in GA, only if we're not loading
+        // the page from a session detail deep link. Don't want to double record.
+        if (!pageIsDeepLinked_) {
+          IOWA.Analytics.trackPageView(location.pathname + location.hash);
+        }
       };
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
