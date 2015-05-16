@@ -51,6 +51,21 @@ $name: 'page-home';
   background-color: transparent;
 }
 
+.photo__masthead {
+  background: url(../images/videos/keynote.jpg) no-repeat 50% 0;
+  background-size: cover;
+}
+
+.card__photo--stage {
+  height: 100%;
+  h5 {
+    color: white;
+    text-shadow: .5px .5px 1px rgba(0, 0, 0, 0.25);
+    position: relative;
+    top: $mobileKeyline;
+  }
+}
+
 .home-photo {
   background: url(../images/home/Image-01.jpg) no-repeat 50% 0;
   background-size: cover;
@@ -252,7 +267,7 @@ $name: 'page-home';
     padding-top: $overlayCardTop;
 
     h2 {
-      max-width: 300px;
+      max-width: 350px;
     }
 
     .join__social {

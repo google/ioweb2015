@@ -1,6 +1,6 @@
 {% define "title" %}Google I/O 2015{% end %}
 
-{% define "mastheadBgClass" %}bg-cyan{% end %}
+{% define "mastheadBgClass" %}bg-photo{% end %}
 
 {% define "masthead" %}
 <!-- <div id="countdown-container" class="photo__masthead--fullbleed" fit>
@@ -13,13 +13,19 @@
       role="timer">
   </countdown-timer>
 </div> -->
+<div class="photo__masthead photo__masthead--fullbleed" fit>
+  <div class="card__photo--stage" layout vertical center-center>
+    <!-- <div class="play__button__container" on-tap="{{openMastheadVideo}}" data-link-track="video-recap-watch">
+      <h5>Watch the 2014 recap video</h5>
+    </div> -->
+  </div>
+</div>
 {% end %}
 
 {% define "content" %}
 
-<social-poller url="api/v1/social" posts="{{socialPosts}}" interval="30000"></social-poller>
+  <social-poller url="api/v1/social" posts="{{socialPosts}}" interval="30000"></social-poller>
 
-<!--
   <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video" tabindex="{{fullscreenVideoActive ? 0 : -1}}"></paper-icon-button>
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
@@ -78,7 +84,7 @@
           <i18n-msg msgid="attend-wherever">or wherever you may be</i18n-msg>
         </h2>
         <div class="attend__globe {{ {show: homeGlobeVisible} | tokenList }}">
-          <webgl-globe location="{{cycleLocations[selectedCity]}}"
+          <!-- <webgl-globe location="{{cycleLocations[selectedCity]}}"
                        locationTarget="{'lat': 36.5, 'lng': 0}"
                        fov="0.3927"
                        offsetY="-0.625"
@@ -89,7 +95,7 @@
                        noDraw?="{{mode === 'active'}}"
                        on-location-transitionend="{{onArrivedAtGlobePin}}"
                        webglSupported="{{webglSupported}}"></webgl-globe>
-          <core-icon icon="io:place" class="globe-marker up"></core-icon>
+          <core-icon icon="io:place" class="globe-marker up"></core-icon> -->
         </div>
       </section>
 
@@ -107,7 +113,7 @@
       </div>
 
       <section id="join" class="page__section js-experiment-instrument js-experiment-instrument--no-bottom-margin bg-light-grey">
-        <h2><i18n-msg msgid="join-convo">Join the conversation now at #io15</i18n-msg></h2>
+        <h2>See what everyone was talking about at #io15</h2>
         <div class="join__social" layout vertical end hidden?="{{isPhoneSize}}">
           <a href="https://plus.google.com/+GoogleDevelopers" data-track-link="home-social-plus-google-developers" target="_blank">
             +googledevelopers<core-icon icon="io:post-gplus"></core-icon>
@@ -146,7 +152,7 @@
     </div>
   </template>
 
--->
+
 
   <script>
   (function() {
