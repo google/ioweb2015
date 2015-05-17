@@ -5,7 +5,7 @@ script:
   # workaround for cache, see https://github.com/drone/drone/issues/147
   - mkdir -p /cache/npm /cache/bower /cache/node_modules
   - npm config set cache /cache/npm
-  - rm -rf app/bower_components && ln -s /cache/bower app/bower_components
+  #- rm -rf app/bower_components && ln -s /cache/bower app/bower_components
   - rm -rf node_modules experiment/node_modules
   - ln -s /cache/node_modules node_modules
   - ln -s /cache/node_modules experiment/node_modules
