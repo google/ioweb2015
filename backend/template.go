@@ -1,159 +1,155 @@
 package main
 
 import (
-	"bytes"
-	"html/template"
-	"path"
-	"path/filepath"
-	"strings"
-	"sync"
-	"time"
+  "bytes"
+  "html/template"
+  "path"
+  "path/filepath"
+  "strings"
+  "sync"
+  "time"
 
-	"golang.org/x/net/context"
+  "golang.org/x/net/context"
 )
 
 const (
-	// defaultTitle is the site pages default title.
-	defaultTitle = "Google I/O 2015"
-	// descDefault is the default site description
-	descDefault = "Google I/O 2015 brings together developers for an immersive," +
-		" two-day experience focused on exploring the next generation of " +
-		"technology, mobile and beyond. Join us online or in person May 28-29, " +
-		"2015. #io15"
-	// descExperiment is used when users share an experiment link on social.
-	descExperiment = "Make music with instruments inspired by material design " +
-		"for #io15. Play, record and share."
-	// images for og:image meta tag
-	ogImageDefault    = "images/io15-color.png"
-	ogImageExperiment = "images/io15-experiment.png"
+  // defaultTitle is the site pages default title.
+  defaultTitle = "Google I/O 2015"
+  // descDefault is the default site description
+  descDefault = "Google I/O 2015 brings together developers for an immersive," +
+    " two-day experience focused on exploring the next generation of " +
+    "technology, mobile and beyond. Join us online or in person May 28-29, " +
+    "2015. #io15"
+  // descExperiment is used when users share an experiment link on social.
+  descExperiment = "Make music with instruments inspired by material design " +
+    "for #io15. Play, record and share."
+  // images for og:image meta tag
+  ogImageDefault    = "images/io15-color.png"
+  ogImageExperiment = "images/io15-experiment.png"
 
-	// templatesDir is the templates directory path relative to config.Dir.
-	templatesDir = "templates"
+  // templatesDir is the templates directory path relative to config.Dir.
+  templatesDir = "templates"
 )
 
 var (
-	// tmplFunc is a map of functions available to all templates.
-	tmplFunc = template.FuncMap{
-		"safeHTML":  func(v string) template.HTML { return template.HTML(v) },
-		"canonical": canonicalURL,
-		"r":         resourceURL,
-	}
-	// tmplCache caches HTML templates parsed in parseTemplate()
-	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
+  // tmplFunc is a map of functions available to all templates.
+  tmplFunc = template.FuncMap{
+    "safeHTML":  func(v string) template.HTML { return template.HTML(v) },
+    "canonical": canonicalURL,
+    "r":         resourceURL,
+  }
+  // tmplCache caches HTML templates parsed in parseTemplate()
+  tmplCache = &templateCache{templates: make(map[string]*template.Template)}
 )
 
 // templateCache is in-memory cache for parsed templates
 type templateCache struct {
-	sync.Mutex
-	templates map[string]*template.Template
+  sync.Mutex
+  templates map[string]*template.Template
 }
 
 // templateData is the templates context
 type templateData struct {
-	Env          string
-	ClientID     string
-	Prefix       string
-	Slug         string
-	Title        string
-	Desc         string
-	OgTitle      string
-	OgImage      string
-	StartDateStr string
+  Env          string
+  ClientID     string
+  Prefix       string
+  Slug         string
+  Title        string
+  Desc         string
+  OgTitle      string
+  OgImage      string
+  StartDateStr string
 }
 
 // renderTemplate executes a template found in name.html file
 // using either layout_full.html or layout_partial.html as the root template.
 // env is the app current environment: "dev", "stage" or "prod".
 func renderTemplate(c context.Context, name string, partial bool, data *templateData) ([]byte, error) {
-	tpl, err := parseTemplate(name, partial)
-	if err != nil {
-		return nil, err
-	}
-	if data == nil {
-		data = &templateData{}
-	}
-	if data.Env == "" {
-		data.Env = config.Env
-	}
-	data.ClientID = config.Google.Auth.Client
-	data.Slug = name
-	data.Prefix = config.Prefix
-	data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(time.RFC3339)
+  tpl, err := parseTemplate(name, partial)
+  if err != nil {
+    return nil, err
+  }
+  if data == nil {
+    data = &templateData{}
+  }
+  if data.Env == "" {
+    data.Env = config.Env
+  }
+  data.ClientID = config.Google.Auth.Client
+  data.Slug = name
+  data.Prefix = config.Prefix
+  data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(time.RFC3339)
+  if data.Desc == "" {
+    data.Desc = descDefault
+  }
+  if data.OgImage == "" {
+    data.OgImage = ogImageDefault
+  }
+  if data.Title == "" {
+    data.Title = pageTitle(tpl)
+  }
+  if data.OgTitle == "" {
+    data.OgTitle = data.Title
+  }
 
-	if v, err := scheduleLiveIDs(c); err == nil {
-		data.LiveIDs = v
-	}
-	if data.Title == "" {
-		data.Title = pageTitle(tpl)
-	}
-	if data.OgTitle == "" {
-		data.OgTitle = data.Title
-	}
-	if data.Desc == "" {
-		data.Desc = descDefault
-	}
-	if data.OgImage == "" {
-		data.OgImage = ogImageDefault
-	}
-
-	var b bytes.Buffer
-	if err := tpl.Execute(&b, data); err != nil {
-		return nil, err
-	}
-	return b.Bytes(), nil
+  var b bytes.Buffer
+  if err := tpl.Execute(&b, data); err != nil {
+    return nil, err
+  }
+  return b.Bytes(), nil
 }
 
 // parseTemplate creates a template identified by name, using appropriate layout.
 // HTTP error layout is used for name arg prefixed with "error_", e.g. "error_404".
 func parseTemplate(name string, partial bool) (*template.Template, error) {
-	var layout string
-	switch {
-	case strings.HasPrefix(name, "error_"):
-		layout = "layout_error.html"
-	case name == "upgrade":
-		layout = "layout_bare.html"
-	case partial:
-		layout = "layout_partial.html"
-	default:
-		layout = "layout_full.html"
-	}
+  var layout string
+  switch {
+  case strings.HasPrefix(name, "error_"):
+    layout = "layout_error.html"
+  case name == "upgrade":
+    layout = "layout_bare.html"
+  case partial:
+    layout = "layout_partial.html"
+  default:
+    layout = "layout_full.html"
+  }
 
-	key := name + layout
-	tmplCache.Lock()
-	defer tmplCache.Unlock()
-	if t, ok := tmplCache.templates[key]; ok {
-		return t, nil
-	}
+  key := name + layout
+  tmplCache.Lock()
+  defer tmplCache.Unlock()
+  if t, ok := tmplCache.templates[key]; ok {
+    return t, nil
+  }
 
-	t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
-		filepath.Join(config.Dir, templatesDir, layout),
-		filepath.Join(config.Dir, templatesDir, name+".html"),
-	)
-	if err != nil {
-		return nil, err
-	}
-	if !isDev() {
-		tmplCache.templates[key] = t
-	}
-	return t, nil
+  t, err := template.New(layout).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(
+    filepath.Join(config.Dir, templatesDir, layout),
+    filepath.Join(config.Dir, templatesDir, name+".html"),
+  )
+  if err != nil {
+    return nil, err
+  }
+  if !isDev() {
+    tmplCache.templates[key] = t
+  }
+  return t, nil
 }
 
 // pageTitle executes "title" template and returns its result or defaultTitle.
 func pageTitle(t *template.Template) string {
-	b := new(bytes.Buffer)
-	if err := t.ExecuteTemplate(b, "title", nil); err != nil || b.Len() == 0 {
-		return defaultTitle
-	}
-	return b.String()
+  b := new(bytes.Buffer)
+  if err := t.ExecuteTemplate(b, "title", nil); err != nil || b.Len() == 0 {
+    return defaultTitle
+  }
+  return b.String()
 }
 
 // canonicalURL returns a canonical URL of path p.
 // Relative paths are based off of config.Prefix.
 func canonicalURL(p string) string {
-	if p == "home" || p == "/" || p == "" {
-		return config.Prefix + "/"
-	}
-	return path.Join(config.Prefix, p)
+  if p == "home" || p == "/" || p == "" {
+    return config.Prefix + "/"
+  }
+  return path.Join(config.Prefix, p)
 }
 
 // resourceURL returns absolute path to a resource referenced by parts.
@@ -161,13 +157,13 @@ func canonicalURL(p string) string {
 // returns "/myprefix/images/img.jpg".
 // If the first part starts with http(s)://, it is the returned value.
 func resourceURL(parts ...string) string {
-	lp := strings.ToLower(parts[0])
-	if strings.HasPrefix(lp, "http://") || strings.HasPrefix(lp, "https://") {
-		return parts[0]
-	}
-	p := strings.Join(parts, "/")
-	if !strings.HasPrefix(p, config.Prefix) {
-		p = config.Prefix + "/" + p
-	}
-	return path.Clean(p)
+  lp := strings.ToLower(parts[0])
+  if strings.HasPrefix(lp, "http://") || strings.HasPrefix(lp, "https://") {
+    return parts[0]
+  }
+  p := strings.Join(parts, "/")
+  if !strings.HasPrefix(p, config.Prefix) {
+    p = config.Prefix + "/" + p
+  }
+  return path.Clean(p)
 }
