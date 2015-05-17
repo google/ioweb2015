@@ -33,42 +33,15 @@
 
   <section class="subpage-event subpage__content {{ {active: pages['onsite'].selectedSubpage == 'event'} | tokenList}}">
 
-    <!-- <div class="card__container card__container--top slide-up">
+    <div class="card__container card__container--top slide-up">
       <div class="card js-experiment-visualizer">
         <div class="card-content">
-          <h3 class="card__title">Tips for Attendees</h3>
-          <div>Registration for Google I/O 2015 is now closed and tickets are sold out. If you're a registered attendee, read through the FAQ to find out how to best navigate the conference, organize your schedule, and get the most from the event.</div>
-        </div>
-        <div class="card-content">
-          <a href="faq" data-ajax-link data-transition="hero-card-transition" data-track-link="onsite-faq">View FAQ</a>
-        </div>
-         <div class="ripple">
-          <div class="ripple__content"></div>
-        </div>
-      </div>
-    </div> -->
-
-    <div class="card__container card__container--top sidebyside slide-up" layout horizontal vertical?="{{isPhoneSize}}" relative>
-      <div class="card js-experiment-visualizer" layout vertical auto-vertical flex>
-        <div class="card-content" flex?="{{!isPhoneSize}}">
           <h3 class="card__title">Venue map</h3>
           <div>Find your way around I/O and participate in sandbox talks, attend sessions, explore the codelab space, and more with our floor-by-floor venue map of Moscone West.</div>
         </div>
         <div class="card-content anchor-like">
           <span role="link" tabindex="0" data-track-link="onsite-venue-map" on-tap="{{toggleMapGallery}}">See venue map</span>
         </div>
-      </div>
-      <div class="card js-experiment-visualizer" auto-vertical flex>
-        <div class="card-content">
-          <h3 class="card__title">Tips for Attendees</h3>
-          <div>Learn everything you need to know about Google I/O. Find out how to best navigate the conference, organize your schedule, and get the most from the event.</div>
-        </div>
-        <div class="card-content">
-          <a href="faq" data-track-link="onsite-faq" data-ajax-link data-transition="hero-card-transition">View faq</a>
-        </div>
-      </div>
-      <div class="ripple">
-        <div class="ripple__content"></div>
       </div>
     </div>
 
