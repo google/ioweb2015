@@ -81,21 +81,23 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 		data.Env = config.Env
 	}
 	data.ClientID = config.Google.Auth.Client
-	data.Title = pageTitle(tpl)
 	data.Slug = name
 	data.Prefix = config.Prefix
 	data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(time.RFC3339)
 	if v, err := scheduleLiveIDs(c); err == nil {
 		data.LiveIDs = v
 	}
+	if data.Title == "" {
+		data.Title = pageTitle(tpl)
+	}
+	if data.OgTitle == "" {
+		data.OgTitle = data.Title
+	}
 	if data.Desc == "" {
 		data.Desc = descDefault
 	}
 	if data.OgImage == "" {
 		data.OgImage = ogImageDefault
-	}
-	if data.OgTitle == "" {
-		data.OgTitle = data.Title
 	}
 
 	var b bytes.Buffer

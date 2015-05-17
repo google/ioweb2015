@@ -246,11 +246,12 @@ func TestServeSessionTemplate(t *testing.T) {
 	table := []*struct{ p, title, desc, image string }{
 		{"/schedule", "Schedule", descDefault, config.Prefix + "/" + ogImageDefault},
 		{"/schedule?sid=not-there", "Schedule", descDefault, config.Prefix + "/" + ogImageDefault},
-		{"/schedule?sid=123", "Session", "desc", "http://image.jpg"},
+		{"/schedule?sid=123", "Session - Google I/O Schedule", "desc", "http://image.jpg"},
 	}
 
 	for i, test := range table {
 		lookup := []string{
+			`<title>` + test.title + `</title>`,
 			`<meta itemprop="name" content="` + test.title + `">`,
 			`<meta itemprop="description" content="` + test.desc + `">`,
 			`<meta itemprop="image" content="` + test.image + `">`,
