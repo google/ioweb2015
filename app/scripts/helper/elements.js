@@ -578,7 +578,7 @@ IOWA.Elements = (function() {
 
       // Audio from BenSound (http://www.bensound.com/) - Creative Commons.
       var prefix = IOWA.Util.getStaticBaseURL() + 'bower_components/elevator/demo/music/';
-      var mainAudio = new Audio(prefix + 'elevator-music.mp3');
+      var mainAudio = new Audio(prefix + 'elevator.mp3');
       var endAudio = new Audio(prefix + 'ding.mp3');
 
       mainAudio.play();

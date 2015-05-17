@@ -61,7 +61,7 @@
     "web-animations-js": "web-animations/web-animations-js#^1.0.7",
     "moment": "~2.10.2",
     "moment-timezone": "~0.3.1",
-    "elevator": "tholman/elevator.js"
+    "elevator": "tholman/elevator.js#db3486b1d99c9ab284f5a8479d0025f279083713"
   },
   "resolutions": {
     "web-animations-js": "1.0.7",
