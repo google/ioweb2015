@@ -39,12 +39,12 @@ main {
   // height: 310px; // phase 3
   padding: 0;
 
-  paper-button {
-    position: absolute;
-    bottom: 20%;
-    width: 100%;
-    margin: 0;
-  }
+  // paper-button {
+  //   position: absolute;
+  //   bottom: 20%;
+  //   width: 100%;
+  //   margin: 0;
+  // }
 
   > div {
     min-height: 200px;
@@ -60,6 +60,10 @@ main {
       background-image: url(../images/about/Image-04.jpg);
     }
   }
+}
+
+.card__photo--recap {
+  background-image: url(../images/about/Image-05.jpg);
 }
 
 .photo__about {
@@ -80,23 +84,23 @@ main {
   background-size: cover;
 }
 
-// phase 3
-#join {
-  h2 {
-    max-width: 230px;
-  }
+// // phase 3
+// #join {
+//   h2 {
+//     max-width: 230px;
+//   }
 
-  .join__social {
-    a {
-      margin-bottom: 15px;
-    }
+//   .join__social {
+//     a {
+//       margin-bottom: 15px;
+//     }
 
-    core-icon {
-      margin-left: 5px;
-    }
-  }
-}
-// ----
+//     core-icon {
+//       margin-left: 5px;
+//     }
+//   }
+// }
+// // ----
 
 // phase2/4 -----
 @media (min-width: $tablet-breakpoint-min) {
@@ -120,46 +124,46 @@ main {
   }
 }
 
-// phase3 -----
-@media (min-width: $tablet-breakpoint-min) {
-  .pics__section {
-    height: 1050px;
-    margin-top: -134px;
+// // phase3 -----
+// @media (min-width: $tablet-breakpoint-min) {
+//   .pics__section {
+//     height: 1050px;
+//     margin-top: -134px;
 
-    > div {
-      min-height: 600px;
-    }
-    .second__row {
-      min-height: 400px;
-    }
+//     > div {
+//       min-height: 600px;
+//     }
+//     .second__row {
+//       min-height: 400px;
+//     }
 
-    .pics__section--under {
-      min-height: 640px; // FF
-    }
-  }
-  #hashtag {
-    margin-top: -295px;
-    padding-top: 297px;
-  }
+//     .pics__section--under {
+//       min-height: 640px; // FF
+//     }
+//   }
+//   #hashtag {
+//     margin-top: -295px;
+//     padding-top: 297px;
+//   }
 
-  #join {
-    position: relative;
+//   #join {
+//     position: relative;
 
-    .join__social {
-      position: absolute;
-      top: $desktopKeyline;
-      right: $desktopKeyline;
-    }
-  }
-}
-// ----
+//     .join__social {
+//       position: absolute;
+//       top: $desktopKeyline;
+//       right: $desktopKeyline;
+//     }
+//   }
+// }
+// // ----
 
-$cyan1: $color-cyan-500;
-$cyan2: #00ACC1;
-$cyan3: #B2EBF2;
-$cyan4: #4DD0E1;
-$cyan5: #80DEEA;
-$cyan5: #26C6DA;
+// $cyan1: $color-cyan-500;
+// $cyan2: #00ACC1;
+// $cyan3: #B2EBF2;
+// $cyan4: #4DD0E1;
+// $cyan5: #80DEEA;
+// $cyan5: #26C6DA;
 
 
 @media (min-width: $tablet-breakpoint-mid) {
@@ -188,18 +192,18 @@ $cyan5: #26C6DA;
     padding-top: 319px;
   }
 
-  // phase 3
-  #join {
-    h2 {
-      max-width: 300px;
-    }
+  // // phase 3
+  // #join {
+  //   h2 {
+  //     max-width: 300px;
+  //   }
 
-    .join__social {
-      right: $largeKeyline;
-      top: $largeKeyline;
-    }
-  }
-  // ----
+  //   .join__social {
+  //     right: $largeKeyline;
+  //     top: $largeKeyline;
+  //   }
+  // }
+  // // ----
 
 }
 
@@ -221,7 +225,7 @@ $cyan5: #26C6DA;
     background-image: url(../images/about/Image-05@2x.jpg);
   }
   .card__photo--recap {
-    background-image: url(../images/home/recap-500@2x.jpg);
+    background-image: url(../images/about/Image-05@2x.jpg);
   }
   .pics__section--under {
     .photo__about {

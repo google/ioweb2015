@@ -31,6 +31,20 @@
     <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
   </core-toolbar>
 
+  <!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
+  <paper-dialog class="video_overlay-dialog" transition="core-transition-center"
+                backdrop?="{{!isIOS}}" layered="false"
+                on-core-overlay-close-completed="{{closeMastheadVideo}}">
+    <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close dialog"></paper-icon-button>
+    <template if="{{mastheadVideoActive}}">
+      <div class="fullvideo__container" fit>
+        <google-youtube videoid="ksvdvCDO7pA" fluid
+            autohide="1" controls="2" modestbranding="1" showinfo="0"
+            iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
+      </div>
+    </template>
+  </paper-dialog>
+
   <div class="active">
     <div class="card__container card__container--top slide-up">
       <div class="card js-experiment-visualizer">
@@ -39,22 +53,15 @@
         </div>
         <div relative><paper-progress indeterminate fit hidden?="{{!settingsIOReminder}}"></paper-progress></div>
         <div class="card-content link-spacing">
-          <a href="about" data-ajax-link data-transition="hero-card-transition"
-             data-track-link="home-learn-more-about-io">
-              <i18n-msg msgid="learnmore">Learn more about I/O</i18n-msg>
+          <a href="#" data-track-link="home-watch-keynote"
+             class="notification__feature" on-tap="{{openMastheadVideo}}">
+            <core-icon icon="io:videocam"></core-icon> Watch the keynote
           </a>
-          <a href="#" data-track-link="home-set-reminder"
-             class="notification__feature" on-click="{{onSetReminder}}">
-            <core-icon icon="io:notifications-none"></core-icon> Set a reminder
-          </a>
-        </div>
-        <div class="ripple">
-          <div class="ripple__content"></div>
         </div>
       </div>
     </div>
     <div class="slide-up-delay">
-      <section class="home-photo page__section js-experiment-instrument js-experiment-instrument--no-bottom-margin"></section>
+     <!--  <section class="home-photo page__section js-experiment-instrument js-experiment-instrument--no-bottom-margin"></section>
 
       <div class="registration__card card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
         <div class="card js-experiment-visualizer" auto-vertical flex>
@@ -71,9 +78,26 @@
             <a href="onsite" data-ajax-link data-track-link="home-plan-experience">Plan your I/O experience</a>
           </div>
         </div>
-      </div>
+      </div> -->
 
-      <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey {{ {'no-webgl': !webglSupported} | tokenList }}">
+      <section class="page__section page__section--featured js-experiment-instrument bg-dark-grey">
+        <h2>Featured sessions</h2>
+        <div>
+          <div class="featured__videos">TODO</div>
+        </div>
+      </section>
+
+      <section class="page__section pics__section js-experiment-instrument" layout vertical>
+        <div layout horizontal>
+          <div class="photo__home" flex two?="{{isDesktopSize}}"></div>
+          <div layout vertical flex>
+            <div class="photo__home--top" flex></div>
+            <div class="photo__home--bottom" flex></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- <section class="page__section page__section--attend js-experiment-instrument bg-dark-grey {{ {'no-webgl': !webglSupported} | tokenList }}">
         <h2>
           <i18n-msg msgid="attend-from">Attend I/O from</i18n-msg>
           <name-cycler items="{{cycleLocations}}"
@@ -83,8 +107,9 @@
           <br>
           <i18n-msg msgid="attend-wherever">or wherever you may be</i18n-msg>
         </h2>
+
         <div class="attend__globe {{ {show: homeGlobeVisible} | tokenList }}">
-          <!-- <webgl-globe location="{{cycleLocations[selectedCity]}}"
+          <webgl-globe location="{{cycleLocations[selectedCity]}}"
                        locationTarget="{'lat': 36.5, 'lng': 0}"
                        fov="0.3927"
                        offsetY="-0.625"
@@ -95,19 +120,17 @@
                        noDraw?="{{mode === 'active'}}"
                        on-location-transitionend="{{onArrivedAtGlobePin}}"
                        webglSupported="{{webglSupported}}"></webgl-globe>
-          <core-icon icon="io:place" class="globe-marker up"></core-icon> -->
+          <core-icon icon="io:place" class="globe-marker up"></core-icon>
         </div>
-      </section>
+      </section> -->
 
       <div class="card__container">
-        <div class="card card--force-compositing js-experiment-visualizer">
+        <div class="card js-experiment-visualizer">
           <div class="card-content">
-            <h3>If you aren't able to join us for I/O in person this year, you can still make an event out of it. Watch the live stream with other developers near you.</h3>
+            <h3>We've wrapped up another amazing year of I/O. Check out the best moments from 2015 in photos.</h3>
           </div>
           <div class="card-content">
-            <a href="offsite#join" data-ajax-link data-track-link="home-join-from-your-location">
-              <i18n-msg msgid="join-from-offsite">Join from your location</i18n-msg>
-            </a>
+            <a href="about#photos" data-ajax-link data-track-link="home-see-2015-photos">See photos from I/O 2015</a>
           </div>
         </div>
       </div>
@@ -167,39 +190,57 @@
 
       page.load = function() {
         // Reset template variables for when revisiting the page.
-        IOWA.Elements.Template.homeGlobeVisible = false;
-        IOWA.Elements.Template.selectedCity = null;
+        // IOWA.Elements.Template.homeGlobeVisible = false;
+        // IOWA.Elements.Template.selectedCity = null;
         IOWA.Elements.Template.fullscreenVideoActive = false;
-        IOWA.Elements.Template.webglSupported = true;
+        // IOWA.Elements.Template.webglSupported = true;
       };
 
-      IOWA.Elements.Template.onGlobeLocationUpdate = function(e, detail, sender) {
-        e.stopPropagation();
-        if (detail.isSelected) {
-          IOWA.Elements.Main.querySelector('.globe-marker').classList.add('up');
-        }
+      // IOWA.Elements.Template.onGlobeLocationUpdate = function(e, detail, sender) {
+      //   e.stopPropagation();
+      //   if (detail.isSelected) {
+      //     IOWA.Elements.Main.querySelector('.globe-marker').classList.add('up');
+      //   }
+      // };
+
+      // IOWA.Elements.Template.onArrivedAtGlobePin = function(e, detail, sender) {
+      //   e.stopPropagation();
+      //   IOWA.Elements.Main.querySelector('.globe-marker').classList.remove('up');
+      // };
+
+      // IOWA.Elements.Template.onSetReminder = function(e, detail, sender) {
+      //   e.preventDefault();
+
+      //   var template = this;
+      //   template.settingsIOReminder = true;
+
+      //   IOWA.Schedule.saveSession('__keynote__', true).then(function() {
+      //     template.settingsIOReminder = false;
+
+      //     if (template.savedSessions.length) {
+      //       IOWA.Schedule.updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
+      //     }
+
+      //     IOWA.Schedule.bookmarkSessionNotification(
+      //         true, "You'll be reminded when I/O starts.")
+      //   });
+      // };
+
+      IOWA.Elements.Template.closeMastheadVideo = function(e, detail, sender) {
+        this.mastheadVideoActive = false;
       };
 
-      IOWA.Elements.Template.onArrivedAtGlobePin = function(e, detail, sender) {
-        e.stopPropagation();
-        IOWA.Elements.Main.querySelector('.globe-marker').classList.remove('up');
-      };
+      IOWA.Elements.Template.openMastheadVideo = function(e, detail, sender) {
+        IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
 
-      IOWA.Elements.Template.onSetReminder = function(e, detail, sender) {
-        e.preventDefault();
+        this.mastheadVideoActive = true; // stamp template
 
-        var template = this;
-        template.settingsIOReminder = true;
-
-        IOWA.Schedule.saveSession('__keynote__', true).then(function() {
-          template.settingsIOReminder = false;
-
-          if (template.savedSessions.length) {
-            IOWA.Schedule.updateSavedSessionsUI(IOWA.Elements.Template.savedSessions);
-          }
-
-          IOWA.Schedule.bookmarkSessionNotification(
-              true, "You'll be reminded when I/O starts.")
+        // Wait 1 rAF for template to stamp.
+        this.async(function() {
+          var dialog = IOWA.Elements.Main.querySelector('paper-dialog');
+          var videoid = IOWA.Elements.Template.scheduleData.sessions[0].youtubeUrl;
+          dialog.querySelector('google-youtube').videoid = videoid;
+          dialog.toggle();
         });
       };
 
