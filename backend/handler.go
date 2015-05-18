@@ -690,6 +690,10 @@ func serveUserSurvey(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
+	if isDev() {
+		w.Write([]byte(`["__keynote__"]`))
+		return
+	}
 	sessions, err := submittedSurveySessions(c, contextUser(c))
 	if err != nil {
 		writeJSONError(c, w, http.StatusInternalServerError, err)
@@ -723,6 +727,11 @@ func submitUserSurvey(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sid := path.Base(r.URL.Path)
+	if isDev() {
+		w.Write([]byte(`["` + sid + `"]`))
+		return
+	}
+
 	// we don't accept feedback for certain sessions
 	if disabledSurvey(sid) {
 		writeJSONError(c, w, http.StatusBadRequest, "survey feedback not allowed for this session")
