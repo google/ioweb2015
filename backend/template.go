@@ -250,12 +250,14 @@ func getSitemap(c context.Context, baseURL *url.URL) (*sitemap, error) {
 				return nil
 			}
 		}
+		freq := "weekly"
 		if name == "home" {
-			name = "."
+			name = ""
+			freq = "daily"
 		}
 		item := &sitemapItem{
 			Loc:  baseURL.ResolveReference(&url.URL{Path: name}).String(),
-			Freq: "weekly",
+			Freq: freq,
 		}
 		items = append(items, item)
 		return nil
