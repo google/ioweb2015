@@ -3,7 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "authors": [
-    "Eric Bidelman <e.bidelman@google.com>"
+    "Eric Bidelman <ebidel@>",
+    "Alex Vaghin",
+    "Jeff Posnick",
+    "Ewa Gasperowicz",
+    "Brendan Kenny",
+    "Paul Lewis",
+    "Rob Dodson"
   ],
   "description": "Google I/O Web App",
   "main": "index.html",

@@ -1,5 +1,22 @@
 /* jshint node: true */
 
+/**
+ *
+ * Copyright 2015 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var fs = require('fs');
@@ -10,7 +27,7 @@ var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var pagespeed = require('psi');
 var del = require('del');
-var i18n_replace = require('./gulp_scripts/i18n_replace');
+
 var generateServiceWorker = require('./gulp_scripts/generate_service_worker');
 var runSequence = require('run-sequence');
 var argv = require('yargs').argv;
@@ -96,10 +113,6 @@ gulp.task('vulcanize-elements', ['sass'], function() {
       inline: true,
       dest: APP_DIR + '/elements'
     }))
-    // .pipe(i18n_replace({
-    //   strict: !!argv.strict,
-    //   path: '_messages',
-    // }))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
 });
 
@@ -139,18 +152,6 @@ gulp.task('vulcanize-extended-elements', ['sass'], function() {
     }))
     .pipe(gulp.dest(DIST_STATIC_DIR + '/' + APP_DIR + '/elements/'));
 });
-
-// gulp.task('i18n_index', function() {
-//   return gulp.src(['index.html', 'error.html', 'upgrade.html'])
-//     .pipe(argv.pretty ? $.gutil.noop() : $.replace(/window\.DEV ?= ?true.*/, ''))
-//     .pipe($.replace('<base href="">',
-//         '<base href="' + STATIC_URL + '">'))
-//     .pipe(i18n_replace({
-//       strict: !!argv.strict,
-//       path: '_messages',
-//     }))
-//     .pipe(gulp.dest(DIST_PROD_DIR));
-// });
 
 // copy needed assets (images, polymer elements, etc) to /dist directory
 gulp.task('copy-assets', function() {
