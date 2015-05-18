@@ -2447,6 +2447,57 @@ func TestHandleClockNextSessions(t *testing.T) {
 	checkUpdates(dc, "api")
 }
 
+func TestHandleEasterEgg(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	const link = "http://example.org/egg"
+	config.SyncToken = "secret"
+
+	table := []struct {
+		inLink  string
+		expires time.Time
+		auth    string
+		code    int
+		outLink string
+	}{
+		{link, time.Now().Add(10 * time.Minute), config.SyncToken, http.StatusOK, link},
+		{link, time.Now().Add(-10 * time.Minute), config.SyncToken, http.StatusOK, ""},
+		{link, time.Now().Add(time.Minute), "invalid", http.StatusForbidden, ""},
+		{link, time.Now().Add(time.Minute), "", http.StatusForbidden, ""},
+	}
+
+	for i, test := range table {
+		body := fmt.Sprintf(`{
+			"link": %q,
+			"expires": %q
+		}`, test.inLink, test.expires.Format(time.RFC3339))
+		r := newTestRequest(t, "POST", "/api/v1/easter-egg", strings.NewReader(body))
+		r.Header.Set("authorization", test.auth)
+		w := httptest.NewRecorder()
+		handleEasterEgg(w, r)
+
+		if w.Code != test.code {
+			t.Errorf("%d: w.Code = %d; want %d\nResponse: %s", i, w.Code, test.code, w.Body.String())
+		}
+		if test.code != http.StatusOK {
+			continue
+		}
+		c := newContext(r)
+		if err := cache.flush(c); err != nil {
+			t.Error(err)
+			continue
+		}
+		link := getEasterEggLink(c)
+		if link != test.outLink {
+			t.Errorf("%d: link = %q; want %q", i, link, test.outLink)
+		}
+	}
+}
+
 func fetchFirstSWToken(t *testing.T, auth string) string {
 	r := newTestRequest(t, "GET", "/api/v1/user/updates", nil)
 	r.Header.Set("authorization", bearerHeader+auth)
