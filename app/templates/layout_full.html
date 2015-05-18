@@ -55,7 +55,7 @@ limitations under the License.
   <!-- G+ sharing meta data -->
   <meta itemprop="name" content="{% .OgTitle %}">
   <meta itemprop="description" content="{% .Desc %}">
-  <meta itemprop="image" content="{% r .OgImage %}">
+  <meta itemprop="image" content="{% url .OgImage %}">
   <!-- May 28 9:30am PDT through May 29 5pm PDT -->
   <meta itemprop="startDate" content="2015-05-28T16:30:00Z">
   <meta itemprop="endDate" content="2015-05-29T23:59:59Z">
@@ -67,14 +67,14 @@ limitations under the License.
   <meta property="og:url" content="{% .Prefix %}">
   <meta property="og:description" content="{% .Desc %}">
   <meta property="og:type" content="Event">
-  <meta property="og:image" content="{% r .OgImage %}">
+  <meta property="og:image" content="{% url .OgImage %}">
 
   <!-- Twitter meta data -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@googledevs">
   <meta name="twitter:title" content="{% .OgTitle %}">
   <meta name="twitter:description" content="{% .Desc %}">
-  <meta name="twitter:image:src" content="{% r .OgImage %}">
+  <meta name="twitter:image:src" content="{% url .OgImage %}">
 
   <!-- Unsupported browser checks need to come before webcomponents.js is loaded,
        otherwise unsupported browsers will error out and not record a pageview.
@@ -159,7 +159,7 @@ limitations under the License.
     if (!supported) {
       // Note: pageview is recorded when IOWA.Analytics is setup.
       IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', null, null, function() {
-        window.location = {% canonical "upgrade" %};
+        window.location = {% url "upgrade" %};
       });
     }
   })();
@@ -172,8 +172,9 @@ limitations under the License.
 
   <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="elements/elements.html">
-
-  <link rel="canonical" href="{% canonical .Slug %}">
+  {% if .Canonical %}
+  <link rel="canonical" href="{% .Canonical %}">
+  {% end %}
 </head>
 <body id="page-{% .Slug %}">
 

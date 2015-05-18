@@ -35,11 +35,10 @@ const (
 var (
 	// tmplFunc is a map of functions available to all templates.
 	tmplFunc = template.FuncMap{
-		"safeHTML":  func(v string) template.HTML { return template.HTML(v) },
-		"safeAttr":  safeHTMLAttr,
-		"json":      jsonForTemplate,
-		"canonical": canonicalURL,
-		"r":         resourceURL,
+		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
+		"safeAttr": safeHTMLAttr,
+		"json":     jsonForTemplate,
+		"url":      resourceURL,
 	}
 	// tmplCache caches HTML templates parsed in parseTemplate()
 	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
@@ -57,6 +56,7 @@ type templateData struct {
 	ClientID     string
 	Prefix       string
 	Slug         string
+	Canonical    string
 	Title        string
 	Desc         string
 	OgTitle      string
@@ -156,15 +156,6 @@ func pageTitle(t *template.Template) string {
 		return defaultTitle
 	}
 	return b.String()
-}
-
-// canonicalURL returns a canonical URL of path p.
-// Relative paths are based off of config.Prefix.
-func canonicalURL(p string) string {
-	if p == "home" || p == "/" || p == "" {
-		return config.Prefix + "/"
-	}
-	return path.Join(config.Prefix, p)
 }
 
 // resourceURL returns absolute path to a resource referenced by parts.

@@ -140,7 +140,8 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		tplname = "home"
 	}
 
-	data := &templateData{}
+	// TODO: move all template-related stuff to template.go
+	data := &templateData{Canonical: canonicalURL(r, nil)}
 	switch {
 	case experimentShare:
 		data.OgTitle = defaultTitle
@@ -155,6 +156,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
+		data.Canonical = canonicalURL(r, url.Values{"sid": {sid}})
 		data.Title = s.Title + " - Google I/O Schedule"
 		data.OgTitle = data.Title
 		data.OgImage = s.Photo
@@ -690,6 +692,10 @@ func serveUserSurvey(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(c, w, errStatus(err), err)
 		return
 	}
+	if isDev() {
+		w.Write([]byte(`["__keynote__"]`))
+		return
+	}
 	sessions, err := submittedSurveySessions(c, contextUser(c))
 	if err != nil {
 		writeJSONError(c, w, http.StatusInternalServerError, err)
@@ -723,6 +729,11 @@ func submitUserSurvey(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sid := path.Base(r.URL.Path)
+	if isDev() {
+		w.Write([]byte(`["` + sid + `"]`))
+		return
+	}
+
 	// we don't accept feedback for certain sessions
 	if disabledSurvey(sid) {
 		writeJSONError(c, w, http.StatusBadRequest, "survey feedback not allowed for this session")
@@ -1233,6 +1244,36 @@ func toAPISchedule(d *eventData) interface{} {
 		Speakers: d.Speakers,
 		Tags:     d.Tags,
 	}
+}
+
+// canonicalURL returns a canonical URL of the page rendered for a request at URL u.
+func canonicalURL(r *http.Request, q url.Values) string {
+	// make sure path has site prefix
+	p := r.URL.Path
+	if !strings.HasPrefix(p, config.Prefix) {
+		p = path.Join(config.Prefix, p)
+	}
+	// remove /home
+	if p == path.Join(config.Prefix, "home") {
+		p = config.Prefix + "/"
+	}
+	// re-add trailing slash if needed
+	if p == config.Prefix {
+		p += "/"
+	}
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   r.Host,
+		Path:   p,
+	}
+	if r.TLS == nil {
+		u.Scheme = "http"
+	}
+	if q != nil {
+		u.RawQuery = q.Encode()
+	}
+	return u.String()
 }
 
 // ctxKey is a custom type for context.Context values.

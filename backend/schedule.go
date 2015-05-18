@@ -51,6 +51,7 @@ type eventSession struct {
 	StartTime  time.Time `json:"startTimestamp"`
 	EndTime    time.Time `json:"endTimestamp"`
 	IsLive     bool      `json:"isLivestream"`
+	IsFeatured bool      `json:"isFeatured"`
 	Tags       []string  `json:"tags"`
 	Speakers   []string  `json:"speakers"`
 	Room       string    `json:"room"`
@@ -411,6 +412,7 @@ func compareSessions(a, b *eventSession) bool {
 	}
 
 	// compare for 'details' update
+	b.IsFeatured = a.IsFeatured
 	b.IsLive = a.IsLive
 	b.YouTube = a.YouTube
 	if !reflect.DeepEqual(a, b) {
