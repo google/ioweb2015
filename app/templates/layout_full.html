@@ -159,7 +159,7 @@ limitations under the License.
     if (!supported) {
       // Note: pageview is recorded when IOWA.Analytics is setup.
       IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', null, null, function() {
-        window.location = {% canonical "upgrade" %};
+        window.location = {% r "upgrade" %};
       });
     }
   })();
@@ -172,8 +172,9 @@ limitations under the License.
 
   <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="elements/elements.html">
-
-  <link rel="canonical" href="{% canonical .Slug %}">
+  {% if .Canonical %}
+  <link rel="canonical" href="{% .Canonical %}">
+  {% end %}
 </head>
 <body id="page-{% .Slug %}">
 

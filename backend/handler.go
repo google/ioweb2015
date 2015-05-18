@@ -140,7 +140,8 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		tplname = "home"
 	}
 
-	data := &templateData{}
+	// TODO: move all template-related stuff to template.go
+	data := &templateData{Canonical: canonicalURL(r, nil)}
 	switch {
 	case experimentShare:
 		data.OgTitle = defaultTitle
@@ -155,6 +156,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
+		data.Canonical = canonicalURL(r, url.Values{"sid": {sid}})
 		data.Title = s.Title + " - Google I/O Schedule"
 		data.OgTitle = data.Title
 		data.OgImage = s.Photo
@@ -1233,6 +1235,36 @@ func toAPISchedule(d *eventData) interface{} {
 		Speakers: d.Speakers,
 		Tags:     d.Tags,
 	}
+}
+
+// canonicalURL returns a canonical URL of the page rendered for a request at URL u.
+func canonicalURL(r *http.Request, q url.Values) string {
+	// make sure path has site prefix
+	p := r.URL.Path
+	if !strings.HasPrefix(p, config.Prefix) {
+		p = path.Join(config.Prefix, p)
+	}
+	// remove /home
+	if p == path.Join(config.Prefix, "home") {
+		p = config.Prefix + "/"
+	}
+	// re-add trailing slash if needed
+	if p == config.Prefix {
+		p += "/"
+	}
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   r.Host,
+		Path:   p,
+	}
+	if r.TLS == nil {
+		u.Scheme = "http"
+	}
+	if q != nil {
+		u.RawQuery = q.Encode()
+	}
+	return u.String()
 }
 
 // ctxKey is a custom type for context.Context values.
