@@ -30,7 +30,7 @@ $icon-margin: 10px;
 }
 
 .photo__masthead {
-  background: url(../images/videos/keynote.jpg) no-repeat 50% 0;
+  background: url(../images//offsite/Recap-Video-Image.jpg) no-repeat 50% 50%;
   background-size: cover;
 }
 
@@ -44,20 +44,20 @@ $icon-margin: 10px;
 }
 
 .photo__home {
-  background-image: url(../images/home/Image-Gallery-01.jpg);
-  background-position: 50% 0;
+  background-image: url(../images/offsite/Image-01@2x.jpg);
+  background-position: 50% 50%;
   background-size: cover;
 }
 
 .photo__home--top {
-  background-image: url(../images/home/Image-Gallery-02.jpg);
-  background-position: 100% 0;
+  background-image: url(../images/offsite/Image-03@2x.jpg);
+  background-position: 50% 0;
   background-size: cover;
 }
 
 .photo__home--bottom {
-  background-image: url(../images/home/Image-Gallery-03.jpg);
-  background-position: 0 0;
+  background-image: url(../images/offsite/Image-02@2x.jpg);
+  background-position: 50% 0;
   background-size: cover;
 }
 
@@ -293,6 +293,12 @@ google-youtube {
   }
 }
 
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .pics__section {
+    margin-top: -124px;
+  }
+}
+
 @media (min-width: $desktop-breakpoint-mid) {
   .pics__section {
     margin-top: -100px;
@@ -317,14 +323,17 @@ google-youtube {
 }
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .photo__masthead {
+    background-image: url(../images/offsite/Recap-Video-Image@2x.jpg);
+  }
   .photo__home {
-    background-image: url(../images/home/Image-Gallery-01@2x.jpg);
+    background-image: url(../images/offsite/Image-01@2x.jpg);
   }
   .photo__home--top {
-    background-image: url(../images/home/Image-Gallery-02@2x.jpg);
+    background-image: url(../images/offsite/Image-03@2x.jpg);
   }
   .photo__home--bottom {
-    background-image: url(../images/home/Image-Gallery-03@2x.jpg);
+    background-image: url(../images/offsite/Image-02@2x.jpg);
   }
 }
 
