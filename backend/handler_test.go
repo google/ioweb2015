@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -281,6 +282,67 @@ func TestServeSessionTemplate(t *testing.T) {
 		if miss > 0 {
 			t.Errorf("%d: %d meta tags are missing in layout:\n%s", i, miss, w.Body.String())
 		}
+	}
+}
+
+func TestServeSitemap(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	c := newContext(newTestRequest(t, "GET", "/dummmy", nil))
+	if err := storeEventData(c, &eventData{
+		modified: time.Now(),
+		Sessions: map[string]*eventSession{
+			"123": &eventSession{Id: "123"},
+		},
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	config.Prefix = "/pref"
+	r := newTestRequest(t, "GET", "/sitemap.xml", nil)
+	r.Host = "example.org"
+	r.TLS = &tls.ConnectionState{}
+	w := httptest.NewRecorder()
+	serveSitemap(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	lookup := []struct {
+		line  string
+		found bool
+	}{
+		{`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`, true},
+		{`<loc>https://example.org/pref/</loc>`, true},
+		{`<loc>https://example.org/pref/about</loc>`, true},
+		{`<loc>https://example.org/pref/schedule</loc>`, true},
+		{`<loc>https://example.org/pref/schedule?sid=123</loc>`, true},
+		{`<loc>https://example.org/pref/home`, false},
+		{`<loc>https://example.org/pref/embed`, false},
+		{`<loc>https://example.org/pref/upgrade`, false},
+		{`<loc>https://example.org/pref/admin`, false},
+		{`<loc>https://example.org/pref/debug`, false},
+		{`<loc>https://example.org/pref/error_`, false},
+	}
+	err := false
+	for _, l := range lookup {
+		found := strings.Contains(w.Body.String(), l.line)
+		if !found && l.found {
+			err = true
+			t.Errorf("does not contain %s", l.line)
+		}
+		if found && !l.found {
+			err = true
+			t.Errorf("contain %s", l.line)
+		}
+	}
+	if err {
+		t.Errorf("response:\n%s", w.Body.String())
 	}
 }
 
