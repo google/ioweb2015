@@ -80,7 +80,7 @@ type templateData struct {
 }
 
 type sitemap struct {
-	XMLName xml.Name `xml:"urlset"`
+	XMLName xml.Name `xml:"http://www.sitemaps.org/schemas/sitemap/0.9 urlset"`
 	Items   []*sitemapItem
 }
 

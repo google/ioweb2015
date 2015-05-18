@@ -367,6 +367,7 @@ func TestServeSitemap(t *testing.T) {
 		line  string
 		found bool
 	}{
+		{`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`, true},
 		{`<loc>https://example.org/pref/</loc>`, true},
 		{`<loc>https://example.org/pref/about</loc>`, true},
 		{`<loc>https://example.org/pref/schedule</loc>`, true},
@@ -391,7 +392,7 @@ func TestServeSitemap(t *testing.T) {
 		}
 	}
 	if err {
-		t.Errorf("response: %s", w.Body.String())
+		t.Errorf("response:\n%s", w.Body.String())
 	}
 }
 
