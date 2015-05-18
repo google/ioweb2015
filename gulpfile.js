@@ -702,3 +702,22 @@ gulp.task('screenshots', ['backend'], function(callback) {
     pages, widths, height, callbackWrapper);
 });
 
+gulp.task('sitemap', function() {
+  gulp.src(APP_DIR + '/templates/!(layout_|error).html', {read: false})
+    .pipe($.rename(function(path) {
+      if (path.basename === 'home') {
+        path.basename = '/'; // homepage is served from root.
+      }
+      path.extname = ''; // remove .html from URLs.
+    }))
+    .pipe($.sitemap({
+      siteUrl: PROD_ORIGIN + URL_PREFIX,
+      changefreq: 'weekly',
+      spacing: '  ',
+      mappings: [{
+        pages: [''], // homepage should be more frequent
+        changefreq: 'daily'
+      }]
+    }))
+    .pipe(gulp.dest(APP_DIR));
+});
