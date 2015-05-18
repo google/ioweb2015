@@ -148,19 +148,22 @@ func TestServeTemplate(t *testing.T) {
 	config.Prefix = "/root"
 
 	table := []struct{ path, slug, canonical string }{
-		{"/", "home", "/root/"},
-		{"/home?experiment", "home", "/root/"},
-		{"/about", "about", "/root/about"},
-		{"/about?experiment", "about", "/root/about"},
-		{"/schedule", "schedule", "/root/schedule"},
-		{"/onsite", "onsite", "/root/onsite"},
-		{"/offsite", "offsite", "/root/offsite"},
-		{"/registration", "registration", "/root/registration"},
-		{"/faq", "faq", "/root/faq"},
-		{"/form", "form", "/root/form"},
+		{"/", "home", "http://example.org/root/"},
+		{"/home?experiment", "home", "http://example.org/root/"},
+		{"/about", "about", "http://example.org/root/about"},
+		{"/about?experiment", "about", "http://example.org/root/about"},
+		{"/about?some=param", "about", "http://example.org/root/about"},
+		{"/schedule", "schedule", "http://example.org/root/schedule"},
+		{"/schedule?sid=not-there", "schedule", "http://example.org/root/schedule"},
+		{"/onsite", "onsite", "http://example.org/root/onsite"},
+		{"/offsite", "offsite", "http://example.org/root/offsite"},
+		{"/registration", "registration", "http://example.org/root/registration"},
+		{"/faq", "faq", "http://example.org/root/faq"},
+		{"/form", "form", "http://example.org/root/form"},
 	}
 	for i, test := range table {
 		r := newTestRequest(t, "GET", test.path, nil)
+		r.Host = "example.org"
 		w := httptest.NewRecorder()
 		serveTemplate(w, r)
 
