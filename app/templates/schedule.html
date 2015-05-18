@@ -107,10 +107,124 @@
 
     </div>
   </div>
+
+
   <div class="session__info__section session__info__links card-content" hidden?="{{!selectedSession.hasRelated}}">
     <span class="anchor-like" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related" core-overlay-toggle>View related content</span>
+    <span class="anchor-like" on-click="{{onRateSession}}" data-track-link="schedule-rate-session">Rate this session</span>
   </div>
 </paper-dialog>
+
+
+
+
+
+
+
+<paper-dialog class="session__rate" transition="core-transition-center"
+              layered="false" backdrop?="{{!isIOS}}"
+              on-core-overlay-close-completed=""
+              on-core-overlay-open-completed="">
+  <div class="session__info__section rate__header" layout horizontal center>
+    <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
+    <span>Rate this session</span>
+  </div>
+
+
+
+  <div class="session__info__section">
+    <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
+    <h5 class="session__authors">
+      <template repeat="{{speakerId, i in selectedSession.speakers}}">
+        <span>{{scheduleData.speakers[speakerId].name}}<span hidden?="{{i > selectedSession.speakers.length-2}}">, </span></span>
+      </template>
+    </h5>
+  </div>
+
+  <div class="session__info__section">
+    <p>Session rating</p>
+    <div>
+      <div>
+        <core-menu layout selected="{{answers.overall}}" horizontal justified>
+          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
+          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
+          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
+          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
+          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
+        </core-menu>
+      </div>
+      <div class="rate__hint" layout horizontal justified>
+        <span>Not so awesome</span>
+        <span>Awesome</span>
+      </div>
+    </div>
+  </div>
+  <div class="session__info__section">
+    <p>How relevant was this session to your projects?</p>
+    <div>
+      <div>
+        <core-menu selected="{{answers.relevance}}" layout horizontal justified>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+        </core-menu>
+      </div>
+      <div class="rate__hint" layout horizontal justified>
+        <span>Not at all</span>
+        <span>Extremely</span>
+      </div>
+    </div>
+  </div>
+  <div class="session__info__section">
+    <p>Based on the description/my expectations, the content was</p>
+    <div>
+      <div>
+        <core-menu selected="{{answers.content}}" layout horizontal justified>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+        </core-menu>
+      </div>
+      <div class="rate__hint" layout horizontal justified>
+        <span>Too basic</span>
+        <span>Too advanced</span>
+      </div>
+    </div>
+  </div>
+  <div class="session__info__section">
+    <p>Speaker quality</p>
+    <div>
+      <div>
+        <core-menu selected="{{answers.speaker}}" layout horizontal justified>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+          <paper-icon-button icon="favorite" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+        </core-menu>
+      </div>
+      <div class="rate__hint" layout horizontal justified>
+        <span>Poor</span>
+        <span>Outstanding</span>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="session__info__section session__info__links card-content">
+    <span class="anchor-like" on-click="{{onRateSessionSubmit}}" data-track-link="schedule-rate-submit" core-overlay-toggle>Submit</span>
+  </div>
+
+</paper-dialog>
+
+
+
+
+
 
 <div class="subpage__container">
   <section class="subpage-agenda subpage__content {{ {active: pages['schedule'].selectedSubpage == 'agenda'} | tokenList}}">
@@ -339,6 +453,7 @@
     var pageIsDeepLinked_ = false; // Flag to not double-record page view on deep linking into session.
     var ioScheduleEl = null;
     var detailsPanel = null;
+    var ratePanel = null;
 
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
@@ -392,6 +507,11 @@
         IOWA.Elements.Template.startScheduleVideo = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
+        detailsPanel = detailsPanel || document.querySelector('.session__detail');
+        ratePanel = ratePanel || document.querySelector('.session__rate');
+
+        detailsPanel.querySelector('core-image').classList.remove('fadeout');
+        detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
@@ -503,6 +623,73 @@
         }
         ioScheduleEl.filters = [this.selectedSession.id];
       };
+
+
+
+
+
+
+
+
+
+      IOWA.Elements.Template.onRateSession = function(e, detail, sender) {
+
+        this.answers = {
+        }; // Reset answers.
+
+        ratePanel.open();
+        /*e.stopPropagation();
+        if (sender && sender.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+        }
+        ioScheduleEl.filters = [this.selectedSession.id];*/
+      };
+
+      IOWA.Elements.Template.onRateSessionSubmit = function(e, detail, sender) {
+        IOWA.Schedule.saveSurvey(this.selectedSession.id, this.answers).then(function() {
+
+          console.log('done')
+          return;
+          this.scheduleFetchingUserData = false;
+          this.selectedSession.saved = saved;
+
+          IOWA.Schedule.bookmarkSessionNotification(saved);
+
+          ioScheduleEl.updateTimeBlocks(); // Needed for My Schedule to update.
+        }.bind(this));
+
+        /*e.stopPropagation();
+        if (sender && sender.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+        }
+        ioScheduleEl.filters = [this.selectedSession.id];*/
+      };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      IOWA.Elements.Template.openRateForm = function(sessionOrEvent) {
+        if (!sessionOrEvent) {
+          return;
+        }
+        this.selectedSession = sessionOrEvent.detail ? sessionOrEvent.detail.session : sessionOrEvent;
+
+        // Open paper-dialog.
+        detailsPanel.open();
+      };
+
 
       IOWA.Elements.Template.selectTimezone = function(e, detail, sender) {
         var day1LocalizedTime = ioScheduleEl.getLocalizedTime(ioScheduleEl.gmtDayOne);

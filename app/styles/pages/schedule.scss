@@ -132,6 +132,105 @@ core-icon[icon="schedule"] {
   white-space: nowrap;
 }
 
+
+
+.session__rate {
+  $lineHeight: 32px;
+
+  .session__info__section {
+    padding: $desktopKeyline;
+    border-top: 1px solid $color-light-grey-border;
+  }
+
+  .session__info__links {
+    border-top: 1px solid $color-light-grey-border;
+    text-transform: uppercase;
+  }
+
+  .rate__header {
+    color: $color-heading;
+    padding: 8px;
+  }
+
+  .session__title {
+    color: #000;
+  }
+
+  .session__authors {
+    color: $color-link-grey;
+    line-height: $lineHeight;
+    font-weight: 400;
+  }
+
+  core-menu {
+    margin: 0;
+  }
+
+  p {
+    margin-bottom: $tabletKeyline;
+  }
+
+  .rate__hint {
+    margin-top: $tabletKeyline;
+    color: $color-link-grey;
+  }
+
+  .rate__icon-1::after {
+    content: "1";
+  }
+
+  .rate__icon-2::after {
+    content: "2";
+  }
+
+  .rate__icon-3::after {
+    content: "3";
+  }
+
+  .rate__icon-4::after {
+    content: "4";
+  }
+
+  .rate__icon-5::after {
+    content: "5";
+  }
+
+  .rate__icon {
+    color: $color-link-grey;
+    background-color: $color-light-grey-border;
+    transition: background-color .3s linear .1s, color .3s linear .1s;
+    //transition-delay: .1s, color .1s;
+    border-radius: 50%;
+  }
+
+  .rate__icon-empty {
+    color: $color-text;
+  }
+
+  .rate__icon-empty::shadow core-icon {
+    visibility: hidden;
+
+  }
+
+  .rate__icon.core-selected {
+    background-color: $color-bluegrey-700;
+    color: #fff;
+  }
+
+
+
+  .rate__icon::after {
+    position: absolute;
+    color: inherit;
+    margin: -31px auto 0 auto;
+    /* text-align: center; */
+    /* width: 100%; */
+    /* box-sizing: content-box; */
+    padding: 8px;
+  }
+
+}
+
 .session__detail {
   $lineHeight: 32px;
 
@@ -178,6 +277,10 @@ core-icon[icon="schedule"] {
   .session__info__links {
     border-top: 1px solid $color-light-grey-border;
     text-transform: uppercase;
+
+      .anchor-like {
+        margin-right: $tabletKeyline;
+      }
   }
   .session__desc {
     margin: $tabletKeyline 0;

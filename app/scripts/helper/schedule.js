@@ -22,6 +22,7 @@ IOWA.Schedule = (function() {
 
   var SCHEDULE_ENDPOINT = 'api/v1/schedule';
   var SCHEDULE_ENDPOINT_USERS = 'api/v1/user/schedule';
+  var SURVEY_ENDPOINT_USERS = 'api/v1/user/survey';
   var QUEUED_SESSION_UPDATES_DB_NAME = 'shed-offline-session-updates';
 
   var scheduleData_ = null;
@@ -162,6 +163,44 @@ IOWA.Schedule = (function() {
           throw error;
         });
     });
+  }
+
+  /**
+   * Adds/removes a session from the user's bookmarked sessions.
+   * @param {string} sessionId The session to add/remove.
+   * @param {Boolean} save True if the session should be added, false if it
+   *     should be removed.
+   * @return {Promise} Resolves with the server's response.
+   */
+  function saveSurvey(sessionId, answers) {
+    //IOWA.Analytics.trackEvent('session', 'bookmark', save ? 'save' : 'remove');
+
+    console.log(sessionId, answers);
+
+
+    IOWA.Auth.waitForSignedIn('Sign in to submit feedback').then(function() {
+
+      IOWA.Elements.Template.scheduleFetchingUserData = true;
+      var url = SURVEY_ENDPOINT_USERS + '/' + sessionId;
+      return IOWA.Request.xhrPromise('PUT', url, true, answers)
+        .then(function() {
+          console.log('then')
+
+        })
+        //.then(clearCachedUserSchedule)
+        .catch(function(error) {
+          // error will be an XMLHttpRequestProgressEvent if the xhrPromise() was rejected due to
+          // a network error. Otherwise, error will be a Error object.
+          if ('serviceWorker' in navigator && XMLHttpRequestProgressEvent &&
+              error instanceof XMLHttpRequestProgressEvent) {
+            IOWA.Elements.Toast.showMessage('Unable to save feedback results. The change will be retried on your next visit.');
+          } else {
+            IOWA.Elements.Toast.showMessage('Unable to save feedback results.');
+          }
+          throw error;
+        });
+    });
+
   }
 
   /**
@@ -325,6 +364,7 @@ IOWA.Schedule = (function() {
     fetchUserSchedule: fetchUserSchedule,
     loadUserSchedule: loadUserSchedule,
     saveSession: saveSession,
+    saveSurvey: saveSurvey,
     generateFilters: generateFilters,
     getSessionById: getSessionById,
     updateSavedSessionsUI: updateSavedSessionsUI,
