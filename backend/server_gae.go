@@ -37,6 +37,7 @@ import (
 var passthruPrefixes = []string{
 	"/sync",
 	"/api/v1/user",
+	"/api/v1/easter-egg",
 }
 
 func init() {
