@@ -50,13 +50,13 @@ limitations under the License.
   <meta property="og:title" content="{% .Title %}">
   <meta property="og:description" content="{% .Desc %}">
   <meta property="og:type" content="Event">
-  <meta property="og:image" content="{% r .OgImage %}">
+  <meta property="og:image" content="{% url .OgImage %}">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@googledevs">
   <meta name="twitter:title" content="{% .Title %}">
   <meta name="twitter:description" content="{% .Desc %}">
-  <meta name="twitter:image:src" content="{% r .OgImage %}">
+  <meta name="twitter:image:src" content="{% url .OgImage %}">
 
   <script type="application/ld+json">
     {
@@ -164,7 +164,7 @@ limitations under the License.
     if (!supported) {
       // Note: pageview is recorded when IOWA.Analytics is setup.
       IOWA.Analytics.trackEvent('Polymer', 'unsupported-browser', null, null, function() {
-        window.location = {% canonical "upgrade" %};
+        window.location = {% r "upgrade" %};
       });
     }
   })();
