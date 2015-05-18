@@ -346,9 +346,12 @@ func TestServeSitemap(t *testing.T) {
 	defer preserveConfig()()
 
 	c := newContext(newTestRequest(t, "GET", "/dummmy", nil))
-	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
-		"123": &eventSession{Id: "123"},
-	}}); err != nil {
+	if err := storeEventData(c, &eventData{
+		modified: time.Now(),
+		Sessions: map[string]*eventSession{
+			"123": &eventSession{Id: "123"},
+		},
+	}); err != nil {
 		t.Fatal(err)
 	}
 

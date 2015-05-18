@@ -85,10 +85,10 @@ type sitemap struct {
 }
 
 type sitemapItem struct {
-	XMLName xml.Name  `xml:"url"`
-	Loc     string    `xml:"loc"`
-	Mod     time.Time `xml:"lastmod"`
-	Freq    string    `xml:"changefreq"`
+	XMLName xml.Name   `xml:"url"`
+	Loc     string     `xml:"loc"`
+	Freq    string     `xml:"changefreq,omitempty"`
+	Mod     *time.Time `xml:"lastmod,omitempty"`
 }
 
 // renderTemplate executes a template found in name.html file
@@ -255,7 +255,6 @@ func getSitemap(c context.Context, baseURL *url.URL) (*sitemap, error) {
 		}
 		item := &sitemapItem{
 			Loc:  baseURL.ResolveReference(&url.URL{Path: name}).String(),
-			Mod:  fi.ModTime().In(time.UTC),
 			Freq: "weekly",
 		}
 		items = append(items, item)
@@ -266,16 +265,17 @@ func getSitemap(c context.Context, baseURL *url.URL) (*sitemap, error) {
 	}
 
 	// schedule
-	d, err := getLatestEventData(c, nil)
+	sched, err := getLatestEventData(c, nil)
 	if err != nil {
 		return nil, err
 	}
-	for id, _ := range d.Sessions {
+	mod := sched.modified.In(time.UTC)
+	for id, _ := range sched.Sessions {
 		u := baseURL.ResolveReference(&url.URL{Path: "schedule"})
 		u.RawQuery = url.Values{"sid": {id}}.Encode()
 		item := &sitemapItem{
 			Loc:  u.String(),
-			Mod:  d.modified.In(time.UTC),
+			Mod:  &mod,
 			Freq: "daily",
 		}
 		items = append(items, item)
