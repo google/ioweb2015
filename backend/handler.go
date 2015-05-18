@@ -49,6 +49,7 @@ func registerHandlers() {
 	handle("/api/v1/social", serveSocial)
 	handle("/api/v1/auth", handleAuth)
 	handle("/api/v1/schedule", serveSchedule)
+	handle("/api/v1/easter-egg", handleEasterEgg)
 	handle("/api/v1/user/schedule", handleUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserSchedule)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
@@ -1032,6 +1033,24 @@ func handleClock(w http.ResponseWriter, r *http.Request) {
 	})
 	if terr != nil {
 		errorf(c, "txn err: %v", terr)
+	}
+}
+
+// handleEasterEgg is the easter egg link handler.
+// It replaces current link with the new one.
+func handleEasterEgg(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	if v := r.Header.Get("authorization"); v != config.SyncToken {
+		writeJSONError(c, w, http.StatusForbidden, errAuthInvalid)
+		return
+	}
+	egg := &easterEgg{}
+	if err := json.NewDecoder(r.Body).Decode(egg); err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+	if err := storeEasterEgg(c, egg); err != nil {
+		writeJSONError(c, w, errStatus(err), err)
 	}
 }
 

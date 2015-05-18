@@ -122,3 +122,22 @@ func storeNextSessions(c context.Context, items []*eventSession) error {
 func filterNextSessions(c context.Context, items []*eventSession) ([]*eventSession, error) {
 	return nil, errors.New("not implemented")
 }
+
+// storeEasterEgg replaces current easter egg data with egg.
+func storeEasterEgg(c context.Context, egg *easterEgg) error {
+	return errors.New("not implemented")
+}
+
+// getEasterEggLink returns current easter egg link or empty string
+// if not found or expired.
+func getEasterEggLink(c context.Context) string {
+	return ""
+}
+
+func updateEggCache(c context.Context, egg *easterEgg) error {
+	return errors.New("not implemented")
+}
+
+func getCachedEgg(c context.Context) (*easterEgg, error) {
+	return nil, errors.New("not implemented")
+}

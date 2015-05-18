@@ -64,6 +64,18 @@ type templateData struct {
 	StartDateStr string
 	// livestream youtube video IDs
 	LiveIDs []string
+	// easter egg link, unless expired
+	EggLink string
+}
+
+// easterEgg's link is embedded in pages, for fun.
+type easterEgg struct {
+	Link    string    `datastore:"link,noindex"`
+	Expires time.Time `datastore:"expires,noindex"`
+}
+
+func (egg *easterEgg) expired() bool {
+	return egg.Expires.Before(time.Now())
 }
 
 // renderTemplate executes a template found in name.html file
@@ -84,6 +96,7 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	data.Slug = name
 	data.Prefix = config.Prefix
 	data.StartDateStr = config.Schedule.Start.In(config.Schedule.Location).Format(time.RFC3339)
+	data.EggLink = getEasterEggLink(c)
 	if v, err := scheduleLiveIDs(c); err == nil {
 		data.LiveIDs = v
 	}

@@ -24,6 +24,7 @@ const (
 	kindChanges     = "Changes"
 	kindAppFolder   = "AppFolder"
 	kindNext        = "Next"
+	kindEgg         = "Egg"
 )
 
 type eventDataCache struct {
@@ -398,6 +399,54 @@ func filterNextSessions(c context.Context, items []*eventSession) ([]*eventSessi
 		res = append(res, items[i])
 	}
 	return res, nil
+}
+
+// storeEasterEgg replaces current easter egg data with egg.
+func storeEasterEgg(c context.Context, egg *easterEgg) error {
+	k := datastore.NewKey(c, kindEgg, "latest", 0, nil)
+	if _, err := datastore.Put(c, k, egg); err != nil {
+		return err
+	}
+	if err := updateEggCache(c, egg); err != nil {
+		errorf(c, "storeEasterEgg: %v", err)
+	}
+	return nil
+}
+
+// getEasterEggLink returns current easter egg link or empty string
+// if not found or expired.
+func getEasterEggLink(c context.Context) string {
+	egg, err := getCachedEgg(c)
+	if err != nil {
+		egg = &easterEgg{}
+		k := datastore.NewKey(c, kindEgg, "latest", 0, nil)
+		if err := datastore.Get(c, k, egg); err != nil {
+			return ""
+		}
+		updateEggCache(c, egg)
+	}
+	link := egg.Link
+	if egg.expired() {
+		link = ""
+	}
+	return link
+}
+
+func updateEggCache(c context.Context, egg *easterEgg) error {
+	b, err := json.Marshal(egg)
+	if err != nil {
+		return err
+	}
+	return cache.set(c, kindEgg, b, time.Hour)
+}
+
+func getCachedEgg(c context.Context) (*easterEgg, error) {
+	b, err := cache.get(c, kindEgg)
+	if err != nil {
+		return nil, err
+	}
+	egg := &easterEgg{}
+	return egg, json.Unmarshal(b, egg)
 }
 
 // eventDataParent returns a common ancestor for all kindEventData entities.
