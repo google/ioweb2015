@@ -132,8 +132,6 @@ core-icon[icon="schedule"] {
   white-space: nowrap;
 }
 
-
-
 .session__rate {
   $lineHeight: 32px;
 
@@ -199,8 +197,12 @@ core-icon[icon="schedule"] {
     color: $color-link-grey;
     background-color: $color-light-grey-border;
     transition: background-color .3s linear .1s, color .3s linear .1s;
-    //transition-delay: .1s, color .1s;
     border-radius: 50%;
+
+    &.core-selected {
+      background-color: $color-bluegrey-700;
+      color: #fff;
+    }
   }
 
   .rate__icon-empty {
@@ -209,26 +211,14 @@ core-icon[icon="schedule"] {
 
   .rate__icon-empty::shadow core-icon {
     visibility: hidden;
-
   }
-
-  .rate__icon.core-selected {
-    background-color: $color-bluegrey-700;
-    color: #fff;
-  }
-
-
 
   .rate__icon::after {
     position: absolute;
     color: inherit;
     margin: -31px auto 0 auto;
-    /* text-align: center; */
-    /* width: 100%; */
-    /* box-sizing: content-box; */
     padding: 8px;
   }
-
 }
 
 .session__detail {
@@ -280,6 +270,11 @@ core-icon[icon="schedule"] {
 
       .anchor-like {
         margin-right: $tabletKeyline;
+      }
+
+      .anchor-like-disabled {
+        color: $color-session-detail-light-grey;
+        font-weight: 500;
       }
   }
   .session__desc {
@@ -365,6 +360,13 @@ core-icon[icon="schedule"] {
     order: -1;
   }
   .session__detail {
+    margin: 0;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100%;
+    height: 100%;
+  }
+  .session__rate {
     margin: 0;
     left: 0 !important;
     top: 0 !important;

@@ -27,6 +27,7 @@ IOWA.Schedule = (function() {
 
   var scheduleData_ = null;
   var userSavedSessions_ = [];
+  var userSavedSurveys_ = [];
 
   // A promise fulfilled by the loaded schedule.
   var scheduleDeferredPromise = null;
@@ -94,6 +95,27 @@ IOWA.Schedule = (function() {
   }
 
   /**
+   * Fetches the user's submitted session surveys.
+   * If this is the first time it's been called, then uses the cache-then-network strategy to
+   * first try to read the data stored in the Cache Storage API, and invokes the callback with that
+   * response. It then tries to fetch a fresh copy of the data from the network, saves the response
+   * locally in memory, and resolves the promise with that response.
+   * @param {function} callback The callback to execute when the user survey data is available.
+   */
+  function fetchUserSurveys(callback) {
+    if (userSavedSurveys_.length) {
+      callback(userSavedSurveys_);
+    } else {
+      var callbackWrapper = function(userSavedSurveys) {
+        userSavedSurveys_ = userSavedSurveys || [];
+        callback(userSavedSurveys_);
+      };
+
+      IOWA.Request.cacheThenNetwork(SURVEY_ENDPOINT_USERS, callback, callbackWrapper, true);
+    }
+  }
+
+  /**
    * Fetches the user's saved sessions.
    * If this is the first time it's been called, then uses the cache-then-network strategy to
    * first try to read the data stored in the Cache Storage API, and invokes the callback with that
@@ -132,6 +154,13 @@ IOWA.Schedule = (function() {
         template.savedSessions = savedSessions;
         updateSavedSessionsUI(template.savedSessions);
       });
+
+      // Fetch user's rated sessions.
+      fetchUserSurveys(function(savedSurveys) {
+        var template = IOWA.Elements.Template;
+        template.savedSurveys = savedSurveys;
+        updateRatedSessions(savedSurveys);
+      });
     });
   }
 
@@ -166,28 +195,19 @@ IOWA.Schedule = (function() {
   }
 
   /**
-   * Adds/removes a session from the user's bookmarked sessions.
-   * @param {string} sessionId The session to add/remove.
-   * @param {Boolean} save True if the session should be added, false if it
-   *     should be removed.
+   * Submits session survey results.
+   * @param {string} sessionId The session to be rated.
+   * @param {Object} answers An object with question/answer pairs.
    * @return {Promise} Resolves with the server's response.
    */
   function saveSurvey(sessionId, answers) {
-    //IOWA.Analytics.trackEvent('session', 'bookmark', save ? 'save' : 'remove');
-
-    console.log(sessionId, answers);
-
-
-    IOWA.Auth.waitForSignedIn('Sign in to submit feedback').then(function() {
-
-      IOWA.Elements.Template.scheduleFetchingUserData = true;
+    IOWA.Analytics.trackEvent('session', 'rate', sessionId);
+    return IOWA.Auth.waitForSignedIn('Sign in to submit feedback').then(function() {
       var url = SURVEY_ENDPOINT_USERS + '/' + sessionId;
       return IOWA.Request.xhrPromise('PUT', url, true, answers)
-        .then(function() {
-          console.log('then')
-
+        .then(function(response) {
+          IOWA.Elements.Template.savedSurveys = response;
         })
-        //.then(clearCachedUserSchedule)
         .catch(function(error) {
           // error will be an XMLHttpRequestProgressEvent if the xhrPromise() was rejected due to
           // a network error. Otherwise, error will be a Error object.
@@ -282,6 +302,14 @@ IOWA.Schedule = (function() {
     for (var i = 0; i < sessions.length; ++i) {
       var session = sessions[i];
       session.saved = savedSessions.indexOf(session.id) !== -1;
+    }
+  }
+
+  function updateRatedSessions(savedSurveys) {
+    var sessions = IOWA.Elements.Template.scheduleData.sessions;
+    for (var i = 0; i < sessions.length; ++i) {
+      var session = sessions[i];
+      session.rated = savedSurveys.indexOf(session.id) !== -1;
     }
   }
 
