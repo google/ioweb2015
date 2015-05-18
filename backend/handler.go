@@ -1082,6 +1082,11 @@ func handleClock(w http.ResponseWriter, r *http.Request) {
 // handleEasterEgg is the easter egg link handler.
 // It replaces current link with the new one.
 func handleEasterEgg(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		serveEasterEgg(w, r)
+		return
+	}
+
 	c := newContext(r)
 	if v := r.Header.Get("authorization"); v != config.SyncToken {
 		writeJSONError(c, w, http.StatusForbidden, errAuthInvalid)
@@ -1095,6 +1100,17 @@ func handleEasterEgg(w http.ResponseWriter, r *http.Request) {
 	if err := storeEasterEgg(c, egg); err != nil {
 		writeJSONError(c, w, errStatus(err), err)
 	}
+}
+
+// serveEasterEgg responds with current egg link
+func serveEasterEgg(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	link := getEasterEggLink(c)
+	if link == "" && isDev() {
+		link = "http://example.org/test"
+	}
+	w.Header().Set("content-type", "application/json")
+	fmt.Fprintf(w, `{"link": %q}`, link)
 }
 
 // handleAdmin renders admin home page on 'GET' requests,
