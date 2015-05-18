@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"html/template"
 	"io"
@@ -41,6 +42,7 @@ var (
 func registerHandlers() {
 	// HTML
 	handle("/", rootHandleFn)
+	handle("/sitemap.xml", serveSitemap)
 	// API v0 - pre-phase2
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
@@ -185,6 +187,31 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		errorf(c, "renderTemplate(%q): %v", tplname, err)
 	}
+}
+
+// serveSitemap responds with sitemap XML entries for a better SEO.
+func serveSitemap(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	base := &url.URL{
+		Scheme: "https",
+		Host:   r.Host,
+		Path:   config.Prefix + "/",
+	}
+	if r.TLS == nil {
+		base.Scheme = "http"
+	}
+	m, err := getSitemap(c, base)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	res, err := xml.MarshalIndent(m, "  ", "    ")
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	w.Header().Set("content-type", "application/xml")
+	w.Write(res)
 }
 
 // serveIOExtEntries responds with I/O extended entries in JSON format.

@@ -3,7 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"html/template"
+	"net/url"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -42,6 +45,16 @@ var (
 	}
 	// tmplCache caches HTML templates parsed in parseTemplate()
 	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
+
+	// don't include these in sitemap
+	skipSitemap = []string{
+		"embed",
+		"upgrade",
+		"admin/",
+		"debug/",
+		"layout_",
+		"error_",
+	}
 )
 
 // templateCache is in-memory cache for parsed templates
@@ -64,6 +77,18 @@ type templateData struct {
 	StartDateStr string
 	// livestream youtube video IDs
 	LiveIDs []string
+}
+
+type sitemap struct {
+	XMLName xml.Name `xml:"http://www.sitemaps.org/schemas/sitemap/0.9 urlset"`
+	Items   []*sitemapItem
+}
+
+type sitemapItem struct {
+	XMLName xml.Name   `xml:"url"`
+	Loc     string     `xml:"loc"`
+	Freq    string     `xml:"changefreq,omitempty"`
+	Mod     *time.Time `xml:"lastmod,omitempty"`
 }
 
 // renderTemplate executes a template found in name.html file
@@ -193,4 +218,61 @@ func safeHTMLAttr(k, v string) template.HTMLAttr {
 		q = "'"
 	}
 	return template.HTMLAttr(k + "=" + q + v + q)
+}
+
+// getSitemap returns a sitemap containing both templated pages
+// and schedule session details.
+func getSitemap(c context.Context, baseURL *url.URL) (*sitemap, error) {
+	items := make([]*sitemapItem, 0)
+
+	// templated pages
+	root := filepath.Join(config.Dir, templatesDir)
+	err := filepath.Walk(root, func(p string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		ext := filepath.Ext(p)
+		if p == root || fi.IsDir() || ext != ".html" {
+			return nil
+		}
+		name := p[len(root)+1 : len(p)-len(ext)]
+		for _, s := range skipSitemap {
+			if strings.HasPrefix(name, s) {
+				return nil
+			}
+		}
+		freq := "weekly"
+		if name == "home" {
+			name = ""
+			freq = "daily"
+		}
+		item := &sitemapItem{
+			Loc:  baseURL.ResolveReference(&url.URL{Path: name}).String(),
+			Freq: freq,
+		}
+		items = append(items, item)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// schedule
+	sched, err := getLatestEventData(c, nil)
+	if err != nil {
+		return nil, err
+	}
+	mod := sched.modified.In(time.UTC)
+	for id, _ := range sched.Sessions {
+		u := baseURL.ResolveReference(&url.URL{Path: "schedule"})
+		u.RawQuery = url.Values{"sid": {id}}.Encode()
+		item := &sitemapItem{
+			Loc:  u.String(),
+			Mod:  &mod,
+			Freq: "daily",
+		}
+		items = append(items, item)
+	}
+
+	return &sitemap{Items: items}, nil
 }
