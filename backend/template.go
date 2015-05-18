@@ -38,7 +38,7 @@ var (
 		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
 		"safeAttr": safeHTMLAttr,
 		"json":     jsonForTemplate,
-		"r":        resourceURL,
+		"url":      resourceURL,
 	}
 	// tmplCache caches HTML templates parsed in parseTemplate()
 	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
