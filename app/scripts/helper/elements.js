@@ -140,6 +140,11 @@ IOWA.Elements = (function() {
 
     // Kickoff a11y helpers for elements
     IOWA.A11y.init();
+
+    // Do top secret stuff.
+    IOWA.Request.xhrPromise('GET', 'api/v1/easter-egg').then(function(response) {
+      IOWA.Elements.Template.eeFooterLink = response.link;
+    });
   }
 
   function init() {
@@ -159,6 +164,7 @@ IOWA.Elements = (function() {
     template.isIOS = IOWA.Util.isIOS();
     template.scheduleData = null;
     template.savedSessions = [];
+    template.eeFooterLink = null;
 
     // Sign-in defaults.
     template.isSignedIn = false;
