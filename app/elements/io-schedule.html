@@ -16,7 +16,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-label/core-label.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/core-a11y-keys/core-a11y-keys.html">
-<link rel="import" href="io-radio-button.html">
+<!-- <link rel="import" href="io-radio-button.html"> -->
 <link rel="import" href="io-checkbox.html">
 
 <!--
@@ -61,9 +61,9 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                   <template repeat="{{session in timeBlock.sessions}}">
                     <div class="schedule-row" layout horizontal
                          center?="{{isDesktopSize}}">
-                      <io-radio-button aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
+                      <io-checkbox aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
                                        toggles checked?="{{session.saved}}"
-                                       on-change="{{onToggleSaveSession}}"></io-radio-button>
+                                       on-change="{{onToggleSaveSession}}"></io-checkbox>
                       <div layout vertical?="{{!isDesktopSize}}"
                            horizontal?="{{isDesktopSize}}" flex tabindex="0"
                            on-click="{{onSessionSelect}}" on-keyup="{{onSessionKeyUp}}">
@@ -115,9 +115,9 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
                     <div class="schedule-row" layout horizontal center?="{{isDesktopSize}}"
                          hidden?="{{session.hide}}">
-                      <io-radio-button aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
+                      <io-checkbox aria-labelledby="session-{{session.id}}-time session-{{session.id}}-title"
                           toggles checked?="{{session.saved}}"
-                          on-change="{{onToggleSaveSession}}"></io-radio-button>
+                          on-change="{{onToggleSaveSession}}"></io-checkbox>
                       <div layout vertical?="{{!isDesktopSize}}"
                            horizontal?="{{isDesktopSize}}" flex tabindex="0"
                            on-click="{{onSessionSelect}}" on-keyup="{{onSessionKeyUp}}">
