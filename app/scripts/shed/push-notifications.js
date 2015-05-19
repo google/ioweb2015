@@ -26,7 +26,8 @@
     'session-details': 'schedule#myschedule',
     'io-soon': './',
     'session-start': 'schedule#myschedule',
-    'video-available': 'schedule#myschedule'
+    'video-available': 'schedule#myschedule',
+    survey: 'schedule#myschedule'
   };
   var UTM_SOURCE_PARAM = 'utm_source=notification';
   var SESSION_DEEPLINK_PREFIX = 'schedule?sid=';
@@ -92,7 +93,8 @@
       details: generateDetailsNotification,
       soon: generateSoonNotification,
       start: generateStartNotification,
-      video: generateVideoNotification
+      video: generateVideoNotification,
+      survey: generateSurveyNotification
     };
 
     var notifications = Object.keys(updates).filter(function(updateType) {
@@ -229,7 +231,6 @@
    * @return {object} An object with the data needed to display a notification.
    */
   function generateVideoNotification(sessions) {
-    console.log(sessions);
     var sessionTitles = formatSessionTitles(sessions);
 
     // Special-case logic to handle the case where there's just one new video, since we can
@@ -261,6 +262,18 @@
     return sessions.map(function(session) {
       return '"' + session.title + '"';
     });
+  }
+
+  /**
+   * @return {object} An object with the data needed to display a notification.
+   */
+  function generateSurveyNotification() {
+    return {
+      title: 'Remember to rate the events you attended',
+      body: 'We value your feedback!',
+      icon: DEFAULT_ICON,
+      tag: 'survey'
+    };
   }
 
   /**
