@@ -74,9 +74,9 @@ handlers:
   http_headers:
     Access-Control-Allow-Origin: "*"
 
-- url: $PREFIX$/(.+\.(json|ico|txt|mp3))$
+- url: $PREFIX$/(.+\.(ico|txt|mp3))$
   static_files: app/\1
-  upload: app/(.+\.(json|ico|txt|mp3))$
+  upload: app/(.+\.(ico|txt|mp3))$
   secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"
