@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Copyright 2015 Google Inc. All rights reserved.
+
 deployVersion=$1
 
 if [ -z "$deployVersion" ]
