@@ -241,12 +241,13 @@ IOWA.Util = IOWA.Util || (function() {
    */
   var resizeRipple = function(ripple) {
     var parentRect = ripple.parentNode.getBoundingClientRect();
-    var radius = Math.floor(Math.sqrt(parentRect.width * parentRect.width +
-      parentRect.height * parentRect.height));
-    ripple.style.width = 2 * radius + 'px';
-    ripple.style.height = 2 * radius + 'px';
-    ripple.style.left = -radius + 'px';
-    ripple.style.top = -radius + 'px';
+
+    var rippleContainerSize = parentRect.width / 2;
+    ripple.style.width = rippleContainerSize + 'px';
+    ripple.style.height = rippleContainerSize + 'px';
+    ripple.style.left = -(rippleContainerSize / 2) + 'px';
+    ripple.style.top = -(rippleContainerSize / 2) + 'px';
+
     return parentRect;
   };
 
