@@ -320,10 +320,14 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 gulp.task('serve', ['backend', 'backend:config', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
-  var start = spawn.bind(null, 'bin/server',
-    ['-addr', serverAddr],
-    {cwd: BACKEND_DIR, stdio: 'inherit'}
-  );
+  var start = function() {
+    var env = process.env;
+    env['RUN_WITH_DEVAPPSERVER'] = '1';
+    return spawn('bin/server',
+      ['-addr', serverAddr],
+      {cwd: BACKEND_DIR, stdio: 'inherit', env: env}
+    );
+  };
 
   if (noWatch) {
     start();

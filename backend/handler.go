@@ -98,7 +98,7 @@ func registerHandlers() {
 	// warmup, can't use prefix
 	http.HandleFunc("/_ah/warmup", func(w http.ResponseWriter, r *http.Request) {
 		c := newContext(r)
-		logf(c, "warmup: env = %s", config.Env)
+		logf(c, "warmup: env = %s; devserver? %v", config.Env, isDevServer())
 	})
 }
 
@@ -181,6 +181,10 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
+	if !isDevServer() {
+		w.Header().Set("Content-Security-Policy", "upgrade-insecure-requests")
+	}
+
 	b, err := renderTemplate(c, tplname, wantsPartial, data)
 	if err == nil {
 		w.Header().Set("Cache-Control", "public, max-age=300")
