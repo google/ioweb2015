@@ -199,7 +199,7 @@ IOWA.Schedule = (function() {
         if ('serviceWorker' in navigator && XMLHttpRequestProgressEvent &&
             error instanceof XMLHttpRequestProgressEvent) {
           IOWA.Elements.Toast.showMessage(
-              errorMsg + 'The change will be retried on your next visit.');
+              errorMsg + ' The change will be retried on your next visit.');
         } else {
           IOWA.Elements.Toast.showMessage(errorMsg);
         }
@@ -318,7 +318,7 @@ IOWA.Schedule = (function() {
   }
 
   function clearCachedUserSchedule() {
-    cache['userSavedSessions'] = [];
+    cache.userSavedSessions = [];
   }
 
   /**
