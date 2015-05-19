@@ -36,10 +36,15 @@
   background-color: #B2EBF2;
 }
 
-
 .schedule-rows .schedule-row,
 .filter-rows > core-label {
   margin-bottom: $tabletKeyline;
+}
+
+.filter-rows {
+  io-checkbox {
+    margin: 0 0 0 $tabletKeyline;
+  }
 }
 
 .filter-rows > core-label {
@@ -83,12 +88,7 @@
 }
 
 io-checkbox {
-  margin-left: $tabletKeyline;
-}
-
-io-radio-button {
   margin-right: $tabletKeyline;
-  margin-top: 5px;
 }
 
 paper-progress {
@@ -140,8 +140,5 @@ paper-progress {
 @media (min-width: $desktop-breakpoint-mid) {
   .schedule-title {
     order: 0;
-  }
-  io-radio-button {
-    margin-top: 0;
   }
 }
