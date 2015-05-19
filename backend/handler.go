@@ -1,7 +1,22 @@
+// Copyright 2015 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"html/template"
 	"io"
@@ -41,6 +56,7 @@ var (
 func registerHandlers() {
 	// HTML
 	handle("/", rootHandleFn)
+	handle("/sitemap.xml", serveSitemap)
 	// API v0 - pre-phase2
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
@@ -49,6 +65,7 @@ func registerHandlers() {
 	handle("/api/v1/social", serveSocial)
 	handle("/api/v1/auth", handleAuth)
 	handle("/api/v1/schedule", serveSchedule)
+	handle("/api/v1/easter-egg", handleEasterEgg)
 	handle("/api/v1/user/schedule", handleUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserSchedule)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
@@ -140,7 +157,8 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		tplname = "home"
 	}
 
-	data := &templateData{}
+	// TODO: move all template-related stuff to template.go
+	data := &templateData{Canonical: canonicalURL(r, nil)}
 	switch {
 	case experimentShare:
 		data.OgTitle = defaultTitle
@@ -155,6 +173,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
+		data.Canonical = canonicalURL(r, url.Values{"sid": {sid}})
 		data.Title = s.Title + " - Google I/O Schedule"
 		data.OgTitle = data.Title
 		data.OgImage = s.Photo
@@ -183,6 +202,31 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		errorf(c, "renderTemplate(%q): %v", tplname, err)
 	}
+}
+
+// serveSitemap responds with sitemap XML entries for a better SEO.
+func serveSitemap(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	base := &url.URL{
+		Scheme: "https",
+		Host:   r.Host,
+		Path:   config.Prefix + "/",
+	}
+	if r.TLS == nil {
+		base.Scheme = "http"
+	}
+	m, err := getSitemap(c, base)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	res, err := xml.MarshalIndent(m, "  ", "    ")
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	w.Header().Set("content-type", "application/xml")
+	w.Write(res)
 }
 
 // serveIOExtEntries responds with I/O extended entries in JSON format.
@@ -1035,6 +1079,40 @@ func handleClock(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleEasterEgg is the easter egg link handler.
+// It replaces current link with the new one.
+func handleEasterEgg(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		serveEasterEgg(w, r)
+		return
+	}
+
+	c := newContext(r)
+	if v := r.Header.Get("authorization"); v != config.SyncToken {
+		writeJSONError(c, w, http.StatusForbidden, errAuthInvalid)
+		return
+	}
+	egg := &easterEgg{}
+	if err := json.NewDecoder(r.Body).Decode(egg); err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+		return
+	}
+	if err := storeEasterEgg(c, egg); err != nil {
+		writeJSONError(c, w, errStatus(err), err)
+	}
+}
+
+// serveEasterEgg responds with current egg link
+func serveEasterEgg(w http.ResponseWriter, r *http.Request) {
+	c := newContext(r)
+	link := getEasterEggLink(c)
+	if link == "" && isDev() {
+		link = "http://example.org/test"
+	}
+	w.Header().Set("content-type", "application/json")
+	fmt.Fprintf(w, `{"link": %q}`, link)
+}
+
 // handleAdmin renders admin home page on 'GET' requests,
 // and modifies config otherwise.
 // It is accessible only to config.Admins.
@@ -1242,6 +1320,36 @@ func toAPISchedule(d *eventData) interface{} {
 		Speakers: d.Speakers,
 		Tags:     d.Tags,
 	}
+}
+
+// canonicalURL returns a canonical URL of the page rendered for a request at URL u.
+func canonicalURL(r *http.Request, q url.Values) string {
+	// make sure path has site prefix
+	p := r.URL.Path
+	if !strings.HasPrefix(p, config.Prefix) {
+		p = path.Join(config.Prefix, p)
+	}
+	// remove /home
+	if p == path.Join(config.Prefix, "home") {
+		p = config.Prefix + "/"
+	}
+	// re-add trailing slash if needed
+	if p == config.Prefix {
+		p += "/"
+	}
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   r.Host,
+		Path:   p,
+	}
+	if r.TLS == nil {
+		u.Scheme = "http"
+	}
+	if q != nil {
+		u.RawQuery = q.Encode()
+	}
+	return u.String()
 }
 
 // ctxKey is a custom type for context.Context values.

@@ -1,6 +1,21 @@
+// Copyright 2015 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -148,19 +163,22 @@ func TestServeTemplate(t *testing.T) {
 	config.Prefix = "/root"
 
 	table := []struct{ path, slug, canonical string }{
-		{"/", "home", "/root/"},
-		{"/home?experiment", "home", "/root/"},
-		{"/about", "about", "/root/about"},
-		{"/about?experiment", "about", "/root/about"},
-		{"/schedule", "schedule", "/root/schedule"},
-		{"/onsite", "onsite", "/root/onsite"},
-		{"/offsite", "offsite", "/root/offsite"},
-		{"/registration", "registration", "/root/registration"},
-		{"/faq", "faq", "/root/faq"},
-		{"/form", "form", "/root/form"},
+		{"/", "home", "http://example.org/root/"},
+		{"/home?experiment", "home", "http://example.org/root/"},
+		{"/about", "about", "http://example.org/root/about"},
+		{"/about?experiment", "about", "http://example.org/root/about"},
+		{"/about?some=param", "about", "http://example.org/root/about"},
+		{"/schedule", "schedule", "http://example.org/root/schedule"},
+		{"/schedule?sid=not-there", "schedule", "http://example.org/root/schedule"},
+		{"/onsite", "onsite", "http://example.org/root/onsite"},
+		{"/offsite", "offsite", "http://example.org/root/offsite"},
+		{"/registration", "registration", "http://example.org/root/registration"},
+		{"/faq", "faq", "http://example.org/root/faq"},
+		{"/form", "form", "http://example.org/root/form"},
 	}
 	for i, test := range table {
 		r := newTestRequest(t, "GET", test.path, nil)
+		r.Host = "example.org"
 		w := httptest.NewRecorder()
 		serveTemplate(w, r)
 
@@ -292,6 +310,7 @@ func TestServeEmbed(t *testing.T) {
 	config.Schedule.Location = time.UTC
 
 	r := newTestRequest(t, "GET", "/embed", nil)
+	r.Host = "example.org"
 	c := newContext(r)
 
 	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
@@ -321,7 +340,7 @@ func TestServeEmbed(t *testing.T) {
 		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
 	}
 	lookup := []string{
-		`<link rel="canonical" href="/pref/embed">`,
+		`<link rel="canonical" href="http://example.org/pref/embed">`,
 		`startDate="2015-06-30T09:30:00Z"`,
 		`videoIds='["keynote","live"]'`,
 	}
@@ -334,6 +353,67 @@ func TestServeEmbed(t *testing.T) {
 	}
 	if err {
 		t.Logf("response: %s", w.Body.String())
+	}
+}
+
+func TestServeSitemap(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	c := newContext(newTestRequest(t, "GET", "/dummmy", nil))
+	if err := storeEventData(c, &eventData{
+		modified: time.Now(),
+		Sessions: map[string]*eventSession{
+			"123": &eventSession{Id: "123"},
+		},
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	config.Prefix = "/pref"
+	r := newTestRequest(t, "GET", "/sitemap.xml", nil)
+	r.Host = "example.org"
+	r.TLS = &tls.ConnectionState{}
+	w := httptest.NewRecorder()
+	serveSitemap(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("w.Code = %d; want 200", w.Code)
+	}
+
+	lookup := []struct {
+		line  string
+		found bool
+	}{
+		{`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`, true},
+		{`<loc>https://example.org/pref/</loc>`, true},
+		{`<loc>https://example.org/pref/about</loc>`, true},
+		{`<loc>https://example.org/pref/schedule</loc>`, true},
+		{`<loc>https://example.org/pref/schedule?sid=123</loc>`, true},
+		{`<loc>https://example.org/pref/home`, false},
+		{`<loc>https://example.org/pref/embed`, false},
+		{`<loc>https://example.org/pref/upgrade`, false},
+		{`<loc>https://example.org/pref/admin`, false},
+		{`<loc>https://example.org/pref/debug`, false},
+		{`<loc>https://example.org/pref/error_`, false},
+	}
+	err := false
+	for _, l := range lookup {
+		found := strings.Contains(w.Body.String(), l.line)
+		if !found && l.found {
+			err = true
+			t.Errorf("does not contain %s", l.line)
+		}
+		if found && !l.found {
+			err = true
+			t.Errorf("contain %s", l.line)
+		}
+	}
+	if err {
+		t.Errorf("response:\n%s", w.Body.String())
 	}
 }
 
@@ -2365,6 +2445,57 @@ func TestHandleClockNextSessions(t *testing.T) {
 		t.Fatal(err)
 	}
 	checkUpdates(dc, "api")
+}
+
+func TestHandleEasterEgg(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	const link = "http://example.org/egg"
+	config.SyncToken = "secret"
+
+	table := []struct {
+		inLink  string
+		expires time.Time
+		auth    string
+		code    int
+		outLink string
+	}{
+		{link, time.Now().Add(10 * time.Minute), config.SyncToken, http.StatusOK, link},
+		{link, time.Now().Add(-10 * time.Minute), config.SyncToken, http.StatusOK, ""},
+		{link, time.Now().Add(time.Minute), "invalid", http.StatusForbidden, ""},
+		{link, time.Now().Add(time.Minute), "", http.StatusForbidden, ""},
+	}
+
+	for i, test := range table {
+		body := fmt.Sprintf(`{
+			"link": %q,
+			"expires": %q
+		}`, test.inLink, test.expires.Format(time.RFC3339))
+		r := newTestRequest(t, "POST", "/api/v1/easter-egg", strings.NewReader(body))
+		r.Header.Set("authorization", test.auth)
+		w := httptest.NewRecorder()
+		handleEasterEgg(w, r)
+
+		if w.Code != test.code {
+			t.Errorf("%d: w.Code = %d; want %d\nResponse: %s", i, w.Code, test.code, w.Body.String())
+		}
+		if test.code != http.StatusOK {
+			continue
+		}
+		c := newContext(r)
+		if err := cache.flush(c); err != nil {
+			t.Error(err)
+			continue
+		}
+		link := getEasterEggLink(c)
+		if link != test.outLink {
+			t.Errorf("%d: link = %q; want %q", i, link, test.outLink)
+		}
+	}
 }
 
 func fetchFirstSWToken(t *testing.T, auth string) string {

@@ -1,9 +1,26 @@
+// Copyright 2015 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"html/template"
+	"net/url"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -35,14 +52,23 @@ const (
 var (
 	// tmplFunc is a map of functions available to all templates.
 	tmplFunc = template.FuncMap{
-		"safeHTML":  func(v string) template.HTML { return template.HTML(v) },
-		"safeAttr":  safeHTMLAttr,
-		"json":      jsonForTemplate,
-		"canonical": canonicalURL,
-		"r":         resourceURL,
+		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
+		"safeAttr": safeHTMLAttr,
+		"json":     jsonForTemplate,
+		"url":      resourceURL,
 	}
 	// tmplCache caches HTML templates parsed in parseTemplate()
 	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
+
+	// don't include these in sitemap
+	skipSitemap = []string{
+		"embed",
+		"upgrade",
+		"admin/",
+		"debug/",
+		"layout_",
+		"error_",
+	}
 )
 
 // templateCache is in-memory cache for parsed templates
@@ -57,6 +83,7 @@ type templateData struct {
 	ClientID     string
 	Prefix       string
 	Slug         string
+	Canonical    string
 	Title        string
 	Desc         string
 	OgTitle      string
@@ -64,6 +91,28 @@ type templateData struct {
 	StartDateStr string
 	// livestream youtube video IDs
 	LiveIDs []string
+}
+
+// easterEgg's link is embedded in pages, for fun.
+type easterEgg struct {
+	Link    string    `datastore:"link,noindex"`
+	Expires time.Time `datastore:"expires,noindex"`
+}
+
+func (egg *easterEgg) expired() bool {
+	return egg.Expires.Before(time.Now())
+}
+
+type sitemap struct {
+	XMLName xml.Name `xml:"http://www.sitemaps.org/schemas/sitemap/0.9 urlset"`
+	Items   []*sitemapItem
+}
+
+type sitemapItem struct {
+	XMLName xml.Name   `xml:"url"`
+	Loc     string     `xml:"loc"`
+	Freq    string     `xml:"changefreq,omitempty"`
+	Mod     *time.Time `xml:"lastmod,omitempty"`
 }
 
 // renderTemplate executes a template found in name.html file
@@ -158,15 +207,6 @@ func pageTitle(t *template.Template) string {
 	return b.String()
 }
 
-// canonicalURL returns a canonical URL of path p.
-// Relative paths are based off of config.Prefix.
-func canonicalURL(p string) string {
-	if p == "home" || p == "/" || p == "" {
-		return config.Prefix + "/"
-	}
-	return path.Join(config.Prefix, p)
-}
-
 // resourceURL returns absolute path to a resource referenced by parts.
 // For instance, given config.Prefix = "/myprefix", resourceURL("images", "img.jpg")
 // returns "/myprefix/images/img.jpg".
@@ -202,4 +242,61 @@ func safeHTMLAttr(k, v string) template.HTMLAttr {
 		q = "'"
 	}
 	return template.HTMLAttr(k + "=" + q + v + q)
+}
+
+// getSitemap returns a sitemap containing both templated pages
+// and schedule session details.
+func getSitemap(c context.Context, baseURL *url.URL) (*sitemap, error) {
+	items := make([]*sitemapItem, 0)
+
+	// templated pages
+	root := filepath.Join(config.Dir, templatesDir)
+	err := filepath.Walk(root, func(p string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		ext := filepath.Ext(p)
+		if p == root || fi.IsDir() || ext != ".html" {
+			return nil
+		}
+		name := p[len(root)+1 : len(p)-len(ext)]
+		for _, s := range skipSitemap {
+			if strings.HasPrefix(name, s) {
+				return nil
+			}
+		}
+		freq := "weekly"
+		if name == "home" {
+			name = ""
+			freq = "daily"
+		}
+		item := &sitemapItem{
+			Loc:  baseURL.ResolveReference(&url.URL{Path: name}).String(),
+			Freq: freq,
+		}
+		items = append(items, item)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// schedule
+	sched, err := getLatestEventData(c, nil)
+	if err != nil {
+		return nil, err
+	}
+	mod := sched.modified.In(time.UTC)
+	for id, _ := range sched.Sessions {
+		u := baseURL.ResolveReference(&url.URL{Path: "schedule"})
+		u.RawQuery = url.Values{"sid": {id}}.Encode()
+		item := &sitemapItem{
+			Loc:  u.String(),
+			Mod:  &mod,
+			Freq: "daily",
+		}
+		items = append(items, item)
+	}
+
+	return &sitemap{Items: items}, nil
 }

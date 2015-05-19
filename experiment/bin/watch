@@ -1,3 +1,5 @@
 #!/bin/bash
 
+# Copyright 2015 Google Inc. All rights reserved.
+
 npm install && node_modules/webpack-dev-server/bin/webpack-dev-server.js --port 5555 -d --progress --colors --content-base public

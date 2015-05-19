@@ -1,3 +1,17 @@
+// Copyright 2015 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // +build appengine
 
 package main
@@ -24,6 +38,7 @@ const (
 	kindChanges     = "Changes"
 	kindAppFolder   = "AppFolder"
 	kindNext        = "Next"
+	kindEgg         = "Egg"
 )
 
 type eventDataCache struct {
@@ -398,6 +413,54 @@ func filterNextSessions(c context.Context, items []*eventSession) ([]*eventSessi
 		res = append(res, items[i])
 	}
 	return res, nil
+}
+
+// storeEasterEgg replaces current easter egg data with egg.
+func storeEasterEgg(c context.Context, egg *easterEgg) error {
+	k := datastore.NewKey(c, kindEgg, "latest", 0, nil)
+	if _, err := datastore.Put(c, k, egg); err != nil {
+		return err
+	}
+	if err := updateEggCache(c, egg); err != nil {
+		errorf(c, "storeEasterEgg: %v", err)
+	}
+	return nil
+}
+
+// getEasterEggLink returns current easter egg link or empty string
+// if not found or expired.
+func getEasterEggLink(c context.Context) string {
+	egg, err := getCachedEgg(c)
+	if err != nil {
+		egg = &easterEgg{}
+		k := datastore.NewKey(c, kindEgg, "latest", 0, nil)
+		if err := datastore.Get(c, k, egg); err != nil {
+			return ""
+		}
+		updateEggCache(c, egg)
+	}
+	link := egg.Link
+	if egg.expired() {
+		link = ""
+	}
+	return link
+}
+
+func updateEggCache(c context.Context, egg *easterEgg) error {
+	b, err := json.Marshal(egg)
+	if err != nil {
+		return err
+	}
+	return cache.set(c, kindEgg, b, time.Hour)
+}
+
+func getCachedEgg(c context.Context) (*easterEgg, error) {
+	b, err := cache.get(c, kindEgg)
+	if err != nil {
+		return nil, err
+	}
+	egg := &easterEgg{}
+	return egg, json.Unmarshal(b, egg)
 }
 
 // eventDataParent returns a common ancestor for all kindEventData entities.

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Copyright 2015 Google Inc. All rights reserved.
+
 audiosprite --output normalaudiosprite --export=mp3 public/sounds/normal/*.mp3
 mv normalaudiosprite.mp3 public/normalaudiosprite.mp3
 mv normalaudiosprite.json app/data/normalaudiosprite.json

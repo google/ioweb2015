@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Copyright 2015 Google Inc. All rights reserved.
+
 if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]; then
   exit 0;
 fi

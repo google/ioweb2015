@@ -18,11 +18,6 @@ handlers:
   http_headers:
     Access-Control-Allow-Origin: "*"
 
-- url: $PREFIX$/sitemap\.xml$
-  static_files: app/sitemap.xml
-  upload: app/sitemap\.xml$
-  secure: always
-
 - url: $PREFIX$/permissions.*
   static_files: app/permissions.html
   upload: app/permissions\.html$

@@ -1,4 +1,6 @@
 #!/bin/bash
 
+# Copyright 2015 Google Inc. All rights reserved.
+
 npm install
 STATIC_BASE=$1 node_modules/webpack/bin/webpack.js -p --bail
