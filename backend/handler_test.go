@@ -417,6 +417,25 @@ func TestServeSitemap(t *testing.T) {
 	}
 }
 
+func TestServeManifest(t *testing.T) {
+	defer preserveConfig()()
+	config.Google.GCM.Sender = "sender-123"
+
+	r := newTestRequest(t, "GET", "/manifest.json", nil)
+	w := httptest.NewRecorder()
+	serveManifest(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200", w.Code)
+	}
+	res := map[string]interface{}{}
+	if err := json.Unmarshal(w.Body.Bytes(), &res); err != nil {
+		t.Fatal(err)
+	}
+	if v, ok := res["gcm_sender_id"].(string); !ok || v != "sender-123" {
+		t.Errorf("gcm_sender_id = %v; want 'sender-123'", res["gcm_sender_id"])
+	}
+}
+
 func TestHandleAuth(t *testing.T) {
 	defer resetTestState(t)
 	defer preserveConfig()()

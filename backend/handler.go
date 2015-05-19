@@ -54,9 +54,10 @@ var (
 
 // registerHandlers sets up all backend handle funcs, including the API.
 func registerHandlers() {
-	// HTML
+	// HTML and other non-API
 	handle("/", rootHandleFn)
 	handle("/sitemap.xml", serveSitemap)
+	handle("/manifest.json", serveManifest)
 	// API v0 - pre-phase2
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
@@ -227,6 +228,17 @@ func serveSitemap(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("content-type", "application/xml")
 	w.Write(res)
+}
+
+// serveSitemap responds with app manifest.
+func serveManifest(w http.ResponseWriter, r *http.Request) {
+	m, err := renderManifest()
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	w.Header().Set("content-type", "application/manifest+json")
+	w.Write(m)
 }
 
 // serveIOExtEntries responds with I/O extended entries in JSON format.
