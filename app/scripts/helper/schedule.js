@@ -26,8 +26,10 @@ IOWA.Schedule = (function() {
   var QUEUED_SESSION_UPDATES_DB_NAME = 'shed-offline-session-updates';
 
   var scheduleData_ = null;
-  var userSavedSessions_ = [];
-  var userSavedSurveys_ = [];
+  var cache = {
+    'userSavedSessions': [],
+    'userSavedSurveys': []
+  };
 
   // A promise fulfilled by the loaded schedule.
   var scheduleDeferredPromise = null;
@@ -95,23 +97,25 @@ IOWA.Schedule = (function() {
   }
 
   /**
-   * Fetches the user's submitted session surveys.
+   * Fetches the resource from cached value storage or network.
    * If this is the first time it's been called, then uses the cache-then-network strategy to
    * first try to read the data stored in the Cache Storage API, and invokes the callback with that
    * response. It then tries to fetch a fresh copy of the data from the network, saves the response
    * locally in memory, and resolves the promise with that response.
+   * @param {string} url The address of the resource.
+   * @param {Array} resourceCache A variable name to store the cached resource.
    * @param {function} callback The callback to execute when the user survey data is available.
    */
-  function fetchUserSurveys(callback) {
-    if (userSavedSurveys_.length) {
-      callback(userSavedSurveys_);
+  function fetchResource(url, resourceCache, callback) {
+    if (cache[resourceCache].length) {
+      callback(cache[resourceCache]);
     } else {
-      var callbackWrapper = function(userSavedSurveys) {
-        userSavedSurveys_ = userSavedSurveys || [];
-        callback(userSavedSurveys_);
+      var callbackWrapper = function(resource) {
+        cache[resourceCache] = resource || [];
+        callback(cache[resourceCache]);
       };
 
-      IOWA.Request.cacheThenNetwork(SURVEY_ENDPOINT_USERS, callback, callbackWrapper, true);
+      IOWA.Request.cacheThenNetwork(url, callback, callbackWrapper, true);
     }
   }
 
@@ -124,16 +128,7 @@ IOWA.Schedule = (function() {
    * @param {function} callback The callback to execute when the user schedule data is available.
    */
   function fetchUserSchedule(callback) {
-    if (userSavedSessions_.length) {
-      callback(userSavedSessions_);
-    } else {
-      var callbackWrapper = function(userSavedSessions) {
-        userSavedSessions_ = userSavedSessions || [];
-        callback(userSavedSessions_);
-      };
-
-      IOWA.Request.cacheThenNetwork(SCHEDULE_ENDPOINT_USERS, callback, callbackWrapper, true);
-    }
+    fetchResource(SCHEDULE_ENDPOINT_USERS, 'userSavedSessions', callback);
   }
 
   /**
@@ -156,7 +151,7 @@ IOWA.Schedule = (function() {
       });
 
       // Fetch user's rated sessions.
-      fetchUserSurveys(function(savedSurveys) {
+      fetchResource(SURVEY_ENDPOINT_USERS, 'userSavedSurveys', function(savedSurveys) {
         var template = IOWA.Elements.Template;
         template.savedSurveys = savedSurveys;
         updateRatedSessions(savedSurveys);
@@ -174,24 +169,43 @@ IOWA.Schedule = (function() {
   function saveSession(sessionId, save) {
     IOWA.Analytics.trackEvent('session', 'bookmark', save ? 'save' : 'remove');
 
-    return IOWA.Auth.waitForSignedIn('Sign in to add events to My Schedule').then(function() {
+    return IOWA.Auth.waitForSignedIn(
+        'Sign in to add events to My Schedule').then(function() {
       IOWA.Elements.Template.scheduleFetchingUserData = true;
       var url = SCHEDULE_ENDPOINT_USERS + '/' + sessionId;
-      return IOWA.Request.xhrPromise(save ? 'PUT' : 'DELETE', url, true)
-        .then(clearCachedUserSchedule)
-        .catch(function(error) {
-          IOWA.Elements.Template.scheduleFetchingUserData = false;
-          // error will be an XMLHttpRequestProgressEvent if the xhrPromise() was rejected due to
-          // a network error. Otherwise, error will be a Error object.
-          if ('serviceWorker' in navigator && XMLHttpRequestProgressEvent &&
-              error instanceof XMLHttpRequestProgressEvent) {
-            IOWA.Elements.Toast.showMessage('Unable to modify My Schedule. The change will be retried on your next visit.');
-          } else {
-            IOWA.Elements.Toast.showMessage('Unable to modify My Schedule.');
-          }
-          throw error;
-        });
+      var method = save ? 'PUT' : 'DELETE';
+      return submitSessionRequest(
+          url, method, null, 'Unable to modify My Schedule.',
+          clearCachedUserSchedule);
     });
+  }
+
+  /**
+   * Submits session-related request to backend.
+   * @param {string} url Request url.
+   * @param {string} method Request method, e.g. 'PUT'.
+   * @param {Object} payload JSON payload.
+   * @param {string} errorMsg Message to be shown on error.
+   * @param {function} callback Callback to be called with the resource.
+   * @return {Promise} Resolves with the server's response.
+   */
+  function submitSessionRequest(url, method, payload, errorMsg, callback) {
+    return IOWA.Request.xhrPromise(method, url, true, payload)
+      .then(callback)
+      .catch(function(error) {
+        // error will be an XMLHttpRequestProgressEvent if the xhrPromise()
+        // was rejected due to a network error.
+        // Otherwise, error will be a Error object.
+        if ('serviceWorker' in navigator && XMLHttpRequestProgressEvent &&
+            error instanceof XMLHttpRequestProgressEvent) {
+          IOWA.Elements.Toast.showMessage(
+              errorMsg + 'The change will be retried on your next visit.');
+        } else {
+          IOWA.Elements.Toast.showMessage(errorMsg);
+        }
+        throw error;
+      });
+
   }
 
   /**
@@ -202,25 +216,15 @@ IOWA.Schedule = (function() {
    */
   function saveSurvey(sessionId, answers) {
     IOWA.Analytics.trackEvent('session', 'rate', sessionId);
-    return IOWA.Auth.waitForSignedIn('Sign in to submit feedback').then(function() {
+    return IOWA.Auth.waitForSignedIn(
+        'Sign in to submit feedback').then(function() {
       var url = SURVEY_ENDPOINT_USERS + '/' + sessionId;
-      return IOWA.Request.xhrPromise('PUT', url, true, answers)
-        .then(function(response) {
-          IOWA.Elements.Template.savedSurveys = response;
-        })
-        .catch(function(error) {
-          // error will be an XMLHttpRequestProgressEvent if the xhrPromise() was rejected due to
-          // a network error. Otherwise, error will be a Error object.
-          if ('serviceWorker' in navigator && XMLHttpRequestProgressEvent &&
-              error instanceof XMLHttpRequestProgressEvent) {
-            IOWA.Elements.Toast.showMessage('Unable to save feedback results. The change will be retried on your next visit.');
-          } else {
-            IOWA.Elements.Toast.showMessage('Unable to save feedback results.');
-          }
-          throw error;
-        });
+      var callback = function(response) {
+        IOWA.Elements.Template.savedSurveys = response;
+      };
+      return submitSessionRequest(
+          url, 'PUT', answers, 'Unable to save feedback results.', callback);
     });
-
   }
 
   /**
@@ -314,7 +318,7 @@ IOWA.Schedule = (function() {
   }
 
   function clearCachedUserSchedule() {
-    userSavedSessions_ = [];
+    cache['userSavedSessions'] = [];
   }
 
   /**

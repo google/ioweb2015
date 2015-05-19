@@ -107,19 +107,19 @@
 
     </div>
   </div>
-  <div class="session__info__section session__info__links card-content" layout horizontal justified?="{{isPhoneSize}}">
-    <span class="anchor-like" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related"
+  <div class="session__info__section session__info__links card-content"
+      layout horizontal justified?="{{isPhoneSize}}"
+      hidden?="{{selectedSession.id == '__afterhours__'}}">
+    <span class="anchor-like" role="link" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related"
         core-overlay-toggle hidden?="{{!selectedSession.hasRelated}}">View related content</span>
-    <span class="anchor-like" on-click="{{onRateSession}}"
-        data-track-link="schedule-rate-session" hidden?="{{selectedSession.rated}}">Rate <span hidden?="{{isPhoneSize}}">this</span> session</span>
+    <span class="anchor-like" on-click="{{onRateSession}}" role="link"
+        data-track-link="schedule-rate-session" hidden?="{{selectedSession.rated || selectedSession.id == '__afterhours__'}}">Rate session</span>
     <span class="anchor-like-disabled" hidden?="{{!selectedSession.rated}}">Session rated</span>
   </div>
 </paper-dialog>
 
 <paper-dialog class="session__rate" transition="core-transition-center"
-              layered="false" backdrop?="{{!isIOS}}"
-              on-core-overlay-close-completed=""
-              on-core-overlay-open-completed="">
+              layered="false" backdrop?="{{!isIOS}}">
   <div class="session__info__section rate__header" layout horizontal center>
     <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
     <span>Rate this session</span>
@@ -127,9 +127,7 @@
   <div class="session__info__section">
     <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
     <h5 class="session__authors">
-      <template repeat="{{speakerId, i in selectedSession.speakers}}">
-        <span>{{scheduleData.speakers[speakerId].name}}<span hidden?="{{i > selectedSession.speakers.length-2}}">, </span></span>
-      </template>
+      {{selectedSession.speakers | speakerIdsToNameString}}
     </h5>
   </div>
   <div class="session__info__section">
@@ -205,7 +203,8 @@
     </div>
   </div>
   <div class="session__info__section session__info__links card-content">
-    <span class="anchor-like" on-click="{{onRateSessionSubmit}}" data-track-link="schedule-rate-submit" core-overlay-toggle>Submit</span>
+    <span class="anchor-like" on-click="{{onRateSessionSubmit}}" role="link"
+        data-track-link="schedule-rate-submit" core-overlay-toggle>Submit</span>
   </div>
 </paper-dialog>
 
@@ -490,17 +489,13 @@
         IOWA.Elements.Template.startScheduleVideo = false;
 
         ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
-        detailsPanel = detailsPanel || document.querySelector('.session__detail');
-        ratePanel = ratePanel || document.querySelector('.session__rate');
-
-        detailsPanel.querySelector('core-image').classList.remove('fadeout');
-        detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
 
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
           detailsPanel = document.querySelector('.session__detail');
           detailsPanel.querySelector('core-image').classList.remove('fadeout');
           detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
+          ratePanel = ratePanel || document.querySelector('.session__rate');
 
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
@@ -620,17 +615,6 @@
           this.selectedSession.rated = true;
         }.bind(this));
       };
-
-      IOWA.Elements.Template.openRateForm = function(sessionOrEvent) {
-        if (!sessionOrEvent) {
-          return;
-        }
-        this.selectedSession = sessionOrEvent.detail ? sessionOrEvent.detail.session : sessionOrEvent;
-
-        // Open paper-dialog.
-        detailsPanel.open();
-      };
-
 
       IOWA.Elements.Template.selectTimezone = function(e, detail, sender) {
         var day1LocalizedTime = ioScheduleEl.getLocalizedTime(ioScheduleEl.gmtDayOne);
