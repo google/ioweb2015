@@ -20,7 +20,7 @@
 
 IOWA.PageAnimation = (function() {
 
-  var CONTENT_SLIDE_DURATION = 400;
+  var CONTENT_SLIDE_DURATION = 300;
   var CONTENT_SLIDE_DELAY = 200;
   var CONTENT_SLIDE_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
   var CONTENT_SLIDE_LENGTH = '100px';
@@ -171,13 +171,17 @@ IOWA.PageAnimation = (function() {
    */
   function rippleEffect(ripple, x, y, duration, color, isFadeRipple) {
     var translate = 'translate3d(' + x + 'px,' + y + 'px, 0)';
+    var parentRect = ripple.parentNode.getBoundingClientRect();
+    var scaleTo = Math.ceil((Math.max(
+        parentRect.width, parentRect.height) / ripple.offsetHeight) * 2);
+
     var start = {
       transform: translate + ' scale(0)',
       opacity: isFadeRipple ? 0.5 : 1,
       backgroundColor: color
     };
     var end = {
-      transform: translate + ' scale(1)',
+      transform: translate + ' scale(' + scaleTo + ')',
       opacity: isFadeRipple ? 0 : 1,
       backgroundColor: color
     };
@@ -374,7 +378,7 @@ IOWA.PageAnimation = (function() {
 
       var x = e.touches ? e.touches[0].pageX : e.pageX;
       var y = e.touches ? e.touches[0].pageY : e.pageY;
-      var duration = isFadeRipple ? 300 : 600;
+      var duration = 300;//isFadeRipple ? 300 : 600;
       var rippleAnim = rippleEffect(
             IOWA.Elements.Ripple, x, y, duration,
             rippleColor, isFadeRipple);
