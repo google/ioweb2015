@@ -357,6 +357,13 @@ IOWA.Elements = (function() {
       return day;
     };
 
+    template.isSessionFinishedFilter = function(session) {
+      if (!session) {
+        return;
+      }
+      return new Date(session.endTimestamp) < Date.now();
+    };
+
     template.formatSessionTagsFilter = function(tagList) {
       if (!tagList) {
         return;

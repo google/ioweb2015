@@ -93,11 +93,13 @@ paper-tabs.white {
       color: inherit;
     }
   }
+  .session__rate::shadow #scroller,
   .session__detail::shadow #scroller {
     width: 100%;
     padding: 0;
   }
   @media (min-width: $tablet-breakpoint-min) {
+    .session__rate::shadow #scroller,
     .session__detail::shadow #scroller {
       width: 768px;
     }
