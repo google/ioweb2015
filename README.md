@@ -69,9 +69,9 @@ To change the app environment when using GAE SDK, provide `--env` argument:
 
 Other arguments are:
 
-* `--open` - open serving url in a new browser tab on start.
-* `--watch` - watch for file changes and recompile relative bits.
-* `--reload` - enable live reload; implies `--watch`.
+* `--no-watch` don't watch for file changes and recompile relative bits.
+* `--open` open serving url in a new browser tab on start.
+* `--reload` enable live reload. Always watches for file changes; `--no-watch` will have no effect.
 
 ### Building
 

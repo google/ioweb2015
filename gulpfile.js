@@ -451,8 +451,9 @@ gulp.task('encrypt', function(done) {
 // watch for file changes and live-reload when needed.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 // App environment is 'dev' by default. Change with '--env=prod'.
-gulp.task('serve', ['backend:build', 'backend:config', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function(done) {
-  var url = backend.serve({dir: IOWA.backendDir, watch: argv.watch, reload: argv.reload}, done);
+gulp.task('serve', ['backend:build', 'backend:config', 'sass', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function(done) {
+  var opts = {dir: IOWA.backendDir, watch: argv.watch !== false, reload: argv.reload};
+  var url = backend.serve(opts, done);
   openUrl(url);
   if (argv.watch) {
     watch();
@@ -461,11 +462,11 @@ gulp.task('serve', ['backend:build', 'backend:config', 'generate-page-metadata',
 
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
-gulp.task('serve:gae', ['backend:config', 'backend:gaeconfig', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function(done) {
+gulp.task('serve:gae', ['backend:config', 'backend:gaeconfig', 'sass', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function(done) {
   var url = backend.serveGAE({dir: IOWA.backendDir, reload: argv.reload}, done);
   // give GAE server some time to start
   setTimeout(openUrl.bind(null, url, null, null), 1000);
-  if (argv.watch) {
+  if (argv.watch !== false) {
     watch();
   }
 });
