@@ -37,7 +37,6 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
         width: 100%;
         max-width: 820px;
         height: 50vh;
-        background-color: #00BCD4;
       }
       .item {
         box-sizing: border-box;
@@ -52,7 +51,8 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
         <template>
            <div class="item" layout horizontal center-center>
              <core-image _src="{{model.src}}" load?="{{!!model}}"
-                         sizing="cover" preload placeholder="images/io15-color.png" fade></core-image>
+                         sizing="{{sizing}}" preload placeholder="images/io15-color.png" fade
+                         style="background-color:{{backgroundColor}}"></core-image>
            </div>
         </template>
       </core-list>
@@ -116,8 +116,26 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
          * @property height
          * @type number
          * @default 200
-        */
-        height: 200
+         */
+        height: 200,
+
+        /**
+         * The sizing "contains" or "cover" for the images.
+         *
+         * @property sizing
+         * @type string
+         * @default 'cover'
+         */
+        sizing: 'cover',
+
+        /**
+         * The background color of the placeholder.
+         *
+         * @property backgroundColor
+         * @type string
+         * @default '#00BCD4'
+         */
+        backgroundColor: '#00BCD4'
       },
 
       created: function() {
