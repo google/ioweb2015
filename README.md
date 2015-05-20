@@ -67,13 +67,11 @@ To change the app environment when using GAE SDK, provide `--env` argument:
   gulp serve:gae --env stage
   ```
 
-Both gulp tasks accept optional `--no-watch` argument in case you need to disable
-file watchers and live reload.
-
 Other arguments are:
 
 * `--open` - open serving url in a new browser tab on start.
-* `--reload` - enable live reload. Disabled by default.
+* `--watch` - watch for file changes and recompile relative bits.
+* `--reload` - enable live reload; implies `--watch`.
 
 ### Building
 
