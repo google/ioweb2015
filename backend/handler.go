@@ -54,9 +54,10 @@ var (
 
 // registerHandlers sets up all backend handle funcs, including the API.
 func registerHandlers() {
-	// HTML
+	// HTML and other non-API
 	handle("/", rootHandleFn)
 	handle("/sitemap.xml", serveSitemap)
+	handle("/manifest.json", serveManifest)
 	// API v0 - pre-phase2
 	handle("/api/extended", serveIOExtEntries)
 	handle("/api/social", serveSocial)
@@ -98,7 +99,7 @@ func registerHandlers() {
 	// warmup, can't use prefix
 	http.HandleFunc("/_ah/warmup", func(w http.ResponseWriter, r *http.Request) {
 		c := newContext(r)
-		logf(c, "warmup: env = %s", config.Env)
+		logf(c, "warmup: env = %s; devserver? %v", config.Env, isDevServer())
 	})
 }
 
@@ -181,6 +182,10 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
+	if !isDevServer() {
+		w.Header().Set("Content-Security-Policy", "upgrade-insecure-requests")
+	}
+
 	b, err := renderTemplate(c, tplname, wantsPartial, data)
 	if err == nil {
 		w.Header().Set("Cache-Control", "public, max-age=300")
@@ -227,6 +232,17 @@ func serveSitemap(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("content-type", "application/xml")
 	w.Write(res)
+}
+
+// serveSitemap responds with app manifest.
+func serveManifest(w http.ResponseWriter, r *http.Request) {
+	m, err := renderManifest()
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	w.Header().Set("content-type", "application/manifest+json")
+	w.Write(m)
 }
 
 // serveIOExtEntries responds with I/O extended entries in JSON format.

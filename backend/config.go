@@ -41,6 +41,14 @@ func isProd() bool {
 	return config.Env == "prod"
 }
 
+// isDevServer returns true if the app is currently running in a dev server.
+// This is orthogonal to isDev/Staging/Prod. For instance, the app can be running
+// on dev server and be in "prod" mode at the same time. In this case
+// both isProd() and isDevServer() return true.
+func isDevServer() bool {
+	return os.Getenv("RUN_WITH_DEVAPPSERVER") != ""
+}
+
 // appConfig defines the backend config file structure.
 type appConfig struct {
 	// App environment: dev, stage or prod

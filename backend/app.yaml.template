@@ -10,14 +10,6 @@ inbound_services:
 
 handlers:
 
-- url: $PREFIX$/manifest\.json$
-  static_files: app/manifest.json
-  upload: app/manifest\.json$
-  mime_type: application/manifest+json
-  secure: always
-  http_headers:
-    Access-Control-Allow-Origin: "*"
-
 - url: $PREFIX$/permissions.*
   static_files: app/permissions.html
   upload: app/permissions\.html$
@@ -82,9 +74,9 @@ handlers:
   http_headers:
     Access-Control-Allow-Origin: "*"
 
-- url: $PREFIX$/(.+\.(json|ico|txt|mp3))$
+- url: $PREFIX$/(.+\.(ico|txt|mp3))$
   static_files: app/\1
-  upload: app/(.+\.(json|ico|txt|mp3))$
+  upload: app/(.+\.(ico|txt|mp3))$
   secure: always
   http_headers:
     Access-Control-Allow-Origin: "*"

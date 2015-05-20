@@ -34,6 +34,6 @@
     "platform": "android",
     "location": "https://play.google.com/store/apps/details?id=com.google.samples.apps.iosched"
   }],
-  "gcm_sender_id": "608394197750",
+  "gcm_sender_id": "{{.GCMSenderID}}",
   "gcm_user_visible_only": true
 }

@@ -156,7 +156,10 @@ gulp.task('vulcanize-extended-elements', ['sass'], function() {
 // copy needed assets (images, polymer elements, etc) to /dist directory
 gulp.task('copy-assets', function() {
   var assets = $.useref.assets();
-  var templates = [APP_DIR + '/templates/**/*.html'];
+  var templates = [
+    APP_DIR + '/templates/**/*.html',
+    APP_DIR + '/templates/**/*.json'
+  ];
   if (argv.env == 'prod') {
     templates.push('!**/templates/debug/**');
   }
@@ -168,7 +171,6 @@ gulp.task('copy-assets', function() {
 
   var otherAssetStream = gulp.src([
     APP_DIR + '/*.{html,txt,ico}',
-    APP_DIR + '/manifest.json',
     APP_DIR + '/clear_cache.html',
     APP_DIR + '/embed.html',
     APP_DIR + '/styles/**.css',
@@ -320,10 +322,14 @@ gulp.task('pagespeed', pagespeed.bind(null, {
 gulp.task('serve', ['backend', 'backend:config', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function() {
   var noWatch = argv.watch === false;
   var serverAddr = 'localhost:' + (noWatch ? '3000' : '8080');
-  var start = spawn.bind(null, 'bin/server',
-    ['-addr', serverAddr],
-    {cwd: BACKEND_DIR, stdio: 'inherit'}
-  );
+  var start = function() {
+    var env = process.env;
+    env['RUN_WITH_DEVAPPSERVER'] = '1';
+    return spawn('bin/server',
+      ['-addr', serverAddr],
+      {cwd: BACKEND_DIR, stdio: 'inherit', env: env}
+    );
+  };
 
   if (noWatch) {
     start();

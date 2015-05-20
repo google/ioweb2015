@@ -18,13 +18,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"html/template"
+	html "html/template"
 	"net/url"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"sync"
+	text "text/template"
 	"time"
 
 	"golang.org/x/net/context"
@@ -51,14 +52,14 @@ const (
 
 var (
 	// tmplFunc is a map of functions available to all templates.
-	tmplFunc = template.FuncMap{
-		"safeHTML": func(v string) template.HTML { return template.HTML(v) },
+	tmplFunc = html.FuncMap{
+		"safeHTML": func(v string) html.HTML { return html.HTML(v) },
 		"safeAttr": safeHTMLAttr,
 		"json":     jsonForTemplate,
 		"url":      resourceURL,
 	}
 	// tmplCache caches HTML templates parsed in parseTemplate()
-	tmplCache = &templateCache{templates: make(map[string]*template.Template)}
+	tmplCache = &templateCache{templates: make(map[string]*html.Template)}
 
 	// don't include these in sitemap
 	skipSitemap = []string{
@@ -74,7 +75,7 @@ var (
 // templateCache is in-memory cache for parsed templates
 type templateCache struct {
 	sync.Mutex
-	templates map[string]*template.Template
+	templates map[string]*html.Template
 }
 
 // templateData is the templates context
@@ -156,9 +157,29 @@ func renderTemplate(c context.Context, name string, partial bool, data *template
 	return b.Bytes(), nil
 }
 
+// renderManifest renders app/templates/manifest.json app manifest.
+func renderManifest() ([]byte, error) {
+	t, err := text.ParseFiles(filepath.Join(config.Dir, templatesDir, "manifest.json"))
+	if err != nil {
+		return nil, err
+	}
+	data := &struct {
+		Name        string
+		GCMSenderID string
+	}{
+		Name:        defaultTitle,
+		GCMSenderID: config.Google.GCM.Sender,
+	}
+	var b bytes.Buffer
+	if err := t.Execute(&b, data); err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
 // parseTemplate creates a template identified by name, using appropriate layout.
 // HTTP error layout is used for name arg prefixed with "error_", e.g. "error_404".
-func parseTemplate(name string, partial bool) (*template.Template, error) {
+func parseTemplate(name string, partial bool) (*html.Template, error) {
 	var layout string
 	switch {
 	default:
@@ -188,7 +209,7 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 		tfiles = append([]string{filepath.Join(config.Dir, templatesDir, layout)}, tfiles...)
 	}
 
-	t, err := template.New(tname).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(tfiles...)
+	t, err := html.New(tname).Delims("{%", "%}").Funcs(tmplFunc).ParseFiles(tfiles...)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +220,7 @@ func parseTemplate(name string, partial bool) (*template.Template, error) {
 }
 
 // pageTitle executes "title" template and returns its result or defaultTitle.
-func pageTitle(t *template.Template) string {
+func pageTitle(t *html.Template) string {
 	b := new(bytes.Buffer)
 	if err := t.ExecuteTemplate(b, "title", nil); err != nil || b.Len() == 0 {
 		return defaultTitle
@@ -236,12 +257,12 @@ func jsonForTemplate(v interface{}) string {
 // safeHTMLAttr returns the attribute an HTML element as k=v.
 // If v contains double quotes "", the attribute value will be wrapped
 // in single quotes '', and vice versa. Defaults to double quotes.
-func safeHTMLAttr(k, v string) template.HTMLAttr {
+func safeHTMLAttr(k, v string) html.HTMLAttr {
 	q := `"`
 	if strings.ContainsRune(v, '"') {
 		q = "'"
 	}
-	return template.HTMLAttr(k + "=" + q + v + q)
+	return html.HTMLAttr(k + "=" + q + v + q)
 }
 
 // getSitemap returns a sitemap containing both templated pages

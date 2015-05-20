@@ -417,6 +417,25 @@ func TestServeSitemap(t *testing.T) {
 	}
 }
 
+func TestServeManifest(t *testing.T) {
+	defer preserveConfig()()
+	config.Google.GCM.Sender = "sender-123"
+
+	r := newTestRequest(t, "GET", "/manifest.json", nil)
+	w := httptest.NewRecorder()
+	serveManifest(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200", w.Code)
+	}
+	res := map[string]interface{}{}
+	if err := json.Unmarshal(w.Body.Bytes(), &res); err != nil {
+		t.Fatal(err)
+	}
+	if v, ok := res["gcm_sender_id"].(string); !ok || v != "sender-123" {
+		t.Errorf("gcm_sender_id = %v; want 'sender-123'", res["gcm_sender_id"])
+	}
+}
+
 func TestHandleAuth(t *testing.T) {
 	defer resetTestState(t)
 	defer preserveConfig()()
@@ -1127,11 +1146,10 @@ func TestSubmitUserSurvey(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
-		"ok":             &eventSession{Id: "ok", StartTime: time.Now().Add(-10 * time.Minute)},
-		"submitted":      &eventSession{Id: "submitted", StartTime: time.Now().Add(-10 * time.Minute)},
-		"disabled":       &eventSession{Id: "disabled", StartTime: time.Now().Add(-10 * time.Minute)},
-		"not-bookmarked": &eventSession{Id: "not-bookmarked", StartTime: time.Now().Add(-10 * time.Minute)},
-		"too-early":      &eventSession{Id: "too-early", StartTime: time.Now().Add(10 * time.Minute)},
+		"ok":        &eventSession{Id: "ok", StartTime: time.Now().Add(-10 * time.Minute)},
+		"submitted": &eventSession{Id: "submitted", StartTime: time.Now().Add(-10 * time.Minute)},
+		"disabled":  &eventSession{Id: "disabled", StartTime: time.Now().Add(-10 * time.Minute)},
+		"too-early": &eventSession{Id: "too-early", StartTime: time.Now().Add(10 * time.Minute)},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -1142,7 +1160,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		if r.Method == "GET" {
 			w.Write([]byte(`{
-				"starred_sessions": ["submitted", "ok", "too-early", "disabled"],
+				"starred_sessions": ["submitted", "too-early", "disabled"],
 				"feedback_submitted_sessions": ["submitted"]
 			}`))
 			return
@@ -1153,7 +1171,7 @@ func TestSubmitUserSurvey(t *testing.T) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if v := []string{"submitted", "ok", "too-early", "disabled"}; !compareStringSlices(data.Bookmarks, v) {
+		if v := []string{"submitted", "too-early", "disabled"}; !compareStringSlices(data.Bookmarks, v) {
 			t.Errorf("data.Bookmarks = %v; want %v", data.Bookmarks, v)
 		}
 		if !compareStringSlices(data.Survey, feedbackIDs) {
@@ -1226,7 +1244,6 @@ func TestSubmitUserSurvey(t *testing.T) {
 		code int
 	}{
 		{"ok", http.StatusCreated},
-		{"not-bookmarked", http.StatusNotFound},
 		{"not-there", http.StatusNotFound},
 		{"submitted", http.StatusBadRequest},
 		{"disabled", http.StatusBadRequest},

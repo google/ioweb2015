@@ -106,12 +106,6 @@ func addSessionSurvey(c context.Context, uid, sid string) ([]string, error) {
 		if i < len(data.Survey) && data.Survey[i] == sid {
 			return nil, errBadData
 		}
-		// accept only ids in the user's bookmarks
-		sort.Strings(data.Bookmarks)
-		i = sort.SearchStrings(data.Bookmarks, sid)
-		if i >= len(data.Bookmarks) || data.Bookmarks[i] != sid {
-			return nil, errNotFound
-		}
 		data.Survey = append(data.Survey, sid)
 		err = storeAppFolderData(c, cred, data)
 		if err != errConflict {
