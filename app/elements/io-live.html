@@ -68,7 +68,7 @@ Fired when the mode changes.
     </style>
 
     <div class="bottom__bar" layout horizontal end justified>
-      <div>
+      <div flex>
         <template if="{{mode === _MODES.BEFORE}}">
           <content></content>
         </template>
@@ -79,7 +79,7 @@ Fired when the mode changes.
 
       <div id="livewidget" on-transitionend="{{onFabTransition}}">
 
-      <paper-dialog id="sessiondetails" transition="paper-dialog-transition-bottom" layered="false"
+        <paper-dialog id="sessiondetails" transition="paper-dialog-transition-bottom" layered="false"
                     on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
           <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
           <div class="card__photo" relative>
@@ -277,6 +277,7 @@ Fired when the mode changes.
 
         </div>
       </div>
+
     </div>
 
     <div id="livecontainer">
@@ -525,6 +526,11 @@ Fired when the mode changes.
     openWidgetChanged: function() {
       this.$.livewidget.classList.toggle('open', this.openWidget);
       this.$.livewidget.classList.add('transitioning');
+
+      // Make sure FAB closes in browsers that don't support the new CSS clip-path.
+      if (IOWA.Util.isFF() || IOWA.Util.isIE()) {
+        this.onFabTransition();
+      }
     },
 
     modeChanged: function() {
@@ -639,8 +645,8 @@ Fired when the mode changes.
     },
 
     onFabTransition: function(e, detail, sender) {
-      e.stopPropagation();
-      sender.classList.remove('transitioning');
+      e && e.stopPropagation();
+      this.$.livewidget.classList.remove('transitioning');
       if (!this.openWidget) {
         this.$.schedfab.style.visibility = 'visible';
       }
