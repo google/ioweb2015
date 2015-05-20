@@ -258,7 +258,15 @@ google-youtube {
       left: $desktopKeyline;
     }
   }
+
+  // Phase 3
+  .card__iorequest {
+    margin-top: -40px;
+  }
+  // ----
+
 }
+
 
 @media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
   .card__photo--stage {
