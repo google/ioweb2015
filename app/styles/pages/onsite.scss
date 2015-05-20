@@ -124,7 +124,7 @@ $name: 'page-onsite';
     margin-top: -53px;
   }
   .onsite__pic--reg {
-    margin-top: -238px;
+    margin-top: -214px;
   }
   .pics__section {
     height: 745px;
@@ -161,12 +161,19 @@ $name: 'page-onsite';
   }
 }
 
+
 @media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
   .onsite__pic {
     margin-top: -77px;
   }
   .onsite__pic--reg {
     margin-top: -262px;
+  }
+}
+
+@media (min-width: $tablet-breakpoint-max) {
+  .onsite__pic--reg {
+    margin-top: -238px;
   }
 }
 
