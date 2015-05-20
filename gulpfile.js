@@ -38,7 +38,7 @@ var backend = require('./gulp_scripts/backend');
 
 var argv = require('yargs').argv;
 var IOWA = require('./package.json').iowa;
-var DIST_EXPERIMENT_DIR = path.join(IOWA.app_dir, IOWA.experiment_dir);
+var DIST_EXPERIMENT_DIR = path.join(IOWA.appDir, IOWA.experimentDir);
 
 // reload is a noop unless '--reload' cmd line arg is specified.
 // reload has no effect without '--watch'.
@@ -59,14 +59,14 @@ if (argv.open) {
 
 // Scripts required for the data-fetching worker.
 var dataWorkerScripts = [
-  IOWA.app_dir + '/bower_components/es6-promise-2.0.1.min/index.js',
-  IOWA.app_dir + '/scripts/helper/request.js',
-  IOWA.app_dir + '/scripts/helper/schedule.js',
-  IOWA.app_dir + '/data-worker.js'
+  IOWA.appDir + '/bower_components/es6-promise-2.0.1.min/index.js',
+  IOWA.appDir + '/scripts/helper/request.js',
+  IOWA.appDir + '/scripts/helper/schedule.js',
+  IOWA.appDir + '/data-worker.js'
 ];
 
 // Default task that builds everything.
-// The output can be found in IOWA.dist_dir.
+// The output can be found in IOWA.distDir.
 gulp.task('default', ['clean'], function(done) {
   runSequence(
     'copy-experiment-to-site', 'sass', 'vulcanize',
@@ -87,7 +87,7 @@ gulp.task('setup', function(cb) {
 
 // Install/update bower components.
 gulp.task('bower', function(cb) {
-  var proc = spawn('../node_modules/bower/bin/bower', ['install'], {cwd: IOWA.app_dir, stdio: 'inherit'});
+  var proc = spawn('../node_modules/bower/bin/bower', ['install'], {cwd: IOWA.appDir, stdio: 'inherit'});
   proc.on('close', cb);
 });
 
@@ -111,8 +111,8 @@ gulp.task('clear', function (done) {
 // TODO(ericbidelman): also remove generated .css files.
 gulp.task('clean', ['clear'], function(cleanCallback) {
   del([
-    IOWA.dist_dir,
-    IOWA.app_dir + '/data-worker-scripts.js',
+    IOWA.distDir,
+    IOWA.appDir + '/data-worker-scripts.js',
     DIST_EXPERIMENT_DIR
   ], cleanCallback);
 });
@@ -131,8 +131,8 @@ gulp.task('vulcanize', [
 gulp.task('copy-assets', function() {
   var assets = $.useref.assets();
   var templates = [
-    APP_DIR + '/templates/**/*.html',
-    APP_DIR + '/templates/**/*.json'
+    IOWA.appDir + '/templates/**/*.html',
+    IOWA.appDir + '/templates/**/*.json'
   ];
   if (argv.env == 'prod') {
     templates.push('!**/templates/debug/**');
@@ -144,23 +144,23 @@ gulp.task('copy-assets', function() {
     .pipe($.useref());
 
   var otherAssetStream = gulp.src([
-    APP_DIR + '/*.{html,txt,ico}',
-    APP_DIR + '/clear_cache.html',
-    APP_DIR + '/styles/**.css',
-    APP_DIR + '/styles/pages/upgrade.css',
-    APP_DIR + '/styles/pages/permissions.css',
-    APP_DIR + '/styles/pages/error.css',
-    APP_DIR + '/elements/**/images/*',
-    APP_DIR + '/elements/webgl-globe/shaders/*.{frag,vert}',
-    APP_DIR + '/elements/webgl-globe/textures/*.{jpg,png}',
-    APP_DIR + '/bower_components/webcomponentsjs/webcomponents.min.js',
-    APP_DIR + '/bower_components/es6-promise-2.0.1.min/index.js',
-    APP_DIR + '/bower_components/elevator/demo/music/*',
+    IOWA.appDir + '/*.{html,txt,ico}',
+    IOWA.appDir + '/clear_cache.html',
+    IOWA.appDir + '/styles/**.css',
+    IOWA.appDir + '/styles/pages/upgrade.css',
+    IOWA.appDir + '/styles/pages/permissions.css',
+    IOWA.appDir + '/styles/pages/error.css',
+    IOWA.appDir + '/elements/**/images/*',
+    IOWA.appDir + '/elements/webgl-globe/shaders/*.{frag,vert}',
+    IOWA.appDir + '/elements/webgl-globe/textures/*.{jpg,png}',
+    IOWA.appDir + '/bower_components/webcomponentsjs/webcomponents.min.js',
+    IOWA.appDir + '/bower_components/es6-promise-2.0.1.min/index.js',
+    IOWA.appDir + '/bower_components/elevator/demo/music/*',
     DIST_EXPERIMENT_DIR + '/**/*'
   ], {base: './'});
 
   return merge(templateStream, otherAssetStream)
-    .pipe(gulp.dest(IOWA.dist_dir))
+    .pipe(gulp.dest(IOWA.distDir))
     .pipe($.size({title: 'copy-assets'}));
 });
 
@@ -188,7 +188,7 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
     'helper/schedule.js',
     'bootstrap.js'
   ].map(function(script) {
-    return IOWA.app_dir + '/scripts/' + script;
+    return IOWA.appDir + '/scripts/' + script;
   });
 
   var siteScriptStream = gulp.src(siteScripts)
@@ -196,19 +196,19 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
     .pipe($.concat('site-scripts.js'));
 
   // analytics.js is loaded separately and shouldn't be concatenated.
-  var analyticsScriptStream = gulp.src([IOWA.app_dir + '/scripts/analytics.js']);
+  var analyticsScriptStream = gulp.src([IOWA.appDir + '/scripts/analytics.js']);
 
   var serviceWorkerScriptStream = gulp.src([
-    IOWA.app_dir + '/bower_components/shed/shed.js',
-    IOWA.app_dir + '/scripts/helper/simple-db.js',
-    IOWA.app_dir + '/scripts/shed/*.js'
+    IOWA.appDir + '/bower_components/shed/shed.js',
+    IOWA.appDir + '/scripts/helper/simple-db.js',
+    IOWA.appDir + '/scripts/shed/*.js'
   ])
     .pipe(reload({stream: true, once: true}))
     .pipe($.concat('shed-scripts.js'));
 
   return merge(siteScriptStream, analyticsScriptStream).add(serviceWorkerScriptStream)
     .pipe($.uglify({preserveComments: 'some'}).on('error', function () {}))
-    .pipe(gulp.dest(IOWA.dist_dir + '/' + IOWA.app_dir + '/scripts'))
+    .pipe(gulp.dest(IOWA.distDir + '/' + IOWA.appDir + '/scripts'))
     .pipe($.size({title: 'concat-and-uglify-js'}));
 });
 
@@ -217,13 +217,13 @@ gulp.task('generate-data-worker-dist', function() {
   return gulp.src(dataWorkerScripts)
     .pipe($.concat('data-worker-scripts.js'))
     .pipe($.uglify({preserveComments: 'some'}).on('error', function () {}))
-    .pipe(gulp.dest(IOWA.dist_dir + '/' + IOWA.app_dir))
+    .pipe(gulp.dest(IOWA.distDir + '/' + IOWA.appDir))
     .pipe($.size({title: 'data-worker-dist'}));
 });
 
 // Generate prod service worker.
 gulp.task('generate-service-worker-dist', function(callback) {
-  var distDir = path.join(IOWA.dist_dir, IOWA.app_dir);
+  var distDir = path.join(IOWA.distDir, IOWA.appDir);
   del.sync([distDir + '/service-worker.js']);
   var importScripts = ['scripts/shed-scripts.js'];
 
@@ -242,9 +242,9 @@ gulp.task('generate-service-worker-dist', function(callback) {
 
 // Compile SASS files.
 gulp.task('sass', function() {
-  return gulp.src([IOWA.app_dir + '/{styles,elements}/**/*.scss'])
+  return gulp.src([IOWA.appDir + '/{styles,elements}/**/*.scss'])
     .pipe($.sass({outputStyle: 'compressed'}))
-    .pipe($.changed(IOWA.app_dir + '/{styles,elements}', {extension: '.scss'}))
+    .pipe($.changed(IOWA.appDir + '/{styles,elements}', {extension: '.scss'}))
     .pipe($.autoprefixer([
       'ie >= 10',
       'ie_mob >= 10',
@@ -254,61 +254,61 @@ gulp.task('sass', function() {
       'opera >= 26',
       'ios >= 7'
     ]))
-    .pipe(gulp.dest(IOWA.app_dir))
+    .pipe(gulp.dest(IOWA.appDir))
     .pipe($.size({title: 'styles'}));
 });
 
 // Optimize Images
 gulp.task('images', function() {
   return gulp.src([
-      IOWA.app_dir + '/images/**/*'
+      IOWA.appDir + '/images/**/*'
     ])
     .pipe($.cache($.imagemin({
       progressive: true,
       interlaced: true
     })))
-    .pipe(gulp.dest(IOWA.dist_dir + '/' + IOWA.app_dir + '/images'))
+    .pipe(gulp.dest(IOWA.distDir + '/' + IOWA.appDir + '/images'))
     .pipe($.size({title: 'images'}));
 });
 
 // vulcanize main site elements separately.
 gulp.task('vulcanize-elements', ['sass'], function() {
   return gulp.src([
-      IOWA.app_dir + '/elements/elements.html'
+      IOWA.appDir + '/elements/elements.html'
     ])
     .pipe($.vulcanize({
       strip: !argv.pretty,
       csp: true,
       inline: true,
-      dest: IOWA.app_dir + '/elements'
+      dest: IOWA.appDir + '/elements'
     }))
-    .pipe(gulp.dest(IOWA.dist_dir + '/' + IOWA.app_dir + '/elements/'));
+    .pipe(gulp.dest(IOWA.distDir + '/' + IOWA.appDir + '/elements/'));
 });
 
 // vulcanize embed gadget.
 gulp.task('vulcanize-gadget-elements', ['sass'], function() {
   return gulp.src([
-      IOWA.app_dir + '/elements/embed-elements.html'
+      IOWA.appDir + '/elements/embed-elements.html'
     ])
     .pipe($.vulcanize({
       strip: !argv.pretty,
       csp: true,
       inline: true,
-      dest: IOWA.app_dir + '/elements'
+      dest: IOWA.appDir + '/elements'
     }))
-    .pipe(gulp.dest(IOWA.dist_dir + '/' + IOWA.app_dir + '/elements/'));
+    .pipe(gulp.dest(IOWA.distDir + '/' + IOWA.appDir + '/elements/'));
 });
 
 // vulcanize extended form elements separately.
 gulp.task('vulcanize-extended-elements', ['sass'], function() {
   return gulp.src([
-      IOWA.app_dir + '/elements/io-extended-form.html'
+      IOWA.appDir + '/elements/io-extended-form.html'
     ])
     .pipe($.vulcanize({
       strip: !argv.pretty,
       csp: true,
       inline: true,
-      dest: IOWA.app_dir + '/elements',
+      dest: IOWA.appDir + '/elements',
       excludes: {
         imports: [ // These are registered in the main site vulcanized bundle.
           'polymer.html$',
@@ -319,16 +319,16 @@ gulp.task('vulcanize-extended-elements', ['sass'], function() {
         ]
       }
     }))
-    .pipe(gulp.dest(IOWA.dist_dir + '/' + IOWA.app_dir + '/elements/'));
+    .pipe(gulp.dest(IOWA.distDir + '/' + IOWA.appDir + '/elements/'));
 });
 
 // Copy experiment files.
 gulp.task('copy-experiment-to-site', ['build-experiment'], function(cb) {
   gulp.src([
-    IOWA.experiment_dir + '/public/js/*.*',
-    IOWA.experiment_dir + '/public/*.mp3',
-    IOWA.experiment_dir + '/public/*.mp4'
-  ], {base: IOWA.experiment_dir + '/public/' })
+    IOWA.experimentDir + '/public/js/*.*',
+    IOWA.experimentDir + '/public/*.mp3',
+    IOWA.experimentDir + '/public/*.mp4'
+  ], {base: IOWA.experimentDir + '/public/' })
   .pipe(gulp.dest(DIST_EXPERIMENT_DIR))
   .on('end', cb);
 });
@@ -345,7 +345,7 @@ gulp.task('build-experiment', buildExperiment);
 
 // Lint JavaScript
 gulp.task('jshint', function() {
-  return gulp.src([IOWA.app_dir + '/scripts/**/*.js'])
+  return gulp.src([IOWA.appDir + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
@@ -354,7 +354,7 @@ gulp.task('jshint', function() {
 
 // Check JS style
 gulp.task('jscs', function() {
-  return gulp.src([IOWA.app_dir + '/scripts/**/*.js'])
+  return gulp.src([IOWA.appDir + '/scripts/**/*.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jscs());
 });
@@ -363,25 +363,25 @@ gulp.task('jscs', function() {
 gulp.task('generate-data-worker-dev', function() {
   return gulp.src(dataWorkerScripts)
     .pipe($.concat('data-worker-scripts.js'))
-    .pipe(gulp.dest(IOWA.app_dir))
+    .pipe(gulp.dest(IOWA.appDir))
     .pipe($.size({title: 'data-worker-dev'}));
 });
 
 // Generate serve-worker.js for local dev env.
 gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
-  del.sync([IOWA.app_dir + '/service-worker.js']);
-  var importScripts = glob.sync('scripts/shed/*.js', {cwd: IOWA.app_dir});
+  del.sync([IOWA.appDir + '/service-worker.js']);
+  var importScripts = glob.sync('scripts/shed/*.js', {cwd: IOWA.appDir});
   importScripts.unshift('scripts/helper/simple-db.js');
   importScripts.unshift('bower_components/shed/shed.js');
 
   // Run with --fetch-dev to generate a service-worker.js that will handle fetch events.
   // By default, the generated service-worker.js will precache resources, but not actually serve
   // them. This is preferable for dev, since things like live reload will work as expected.
-  generateServiceWorker(IOWA.app_dir, !!argv['fetch-dev'], importScripts, function(error, serviceWorkerFileContents) {
+  generateServiceWorker(IOWA.appDir, !!argv['fetch-dev'], importScripts, function(error, serviceWorkerFileContents) {
     if (error) {
       return callback(error);
     }
-    fs.writeFile(IOWA.app_dir + '/service-worker.js', serviceWorkerFileContents, function(error) {
+    fs.writeFile(IOWA.appDir + '/service-worker.js', serviceWorkerFileContents, function(error) {
       if (error) {
         return callback(error);
       }
@@ -392,15 +392,15 @@ gulp.task('generate-service-worker-dev', ['sass'], function(callback) {
 
 // generate pages.js out of templates.
 gulp.task('generate-page-metadata', function(done) {
-  var pagesjs = fs.openSync(IOWA.app_dir + '/scripts/pages.js', 'w');
+  var pagesjs = fs.openSync(IOWA.appDir + '/scripts/pages.js', 'w');
   var proc = spawn('go', ['run', 'util/gen-pages.go'], {stdio: ['ignore', pagesjs, process.stderr]});
   proc.on('exit', done);
 });
 
 // Build experiment and place inside app.
 function buildExperiment(cb) {
-  var args = [IOWA.url_prefix + IOWA.experiment_url];
-  var build = spawn('./bin/build', args, {cwd: IOWA.experiment_dir, stdio: 'inherit'});
+  var args = [IOWA.urlPrefix + IOWA.experimentUrl];
+  var build = spawn('./bin/build', args, {cwd: IOWA.experimentDir, stdio: 'inherit'});
   build.on('close', cb);
 }
 
@@ -427,12 +427,12 @@ gulp.task('backend:dist', function(done) {
 
 // Create server config with defaults.
 gulp.task('backend:config', function() {
-  backend.generateServerConfig(IOWA.backend_dir, argv.env || 'dev');
+  backend.generateServerConfig(IOWA.backendDir, argv.env || 'dev');
 });
 
 // Create GAE config files.
 gulp.task('backend:gaeconfig', function(done) {
-  backend.generateGAEConfig(IOWA.backend_dir, done);
+  backend.generateGAEConfig(IOWA.backendDir, done);
 });
 
 // decrypt backend/server.config.enc into backend/server.config.
@@ -452,7 +452,7 @@ gulp.task('encrypt', function(done) {
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 // App environment is 'dev' by default. Change with '--env=prod'.
 gulp.task('serve', ['backend:build', 'backend:config', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function(done) {
-  var url = backend.serve({dir: IOWA.backend_dir, watch: argv.watch, reload: argv.reload}, done);
+  var url = backend.serve({dir: IOWA.backendDir, watch: argv.watch, reload: argv.reload}, done);
   openUrl(url);
   if (argv.watch) {
     watch();
@@ -462,7 +462,7 @@ gulp.task('serve', ['backend:build', 'backend:config', 'generate-page-metadata',
 // The same as 'serve' task but using GAE dev appserver.
 // If you don't want file watchers and live-reload, use '--no-watch' option.
 gulp.task('serve:gae', ['backend:config', 'backend:gaeconfig', 'generate-page-metadata', 'generate-data-worker-dev', 'generate-service-worker-dev'], function(done) {
-  var url = backend.serveGAE({dir: IOWA.backend_dir, reload: argv.reload}, done);
+  var url = backend.serveGAE({dir: IOWA.backendDir, reload: argv.reload}, done);
   // give GAE server some time to start
   setTimeout(openUrl.bind(null, url, null, null), 1000);
   if (argv.watch) {
@@ -473,7 +473,7 @@ gulp.task('serve:gae', ['backend:config', 'backend:gaeconfig', 'generate-page-me
 // Serve build with GAE dev appserver. This is how it would look in production.
 // There are no file watchers.
 gulp.task('serve:dist', ['default'], function(done) {
-  var backendDir = path.join(IOWA.dist_dir, IOWA.backend_dir);
+  var backendDir = path.join(IOWA.distDir, IOWA.backendDir);
   var url = backend.serveGAE({dir: backendDir}, done);
   // give GAE server some time to start
   setTimeout(openUrl.bind(null, url, null, null), 1000);
@@ -485,11 +485,11 @@ gulp.task('serve:dist', ['default'], function(done) {
 
 // Watch file changes and reload running server or rebuild stuff.
 function watch() {
-  gulp.watch([IOWA.app_dir + '/**/*.html'], reload);
-  gulp.watch([IOWA.app_dir + '/{elements,styles}/**/*.{scss,css}'], ['sass', reload]);
-  gulp.watch([IOWA.app_dir + '/scripts/**/*.js'], ['jshint']);
-  gulp.watch([IOWA.app_dir + '/images/**/*'], reload);
-  gulp.watch([IOWA.app_dir + '/bower.json'], ['bower']);
+  gulp.watch([IOWA.appDir + '/**/*.html'], reload);
+  gulp.watch([IOWA.appDir + '/{elements,styles}/**/*.{scss,css}'], ['sass', reload]);
+  gulp.watch([IOWA.appDir + '/scripts/**/*.js'], ['jshint']);
+  gulp.watch([IOWA.appDir + '/images/**/*'], reload);
+  gulp.watch([IOWA.appDir + '/bower.json'], ['bower']);
   gulp.watch(dataWorkerScripts, ['generate-data-worker-dev']);
 }
 
@@ -505,15 +505,15 @@ function watch() {
 gulp.task('screenshots', ['backend:build'], function(callback) {
   var seleniumScreenshots = require('./gulp_scripts/screenshots');
   // We don't want the service worker to served cached content when taking screenshots.
-  del.sync(IOWA.app_dir + '/service-worker.js');
+  del.sync(IOWA.appDir + '/service-worker.js');
 
-  var styleWatcher = gulp.watch([IOWA.app_dir + '/{elements,styles}/**/*.{scss,css}'], ['sass']);
+  var styleWatcher = gulp.watch([IOWA.appDir + '/{elements,styles}/**/*.{scss,css}'], ['sass']);
   var callbackWrapper = function(error) {
     styleWatcher.end();
     callback(error);
   };
 
-  var allPages = glob.sync(IOWA.app_dir + '/templates/!(layout_).html').map(function(templateFile) {
+  var allPages = glob.sync(IOWA.appDir + '/templates/!(layout_).html').map(function(templateFile) {
     return path.basename(templateFile).replace('.html', '');
   });
 
@@ -524,13 +524,13 @@ gulp.task('screenshots', ['backend:build'], function(callback) {
     (argv.widths.split ? argv.widths.split(',').map(Number) : [argv.widths]) :
     [400, 900, 1200];
   var height = argv.height || 9999;
-  seleniumScreenshots(branchOrCommit, IOWA.app_dir, 'http://localhost:9999' + IOWA.url_prefix + '/',
+  seleniumScreenshots(branchOrCommit, IOWA.appDir, 'http://localhost:9999' + IOWA.urlPrefix + '/',
     pages, widths, height, callbackWrapper);
 });
 
 // Generate sitemap.xml. Not currently used as we're generating one dynamically on the backend.
 gulp.task('sitemap', function() {
-  gulp.src(IOWA.app_dir + '/templates/!(layout_|error).html', {read: false})
+  gulp.src(IOWA.appDir + '/templates/!(layout_|error).html', {read: false})
     .pipe($.rename(function(path) {
       if (path.basename === 'home') {
         path.basename = '/'; // homepage is served from root.
@@ -538,7 +538,7 @@ gulp.task('sitemap', function() {
       path.extname = ''; // remove .html from URLs.
     }))
     .pipe($.sitemap({
-      siteUrl: IOWA.origin_prod + IOWA.url_prefix,
+      siteUrl: IOWA.originProd + IOWA.urlPrefix,
       changefreq: 'weekly',
       spacing: '  ',
       mappings: [{
@@ -546,7 +546,7 @@ gulp.task('sitemap', function() {
         changefreq: 'daily'
       }]
     }))
-    .pipe(gulp.dest(IOWA.app_dir));
+    .pipe(gulp.dest(IOWA.appDir));
 });
 
 // Run PageSpeed Insights
@@ -556,6 +556,6 @@ gulp.task('pagespeed', pagespeed.bind(null, {
   // free (no API key) tier. You can use a Google
   // Developer API key if you have one. See
   // http://goo.gl/RkN0vE for info key: 'YOUR_API_KEY'
-  url: IOWA.origin_prod + IOWA.url_prefix,
+  url: IOWA.originProd + IOWA.urlPrefix,
   strategy: 'mobile'
 }));

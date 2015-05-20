@@ -30,15 +30,15 @@ var IOWA = require('../package.json').iowa;
  */
 function copy(appenv, callback) {
   gulp.src([
-    IOWA.backend_dir + '/**/*.go',
-    IOWA.backend_dir + '/*.yaml',
-    IOWA.backend_dir + '/*.config'
+    IOWA.backendDir + '/**/*.go',
+    IOWA.backendDir + '/*.yaml',
+    IOWA.backendDir + '/*.config'
   ], {base: './'})
-  .pipe(gulp.dest(IOWA.dist_dir))
+  .pipe(gulp.dest(IOWA.distDir))
   .on('end', function() {
-    var destBackend = [IOWA.dist_dir, IOWA.backend_dir].join('/');
+    var destBackend = [IOWA.distDir, IOWA.backendDir].join('/');
     // ../app <= dist/backend/app
-    fs.symlinkSync('../' + IOWA.app_dir, destBackend + '/' + IOWA.app_dir);
+    fs.symlinkSync('../' + IOWA.appDir, destBackend + '/' + IOWA.appDir);
     // create server config for the right env
     generateServerConfig(destBackend, appenv);
     // create GAE config from backend/app.yaml.template
@@ -59,8 +59,8 @@ function test(opts, callback) {
     var run = singleTestRound.bind(null, cmd, opts.test);
     var proc = run();
     if (opts.watch) {
-      gulp.watch([IOWA.backend_dir + '/**/*.go'], run);
-      gulp.watch([IOWA.app_dir + '/templates/*'], run);
+      gulp.watch([IOWA.backendDir + '/**/*.go'], run);
+      gulp.watch([IOWA.appDir + '/templates/*'], run);
       callback();
       return;
     }
@@ -88,7 +88,7 @@ function singleTestRound(cmd, testPattern) {
   if (testPattern) {
     args.push('-test.run=' + testPattern);
   }
-  return spawn(cmd, args, {cwd: IOWA.backend_dir, stdio: 'inherit'});
+  return spawn(cmd, args, {cwd: IOWA.backendDir, stdio: 'inherit'});
 }
 
 /**
@@ -109,7 +109,7 @@ function serve(opts, callback) {
   }
   var port = opts.port || (opts.reload ? '8080' : '3000');
   var serverAddr = 'localhost:' + port;
-  var url = 'http://' + serverAddr + IOWA.url_prefix;
+  var url = 'http://' + serverAddr + IOWA.urlPrefix;
 
   var proc;
   var spawnBackend = function() {
@@ -124,7 +124,7 @@ function serve(opts, callback) {
     return url;
   }
 
-  gulp.watch([IOWA.backend_dir + '/**/*.go'], function() {
+  gulp.watch([IOWA.backendDir + '/**/*.go'], function() {
     build(function(code) {
       if (code !== 0) {
         return;
@@ -150,7 +150,7 @@ function serve(opts, callback) {
     callback();
   });
   browserSync({notify: false, open: false, port: 3000, proxy: serverAddr});
-  return 'http://localhost:3000' + IOWA.url_prefix;
+  return 'http://localhost:3000' + IOWA.urlPrefix;
 }
 
 /**
@@ -166,11 +166,11 @@ function serve(opts, callback) {
 function serveGAE(opts, callback) {
   var port = opts.port || (opts.reload ? '8080' : '3000');
   var serverAddr = 'localhost:' + port;
-  var url = 'http://' + serverAddr + IOWA.url_prefix;
+  var url = 'http://' + serverAddr + IOWA.urlPrefix;
   var args = [
     'preview', 'app', 'run', opts.dir,
     '--host', serverAddr,
-    '--datastore-path', IOWA.backend_dir + '/.gae_datastore'
+    '--datastore-path', IOWA.backendDir + '/.gae_datastore'
   ];
 
   var backend = spawn('gcloud', args, {stdio: 'inherit'});
@@ -183,7 +183,7 @@ function serveGAE(opts, callback) {
   browserSync.emitter.on('service:exit', callback);
   // give GAE server some time to start
   setTimeout(browserSync.bind(null, {notify: false, open: false, port: 3000, proxy: serverAddr}), 2000);
-  return 'http://localhost:3000' + IOWA.url_prefix;
+  return 'http://localhost:3000' + IOWA.urlPrefix;
 }
 
 /**
@@ -193,13 +193,13 @@ function serveGAE(opts, callback) {
  * @param {string} appenv App environment: 'dev', 'stage' or 'prod'.
  */
 function generateServerConfig(dest, appenv) {
-  dest = (dest || IOWA.backend_dir) + '/server.config';
+  dest = (dest || IOWA.backendDir) + '/server.config';
   appenv = appenv || 'dev';
 
   var files = [
-    IOWA.backend_dir + '/server.config',
-    IOWA.backend_dir + '/server.config.dev',
-    IOWA.backend_dir + '/server.config.template'
+    IOWA.backendDir + '/server.config',
+    IOWA.backendDir + '/server.config.dev',
+    IOWA.backendDir + '/server.config.template'
   ];
   var src;
   for (var i = 0, f; f = files[i]; i++) {
@@ -214,7 +214,7 @@ function generateServerConfig(dest, appenv) {
 
   var cfg = JSON.parse(fs.readFileSync(src, 'utf8'));
   cfg.env = appenv;
-  cfg.prefix = IOWA.url_prefix;
+  cfg.prefix = IOWA.urlPrefix;
   fs.writeFileSync(dest, JSON.stringify(cfg, null, 2));
 }
 
@@ -226,11 +226,11 @@ function generateServerConfig(dest, appenv) {
  */
 function generateGAEConfig(dest, callback) {
   var files = [
-    IOWA.backend_dir + '/app.yaml.template',
-    IOWA.backend_dir + '/cron.yaml.template'
+    IOWA.backendDir + '/app.yaml.template',
+    IOWA.backendDir + '/cron.yaml.template'
   ];
-  gulp.src(files, {base: IOWA.backend_dir})
-    .pipe($.replace(/\$PREFIX\$/g, IOWA.url_prefix))
+  gulp.src(files, {base: IOWA.backendDir})
+    .pipe($.replace(/\$PREFIX\$/g, IOWA.urlPrefix))
     .pipe($.rename({extname: ''}))
     .pipe(gulp.dest(dest))
     .on('end', callback);
@@ -243,7 +243,7 @@ function generateGAEConfig(dest, callback) {
  */
 function build(callback) {
   var args = ['build', '-o', 'bin/server'];
-  var build = spawn('go', args, {cwd: IOWA.backend_dir, stdio: 'inherit'});
+  var build = spawn('go', args, {cwd: IOWA.backendDir, stdio: 'inherit'});
   build.on('exit', callback);
 }
 
@@ -255,7 +255,7 @@ function build(callback) {
 function installDeps(callback) {
   // additional argument is required because it is imported in files
   // hidden by +appengine build tag and not visible to the standard "go get" command.
-  var args = ['get', '-d', './' + IOWA.backend_dir + '/...', 'google.golang.org/appengine'];
+  var args = ['get', '-d', './' + IOWA.backendDir + '/...', 'google.golang.org/appengine'];
   spawn('go', args, {stdio: 'inherit'}).on('exit', callback);
 }
 
@@ -266,7 +266,7 @@ function installDeps(callback) {
  * @param {function} callback Callback function.
  */
 function decrypt(passphrase, callback) {
-  var tarFile = IOWA.backend_dir + '/config.tar';
+  var tarFile = IOWA.backendDir + '/config.tar';
   var args = ['aes-256-cbc', '-d', '-in', tarFile + '.enc', '-out', tarFile];
   if (passphrase) {
     args.push('-pass', 'pass:' + passphrase);
@@ -276,7 +276,7 @@ function decrypt(passphrase, callback) {
       callback(code);
       return;
     }
-    spawn('tar', ['-x', '-f', tarFile, '-C', IOWA.backend_dir], {stdio: 'inherit'}).
+    spawn('tar', ['-x', '-f', tarFile, '-C', IOWA.backendDir], {stdio: 'inherit'}).
     on('exit', fs.unlink.bind(fs, tarFile, callback));
   });
 }
@@ -288,8 +288,8 @@ function decrypt(passphrase, callback) {
  * @param {function} callback Callback function.
  */
 function encrypt(passphrase, callback) {
-  var tarFile = IOWA.backend_dir + '/config.tar';
-  var tarArgs = ['-c', '-f', tarFile, '-C', IOWA.backend_dir,
+  var tarFile = IOWA.backendDir + '/config.tar';
+  var tarArgs = ['-c', '-f', tarFile, '-C', IOWA.backendDir,
     'server.config.dev',
     'server.config.stage',
     'server.config.prod'
