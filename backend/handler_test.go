@@ -1223,20 +1223,20 @@ func TestSubmitUserSurvey(t *testing.T) {
 		"ok": "ok-mapped",
 	}
 	config.Survey.Qmap.Q1.Name = "q1-param"
-	config.Survey.Qmap.Q1.Answers = []string{"", "", "", "", "five"}
+	config.Survey.Qmap.Q1.Answers = map[string]string{"5": "five"}
 	config.Survey.Qmap.Q2.Name = "q2-param"
-	config.Survey.Qmap.Q2.Answers = []string{"", "", "", "four", ""}
+	config.Survey.Qmap.Q2.Answers = map[string]string{"4": "four"}
 	config.Survey.Qmap.Q3.Name = "q3-param"
-	config.Survey.Qmap.Q3.Answers = []string{"", "", "three", "", ""}
+	config.Survey.Qmap.Q3.Answers = map[string]string{"3": "three"}
 	config.Survey.Qmap.Q4.Name = "q4-param"
-	config.Survey.Qmap.Q4.Answers = []string{"", "two", "", "", ""}
+	config.Survey.Qmap.Q4.Answers = map[string]string{"2": "two"}
 	config.Survey.Qmap.Q5.Name = "q5-param"
 
 	const feedback = `{
-		"overall": 5,
-		"relevance": 4,
-		"content": 3,
-		"speaker": 2
+		"overall": "5",
+		"relevance": "4",
+		"content": "3",
+		"speaker": "2"
 	}`
 
 	table := []*struct {
