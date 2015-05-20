@@ -337,10 +337,10 @@ Submit session feedback survey.
 
 ```json
 {
-  "overall": 5,
-  "relevance": 4,
-  "content": 4,
-  "speaker": 5,
+  "overall": "5",
+  "relevance": "4",
+  "content": "4",
+  "speaker": "5",
   "comment": "free text comment"
 }
 ```
@@ -357,7 +357,7 @@ including `:session_id`.
 ```
 
 All fields are optional.
-Integer fields should be in the range from 1 to 5 where 5 is the highest rating.
+Rating fields can have one of the following values: "1", "2", "3", "4" or "5".
 Feedback data for a session with the start timestamp greater than the request time will not be accepted.
 
 Successful submission is indicated by `201` response code.

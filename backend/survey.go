@@ -19,46 +19,38 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sort"
-	"strings"
 
 	"golang.org/x/net/context"
 )
 
 type sessionSurvey struct {
-	Overall   *int   `json:"overall"`
-	Relevance *int   `json:"relevance"`
-	Content   *int   `json:"content"`
-	Speaker   *int   `json:"speaker"`
+	Overall   string `json:"overall"`
+	Relevance string `json:"relevance"`
+	Content   string `json:"content"`
+	Speaker   string `json:"speaker"`
 	Comment   string `json:"comment"`
 }
 
 // valid validates sessionSurvey data.
 func (s *sessionSurvey) valid() bool {
-	for _, x := range []*int{s.Overall, s.Relevance, s.Content, s.Speaker} {
-		if x != nil && (*x < 1 || *x > 5) {
-			return false
-		}
+	if s.Overall != "" && config.Survey.Qmap.Q1.Answers[s.Overall] == "" {
+		return false
+	}
+	if s.Relevance != "" && config.Survey.Qmap.Q2.Answers[s.Relevance] == "" {
+		return false
+	}
+	if s.Content != "" && config.Survey.Qmap.Q3.Answers[s.Content] == "" {
+		return false
+	}
+	if s.Speaker != "" && config.Survey.Qmap.Q4.Answers[s.Speaker] == "" {
+		return false
 	}
 	return true
 }
 
 func (s *sessionSurvey) String() string {
-	data := map[string]*int{
-		"overall":   s.Overall,
-		"relevance": s.Relevance,
-		"content":   s.Content,
-		"speaker":   s.Speaker,
-	}
-	res := make([]string, 0, len(data)+1)
-	for k, v := range data {
-		i := -1
-		if v != nil {
-			i = *v
-		}
-		res = append(res, fmt.Sprintf("%s=%d", k, i))
-	}
-	res = append(res, s.Comment)
-	return strings.Join(res, " ")
+	return fmt.Sprintf("o=%s r=%s c=%s s=%s %s",
+		s.Overall, s.Relevance, s.Content, s.Speaker, s.Comment)
 }
 
 // disabledSurvey returns true if sid is found in config.Survey.Disabled.
@@ -130,17 +122,11 @@ func submitSessionSurvey(c context.Context, sid string, s *sessionSurvey) error 
 	if v, ok := config.Survey.Smap[sid]; ok {
 		sid = v
 	}
-	v := func(a []string, v *int) string {
-		if v == nil || *v < 1 && *v > len(a) {
-			return ""
-		}
-		return a[*v-1]
-	}
 	q := r.URL.Query()
-	q.Set(config.Survey.Qmap.Q1.Name, v(config.Survey.Qmap.Q1.Answers, s.Overall))
-	q.Set(config.Survey.Qmap.Q2.Name, v(config.Survey.Qmap.Q2.Answers, s.Relevance))
-	q.Set(config.Survey.Qmap.Q3.Name, v(config.Survey.Qmap.Q3.Answers, s.Content))
-	q.Set(config.Survey.Qmap.Q4.Name, v(config.Survey.Qmap.Q4.Answers, s.Speaker))
+	q.Set(config.Survey.Qmap.Q1.Name, config.Survey.Qmap.Q1.Answers[s.Overall])
+	q.Set(config.Survey.Qmap.Q2.Name, config.Survey.Qmap.Q2.Answers[s.Relevance])
+	q.Set(config.Survey.Qmap.Q3.Name, config.Survey.Qmap.Q3.Answers[s.Content])
+	q.Set(config.Survey.Qmap.Q4.Name, config.Survey.Qmap.Q4.Answers[s.Speaker])
 	q.Set(config.Survey.Qmap.Q5.Name, s.Comment)
 	q.Set("surveyId", config.Survey.ID)
 	q.Set("registrantKey", config.Survey.Reg)

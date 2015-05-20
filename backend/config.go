@@ -132,19 +132,19 @@ type appConfig struct {
 		Qmap struct {
 			Q1 struct {
 				Name    string
-				Answers []string
+				Answers map[string]string
 			}
 			Q2 struct {
 				Name    string
-				Answers []string
+				Answers map[string]string
 			}
 			Q3 struct {
 				Name    string
-				Answers []string
+				Answers map[string]string
 			}
 			Q4 struct {
 				Name    string
-				Answers []string
+				Answers map[string]string
 			}
 			Q5 struct {
 				Name string
