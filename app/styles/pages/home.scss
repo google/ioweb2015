@@ -65,6 +65,12 @@ $name: 'page-home';
   }
 }
 
+.play__button__container {
+  cursor: pointer;
+  background-size: 40px;
+  height: 60px;
+}
+
 // .home-photo {
 //   background: url(../images/home/Image-01.jpg) no-repeat 50% 0;
 //   background-size: cover;
