@@ -7,6 +7,15 @@
   "engines": {
     "node": ">=0.10.0"
   },
+  "iowa": {
+    "app_dir": "app",
+    "backend_dir": "backend",
+    "experiment_dir": "experiment",
+    "dist_dir": "dist",
+    "url_prefix": "/io2015",
+    "experiment_url": "/experiment/",
+    "origin_prod": "https://events.google.com"
+  },
   "devDependencies": {
     "blink-diff": "^1.0.7",
     "bower": "^1.3.12",
