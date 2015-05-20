@@ -27,7 +27,7 @@
 </core-toolbar>
 
 <io-gallery items='["images/onsite/map/io_floor1_label.jpg", "images/onsite/map/io_floor2_label.jpg", "images/onsite/map/io_floor3_label.jpg"]' hidden?="{{!mapGalleryActive}}" active="{{mapGalleryActive}}"
-            mobile="{{isPhoneSize}}" height="515" fit></io-gallery>
+            mobile="{{isPhoneSize}}" height="515" sizing="contain" backgroundColor="black" fit></io-gallery>
 
 <div class="subpage__container">
 
@@ -52,7 +52,7 @@
       <div class="card js-experiment-visualizer" layout vertical auto-vertical flex>
         <div class="card-content" flex?="{{!isPhoneSize}}">
           <h3 class="card__title">Venue map</h3>
-          <!-- <div>TODO</div> -->
+          <div>Find your way around I/O and participate in sandbox talks, attend sessions, explore the codelab space, and more with our floor-by-floor venue map of Moscone West.</div>
         </div>
         <div class="card-content anchor-like">
           <span role="link" tabindex="0" data-track-link="onsite-venue-map" on-tap="{{toggleMapGallery}}">See venue map</span>
