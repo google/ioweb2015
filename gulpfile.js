@@ -82,7 +82,7 @@ gulp.task('default', ['clean'], function(done) {
 
 // Set up local dev environment.
 gulp.task('setup', function(cb) {
-  runSequence(['bower', 'godeps', 'addgithooks'], 'default', cb);
+  runSequence(['bower', 'godeps', 'addgithooks'], cb);
 });
 
 // Install/update bower components.
