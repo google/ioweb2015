@@ -23,7 +23,7 @@ IOWA.Picasa = (function() {
   var API_ENDPOINT = 'api/v1/photoproxy';
   var GDEVELOPER_USER_ID = '111395306401981598462';
   var IO_ALBUM_ID = '6148448302499535601';
-  var EXTENDED_ALBUM_ID = '6148448302499535601';
+  var EXTENDED_ALBUM_ID = '6151106494033928993';
 
   var lang = document.documentElement.lang;
   var viewPortWidth = document.documentElement.clientWidth;
