@@ -38,6 +38,7 @@ const (
 	updateVideo   = "video"
 	updateStart   = "start"
 	updateSoon    = "soon"
+	updateSurvey  = "survey"
 )
 
 //  userPush is user notification configuration.
@@ -120,7 +121,11 @@ func mergeChanges(dst *dataChanges, src *dataChanges) {
 // TODO: add ioext to dc and filter on radius for ioExtPush.Lat+Lng.
 func filterUserChanges(dc *dataChanges, bks []string, ext *ioExtPush) {
 	sort.Strings(bks)
-	for id := range dc.Sessions {
+	for id, s := range dc.Sessions {
+		if s.Update == updateSurvey {
+			// surveys don't have to match bookmarks
+			continue
+		}
 		i := sort.SearchStrings(bks, id)
 		if i >= len(bks) || bks[i] != id {
 			delete(dc.Sessions, id)

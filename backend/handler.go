@@ -620,7 +620,7 @@ func syncEventData(w http.ResponseWriter, r *http.Request) {
 		if err := storeChanges(c, diff); err != nil {
 			return err
 		}
-		if err := notifySubscribersAsync(c, diff); err != nil {
+		if err := notifySubscribersAsync(c, diff, false); err != nil {
 			return err
 		}
 		return nil
@@ -840,8 +840,9 @@ func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	all := r.FormValue("all") == "true"
 	sessions := strings.Split(r.FormValue("sessions"), " ")
-	if len(sessions) == 0 {
+	if len(sessions) == 0 && !all {
 		logf(c, "handleNotifySubscribers: empty sessions list; won't notify")
 		return
 	}
@@ -855,7 +856,7 @@ func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
 
 	logf(c, "found %d users with notifications enabled", len(users))
 	for _, id := range users {
-		if err := pingUserAsync(c, id, sessions); err != nil {
+		if err := pingUserAsync(c, id, sessions, all); err != nil {
 			errorf(c, "handleNotifySubscribers: %v", err)
 			// TODO: handle this error case
 		}
@@ -872,11 +873,12 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := r.FormValue("uid")
+	all := r.FormValue("all") == "true"
 	// TODO: add ioext conditions
 	sessions := strings.Split(r.FormValue("sessions"), " ")
 	sort.Strings(sessions)
-	if user == "" || len(sessions) == 0 {
-		errorf(c, "invalid params user = %q; session = %v", user, sessions)
+	if user == "" || (len(sessions) == 0 && !all) {
+		errorf(c, "invalid params user = %q; session = %v; all = %v", user, sessions, all)
 		return
 	}
 
@@ -905,23 +907,26 @@ func handlePingUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bookmarks, err := userSchedule(c, user)
-	if ue, ok := err.(*url.Error); ok && (ue.Err == errAuthInvalid || ue.Err == errAuthMissing) {
-		errorf(c, "unrecoverable: %v", err)
-		return
-	}
-	if err != nil {
-		errorf(c, "%v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	var matched bool
-	for _, id := range bookmarks {
-		i := sort.SearchStrings(sessions, id)
-		if matched = i < len(sessions) && sessions[i] == id; matched {
-			break
+	matched := all
+	if !all {
+		bookmarks, err := userSchedule(c, user)
+		if ue, ok := err.(*url.Error); ok && (ue.Err == errAuthInvalid || ue.Err == errAuthMissing) {
+			errorf(c, "unrecoverable: %v", err)
+			return
+		}
+		if err != nil {
+			errorf(c, "%v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		for _, id := range bookmarks {
+			i := sort.SearchStrings(sessions, id)
+			if matched = i < len(sessions) && sessions[i] == id; matched {
+				break
+			}
 		}
 	}
+
 	if !matched {
 		logf(c, "none of user sessions matched")
 		return
@@ -1065,30 +1070,32 @@ func handleClock(w http.ResponseWriter, r *http.Request) {
 	}
 	now := time.Now()
 	upsess := upcomingSessions(now, sessions)
+	upsurvey := upcomingSurveys(now, sessions)
+	allsess := append(upsess, upsurvey...)
 
 	terr := runInTransaction(c, func(c context.Context) error {
-		upsess, err = filterNextSessions(c, upsess)
+		allsess, err = filterNextSessions(c, allsess)
 		if err != nil {
 			return err
 		}
-		if len(upsess) == 0 {
+		if len(allsess) == 0 {
 			return nil
 		}
-		logf(c, "found %d upcoming sessions", len(upsess))
+		logf(c, "found %d upcoming sessions and %d surveys", len(upsess), len(upsurvey))
 		dc := &dataChanges{
 			Updated:   now,
-			eventData: eventData{Sessions: make(map[string]*eventSession, len(upsess))},
+			eventData: eventData{Sessions: make(map[string]*eventSession, len(allsess))},
 		}
-		for _, s := range upsess {
+		for _, s := range allsess {
 			dc.Sessions[s.Id] = s
 		}
-		if err := storeNextSessions(c, upsess); err != nil {
+		if err := storeNextSessions(c, allsess); err != nil {
 			return err
 		}
 		if err := storeChanges(c, dc); err != nil {
 			return err
 		}
-		return notifySubscribersAsync(c, dc)
+		return notifySubscribersAsync(c, dc, len(upsurvey) > 0)
 	})
 	if terr != nil {
 		errorf(c, "txn err: %v", terr)
@@ -1213,11 +1220,19 @@ func debugPush(w http.ResponseWriter, r *http.Request) {
 		dc.Updated = time.Now()
 	}
 
+	all := false
+	for _, s := range dc.Sessions {
+		if s.Update == updateSurvey {
+			all = true
+			break
+		}
+	}
+
 	fn := func(c context.Context) error {
 		if err := storeChanges(c, dc); err != nil {
 			return err
 		}
-		return notifySubscribersAsync(c, dc)
+		return notifySubscribersAsync(c, dc, all)
 	}
 
 	if err := runInTransaction(c, fn); err != nil {

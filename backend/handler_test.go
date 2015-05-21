@@ -2464,6 +2464,125 @@ func TestHandleClockNextSessions(t *testing.T) {
 	checkUpdates(dc, "api")
 }
 
+func TestHandleClockSurvey(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+	defer preserveConfig()()
+
+	now := time.Now()
+	swToken := fetchFirstSWToken(t, testIDToken)
+	if swToken == "" {
+		t.Fatal("no swToken")
+	}
+
+	// gdrive stub
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/file-id" {
+			w.Write([]byte(`{"starred_sessions": ["random"]}`))
+			return
+		}
+		fmt.Fprintf(w, `{"items": [{
+			"id": "file-id",
+			"modifiedDate": "2015-04-11T12:12:46.034Z"
+		}]}`)
+	}))
+	defer ts.Close()
+	config.Google.Drive.FilesURL = ts.URL + "/"
+	config.Google.Drive.Filename = "user_data.json"
+
+	c := newContext(newTestRequest(t, "GET", "/", nil))
+	if err := storeCredentials(c, &oauth2Credentials{
+		userID:      testUserID,
+		Expiry:      time.Now().Add(2 * time.Hour),
+		AccessToken: "access-token",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeUserPushInfo(c, &userPush{userID: testUserID}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeNextSessions(c, []*eventSession{
+		&eventSession{Id: "__keynote__", Update: updateSoon},
+		&eventSession{Id: "__keynote__", Update: updateStart},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"random": &eventSession{
+			Id:        "random",
+			StartTime: now.Add(-timeoutSurvey - time.Minute),
+		},
+		"__keynote__": &eventSession{
+			Id:        "__keynote__",
+			StartTime: now.Add(-timeoutSurvey - time.Minute),
+		},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	upsess := map[string]string{
+		"__keynote__": updateSurvey,
+	}
+	checkUpdates := func(dc *dataChanges, what string) {
+		if len(dc.Sessions) != len(upsess) {
+			t.Errorf("%s: dc.Sessions = %v; want %v", what, dc.Sessions, upsess)
+		}
+		for id, v := range upsess {
+			s, ok := dc.Sessions[id]
+			if !ok {
+				t.Errorf("%s: %q not in %v", what, id, dc.Sessions)
+				continue
+			}
+			if s.Update != v {
+				t.Errorf("%s: s.Update = %q; want %q", what, s.Update, v)
+			}
+		}
+	}
+
+	r := newTestRequest(t, "POST", "/task/clock", nil)
+	r.Header.Set("x-appengine-cron", "true")
+	w := httptest.NewRecorder()
+	handleClock(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200", w.Code)
+	}
+
+	unclocked, err := filterNextSessions(c, []*eventSession{
+		&eventSession{Id: "__keynote__", Update: updateSurvey},
+		&eventSession{Id: "random", Update: updateSurvey},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(unclocked) != 1 {
+		t.Fatalf("unclocked = %v; want [random]", toSessionIDs(unclocked))
+	}
+	if unclocked[0].Id != "random" {
+		t.Fatalf("Id = %q; want 'random'", unclocked[0].Id)
+	}
+
+	dc, err := getChangesSince(c, now.Add(-time.Second))
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkUpdates(dc, "getChangesSince")
+
+	r = newTestRequest(t, "GET", "/api/v1/user/updates", nil)
+	r.Header.Set("authorization", swToken)
+	w = httptest.NewRecorder()
+	serveUserUpdates(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("w.Code = %d; want 200\nResponse: %s", w.Code, w.Body.String())
+	}
+	dc = &dataChanges{}
+	if err := json.Unmarshal(w.Body.Bytes(), dc); err != nil {
+		t.Fatal(err)
+	}
+	checkUpdates(dc, "api")
+}
+
 func TestHandleEasterEgg(t *testing.T) {
 	if !isGAEtest {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
