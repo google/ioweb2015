@@ -31,7 +31,7 @@ import (
 )
 
 // notifySubscriberAsync creates an async job to begin notify subscribers.
-func notifySubscribersAsync(c context.Context, d *dataChanges) error {
+func notifySubscribersAsync(c context.Context, d *dataChanges, all bool) error {
 	skeys := make([]string, 0, len(d.Sessions))
 	for id, _ := range d.Sessions {
 		skeys = append(skeys, id)
@@ -40,6 +40,7 @@ func notifySubscribersAsync(c context.Context, d *dataChanges) error {
 	// TODO: add ioext to the payload
 	t := taskqueue.NewPOSTTask(p, url.Values{
 		"sessions": {strings.Join(skeys, " ")},
+		"all":      {fmt.Sprintf("%v", all)},
 	})
 	_, err := taskqueue.Add(c, t, "")
 	return err
@@ -48,11 +49,12 @@ func notifySubscribersAsync(c context.Context, d *dataChanges) error {
 // pingUserAsync creates an async job to send a push notification to user devices.
 // sessions are session IDs used to compare against user bookmarks.
 // TODO: add ioext support
-func pingUserAsync(c context.Context, uid string, sessions []string) error {
+func pingUserAsync(c context.Context, uid string, sessions []string, all bool) error {
 	p := path.Join(config.Prefix, "/task/ping-user")
 	t := taskqueue.NewPOSTTask(p, url.Values{
 		"uid":      {uid},
 		"sessions": {strings.Join(sessions, " ")},
+		"all":      {fmt.Sprintf("%v", all)},
 	})
 	_, err := taskqueue.Add(c, t, "")
 	return err

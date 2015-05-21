@@ -33,9 +33,10 @@ const (
 	liveStreamedText = "Live streamed"
 	keynoteID        = "__keynote__"
 
-	// upcomingSessions
-	timeoutSoon  = 24 * time.Hour
-	timeoutStart = 10 * time.Minute
+	// sessionUpdates for updateSoon, updateStart and updateSurvey
+	timeoutSoon   = 24 * time.Hour
+	timeoutStart  = 10 * time.Minute
+	timeoutSurvey = 4*24*time.Hour + 30*time.Minute
 
 	// imageURLSizeMarker is used by thumbURL
 	imageURLSizeMarker    = "__w-"
@@ -44,8 +45,12 @@ const (
 	gcsReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
 )
 
-// session IDs to compare timeoutSoon to.
-var soonSessionIDs = []string{keynoteID}
+var (
+	// session IDs to compare timeoutSoon to.
+	soonSessionIDs = []string{keynoteID}
+	// session IDs to compare timeoutSurvey to.
+	surveySessionIDs = []string{keynoteID}
+)
 
 type eventData struct {
 	Sessions map[string]*eventSession `json:"sessions,omitempty"`
@@ -446,9 +451,10 @@ func compareSessions(a, b *eventSession) bool {
 	return false
 }
 
-// upcomingSessions returns a subset of items which have their StartTime field
+// upcomingSessions returns a subset of item copies which have their StartTime field
 // close to timeoutStart or timeoutSoon.
 // It also sets Update field of the returned elements to updateStart or updateSoon respectively.
+// Original items are not modified.
 func upcomingSessions(now time.Time, items []*eventSession) []*eventSession {
 	sort.Strings(soonSessionIDs)
 	res := make([]*eventSession, 0)
@@ -456,15 +462,38 @@ func upcomingSessions(now time.Time, items []*eventSession) []*eventSession {
 		t := s.StartTime.Sub(now)
 		i := sort.SearchStrings(soonSessionIDs, s.Id)
 		doSoon := i < len(soonSessionIDs) && soonSessionIDs[i] == s.Id
+		var update string
 		switch {
 		default:
 			continue
-		case t < timeoutStart:
-			s.Update = updateStart
-		case doSoon && t < timeoutSoon:
-			s.Update = updateSoon
+		case t > 0 && t < timeoutStart:
+			update = updateStart
+		case doSoon && t > 0 && t < timeoutSoon:
+			update = updateSoon
 		}
-		res = append(res, s)
+		scopy := *s
+		scopy.Update = update
+		res = append(res, &scopy)
+	}
+	return res
+}
+
+// upcomingSurveys returns a subset of item copies which are ready to receive user feedback.
+// It also sets Update field of the returned elements to updateSurvey.
+// Original items are not modified.
+func upcomingSurveys(now time.Time, items []*eventSession) []*eventSession {
+	sort.Strings(soonSessionIDs)
+	res := make([]*eventSession, 0)
+	for _, s := range items {
+		t := s.StartTime.Sub(now)
+		i := sort.SearchStrings(surveySessionIDs, s.Id)
+		doSurvey := i < len(surveySessionIDs) && surveySessionIDs[i] == s.Id
+		if !doSurvey || t > 0 || t > -timeoutSurvey {
+			continue
+		}
+		scopy := *s
+		scopy.Update = updateSurvey
+		res = append(res, &scopy)
 	}
 	return res
 }
