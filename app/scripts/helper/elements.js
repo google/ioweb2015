@@ -346,6 +346,15 @@ IOWA.Elements = (function() {
       return new Date(session.endTimestamp) < Date.now();
     };
 
+    template.featuredSessionsFilter = function(sessions) {
+      if (!sessions) {
+        return [];
+      }
+      return this.scheduleData.sessions.filter(function(s) {
+        return s.isFeatured && template.toVideoIdFilter(s.youtubeUrl);
+      });
+    };
+
     template.formatSessionTagsFilter = function(tagList) {
       if (!tagList) {
         return;
@@ -366,7 +375,7 @@ IOWA.Elements = (function() {
       }
       return speakers.map(function(speakerId) {
         return this.scheduleData.speakers[speakerId].name;
-      }.bind(this)).join(', ');
+      }.bind(this)).sort().join(', ');
     };
 
     template.toVideoIdFilter = function(youtubeUrl) {
@@ -515,6 +524,28 @@ IOWA.Elements = (function() {
 
         var thumbnail = videoContainer.querySelector('.fullvideo_thumbnail');
         thumbnail.src = sender.getAttribute('data-videoimg'); // IE10 doesn't support .dataset.
+      });
+    };
+
+    template.closeMastheadVideo = function(e, detail, sender) {
+      this.mastheadVideoActive = false;
+    };
+
+    template.openMastheadVideo = function(e, detail, sender) {
+      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+
+      this.mastheadVideoActive = true; // stamp template
+
+      // Wait 1 rAF for template to stamp.
+      this.async(function() {
+        var dialog = IOWA.Elements.Main.querySelector('paper-dialog');
+        var video = dialog.querySelector('google-youtube');
+
+        video.addEventListener('google-youtube-ready', function(e) {
+          // First session is the keynote.
+          video.videoid = this.scheduleData.sessions[0].youtubeUrl;
+          dialog.toggle();
+        }.bind(this));
       });
     };
 
@@ -710,6 +741,41 @@ IOWA.Elements = (function() {
         this.async(function() {
           IOWA.Elements.GoogleSignIn.user.notify = false;
         });
+      }
+    };
+
+    template.shiftContentLeft = function(e, detail, sender) {
+      var container = document.querySelector('.featured__videos');
+      var transform = container.style.transform;
+
+      // "translate3d(100px, 0px, 0px)" -> 100
+      var lastX = transform ? parseInt(transform.split('(')[1].split(',')[0]) : 0;
+
+      var cardRect = container.lastElementChild.getBoundingClientRect();
+      var cardWidth = cardRect.width;
+
+      var newX = lastX + cardWidth;
+      if (newX < cardWidth) {
+        container.style.transform = 'translate3d(' + newX + 'px, 0, 0)';
+      }
+
+    };
+
+    template.shiftContentRight = function(e, detail, sender) {
+      var container = document.querySelector('.featured__videos');
+      var transform = container.style.transform;
+
+      // "translate3d(100px, 0px, 0px)" -> 100
+      var lastX = transform ? parseInt(transform.split('(')[1].split(',')[0]) : 0;
+
+      var containerWidth = container.getBoundingClientRect().width;
+      var cardRect = container.lastElementChild.getBoundingClientRect();
+      var lastCardRight = cardRect.right;
+      var cardWidth = cardRect.width;
+
+      var newX = lastX - cardWidth;
+      if (lastCardRight > containerWidth) {
+        container.style.transform = 'translate3d(' + newX + 'px, 0, 0)';
       }
     };
 

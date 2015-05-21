@@ -16,7 +16,7 @@
 <div class="photo__masthead photo__masthead--fullbleed" fit>
   <div class="card__photo--stage" layout vertical center-center>
     <div class="play__button__container" on-tap="{{openMastheadVideo}}" data-link-track="home-watch-keynote-masthead">
-      <h5>Watch the 2015 keynote</h5>
+      <h5>Watch the keynote</h5>
     </div>
   </div>
 </div>
@@ -28,7 +28,7 @@
 
   <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video" tabindex="{{fullscreenVideoActive ? 0 : -1}}"></paper-icon-button>
-    <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
+    <span flex>Watch</span>
   </core-toolbar>
 
   <!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
@@ -53,8 +53,7 @@
         </div>
         <div relative><paper-progress indeterminate fit hidden?="{{!settingsIOReminder}}"></paper-progress></div>
         <div class="card-content link-spacing">
-          <a href="#" data-track-link="home-watch-keynote"
-             class="notification__feature" on-tap="{{openMastheadVideo}}">
+          <a href="#" data-track-link="home-watch-keynote" on-tap="{{openMastheadVideo}}">
             <core-icon icon="io:videocam"></core-icon> Watch the keynote
           </a>
         </div>
@@ -81,10 +80,35 @@
       </div> -->
 
       <section class="page__section page__section--featured js-experiment-instrument bg-dark-grey">
-        <h2>Featured sessions</h2>
-        <div>
-          <div class="featured__videos">TODO</div>
+        <div layout horizontal justified>
+          <h2>Featured sessions</h2>
+          <div>
+            <paper-icon-button icon="io:keyboard-arrow-left" on-tap="{{shiftContentLeft}}"></paper-icon-button>
+            <paper-icon-button icon="io:keyboard-arrow-right" on-tap="{{shiftContentRight}}"></paper-icon-button>
+          </div>
         </div>
+        <div class="featured__videos" layout horizontal>
+          <template repeat="{{session in scheduleData.sessions | featuredSessionsFilter}}">
+            <div class="item">
+              <div class="card card__video js-experiment-visualizer"
+                   data-videoid="{{session.youtubeUrl}}" data-videoimg="{{session.photoUrl}}"
+                   on-tap="{{openVideo}}">
+                <div class="card__photo" relative>
+                  <core-image src="{{session.photoUrl}}"
+                              load?="{{!!session}}" sizing="cover" preload
+                              placeholder="images/io15-color.png" fade fit></core-image>
+                </div>
+                <div class="card-content">
+                  <img src="images/play-video-button.png"
+                       class="play__button play__button--card" title="Play video" alt="Play video">
+                  <div class="video-title" title="{{session.title}}">{{session.title}}&nbsp;</div>
+                  <div class="video-author">{{session.speakers | speakerIdsToNameString}}&nbsp;</div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
       </section>
 
       <section class="page__section pics__section js-experiment-instrument" layout vertical>
@@ -168,7 +192,7 @@
 
   <template if="{{fullscreenVideoActive}}">
     <div class="fullvideo__container" fit hidden>
-      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch the I/O Recap Video" fit>
+      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch" fit>
       <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
                       autohide="1" controls="2" modestbranding="1" showinfo="0"
                       iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
@@ -193,6 +217,7 @@
         // IOWA.Elements.Template.homeGlobeVisible = false;
         // IOWA.Elements.Template.selectedCity = null;
         IOWA.Elements.Template.fullscreenVideoActive = false;
+        IOWA.Elements.Template.mastheadVideoActive = false;
         // IOWA.Elements.Template.webglSupported = true;
       };
 
@@ -225,24 +250,6 @@
       //         true, "You'll be reminded when I/O starts.")
       //   });
       // };
-
-      IOWA.Elements.Template.closeMastheadVideo = function(e, detail, sender) {
-        this.mastheadVideoActive = false;
-      };
-
-      IOWA.Elements.Template.openMastheadVideo = function(e, detail, sender) {
-        IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
-
-        this.mastheadVideoActive = true; // stamp template
-
-        // Wait 1 rAF for template to stamp.
-        this.async(function() {
-          var dialog = IOWA.Elements.Main.querySelector('paper-dialog');
-          var videoid = IOWA.Elements.Template.scheduleData.sessions[0].youtubeUrl;
-          dialog.querySelector('google-youtube').videoid = videoid;
-          dialog.toggle();
-        });
-      };
 
       page.load(); // Run load callback on page load.
       page.hasBeenLoaded = true;
