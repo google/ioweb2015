@@ -352,17 +352,17 @@ IOWA.Elements = (function() {
       }
       var superAwesomeSessionId = '21718f8b-b6d4-e411-b87f-00155d5066d7';
       var superAwesomeSession = null;
-      var sessions = this.scheduleData.sessions.filter(function(s, i) {
+      var filteredSessions = this.scheduleData.sessions.filter(function(s, i) {
         if (s.id === superAwesomeSessionId) {
           superAwesomeSession = s;
         }
         return s.isFeatured && template.toVideoIdFilter(s.youtubeUrl);
       });
       if (superAwesomeSession) {
-        sessions.splice(sessions.indexOf(superAwesomeSession), 1);
-        sessions.unshift(superAwesomeSession);
+        filteredSessions.splice(filteredSessions.indexOf(superAwesomeSession), 1);
+        filteredSessions.unshift(superAwesomeSession);
       }
-      return sessions;
+      return filteredSessions;
     };
 
     template.formatSessionTagsFilter = function(tagList) {
