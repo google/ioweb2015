@@ -99,7 +99,7 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
          * @type string
          * @default null
          */
-         imagePath: null,
+        imagePath: null,
 
         /**
          * True when the gallery is being shown.
@@ -152,7 +152,9 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
 
       activeChanged: function() {
         if (this.active) {
-          this.$.list.updateSize();
+          this.async(function() {
+            this.$.list.updateSize();
+          });
         }
       }
     });
