@@ -350,9 +350,19 @@ IOWA.Elements = (function() {
       if (!sessions) {
         return [];
       }
-      return this.scheduleData.sessions.filter(function(s) {
+      var superAwesomeSessionId = '21718f8b-b6d4-e411-b87f-00155d5066d7';
+      var superAwesomeSession = null;
+      var sessions = this.scheduleData.sessions.filter(function(s, i) {
+        if (s.id === superAwesomeSessionId) {
+          superAwesomeSession = s;
+        }
         return s.isFeatured && template.toVideoIdFilter(s.youtubeUrl);
       });
+      if (superAwesomeSession) {
+        sessions.splice(sessions.indexOf(superAwesomeSession), 1);
+        sessions.unshift(superAwesomeSession);
+      }
+      return sessions;
     };
 
     template.formatSessionTagsFilter = function(tagList) {
@@ -745,38 +755,13 @@ IOWA.Elements = (function() {
     };
 
     template.shiftContentLeft = function(e, detail, sender) {
-      var container = document.querySelector('.featured__videos');
-      var transform = container.style.transform;
-
-      // "translate3d(100px, 0px, 0px)" -> 100
-      var lastX = transform ? parseInt(transform.split('(')[1].split(',')[0]) : 0;
-
-      var cardRect = container.lastElementChild.getBoundingClientRect();
-      var cardWidth = cardRect.width;
-
-      var newX = lastX + cardWidth;
-      if (newX < cardWidth) {
-        container.style.transform = 'translate3d(' + newX + 'px, 0, 0)';
-      }
-
+      IOWA.PageAnimation.shiftContentLeft(
+          IOWA.Elements.Main.querySelector('.featured__videos'));
     };
 
     template.shiftContentRight = function(e, detail, sender) {
-      var container = document.querySelector('.featured__videos');
-      var transform = container.style.transform;
-
-      // "translate3d(100px, 0px, 0px)" -> 100
-      var lastX = transform ? parseInt(transform.split('(')[1].split(',')[0]) : 0;
-
-      var containerWidth = container.getBoundingClientRect().width;
-      var cardRect = container.lastElementChild.getBoundingClientRect();
-      var lastCardRight = cardRect.right;
-      var cardWidth = cardRect.width;
-
-      var newX = lastX - cardWidth;
-      if (lastCardRight > containerWidth) {
-        container.style.transform = 'translate3d(' + newX + 'px, 0, 0)';
-      }
+      IOWA.PageAnimation.shiftContentRight(
+          IOWA.Elements.Main.querySelector('.featured__videos'));
     };
 
     template.addEventListener('template-bound', updateElements);
