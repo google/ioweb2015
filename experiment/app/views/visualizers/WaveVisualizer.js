@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var curve = require('third_party/curve_func');
+var curve = require('third_party/curve_func/curve_func');
 
 module.exports = (function() {
   'use strict';
