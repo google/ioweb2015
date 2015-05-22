@@ -123,16 +123,18 @@ core-list {
   }
 }
 
-paper-dialog {
-  height: 167px;
-  width: calc(100vw - 64px);
+main {
+  paper-dialog {
+    height: 167px;
+    width: calc(100vw - 64px);
 
-  paper-icon-button {
-    z-index: 10;
-    color: white;
-    position: absolute;
-    top: $mobileKeyline;
-    left: $mobileKeyline;
+    paper-icon-button {
+      z-index: 10;
+      color: white;
+      position: absolute;
+      top: $mobileKeyline;
+      left: $mobileKeyline;
+    }
   }
 }
 
@@ -175,9 +177,11 @@ paper-dialog {
   .videolist__wrapper {
     height: 200vh;
   }
-  paper-dialog {
-    width: 704px;
-    height: 396px;
+  main {
+    paper-dialog {
+      width: 704px;
+      height: 396px;
+    }
   }
 }
 
@@ -191,16 +195,20 @@ paper-dialog {
       height: 387px;
     }
   }
-  paper-dialog {
-    width: 896px;
-    height: 504px
+  main {
+    paper-dialog {
+      width: 896px;
+      height: 504px
+    }
   }
 }
 
 @media (min-width: $desktop-breakpoint-max) {
-  paper-dialog {
-    width: 1024px;
-    height: 575px;
+  main {
+    paper-dialog {
+      width: 1024px;
+      height: 575px;
+    }
   }
 }
 
