@@ -141,9 +141,11 @@ paper-dialog {
   .page__section--banner {
     padding: 16px;
   }
-  .card--filters {
+  .mobile-filters {
     order: -1;
-    width: 30%;
+  }
+  .card--filters {
+    width: 120px;
     @include typo-button();
     border: none;
     padding-left: 16px;
