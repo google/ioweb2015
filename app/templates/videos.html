@@ -72,14 +72,26 @@
 
     </div>
 
-    <paper-dropdown-menu label="Filter" class="card--filters" hidden?="{{!isPhoneSize}}">
-      <paper-dropdown valign="top" halign="left" class="dropdown">
-        <core-menu class="menu" selected="{{selectedVideoType}}" valueattr="label">
-          <paper-item label="DevBytes">DevBytes</paper-item>
-          <paper-item label="Sessions" disabled?="{{!hasSessionVideos}}">Sessions</paper-item>
-        </core-menu>
-      </paper-dropdown>
-    </paper-dropdown-menu>
+    <div class="mobile-filters" hidden?="{{!isPhoneSize}}" layout horizontal>
+      <paper-dropdown-menu label="Filter" class="card--filters">
+        <paper-dropdown valign="top" halign="left" class="dropdown">
+          <core-menu class="menu" selected="{{selectedVideoType}}" valueattr="label">
+            <paper-item label="DevBytes">DevBytes</paper-item>
+            <paper-item label="Sessions" disabled?="{{!hasSessionVideos}}">Sessions</paper-item>
+          </core-menu>
+        </paper-dropdown>
+      </paper-dropdown-menu>
+
+      <paper-dropdown-menu label="Filter" class="card--filters">
+        <paper-dropdown valign="top" halign="left" class="dropdown">
+          <core-menu class="menu" selected="{{selectedVideoTopic}}" valueattr="label">
+             <template repeat="{{topic in filterTopics}}">
+              <paper-item label="{{topic}}">{{topic}}</paper-item>
+            </template>
+          </core-menu>
+        </paper-dropdown>
+      </paper-dropdown-menu>
+    </div>
 
     <div id="filterbox" class="card card--filters js-experiment-visualizer" flex?="{{!isPhoneSize}}" hidden?="{{isPhoneSize}}">
       <div class="card-content">
