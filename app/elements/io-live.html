@@ -46,11 +46,17 @@ Fired when the mode changes.
         background-color: #00BCD4;
         font-size: 16px;
       }
+      :host([mode="before"]) .bottom__bar {
+        bottom: 16px;
+      }
       paper-tabs.white {
         color: white;
       }
       paper-tabs.white::shadow #selectionBar {
         background-color: #fff;
+      }
+      paper-tabs.white paper-tab::shadow .tab-content {
+        margin: 0;
       }
       paper-tabs.white paper-tab::shadow #ink {
         color: rgba(255,255,255,0.5);
@@ -67,7 +73,7 @@ Fired when the mode changes.
       }
     </style>
 
-    <div class="bottom__bar" layout horizontal end justified>
+    <div class="bottom__bar" layout horizontal center end?="{{isiOS}}" justified>
       <div flex>
         <template if="{{mode === _MODES.BEFORE}}">
           <content></content>
@@ -475,6 +481,8 @@ Fired when the mode changes.
       autoOpenFab: false
     },
 
+    isiOS: false,
+
     created: function() {
       this.sessions = [];
       this.userSessions = [];
@@ -483,6 +491,10 @@ Fired when the mode changes.
       this.liveStreamChannelIds = [];
       this.todaysLiveSessions = [];
       this.currentLiveSessions = [];
+    },
+
+    ready: function() {
+      this.isiOS = IOWA.Util.isIOS();
     },
 
     detached: function() {
