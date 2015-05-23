@@ -232,6 +232,10 @@ paper-tabs {
   text-transform: uppercase;
   letter-spacing: 0.01em;
 
+  paper-tab {
+    cursor: pointer;
+  }
+
   paper-tab[disabled] {
     opacity: 0.5;
     pointer-events: none;
