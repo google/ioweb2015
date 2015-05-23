@@ -20,6 +20,7 @@ IOWA.Picasa = (function() {
 
   "use strict";
 
+  var API_ENDPOINT = 'api/v1/photoproxy';
   var GDEVELOPER_USER_ID = '111395306401981598462';
   var ALBUM_ID = '6148448302499535601';
 
@@ -35,8 +36,11 @@ IOWA.Picasa = (function() {
   function fetch(opt_startIndex, callback) {
     var startIndex = opt_startIndex || 1;
 
+    var url = API_ENDPOINT + '?url=' +
+              encodeURIComponent(feedUrl + '&start-index=' + startIndex);
+
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', feedUrl + '&start-index=' + startIndex);
+    xhr.open('GET', url);
     xhr.onload = function(e) {
       if (this.status != 200) {
         return;
