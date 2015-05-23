@@ -91,8 +91,10 @@ countdown-timer {
   clip-path: circle(32px at center);
   transition: -webkit-clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: white;
-  min-height: 500px;
+  // min-height: 500px;
+  height: 80vh;
   width: calc(100% - 32px);
+  max-width: 360px;
   // @include shadow-z2();
   overflow: hidden;
   opacity: 0;
@@ -386,18 +388,30 @@ paper-progress {
 @media (min-width: $tablet-breakpoint-min) {
   .bottom__bar {
     padding: $desktopKeyline $desktopKeyline 0 $desktopKeyline;
-    bottom: $ytVideoControlsHeight + $desktopKeyline;
+    bottom: $ytVideoControlsHeight + $desktopKeyline !important;
   }
   #livewidget {
-    right: $largeKeyline;
-    width: 360px;
+    right: $desktopKeyline;
+    height: 60vh; // smaller on larger screens
   }
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
   .bottom__bar {
     padding: $largeKeyline $largeKeyline 0 $largeKeyline;
-    bottom: $ytVideoControlsHeight + $largeKeyline;
+    bottom: $ytVideoControlsHeight + $largeKeyline !important;
+  }
+  #livewidget {
+    right: $largeKeyline;
+  }
+}
+
+/**
+ * iPhone 5 - target device aspect ratio.
+ */
+@media screen and (device-aspect-ratio: 40/71) {
+  #livewidget {
+    max-height: 360px;
   }
 }
 

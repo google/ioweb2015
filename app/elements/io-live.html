@@ -70,7 +70,7 @@ Fired when the mode changes.
       }
     </style>
 
-    <div class="bottom__bar" layout horizontal end justified>
+    <div class="bottom__bar" layout horizontal center end?="{{isiOS}}" justified>
       <div flex>
         <template if="{{mode === _MODES.BEFORE}}">
           <content></content>
@@ -478,6 +478,8 @@ Fired when the mode changes.
       autoOpenFab: false
     },
 
+    isiOS: false,
+
     created: function() {
       this.sessions = [];
       this.userSessions = [];
@@ -486,6 +488,10 @@ Fired when the mode changes.
       this.liveStreamChannelIds = [];
       this.todaysLiveSessions = [];
       this.currentLiveSessions = [];
+    },
+
+    ready: function() {
+      this.isiOS = IOWA.Util.isIOS();
     },
 
     detached: function() {
