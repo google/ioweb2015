@@ -494,3 +494,17 @@ paper-progress {
     background-image: url(../images/home/globe-1440@2x.jpg);
   }
 }
+
+@media (max-width: $phone-breakpoint-max) and (orientation: landscape) {
+  main {
+    paper-dialog {
+      top: 0 !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      right: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+}
