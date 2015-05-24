@@ -107,7 +107,7 @@ Fired when the mode changes.
             <div layout horizontal wrap>
               <template repeat="{{speakerId in selectedSession.speakers}}">
                 <div class="speaker__card" layout horizontal>
-                  <div><img _src="{{speakers[speakerId].thumbnailUrl || 'images/schedule/profile_placeholder.png'}}" class="profilepic"></div>
+                  <div><img _src="{{speakers[speakerId].thumbnailUrl || 'images/schedule/profile_placeholder.png'}}" class="profile__pic"></div>
                   <div class="speaker__info" layout vertical flex>
                     <span class="speaker__name">{{speakers[speakerId].name}}</span>
                     <span class="speaker__title">{{speakers[speakerId].company}}</span>
@@ -190,7 +190,7 @@ Fired when the mode changes.
                   <template repeat="{{session in currentLiveSessions}}" if="{{!duringKeynote}}">
                     <div class="schedule-row" layout horizontal center videoid="{{session.youtubeUrl}}">
                       <div>
-                        <img _src="{{session | generateSpeakerImage}}" class="profilepic">
+                        <img _src="{{session | generateSpeakerImage}}" class="profile__pic">
                       </div>
                       <div class="session__detail" layout vertical flex>
                         <span class="session__title" auto-vertical flex?="{{!isPhoneSize}}" two
@@ -205,7 +205,7 @@ Fired when the mode changes.
                   <template repeat="{{channel in missingChannels}}">
                     <div class="schedule-row" layout horizontal center videoid="{{channel.videoId}}">
                       <div>
-                        <img src="images/schedule/channel{{channel.label}}.png" class="profilepic">
+                        <img src="images/schedule/channel{{channel.label}}.png" class="profile__pic">
                       </div>
                       <div class="session__detail" layout vertical flex>
                         <span class="session__title" auto-vertical flex?="{{!isPhoneSize}}" two

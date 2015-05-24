@@ -209,7 +209,7 @@ countdown-timer {
   }
 }
 
-.profilepic {
+.profile__pic {
   height: 56px;
   width: 56px;
   margin-right: $tabletKeyline;
@@ -360,7 +360,7 @@ paper-progress {
   margin: 0;
   overflow: auto;
 
-  .profilepic {
+  .profile__pic {
     width: $profilepicSize;
     height: $profilepicSize;
   }
