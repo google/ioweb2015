@@ -18,6 +18,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-a11y-keys/core-a11y-keys.html">
 <!-- <link rel="import" href="io-radio-button.html"> -->
 <link rel="import" href="io-checkbox.html">
+<link rel="import" href="io-radio-button.html">
 
 <!--
 The `<io-schedule>` element renders a schedule for a given day(s).
@@ -27,6 +28,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 <polymer-element name="io-schedule" block>
   <template>
     <link rel="stylesheet" href="io-schedule.css" no-shim>
+    <style>
+      io-radio-button::shadow #radioContainer {
+        float: right;
+        margin: 5px 0 0 8px;
+      }
+
+      io-radio-button::shadow #radioLabel {
+        margin-left: 0;
+      }
+    </style>
 
     <core-media-query query="(min-width:320px) and (max-width:767px)"
                       queryMatches="{{isPhoneSize}}"></core-media-query>
@@ -155,42 +166,38 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           <div class="card-content">
             <div id="filters">
               <div class="filter-rows filter-section">
-                <template repeat="{{theme in sessionThemes}}">
-                  <core-label center horizontal layout aria-labelledby="filters-header">
-                    <div flex>{{theme}}</div>
-                    <io-checkbox on-change="{{applyFilter}}"
+                <paper-radio-group>
+                  <template repeat="{{theme in sessionThemes}}">
+                    <io-radio-button on-change="{{applyFilter}}" toggles
                         checked?="{{filtersState_[theme]}}"
-                        name="{{theme}}" for></io-checkbox>
-                  </core-label>
-                </template>
+                        name="{{theme}}" filter-type="theme" label="{{theme}}"></io-radio-button>
+                  </template>
+                </paper-radio-group>
               </div>
               <div class="filter-rows filter-section">
-                <template repeat="{{type in sessionTypes}}">
-                  <core-label center horizontal layout aria-labelledby="filters-header">
-                    <div flex>{{type}}</div>
-                    <io-checkbox on-change="{{applyFilter}}"
+                <paper-radio-group>
+                  <template repeat="{{type in sessionTypes}}">
+                    <io-radio-button on-change="{{applyFilter}}" toggles
                         checked?="{{filtersState_[type]}}"
-                        name="{{type}}" for></io-checkbox>
-                  </core-label>
-                </template>
+                        name="{{type}}" filter-type="type" label="{{type}}"></io-radio-button>
+                  </template>
+                </paper-radio-group>
               </div>
               <div class="filter-rows filter-section">
-                <template repeat="{{topic in sessionTopics}}">
-                  <core-label center horizontal layout aria-labelledby="filters-header">
-                    <div flex>{{topic}}</div>
-                    <io-checkbox on-change="{{applyFilter}}"
+                <paper-radio-group>
+                  <template repeat="{{topic in sessionTopics}}">
+                    <io-radio-button on-change="{{applyFilter}}" toggles
                         checked?="{{filtersState_[topic]}}"
-                        name="{{topic}}" for></io-checkbox>
-                  </core-label>
-                </template>
+                        name="{{topic}}" filter-type="topic" label="{{topic}}"></io-radio-button>
+                  </template>
+                </paper-radio-group>
               </div>
               <div class="filter-rows filter-section">
-                <core-label center horizontal layout aria-labelledby="filters-header">
-                  <div flex>Live streamed</div>
-                  <io-checkbox on-change="{{applyFilter}}"
+                <paper-radio-group>
+                  <io-radio-button on-change="{{applyFilter}}" toggles
                       checked?="{{filtersState_['Live streamed']}}"
-                      name="Live streamed" for></io-checkbox>
-                </core-label>
+                      name="Live streamed" filter-type="streamed" label="Live streamed"></io-radio-button>
+                </paper-radio-group>
               </div>
             </div>
           </div>
@@ -389,11 +396,20 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       applyFilter: function(e) {
         var filterName = e.target.getAttribute('name');
-        var filterIndex = this.filters.indexOf(filterName);
-        if (e.target.checked && filterIndex < 0) {
-          this.filters.push(filterName);
-        } else if (!e.target.checked && filterIndex > -1) {
-          this.filters.splice(filterIndex, 1);
+        var filterType = e.target.getAttribute('filter-type');
+        var filterSiblings = e.target.parentNode.querySelectorAll(
+            'io-radio-button[filter-type="' + filterType + '"]');
+        for (i = 0; i < filterSiblings.length; i++) {
+          var filterSibling = filterSiblings[i];
+          // Allow only 1 filter in each section to be selected.
+          filterSibling.checked = filterSibling === e.target ? e.target.checked : false;
+          var filterSiblingName = filterSibling.getAttribute('name');
+          var filterIndex = this.filters.indexOf(filterSiblingName);
+          if (filterSibling.checked && filterIndex < 0) {
+            this.filters.push(filterName);
+          } else if (!filterSibling.checked && filterIndex > -1) {
+            this.filters.splice(filterIndex, 1);
+          }
         }
       },
 
@@ -432,11 +448,11 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           return true;
         }
         for (var i = 0, filter; filter = this.filters[i]; ++i) {
-          if (session.filters[filter]) {
-            return true;
+          if (!session.filters[filter]) {
+            return false;
           }
         }
-        return false;
+        return true;
       },
 
       updateTimeBlocks: function() {

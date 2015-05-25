@@ -91,6 +91,15 @@ io-checkbox {
   margin-right: $tabletKeyline;
 }
 
+paper-radio-group {
+  width: 100%;
+}
+
+io-radio-button {
+  display: block;
+  padding: 12px 0 !important;
+}
+
 paper-progress {
   display: block;
 }
