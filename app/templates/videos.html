@@ -102,26 +102,26 @@
         <div class="filter-rows">
           <paper-radio-group id="filter-videotype" layout vertical selected="{{selectedVideoType}}"
                              on-core-select="{{onVideoFilter}}">
-            <paper-radio-button layout horizontal center name="DevBytes"
-                                label="DevBytes"></paper-radio-button>
-            <paper-radio-button layout horizontal center name="Sessions" label="Sessions"
-                                disabled?="{{!hasSessionVideos}}"></paper-radio-button>
+            <io-radio-button layout horizontal center name="DevBytes"
+                                label="DevBytes"></io-radio-button>
+            <io-radio-button layout horizontal center name="Sessions" label="Sessions"
+                                disabled?="{{!hasSessionVideos}}"></io-radio-button>
           </paper-radio-group>
         </div>
 
         <!-- <div class="filter-rows">
           <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}">
             <template repeat="{{theme in filterThemes}}">
-              <paper-radio-button layout horizontal center name="{{theme}}" label="{{theme}}"></paper-radio-button>
+              <io-radio-button layout horizontal center name="{{theme}}" label="{{theme}}"></io-radio-button>
             </template>
           </paper-radio-group>
         </div> -->
 
         <div class="filter-rows">
           <paper-radio-group layout vertical on-core-select="{{onVideoFilter}}" selected="{{selectedVideoTopic}}">
-            <paper-radio-button layout horizontal center name="All" label="All"></paper-radio-button>
+            <io-radio-button layout horizontal center name="All" label="All"></io-radio-button>
             <template repeat="{{topic in filterTopics}}">
-              <paper-radio-button layout horizontal center name="{{topic}}" label="{{topic}}"></paper-radio-button>
+              <io-radio-button layout horizontal center name="{{topic}}" label="{{topic}}"></io-radio-button>
             </template>
           </paper-radio-group>
         </div>
