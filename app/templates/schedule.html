@@ -591,8 +591,14 @@
       };
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
-        e.stopPropagation();
+        var oldFilters = ioScheduleEl.filters;
         ioScheduleEl.filters = sender.selectedIndex ? [sender.selected] : [];
+        var newFilters = ioScheduleEl.filters;
+        // This shuld not be necessary, since assigning filters above should trigger
+        // the change watcher automatically. For unknown reason, on mobile only, Polymer
+        // is accepting the new value for filters attribute, but not triggering
+        // the change watcher, so we call it manually here.
+        ioScheduleEl.filtersChanged(oldFilters, newFilters);
       };
 
       IOWA.Elements.Template.onRelatedContent = function(e, detail, sender) {
