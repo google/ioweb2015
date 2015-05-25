@@ -591,8 +591,10 @@
       };
 
       IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
-        e.stopPropagation();
+        var oldFilters = ioScheduleEl.filters;
         ioScheduleEl.filters = sender.selectedIndex ? [sender.selected] : [];
+        var newFilters = ioScheduleEl.filters;
+        ioScheduleEl.filtersChanged(oldFilters, newFilters);
       };
 
       IOWA.Elements.Template.onRelatedContent = function(e, detail, sender) {
