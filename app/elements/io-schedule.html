@@ -160,7 +160,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                     <div flex>{{theme}}</div>
                     <io-checkbox on-change="{{applyFilter}}"
                         checked?="{{filtersState_[theme]}}"
-                        name="{{theme}}" for></io-checkbox>
+                        name="{{theme}}" filter-type="theme" for></io-checkbox>
                   </core-label>
                 </template>
               </div>
@@ -170,7 +170,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                     <div flex>{{type}}</div>
                     <io-checkbox on-change="{{applyFilter}}"
                         checked?="{{filtersState_[type]}}"
-                        name="{{type}}" for></io-checkbox>
+                        name="{{type}}" filter-type="type" for></io-checkbox>
                   </core-label>
                 </template>
               </div>
@@ -180,7 +180,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                     <div flex>{{topic}}</div>
                     <io-checkbox on-change="{{applyFilter}}"
                         checked?="{{filtersState_[topic]}}"
-                        name="{{topic}}" for></io-checkbox>
+                        name="{{topic}}" filter-type="topic" for></io-checkbox>
                   </core-label>
                 </template>
               </div>
@@ -189,7 +189,7 @@ The `<io-schedule>` element renders a schedule for a given day(s).
                   <div flex>Live streamed</div>
                   <io-checkbox on-change="{{applyFilter}}"
                       checked?="{{filtersState_['Live streamed']}}"
-                      name="Live streamed" for></io-checkbox>
+                      name="Live streamed" filter-type="streamed" for></io-checkbox>
                 </core-label>
               </div>
             </div>
@@ -389,11 +389,20 @@ The `<io-schedule>` element renders a schedule for a given day(s).
 
       applyFilter: function(e) {
         var filterName = e.target.getAttribute('name');
-        var filterIndex = this.filters.indexOf(filterName);
-        if (e.target.checked && filterIndex < 0) {
-          this.filters.push(filterName);
-        } else if (!e.target.checked && filterIndex > -1) {
-          this.filters.splice(filterIndex, 1);
+        var filterType = e.target.getAttribute('filter-type');
+        var filterSiblings = this.$.filters.querySelectorAll(
+            'io-checkbox[filter-type="' + filterType + '"]');
+        for (i = 0; i < filterSiblings.length; i++) {
+          var filterSibling = filterSiblings[i];
+          // Allow only 1 filter in each section to be selected.
+          filterSibling.checked = filterSibling === e.target ? e.target.checked : false;
+          var filterSiblingName = filterSibling.getAttribute('name');
+          var filterIndex = this.filters.indexOf(filterSiblingName);
+          if (filterSibling.checked && filterIndex < 0) {
+            this.filters.push(filterName);
+          } else if (!filterSibling.checked && filterIndex > -1) {
+            this.filters.splice(filterIndex, 1);
+          }
         }
       },
 
@@ -432,11 +441,11 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           return true;
         }
         for (var i = 0, filter; filter = this.filters[i]; ++i) {
-          if (session.filters[filter]) {
-            return true;
+          if (!session.filters[filter]) {
+            return false;
           }
         }
-        return false;
+        return true;
       },
 
       updateTimeBlocks: function() {
