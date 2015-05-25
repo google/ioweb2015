@@ -18,6 +18,7 @@ limitations under the License.
 <link rel="import" href="../bower_components/core-a11y-keys/core-a11y-keys.html">
 <!-- <link rel="import" href="io-radio-button.html"> -->
 <link rel="import" href="io-checkbox.html">
+<link rel="import" href="io-radio-button.html">
 
 <!--
 The `<io-schedule>` element renders a schedule for a given day(s).
@@ -155,42 +156,42 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           <div class="card-content">
             <div id="filters">
               <div class="filter-rows filter-section">
-                <template repeat="{{theme in sessionThemes}}">
-                  <core-label center horizontal layout aria-labelledby="filters-header">
-                    <div flex>{{theme}}</div>
-                    <io-checkbox on-change="{{applyFilter}}"
+                <paper-radio-group>
+                  <template repeat="{{theme in sessionThemes}}">
+                    <io-radio-button on-change="{{applyFilter}}"
+                        toggles="true"
                         checked?="{{filtersState_[theme]}}"
-                        name="{{theme}}" filter-type="theme" for></io-checkbox>
-                  </core-label>
-                </template>
+                        name="{{theme}}" filter-type="theme" label="{{theme}}"></io-radio-button>
+                  </template>
+                </paper-radio-group>
               </div>
               <div class="filter-rows filter-section">
-                <template repeat="{{type in sessionTypes}}">
-                  <core-label center horizontal layout aria-labelledby="filters-header">
-                    <div flex>{{type}}</div>
-                    <io-checkbox on-change="{{applyFilter}}"
+                <paper-radio-group>
+                  <template repeat="{{type in sessionTypes}}">
+                    <io-radio-button on-change="{{applyFilter}}"
+                        toggles="true"
                         checked?="{{filtersState_[type]}}"
-                        name="{{type}}" filter-type="type" for></io-checkbox>
-                  </core-label>
-                </template>
+                        name="{{type}}" filter-type="type" label="{{type}}"></io-radio-button>
+                  </template>
+                </paper-radio-group>
               </div>
               <div class="filter-rows filter-section">
-                <template repeat="{{topic in sessionTopics}}">
-                  <core-label center horizontal layout aria-labelledby="filters-header">
-                    <div flex>{{topic}}</div>
-                    <io-checkbox on-change="{{applyFilter}}"
+                <paper-radio-group>
+                  <template repeat="{{topic in sessionTopics}}">
+                    <io-radio-button on-change="{{applyFilter}}"
+                        toggles="true"
                         checked?="{{filtersState_[topic]}}"
-                        name="{{topic}}" filter-type="topic" for></io-checkbox>
-                  </core-label>
-                </template>
+                        name="{{topic}}" filter-type="topic" label="{{topic}}"></io-radio-button>
+                  </template>
+                </paper-radio-group>
               </div>
               <div class="filter-rows filter-section">
-                <core-label center horizontal layout aria-labelledby="filters-header">
-                  <div flex>Live streamed</div>
-                  <io-checkbox on-change="{{applyFilter}}"
+                <paper-radio-group>
+                  <io-radio-button on-change="{{applyFilter}}"
+                      toggles="true"
                       checked?="{{filtersState_['Live streamed']}}"
-                      name="Live streamed" filter-type="streamed" for></io-checkbox>
-                </core-label>
+                      name="Live streamed" filter-type="streamed" label="Live streamed"></io-radio-button>
+                </paper-radio-group>
               </div>
             </div>
           </div>
@@ -390,8 +391,8 @@ The `<io-schedule>` element renders a schedule for a given day(s).
       applyFilter: function(e) {
         var filterName = e.target.getAttribute('name');
         var filterType = e.target.getAttribute('filter-type');
-        var filterSiblings = this.$.filters.querySelectorAll(
-            'io-checkbox[filter-type="' + filterType + '"]');
+        var filterSiblings = e.target.parentNode.querySelectorAll(
+            'io-radio-button[filter-type="' + filterType + '"]');
         for (i = 0; i < filterSiblings.length; i++) {
           var filterSibling = filterSiblings[i];
           // Allow only 1 filter in each section to be selected.
