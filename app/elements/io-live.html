@@ -183,7 +183,7 @@ Fired when the mode changes.
                 </div>
               </template>
 
-              <div class="card schedule-rows" layout vertical>
+              <div class="card schedule-rows" layout vertical flex>
 
                 <core-menu id="live-channel-menu" class="schedule__content"
                            valueattr="videoid" selected="{{selectedVideoId}}">
@@ -391,13 +391,21 @@ Fired when the mode changes.
       /**
        * Current day to display schedule information for. This calculated from
        * the `date` property. For example, "May 28 2015 09:00:00 GMT-0700 (PDT)"
-       * would be 1.
+       * would be 28.
        *
        * @property currentDay
        * @type number
-       * @default 1
        */
       currentDay: null,
+
+      /**
+       * Current day of IO.
+       *
+       * @property dayView
+       * @type number
+       * @default 1
+       */
+       dayView: 1,
 
       /**
        * Whether fetching user data is in progress.
@@ -513,18 +521,21 @@ Fired when the mode changes.
       // of I/O. Otherwise, set it to the current day of the show.
       var today = moment();
       if (today < this.day1Start) {
-        this.currentDay = parseInt(this.day1Start.format('D'));
         this.mode = this._MODES.BEFORE;
       } else if (today > this.day2End) {
-        this.currentDay = parseInt(this.day2End.format('D')); // max out on day 2.
         this.mode = this._MODES.AFTER;
       } else {
-        this.currentDay = parseInt(today.format('D'));
         this.mode = this._MODES.LIVE;
       }
 
+      // Calculate day view. Either 28 or 29 based on user's time, but normalize
+      // it to PDT.
+      var day1StartDayPDT = parseInt(moment(this.day1Start).tz('America/Los_Angeles').format('D'));
+      var daysUntilStart =  parseInt(moment(today).tz('America/Los_Angeles').format('D')) - day1StartDayPDT;
+      this.currentDay = daysUntilStart <= 0 ? day1StartDayPDT : day1StartDayPDT + 1;
+
       // May 27 -> 1, May 28 -> 1, May 29 -> 2
-      this.dayView = this.currentDay % parseInt(this.day1Start.format('D')) + 1;
+      this.dayView = this.currentDay % day1StartDayPDT + 1;
     },
 
     sessionsChanged: function() {
