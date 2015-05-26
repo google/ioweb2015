@@ -25,6 +25,17 @@ $name: 'page-home';
 
 ##{$name} {
 
+// phase 4 live mode
+&.io-live-mode {
+  .bg-cyan {
+    color: white !important;
+  }
+  #navbar {
+    background: linear-gradient(to top, transparent, black);
+  }
+}
+// ----
+
 .masthead-container {
   max-width: 100% !important;
   .io-logo {
@@ -37,6 +48,7 @@ $name: 'page-home';
   position: absolute;
   top: 16px;
   left: 95px;
+  background-color: transparent;
 }
 
 .home-photo {

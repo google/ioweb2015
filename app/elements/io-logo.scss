@@ -39,6 +39,12 @@
   background-color: $color-cyan-500;
 }
 
+@media (min-width: $tablet-breakpoint-min) {
+  :host-context(.io-live-mode) {
+     background-color: transparent !important;
+  }
+}
+
 .letter {
   background: #fff;
 }
