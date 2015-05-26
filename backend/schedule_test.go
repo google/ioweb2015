@@ -170,3 +170,32 @@ func TestThumbURL(t *testing.T) {
 		}
 	}
 }
+
+func TestScheduleLiveIDs(t *testing.T) {
+	if !isGAEtest {
+		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
+	}
+	defer resetTestState(t)
+
+	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
+	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
+		"live2":   &eventSession{IsLive: true, YouTube: "live2", Desc: "... channel 2"},
+		"random":  &eventSession{IsLive: false, YouTube: "random"},
+		"live1":   &eventSession{IsLive: true, YouTube: "live1", Desc: "... channel 1"},
+		"live2.2": &eventSession{IsLive: true, YouTube: "live2", Desc: "... channel 2"},
+		"live3":   &eventSession{IsLive: true, YouTube: "live3", Desc: "... channel 3"},
+		keynoteID: &eventSession{IsLive: true, YouTube: "keynote"},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+
+	ids, err := scheduleLiveIDs(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := []string{"keynote", "live1", "live2", "live3"}
+	if !reflect.DeepEqual(ids, want) {
+		t.Errorf("ids = %v; want %v", ids, want)
+	}
+}
