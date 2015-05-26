@@ -313,22 +313,30 @@ func TestServeEmbed(t *testing.T) {
 	r.Host = "example.org"
 	c := newContext(r)
 
+	now := time.Now()
 	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
 		"live": &eventSession{
-			IsLive:  true,
-			YouTube: "live",
+			StartTime: now,
+			IsLive:    true,
+			YouTube:   "live",
+			Desc:      "Channel 1",
 		},
 		"recorded": &eventSession{
-			IsLive:  false,
-			YouTube: "http://recorded",
+			StartTime: now,
+			IsLive:    false,
+			YouTube:   "http://recorded",
+			Desc:      "Channel 1",
 		},
 		keynoteID: &eventSession{
-			IsLive:  true,
-			YouTube: "keynote",
+			StartTime: now,
+			IsLive:    true,
+			YouTube:   "keynote",
 		},
 		"same-live": &eventSession{
-			IsLive:  true,
-			YouTube: "live",
+			StartTime: now,
+			IsLive:    true,
+			YouTube:   "live",
+			Desc:      "Channel 1",
 		},
 	}}); err != nil {
 		t.Fatal(err)
