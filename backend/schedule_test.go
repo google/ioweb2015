@@ -176,9 +176,13 @@ func TestScheduleLiveIDs(t *testing.T) {
 		t.Skipf("not implemented yet; isGAEtest = %v", isGAEtest)
 	}
 	defer resetTestState(t)
+	defer preserveConfig()()
 
-	now := time.Now()
+	now := time.Now().UTC()
 	tomorrow := now.Add(24 * time.Hour)
+	config.Schedule.Location = time.UTC
+	config.Schedule.Start = now
+
 	c := newContext(newTestRequest(t, "GET", "/dummy", nil))
 	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
 		"live2":      &eventSession{StartTime: now, IsLive: true, YouTube: "live2", Desc: "... channel 2"},
@@ -195,13 +199,24 @@ func TestScheduleLiveIDs(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ids, err := scheduleLiveIDs(c)
-	if err != nil {
-		t.Fatal(err)
+	table := []struct {
+		now  time.Time
+		want []string
+	}{
+		{now.Add(-48 * time.Hour), []string{"keynote", "live1", "live2", "live3"}},
+		{now.Add(-24 * time.Hour), []string{"keynote", "live1", "live2", "live3"}},
+		{now, []string{"keynote", "live1", "live2", "live3"}},
+		{tomorrow, []string{"keynote", "live1-2", "live2-2", "live3-2"}},
 	}
 
-	want := []string{"keynote", "live1", "live2", "live3"}
-	if !reflect.DeepEqual(ids, want) {
-		t.Errorf("ids = %v; want %v", ids, want)
+	for i, test := range table {
+		res, err := scheduleLiveIDs(c, test.now)
+		if err != nil {
+			t.Errorf("%d: %v", i, err)
+			continue
+		}
+		if !reflect.DeepEqual(res, test.want) {
+			t.Errorf("%d: res = %v; want %v", i, res, test.want)
+		}
 	}
 }

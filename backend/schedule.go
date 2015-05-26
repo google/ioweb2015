@@ -583,9 +583,10 @@ func unbookmarkSessions(c context.Context, uid string, ids ...string) ([]string,
 	return data.Bookmarks, nil
 }
 
-// scheduleLiveIDs returns a slice of all youtubeUrl field values where isLivestream == true.
+// scheduleLiveIDs returns a slice of all youtubeUrl field values where isLivestream == true
+// for the current day or event first day if start date is in the future comparing to now.
 // Keynote element is always first, even if its youtubeUrl value is empty.
-func scheduleLiveIDs(c context.Context) ([]string, error) {
+func scheduleLiveIDs(c context.Context, now time.Time) ([]string, error) {
 	d, err := getLatestEventData(c, nil)
 	if err != nil {
 		return nil, err
@@ -593,10 +594,18 @@ func scheduleLiveIDs(c context.Context) ([]string, error) {
 	if d.Sessions == nil {
 		return nil, nil
 	}
-	today := time.Now().In(config.Schedule.Location).YearDay()
+
+	now = now.In(config.Schedule.Location)
+	start := config.Schedule.Start.In(config.Schedule.Location)
+	theday := start.YearDay()
+	if now.After(start) {
+		theday = now.YearDay()
+	}
+
 	live := sortedChannelSessions(make([]*eventSession, 0, len(d.Sessions)/2))
 	for id, s := range d.Sessions {
-		if s.StartTime.In(config.Schedule.Location).YearDay() != today || id == keynoteID || !s.hasLiveChannel() {
+		sday := s.StartTime.In(config.Schedule.Location).YearDay()
+		if id == keynoteID || !s.hasLiveChannel() || sday != theday {
 			continue
 		}
 		live = append(live, s)

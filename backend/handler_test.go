@@ -305,15 +305,16 @@ func TestServeEmbed(t *testing.T) {
 	}
 	defer resetTestState(t)
 	defer preserveConfig()()
-	config.Prefix = "/pref"
-	config.Schedule.Start = time.Date(2015, 6, 30, 9, 30, 0, 0, time.UTC)
+
+	now := time.Now().Round(time.Second).UTC()
+	config.Schedule.Start = now
 	config.Schedule.Location = time.UTC
+	config.Prefix = "/pref"
 
 	r := newTestRequest(t, "GET", "/embed", nil)
 	r.Host = "example.org"
 	c := newContext(r)
 
-	now := time.Now()
 	if err := storeEventData(c, &eventData{Sessions: map[string]*eventSession{
 		"live": &eventSession{
 			StartTime: now,
@@ -349,7 +350,7 @@ func TestServeEmbed(t *testing.T) {
 	}
 	lookup := []string{
 		`<link rel="canonical" href="http://example.org/pref/embed">`,
-		`startDate="2015-06-30T09:30:00Z"`,
+		`startDate="` + now.Format(time.RFC3339) + `"`,
 		`videoIds='["keynote","live"]'`,
 	}
 	err := false
