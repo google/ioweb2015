@@ -21,7 +21,9 @@ import (
 	"net/url"
 	"path"
 	"reflect"
+	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -574,16 +576,23 @@ func scheduleLiveIDs(c context.Context) ([]string, error) {
 	if d.Sessions == nil {
 		return nil, nil
 	}
-	keyURL := ""
-	if s, ok := d.Sessions[keynoteID]; ok && s.IsLive {
-		keyURL = s.YouTube
-	}
-	res := []string{keyURL}
+	live := sortedChannelSessions(make([]*eventSession, 0, len(d.Sessions)/2))
 	for id, s := range d.Sessions {
 		if id == keynoteID || !s.IsLive || s.YouTube == "" ||
 			strings.HasPrefix(s.YouTube, "http://") || strings.HasPrefix(s.YouTube, "https://") {
 			continue
 		}
+		live = append(live, s)
+	}
+	sort.Sort(live)
+
+	keyURL := ""
+	if s, ok := d.Sessions[keynoteID]; ok && s.IsLive {
+		keyURL = s.YouTube
+	}
+
+	res := []string{keyURL}
+	for _, s := range live {
 		res = append(res, s.YouTube)
 	}
 	return unique(res), nil
@@ -684,4 +693,32 @@ func (l sortedVideosList) Swap(i, j int) {
 
 func (l sortedVideosList) Less(i, j int) bool {
 	return l[i].Title < l[j].Title
+}
+
+// sortedChannelSessions implements sort.Sort ordering by "Channel N"
+// in the session descriptions.
+type sortedChannelSessions []*eventSession
+
+// reChannleID parses session description text.
+var reChannelID = regexp.MustCompile("(?i)channel\\s+(\\d)")
+
+func (s sortedChannelSessions) Len() int {
+	return len(s)
+}
+
+func (s sortedChannelSessions) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s sortedChannelSessions) Less(i, j int) bool {
+	var ch1, ch2 int
+	m := reChannelID.FindStringSubmatch(s[i].Desc)
+	if m != nil {
+		ch1, _ = strconv.Atoi(m[1])
+	}
+	m = reChannelID.FindStringSubmatch(s[j].Desc)
+	if m != nil {
+		ch2, _ = strconv.Atoi(m[1])
+	}
+	return ch1 < ch2
 }
