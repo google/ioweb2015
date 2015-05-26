@@ -84,7 +84,9 @@
 
       <paper-dropdown-menu label="Filter" class="card--filters">
         <paper-dropdown valign="top" halign="left" class="dropdown">
-          <core-menu class="menu" selected="{{selectedVideoTopic}}" valueattr="label">
+          <core-menu class="menu" selected="{{selectedVideoTopic}}" valueattr="label"
+                     on-core-select="{{onVideoFilter}}">
+             <paper-item label="All">All</paper-item>
              <template repeat="{{topic in filterTopics}}">
               <paper-item label="{{topic}}">{{topic}}</paper-item>
             </template>
