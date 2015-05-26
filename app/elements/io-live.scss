@@ -250,6 +250,7 @@ paper-tabs {
 
 .card__photo--live {
   background-image: url(../images/videos/keynote.jpg);
+  height: 100%;
 
   img {
     height: 48px;
@@ -264,6 +265,12 @@ paper-tabs {
     margin: 0;
     font-weight: normal;
   }
+}
+
+.card__photo--live-desc {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
 }
 
 core-animated-pages {

@@ -144,11 +144,9 @@ Fired when the mode changes.
             <section class="schedule__content" label="live" layout vertical>
 
               <template if="{{mode === _MODES.BEFORE}}">
-                <div layout vertical flex>
-                  <div class="card__photo card__photo--live" flex></div>
-                  <div class="card">
-                    <div class="card-content">Our 8th annual Google I/O developer conference will kick-off with a keynote hosted by our Senior Vice-President of Products, Sundar Pichai.</div>
-                  </div>
+                <div class="card__photo card__photo--live"></div>
+                <div class="card card__photo--live-desc">
+                  <div class="card-content">Our 8th annual Google I/O developer conference will kick-off with a keynote hosted by our Senior Vice-President of Products, Sundar Pichai.</div>
                 </div>
               </template>
 
@@ -183,7 +181,7 @@ Fired when the mode changes.
                 </div>
               </template>
 
-              <div class="card schedule-rows" layout vertical flex>
+              <div class="card schedule-rows" layout vertical flex hidden?="{{duringKeynote}}">
 
                 <core-menu id="live-channel-menu" class="schedule__content"
                            valueattr="videoid" selected="{{selectedVideoId}}">
