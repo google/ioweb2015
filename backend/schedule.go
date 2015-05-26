@@ -576,10 +576,12 @@ func scheduleLiveIDs(c context.Context) ([]string, error) {
 	if d.Sessions == nil {
 		return nil, nil
 	}
+	day := time.Now().YearDay()
 	live := sortedChannelSessions(make([]*eventSession, 0, len(d.Sessions)/2))
 	for id, s := range d.Sessions {
-		if id == keynoteID || !s.IsLive || s.YouTube == "" ||
-			strings.HasPrefix(s.YouTube, "http://") || strings.HasPrefix(s.YouTube, "https://") {
+		if s.StartTime.YearDay() != day || id == keynoteID || !s.IsLive || s.YouTube == "" ||
+			strings.HasPrefix(s.YouTube, "http://") || strings.HasPrefix(s.YouTube, "https://") ||
+			!reChannelID.MatchString(s.Desc) {
 			continue
 		}
 		live = append(live, s)
