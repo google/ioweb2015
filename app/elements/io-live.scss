@@ -297,6 +297,7 @@ core-animated-pages {
     }
 
     .schedule-row {
+      cursor: pointer;
       padding: $tabletKeyline/2 $mobileKeyline;
       flex-shrink: 0;
     }
