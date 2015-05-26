@@ -83,6 +83,14 @@ Fired when the mode changes.
       <paper-fab id="schedfab" icon="picture-in-picture"
                  aria-label="My schedule" title="My schedule" on-tap="{{onFabClick}}"></paper-fab>
 
+      <template if="{{afterKeynote}}">
+        <div class="keynote__banner card {{ {on: afterKeynote && openWidget} | tokenList }}" layout horizontal on-tap="{{onPlayKeynote}}">
+          <div class="card-content" layout horizontal center>
+            <div><core-icon icon="io:play-circle-fill" self-center></core-icon> Watch the keynote</div>
+          </div>
+        </div>
+      </template>
+
       <div id="livewidget" on-transitionend="{{onFabTransition}}">
 
         <paper-dialog id="sessiondetails" transition="paper-dialog-transition-bottom" layered="false"
@@ -127,7 +135,7 @@ Fired when the mode changes.
           </div>
         </paper-dialog>
 
-        <div class="bg-dark-grey" layout vertical>
+        <div class="middle-content-section bg-dark-grey" layout vertical>
 
           <div class="widget-nav" layout horizontal center self-end>
             <paper-icon-button icon="close" on-tap="{{closeFab}}"></paper-icon-button>
@@ -172,7 +180,7 @@ Fired when the mode changes.
 
               <template if="{{mode === _MODES.AFTER}}">
                 <div layout vertical flex>
-                  <div class="card">
+                  <div class="card" layout vertical flex>
                     <div class="card-content">
                       <h2>Thanks for watching I/O 2015</h2>
                       <div>Missed a session? No worries! You'll be able to watch all of the recorded sessions soon.</div>
@@ -280,13 +288,14 @@ Fired when the mode changes.
           </core-animated-pages>
 
         </div>
+
       </div>
 
     </div>
 
     <div id="livecontainer">
 
-      <template if="{{mode === _MODES.LIVE}}">
+      <template if="{{mode !== _MODES.BEFORE}}">
         <div class="fullvideo__container" fit>
           <google-youtube videoid="{{selectedVideoId}}" height="100%" width="100%" fit
                           autohide="1" controls="2" modestbranding="1" showinfo="0"
@@ -478,6 +487,15 @@ Fired when the mode changes.
       duringKeynote: false,
 
       /**
+       * True if the keynote has already passed.
+       *
+       * @property afterKeynote
+       * @type Boolean
+       * @default false
+       */
+      afterKeynote: false,
+
+      /**
        * True if the schedule FAB should auto-open when the element is loaded.
        *
        * @property autoOpenFab
@@ -512,6 +530,10 @@ Fired when the mode changes.
       }
     },
 
+    selectedVideoIdChanged: function() {
+      this.selectedVideoId = this.selectedVideoId.replace(/https?:\/\/youtu\.be\//, '');
+    },
+
     dateChanged: function() {
       this.day1Start = moment(this.date);
       this.day1End = moment(this.day1Start).hours(17).startOf('hour');
@@ -537,6 +559,8 @@ Fired when the mode changes.
 
       // May 27 -> 1, May 28 -> 1, May 29 -> 2
       this.dayView = this.currentDay % day1StartDayPDT + 1;
+
+      this.afterKeynote = today.isAfter(moment(this.day1Start).add(3, 'hours'));
     },
 
     sessionsChanged: function() {
@@ -558,7 +582,7 @@ Fired when the mode changes.
     },
 
     modeChanged: function() {
-      if (this.mode === 'live') {
+      if (this.mode !== this._MODES.BEFORE) {
         document.body.classList.add('io-live-mode');
       }
 
@@ -636,11 +660,17 @@ Fired when the mode changes.
         };
       }.bind(this));
 
+      var now = moment();
+
       // If there are live streamed sessions happening this hour, start
       // playing the first one. Otherwise default to the first non-streaming
       // channel.
       if (this.currentLiveSessions.length) {
         this.selectedVideoId = this.currentLiveSessions[0].youtubeUrl;
+      } else if (this.mode === this._MODES.AFTER ||
+                 (now.isBetween(this.day1End, this.day2Start))) {
+         this.onPlayKeynote();
+
       } else {
         this.selectedVideoId = liveStreamChannelIds[0];
       }
@@ -648,7 +678,6 @@ Fired when the mode changes.
       // Refresh live stream views when the next timeblock hits, either at the
       // next 30min mark or the next hour block.
       var nextTimeMark;
-      var now = moment();
       var remainder = (30 - now.minute()) % 30;
       if (remainder > 0) {
         nextTimeMark = moment(now).add(remainder, 'minutes');
@@ -732,6 +761,14 @@ Fired when the mode changes.
     onCountdownFaded: function(e, detail, sender) {
       if (moment() > this.day1Start) {
         this.mode = this._MODES.LIVE;
+      }
+    },
+
+    onPlayKeynote: function(e, detail, sender) {
+      var keynoteSession = this.sessions[0];
+      if (keynoteSession.id === '__keynote__') {
+        this.selectedVideoId = keynoteSession.youtubeUrl;
+        IOWA.Analytics.trackEvent('live', 'play keynote video');
       }
     },
 
