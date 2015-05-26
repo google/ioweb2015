@@ -490,6 +490,7 @@ Fired when the mode changes.
     },
 
     isiOS: false,
+    _videoReady: false,
 
     created: function() {
       this.sessions = [];
@@ -506,6 +507,8 @@ Fired when the mode changes.
     },
 
     detached: function() {
+      document.body.classList.remove('io-live-mode');
+
       if (this._refreshSessionTimeout) {
         clearTimeout(this._refreshSessionTimeout);
       }
@@ -557,15 +560,18 @@ Fired when the mode changes.
     },
 
     modeChanged: function() {
+      if (this.mode === 'live') {
+        document.body.classList.add('io-live-mode');
+      }
+
       this.asyncFire('io-live-mode', {mode: this.mode});
     },
 
     autoOpenFabChanged: function() {
       // Expand FAB if we're in live mode and not streaming the keynote.
-      if (this.autoOpenFab && !this.duringKeynote && this.mode != this._MODES.BEFORE) {
-        this.async(function() {
-          this.openFab();
-        }, null, 600);
+      if (this.autoOpenFab && this._videoReady &&
+          !this.duringKeynote && this.mode != this._MODES.BEFORE) {
+        this.async(this.openFab, null, 600);
       }
     },
 
@@ -574,6 +580,8 @@ Fired when the mode changes.
     },
 
     onVideoReady: function(e, detail, sender) {
+      this._videoReady = true;
+      this.autoOpenFabChanged(); // go through auto-open fab flow.
       this.listLiveSessionsInThisHour();
     },
 

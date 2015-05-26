@@ -83,24 +83,6 @@ IOWA.Elements = (function() {
       );
     });
 
-    var ioLive = document.querySelector('io-live');
-    if (ioLive) {
-      var onLiveMode_ = function(e) {
-        if (e.detail.mode === 'live') {
-          var els = [IOWA.Elements.Masthead, IOWA.Elements.NavPaperTabs,
-                     IOWA.Elements.Masthead.querySelector('#signin-nav-elements')];
-          els.forEach(function(el) {
-            el.classList.remove('bg-cyan');
-            el.classList.add('bg-photo');
-          });
-
-          ioLive.removeEventListener('io-live-mode', onLiveMode_);
-        }
-      };
-
-      ioLive.addEventListener('io-live-mode', onLiveMode_);
-    }
-
     var main = document.querySelector('.io-main');
 
     var drawer = document.querySelector('core-drawer-panel');
