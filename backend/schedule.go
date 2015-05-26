@@ -52,6 +52,8 @@ var (
 	soonSessionIDs = []string{keynoteID}
 	// session IDs to compare timeoutSurvey to.
 	surveySessionIDs = []string{keynoteID}
+	// reChannleID parses session description text.
+	reChannelID = regexp.MustCompile("(?i)channel\\s+(\\d)")
 )
 
 type eventData struct {
@@ -91,6 +93,21 @@ type eventSession struct {
 
 	// Update is used only api/user/updates
 	Update string `json:"update,omitempty"`
+}
+
+func (s *eventSession) hasLiveChannel() bool {
+	return s.IsLive && s.YouTube != "" &&
+		!strings.HasPrefix(s.YouTube, "http://") && !strings.HasPrefix(s.YouTube, "https://") &&
+		reChannelID.MatchString(s.Desc)
+}
+
+func (s *eventSession) liveChannelID() int {
+	var n int
+	m := reChannelID.FindStringSubmatch(s.Desc)
+	if m != nil {
+		n, _ = strconv.Atoi(m[1])
+	}
+	return n
 }
 
 type eventSpeaker struct {
@@ -576,10 +593,10 @@ func scheduleLiveIDs(c context.Context) ([]string, error) {
 	if d.Sessions == nil {
 		return nil, nil
 	}
+	today := time.Now().In(config.Schedule.Location).YearDay()
 	live := sortedChannelSessions(make([]*eventSession, 0, len(d.Sessions)/2))
 	for id, s := range d.Sessions {
-		if id == keynoteID || !s.IsLive || s.YouTube == "" ||
-			strings.HasPrefix(s.YouTube, "http://") || strings.HasPrefix(s.YouTube, "https://") {
+		if s.StartTime.In(config.Schedule.Location).YearDay() != today || id == keynoteID || !s.hasLiveChannel() {
 			continue
 		}
 		live = append(live, s)
@@ -699,9 +716,6 @@ func (l sortedVideosList) Less(i, j int) bool {
 // in the session descriptions.
 type sortedChannelSessions []*eventSession
 
-// reChannleID parses session description text.
-var reChannelID = regexp.MustCompile("(?i)channel\\s+(\\d)")
-
 func (s sortedChannelSessions) Len() int {
 	return len(s)
 }
@@ -711,14 +725,5 @@ func (s sortedChannelSessions) Swap(i, j int) {
 }
 
 func (s sortedChannelSessions) Less(i, j int) bool {
-	var ch1, ch2 int
-	m := reChannelID.FindStringSubmatch(s[i].Desc)
-	if m != nil {
-		ch1, _ = strconv.Atoi(m[1])
-	}
-	m = reChannelID.FindStringSubmatch(s[j].Desc)
-	if m != nil {
-		ch2, _ = strconv.Atoi(m[1])
-	}
-	return ch1 < ch2
+	return s[i].liveChannelID() < s[j].liveChannelID()
 }
