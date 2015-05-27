@@ -520,6 +520,7 @@ Fired when the mode changes.
 
     ready: function() {
       this.isiOS = IOWA.Util.isIOS();
+      this._loadedOnDate = moment();
     },
 
     detached: function() {
@@ -628,6 +629,17 @@ Fired when the mode changes.
     },
 
     listLiveSessionsInThisHour: function() {
+
+      // Refresh the page once a day if the user has the page open. This is
+      // necessary to get new live streamed channel ids.
+      var now = moment();
+
+      if (this._refreshSessionTimeout &&
+          this._loadedOnDate.format('D') != now.format('D')) {
+        location.reload();
+        return;
+      }
+
       this.currentLiveSessions = this.filterCurrentTimeBlock(this.todaysLiveSessions);
 
       // Find any live channels that are not streaming content right now and
@@ -659,8 +671,6 @@ Fired when the mode changes.
           videoId: channel
         };
       }.bind(this));
-
-      var now = moment();
 
       // If there are live streamed sessions happening this hour, start
       // playing the first one. Otherwise default to the first non-streaming
