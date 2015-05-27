@@ -548,12 +548,12 @@ IOWA.Elements = (function() {
 
       // Wait 1 rAF for template to stamp.
       this.async(function() {
-        var dialog = IOWA.Elements.Main.querySelector('paper-dialog');
         var video = dialog.querySelector('google-youtube');
 
         video.addEventListener('google-youtube-ready', function(e) {
           // First session is the keynote.
-          video.videoid = this.scheduleData.sessions[0].youtubeUrl;
+          // video.videoid = this.toVideoIdFilter(this.scheduleData.sessions[0].youtubeUrl);
+          var dialog = IOWA.Elements.Main.querySelector('paper-dialog');
           dialog.toggle();
         }.bind(this));
       });
