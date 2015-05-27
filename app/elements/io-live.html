@@ -561,7 +561,8 @@ Fired when the mode changes.
       // May 27 -> 1, May 28 -> 1, May 29 -> 2
       this.dayView = this.currentDay % day1StartDayPDT + 1;
 
-      this.afterKeynote = today.isAfter(moment(this.day1Start).add(3, 'hours'));
+      // Keynote ends at 12pm.
+      this.afterKeynote = today.isAfter(moment(this.day1Start).add(2, 'hours').add(30, 'minutes'));
     },
 
     sessionsChanged: function() {
