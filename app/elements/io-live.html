@@ -520,6 +520,7 @@ Fired when the mode changes.
 
     ready: function() {
       this.isiOS = IOWA.Util.isIOS();
+      this._loadedOnDate = moment();
     },
 
     detached: function() {
@@ -631,7 +632,10 @@ Fired when the mode changes.
 
       // Refresh the page if the user has it open on day 1 and we transition
       // into day 2. This is necessary to get new live streamed channel ids.
-      if (this._refreshSessionTimeout && this.dayView == 1) {
+      var now = moment();
+
+      if (this._refreshSessionTimeout && this.dayView == 1 &&
+          this._loadedOnDate.format('D') != now.format('D')) {
         location.reload();
         return;
       }
@@ -667,8 +671,6 @@ Fired when the mode changes.
           videoId: channel
         };
       }.bind(this));
-
-      var now = moment();
 
       // If there are live streamed sessions happening this hour, start
       // playing the first one. Otherwise default to the first non-streaming
