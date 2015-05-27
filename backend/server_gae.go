@@ -53,10 +53,8 @@ func init() {
 	cache = &gaeMemcache{}
 	// apps hosted on GAE use a different HTTP transport
 	httpTransport = func(c context.Context) http.RoundTripper {
-		return &urlfetch.Transport{
-			Context:  c,
-			Deadline: 10 * time.Second,
-		}
+		c, _ = context.WithTimeout(c, 10*time.Second)
+		return &urlfetch.Transport{Context: c}
 	}
 	// allow access only by whitelisted people/domains if not empty
 	if len(config.Whitelist) > 0 {
