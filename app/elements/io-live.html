@@ -630,11 +630,11 @@ Fired when the mode changes.
 
     listLiveSessionsInThisHour: function() {
 
-      // Refresh the page if the user has it open on day 1 and we transition
-      // into day 2. This is necessary to get new live streamed channel ids.
+      // Refresh the page once a day if the user has the page open. This is
+      // necessary to get new live streamed channel ids.
       var now = moment();
 
-      if (this._refreshSessionTimeout && this.dayView == 1 &&
+      if (this._refreshSessionTimeout &&
           this._loadedOnDate.format('D') != now.format('D')) {
         location.reload();
         return;
