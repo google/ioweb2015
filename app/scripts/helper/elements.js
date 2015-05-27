@@ -346,6 +346,25 @@ IOWA.Elements = (function() {
       return new Date(session.endTimestamp) < Date.now();
     };
 
+    template.featuredSessionsFilter = function(sessions) {
+      if (!sessions) {
+        return [];
+      }
+      var superAwesomeSessionId = '21718f8b-b6d4-e411-b87f-00155d5066d7';
+      var superAwesomeSession = null;
+      var filteredSessions = this.scheduleData.sessions.filter(function(s, i) {
+        if (s.id === superAwesomeSessionId) {
+          superAwesomeSession = s;
+        }
+        return s.isFeatured && template.toVideoIdFilter(s.youtubeUrl);
+      });
+      if (superAwesomeSession) {
+        filteredSessions.splice(filteredSessions.indexOf(superAwesomeSession), 1);
+        filteredSessions.unshift(superAwesomeSession);
+      }
+      return filteredSessions;
+    };
+
     template.formatSessionTagsFilter = function(tagList) {
       if (!tagList) {
         return;
@@ -366,7 +385,7 @@ IOWA.Elements = (function() {
       }
       return speakers.map(function(speakerId) {
         return this.scheduleData.speakers[speakerId].name;
-      }.bind(this)).join(', ');
+      }.bind(this)).sort().join(', ');
     };
 
     template.toVideoIdFilter = function(youtubeUrl) {
@@ -515,6 +534,28 @@ IOWA.Elements = (function() {
 
         var thumbnail = videoContainer.querySelector('.fullvideo_thumbnail');
         thumbnail.src = sender.getAttribute('data-videoimg'); // IE10 doesn't support .dataset.
+      });
+    };
+
+    template.closeMastheadVideo = function(e, detail, sender) {
+      this.mastheadVideoActive = false;
+    };
+
+    template.openMastheadVideo = function(e, detail, sender) {
+      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+
+      this.mastheadVideoActive = true; // stamp template
+
+      // Wait 1 rAF for template to stamp.
+      this.async(function() {
+        var dialog = IOWA.Elements.Main.querySelector('paper-dialog');
+        var video = dialog.querySelector('google-youtube');
+
+        video.addEventListener('google-youtube-ready', function(e) {
+          // First session is the keynote.
+          video.videoid = this.scheduleData.sessions[0].youtubeUrl;
+          dialog.toggle();
+        }.bind(this));
       });
     };
 
@@ -711,6 +752,16 @@ IOWA.Elements = (function() {
           IOWA.Elements.GoogleSignIn.user.notify = false;
         });
       }
+    };
+
+    template.shiftContentLeft = function(e, detail, sender) {
+      IOWA.PageAnimation.shiftContentLeft(
+          IOWA.Elements.Main.querySelector('.featured__videos'));
+    };
+
+    template.shiftContentRight = function(e, detail, sender) {
+      IOWA.PageAnimation.shiftContentRight(
+          IOWA.Elements.Main.querySelector('.featured__videos'));
     };
 
     template.addEventListener('template-bound', updateElements);

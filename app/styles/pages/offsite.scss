@@ -25,19 +25,40 @@ $name: 'page-offsite';
 
 $icon-margin: 10px;
 
-.card__photo--stage {
+.masthead-container {
+  max-width: 100%;
+}
+
+.photo__masthead {
+  background: url(../images//offsite/Recap-Video-Image.jpg) no-repeat 50% 50%;
+  background-size: cover;
+}
+
+.pics__section {
   height: 310px;
-  background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url(../images/offsite/stage-887@2x.jpg);
+  padding: 0;
+
+  > div {
+    min-height: 310px;
+  }
+}
+
+.photo__home {
+  background-image: url(../images/offsite/Image-01@2x.jpg);
   background-position: 50% 50%;
   background-size: cover;
-  background-repeat: no-repeat;
+}
 
-  h5 {
-    color: white;
-    text-shadow: .5px .5px 1px rgba(0, 0, 0, 0.25);
-    position: relative;
-    top: $mobileKeyline;
-  }
+.photo__home--top {
+  background-image: url(../images/offsite/Image-03@2x.jpg);
+  background-position: 50% 0;
+  background-size: cover;
+}
+
+.photo__home--bottom {
+  background-image: url(../images/offsite/Image-02@2x.jpg);
+  background-position: 50% 0;
+  background-size: cover;
 }
 
 google-youtube {
@@ -164,6 +185,10 @@ google-youtube {
   }
 }
 
+.page__section--attend {
+  margin-top: 0;
+}
+
 // Smaller than n6
 @media (max-width: 400px) {
   .search__map {
@@ -200,24 +225,25 @@ google-youtube {
 
 
 @media (min-width: $tablet-breakpoint-min) {
-  $marginTop: 140px;
+  $marginTop: 72px;
 
-  .card__photo--stage {
-    height: 900px;
-    position: relative;
-    margin-top: -190px;
-    margin-bottom: -226px;
+  .pics__section {
+    height: 600px;
+    margin-top: -92px;
+
+    > div {
+      min-height: 600px;
+    }
   }
   .play__button__container {
     margin-bottom: 130px;
   }
   .page__section--attend {
     background-position: 50% 90px;
-    margin-top: -80px;
     padding-top: $marginTop;
 
     h2 {
-      max-width: 68%;
+      max-width: 580px;
       padding: 0 $desktopKeyline 0 $desktopKeyline;
     }
 
@@ -259,14 +285,7 @@ google-youtube {
     }
   }
 
-  // Phase 3
-  .card__iorequest {
-    margin-top: -40px;
-  }
-  // ----
-
 }
-
 
 @media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
   .card__photo--stage {
@@ -274,15 +293,17 @@ google-youtube {
   }
 }
 
-@media (min-width: $desktop-breakpoint-mid) {
-   $marginTop: 100px;
+@media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
+  .pics__section {
+    margin-top: -124px;
+  }
+}
 
-  .card__photo--stage {
-    margin-top: -170px;
+@media (min-width: $desktop-breakpoint-mid) {
+  .pics__section {
+    margin-top: -100px;
   }
   .page__section--attend {
-    margin-top: -36px;
-    padding-top: $marginTop;
     background-size: cover;
     background-position: 50% 140px;
 
@@ -291,7 +312,6 @@ google-youtube {
     }
 
     .action__links {
-      top: $marginTop;
       left: $largeKeyline;
       right: $largeKeyline;
     }
@@ -302,21 +322,19 @@ google-youtube {
   }
 }
 
-@media (min-width: $desktop-breakpoint-max) {
-  $marginTop: 180px;
-  .page__section--attend {
-    padding-top: $marginTop;
-    margin-top: -108px;
-
-    .action__links {
-      top: $marginTop;
-    }
+@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
+  .photo__masthead {
+    background-image: url(../images/offsite/Recap-Video-Image@2x.jpg);
   }
-  .card__photo--stage {
-    margin-top: -170px;
-    margin-bottom: -64px;
+  .photo__home {
+    background-image: url(../images/offsite/Image-01@2x.jpg);
+  }
+  .photo__home--top {
+    background-image: url(../images/offsite/Image-03@2x.jpg);
+  }
+  .photo__home--bottom {
+    background-image: url(../images/offsite/Image-02@2x.jpg);
   }
 }
-
 
 }

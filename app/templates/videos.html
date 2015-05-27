@@ -6,7 +6,7 @@
 <div class="photo__masthead photo__masthead--fullbleed" fit>
   <div class="card__photo--stage" layout vertical center-center>
     <div class="play__button__container" on-tap="{{openMastheadVideo}}" data-link-track="video-recap-watch">
-      <h5>Watch the 2014 recap video</h5>
+      <h5>Watch the keynote</h5>
     </div>
   </div>
 </div>
@@ -19,7 +19,8 @@
 </core-toolbar>
 
 <!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
-<paper-dialog transition="core-transition-center" backdrop?="{{!isIOS}}" layered="false"
+<paper-dialog class="video_overlay-dialog" transition="core-transition-center"
+              backdrop?="{{!isIOS}}" layered="false"
               on-core-overlay-close-completed="{{closeMastheadVideo}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close dialog"></paper-icon-button>
   <template if="{{mastheadVideoActive}}">
@@ -174,6 +175,7 @@
 
     page.load = function() {
       // Reset template variables for when revisiting the page.
+      IOWA.Elements.Template.fullscreenVideoActive = false;
       IOWA.Elements.Template.mastheadVideoActive = false;
       IOWA.Elements.Template.hasSessionVideos = false;
       IOWA.Elements.Template.selectedVideoType = 'DevBytes';
@@ -207,17 +209,6 @@
           template.filteredVideoList = formatVideoTypeFilter(videos, template.selectedVideoType);
         }
       });
-    };
-
-    IOWA.Elements.Template.closeMastheadVideo = function(e, detail, sender) {
-      IOWA.Elements.Template.mastheadVideoActive = false;
-    };
-
-    IOWA.Elements.Template.openMastheadVideo = function(e, detail, sender) {
-      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
-
-      this.mastheadVideoActive = true; // stamp template
-      IOWA.Elements.Main.querySelector('paper-dialog').toggle();
     };
 
     IOWA.Elements.Template.onVideoFilter = function(e, detail, sender) {

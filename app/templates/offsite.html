@@ -1,9 +1,11 @@
 {% define "title" %}Attend Offsite{% end %}
 
-{% define "mastheadBgClass" %}bg-cyan{% end %}
+{% define "mastheadBgClass" %}bg-photo{% end %}
 
 {% define "masthead" %}
-  <h1><i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg></h1>
+  <div class="photo__masthead photo__masthead--fullbleed" fit>
+  <div class="card__photo--stage"></div>
+</div>
 {% end %}
 
 {% define "content" %}
@@ -12,10 +14,18 @@
     <span flex><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></span>
   </core-toolbar>
 
+  <core-toolbar class="navbar__overlay navbar__overlay--gallery" aria-hidden="{{!photoGalleryActive}}" fit>
+    <paper-icon-button icon="arrow-back" on-tap="{{closeExtendedPhotoGallery}}" aria-label="Close gallery" tabindex="{{photoGalleryActive ? 0 : -1}}"></paper-icon-button>
+    <span flex>I/O Extended Photos</span>
+  </core-toolbar>
+
   <core-toolbar class="navbar__overlay navbar__overlay--extended" aria-hidden="{{!extendedMapActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeExtendedMapSection}}" aria-label="Close extended map" tabindex="{{extendedMapActive ? 0 : -1}}"></paper-icon-button>
     <span flex>2015 Extended events</span>
   </core-toolbar>
+
+  <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}"
+              imagePath="media.image.url" active="{{photoGalleryActive}}" fit></io-gallery>
 
   <template if="{{fullscreenVideoActive}}">
     <div class="fullvideo__container" fit>
@@ -27,46 +37,29 @@
   </template>
 
   <div class="active">
-    <div class="card__container card__container--top sidebyside slide-up" layout horizontal vertical?="{{isPhoneSize}}" relative>
-      <div class="card js-experiment-visualizer" layout vertical auto-vertical flex>
-        <div class="card-content" flex?="{{!isPhoneSize}}">
-          <h3 class="card__title">Live stream</h3>
-          <div>Watch the keynote and select sessions in real-time, from your laptop or mobile device.</div>
-        </div>
+
+    <div class="card__container card__container--top slide-up">
+      <div class="card js-experiment-visualizer">
         <div class="card-content">
-          <a href="schedule?filters=Live%20streamed#day1" data-track-link="offsite-browse-schedule" data-ajax-link data-transition="hero-card-transition">Browse Live Schedule</a>
+          <h3>Developers and product fans from all over the world were also able to watch and participate in I/O 2015 through our I/O Extended events.</h3>
         </div>
-      </div>
-      <div class="card js-experiment-visualizer" auto-vertical flex>
-        <div class="card-content">
-          <h3 class="card__title">I/O Live Embed Widget</h3>
-          <div>Personalize the I/O live stream for your website and share the #io15 conversation from the event with your audience.</div>
+        <div class="card-content anchor-like">
+          <span role="link" tabindex="0" data-track-link="offsite-photos-extended" on-tap="{{toggleExtendedGallery}}">See photos from I/O extended</span>
         </div>
-        <div class="card-content">
-          <a href="widget" data-track-link="offsite-widget" data-ajax-link data-transition="hero-card-transition">Customize I/O Live widget</a>
-        </div>
-      </div>
-      <div class="ripple">
-        <div class="ripple__content"></div>
       </div>
     </div>
 
-
     <div class="slide-up-delay">
-      <section class="card__photo--stage page__section js-experiment-instrument" layout vertical center-center>
-        <div class="play__button__container" on-tap="{{openSectionVideo}}" data-track-link="offsite-watch-extended-recap-video">
-          <h5><i18n-msg msgid="ioextendedwatch">Watch the 2014 I/O Extended recap video</i18n-msg></h5>
-        </div>
-      </section>
 
-      <div class="card__container" relative>
-        <div class="card js-experiment-visualizer" auto-vertical flex>
-          <div class="card-content">
-            <h3 class="card__title"><i18n-msg msgid="ioextendevents">I/O Extended events</i18n-msg></h3>
-            <div>I/O Extended events may include live streamed sessions, local developer demos, hackathons and more. These events are brought to you by our Google Developer Groups, Student Ambassadors, and local developers.</div>
+      <section class="page__section pics__section js-experiment-instrument" layout vertical>
+        <div layout horizontal>
+          <div class="photo__home" flex two?="{{isDesktopSize}}"></div>
+          <div layout vertical flex>
+            <div class="photo__home--top" flex></div>
+            <div class="photo__home--bottom" flex></div>
           </div>
         </div>
-      </div>
+      </section>
 
       <section class="page__section page__section--attend bg-dark-grey js-experiment-instrument {{ {'no-webgl': !webglSupported} | tokenList }}">
 
@@ -86,29 +79,30 @@
           </div>
         </div>
 
-        <h2 class="extended-title" hidden?="{{!webglSupported}}">Find an I/O Extended event near you</h2>
+        <h2 class="extended-title" hidden?="{{!webglSupported}}">See where I/O Extended events happened in 2015</h2>
         <template if="{{!webglSupported}}">
           <h2 class="extended-title">Searching for events is not supported in your browser :(</h2>
         </template>
 
         <div class="action__links" layout vertical>
+
           <template if="{{extendedMapActive && didExtendedSearch && !politicalAreaSearch && !offsiteMarkerResults.length}}">
             <h4>There are no events near that location. Try another search or check back later to find new events.</h4>
           </template>
+
           <template if="{{extendedMapActive && didExtendedSearch && politicalAreaSearch}}">
             <h4>These are the closest results to your search.</h4>
           </template>
 
-          <!-- <paper-button data-track-link="offsite-notify-me">
-            <core-icon icon="io:notifications-none"></core-icon><i18n-msg msgid="notifyme">Notify me about 2015 events near me</i18n-msg>
-          </paper-button> -->
           <paper-button class="view__events" on-tap="{{openExtendedMap}}" hidden?="{{!webglSupported}}">
             <a href="#join" data-track-link="offsite-view-2015-events"><core-icon icon="io:place"></core-icon>Find 2015 events</a>
           </paper-button>
+
           <div class="search__map" layout horizontal center self-center relative hidden?="{{!webglSupported}}">
             <core-icon icon="io:search"></core-icon>
             <paper-input id="autocomplete" label="Search for a city" on-keydown="{{onPlacesSearchKeydown}}"></paper-input>
           </div>
+
         </div>
         <div class="attend__globe {{ {show: offsiteGlobeVisible} | tokenList }}"
              on-marker-click="{{onMarkerClick}}" relative>
@@ -135,24 +129,6 @@
       </section>
     </div>
 
-    <div class="card__container card__iorequest">
-      <div class="card" auto-vertical flex>
-        <div class="card-content">
-          <h3 class="card__title">#io15request</h3>
-          <p>Developers and product fans who are unable to attend Google I/O in-person are invited to participate in the <b>#io15request</b> program. During conference days, you can request images, information, and answers to your burning I/O questions, and a team of onsite Googlers will do their best to hunt down an answer for you.</p>
-          <div>To put in a request during I/O (May 28-29), all you need to do is create a <b>public</b> Google+ or Twitter post from your profile using the hashtag <b>#io15request</b>. We'll only be able to reply to requests written in English, French and German.</div>
-        </div>
-        <div class="card-content link-spacing">
-          <a href="https://plus.google.com/+topcontributors/" data-track-link="offsite-iorequest-gplus" target="_blank">See #io15requests on Google+</a>
-          <a href="https://twitter.com/search?f=realtime&q=%23io15request&src=typd" data-track-link="offsite-iorequest-twitter" target="_blank">See #io15requests on Twitter</a>
-        </div>
-      </div>
-    </div>
-
-    <section id="hashtag" class="page__section">
-      <div class="io__hash"></div>
-    </section>
-
   </div>
 
   <script>
@@ -162,7 +138,6 @@
 
     function runVideoSectionAnimation(opt_reverse, opt_callback) {
       var topCard = IOWA.Elements.Main.querySelector('.card__container.slide-up');
-      var bottomCard = IOWA.Elements.Main.querySelector('.card__photo--stage').nextElementSibling;
 
       var videoContainer = document.querySelector('.fullvideo__container');
       var video = videoContainer.querySelector('.fullvideo__container google-youtube');
@@ -195,10 +170,6 @@
           new Animation(topCard, [
             {transform: 'translateY(0)', opacity: 1},
             {transform: 'translateY(-100px)', opacity: 0}
-          ], animationTiming),
-          new Animation(bottomCard, [
-            {transform: 'translateY(0)', opacity: 1},
-            {transform: 'translateY(100px)', opacity: 0}
           ], animationTiming)
         ]);
       }
@@ -225,7 +196,6 @@
     }
 
     function runExtendedMapAnimation(opt_reverse, opt_callback) {
-      var bottomCard = IOWA.Elements.Main.querySelector('.card__photo--stage').nextElementSibling;
       var viewButton = IOWA.Elements.Main.querySelector('.view__events');
       var searchInput = IOWA.Elements.Main.querySelector('.search__map');
       var sectionTitle = IOWA.Elements.Main.querySelector('.extended-title');
@@ -247,17 +217,6 @@
           {opacity: 0, visibility: 'hidden'}
         ], animationTiming)
       ]);
-
-      // Only animate card offscreen if not on mobile.
-      if (!IOWA.Elements.Template.isPhoneSize) {
-        animation = new AnimationGroup([
-          animation,
-          new Animation(bottomCard, [
-            {transform: 'translateY(0)', opacity: 1},
-            {transform: 'translateY(-100px)', opacity: 0}
-          ], animationTiming)
-        ]);
-      }
 
       var searchInputAnimation = new Animation(searchInput, [
         {opacity: 0, visibility: 'hidden'},
@@ -281,6 +240,30 @@
       }
     }
 
+    function runExtendedGalleryAnimation(opt_reverse, opt_callback) {
+      var navOverlay = document.querySelector('.navbar__overlay--gallery');
+
+      var reverse = opt_reverse || false;
+
+      var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+      var animation = new Animation(gallery, [
+        {opacity: 0}, {opacity: 1}
+      ], {
+        duration: 500,
+        fill: 'forwards',
+        direction: reverse ? 'reverse' : 'normal',
+        easing: 'cubic-bezier(0.4,0,0.2,1)'
+      });
+
+      IOWA.PageAnimation.play(animation, opt_callback);
+
+      if (reverse) {
+        navOverlay.classList.remove('active');
+      } else {
+        navOverlay.classList.add('active');
+      }
+    }
+
     // Page-specific JS that runs when this page is loaded for the first time.
     function initPage() {
       var page = IOWA.Elements.Template.pages['offsite'];
@@ -292,6 +275,7 @@
       page.load = function() {
         // Reset template variables for when revisiting the page.
         IOWA.Elements.Template.offsiteGlobeVisible = false;
+        IOWA.Elements.Template.photoGalleryActive = false;
         IOWA.Elements.Template.fullscreenVideoActive = false;
         IOWA.Elements.Template.extendedMapActive = false;
         IOWA.Elements.Template.politicalAreaSearch = false;
@@ -317,6 +301,44 @@
 
       page.onPageTransitionDone = function() {
         this.scrollToJoin();
+
+        var gallery = IOWA.Elements.Main.querySelector('io-gallery');
+        if (!gallery.items.length) {
+          IOWA.Picasa.fetchExtendedPhotos(function(photos) {
+            gallery.items = photos;
+          });
+        }
+
+        if (location.hash.substring(1) == 'photos') {
+          IOWA.Elements.Template.toggleExtendedGallery(e);
+        }
+      };
+
+      IOWA.Elements.Template.closeExtendedPhotoGallery = function(e, detail, sender) {
+        runExtendedGalleryAnimation(true, function() {
+          IOWA.Elements.Template.photoGalleryActive = false;
+        });
+
+        history.replaceState({}, null, location.pathname); // Remove #photos hash from URL.
+      };
+
+      IOWA.Elements.Template.toggleExtendedGallery = function(e, detail, sender) {
+        e.preventDefault();
+
+        if (sender && sender.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'link', 'click', sender.getAttribute('data-track-link'));
+        } else {
+          IOWA.Analytics.trackEvent('link', 'click', 'onsite-photos-extended-deeplink');
+        }
+
+        if (!this.photoGalleryActive) {
+          this.photoGalleryActive = true;
+          runExtendedGalleryAnimation();
+        } else {
+          runExtendedGalleryAnimation(true); // reverse animation when gallery is open.
+          this.photoGalleryActive = false;
+        }
       };
 
       IOWA.Elements.Template.onOffsiteVideoReady = function(e, detail, sender) {

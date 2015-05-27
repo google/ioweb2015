@@ -72,6 +72,11 @@
     }
   }
 
+  .card__photo--stage {
+    background: linear-gradient(to top, transparent 86%, black 106%);
+    height: 100%;
+  }
+
   .photo__masthead--fullbleed {
     top: -$navbarHeight;
   }

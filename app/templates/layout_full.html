@@ -180,7 +180,7 @@ limitations under the License.
 
 <!-- Intro animation background is outside of Polymer to reduce perceived latency in polyfilled browsers. -->
 <div class="io-logo-container">
-  <io-logo width="312" height="165" page="{% .Slug %}" class="{% template "mastheadBgClass" .%}" hideMasthead></io-logo>
+  <io-logo width="312" height="165" page="{% .Slug %}" class="{% template "mastheadBgClass" .%}"></io-logo>
   <div class="{% template "mastheadBgClass" .%}" iologobackground></div>
 </div>
 
@@ -213,18 +213,18 @@ limitations under the License.
             <i18n-msg msgid="schedule">Schedule</i18n-msg>
           </a>
         </paper-item>
+        <paper-item label="offsite">
+          <a href="videos" data-ajax-link data-anim-drawer data-track-link="nav-drawer-videos">Videos</a>
+        </paper-item>
         <paper-item label="onsite">
           <a href="onsite" data-ajax-link data-anim-drawer data-track-link="nav-drawer-onsite">
-            <i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg>
+            <i18n-msg msgid="attend-onsite">Onsite</i18n-msg>
           </a>
         </paper-item>
         <paper-item label="offsite">
           <a href="offsite" data-ajax-link data-anim-drawer data-track-link="nav-drawer-offsite">
-            <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
+            <i18n-msg msgid="attend-offsite">Offsite</i18n-msg>
           </a>
-        </paper-item>
-        <paper-item label="offsite">
-          <a href="videos" data-ajax-link data-anim-drawer data-track-link="nav-drawer-videos">Videos</a>
         </paper-item>
       </core-menu>
     </div>
@@ -275,18 +275,18 @@ limitations under the License.
                 <i18n-msg msgid="schedule">Schedule</i18n-msg>
               </a>
             </paper-tab>
+            <paper-tab label="videos" role="">
+              <a href="videos" data-ajax-link data-track-link="nav-videos" data-transition="masthead-ripple-transition" layout horizontal center>Videos</a>
+            </paper-tab>
             <paper-tab label="onsite" role="">
               <a href="onsite" data-ajax-link data-track-link="nav-onsite" data-transition="masthead-ripple-transition" layout horizontal center>
-                <i18n-msg msgid="attend-onsite">Attend Onsite</i18n-msg>
+                <i18n-msg msgid="attend-onsite">Onsite</i18n-msg>
               </a>
             </paper-tab>
             <paper-tab label="offsite" role="">
               <a href="offsite" data-ajax-link data-track-link="nav-offsite" data-transition="masthead-ripple-transition" layout horizontal center>
-                <i18n-msg msgid="attend-offsite">Attend Offsite</i18n-msg>
+                <i18n-msg msgid="attend-offsite">Offsite</i18n-msg>
               </a>
-            </paper-tab>
-            <paper-tab label="videos" role="">
-              <a href="videos" data-ajax-link data-track-link="nav-videos" data-transition="masthead-ripple-transition" layout horizontal center>Videos</a>
             </paper-tab>
           </paper-tabs>
           <span id="signin-nav-elements" class="{{isPhoneSize ? '' : pages[selectedPage].mastheadBgClass}}"
@@ -367,14 +367,14 @@ limitations under the License.
             <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
           </div>
         </div>
-        <!-- <experiment-fab-container class="fab" mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}" hidden?="{{selectedPage !== 'home'}}"></experiment-fab-container> -->
+        <experiment-fab-container class="fab" mini?="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}" hidden?="{{selectedPage !== 'home'}}"></experiment-fab-container>
         <a href="schedule#myschedule" data-ajax-link data-track-link="fab-myschedule"
            hidden?="{{selectedPage === 'home'}}">
           <paper-fab class="fab" icon="event" title="My Schedule" mini?="{{isPhoneSize}}"></paper-fab>
         </a>
       </header>
 
-      <template if="{{selectedPage === 'home'}}">
+      <!-- <template if="{{selectedPage === 'home'}}">
         <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
           <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}"
                    sessions="{{scheduleData.sessions}}"
@@ -387,14 +387,14 @@ limitations under the License.
             <h2>I/O is starting soon. #io15</h2>
           </io-live>
         </div>
-      </template>
+      </template> -->
 
       <main class="io-main {{ {transitionIn: pageTransitioningIn, transitionOut: pageTransitioningOut} | tokenList }}">
         <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
       </main>
 
-      <!-- <footer layout vertical> -->
-      <footer layout vertical hidden?="{{selectedPage === 'home'}}">
+      <footer layout vertical>
+      <!-- <footer layout vertical hidden?="{{selectedPage === 'home'}}"> -->
 
         <i18n-msg id="share-text" msgid="share-text" hidden>#io15 brings together devs to explore the next generation of tech and mobile. Join us online or in person May 28-29: https://google.com/io</i18n-msg>
 

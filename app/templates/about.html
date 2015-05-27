@@ -14,7 +14,7 @@
 
   <core-toolbar class="navbar__overlay navbar__overlay--video" aria-hidden="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back" on-tap="{{closeVideoCard}}" aria-label="Close video" tabindex="{{fullscreenVideoActive ? 0 : -1}}"></paper-icon-button>
-    <span flex><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
+    <span flex><i18n-msg msgid="watch-keynote-video">Watch the 2015 I/O Keynote</i18n-msg></span>
   </core-toolbar>
 
   <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}"
@@ -27,7 +27,7 @@
           <h3>Google I/O is two days of inspirational talks, hands-on learning, and a chance to hear more about Google's latest developer products.</h3>
         </div>
         <div class="card-content">
-          <span class="anchor-like" role="link" tabindex="0" data-track-link="about-view-photos-card" on-tap="{{togglePhotoGallery}}">See real-time photos from I/O 2015</span>
+          <span class="anchor-like" role="link" tabindex="0" data-track-link="about-view-photos-card" on-tap="{{togglePhotoGallery}}">See photos from I/O 2015</span>
         </div>
       </div>
     </div>
@@ -56,30 +56,6 @@
           <div class="photo__about" flex two></div>
         </div>
       </section>
-
-      <div class="card__container sidebyside" layout horizontal vertical?="{{isPhoneSize}}" relative>
-        <div class="card js-experiment-visualizer" auto-vertical flex>
-          <div class="card-content">
-            <h3><i18n-msg msgid="about-sundar">Join us to learn about product and platform innovations at Google, starting with a live kickoff from our Senior Vice-President of Products, Sundar Pichai.</i18n-msg></h3>
-          </div>
-          <div class="card-content">
-            <a href="https://www.google.com/events/io/io14videos" target="_blank" data-track-link="about-see-keynote-and-sessions">
-              <i18n-msg msgid="about-see-sessions">Watch the 2014 sessions</i18n-msg>
-            </a>
-          </div>
-        </div>
-        <div class="card js-experiment-visualizer" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="about-watch-2014-recap-video">
-          <div flex class="card__photo card__photo--recap"></div>
-          <div class="card-content">
-            <img src="images/play-video-button.png" class="play__button play__button--card" alt="Play video">
-            <span class="anchor-like" role="link" tabindex="0"><i18n-msg msgid="watch-recap-video">Watch the 2014 I/O Recap Video</i18n-msg></span>
-          </div>
-        </div>
-      </div>
-
-      <section id="hashtag" class="page__section bg-cyan js-experiment-instrument">
-        <a href="//www.google.com/?#q=%23io15" target="_blank" data-track-link="about-hashtag-search"><div class="io__hash"></div></a>
-      </section>
       -->
 
       <section class="page__section pics__section js-experiment-instrument" layout vertical>
@@ -102,52 +78,29 @@
             </div>
           </div>
         </div>
-        <div class="second__row" layout horizontal>
-          <div class="photo__about--top" flex relative>
-            <core-image placeholder="images/home/io-logo@2x.png"
-                        style="background-color:#4DD0E1"
-                        sizing="cover" preload fade fit></core-image>
-          </div>
-          <div class="photo__about--bottom" flex relative>
-            <core-image placeholder="images/home/io-logo@2x.png"
-                        style="background-color:#80DEEA"
-                        sizing="cover" preload fade fit></core-image>
-          </div>
-          <div class="photo__about--bottom" flex relative hidden?="{{isPhoneSize}}">
-            <core-image placeholder="images/home/io-logo@2x.png"
-                        style="background-color:#26C6DA"
-                        sizing="cover" preload fade fit></core-image>
-          </div>
-        </div>
       </section>
 
-      <section id="join" class="page__section js-experiment-instrument js-experiment-instrument--no-bottom-margin bg-light-grey">
-        <h2><i18n-msg msgid="join-convo">Join the conversation now at #io15</i18n-msg></h2>
-        <div class="join__social" layout vertical end hidden?="{{isPhoneSize}}">
-          <a href="https://plus.google.com/+GoogleDevelopers" data-track-link="home-social-plus-google-developers" target="_blank">
-            +googledevelopers<core-icon icon="io:post-gplus"></core-icon>
-          </a>
-          <a href="https://twitter.com/googledevs" data-track-link="home-social-twitter-google-devs" target="_blank">
-            @googledevs<core-icon icon="io:post-twitter"></core-icon>
-          </a>
-        </div>
-
-        <div class="io__hash" aria-label="I/O hash tag"></div>
-
-        <social-poller url="api/v1/social" posts="{{socialPosts}}" interval="30000"></social-poller>
-
-        <template if="{{socialPosts.length >= 3}}">
-          <div class="sidebyside" layout horizontal vertical?="{{isPhoneSize}}">
-            <template repeat="{{socialPost in socialPosts | limit(3)}}">
-              <social-post kind="{{socialPost.kind}}"
-                           author="{{socialPost.author}}"
-                           url="{{socialPost.url}}"
-                           text="{{socialPost.text}}"
-                           when="{{socialPost.when}}">
-              </social-post>
-            </template>
+      <div class="card__container sidebyside card--force-compositing" layout horizontal vertical?="{{isPhoneSize}}">
+        <div class="card js-experiment-visualizer" auto-vertical flex>
+          <div class="card-content">
+            <h3>Learn about product and platform innovations at Google, starting with the keynote hosted by our Senior Vice-President for Android, Chrome, &amp; App, Sundar Picha.</h3>
           </div>
-        </template>
+          <div class="card-content">
+            <a href="videos" data-track-link="about-see-keynote-and-sessions">Watch the 2015 keynote and sessions
+            </a>
+          </div>
+        </div>
+        <div class="card js-experiment-visualizer" layout vertical auto-vertical flex on-tap="{{playVideo}}" data-track-link="about-watch-keynote-video">
+          <div flex class="card__photo card__photo--recap"></div>
+          <div class="card-content">
+            <img src="images/play-video-button.png" class="play__button play__button--card" alt="Play video">
+            <span class="anchor-like" role="link" tabindex="0">Watch the keynote</span>
+          </div>
+        </div>
+      </div>
+
+      <section id="hashtag" class="page__section bg-cyan js-experiment-instrument">
+        <a href="//www.google.com/?#q=%23io15" target="_blank" data-track-link="about-hashtag-search"><div class="io__hash"></div></a>
       </section>
 
     </div>
@@ -155,7 +108,8 @@
 
   <template if="{{fullscreenVideoActive}}">
     <div class="fullvideo__container" fit hidden>
-      <img src="images/home/recap-500@2x.jpg" class="fullvideo_thumbnail" alt="Watch the I/O Recap Video" fit>
+      <img src="images/about/Image-05.jpg" class="fullvideo_thumbnail" alt="Watch the I/O 2015 keynote" fit>
+      <!-- TODO: update to keynote video. -->
       <google-youtube videoid="ksvdvCDO7pA" height="100%" width="100%" fit
                       autohide="1" controls="2" modestbranding="1" showinfo="0"
                       iv_load_policy="3" rel="0" autoplay="1"></google-youtube>

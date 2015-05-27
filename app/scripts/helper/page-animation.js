@@ -290,6 +290,46 @@ IOWA.PageAnimation = (function() {
   }
 
   /**
+   * Slides (transforms) container to the left.
+   * @param {Element} container The container to move.
+   */
+  function shiftContentLeft(container) {
+    var transform = container.style.transform;
+
+    // "translate3d(100px, 0px, 0px)" -> 100
+    var lastX = transform ? parseInt(transform.split('(')[1].split(',')[0]) : 0;
+
+    var cardRect = container.lastElementChild.getBoundingClientRect();
+    var cardWidth = cardRect.width;
+
+    var newX = lastX + cardWidth;
+    if (newX < cardWidth) {
+      container.style.transform = 'translate3d(' + newX + 'px, 0, 0)';
+    }
+  }
+
+  /**
+   * Slides (transforms) container to the right.
+   * @param {Element} container The container to move.
+   */
+  function shiftContentRight(container) {
+    var transform = container.style.transform;
+
+    // "translate3d(100px, 0px, 0px)" -> 100
+    var lastX = transform ? parseInt(transform.split('(')[1].split(',')[0]) : 0;
+
+    var containerWidth = container.getBoundingClientRect().width;
+    var cardRect = container.lastElementChild.getBoundingClientRect();
+    var lastCardRight = cardRect.right;
+    var cardWidth = cardRect.width;
+
+    var newX = lastX - cardWidth;
+    if (lastCardRight > containerWidth) {
+      container.style.transform = 'translate3d(' + newX + 'px, 0, 0)';
+    }
+  }
+
+  /**
    * Plays an animation, animation group or animation sequence. Calls
    *     a callback when it finishes, if one was assigned.
    * @param {AnimationNode} animation Animation or AnimationGroup or
@@ -440,6 +480,8 @@ IOWA.PageAnimation = (function() {
     playMastheadRippleTransition: playMastheadRippleTransition,
     playHeroTransitionStart: playHeroTransitionStart,
     playHeroTransitionEnd: playHeroTransitionEnd,
+    shiftContentLeft: shiftContentLeft,
+    shiftContentRight: shiftContentRight
   };
 
 })();

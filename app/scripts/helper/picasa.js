@@ -22,19 +22,23 @@ IOWA.Picasa = (function() {
 
   var API_ENDPOINT = 'api/v1/photoproxy';
   var GDEVELOPER_USER_ID = '111395306401981598462';
-  var ALBUM_ID = '6148448302499535601';
+  var IO_ALBUM_ID = '6148448302499535601';
+  var EXTENDED_ALBUM_ID = '6151106494033928993';
 
   var lang = document.documentElement.lang;
   var viewPortWidth = document.documentElement.clientWidth;
 
-  var feedUrl = 'https://picasaweb.google.com/data/feed/api/user/' +
-                GDEVELOPER_USER_ID + '/albumid/' + ALBUM_ID +
-                '?alt=jsonc&kind=photo&hl=' + lang +
-                '&imgmax=' + Math.min(viewPortWidth * (window.devicePixelRatio || 1), 1440) +
-                '&max-results=5000&v=2';
+  function getFeedUrl(albumId) {
+    return 'https://picasaweb.google.com/data/feed/api/user/' +
+           GDEVELOPER_USER_ID + '/albumid/' + albumId +
+           '?alt=jsonc&kind=photo&hl=' + lang +
+           '&imgmax=' + Math.min(viewPortWidth * (window.devicePixelRatio || 1), 1440) +
+           '&max-results=5000&v=2';
+  }
 
-  function fetch(opt_startIndex, callback) {
+  function fetchPhotos(opt_startIndex, callback, opt_albumId) {
     var startIndex = opt_startIndex || 1;
+    var feedUrl = getFeedUrl(opt_albumId || IO_ALBUM_ID);
 
     var url = API_ENDPOINT + '?url=' +
               encodeURIComponent(feedUrl + '&start-index=' + startIndex);
@@ -52,8 +56,13 @@ IOWA.Picasa = (function() {
     xhr.send();
   }
 
+  function fetchExtendedPhotos(callback) {
+    return fetchPhotos(null, callback, EXTENDED_ALBUM_ID);
+  }
+
   return {
-    fetchPhotos: fetch
+    fetchPhotos: fetchPhotos,
+    fetchExtendedPhotos: fetchExtendedPhotos
   };
 
 })();
