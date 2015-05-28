@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -45,6 +46,13 @@ type eventDataCache struct {
 	Etag      string    `datastore:"-"`
 	Timestamp time.Time `datastore:"ts"`
 	Bytes     []byte    `datastore:"data"`
+}
+
+var cachedEventDataKey string
+
+func init() {
+	// shard the memcache key across 4 instances
+	cachedEventDataKey = fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
 }
 
 // RunInTransaction runs f in a transaction.
@@ -236,7 +244,7 @@ func clearEventData(c context.Context) error {
 }
 
 func getCachedEventData(c context.Context) (*eventDataCache, error) {
-	b, err := cache.get(c, kindEventData)
+	b, err := cache.get(c, cachedEventDataKey)
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +257,7 @@ func cacheEventData(c context.Context, d *eventDataCache) error {
 	if err := gob.NewEncoder(&b).Encode(d); err != nil {
 		return err
 	}
-	return cache.set(c, kindEventData, b.Bytes(), 1*time.Hour)
+	return cache.set(c, cachedEventDataKey, b.Bytes(), 1*time.Hour)
 }
 
 // getLatestEventData fetches most recent version of eventData previously saved with storeEventData().
