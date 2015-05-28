@@ -48,6 +48,13 @@ type eventDataCache struct {
 	Bytes     []byte    `datastore:"data"`
 }
 
+var cachedEventDataKey string
+
+func init() {
+	// shard the memcache key across 4 instances
+	cachedEventDataKey = fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
+}
+
 // RunInTransaction runs f in a transaction.
 // It calls f with a transaction context tc that f should use for all operations.
 func runInTransaction(c context.Context, f func(context.Context) error) error {
@@ -237,9 +244,7 @@ func clearEventData(c context.Context) error {
 }
 
 func getCachedEventData(c context.Context) (*eventDataCache, error) {
-	// shard the memcache key across 4 instances
-	key := fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
-	b, err := cache.get(c, key)
+	b, err := cache.get(c, cachedEventDataKey)
 	if err != nil {
 		return nil, err
 	}
@@ -252,9 +257,7 @@ func cacheEventData(c context.Context, d *eventDataCache) error {
 	if err := gob.NewEncoder(&b).Encode(d); err != nil {
 		return err
 	}
-	// shard the memcache key across 4 instances
-	key := fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
-	return cache.set(c, key, b.Bytes(), 1*time.Hour)
+	return cache.set(c, cachedEventDataKey, b.Bytes(), 1*time.Hour)
 }
 
 // getLatestEventData fetches most recent version of eventData previously saved with storeEventData().
