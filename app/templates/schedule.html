@@ -114,7 +114,7 @@
         core-overlay-toggle hidden?="{{!selectedSession.hasRelated}}">View related content</span>
     <span class="anchor-like" on-click="{{onRateSession}}" role="link"
         data-track-link="schedule-rate-session" hidden?="{{selectedSession.rated || selectedSession.id == '__afterhours__' || !isSessionFinishedFilter(selectedSession) }}">Rate session</span>
-    <span class="anchor-like-disabled" hidden?="{{!selectedSession.rated}}">Session rated</span>
+    <span class="anchor-like-disabled" hidden?="{{!selectedSession.rated}}">Rating submitted</span>
   </div>
 </paper-dialog>
 
@@ -131,7 +131,7 @@
     </h5>
   </div>
   <div class="session__info__section">
-    <p>Session rating</p>
+    <p>Session rating:</p>
     <div>
       <div>
         <core-menu layout selected="{{answers.overall}}" valueattr="value" horizontal justified>
@@ -167,7 +167,7 @@
     </div>
   </div>
   <div class="session__info__section">
-    <p>Based on the description/my expectations, the content was</p>
+    <p>Based on the description/my expectations, the content was:</p>
     <div>
       <div>
         <core-menu selected="{{answers.content}}" valueattr="value" layout horizontal justified>
@@ -185,7 +185,7 @@
     </div>
   </div>
   <div class="session__info__section">
-    <p>Speaker quality</p>
+    <p>Speaker quality:</p>
     <div>
       <div>
         <core-menu selected="{{answers.speaker}}" valueattr="value" layout horizontal justified>

@@ -553,7 +553,7 @@ IOWA.Elements = (function() {
 
         video.addEventListener('google-youtube-ready', function(e) {
           // First session is the keynote.
-          video.videoid = this.scheduleData.sessions[0].youtubeUrl;
+          // video.videoid = this.toVideoIdFilter(this.scheduleData.sessions[0].youtubeUrl);
           dialog.toggle();
         }.bind(this));
       });
