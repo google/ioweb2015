@@ -195,7 +195,9 @@ Fired when the mode changes.
         <countdown-timer role="timer" bgcolor="#00BCD4" date="{{date}}"
             easeintime="490" waittime="100" easeouttime="400"
             value="{{countdownValue}}" autoStart fit
-            aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O">
+            aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O"
+            on-timerthreshold="{{onCountdownTimerThreshold}}"
+            on-transitionend="{{onCountdownFaded}}">
         </countdown-timer>
       </template>
 
@@ -316,26 +318,12 @@ Fired when the mode changes.
       selectedSession: null
     },
 
-  eventDelegates: {
-    'dblclick': 'toggleVideo'
-  },
-
     created: function() {
       this.sessions = [];
       this.userSessions = [];
       this.socialPosts = [];
       this.speakers = {};
     },
-
-    // attached: function() {
-    //   var now = new Date();
-    //   var eventStart = new Date(this.date);
-    //   if (now > eventStart) {
-    //     this.mode = this._MODES.LIVE;
-    //   } else {
-    //     this.mode = this._MODES.BEFORE;
-    //   }
-    // },
 
     dateChanged: function() {
       this.day1Start = moment(this.date);
@@ -383,10 +371,6 @@ Fired when the mode changes.
       this.$.sessiondetails.open();
     },
 
-toggleVideo: function(e, detail, sender) {
-  this.mode = this._MODES.LIVE;
-},
-
     onFabTransition: function(e, detail, sender) {
       e.stopPropagation();
       sender.classList.remove('transitioning');
@@ -427,6 +411,20 @@ toggleVideo: function(e, detail, sender) {
 
     onSessionDetailsOpen: function(e, detail, sender) {
       sender.querySelector('.session__title').focus();
+    },
+
+    onCountdownTimerThreshold: function(e, detail, sender) {
+      if (detail.label === 'Ended' || detail.ended) {
+        this.async(function() {
+          this.$.livecontainer.querySelector('countdown-timer').style.opacity = 0;
+        }, null, 1000);
+      }
+    },
+
+    onCountdownFaded: function(e, detail, sender) {
+      if (moment() > this.day1Start) {
+        this.mode = this._MODES.LIVE;
+      }
     },
 
     speakerIdsToNameString: function(speakers) {
