@@ -109,7 +109,7 @@ The `<io-gadget>` element renders a youtube video + social feed.
                           <paper-item videoid="{{video}}">Keynote</paper-item>
                         </template>
                         <template if="{{i > 0}}">
-                          <paper-item videoid="{{video}}">Channel {{i + 1}}</paper-item>
+                          <paper-item videoid="{{video}}">Channel {{i}}</paper-item>
                         </template>
                       </template>
                     </core-menu>
@@ -270,10 +270,6 @@ The `<io-gadget>` element renders a youtube video + social feed.
         this.setView();
       },
 
-      videoIdsChanged: function() {
-        this.selectedVideoId = this.videoIds[0];
-      },
-
       updateVideoInfo: function() {
         var video = this.$['gadget-content'].querySelector('google-youtube');
         var meta = video.player.getVideoData();
@@ -347,6 +343,16 @@ The `<io-gadget>` element renders a youtube video + social feed.
           this.view = this.VIEWS_.AFTER;
 
           return; // don't refresh view.
+        }
+
+        // Select a random channel if we're after the keynote.
+        this.afterKeynote = today.isAfter(
+            moment(this.startDate).add(2, 'hours').add(30, 'minutes'));
+        if (this.afterKeynote) {
+          var index = Math.floor(Math.random() * (this.videoIds.length - 1) + 1);
+          this.selectedVideoId = this.videoIds[index];
+        } else {
+          this.selectedVideoId = this.videoIds[0];
         }
 
         interval_ = setTimeout(this.setView.bind(this), timeout);
