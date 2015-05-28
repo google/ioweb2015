@@ -18,6 +18,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -45,6 +46,8 @@ type cacheInterface interface {
 	// get gets data from the cache put under key.
 	// it returns errCacheMiss if item is not in the cache or expired.
 	get(c context.Context, key string) ([]byte, error)
+	// deleteMulti removes keys from mecache.
+	deleleMulti(c context.Context, keys []string) error
 	// flush flushes all items from memcache.
 	flush(c context.Context) error
 }
@@ -109,6 +112,19 @@ func (mc *memoryCache) get(c context.Context, key string) ([]byte, error) {
 		return nil, errCacheMiss
 	}
 	return item.data, nil
+}
+
+func (mc *memoryCache) deleleMulti(c context.Context, keys []string) error {
+	sort.Strings(keys)
+	mc.Lock()
+	defer mc.Unlock()
+	for k := range mc.items {
+		i := sort.SearchStrings(keys, k)
+		if i < len(keys) && keys[i] == k {
+			delete(mc.items, k)
+		}
+	}
+	return nil
 }
 
 func (mc *memoryCache) flush(c context.Context) error {

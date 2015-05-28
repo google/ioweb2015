@@ -48,11 +48,20 @@ type eventDataCache struct {
 	Bytes     []byte    `datastore:"data"`
 }
 
-var cachedEventDataKey string
+var (
+	cachedEventDataKey     string
+	allCachedEventDataKeys []string
+)
 
 func init() {
 	// shard the memcache key across 4 instances
 	cachedEventDataKey = fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
+	allCachedEventDataKeys = []string{
+		kindEventData + "-0",
+		kindEventData + "-1",
+		kindEventData + "-2",
+		kindEventData + "-3",
+	}
 }
 
 // RunInTransaction runs f in a transaction.
@@ -257,6 +266,7 @@ func cacheEventData(c context.Context, d *eventDataCache) error {
 	if err := gob.NewEncoder(&b).Encode(d); err != nil {
 		return err
 	}
+	cache.deleleMulti(c, allCachedEventDataKeys)
 	return cache.set(c, cachedEventDataKey, b.Bytes(), 1*time.Hour)
 }
 
