@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -236,7 +237,9 @@ func clearEventData(c context.Context) error {
 }
 
 func getCachedEventData(c context.Context) (*eventDataCache, error) {
-	b, err := cache.get(c, kindEventData)
+	// shard the memcache key across 4 instances
+	key := fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
+	b, err := cache.get(c, key)
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +252,9 @@ func cacheEventData(c context.Context, d *eventDataCache) error {
 	if err := gob.NewEncoder(&b).Encode(d); err != nil {
 		return err
 	}
-	return cache.set(c, kindEventData, b.Bytes(), 1*time.Hour)
+	// shard the memcache key across 4 instances
+	key := fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
+	return cache.set(c, key, b.Bytes(), 1*time.Hour)
 }
 
 // getLatestEventData fetches most recent version of eventData previously saved with storeEventData().

@@ -1760,6 +1760,7 @@ func TestSyncEventDataWithDiff(t *testing.T) {
 		t.Fatalf("slurp never happened")
 	}
 
+	cache.flush(c)
 	data, err := getLatestEventData(c, nil)
 	if err != nil {
 		t.Fatalf("getLatestEventData: %v", err)
