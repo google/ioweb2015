@@ -114,7 +114,7 @@
         core-overlay-toggle hidden?="{{!selectedSession.hasRelated}}">View related content</span>
     <span class="anchor-like" on-click="{{onRateSession}}" role="link"
         data-track-link="schedule-rate-session" hidden?="{{selectedSession.rated || selectedSession.id == '__afterhours__' || !isSessionFinishedFilter(selectedSession) }}">Rate session</span>
-    <span class="anchor-like-disabled" hidden?="{{!selectedSession.rated}}">Session rated</span>
+    <span class="anchor-like-disabled" hidden?="{{!selectedSession.rated}}">Rating submitted</span>
   </div>
 </paper-dialog>
 
