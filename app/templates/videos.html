@@ -131,10 +131,10 @@
 (function() {
 
   // TODO(ericbidelman): consolidate this API call with /schedule page usage.
-  var VIDEOS_ENDPOINT = 'api/v1/schedule';
+  var SCHEDULE_ENDPOINT = 'api/v1/schedule';
 
   function fetchVideos() {
-    return IOWA.Request.xhrPromise('GET', VIDEOS_ENDPOINT, false).then(function(resp) {
+    return IOWA.Request.xhrPromise('GET', SCHEDULE_ENDPOINT, false).then(function(resp) {
       var videoLib = resp.video_library;
       return Object.keys(videoLib).map(function(key) { return videoLib[key]; });
     });
