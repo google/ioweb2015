@@ -537,7 +537,7 @@ Fired when the mode changes.
       // TODO: remove when edited video is ready. This starts the keynote at t=50m28s.
       if (this.sessions.length) {
         var keynoteSession = this.sessions[0];
-        var start = this.selectedVideoId.match(keynoteSession.youtubeUrl) ? 3028 : 0;
+        var start = keynoteSession.youtubeUrl.match(this.selectedVideoId) ? 3028 : 0;
         var video = this.$.livecontainer.querySelector('google-youtube');
         this.async(function() {
           video.player.seekTo(start);
