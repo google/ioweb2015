@@ -100,7 +100,7 @@ main {
 
 @media (min-width: $tablet-breakpoint-mid) {
   .pics__section {
-    margin-top: -102px;
+    margin-top: -134px;
   }
 }
 
@@ -113,7 +113,7 @@ main {
 
 @media (min-width: $desktop-breakpoint-mid) {
   .pics__section {
-    margin-top: -110px;
+    margin-top: -146px;
 
     .pics__section--under {
       min-height: 679px;
@@ -129,6 +129,9 @@ main {
   #hashtag {
     margin-top: -283px;
     padding-top: 283px;
+  }
+  .pics__section {
+    margin-top: -110px;
   }
 }
 
