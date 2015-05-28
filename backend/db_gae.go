@@ -54,6 +54,7 @@ var (
 )
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
 	// shard the memcache key across 4 instances
 	cachedEventDataKey = fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
 	allCachedEventDataKeys = []string{
@@ -233,8 +234,8 @@ func storeEventData(c context.Context, d *eventData) error {
 		return perr(err)
 	}
 	ent.Etag = hexKey(key)
-	// better safe than sorry
-	return cacheEventData(c, ent)
+	cache.deleleMulti(c, allCachedEventDataKeys)
+	return nil
 }
 
 // clearEventData deletes all EventData entities and flushes cache.
@@ -266,7 +267,6 @@ func cacheEventData(c context.Context, d *eventDataCache) error {
 	if err := gob.NewEncoder(&b).Encode(d); err != nil {
 		return err
 	}
-	cache.deleleMulti(c, allCachedEventDataKeys)
 	return cache.set(c, cachedEventDataKey, b.Bytes(), 1*time.Hour)
 }
 
