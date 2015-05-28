@@ -186,7 +186,8 @@ func getUserPushInfo(c context.Context, uid string) (*userPush, error) {
 func listUsersWithPush(c context.Context) ([]string, error) {
 	users := make([]string, 0)
 	q := datastore.NewQuery(kindUserPush).Filter("on =", true).KeysOnly()
-	for t := q.Run(context.WithTimeout(c, time.Minute)); ; {
+	c, _ := context.WithTimeout(c, time.Minute)
+	for t := q.Run(c); ; {
 		k, err := t.Next(nil)
 		if err == datastore.Done {
 			break
