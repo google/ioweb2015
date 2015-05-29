@@ -158,3 +158,13 @@ http://HOST/io2015/debug/sync
 * dev server: [localhost:3000/io2015/debug/sync](http://localhost:3000/io2015/debug/sync)
 * staging: [go/iowastaging/debug/sync](http://go/iowastaging/debug/sync)
 
+## Testing
+
+Frontend tests are run via https://github.com/Polymer/web-component-tester
+
+Configuration is in wct.conf.js.
+
+To run tests, run:
+
+    wct
+
