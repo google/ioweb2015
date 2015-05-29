@@ -376,6 +376,7 @@ limitations under the License.
 
       <template if="{{selectedPage === 'home'}}">
         <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
+
           <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}"
                    sessions="{{scheduleData.sessions}}"
                    speakers="{{scheduleData.speakers}}"
@@ -386,6 +387,7 @@ limitations under the License.
                    autoOpenFab="{{pageTransitionDone}}" fit>
             <h2>I/O is starting soon. #io15</h2>
           </io-live>
+
         </div>
       </template>
 
