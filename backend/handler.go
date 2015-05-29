@@ -67,7 +67,7 @@ func registerHandlers() {
 	handle("/api/v1/auth", handleAuth)
 	handle("/api/v1/schedule", serveSchedule)
 	handle("/api/v1/easter-egg", handleEasterEgg)
-  handle("/api/v1/photoproxy", servePhotosProxy)
+	handle("/api/v1/photoproxy", servePhotosProxy)
 	handle("/api/v1/user/schedule", handleUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserSchedule)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
@@ -850,7 +850,7 @@ func handleNotifySubscribers(w http.ResponseWriter, r *http.Request) {
 
 	users, err := listUsersWithPush(c)
 	if err != nil {
-		errorf(c, "handleNotifySubscribers: %v")
+		errorf(c, "handleNotifySubscribers: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

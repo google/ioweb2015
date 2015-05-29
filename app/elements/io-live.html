@@ -83,13 +83,13 @@ Fired when the mode changes.
       <paper-fab id="schedfab" icon="picture-in-picture"
                  aria-label="My schedule" title="My schedule" on-tap="{{onFabClick}}"></paper-fab>
 
-      <template if="{{afterKeynote}}">
+      <!-- <template if="{{afterKeynote}}">
         <div class="keynote__banner card {{ {on: afterKeynote && openWidget} | tokenList }}" layout horizontal on-tap="{{onPlayKeynote}}">
           <div class="card-content" layout horizontal center>
             <div><core-icon icon="io:play-circle-fill" self-center></core-icon> Watch the keynote</div>
           </div>
         </div>
-      </template>
+      </template> -->
 
       <div id="livewidget" on-transitionend="{{onFabTransition}}">
 

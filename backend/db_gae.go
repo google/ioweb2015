@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -45,6 +46,23 @@ type eventDataCache struct {
 	Etag      string    `datastore:"-"`
 	Timestamp time.Time `datastore:"ts"`
 	Bytes     []byte    `datastore:"data"`
+}
+
+var (
+	cachedEventDataKey     string
+	allCachedEventDataKeys []string
+)
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+	// shard the memcache key across 4 instances
+	cachedEventDataKey = fmt.Sprintf("%s-%d", kindEventData, rand.Intn(4))
+	allCachedEventDataKeys = []string{
+		kindEventData + "-0",
+		kindEventData + "-1",
+		kindEventData + "-2",
+		kindEventData + "-3",
+	}
 }
 
 // RunInTransaction runs f in a transaction.
@@ -168,6 +186,7 @@ func getUserPushInfo(c context.Context, uid string) (*userPush, error) {
 func listUsersWithPush(c context.Context) ([]string, error) {
 	users := make([]string, 0)
 	q := datastore.NewQuery(kindUserPush).Filter("on =", true).KeysOnly()
+	c, _ = context.WithTimeout(c, time.Minute)
 	for t := q.Run(c); ; {
 		k, err := t.Next(nil)
 		if err == datastore.Done {
@@ -216,8 +235,8 @@ func storeEventData(c context.Context, d *eventData) error {
 		return perr(err)
 	}
 	ent.Etag = hexKey(key)
-	// better safe than sorry
-	return cacheEventData(c, ent)
+	cache.deleleMulti(c, allCachedEventDataKeys)
+	return nil
 }
 
 // clearEventData deletes all EventData entities and flushes cache.
@@ -236,7 +255,7 @@ func clearEventData(c context.Context) error {
 }
 
 func getCachedEventData(c context.Context) (*eventDataCache, error) {
-	b, err := cache.get(c, kindEventData)
+	b, err := cache.get(c, cachedEventDataKey)
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +268,7 @@ func cacheEventData(c context.Context, d *eventDataCache) error {
 	if err := gob.NewEncoder(&b).Encode(d); err != nil {
 		return err
 	}
-	return cache.set(c, kindEventData, b.Bytes(), 1*time.Hour)
+	return cache.set(c, cachedEventDataKey, b.Bytes(), 1*time.Hour)
 }
 
 // getLatestEventData fetches most recent version of eventData previously saved with storeEventData().
