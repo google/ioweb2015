@@ -18,7 +18,7 @@
   * @fileOverview The ajax-based routing for IOWA subpages.
   */
 
-IOWA.Router = (function() {
+IOWA.Router_ = function(window) {
 
   "use strict";
 
@@ -302,7 +302,7 @@ IOWA.Router = (function() {
     var transition = transitionAttribute || 'page-slide-transition';
     var router = this;
     // Start transition.
-    IOWA.Elements.Template.fire('page-transition-start');
+    this.t.fire('page-transition-start');
     // Play exit sequence.
     IOWA.PageAnimation[Router.pageExitTransitions[transition]](
         this.state.start.page, this.state.end.page, e, source)
@@ -332,7 +332,7 @@ IOWA.Router = (function() {
       .then(IOWA.PageAnimation[Router.pageEnterTransitions[transition]])
       .then(function() {
         // End transition.
-        IOWA.Elements.Template.fire('page-transition-done');
+        this.t.fire('page-transition-done');
         // Run page's custom onPageTransitionDone handlers.
         router.runPageHandler('onPageTransitionDone', router.state.current.page);
       });
@@ -360,7 +360,7 @@ IOWA.Router = (function() {
           // Update current state of the page in Router and Template.
           router.state.current = router.parseUrl(router.state.end.href);
           // Update UI state based on the router's state.
-          router.updateUIstate();
+          return router.updateUIstate();
         })
         // Play entry sequence.
         .then(IOWA.PageAnimation.playSectionSlideIn.bind(null, newSubpage))
@@ -439,5 +439,4 @@ IOWA.Router = (function() {
   };
 
   return new Router();
-
-})();
+};
