@@ -628,6 +628,14 @@ Fired when the mode changes.
     },
 
     listLiveSessionsInThisHour: function() {
+
+      // Refresh the page if the user has it open on day 1 and we transition
+      // into day 2. This is necessary to get new live streamed channel ids.
+      if (this._refreshSessionTimeout && this.dayView == 1) {
+        location.reload();
+        return;
+      }
+
       this.currentLiveSessions = this.filterCurrentTimeBlock(this.todaysLiveSessions);
 
       // Find any live channels that are not streaming content right now and
