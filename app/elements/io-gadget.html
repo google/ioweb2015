@@ -47,42 +47,33 @@ The `<io-gadget>` element renders a youtube video + social feed.
 
         <template if="{{view === VIEWS_.BEFORE}}">
           <div class="preroll" layout vertical center-center auto-vertical flex two>
-            <div class="livelogo" layout horizontal>
-              <span><img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo"></span>
-              <h1 self-end>Live</h1>
-            </div>
-            <div layout vertical>
-              <h2>Tune in on May 28, starting at 9AM PDT.</h2>
-              <h3>#io15</h3>
+            <div layout vertical self-start>
+              <h1>I/O live</h1>
+              <h3>Tune in here on May 28, starting at 9AM PDT.<br>
+              Learn more about Google I/O at <a href="https://google.com/io" target="_blank">google.com/io</a>.</h3>
+              <h4>#io15</h4>
             </div>
           </div>
         </template>
 
         <template if="{{view === VIEWS_.BETWEEN}}">
           <div class="preroll" layout vertical center-center auto-vertical flex two>
-            <div class="livelogo" layout horizontal>
-              <span><img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo"></span>
-              <h1 self-end>Live</h1>
-            </div>
-            <div layout vertical>
-              <h2>Tune in again on May 29, starting at 9AM PDT.</h2>
-              <h3>#io15</h3>
+            <div layout vertical self-start>
+              <h1>I/O live</h1>
+              <h3>Tune in here again on May 29, starting at 9AM PDT.<br>
+              Meanwhile, watch the 2015 keynote and sessions at <a href="{{'videos'}}" target="_blank">events.google.com/io2015/videos</a>.</h3>
+              <h4>#io15</h4>
             </div>
           </div>
         </template>
 
         <template if="{{view === VIEWS_.AFTER}}">
           <div class="preroll" layout vertical center-center auto-vertical flex two>
-            <div class="livelogo" layout horizontal>
-              <span><img src="../images/home/io-logo.png" title="I/O Logo" alt="I/O Logo"></span>
-              <h1 self-end>Live</h1>
-            </div>
-            <div layout vertical>
-              <h2>Thanks for another great Google I/O.</h2>
-              <h3>#io15</h3>
-              <span class="viewvideos" self-center>
-                <a href="{{'videos'}}" target="_blank" layout horizontal center><core-icon icon="io:videocam"></core-icon> Watch videos from the event</a>
-              </span>
+            <div layout vertical self-start>
+              <h1>I/O live</h1>
+              <h3>Thanks for another great Google I/O.<br>
+              Watch the 2015 keynote and sessions at <a href="{{'videos'}}" target="_blank">events.google.com/io2015/videos</a>.</h3>
+              <h4>#io15</h4>
             </div>
           </div>
         </template>

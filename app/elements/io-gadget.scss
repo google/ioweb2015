@@ -141,30 +141,31 @@ paper-dropdown-menu {
   color: #fff;
   padding: $tabletKeyline;
 
-  h1, h2, h3, a {
+  h1, h2, h3, h4, a {
     color: inherit;
   }
 
-  h2, .viewvideos {
-    margin-top: $tabletKeyline;
+  a {
+    font-weight: inherit;
   }
 
-  h3 {
+  h3, .viewvideos {
+    margin-top: $mobileKeyline;
+    margin-bottom: $mobileKeyline;
+  }
+
+  h1, a {
     color: $color-cyan-400;
   }
 
   img {
-    width: 200px;
-    height: auto;
+    width: 90px;
+    height: 65px;
   }
 
-  .livelogo {
-    h1 {
-      margin-bottom: 12px;
-      margin-left: 12px;
-      font-size: 30px;
-    }
-
+  h1 {
+    font-size: 34px;
+    line-height: 1;
   }
 }
 
