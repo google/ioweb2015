@@ -285,8 +285,8 @@ $name: 'page-home';
 
   .page__section--featured {
     // height: 745px;
-    margin-top: -167px;
-    padding-top: calc(167px + 40px);
+    margin-top: -103px;
+    padding-top: calc(103px + 40px);
 
     .featured__videos {
       margin-left: -$desktopKeyline;
@@ -354,8 +354,8 @@ $name: 'page-home';
 
 @media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
   .page__section--featured {
-    margin-top: -167px;
-    padding-top: calc(167px + 40px);
+    margin-top: -135px;
+    padding-top: calc(135px + 40px);
   }
 }
 
@@ -363,7 +363,7 @@ $name: 'page-home';
   $overlayCardTop: 181px;
 
   .page__section--featured {
-    margin-top: -147px;
+    margin-top: -111px;
 
     .featured__videos {
       margin-left: -$largeKeyline;
