@@ -36,7 +36,7 @@ $playButtonHeightWidth: 40px;
 }
 
 .photo__masthead {
-  background: url(../images/videos/keynote.jpg) no-repeat 50% 0;
+  background: url(../images/home/keynote20152.jpg) no-repeat 50% 30%;
   background-size: cover;
 }
 
@@ -213,7 +213,7 @@ main {
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
   .photo__masthead {
-    background-image: url(../images/videos/keynote@2x.jpg);
+    background-image: url(../images/home/keynote20152@2x.jpg);
   }
 }
 

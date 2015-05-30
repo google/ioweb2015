@@ -52,7 +52,7 @@ $name: 'page-home';
 }
 
 .photo__masthead {
-  background: url(../images/videos/keynote.jpg) no-repeat 50% 0;
+  background: url(../images/home/keynote2015.jpg) no-repeat 50% 30%;
   background-size: cover;
 }
 
@@ -158,19 +158,19 @@ $name: 'page-home';
 }
 
 .photo__home {
-  background-image: url(../images/home/Image-Gallery-01.jpg);
+  background-image: url(../images/home/home1.jpg);
   background-position: 50% 0;
   background-size: cover;
 }
 
 .photo__home--top {
-  background-image: url(../images/home/Image-Gallery-02.jpg);
+  background-image: url(../images/home/home2.jpg);
   background-position: 100% 0;
   background-size: cover;
 }
 
 .photo__home--bottom {
-  background-image: url(../images/home/Image-Gallery-03.jpg);
+  background-image: url(../images/home/home3.jpg);
   background-position: 0 0;
   background-size: cover;
 }
@@ -401,15 +401,15 @@ $name: 'page-home';
   // .card__photo--plan  {
   //   background-image: url(../images/home/moscone-500@2x.jpg);
   // }
-  .photo__home {
-    background-image: url(../images/home/Image-Gallery-01@2x.jpg);
-  }
-  .photo__home--top {
-    background-image: url(../images/home/Image-Gallery-02@2x.jpg);
-  }
-  .photo__home--bottom {
-    background-image: url(../images/home/Image-Gallery-03@2x.jpg);
-  }
+  // .photo__home {
+  //   background-image: url(../images/home/Image-Gallery-01@2x.jpg);
+  // }
+  // .photo__home--top {
+  //   background-image: url(../images/home/Image-Gallery-02@2x.jpg);
+  // }
+  // .photo__home--bottom {
+  //   background-image: url(../images/home/Image-Gallery-03@2x.jpg);
+  // }
 }
 
 }
