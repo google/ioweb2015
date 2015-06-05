@@ -113,7 +113,10 @@ function serve(opts, callback) {
 
   var proc;
   var spawnBackend = function() {
-    proc = spawn('bin/server', ['-addr', serverAddr], {cwd: opts.dir, stdio: 'inherit'});
+    var env = process.env;
+    env['RUN_WITH_DEVAPPSERVER'] = '1';
+    proc = spawn('bin/server', ['-addr', serverAddr],
+                 {cwd: opts.dir, stdio: 'inherit', env: env});
   };
 
   spawnBackend();
