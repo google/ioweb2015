@@ -15,8 +15,6 @@
  */
 
 (function() {
-  // Polyfill Promise() in browsers that don't support it natively.
-  ES6Promise.polyfill();
 
   function initWorker() {
     var MAX_WORKER_TIMEOUT_ = 10 * 1000; // 10s

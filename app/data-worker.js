@@ -15,7 +15,7 @@
  */
 
 // Scripts required for execution (included by generate-data-worker gulp tasks):
-// bower_components/es6-promise-2.0.1.min/index.js
+// bower_components/es6-promise/dist/es6-promise.min.js
 // scripts/helper/request.js
 // scripts/helper/schedule.js
 

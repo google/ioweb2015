@@ -59,7 +59,7 @@ if (argv.open) {
 
 // Scripts required for the data-fetching worker.
 var dataWorkerScripts = [
-  IOWA.appDir + '/bower_components/es6-promise-2.0.1.min/index.js',
+  IOWA.appDir + '/bower_components/es6-promise/dist/es6-promise.min.js',
   IOWA.appDir + '/scripts/helper/request.js',
   IOWA.appDir + '/scripts/helper/schedule.js',
   IOWA.appDir + '/data-worker.js'
@@ -154,7 +154,7 @@ gulp.task('copy-assets', function() {
     IOWA.appDir + '/elements/webgl-globe/shaders/*.{frag,vert}',
     IOWA.appDir + '/elements/webgl-globe/textures/*.{jpg,png}',
     IOWA.appDir + '/bower_components/webcomponentsjs/webcomponents.min.js',
-    IOWA.appDir + '/bower_components/es6-promise-2.0.1.min/index.js',
+    IOWA.appDir + '/bower_components/es6-promise/dist/es6-promise.min.js',
     IOWA.appDir + '/bower_components/elevator/demo/music/*',
     DIST_EXPERIMENT_DIR + '/**/*'
   ], {base: './'});
@@ -174,7 +174,7 @@ gulp.task('concat-and-uglify-js', ['js', 'generate-page-metadata'], function() {
     '../bower_components/moment/moment.js',
     '../bower_components/moment-timezone/builds/moment-timezone-with-data.min.js',
     'helper/util.js',
-    '../bower_components/es6-promise-2.0.1.min/index.js',
+    '../bower_components/es6-promise/dist/es6-promise.min.js',
     'helper/auth.js',
     'helper/page-animation.js',
     'helper/elements.js',
