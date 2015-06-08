@@ -166,5 +166,5 @@ Configuration is in wct.conf.js.
 
 To run tests, run:
 
-    wct
+    node_modules/web-component-tester/bin/wct
 
