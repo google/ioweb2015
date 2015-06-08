@@ -33,8 +33,6 @@ var opn = require('opn');
 var glob = require('glob');
 var pagespeed = require('psi');
 
-require('web-component-tester').gulp.init(gulp);
-
 var generateServiceWorker = require('./gulp_scripts/service-worker');
 var backend = require('./gulp_scripts/backend');
 

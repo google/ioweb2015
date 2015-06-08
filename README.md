@@ -164,7 +164,11 @@ Frontend tests are run via https://github.com/Polymer/web-component-tester
 
 Configuration is in wct.conf.js.
 
-To run tests, run:
+To run tests, install wct globally:
 
-    node_modules/web-component-tester/bin/wct
+    npm install -g web-component-tester
+
+and run:
+
+    wct
 
