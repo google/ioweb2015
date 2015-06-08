@@ -41,39 +41,10 @@ main {
   > div {
     min-height: 200px;
   }
-
-  .pics__section--under {
-    z-index: -1;
-    position: absolute;
-    left: 0;
-    width: 100%;
-
-    .photo__about {
-      background-image: url(../images/about/Image-04.jpg);
-    }
-  }
 }
 
 .card__photo--recap {
-  background-image: url(../images/about/Image-05.jpg);
-}
-
-.photo__about {
-  background-image: url(../images/about/Image-06.jpg);
-  background-position: 50% 0;
-  background-size: cover;
-}
-
-.photo__about--top {
-  background-image: url(../images/about/Image-01.jpg);
-  background-position: 100% 0;
-  background-size: cover;
-}
-
-.photo__about--bottom {
-  background-image: url(../images/about/Image-05.jpg);
-  background-position: 0 0;
-  background-size: cover;
+  background-image: url(../images/home/keynote2015.jpg);
 }
 
 @media (min-width: $tablet-breakpoint-min) {
@@ -85,10 +56,6 @@ main {
 
     > div {
       min-height: 745px;
-    }
-
-    .pics__section--under {
-      min-height: 640px; // FF
     }
   }
   #hashtag {
@@ -114,10 +81,6 @@ main {
 @media (min-width: $desktop-breakpoint-mid) {
   .pics__section {
     margin-top: -146px;
-
-    .pics__section--under {
-      min-height: 679px;
-    }
   }
   #hashtag {
     margin-top: -319px;
@@ -136,22 +99,8 @@ main {
 }
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-  .photo__about {
-    background-image: url(../images/about/Image-06@2x.jpg);
-  }
-  .photo__about--top {
-    background-image: url(../images/about/Image-01@2x.jpg);
-  }
-  .photo__about--bottom {
-    background-image: url(../images/about/Image-05@2x.jpg);
-  }
   .card__photo--recap {
-    background-image: url(../images/about/Image-05@2x.jpg);
-  }
-  .pics__section--under {
-    .photo__about {
-      background-image: url(../images/about/Image-04@2x.jpg) !important;
-    }
+    background-image: url(../images/home/keynote2015@2x.jpg);
   }
 }
 

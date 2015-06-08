@@ -25,17 +25,6 @@ $name: 'page-home';
 
 ##{$name} {
 
-// phase 4 live mode
-&.io-live-mode {
-  .bg-cyan {
-    color: white !important;
-  }
-  #navbar {
-    background: linear-gradient(to top, transparent, black);
-  }
-}
-// ----
-
 .masthead-container {
   max-width: 100% !important;
   .io-logo {
@@ -52,7 +41,7 @@ $name: 'page-home';
 }
 
 .photo__masthead {
-  background: url(../images/videos/keynote.jpg) no-repeat 50% 0;
+  background: url(../images/home/keynote2015.jpg) no-repeat 50% 30%;
   background-size: cover;
 }
 
@@ -71,58 +60,6 @@ $name: 'page-home';
   height: 60px;
 }
 
-// .home-photo {
-//   background: url(../images/home/Image-01.jpg) no-repeat 50% 0;
-//   background-size: cover;
-//   height: 310px;
-// }
-
-// .page__section--attend {
-//   position: relative;
-//   color: #fff;
-//   padding-left: 0;
-//   padding-right: 0;
-//   padding-bottom: 0;
-
-//   // &.no-webgl {
-//   //   @extend .bg-globe;
-//   // }
-
-//   h2 {
-//     padding: 0 $mobileKeyline 0 $mobileKeyline;
-//   }
-
-//   // name-cycler {
-//   //   color: $color-cyan-A400;
-//   //   vertical-align: top;
-//   // }
-
-//   // .attend__globe {
-//   //   .globe-marker {
-//   //     position: absolute;
-//   //     left: 0;
-//   //     right: 0;
-//   //     margin: 0 auto;
-//   //     color: #eeff41;
-//   //     transition: all 400ms cubic-bezier(0,0,0.2,1);
-//   //     opacity: 1;
-//   //   }
-//   // }
-// }
-
-// .card__photo--plan {
-//   background-image: url(../images/home/moscone-500.jpg);
-//   border-top-left-radius: inherit;
-//   border-top-right-radius: inherit;
-//   min-height: 200px;
-// }
-
-// .registration__card {
-//   core-icon {
-//     margin-right: 15px;
-//   }
-// }
-
 #join {
   h2 {
     max-width: 230px;
@@ -139,15 +76,6 @@ $name: 'page-home';
   }
 }
 
-// #countdown-container {g
-//   countdown-timer {
-//     top: 0;
-//     left: 0;
-//     width: 100%;
-//     height: 100%;
-//   }
-// }
-
 .pics__section {
   height: 310px;
   padding: 0;
@@ -158,19 +86,19 @@ $name: 'page-home';
 }
 
 .photo__home {
-  background-image: url(../images/home/Image-Gallery-01.jpg);
+  background-image: url(../images/home/home1.jpg);
   background-position: 50% 0;
   background-size: cover;
 }
 
 .photo__home--top {
-  background-image: url(../images/home/Image-Gallery-02.jpg);
+  background-image: url(../images/home/home2.jpg);
   background-position: 100% 0;
   background-size: cover;
 }
 
 .photo__home--bottom {
-  background-image: url(../images/home/Image-Gallery-03.jpg);
+  background-image: url(../images/home/home3.jpg);
   background-position: 0 0;
   background-size: cover;
 }
@@ -240,37 +168,10 @@ $name: 'page-home';
       margin-right: -$mobileKeyline;
     }
   }
-
-  // name-cycler {
-  //   min-width: 160px;
-  // }
-  // .registration__card {
-  //   .card {
-  //     border-bottom: 1px solid $color-light-grey-border;
-  //   }
-  // }
-  // .attend__globe {
-  //   .globe-marker {
-  //     $transformY: 98px;
-  //     width: 36px;
-  //     height: 36px;
-  //     transform: translate3d(0, -$transformY, 0);
-
-  //     &.up {
-  //       transform: translate3d(0, -$transformY - 25, 0);
-  //       opacity: 0;
-  //     }
-
-  //   }
-  // }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
   $overlayCardTop: 153px;
-
-  // #countdown-container {
-  //   top: -$navbarHeight - 80px;
-  // }
 
   .io__hash {
     margin: 80px auto;
@@ -284,9 +185,8 @@ $name: 'page-home';
   }
 
   .page__section--featured {
-    // height: 745px;
-    margin-top: -167px;
-    padding-top: calc(167px + 40px);
+    margin-top: -103px;
+    padding-top: calc(103px + 40px);
 
     .featured__videos {
       margin-left: -$desktopKeyline;
@@ -304,14 +204,6 @@ $name: 'page-home';
         }
       }
     }
-
-    // .registration__setreminder {
-    //   background: #fff;
-    //   color: $color-cyan-A700;
-    //   position: absolute;
-    //   top: 40px;
-    //   right: $desktopKeyline;
-    // }
   }
 
   .pics__section {
@@ -323,22 +215,6 @@ $name: 'page-home';
     }
   }
 
-  // .page__section--attend {
-  //   margin-bottom: -105px;
-  // }
-  // .attend__globe {
-  //   .globe-marker {
-  //     $transformY: 262px;
-  //     width: 48px;
-  //     height: 48px;
-  //     transform: translate3d(0, -$transformY, 0);
-
-  //     &.up {
-  //       transform: translate3d(0, -$transformY - 25, 0);
-  //       opacity: 0;
-  //     }
-  //   }
-  // }
   #join {
     position: relative;
     margin-top: -112px;
@@ -354,8 +230,8 @@ $name: 'page-home';
 
 @media (min-width: $tablet-breakpoint-min) and (max-width: $tablet-breakpoint-mid) {
   .page__section--featured {
-    margin-top: -167px;
-    padding-top: calc(167px + 40px);
+    margin-top: -135px;
+    padding-top: calc(135px + 40px);
   }
 }
 
@@ -363,19 +239,14 @@ $name: 'page-home';
   $overlayCardTop: 181px;
 
   .page__section--featured {
-    margin-top: -147px;
+    margin-top: -111px;
 
     .featured__videos {
       margin-left: -$largeKeyline;
       margin-right: -$largeKeyline;
     }
   }
-  // .page__section--attend {
-  //   padding-top: $largeKeyline + $desktopKeyline;
-  //   h2 {
-  //     padding: 0 $largeKeyline 0 $largeKeyline;
-  //   }
-  // }
+
   #join {
     margin-top: -120px;
     padding-top: $overlayCardTop;
@@ -391,24 +262,9 @@ $name: 'page-home';
   }
 }
 
-@media (min-width: $desktop-breakpoint-max) {
-  // .page__section--attend {
-  //   margin-bottom: -105px;
-  // }
-}
-
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-  // .card__photo--plan  {
-  //   background-image: url(../images/home/moscone-500@2x.jpg);
-  // }
-  .photo__home {
-    background-image: url(../images/home/Image-Gallery-01@2x.jpg);
-  }
-  .photo__home--top {
-    background-image: url(../images/home/Image-Gallery-02@2x.jpg);
-  }
-  .photo__home--bottom {
-    background-image: url(../images/home/Image-Gallery-03@2x.jpg);
+  .photo__masthead {
+    background-image: url(../images/home/keynote2015@2x.jpg);
   }
 }
 

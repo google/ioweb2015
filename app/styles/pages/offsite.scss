@@ -30,7 +30,7 @@ $icon-margin: 10px;
 }
 
 .photo__masthead {
-  background: url(../images//offsite/Recap-Video-Image.jpg) no-repeat 50% 50%;
+  background: url(../images/offsite/offsitesundar.jpg) no-repeat 50% 50%;
   background-size: cover;
 }
 
@@ -44,19 +44,19 @@ $icon-margin: 10px;
 }
 
 .photo__home {
-  background-image: url(../images/offsite/Image-01@2x.jpg);
+  background-image: url(../images/offsite/offsitegroup.jpg);
   background-position: 50% 50%;
   background-size: cover;
 }
 
 .photo__home--top {
-  background-image: url(../images/offsite/Image-03@2x.jpg);
+  background-image: url(../images/offsite/offsitecity.jpg);
   background-position: 50% 0;
   background-size: cover;
 }
 
 .photo__home--bottom {
-  background-image: url(../images/offsite/Image-02@2x.jpg);
+  background-image: url(../images/offsite/offsiteshri.jpg);
   background-position: 50% 0;
   background-size: cover;
 }
@@ -319,21 +319,6 @@ google-youtube {
     .marker-results {
       left: $largeKeyline;
     }
-  }
-}
-
-@media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-  .photo__masthead {
-    background-image: url(../images/offsite/Recap-Video-Image@2x.jpg);
-  }
-  .photo__home {
-    background-image: url(../images/offsite/Image-01@2x.jpg);
-  }
-  .photo__home--top {
-    background-image: url(../images/offsite/Image-03@2x.jpg);
-  }
-  .photo__home--bottom {
-    background-image: url(../images/offsite/Image-02@2x.jpg);
   }
 }
 

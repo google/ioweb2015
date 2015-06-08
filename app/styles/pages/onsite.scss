@@ -41,7 +41,7 @@ $name: 'page-onsite';
 }
 
 .onsite__pic--reg {
-  background-image: url(../images/onsite/Image-05.jpg);
+  background-image: url(../images/onsite/onsitedude.jpg);
 }
 
 #traveldetails,
@@ -94,19 +94,19 @@ $name: 'page-onsite';
 }
 
 .photo__afterhours {
-  background-image: url(../images/onsite/Image-02.jpg);
+  background-image: url(../images/onsite/onsite_large.jpg);
   background-position: 50% 50%;
   background-size: cover;
 }
 
 .photo__afterhours--top {
-  background-image: url(../images/onsite/Image-03.jpg);
+  background-image: url(../images/onsite/onsite2.jpg);
   background-position: 100% 50%;
   background-size: cover;
 }
 
 .photo__afterhours--bottom {
-  background-image: url(../images/onsite/Image-04.jpg);
+  background-image: url(../images/onsite/onsite3.jpg);
   background-position: 100% 50%;
   background-size: cover;
 }
@@ -198,24 +198,5 @@ $name: 'page-onsite';
     margin-top: -42px;
   }
 }
-
-// @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-//   .onsite__pic {
-//     background-image: url(../images/onsite/Image-01@2x.jpg);
-//   }
-//   .onsite__pic--reg {
-//     background-image: url(../images/onsite/Image-05@2x.jpg);
-//   }
-//   .photo__afterhours {
-//     background-image: url(../images/onsite/Image-02@2x.jpg);
-//   }
-//   .photo__afterhours--top {
-//     background-image: url(../images/onsite/Image-03@2x.jpg);
-//   }
-//   .photo__afterhours--bottom {
-//     background-image: url(../images/onsite/Image-04@2x.jpg);
-//   }
-// }
-
 
 }
