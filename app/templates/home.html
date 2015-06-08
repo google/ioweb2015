@@ -91,7 +91,7 @@
         <div class="featured__videos" layout horizontal>
           <template repeat="{{session in scheduleData.sessions | featuredSessionsFilter}}">
             <div class="item">
-              <div class="card card__video js-experiment-visualizer"
+              <div class="card card__video"
                    data-videoid="{{session.youtubeUrl}}" data-videoimg="{{session.photoUrl}}"
                    on-tap="{{openVideo}}">
                 <div class="card__photo" relative>

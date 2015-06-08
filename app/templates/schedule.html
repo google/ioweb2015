@@ -489,10 +489,9 @@
         IOWA.Elements.Template.scheduleFetchingUserData = false;
         IOWA.Elements.Template.startScheduleVideo = false;
 
-        ioScheduleEl = ioScheduleEl || document.querySelector('io-schedule');
-
         // Wait 1 rAF for template to stamp.
         IOWA.Elements.Template.async(function() {
+          ioScheduleEl = document.querySelector('io-schedule');
           detailsPanel = document.querySelector('.session__detail');
           detailsPanel.querySelector('core-image').classList.remove('fadeout');
           detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');

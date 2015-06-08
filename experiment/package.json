@@ -17,7 +17,7 @@
     "autoprefixer-loader": "^1.1.0",
     "compression-webpack-plugin": "^0.1.2",
     "css-loader": "^0.9.1",
-    "es6-promise": "^2.0.1",
+    "es6-promise": "^2.1.1",
     "es6-set": "^0.1.1",
     "es6-symbol": "^2.0.1",
     "exports-loader": "^0.6.2",
