@@ -1,0 +1,16 @@
+sudo: false
+language: node
+cache:
+  directories:
+    - node_modules
+    - experiment/node_modules
+    - app/bower_components
+install:
+  - npm install -q
+  - npm install -g gulp
+  - gulp bower
+  - gulp godeps
+script:
+  - gulp
+  - gulp backend:test
+
