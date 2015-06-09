@@ -349,13 +349,12 @@ IOWA.PageAnimation = (function() {
   /**
    * Slides in the content of the page.
    */
-  function playPageSlideIn () {
+  function playPageSlideIn() {
     return new Promise(function(resolve, reject) {
       // Wait 1 rAF for DOM to settle.
       IOWA.Elements.Template.async(function() {
         // Hide the masthead ripple before proceeding with page transition.
-        play(
-            elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
+        play(elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
         play(pageSlideIn(), function() {
           resolve();
         });

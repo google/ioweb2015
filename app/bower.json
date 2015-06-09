@@ -65,7 +65,7 @@
     "paper-toast": "Polymer/paper-toast#^0.5.6",
     "polymer": "Polymer/polymer#^0.5.6",
     "shed": "wibblymat/shed#^1.0.0",
-    "es6-promise": "jakearchibald/es6-promise#0003ca2ad5626323e7e01d55c646f8622d5a8d81",
+    "es6-promise": "jakearchibald/es6-promise#^2.2.0",
     "web-animations-js": "web-animations/web-animations-js#^1.0.7",
     "moment": "~2.10.2",
     "moment-timezone": "~0.3.1",

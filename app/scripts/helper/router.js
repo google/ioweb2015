@@ -302,7 +302,7 @@ IOWA.Router_ = function(window) {
     var transition = transitionAttribute || 'page-slide-transition';
     var router = this;
     // Start transition.
-    this.t.fire('page-transition-start');
+    router.t.fire('page-transition-start');
     // Play exit sequence.
     IOWA.PageAnimation[Router.pageExitTransitions[transition]](
         this.state.start.page, this.state.end.page, e, source)
@@ -332,9 +332,12 @@ IOWA.Router_ = function(window) {
       .then(IOWA.PageAnimation[Router.pageEnterTransitions[transition]])
       .then(function() {
         // End transition.
-        this.t.fire('page-transition-done');
+        router.t.fire('page-transition-done');
         // Run page's custom onPageTransitionDone handlers.
         router.runPageHandler('onPageTransitionDone', router.state.current.page);
+      }).catch(function(e) {
+        console.error(e);
+        IOWA.Util.reportError(e);
       });
   };
 
