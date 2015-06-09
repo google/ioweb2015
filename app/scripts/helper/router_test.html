@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./../bower_components/web-component-tester/browser.js"></script>
+
+  <script src="../main.js"></script>
+  <script src="util.js"></script>
+  <script src="router.js"></script>
+</head>
+<body>
+
+  <div id="iowa-elements-main">
+    <div class="subpage-day1"></div>
+    <div class="subpage-day2"></div>
+  </div>
+  <script>
+    suite('IOWA.Router_', function() {
+
+      var url, mockWindow, router;
+
+      suiteSetup(function() {
+        url = 'https://events.google.com/io2015/schedule' +
+            '?sid=2276bd7d-0ee9-e411-b87f-00155d5066d7' +
+            '#day2/2276bd7d-0ee9-e411-b87f-00155d5066d7';
+        mockWindow = {
+          PREFIX: '/io2015',
+          addEventListener: function() {},
+          location: {
+            href: url,
+            origin: 'https://events.google.com'
+          }
+        };
+        IOWA.Elements = {
+          Main: document.querySelector('#iowa-elements-main')
+        }
+      });
+
+      setup(function() {
+        router = IOWA.Router_(mockWindow);
+      });
+
+      test('parseUrl', function() {
+        router.init();
+        var parsedUrl = router.parseUrl(url);
+        expect(parsedUrl.page).to.be.equal('schedule');
+        expect(parsedUrl.subpage).to.be.equal('day2');
+        expect(parsedUrl.resourceId).to.be.equal(
+            '2276bd7d-0ee9-e411-b87f-00155d5066d7');
+        expect(parsedUrl.params.sid).to.be.equal(
+            '2276bd7d-0ee9-e411-b87f-00155d5066d7');
+        expect(parsedUrl.pathname).to.be.equal('/io2015/schedule');
+        expect(parsedUrl.search).to.be.equal(
+            '?sid=2276bd7d-0ee9-e411-b87f-00155d5066d7');
+        expect(parsedUrl.hash).to.be.equal(
+            '#day2/2276bd7d-0ee9-e411-b87f-00155d5066d7');
+        expect(parsedUrl.href).to.be.equal(url);
+      });
+
+      test('init sets up router state', function() {
+        router.init();
+        expect(router).to.have.property('state');
+        expect(router.state.current).to.have.property('page').and.equal('schedule');
+        expect(router.state.start).to.be.null;
+        expect(router.state.end).to.be.null;
+      });
+
+      test('init sets up template', function() {
+        var template = 'mock template';
+        router.init(template);
+        expect(router).to.have.property('t').and.equal(template);
+      });
+
+      test('navigate runs page transition', function() {
+        router.init();
+        var newUrl = 'https://events.google.com/io2015/videos';
+        router.runPageTransition = sinon.spy();
+        router.navigate(newUrl);
+        expect(router.runPageTransition.called).to.be.true;
+      });
+
+      test('navigate runs subpage transition', function() {
+        router.init();
+        var newUrl = 'https://events.google.com/io2015/schedule#day1';
+        router.runPageTransition = sinon.spy();
+        router.runSubpageTransition = sinon.spy();
+        router.navigate(newUrl);
+        expect(router.runPageTransition.called).to.be.false;
+        expect(router.runSubpageTransition.called).to.be.true;
+      });
+
+      test('navigate ignores navigation to the same page', function() {
+        router.init();
+        var newUrl = 'https://events.google.com/io2015/schedule#day2';
+        router.runPageTransition = sinon.spy();
+        router.runSubpageTransition = sinon.spy();
+        router.navigate(newUrl);
+        expect(router.runPageTransition.called).to.be.false;
+        expect(router.runSubpageTransition.called).to.be.false;
+      });
+
+      test('navigate updates router state', function() {
+        router.init();
+        var newUrl = 'https://events.google.com/io2015/videos?filters=somefilters#section';
+        router.runPageTransition = sinon.spy();
+        router.runSubpageTransition = sinon.spy();
+        router.navigate(newUrl);
+
+        expect(router.state.start.page).to.equal('schedule');
+        expect(router.state.current.page).to.equal('schedule');
+        expect(router.state.end.page).to.equal('videos');
+
+        expect(router.state.start.subpage).to.equal('day2');
+        expect(router.state.current.subpage).to.equal('day2');
+        expect(router.state.end.subpage).to.equal('section');
+
+        expect(router.state.start.params.sid).to.equal(
+            '2276bd7d-0ee9-e411-b87f-00155d5066d7');
+        expect(router.state.current.params.sid).to.equal(
+            '2276bd7d-0ee9-e411-b87f-00155d5066d7');
+        expect(router.state.end.params.filters).to.equal('somefilters');
+      });
+
+      test('runSubpageTransition', function() {
+        // Set up mocks.
+        var template = {
+          fire: sinon.spy()
+        };
+        var stubPromise = {
+          then: function(resolve, reject) {
+            return resolve();  // Promise-like, always resolves positively.
+          }
+        };
+        IOWA.PageAnimation = {
+          playSectionSlideOut: sinon.stub().returns(stubPromise),
+          playSectionSlideIn: sinon.stub().returns(stubPromise)
+        };
+        var mockUpdateUIstate = sinon.stub(router, 'updateUIstate').returns(
+            stubPromise);
+        var mockRunPageHandler = sinon.stub(router, 'runPageHandler').returns(
+            stubPromise);
+        // Run test.
+        router.init(template);
+        var newUrl = 'https://events.google.com/io2015/schedule#day1';
+        router.navigate(newUrl);
+        expect(IOWA.PageAnimation.playSectionSlideOut.called).to.be.true;
+        expect(router.updateUIstate.called).to.be.true;
+        expect(IOWA.PageAnimation.playSectionSlideIn.called).to.be.true;
+        expect(router.runPageHandler.called).to.be.true;
+        // Reset.
+        router.updateUIstate.restore();
+        router.runPageHandler.restore();
+        IOWA.PageAnimation = null;
+      });
+    });
+  </script>
+</body>
+</html>

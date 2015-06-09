@@ -68,6 +68,7 @@
   }
 
   function afterImports() {
+    IOWA.Router = IOWA.Router_(window);
     IOWA.Elements.init();
     IOWA.Router.init(IOWA.Elements.Template);
     IOWA.Notifications.init();
