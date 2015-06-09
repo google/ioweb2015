@@ -73,6 +73,8 @@
   },
   "resolutions": {
     "web-animations-js": "1.0.7",
-    "webcomponentsjs": "^0.6.1"
+    "webcomponentsjs": "^0.6.1",
+    "google-apis": "^0.4.4",
+    "polymer": "^0.5.6"
   }
 }
