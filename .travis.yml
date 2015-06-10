@@ -9,7 +9,7 @@ cache:
     - app/bower_components
 install:
   - mkdir $HOME/go
-  - [ -d $HOME/google-cloud-sdk ] || util/gcloud-install
+  - . util/gcloud-install && install_or_update_gcloud
   - npm install -q
   - npm install -g gulp
   - gulp bower
