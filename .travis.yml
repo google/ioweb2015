@@ -1,11 +1,14 @@
 sudo: false
 language: node
+env:
+  - GOPATH=$HOME/go
 cache:
   directories:
     - node_modules
     - experiment/node_modules
     - app/bower_components
 install:
+  - mkdir $HOME/go
   - npm install -q
   - npm install -g gulp
   - gulp bower
