@@ -5,7 +5,7 @@ env:
 cache:
   directories:
     - node_modules
-    - experiment/node_modules
+      #- experiment/node_modules
     - app/bower_components
     - $HOME/google-cloud-sdk
 install:
@@ -16,7 +16,7 @@ install:
   - gulp bower
   - gulp godeps
 script:
-  - gulp
+  - gulp; experiment/node_modules/webpack/bin/webpack.js --version
   - gulp backend:test
   - gulp backend:test --gae
 
