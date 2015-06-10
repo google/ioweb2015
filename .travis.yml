@@ -16,7 +16,7 @@ install:
   - gulp bower
   - gulp godeps
 script:
-  - gulp; experiment/node_modules/webpack/bin/webpack.js --version
+  - '$(gulp || 0) && experiment/node_modules/webpack/bin/webpack.js --version'
   - gulp backend:test
   - gulp backend:test --gae
 
