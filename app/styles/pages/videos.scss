@@ -125,9 +125,6 @@ core-list {
 
 main {
   paper-dialog {
-    height: 167px;
-    width: calc(100vw - 64px);
-
     paper-icon-button {
       z-index: 10;
       color: white;
@@ -176,12 +173,6 @@ main {
   .videolist__wrapper {
     height: 200vh;
   }
-  main {
-    paper-dialog {
-      width: 704px;
-      height: 396px;
-    }
-  }
 }
 
 @media (min-width: $desktop-breakpoint-min) {
@@ -192,21 +183,6 @@ main {
   .card__video {
     .card__photo {
       height: 387px;
-    }
-  }
-  main {
-    paper-dialog {
-      width: 896px;
-      height: 504px
-    }
-  }
-}
-
-@media (min-width: $desktop-breakpoint-max) {
-  main {
-    paper-dialog {
-      width: 1024px;
-      height: 575px;
     }
   }
 }

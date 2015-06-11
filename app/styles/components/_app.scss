@@ -365,8 +365,8 @@ paper-progress {
 }
 
 .video_overlay-dialog {
-  height: 360px;
-  width: calc(100vw - 64px);
+  height: 100%;
+  width: 100%;
 
   paper-icon-button {
     z-index: 10;
@@ -383,11 +383,6 @@ paper-progress {
   }
   .attend__globe {
     height: 150px;
-  }
-  .video_overlay-dialog {
-    margin: 0;
-    height: 203px;
-    width: 100%;
   }
 }
 
@@ -419,10 +414,6 @@ paper-progress {
     margin-top:  $desktopKeyline;
     height: 500px;
   }
-  .video_overlay-dialog {
-    width: 704px;
-    height: 396px;
-  }
   h1 {
     @include typo-heading-1();
     font-size: 48px;
@@ -430,14 +421,6 @@ paper-progress {
     line-height: 56px;
   }
   // Rest of heading are same as mobile.
-}
-
-
-@media (min-width: $desktop-breakpoint-min) {
-  .video_overlay-dialog {
-    width: 896px;
-    height: 504px
-  }
 }
 
 @media (min-width: $desktop-breakpoint-mid) {
@@ -479,13 +462,6 @@ paper-progress {
     font-size: 16px;
     line-height: 24px;
     font-weight: 500;
-  }
-}
-
-@media (min-width: $desktop-breakpoint-max) {
-  .video_overlay-dialog {
-    width: 1024px;
-    height: 575px;
   }
 }
 
