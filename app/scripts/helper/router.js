@@ -206,7 +206,10 @@ IOWA.Router_ = function(window) {
           templateToReplace.setAttribute('ref', template.id);
         }
       }
-      resolve();
+      // Wait for the template ref= to settle.
+      IOWA.Elements.Template.async(function() {
+        resolve();
+      });
     });
   };
 
