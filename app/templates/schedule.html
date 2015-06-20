@@ -109,11 +109,11 @@
   </div>
   <div class="session__info__section session__info__links card-content"
       layout horizontal justified?="{{isPhoneSize}}"
-      hidden?="{{selectedSession.id == '__afterhours__'}}">
+      hidden?="{{selectedSession.id == '__afterhours__' || (!isSessionFinishedFilter(selectedSession) && !selectedSession.hasRelated)}}">
     <span class="anchor-like" role="link" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related"
         core-overlay-toggle hidden?="{{!selectedSession.hasRelated}}">View related content</span>
     <span class="anchor-like" on-click="{{onRateSession}}" role="link"
-        data-track-link="schedule-rate-session" hidden?="{{selectedSession.rated || selectedSession.id == '__afterhours__'}}">Rate session</span>
+        data-track-link="schedule-rate-session" hidden?="{{selectedSession.rated || selectedSession.id == '__afterhours__' || !isSessionFinishedFilter(selectedSession) }}">Rate session</span>
     <span class="anchor-like-disabled" hidden?="{{!selectedSession.rated}}">Session rated</span>
   </div>
 </paper-dialog>
@@ -134,12 +134,12 @@
     <p>Session rating</p>
     <div>
       <div>
-        <core-menu layout selected="{{answers.overall}}" horizontal justified>
-          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon"></paper-icon-button>
+        <core-menu layout selected="{{answers.overall}}" valueattr="value" horizontal justified>
+          <paper-icon-button value="1" icon="star" class="rate__icon"></paper-icon-button>
+          <paper-icon-button value="2" icon="star" class="rate__icon"></paper-icon-button>
+          <paper-icon-button value="3" icon="star" class="rate__icon"></paper-icon-button>
+          <paper-icon-button value="4" icon="star" class="rate__icon"></paper-icon-button>
+          <paper-icon-button value="5" icon="star" class="rate__icon"></paper-icon-button>
         </core-menu>
       </div>
       <div class="rate__hint" layout horizontal justified>
@@ -152,12 +152,12 @@
     <p>How relevant was this session to your projects?</p>
     <div>
       <div>
-        <core-menu selected="{{answers.relevance}}" layout horizontal justified>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+        <core-menu selected="{{answers.relevance}}" valueattr="value" layout horizontal justified>
+          <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+          <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+          <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+          <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+          <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
         </core-menu>
       </div>
       <div class="rate__hint" layout horizontal justified>
@@ -170,12 +170,12 @@
     <p>Based on the description/my expectations, the content was</p>
     <div>
       <div>
-        <core-menu selected="{{answers.content}}" layout horizontal justified>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+        <core-menu selected="{{answers.content}}" valueattr="value" layout horizontal justified>
+          <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+          <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+          <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+          <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+          <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
         </core-menu>
       </div>
       <div class="rate__hint" layout horizontal justified>
@@ -188,12 +188,12 @@
     <p>Speaker quality</p>
     <div>
       <div>
-        <core-menu selected="{{answers.speaker}}" layout horizontal justified>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
-          <paper-icon-button icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+        <core-menu selected="{{answers.speaker}}" valueattr="value" layout horizontal justified>
+          <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+          <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+          <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+          <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+          <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
         </core-menu>
       </div>
       <div class="rate__hint" layout horizontal justified>
@@ -203,8 +203,9 @@
     </div>
   </div>
   <div class="session__info__section session__info__links card-content">
-    <span class="anchor-like" on-click="{{onRateSessionSubmit}}" role="link"
-        data-track-link="schedule-rate-submit" core-overlay-toggle>Submit</span>
+    <span class="anchor-like"
+        disabled?="{{ !answers.overall && !answers.relevance && !answers.content && !answers.speaker}}" on-click="{{onRateSessionSubmit}}" role="link"
+        data-track-link="schedule-rate-submit" core-overlay-toggle?="{{ answers.overall || answers.relevance || answers.content || answers.speaker}}">Submit {{answers.speaker}}</span>
   </div>
 </paper-dialog>
 
@@ -611,6 +612,9 @@
       };
 
       IOWA.Elements.Template.onRateSessionSubmit = function(e, detail, sender) {
+        if (sender.hasAttribute('disabled')) {
+          return;
+        }
         IOWA.Schedule.saveSurvey(this.selectedSession.id, this.answers).then(function() {
           this.selectedSession.rated = true;
         }.bind(this));

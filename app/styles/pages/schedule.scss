@@ -205,6 +205,13 @@ core-icon[icon="schedule"] {
     }
   }
 
+  .anchor-like-disabled,
+  .anchor-like[disabled] {
+    color: $color-session-detail-light-grey;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
   .rate__icon-empty {
     color: $color-text;
   }
