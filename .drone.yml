@@ -1,25 +1,29 @@
-image: crhym3/ci
-git:
+clone:
   depth: 1
-script:
-  # workaround for cache, see https://github.com/drone/drone/issues/147
-  - mkdir -p /cache/npm /cache/bower /cache/node_modules
-  - npm config set cache /cache/npm
-  - rm -rf app/bower_components && ln -s /cache/bower app/bower_components
-  - rm -rf node_modules experiment/node_modules
-  - ln -s /cache/node_modules node_modules
-  - ln -s /cache/node_modules experiment/node_modules
-  # install dependencies
-  - npm -q install
-  - cd app && ../node_modules/bower/bin/bower install -q --allow-root && cd ..
-  - gulp godeps
-  # ensure the build works
-  - gulp
-  # backend testing
-  - gulp backend:test
-  - gulp backend:test --gae
-  # deploy to appspot if this is master branch
-  - util/auto-deploy
 cache:
-  - /cache
-
+  mount:
+    - node_modules
+    - experiment/node_modules
+    - app/bower_components
+build:
+  image: crhym3/ci-image
+  environment:
+    - GAE_SDK_URL=https://storage.googleapis.com/appengine-sdks/featured/go_appengine_sdk_linux_amd64-1.9.28.zip
+  commands:
+    # install dependencies
+    - npm -q install
+    - cd app && ../node_modules/bower/bin/bower install -q --allow-root && cd ..
+    - gulp godeps
+    # ensure the build works
+    - gulp
+    # backend testing
+    - gulp backend:test
+    - curl -sSLo sdk.zip $GAE_SDK_URL && unzip -q sdk.zip
+    - go_appengine/goapp test ./backend
+deploy:
+  bash:
+    when:
+      owner: GoogleChrome
+      branch: master
+    script:
+      - util/auto-deploy
