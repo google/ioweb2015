@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-@import 'base/_breakpoints';
-@import 'base/_color';
-@import 'base/_typography';
-@import 'base/_layout';
+@import 'base/breakpoints';
+@import 'base/color';
+@import 'base/typography';
+@import 'base/layout';
 
-@import 'base/forms_sd';
+@import 'base/forms_sd.scss';
 
-core-drawer-panel::shadow {
+paper-drawer-panel::shadow {
   #drawer {
     z-index: 100; // TODO: stick in _zindex.scss
   }

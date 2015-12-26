@@ -16,11 +16,11 @@
 
 $name: 'page-videos';
 
-@import '../base/_vars';
-@import '../base/_color';
-@import '../base/_breakpoints';
-@import '../base/_typography';
-@import '../base/_layout';
+@import '../base/vars';
+@import '../base/color';
+@import '../base/breakpoints';
+@import '../base/typography';
+@import '../base/layout';
 
 
 ##{$name} {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-.io-logo {
+.io-logo:not(.style-scope) {
   background: url('../images/home/io-logo.png') no-repeat;
   background-size: contain;
   height: 40px;
@@ -64,8 +64,8 @@
     color: white;
   }
 
-  core-toolbar {
-    .io-logo {
+  paper-toolbar {
+    .io-logo:not(.style-scope) {
       margin-top: $mobileKeyline / 2;
       margin-left: $mobileKeyline / 2;
       display: inline-block;
@@ -337,7 +337,7 @@ paper-fab {
     > .profilepic {
       display: none;
     }
-    .io-logo {
+    .io-logo:not(.style-scope) {
       display: none;
     }
     paper-icon-button[focused] {
@@ -405,7 +405,7 @@ paper-fab {
 }
 
 @media (min-resolution: 2.0dppx), (-webkit-min-device-pixel-ratio: 2), (min-width: $tablet-breakpoint-min) {
-  .io-logo {
+  .io-logo:not(.style-scope) {
     background-image: url('../images/home/io-logo@2x.png');
   }
 }

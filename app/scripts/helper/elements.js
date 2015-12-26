@@ -21,6 +21,7 @@ IOWA.Elements = (function() {
     var signinIntroEl = document.querySelector('.card__signin-intro');
     var showSigninIntro = !JSON.parse(localStorage.getItem('showSigninIntro'));
     if (showSigninIntro) {
+// TODO: update for polymer 1.0 port
       signinIntroEl.addEventListener('core-overlay-close-completed', function(e) {
         e.stopPropagation();
         localStorage.setItem('showSigninIntro', JSON.stringify(true));
@@ -85,8 +86,8 @@ IOWA.Elements = (function() {
 
     var main = document.querySelector('.io-main');
 
-    var drawer = document.querySelector('core-drawer-panel');
-    drawer.addEventListener('core-activate', function(e) {
+    var drawer = document.querySelector('paper-drawer-panel');
+    drawer.addEventListener('iron-activate', function(e) {
       this.closeDrawer();
     });
 
@@ -408,7 +409,7 @@ IOWA.Elements = (function() {
       nav.classList.toggle('active');
     };
 
-    template.closeVideoCard = function(e, detail, sender) {
+    template.closeVideoCard = function(e, detail) {
       this.cardVideoTakeover(this.currentCard, true);
       this.toggleVideoOverlayNav();
     };
@@ -501,11 +502,11 @@ IOWA.Elements = (function() {
       }.bind(this);
     };
 
-    template.playVideo = function(e, detail, sender) {
-      this.currentCard = sender;
+    template.playVideo = function(e, detail) {
+      this.currentCard = Polymer.dom(e).rootTarget;
       this.fullscreenVideoActive = true; // Active the placeholder template.
 
-      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+      IOWA.Analytics.trackEvent('link', 'click', this.currentCard.getAttribute('data-track-link'));
 
       // Wait one rAF for template to have stamped.
       this.async(function() {
@@ -513,12 +514,12 @@ IOWA.Elements = (function() {
       });
     };
 
-    template.openVideo = function(e, detail, sender) {
-      this.currentCard = sender;
+    template.openVideo = function(e, detail) {
+      this.currentCard = Polymer.dom(e).rootTarget;
       this.fullscreenVideoActive = true; // Active the placeholder template.
 
       // Note: IE10 doesn't support .dataset.
-      var videoId = this.toVideoIdFilter(sender.getAttribute('data-videoid'));
+      var videoId = this.toVideoIdFilter(this.currentCard.getAttribute('data-videoid'));
 
       IOWA.Analytics.trackEvent('video', 'watch', videoId);
 
@@ -533,16 +534,16 @@ IOWA.Elements = (function() {
         }.bind(this));
 
         var thumbnail = videoContainer.querySelector('.fullvideo_thumbnail');
-        thumbnail.src = sender.getAttribute('data-videoimg'); // IE10 doesn't support .dataset.
+        thumbnail.src = this.currentCard.getAttribute('data-videoimg'); // IE10 doesn't support .dataset.
       });
     };
 
-    template.closeMastheadVideo = function(e, detail, sender) {
+    template.closeMastheadVideo = function(e, detail) {
       this.mastheadVideoActive = false;
     };
 
-    template.openMastheadVideo = function(e, detail, sender) {
-      IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+    template.openMastheadVideo = function(e, detail) {
+      IOWA.Analytics.trackEvent('link', 'click', Polymer.dom(e).rootTarget.getAttribute('data-track-link'));
 
       this.mastheadVideoActive = true; // stamp template
 
@@ -559,10 +560,10 @@ IOWA.Elements = (function() {
       });
     };
 
-    template.openShareWindow = function(e, detail, sender) {
+    template.openShareWindow = function(e, detail) {
       e.preventDefault();
 
-      var type = sender.getAttribute('data-share-type');
+      var type = Polymer.dom(e).rootTarget.getAttribute('data-share-type');
       var url = null;
       var width = 600;
       var height = 600;
@@ -572,7 +573,8 @@ IOWA.Elements = (function() {
       var title = document.title;
       var summary = null;
 
-      var selectedSession = sender.templateInstance.model.selectedSession;
+// TODO: update for polymer 1.0 port
+      var selectedSession = Polymer.dom(e).rootTarget.templateInstance.model.selectedSession;
       if (selectedSession) {
         title = selectedSession.title;
         summary = selectedSession.description;
@@ -623,8 +625,8 @@ IOWA.Elements = (function() {
 
     };
 
-    template.openSettings = function(e, detail, sender) {
-      var attr = sender.getAttribute('data-track-link');
+    template.openSettings = function(e, detail) {
+      var attr = Polymer.dom(e).rootTarget.getAttribute('data-track-link');
       if (attr) {
         IOWA.Analytics.trackEvent('link', 'click', attr);
       }
@@ -635,7 +637,7 @@ IOWA.Elements = (function() {
       this.selectedPage = 'home';
     };
 
-    template.backToTop = function(e, detail, sender) {
+    template.backToTop = function(e, detail) {
       e.preventDefault();
 
       // Audio from BenSound (http://www.bensound.com/) - Creative Commons.
@@ -653,7 +655,7 @@ IOWA.Elements = (function() {
       IOWA.A11y.focusNavigation();
     };
 
-    template.onCountdownTimerThreshold = function(e, detail, sender) {
+    template.onCountdownTimerThreshold = function(e, detail) {
       if (detail.label === 'Ended') {
         this.countdownEnded = true;
       }
@@ -681,11 +683,12 @@ IOWA.Elements = (function() {
       IOWA.Elements.GoogleSignIn.signOut();
     };
 
-    template.updateNotifyUser = function(e, detail, sender) {
+    template.updateNotifyUser = function(e, detail) {
       // Both these functions are asynchronous and return promises. Since there's no specific
       // callback or follow-up that needs to be performed once they complete, the returned promise
       // is ignored.
-      if (sender.checked) {
+      var target = Polymer.dom(e).rootTarget;
+      if (target.checked) {
         // subscribePromise() handles registering a subscription with the browser's push manager
         // and toggling the notify state to true in the backend via an API call.
         IOWA.Notifications.subscribePromise().then(function() {
@@ -715,7 +718,7 @@ IOWA.Elements = (function() {
     // global notifications are enabled, the current browser has a push subscription,
     // and window.Notification.permission === 'granted'.
     // Updates IOWA.Elements.GoogleSignIn.user.notify = false otherwise.
-    template.getNotificationState = function(e, detail, sender) {
+    template.getNotificationState = function(e, detail) {
       // The core-overlay-open event that invokes this is called once when the overlay opens, and
       // once when it closes. We only want this code to run when the overlay opens.
       // detail is true when the setting panel is opened, and false when it's closed.
@@ -754,17 +757,17 @@ IOWA.Elements = (function() {
       }
     };
 
-    template.shiftContentLeft = function(e, detail, sender) {
+    template.shiftContentLeft = function(e, detail) {
       IOWA.PageAnimation.shiftContentLeft(
           IOWA.Elements.Main.querySelector('.featured__videos'));
     };
 
-    template.shiftContentRight = function(e, detail, sender) {
+    template.shiftContentRight = function(e, detail) {
       IOWA.PageAnimation.shiftContentRight(
           IOWA.Elements.Main.querySelector('.featured__videos'));
     };
 
-    template.addEventListener('template-bound', updateElements);
+    template.addEventListener('dom-change', updateElements);
     template.addEventListener('page-transition-done', function(e) {
       this.pageTransitionDone = true;
       IOWA.Elements.NavPaperTabs.style.pointerEvents = '';
@@ -774,9 +777,29 @@ IOWA.Elements = (function() {
       IOWA.Elements.NavPaperTabs.style.pointerEvents = 'none';
     });
 
+    template._isPage= function(page, selectedPage) {
+      return page === selectedPage;
+    };
+
+    template._computeMastheadClass = function(pages, selectedPage) {
+      return pages[selectedPage].mastheadBgClass;
+    };
+
+    template._computeSignNavElementsCLass = function(isPhoneSize, pages, selectedPage) {
+      return isPhoneSize ? '' : pages[selectedPage].mastheadBgClass;
+    };
+
+    template._disableNotify = function(notify) {
+      return notify === null;
+    };
+
+    template._addClass = function(name, prop) {
+      return name ? prop : '';
+    };
+
     IOWA.Elements.Template = template;
     IOWA.Elements.ScrollContainer = document.querySelector(
-        'core-drawer-panel [main]');
+        'paper-drawer-panel [main]');
     template.ScrollContainer = IOWA.Elements.ScrollContainer;
   }
 

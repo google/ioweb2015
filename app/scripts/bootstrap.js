@@ -74,12 +74,9 @@
     IOWA.Notifications.init();
 
     initWorker();
-
-    CoreStyle.g.paperInput.labelColor = '#008094';
-    CoreStyle.g.paperInput.focusedColor = '#008094';
   }
 
-  window.addEventListener('core-media-change', function(e) {
+  window.addEventListener('iron-media-change', function(e) {
     // Disable swipping on tablet/desktop.
     if (e.target.id === 'mq-phone') {
       var isPhoneSize = e.detail.matches;
