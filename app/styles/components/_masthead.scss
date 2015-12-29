@@ -118,7 +118,7 @@
 }
 
 
-core-drawer-panel {
+paper-drawer-panel {
   [drawer] {
     font-size: 14px;
     font-weight: 500;
@@ -128,14 +128,14 @@ core-drawer-panel {
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
   }
-  core-toolbar .bottom {
+  paper-toolbar .bottom {
     font-size: 14px;
     line-height: 20px;
   }
   .drawer-panel-content {
     overflow: auto;
 
-    core-menu {
+    paper-menu {
       margin-left: 0;
       margin-right: 0;
     }
@@ -150,11 +150,7 @@ core-drawer-panel {
 
 #navbar {
   background-color: transparent;
-  height: $navbarHeight;
-
-  &.core-narrow {
-    height: $navbarHeightMobile;
-  }
+  // height: $navbarHeight;
 
   paper-tabs {
     display: none;

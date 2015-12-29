@@ -46,7 +46,7 @@ IOWA.PageAnimation = (function() {
    */
   function elementFadeOut(el, options) {
     options.fill = 'forwards'; // Always keep the state at the end of animation.
-    return new Animation(el, [{opacity: 1}, {opacity: 0}], options);
+    return new KeyframeEffect(el, [{opacity: 1}, {opacity: 0}], options);
   }
 
   /**
@@ -57,7 +57,7 @@ IOWA.PageAnimation = (function() {
    */
   function elementFadeIn(el, options) {
     options.fill = 'forwards'; // Always keep the state at the end of animation.
-    return new Animation(el, [{opacity: 0}, {opacity: 1}], options);
+    return new KeyframeEffect(el, [{opacity: 0}, {opacity: 1}], options);
   }
 
   /**
@@ -78,9 +78,9 @@ IOWA.PageAnimation = (function() {
       transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
       opacity: 0
     };
-    return new AnimationGroup([
-      new Animation(main, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
-      new Animation(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
+    return new GroupEffect([
+      new KeyframeEffect(main, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
+      new KeyframeEffect(mainDelayed, [start, end], CONTENT_SLIDE_OPTIONS),
     ]);
   }
 
@@ -102,9 +102,9 @@ IOWA.PageAnimation = (function() {
       transform: 'translate(0, 0)',
       opacity: 1
     };
-    return new AnimationGroup([
-      new Animation(main, [start, end], CONTENT_SLIDE_OPTIONS),
-      new Animation(mainDelayed, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
+    return new GroupEffect([
+      new KeyframeEffect(main, [start, end], CONTENT_SLIDE_OPTIONS),
+      new KeyframeEffect(mainDelayed, [start, end], CONTENT_SLIDE_DELAY_OPTIONS),
     ]);
   }
 
@@ -114,7 +114,7 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function contentSlideOut() {
-    return new AnimationGroup([
+    return new GroupEffect([
       sectionSlideOut(IOWA.Elements.Main),
       elementFadeOut(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
       elementFadeOut(IOWA.Elements.MastheadMetaCorner, CONTENT_SLIDE_OPTIONS),
@@ -129,7 +129,7 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function contentSlideIn() {
-    return new AnimationGroup([
+    return new GroupEffect([
       sectionSlideIn(IOWA.Elements.Main),
       elementFadeIn(IOWA.Elements.MastheadMetaCorner, CONTENT_SLIDE_OPTIONS),
       elementFadeIn(IOWA.Elements.Footer, CONTENT_SLIDE_DELAY_OPTIONS)
@@ -141,7 +141,7 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function navSlideOut() {
-    return new Animation(IOWA.Elements.Nav, [
+    return new KeyframeEffect(IOWA.Elements.Nav, [
        {transform: 'translateY(0)'},
        {transform: 'translateY(-100%)'}
     ], CONTENT_SLIDE_OPTIONS);
@@ -152,7 +152,7 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function navSlideIn() {
-    return new Animation(IOWA.Elements.Nav, [
+    return new KeyframeEffect(IOWA.Elements.Nav, [
        {transform: 'translateY(-100%)'},
        {transform: 'translateY(0)'}
     ], CONTENT_SLIDE_OPTIONS);
@@ -185,7 +185,7 @@ IOWA.PageAnimation = (function() {
       opacity: isFadeRipple ? 0 : 1,
       backgroundColor: color
     };
-    var animation = new Animation(ripple, [start, end], {
+    var animation = new KeyframeEffect(ripple, [start, end], {
       duration: duration,
       fill: 'forwards'  // Makes ripple keep its state at the end of animation
     });
@@ -206,7 +206,7 @@ IOWA.PageAnimation = (function() {
       section.style.display = '';
     }
     var slideInAnimation = section ? sectionSlideIn(section) : contentSlideIn();
-    return new AnimationGroup([
+    return new GroupEffect([
       slideInAnimation,
       elementFadeIn(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS)
     ], CONTENT_SLIDE_OPTIONS);
@@ -218,7 +218,7 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Ripple animation definition.
    */
   function pageSlideIn() {
-    var animationGroup =  new AnimationGroup([
+    var animationGroup =  new GroupEffect([
       contentSlideIn(),
       elementFadeIn(IOWA.Elements.MastheadMeta, CONTENT_SLIDE_OPTIONS),
     ], CONTENT_SLIDE_OPTIONS);
@@ -250,7 +250,7 @@ IOWA.PageAnimation = (function() {
 
     card.style.transformOrigin = '0 0';
     card.style.webkitTransformOrigin = '0 0';
-    var cardTransition = new Animation(card, [
+    var cardTransition = new KeyframeEffect(card, [
       {transform: 'translate3d(0, 0, 0) scale(1)'},
       {transform: [translate, scale].join(' ')}
     ], {
@@ -261,7 +261,7 @@ IOWA.PageAnimation = (function() {
     var mainDelayed = IOWA.Elements.Main.querySelector('.slide-up-delay');
 
     // First run the hero card takeover...
-    var animationGroup = new AnimationGroup([
+    var animationGroup = new GroupEffect([
       rippleEffect(ripple, x - rippleRect.left, y - rippleRect.top, duration),
       cardTransition,
       navSlideOut(),
@@ -269,7 +269,7 @@ IOWA.PageAnimation = (function() {
     ]);
 
     // ...then hide the content under the hero unit.
-    return new AnimationSequence([
+    return new SequenceEffect([
       animationGroup,
       elementFadeOut(IOWA.Elements.Ripple, {duration: 0}), // Hide instantly.
       elementFadeOut(IOWA.Elements.Footer, {duration: 0}),  // Same.
@@ -283,7 +283,7 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Ripple animation definition.
    */
   function pageCardTakeoverIn() {
-    return new AnimationGroup([
+    return new GroupEffect([
       pageSlideIn(),
       navSlideIn()
     ], CONTENT_SLIDE_OPTIONS);
@@ -299,7 +299,7 @@ IOWA.PageAnimation = (function() {
     // "translate3d(100px, 0px, 0px)" -> 100
     var lastX = transform ? parseInt(transform.split('(')[1].split(',')[0]) : 0;
 
-    var cardRect = container.lastElementChild.getBoundingClientRect();
+    var cardRect = container.querySelector('.item:last-of-type').getBoundingClientRect();
     var cardWidth = cardRect.width;
 
     var newX = lastX + cardWidth;
@@ -319,11 +319,13 @@ IOWA.PageAnimation = (function() {
     var lastX = transform ? parseInt(transform.split('(')[1].split(',')[0]) : 0;
 
     var containerWidth = container.getBoundingClientRect().width;
-    var cardRect = container.lastElementChild.getBoundingClientRect();
+    var cardRect = container.querySelector('.item:last-of-type').getBoundingClientRect();
+
     var lastCardRight = cardRect.right;
     var cardWidth = cardRect.width;
 
     var newX = lastX - cardWidth;
+
     if (lastCardRight > containerWidth) {
       container.style.transform = 'translate3d(' + newX + 'px, 0, 0)';
     }
@@ -381,7 +383,7 @@ IOWA.PageAnimation = (function() {
    */
   function playSectionSlideOut(section) {
     return new Promise(function(resolve, reject) {
-      play(new AnimationGroup([
+      play(new GroupEffect([
       sectionSlideOut(section),
       elementFadeOut(
           IOWA.Elements.Footer, {duration: 400})
@@ -394,7 +396,7 @@ IOWA.PageAnimation = (function() {
    */
   function playSectionSlideIn(section) {
     return new Promise(function(resolve, reject) {
-      play(new AnimationGroup([
+      play(new GroupEffect([
         sectionSlideIn(section),
         elementFadeIn(
             IOWA.Elements.Footer, {duration: 400})
@@ -426,7 +428,7 @@ IOWA.PageAnimation = (function() {
         contentSlideOut(),
       ];
 
-      var animation = new AnimationGroup(animGroup);
+      var animation = new GroupEffect(animGroup);
       play(animation, resolve);
     });
   }

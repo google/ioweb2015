@@ -167,6 +167,7 @@ limitations under the License.
   <!-- Page styles -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
   <link rel="stylesheet" href="styles/main.css">
+<!-- TODO: update for Polymer 1.0 -->
   <link rel="stylesheet" href="styles/main_sd.css" shim-shadowdom>
 
   <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
@@ -194,6 +195,9 @@ limitations under the License.
     [flex] {
       @apply(--layout-flex);
     }
+    [two] {
+      @apply(--layout-flex-2);
+    }
     [end-justified] {
       @apply(--layout-end-justified);
     }
@@ -202,6 +206,9 @@ limitations under the License.
     }
     [justified] {
       @apply(--layout-justified);
+    }
+    [self-center] {
+      @apply(--layout-self-center);
     }
   </style>
 </head>
@@ -226,7 +233,7 @@ limitations under the License.
       </div>
     </paper-toolbar>
     <div class="drawer-panel-content" flex>
-      <paper-menu id="drawer-menu" selected="{% .Slug %}" valueattr="label">
+      <paper-menu id="drawer-menu" selected="{% .Slug %}" attr-for-selected="label">
         <paper-item label="home">
           <a href="./" data-ajax-link data-anim-drawer data-track-link="nav-drawer-home">
             <i18n-msg msgid="home">Home</i18n-msg>
@@ -270,9 +277,9 @@ limitations under the License.
                      user="{{currentUser}}"></google-signin>
 
       <!-- Responsive handlers -->
-      <iron-media-query id="mq-phone" query="(min-width:320px) and (max-width:767px)"
+      <iron-media-query id="mq-phone" full query="(min-width:320px) and (max-width:767px)"
                         query-matches="{{isPhoneSize}}"></iron-media-query>
-      <iron-media-query id="mq-tablet" query="(min-width:768px) and (max-width:944px)"
+      <iron-media-query id="mq-tablet" full query="(min-width:768px) and (max-width:944px)"
                         query-matches="{{isTabletSize}}"></iron-media-query>
       <iron-media-query id="mq-desktop" query="(min-width:945px)"
                         query-matches="{{isDesktopSize}}"></iron-media-query>
@@ -296,7 +303,8 @@ limitations under the License.
             </div>
           </div>
 <!-- TODO: update for polymer 1.0 port. check usage of attrs -->
-          <paper-tabs class$="white {{_computeMastheadClass(pages, selectedPage)}}" valueattr="label" selected="{{selectedPage}}" link noink>
+          <paper-tabs class$="white {{_computeMastheadClass(pages, selectedPage)}}"
+              attr-for-selected="label" selected="{{selectedPage}}" link noink>
             <paper-tab label="about" role="">
               <a href="about" data-ajax-link data-track-link="nav-about" data-transition="masthead-ripple-transition" layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>
@@ -322,13 +330,13 @@ limitations under the License.
             </paper-tab>
           </paper-tabs>
           <span id="signin-nav-elements" layout horizontal center
-                class$="{{_computeSignNavElementsCLass(isPhoneSize, pages, selectedPage)}}">
+                class$="{{_computeSignNavElementsClass(isPhoneSize, pages, selectedPage)}}">
             <!-- Note: Use on-click instead of on-tap so oauth popup is not blocked. Needs user gesture. -->
             <!-- /fakesignin is not a real endpoint, but we need it to trick router not
                  to return early from the document-level touchstart listener on mobile. -->
             <span class="anchor-like button-link" data-track-link="nav-signin"
                   on-click="signIn" hidden$="{{currentUser}}">Sign in</span>
-            <template is="dom-if" if="{{currentUser}}">
+            <template is="dom-if" if="{{currentUser}}" restamp>
               <img src$="{{currentUser.picture}}" class="profilepic">
               <paper-menu-button>
                 <paper-icon-button icon="io:more-vert" aria-label="Settings"></paper-icon-button>
@@ -402,7 +410,7 @@ limitations under the License.
              layout vertical$="{{isPhoneSize}}" horizontal$="{{!isPhoneSize}}">
           <div class$="masthead-meta {{_addClass('transition', pageTransitioningOut)}}"
                layout vertical flex end-justified$="{{isPhoneSize}}">
-            <template id="template-masthead-container" ref="" bind>{% template "masthead" .%}</template>
+            <div id="template-masthead-container">{% template "masthead" .%}</div>
           </div>
         </div>
         <!-- <experiment-fab-container class="fab" mini$="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}" hidden$="{{selectedPage !== 'home'}}"></experiment-fab-container> -->
@@ -413,7 +421,7 @@ limitations under the License.
         </a>
       </header>
 
-      <!-- <template is="dom-if" if="{{_isPage('home', selectedPage)}}">
+      <!-- <template is="dom-if" if="{{_isPage('home', selectedPage)}}" restamp>
         <div id="iolive" class="{{ {show: selectedPage === 'home'} | tokenList }}" fit>
           <io-live mode="{{liveModuleMode}}" date="{% .StartDateStr %}"
                    sessions="{{scheduleData.sessions}}"
@@ -429,7 +437,7 @@ limitations under the License.
       </template> -->
 
       <main class$="io-main {{_addClass('transitionIn', pageTransitioningIn)}} {{_addClass('transitionOut', pageTransitioningOut)}}">
-        <template id="template-content-container" ref="" bind>{% template "content" .%}</template>
+        <div id="template-content-container">{% template "content" .%}</div>
       </main>
 
       <footer layout vertical>
@@ -442,9 +450,10 @@ limitations under the License.
             <a href="https://plus.google.com/+GoogleDevelopers" target="_blank" class="share-icon" data-track-link="footer-share-gplus" data-share-type="gplus" on-click="openShareWindow"><iron-icon icon="io:post-gplus"></iron-icon></a>
             <a href="https://twitter.com/googledevs" target="_blank" class="share-icon" data-track-link="footer-share-twitter" data-share-type="twitter" on-click="openShareWindow"><iron-icon icon="io:post-twitter"></iron-icon></a>
           </span>
-          <span>
+          <!-- <span>
             <a href$="{{eeFooterLink}}" class="invisible" hidden$="{{!eeFooterLink}}" target="_blank" data-track-link="footer-challenge-link">Ready for a challenge?</a>
-          </span>
+          </span> -->
+
 <!-- TODO: update polymer 1.0 -->
 <!-- <iron-a11y-keys target="{{$.backtotop}}" keys="enter" on-keys-pressed="backToTop"></iron-a11y-keys> -->
           <a href="#" id="backtotop" class="footer-backtotop" on-click="backToTop" data-track-link="footer-backtop-new">Back to the top <iron-icon icon="expand-less"></iron-icon></a>
@@ -455,14 +464,17 @@ limitations under the License.
           <nav layout vertical end justified>
             <span><a href="faq" data-ajax-link data-track-link="footer-faq">FAQ</a></span>
             <span><a href="https://www.google.com/events/io" target="_blank" data-track-link="footer-2014-site">I/O 2014</a></span>
-            <paper-dropdown-menu label="Google Developers">
-              <paper-dropdown valign="bottom" halign="right" class="dropdown" duration="200">
+
+            <paper-dropdown-menu label="Google Developers" no-label-float
+                                 vertical-align="bottom">
+              <paper-listbox class="dropdown-content" selected="en" attr-for-selected="lang">
                 <paper-item><a href="https://developers.google.com" target="_blank" data-track-link="footer-link-devsite">developers.google.com</a></paper-item>
                 <paper-item><a href="https://plus.google.com/+GoogleDevelopers" target="_blank" data-track-link="footer-link-gplus">+googledevelopers</a></paper-item>
                 <paper-item><a href="https://twitter.com/googledevs" target="_blank" data-track-link="footer-link-twitter">@googledevs</a></paper-item>
                 <paper-item><a href="http://googledevelopers.blogspot.com/" target="_blank" data-track-link="footer-link-blog">Blog</a></paper-item>
-              </paper-dropdown>
+              </paper-listbox>
             </paper-dropdown-menu>
+
             <span><a href="https://plus.google.com/u/0/communities/105113874753230740413" target="_blank" data-track-link="footer-community">I/O Community</a></span>
             <span><a href="https://www.google.com/intl/en/policies/privacy/" target="_blank">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Terms</a></span>
             <span class="footer-share-links--bottom">

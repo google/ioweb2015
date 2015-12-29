@@ -27,9 +27,9 @@
   <io-gallery hidden?="{{!photoGalleryActive}}" mobile="{{isPhoneSize}}"
               imagePath="media.image.url" active="{{photoGalleryActive}}" fit></io-gallery>
 
-  <template if="{{fullscreenVideoActive}}">
+  <template is="dom-if" if="{{fullscreenVideoActive}}" restamp>
     <div class="fullvideo__container" fit>
-     <google-youtube videoid="A-bjrru5bLU" height="100%" width="100%" fit
+     <google-youtube video-id="A-bjrru5bLU" height="100%" width="100%" fit
                      autohide="1" controls="2" modestbranding="1" showinfo="0"
                      iv_load_policy="3" rel="0" autoplay="1"
                      on-google-youtube-ready="{{onOffsiteVideoReady}}"></google-youtube>
@@ -79,28 +79,29 @@
           </div>
         </div>
 
-        <h2 class="extended-title" hidden?="{{!webglSupported}}">See where I/O Extended events happened in 2015</h2>
-        <template if="{{!webglSupported}}">
-          <h2 class="extended-title">Searching for events is not supported in your browser :(</h2>
-        </template>
+        <h2 class="extended-title" hidden$="[[!webglSupported]]">See where I/O Extended events happened in 2015</h2>
+        <h2 class="extended-title" hidden$="[[webglSupported]]">Searching for events is not supported in your browser :(</h2>
 
         <div class="action__links" layout vertical>
 
-          <template if="{{extendedMapActive && didExtendedSearch && !politicalAreaSearch && !offsiteMarkerResults.length}}">
+          <template is="dom-if" if="{{extendedMapActive && didExtendedSearch && !politicalAreaSearch && !offsiteMarkerResults.length}}">
             <h4>There are no events near that location. Try another search or check back later to find new events.</h4>
           </template>
 
-          <template if="{{extendedMapActive && didExtendedSearch && politicalAreaSearch}}">
+          <template is="dom-if" if="{{extendedMapActive && didExtendedSearch && politicalAreaSearch}}">
             <h4>These are the closest results to your search.</h4>
           </template>
 
-          <paper-button class="view__events" on-tap="{{openExtendedMap}}" hidden?="{{!webglSupported}}">
-            <a href="#join" data-track-link="offsite-view-2015-events"><core-icon icon="io:place"></core-icon>Find 2015 events</a>
+          <paper-button class="view__events" on-tap="openExtendedMap"
+                        hidden$="[[!webglSupported]]">
+            <a href="#join" data-track-link="offsite-view-2015-events"><iron-icon icon="io:place"></iron-icon>Find 2015 events</a>
           </paper-button>
 
-          <div class="search__map" layout horizontal center self-center relative hidden?="{{!webglSupported}}">
-            <core-icon icon="io:search"></core-icon>
-            <paper-input id="autocomplete" label="Search for a city" on-keydown="{{onPlacesSearchKeydown}}"></paper-input>
+          <div class="search__map" layout horizontal center self-center relative
+               hidden$="{{!webglSupported}}">
+            <iron-icon icon="io:search"></iron-icon>
+            <paper-input id="autocomplete" label="Search for a city"
+                         on-keydown="onPlacesSearchKeydown"></paper-input>
           </div>
 
         </div>
@@ -159,22 +160,22 @@
 
       var button = IOWA.Elements.Main.querySelector('.play__button__container');
 
-      var animation = new Animation(button, [
+      var animation = new KeyframeEffect(button, [
         {opacity: 1}, {opacity: 0}
       ], animationTiming);
 
       // Only animate top/bottom cards offscreen if not on mobile.
       if (!IOWA.Elements.Template.isPhoneSize) {
-        animation = new AnimationGroup([
+        animation = new GroupEffect([
           animation,
-          new Animation(topCard, [
+          new KeyframeEffect(topCard, [
             {transform: 'translateY(0)', opacity: 1},
             {transform: 'translateY(-100px)', opacity: 0}
           ], animationTiming)
         ]);
       }
 
-      var videoAnimation = new Animation(video, [
+      var videoAnimation = new KeyframeEffect(video, [
         {opacity: 0}, {opacity: 1}
       ], animationTiming);
 
@@ -182,13 +183,13 @@
 
       if (opt_reverse) {
         // Fade out gallery and slide back in page sections at the same time.
-        IOWA.PageAnimation.play(new AnimationGroup([
+        IOWA.PageAnimation.play(new GroupEffect([
           animation, videoAnimation
         ]), opt_callback);
         navOverlay.classList.remove('active');
       } else {
         // Slide out page sections, then fade in gallery.
-        IOWA.PageAnimation.play(new AnimationSequence([
+        IOWA.PageAnimation.play(new SequenceEffect([
           animation, videoAnimation
         ]), opt_callback);
         navOverlay.classList.add('active');
@@ -207,18 +208,18 @@
         easing: 'cubic-bezier(0.4,0,0.2,1)'
       };
 
-      var animation = new AnimationGroup([
-        new Animation(viewButton, [
+      var animation = new GroupEffect([
+        new KeyframeEffect(viewButton, [
           {opacity: 1, visibility: 'visible', 'pointer-events': 'auto'},
           {opacity: 0, visibility: 'hidden', 'pointer-events': 'none'}
         ], animationTiming),
-        new Animation(sectionTitle, [
+        new KeyframeEffect(sectionTitle, [
           {opacity: 1, visibility: 'visible'},
           {opacity: 0, visibility: 'hidden'}
         ], animationTiming)
       ]);
 
-      var searchInputAnimation = new Animation(searchInput, [
+      var searchInputAnimation = new KeyframeEffect(searchInput, [
         {opacity: 0, visibility: 'hidden'},
         {opacity: 1, visibility: 'visible'}
       ], animationTiming);
@@ -227,13 +228,13 @@
 
       if (opt_reverse) {
         // Fade in button, and bring back cards at same time.
-        IOWA.PageAnimation.play(new AnimationGroup([
+        IOWA.PageAnimation.play(new GroupEffect([
           animation, searchInputAnimation
         ]), opt_callback);
         navOverlay.classList.remove('active');
       } else {
         // Dismiss cards offscreen, then fade in search input.
-        IOWA.PageAnimation.play(new AnimationSequence([
+        IOWA.PageAnimation.play(new SequenceEffect([
           animation, searchInputAnimation
         ]), opt_callback);
         navOverlay.classList.add('active');
@@ -246,7 +247,7 @@
       var reverse = opt_reverse || false;
 
       var gallery = IOWA.Elements.Main.querySelector('io-gallery');
-      var animation = new Animation(gallery, [
+      var animation = new KeyframeEffect(gallery, [
         {opacity: 0}, {opacity: 1}
       ], {
         duration: 500,

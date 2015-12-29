@@ -27,7 +27,7 @@
                            layout horizontal center-center>My Schedule</a>
       </paper-tab>
     </paper-tabs>
-    <paper-dropdown-menu label="Select timezone" hidden?="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
+    <paper-dropdown-menu label="Select timezone" hidden$="{{isPhoneSize || pages[selectedPage].selectedSubpage === 'agenda'}}">
       <paper-dropdown class="dropdown" halign="right" duration="200">
         <core-menu class="menu" selected="{{selectedTimezone}}" valueattr="label" on-core-activate="{{selectTimezone}}">
           <template repeat="{{zone in timezones}}">
@@ -47,14 +47,14 @@
               on-core-overlay-open-completed="{{onSessionDetailsOpen}}">
   <paper-icon-button icon="arrow-back" core-overlay-toggle aria-label="Close session"></paper-icon-button>
   <div class="card__photo" relative>
-    <template if="{{startScheduleVideo && !selectedSession.isLivestream && selectedSession.youtubeUrl}}">
-      <google-youtube videoid="{{selectedSession.youtubeUrl | toVideoIdFilter}}" height="100%" width="100%" fit
+    <template is="dom-if" if="{{startScheduleVideo && !selectedSession.isLivestream && selectedSession.youtubeUrl}}" restamp>
+      <google-youtube video-id="{{selectedSession.youtubeUrl | toVideoIdFilter}}" height="100%" width="100%" fit
                       autohide="1" controls="2" modestbranding="1" showinfo="0"
                       iv_load_policy="3" rel="0" autoplay="1"
                       on-google-youtube-ready="{{onScheduleVideoReady}}"></google-youtube>
     </template>
     <div class="play__button__container" on-click="{{onVideoPlay}}" data-track-link="{{selectedSession.youtubeUrl}}"
-         hidden?="{{selectedSession.isLivestream || !selectedSession.youtubeUrl}}" layout vertical center-center fit>
+         hidden$="{{selectedSession.isLivestream || !selectedSession.youtubeUrl}}" layout vertical center-center fit>
       <h4>Watch video</h4>
     </div>
     <core-image src="{{selectedSession.photoUrl || 'images/schedule/session_placeholder.jpg'}}"
@@ -64,11 +64,11 @@
                mini?="{{isPhoneSize}}" class="{{ {active: selectedSession.saved} | tokenList }}"
                on-up="{{toggleSaveSession}}"
                disabled?="{{scheduleFetchingUserData}}"></paper-fab>
-    <paper-progress indeterminate hidden?="{{!currentUser || (savedSessions && !scheduleFetchingUserData)}}"></paper-progress>
+    <paper-progress indeterminate hidden$="{{!currentUser || (savedSessions && !scheduleFetchingUserData)}}"></paper-progress>
   </div>
   <div class="session__info__section">
     <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
-    <h5 class="session__time">May {{selectedSession.day}} / {{selectedSession.start}}<span hidden?="{{selectedSession.id === '__keynote__'}}"> - {{selectedSession.end}}</span> / {{selectedSession.room}}</h5>
+    <h5 class="session__time">May {{selectedSession.day}} / {{selectedSession.start}}<span hidden$="{{selectedSession.id === '__keynote__'}}"> - {{selectedSession.end}}</span> / {{selectedSession.room}}</h5>
     <h5 class="session__categories">{{selectedSession.tags | formatSessionTagsFilter}}</h5>
     <div class="session__desc">{{selectedSession.description}}</div>
     <div class="session__social" layout horizontal>
@@ -84,10 +84,10 @@
          data-track-link="schedule-detail-share-fb" on-click="{{openShareWindow}}">
         <core-icon icon="io:post-facebook"></core-icon>
       </a>
-      <span flex class="session__livestream" hidden?="{{!selectedSession.isLivestream}}">Live streamed <core-icon icon="io:videocam"></core-icon></span>
+      <span flex class="session__livestream" hidden$="{{!selectedSession.isLivestream}}">Live streamed <core-icon icon="io:videocam"></core-icon></span>
     </div>
   </div>
-  <div class="session__info__section session__speakers" hidden?="{{!selectedSession.speakers.length}}">
+  <div class="session__info__section session__speakers" hidden$="{{!selectedSession.speakers.length}}">
     <h4>Speakers</h4>
     <div layout horizontal wrap>
       <template repeat="{{speakerId in selectedSession.speakers}}">
@@ -98,8 +98,8 @@
             <span class="speaker__title">{{scheduleData.speakers[speakerId].company}}</span>
             <div class="speaker__desc">{{scheduleData.speakers[speakerId].bio}}</div>
             <div class="session__social" layout horizontal>
-              <a href="{{scheduleData.speakers[speakerId].plusoneUrl}}" target="_blank" class="share-icon" hidden?="{{!scheduleData.speakers[speakerId].plusoneUrl}}"><core-icon icon="io:post-gplus"></core-icon></a>
-              <a href="{{scheduleData.speakers[speakerId].twitterUrl}}" target="_blank" class="share-icon" hidden?="{{!scheduleData.speakers[speakerId].twitterUrl}}"><core-icon icon="io:post-twitter"></core-icon></a>
+              <a href="{{scheduleData.speakers[speakerId].plusoneUrl}}" target="_blank" class="share-icon" hidden$="{{!scheduleData.speakers[speakerId].plusoneUrl}}"><core-icon icon="io:post-gplus"></core-icon></a>
+              <a href="{{scheduleData.speakers[speakerId].twitterUrl}}" target="_blank" class="share-icon" hidden$="{{!scheduleData.speakers[speakerId].twitterUrl}}"><core-icon icon="io:post-twitter"></core-icon></a>
             </div>
           </div>
         </div>
@@ -109,12 +109,12 @@
   </div>
   <div class="session__info__section session__info__links card-content"
       layout horizontal justified?="{{isPhoneSize}}"
-      hidden?="{{selectedSession.id == '__afterhours__' || (!isSessionFinishedFilter(selectedSession) && !selectedSession.hasRelated)}}">
+      hidden$="{{selectedSession.id == '__afterhours__' || (!isSessionFinishedFilter(selectedSession) && !selectedSession.hasRelated)}}">
     <span class="anchor-like" role="link" on-click="{{onRelatedContent}}" data-track-link="schedule-detail-related"
-        core-overlay-toggle hidden?="{{!selectedSession.hasRelated}}">View related content</span>
+        core-overlay-toggle hidden$="{{!selectedSession.hasRelated}}">View related content</span>
     <span class="anchor-like" on-click="{{onRateSession}}" role="link"
-        data-track-link="schedule-rate-session" hidden?="{{selectedSession.rated || selectedSession.id == '__afterhours__' || !isSessionFinishedFilter(selectedSession) }}">Rate session</span>
-    <span class="anchor-like-disabled" hidden?="{{!selectedSession.rated}}">Rating submitted</span>
+        data-track-link="schedule-rate-session" hidden$="{{selectedSession.rated || selectedSession.id == '__afterhours__' || !isSessionFinishedFilter(selectedSession) }}">Rate session</span>
+    <span class="anchor-like-disabled" hidden$="{{!selectedSession.rated}}">Rating submitted</span>
   </div>
 </paper-dialog>
 
@@ -319,7 +319,7 @@
     <section  class="page__section page__section--top slide-up">
       <div id="signin-prompt"
           class="card__container card__container--top {{ {'prompt-hidden': currentUser} | tokenList}}"
-          hidden?="{{pages['schedule'].selectedSubpage === 'myschedule'}}">
+          hidden$="{{pages['schedule'].selectedSubpage === 'myschedule'}}">
         <div class="card js-experiment-visualizer">
           <div class="card-content">
             <h3 class="card__title">Create your custom I/O schedule</h3>
@@ -338,10 +338,10 @@
         </div>
       </div>
 
-      <div class="card__container card__container--top" hidden?="{{pages['schedule'].selectedSubpage !== 'myschedule'}}">
+      <div class="card__container card__container--top" hidden$="{{pages['schedule'].selectedSubpage !== 'myschedule'}}">
         <div class="card js-experiment-visualizer">
 
-          <template if="{{!currentUser}}">
+          <template is="dom-if" if="{{!currentUser}}">
             <div class="card-content">
               <h3 class="card__title">Create your custom I/O schedule</h3>
               <div>
@@ -353,12 +353,13 @@
               </div>
             </div>
             <div class="card-content">
-              <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-sign-in"
-                    on-click="{{signIn}}">Sign in</span>
+              <span class="anchor-like" role="link" tabindex="0"
+                    data-track-link="schedule-sign-in"
+                    on-click="signIn">Sign in</span>
             </div>
           </template>
 
-          <template if="{{currentUser}}">
+          <template is="dom-if" if="{{currentUser}}">
             <div class="card-content notification__feature">
               <div>If you have notifications enabled, you'll be notified on this device when:
                 <ul>
@@ -371,8 +372,9 @@
               </p>
             </div>
             <div class="card-content notification__feature">
-              <span class="anchor-like" role="link" tabindex="0" data-track-link="schedule-open-settings"
-                    on-click="{{openSettings}}">Go to settings</span>
+              <span class="anchor-like" role="link" tabindex="0"
+                    data-track-link="schedule-open-settings"
+                    on-click="openSettings">Go to settings</span>
             </div>
           </template>
 
@@ -381,7 +383,7 @@
 
     </section>
     <div class="slide-up-delay">
-      <div class="page__filters" layout horizontal hidden?="{{!isPhoneSize || pages[selectedPage].selectedSubpage === 'myschedule'}}">
+      <div class="page__filters" layout horizontal hidden$="{{!isPhoneSize || pages[selectedPage].selectedSubpage === 'myschedule'}}">
         <span flex>
           <paper-dropdown-menu>
             <paper-dropdown class="dropdown" halign="left" duration="200">

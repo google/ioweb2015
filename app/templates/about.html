@@ -82,10 +82,10 @@
     </div>
   </div>
 
-  <template if="{{fullscreenVideoActive}}">
+  <template is="dom-if" if="{{fullscreenVideoActive}}" restamp>
     <div class="fullvideo__container" fit hidden>
       <img src="images/home/keynote2015.jpg" class="fullvideo_thumbnail" alt="Watch the I/O 2015 keynote" fit>
-      <google-youtube videoid="7V-fIGMDsmE" height="100%" width="100%" fit
+      <google-youtube video-id="7V-fIGMDsmE" height="100%" width="100%" fit
                       autohide="1" controls="2" modestbranding="1" showinfo="0"
                       iv_load_policy="3" rel="0" autoplay="1"></google-youtube>
     </div>
@@ -112,7 +112,7 @@
         easing: 'cubic-bezier(0.4,0,0.2,1)'
       };
 
-      var animation = new Animation(bottomSection, [
+      var animation = new KeyframeEffect(bottomSection, [
         {transform: 'translateY(0)', opacity: 1},
         {transform: 'translateY(100px)', opacity: 0}
       ], animationTiming);
@@ -121,32 +121,32 @@
 
       // Only animate top/bottom cards offscreen if not on mobile.
       if (!gallery.mobile) {
-        animation = new AnimationGroup([
+        animation = new GroupEffect([
           animation,
-          new Animation(topCard, [
+          new KeyframeEffect(topCard, [
             {transform: 'translateY(0)', opacity: 1},
             {transform: 'translateY(-100px)', opacity: 0}
           ], animationTiming),
-          new Animation(bottomCard, [
+          new KeyframeEffect(bottomCard, [
             {transform: 'translateY(0)', opacity: 1},
             {transform: 'translateY(100px)', opacity: 0}
           ], animationTiming)
         ]);
       }
 
-      var galleryAnimation = new Animation(gallery, [
+      var galleryAnimation = new KeyframeEffect(gallery, [
         {opacity: 0}, {opacity: 1}
       ], animationTiming);
 
       if (reverse) {
         // Fade out gallery and slide back in page sections at the same time.
-        IOWA.PageAnimation.play(new AnimationGroup([
+        IOWA.PageAnimation.play(new GroupEffect([
           animation, galleryAnimation
         ]), opt_callback);
         navOverlay.classList.remove('active');
       } else {
         // Slide out page sections, then fade in gallery.
-        IOWA.PageAnimation.play(new AnimationSequence([
+        IOWA.PageAnimation.play(new SequenceEffect([
           animation, galleryAnimation
         ]), opt_callback);
         navOverlay.classList.add('active');

@@ -195,7 +195,7 @@
       var reverse = opt_reverse || false;
 
       var gallery = IOWA.Elements.Main.querySelector('io-gallery');
-      var galleryAnimation = new Animation(gallery, [
+      var galleryAnimation = new KeyframeEffect(gallery, [
         {opacity: 0}, {opacity: 1}
       ], {
         duration: 500,

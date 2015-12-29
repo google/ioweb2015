@@ -76,15 +76,6 @@
     initWorker();
   }
 
-  window.addEventListener('iron-media-change', function(e) {
-    // Disable swipping on tablet/desktop.
-    if (e.target.id === 'mq-phone') {
-      var isPhoneSize = e.detail.matches;
-      IOWA.Elements.Drawer.querySelector('[drawer]').hidden = !isPhoneSize;
-      IOWA.Elements.Drawer.disableSwipe = !isPhoneSize;
-    }
-  });
-
   window.addEventListener('keydown', function(e) {
     // ESC closes any overlays.
     if (e.keyCode === 27) {

@@ -146,17 +146,11 @@ IOWA.Router_ = function(window) {
    */
   Router.prototype.importPage = function() {
     var pageName = this.state.end.page;
+
     return new Promise(function(resolve, reject) {
-      var importURL = pageName + '?partial';
-      // TODO(ericbidelman): update call when
-      // github.com/Polymer/polymer/pull/1128 lands.
-      Polymer.import([importURL], function() {
+      Polymer.Base.importHref(pageName + '?partial', function(e) {
         // Don't proceed if import didn't load correctly.
-        var htmlImport = document.querySelector(
-            'link[rel="import"][href="' + importURL + '"]');
-        if (htmlImport && !htmlImport.import) {
-          return;
-        }
+        var htmlImport = e.target.import;
         // FF doesn't execute the <script> inside the main content <template>
         // (inside page partial import). Instead, the first time the partial is
         // loaded, find any script tags in and make them runnable by appending
@@ -165,7 +159,7 @@ IOWA.Router_ = function(window) {
           var contentTemplate = document.querySelector(
              '#template-' + pageName + '-content');
           if (!contentTemplate) {
-            var containerTemplate = htmlImport.import.querySelector(
+            var containerTemplate = htmlImport.querySelector(
                 '[data-ajax-target-template="template-content-container"]');
             var scripts = containerTemplate.content.querySelectorAll('script');
             Array.prototype.forEach.call(scripts, function(node, i) {
@@ -174,36 +168,40 @@ IOWA.Router_ = function(window) {
           }
         }
         // Update content of the page.
-        resolve(htmlImport.import);
+        resolve(htmlImport);
+      }, function(e) {
+        console.error('Page could not be dynamically loaded', e);
+        IOWA.Util.reportError(e);
+        reject(e);
       });
     });
   };
 
   /**
-   * Attaches imported templates and loads the content for the current page.
+   * Swaps in partial from new imported template content.
    * @return {Promise}
    * @private
    */
   Router.prototype.renderTemplates = function(importContent) {
     var pageName = this.state.end.page;
+
     return new Promise(function(resolve, reject) {
       // Add freshly fetched templates to DOM, if not yet present.
       var newTemplates = importContent.querySelectorAll('.js-ajax-template');
-      for (var i = 0; i < newTemplates.length; i++) {
-        var newTemplate = newTemplates[i];
-        if (!document.getElementById(newTemplate.id)) {
-          document.body.appendChild(newTemplate);
+      for (var i = 0; i < newTemplates.length; ++i) {
+        var newTmpl = newTemplates[i];
+        if (!document.getElementById(newTmpl.id)) {
+          document.body.appendChild(newTmpl);
         }
       }
       // Replace current templates content with new one.
-      var newPageTemplates = document.querySelectorAll(
-          '.js-ajax-' + pageName);
-      for (var j = 0, length = newPageTemplates.length; j < length; j++) {
-        var template = newPageTemplates[j];
-        var templateToReplace = document.getElementById(
-            template.getAttribute('data-ajax-target-template'));
-        if (templateToReplace) {
-          templateToReplace.setAttribute('ref', template.id);
+      var existingTemplates = document.querySelectorAll('.js-ajax-' + pageName);
+      for (var j = 0; j < existingTemplates.length; ++j) {
+        var tmpl = existingTemplates[j];
+        var template = document.getElementById(
+            tmpl.getAttribute('data-ajax-target-template'));
+        if (template) {
+          template.setAttribute('ref', tmpl.id);
         }
       }
       // Wait for the template ref= to settle.
