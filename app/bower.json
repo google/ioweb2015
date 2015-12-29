@@ -1,6 +1,6 @@
 {
   "name": "GoogleIOWeb",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "authors": [
     "Eric Bidelman <ebidel@>",
@@ -64,12 +64,12 @@
     "polymer": "Polymer/polymer#^1.2.3",
     "shed": "wibblymat/shed#^1.0.0",
     "es6-promise": "jakearchibald/es6-promise#^3.0.2",
-    "web-animations-js": "web-animations/web-animations-js#^1.0.7",
+    "web-animations-js": "web-animations/web-animations-js#^2.1.4",
     "moment": "~2.10.6",
     "moment-timezone": "~0.4.1",
     "elevator": "tholman/elevator.js#6279b1dd365143730b2cd0d211d7aa3aff1c1e1d"
   },
   "resolutions": {
-    "web-animations-js": "1.0.7"
+    "web-animations-js": "^2.1.4"
   }
 }
