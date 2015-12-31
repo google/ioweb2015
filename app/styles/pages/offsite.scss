@@ -99,7 +99,7 @@ google-youtube {
       left: 0;
     }
 
-    core-icon {
+    iron-icon {
       margin-right: $icon-margin;
     }
   }
@@ -115,7 +115,7 @@ google-youtube {
     opacity: 0;
     visibility: hidden;
 
-    core-icon {
+    iron-icon {
       position: absolute;
       right: 0;
       bottom: calc(50% - 30px/2 + 2px); // 30px is height of input container.
@@ -254,7 +254,7 @@ google-youtube {
       right: $desktopKeyline;
       align-items: flex-end;
 
-      core-icon {
+      iron-icon {
         order: 1;
         margin-left: $icon-margin;
       }

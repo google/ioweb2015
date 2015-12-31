@@ -9,7 +9,7 @@
       easeintime="490" waittime="100"
       easeouttime="400"
       value="{{countdownValue}}" autoStart
-      aria-label="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O"
+      aria-label$="{{countdownValue.days}} days, {{countdownValue.hours}} hours, {{countdownValue.minutes}} minutes, {{countdownValue.seconds}} seconds, until Google I/O"
       role="timer">
   </countdown-timer>
 </div> -->
@@ -28,7 +28,7 @@
   <social-poller url="api/v1/social" posts="{{socialPosts}}" interval="30000"></social-poller>
 
   <paper-toolbar class="navbar__overlay navbar__overlay--video"
-                 aria-hidden="{{!fullscreenVideoActive}}" fit>
+                 aria-hidden$="{{!fullscreenVideoActive}}" fit>
     <paper-icon-button icon="arrow-back"
         on-tap="closeVideoCard"
         aria-label="Close video"

@@ -210,6 +210,16 @@ limitations under the License.
     [self-center] {
       @apply(--layout-self-center);
     }
+
+    paper-tabs.white {
+      --paper-tabs-selection-bar-color: #fff;
+      --paper-tab-ink: rgba(255,255,255,0.5);
+    }
+    paper-tabs.white paper-tab {
+      --paper-tab-content: {
+        opacity: 1 !important;
+      };
+    }
   </style>
 </head>
 <body id="page-{% .Slug %}">
@@ -304,7 +314,7 @@ limitations under the License.
           </div>
 <!-- TODO: update for polymer 1.0 port. check usage of attrs -->
           <paper-tabs class$="white {{_computeMastheadClass(pages, selectedPage)}}"
-              attr-for-selected="label" selected="{{selectedPage}}" link noink>
+              attr-for-selected="label" selected="{{selectedPage}}" noink>
             <paper-tab label="about" role="">
               <a href="about" data-ajax-link data-track-link="nav-about" data-transition="masthead-ripple-transition" layout horizontal center>
                 <i18n-msg msgid="about">About</i18n-msg>

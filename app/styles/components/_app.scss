@@ -204,7 +204,7 @@ paper-progress {
   position: fixed !important;  // iOS
   font-size: 20px;
   font-weight: 500;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.5) !important;
   color: #fff;
   text-transform: uppercase;
   transition: transform 400ms cubic-bezier(0,0,0.2,1);

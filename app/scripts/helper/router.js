@@ -173,7 +173,7 @@ IOWA.Router_ = function(window) {
         console.error('Page could not be dynamically loaded', e);
         IOWA.Util.reportError(e);
         reject(e);
-      });
+      }, true);
     });
   };
 
@@ -201,13 +201,16 @@ IOWA.Router_ = function(window) {
         var template = document.getElementById(
             tmpl.getAttribute('data-ajax-target-template'));
         if (template) {
-          template.setAttribute('ref', tmpl.id);
+          // template.setAttribute('ref', tmpl.id);
+          template.innerHTML = '';
+          template.appendChild(tmpl.content);
         }
       }
+
       // Wait for the template ref= to settle.
-      IOWA.Elements.Template.async(function() {
+      // IOWA.Elements.Template.async(function() {
         resolve();
-      });
+      // });
     });
   };
 

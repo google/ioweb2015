@@ -30,19 +30,19 @@ paper-drawer-panel::shadow {
   }
 }
 
-paper-tabs.white {
-  &::shadow #selectionBar {
-    background-color: #fff;
-  }
-  & paper-tab::shadow {
-    .tab-content {
-      opacity: 1 !important;
-    }
-    #ink {
-      color: rgba(255,255,255,0.5);
-    }
-  }
-}
+// paper-tabs.white {
+//   &::shadow #selectionBar {
+//     background-color: #fff;
+//   }
+//   & paper-tab::shadow {
+//     .tab-content {
+//       opacity: 1 !important;
+//     }
+//     #ink {
+//       color: rgba(255,255,255,0.5);
+//     }
+//   }
+// }
 
 .card__signin-intro {
   &::shadow #scroller {
@@ -124,7 +124,7 @@ paper-tabs.white {
 // phase 3 -----
 #page-about {
   .pics__section {
-    core-image::shadow #placeholder {
+    iron-image::shadow #placeholder {
       background-size: 15% !important;
       opacity: 0.5;
       &.fadein {
@@ -135,7 +135,7 @@ paper-tabs.white {
 }
 // -----
 
-.card__photo core-image::shadow #placeholder {
+.card__photo iron-image::shadow #placeholder {
   background-color: $color-cyan-500;
   background-size: contain !important;
 }

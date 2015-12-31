@@ -51,7 +51,7 @@ $name: 'page-schedule';
     margin: $tabletKeyline;;
     padding: 0;
     border: none;
-    core-menu {
+    iron-menu {
       margin: 0;
     }
     paper-item {
@@ -104,7 +104,7 @@ $name: 'page-schedule';
   margin-bottom: $tabletKeyline;
 }
 
-core-icon[icon="schedule"] {
+iron-icon[icon="schedule"] {
   margin-right: 40px;
 }
 
@@ -160,7 +160,7 @@ core-icon[icon="schedule"] {
     font-weight: 400;
   }
 
-  core-menu {
+  iron-menu {
     margin: 0;
   }
 
@@ -199,7 +199,7 @@ core-icon[icon="schedule"] {
     transition: background-color .3s linear .1s, color .3s linear .1s;
     border-radius: 50%;
 
-    &.core-selected {
+    &.iron-selected {
       background-color: $color-bluegrey-700;
       color: #fff;
     }
@@ -216,7 +216,8 @@ core-icon[icon="schedule"] {
     color: $color-text;
   }
 
-  .rate__icon-empty::shadow core-icon {
+// TODO: update for polymer 1.0
+  .rate__icon-empty::shadow iron-icon {
     visibility: hidden;
   }
 
@@ -328,7 +329,7 @@ core-icon[icon="schedule"] {
       top: 50px;
     }
   }
-  core-image,
+  iron-image,
   .play__button__container {
     transition: opacity 350ms cubic-bezier(0,0,0.2,1);
   }
