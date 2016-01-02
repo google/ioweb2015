@@ -64,7 +64,7 @@ The `<io-gallery>` element renders a fullscreen photo gallery.
     <iron-list id="list" items="[[renderList]]" as="item">
       <template>
          <div class="item center-center">
-           <iron-image src="{{item.src}}" sizing="{{sizing}}" preload
+           <iron-image src="[[item.src]]" sizing="[[sizing]]" preload
                placeholder="images/io15-color.png" fade
                style$="background-color:[[backgroundColor]]"></iron-image>
          </div>

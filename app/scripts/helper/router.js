@@ -203,7 +203,13 @@ IOWA.Router_ = function(window) {
         if (template) {
           // template.setAttribute('ref', tmpl.id);
           template.innerHTML = '';
-          template.appendChild(tmpl.content);
+          // var content = document.importNode(tmpl.content, true);
+          var content = tmpl.content;
+          // var content = tmpl.stamp().root;
+
+          // TODO: polymer 1.0 update. Find solution for dynamic pages.
+          // For page transitions, content does not contain upgraded elements.
+          template.appendChild(content);
         }
       }
 

@@ -305,9 +305,9 @@ experiment-fab-container, .fab {
 }
 
 paper-fab {
-  background: #fff;
+  background: #fff !important;
   position: absolute;
-  color: $color-fab-icon;
+  color: $color-fab-icon !important;
 }
 
 @media (max-width: $phone-breakpoint-max) {
