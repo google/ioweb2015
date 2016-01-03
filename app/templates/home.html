@@ -190,11 +190,12 @@
 
         <div class="io__hash" aria-label="I/O hash tag"></div>
 
-        <social-poller url="api/v1/social" posts="{{socialPosts}}" interval="30000"></social-poller>
+        <social-poller url="api/v1/social" posts="{{socialPosts}}"
+                       interval="30000"></social-poller>
 
         <template is="dom-if" if="[[_showSocialPosts(socialPosts, 3)]]">
           <div class="sidebyside" layout horizontal vertical$="{{isPhoneSize}}">
-            <template is="dom-repeat" repeat="{{limit(socialPosts, 3)}}" as="post">
+            <template is="dom-repeat" items="{{limit(socialPosts, 3)}}" as="post">
               <social-post kind="[[post.kind]]"
                            author="[[post.author]]"
                            url="[[post.url]]"
