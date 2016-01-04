@@ -210,6 +210,9 @@ limitations under the License.
     [self-center] {
       @apply(--layout-self-center);
     }
+    [wrap] {
+       @apply(--layout-wrap);
+    }
 
     paper-tabs.white {
       --paper-tabs-selection-bar-color: #fff;
@@ -219,6 +222,23 @@ limitations under the License.
       --paper-tab-content: {
         opacity: 1 !important;
       };
+    }
+
+    footer paper-dropdown-menu {
+      --paper-input-container-underline: {
+        display: none;
+      };
+      --paper-input-container-underline-focus: {
+        display: none;
+      };
+      --paper-input-container: {
+        padding: 0;
+        max-width: 150px;
+      };
+      --paper-input-container-label: {
+        color: inherit;
+        font: inherit;
+      }
     }
   </style>
 </head>
@@ -476,8 +496,8 @@ limitations under the License.
             <span><a href="https://www.google.com/events/io" target="_blank" data-track-link="footer-2014-site">I/O 2014</a></span>
 
             <paper-dropdown-menu label="Google Developers" no-label-float
-                                 vertical-align="bottom">
-              <paper-listbox class="dropdown-content" selected="en" attr-for-selected="lang">
+                                 vertical-align="bottom" noink>
+              <paper-listbox class="dropdown-content">
                 <paper-item><a href="https://developers.google.com" target="_blank" data-track-link="footer-link-devsite">developers.google.com</a></paper-item>
                 <paper-item><a href="https://plus.google.com/+GoogleDevelopers" target="_blank" data-track-link="footer-link-gplus">+googledevelopers</a></paper-item>
                 <paper-item><a href="https://twitter.com/googledevs" target="_blank" data-track-link="footer-link-twitter">@googledevs</a></paper-item>
