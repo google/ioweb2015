@@ -122,7 +122,6 @@ paper-drawer-panel {
   [drawer] {
     font-size: 14px;
     font-weight: 500;
-    background-color: $color-body;
   }
   [main] {
     overflow-y: scroll;
@@ -132,13 +131,12 @@ paper-drawer-panel {
     font-size: 14px;
     line-height: 20px;
   }
+  #drawer-menu .iron-selected {
+    background-color: #eaeaea;
+  }
   .drawer-panel-content {
     overflow: auto;
 
-    paper-menu {
-      margin-left: 0;
-      margin-right: 0;
-    }
     paper-item {
       font-size: inherit;
     }

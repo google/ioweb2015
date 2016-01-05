@@ -142,7 +142,7 @@ paper-progress {
 }
 
 .bg-cyan {
-  background-color: $color-cyan-500;
+  background-color: $color-cyan-500 !important;
   color: #07434D;
 
   h1, h2, h3, h4 {

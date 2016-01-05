@@ -371,13 +371,6 @@ IOWA.Elements = (function() {
       return day;
     };
 
-    template.isSessionFinishedFilter = function(session) {
-      if (!session) {
-        return;
-      }
-      return new Date(session.endTimestamp) < Date.now();
-    };
-
     template.featuredSessionsFilter = function(sessions) {
       if (!sessions) {
         return [];
@@ -828,8 +821,23 @@ IOWA.Elements = (function() {
       IOWA.Elements.NavPaperTabs.style.pointerEvents = 'none';
     });
 
+    template._equal = function(key, val) {
+      return key === val;
+    };
+
+    template._propOfArrayItem = function(array, index, prop) {
+      return array[index][prop];
+    };
+
     template._isPage = function(page, selectedPage) {
-      return page === selectedPage;
+      return this._equal(page, selectedPage);
+    };
+
+    template._isSelectedSubpage = function(pageName, subpageName) {
+      if (!this.pages) {
+        return false;
+      }
+      return this.pages[pageName].selectedSubpage == subpageName;
     };
 
     template._computeMastheadClass = function(pages, selectedPage) {
@@ -853,8 +861,27 @@ IOWA.Elements = (function() {
     };
 
     template._showSocialPosts = function(posts, atLeast) {
-      return socialPosts.length >= atLeast;
+      return posts.length >= atLeast;
     };
+
+    // Schedule ---
+
+    template._hideTimezoneSelector = function(isPhoneSize, selectedPage) {
+      return isPhoneSize || this.pages[selectedPage].selectedSubpage === 'agenda';
+    };
+
+    template._hideSessionFilters = function(isPhoneSize, selectedPage) {
+      return !isPhoneSize || this.pages[selectedPage].selectedSubpage === 'myschedule';
+    };
+
+    template._computeActiveClassForSubpage = function(pageName, subpageName, opt_negate) {
+      var isSubpage = this._isSelectedSubpage(pageName, subpageName);
+      if (opt_negate) {
+        isSubpage = !isSubpage;
+      }
+      return this._addClass('active', isSubpage);
+    };
+    // ---
 
     IOWA.Elements.Template = template;
     IOWA.Elements.ScrollContainer = document.querySelector(

@@ -67,7 +67,7 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function sectionSlideOut(section) {
-    var prefix = section.classList.contains('active') ? '': '.active ';
+    var prefix = section.classList.contains('active') ? '' : '.active ';
     var main = section.querySelector(prefix + '.slide-up');
     var mainDelayed = section.querySelector(prefix + '.slide-up-delay');
     var start = {

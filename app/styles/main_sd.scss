@@ -21,14 +21,14 @@
 
 @import 'base/forms_sd.scss';
 
-paper-drawer-panel::shadow {
-  #drawer {
-    z-index: 100; // TODO: stick in _zindex.scss
-  }
-  #scrim {
-    z-index: 5;// TODO: stick in _zindex.scss
-  }
-}
+// paper-drawer-panel::shadow {
+//   #drawer {
+//     z-index: 100; // TODO: stick in _zindex.scss
+//   }
+//   #scrim {
+//     z-index: 5;// TODO: stick in _zindex.scss
+//   }
+// }
 
 // paper-tabs.white {
 //   &::shadow #selectionBar {
@@ -93,11 +93,11 @@ paper-drawer-panel::shadow {
 }
 
 #page-schedule {
-  paper-dropdown-menu::shadow {
-    #arrow, #label {
-      color: inherit;
-    }
-  }
+  // paper-dropdown-menu::shadow {
+  //   #arrow, #label {
+  //     color: inherit;
+  //   }
+  // }
   .session__rate::shadow #scroller,
   .session__detail::shadow #scroller {
     width: 100%;
@@ -113,7 +113,7 @@ paper-drawer-panel::shadow {
 
 #page-videos {
   .filter-rows {
-    io-radio-button::shadow #radioLabel {
+    paper-radio-button::shadow #radioLabel {
       order: -1;
       margin: 0 10px 0 0;
       flex: 1;
@@ -121,27 +121,27 @@ paper-drawer-panel::shadow {
   }
 }
 
-// phase 3 -----
-#page-about {
-  .pics__section {
-    iron-image::shadow #placeholder {
-      background-size: 15% !important;
-      opacity: 0.5;
-      &.fadein {
-        opacity: 0;
-      }
-    }
-  }
-}
-// -----
+// // phase 3 -----
+// #page-about {
+//   .pics__section {
+//     iron-image::shadow #placeholder {
+//       background-size: 15% !important;
+//       opacity: 0.5;
+//       &.fadein {
+//         opacity: 0;
+//       }
+//     }
+//   }
+// }
+// // -----
 
 .card__photo iron-image::shadow #placeholder {
   background-color: $color-cyan-500;
   background-size: contain !important;
 }
 
-footer {
-  paper-dropdown-menu::shadow #label {
-    color: inherit;
-  }
-}
+// footer {
+//   paper-dropdown-menu::shadow #label {
+//     color: inherit;
+//   }
+// }
