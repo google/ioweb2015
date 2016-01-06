@@ -179,6 +179,7 @@ IOWA.Elements = (function() {
     template.scheduleData = null;
     template.savedSessions = [];
     template.eeFooterLink = null;
+    template.settingsIOReminder = false;
 
     // Sign-in defaults.
     template.isSignedIn = false;

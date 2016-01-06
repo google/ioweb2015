@@ -262,6 +262,17 @@ limitations under the License.
       };
     }
 
+    :root {
+      --color-cyan-500: #00BCD4; /* Duplicated from _colors.scss */
+    }
+
+    .card__photo iron-image {
+      --iron-image-placeholder: {
+        background-color: var(--color-cyan-500);
+        background-size: contain !important;
+      };
+    }
+
     #page-about .pics__section iron-image {
       --iron-image-placeholder: {
         background-size: 15% !important;
@@ -521,7 +532,7 @@ limitations under the License.
 
             <span><a href="https://plus.google.com/u/0/communities/105113874753230740413" target="_blank" data-track-link="footer-community">I/O Community</a></span>
             <span><a href="https://www.google.com/intl/en/policies/privacy/" target="_blank">Privacy</a> &amp; <a href="https://www.google.com/intl/en/policies/terms/" target="_blank">Terms</a></span>
-            <span class="footer-share-links--bottom">
+            <span class="footer-share-links--bottom" layout horizontal>
               <a href="https://plus.google.com/+GoogleDevelopers" target="_blank"
                  class="share-icon"  data-track-link="footer-share-gplus" data-share-type="gplus"
                  on-click="openShareWindow"><iron-icon icon="io:post-gplus"></iron-icon></a>

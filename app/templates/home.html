@@ -38,7 +38,6 @@
 
   <!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
 
-<!-- TODO: update for Polymer 1.0 -->
   <paper-dialog class="video_overlay-dialog"
                 entry-animation="scale-up-animation"
                 exit-animation="fade-out-animation"
@@ -111,8 +110,8 @@
                    data-videoimg$="[[session.photoUrl]]"
                    on-tap="openVideo">
                 <div class="card__photo" relative>
-                  <iron-image src$="{{session.photoUrl}}"
-                              load$="{{!!session}}" sizing="cover" preload
+                  <iron-image src="{{session.photoUrl}}"
+                              sizing="cover" preload
                               placeholder="images/io15-color.png" fade fit></iron-image>
                 </div>
                 <div class="card-content">
