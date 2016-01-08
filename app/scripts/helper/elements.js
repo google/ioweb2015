@@ -69,13 +69,13 @@ IOWA.Elements = (function() {
       IOWA.Elements.GoogleSignIn.load = true;
 
       // Deep link into a subpage.
-      var tpl = IOWA.Elements.Template;
+      var t = IOWA.Elements.Template;
       var parsedUrl = IOWA.Router.parseUrl(window.location.href);
-      var defaultSubpage = tpl.pages[tpl.selectedPage].defaultSubpage;
+      var defaultSubpage = t.pages[t.selectedPage].defaultSubpage;
       var selectedSubpage = parsedUrl.subpage || defaultSubpage;
       var subpage = document.querySelector('.subpage-' + selectedSubpage);
       if (subpage) {
-        tpl.pages[tpl.selectedPage].selectedSubpage = selectedSubpage;
+        t.set(['pages', t.selectedPage, 'selectedSubpage'], selectedSubpage);
         subpage.classList.add('active');
       }
 
@@ -84,8 +84,8 @@ IOWA.Elements = (function() {
           // Fire event when the page transitions are final.
           IOWA.Elements.Template.fire('page-transition-done');
           // Run page's custom onPageTransitionDone handlers, if present.
-          if (tpl.pages[tpl.selectedPage].onPageTransitionDone) {
-            tpl.pages[tpl.selectedPage].onPageTransitionDone();
+          if (t.pages[t.selectedPage].onPageTransitionDone) {
+            t.pages[t.selectedPage].onPageTransitionDone();
           }
           optionallyLaunchExperiment();
           IOWA.ServiceWorkerRegistration.register();
@@ -854,7 +854,7 @@ IOWA.Elements = (function() {
     };
 
     template._addClass = function(name, prop) {
-      return name ? prop : '';
+      return prop ? name : '';
     };
 
     template._enableTabIndex = function(val) {
@@ -875,7 +875,7 @@ IOWA.Elements = (function() {
       return !isPhoneSize || this.pages[selectedPage].selectedSubpage === 'myschedule';
     };
 
-    template._computeActiveClassForSubpage = function(pageName, subpageName, opt_negate) {
+    template._computeActiveClassForSubpage = function(selectedSubpage, pageName, subpageName, opt_negate) {
       var isSubpage = this._isSelectedSubpage(pageName, subpageName);
       if (opt_negate) {
         isSubpage = !isSubpage;

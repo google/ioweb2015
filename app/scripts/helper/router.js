@@ -240,7 +240,7 @@ IOWA.Router_ = function(window) {
   };
 
   /**
-   * Updates the state of UI elements based on the curent state of the router.
+   * Updates the state of UI elements based on the current state of the router.
    * @private
    */
   Router.prototype.updateUIstate = function() {
@@ -249,7 +249,9 @@ IOWA.Router_ = function(window) {
 
     // Update menu/drawer/subtabs selected item.
     this.t.selectedPage = pageName;
-    this.t.pages[pageName].selectedSubpage = this.state.current.subpage;
+    // this.t.pages[pageName].selectedSubpage = this.state.current.subpage;
+    this.t.set(['pages', pageName, 'selectedSubpage'], this.state.current.subpage);
+
     IOWA.Elements.DrawerMenu.selected = pageName;
 
     // Update some elements only if navigating to a new page.
@@ -265,7 +267,8 @@ IOWA.Router_ = function(window) {
         MASTHEAD_BG_CLASS_REGEX, ' ' + pageMeta.mastheadBgClass + ' ');
       // Reset subpage, since leaving the page.
       var startPage = this.state.start.page;
-      this.t.pages[startPage].selectedSubpage = startPage.defaultSubpage;
+      // this.t.pages[startPage].selectedSubpage = startPage.defaultSubpage;
+      this.t.set(['pages', startPage, 'selectedSubpage'], startPage.defaultSubpage);
       // Scroll to top of new page.
       IOWA.Elements.ScrollContainer.scrollTop = 0;
     }
@@ -365,6 +368,7 @@ IOWA.Router_ = function(window) {
     var newSubpage = IOWA.Elements.Main.querySelector(
         '.subpage-' + this.state.end.subpage);
     var router = this;
+
     // Run subpage transition if both subpages exist.
     if (oldSubpage && newSubpage) {
       // Play exit sequence.

@@ -97,7 +97,7 @@
       if (template.mapGalleryActive) {
         template.closeMapGallery();
       }
-      var live = document.querySelector('io-live[openWidget]');
+      var live = document.querySelector('io-live[open-widget]');
       if (live) {
         live.openWidget = false;
       }
@@ -110,7 +110,8 @@
   });
 
   window.addEventListener('offline', function(e) {
-    IOWA.Elements.Toast.showMessage('Offline. Changes you make to My Schedule will be saved for later.');
+    IOWA.Elements.Toast.showMessage(
+        'Offline. Changes you make to My Schedule will be saved for later.');
   });
 
   // Watch for sign-in changes to fetch user schedule, update UI, etc.
@@ -146,6 +147,6 @@
   if (IOWA.Util.supportsHTMLImports) {
     afterImports();
   } else {
-    document.addEventListener('polymer-ready', afterImports);
+    document.addEventListener('WebComponentsReady', afterImports);
   }
 })();

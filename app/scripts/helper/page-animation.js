@@ -67,9 +67,8 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function sectionSlideOut(section) {
-    var prefix = section.classList.contains('active') ? '' : '.active ';
-    var main = section.querySelector(prefix + '.slide-up');
-    var mainDelayed = section.querySelector(prefix + '.slide-up-delay');
+    var main = section.querySelector('.slide-up');
+    var mainDelayed = section.querySelector('.slide-up-delay');
     var start = {
       transform: 'translate(0, 0)',
       opacity: 1
@@ -91,9 +90,8 @@ IOWA.PageAnimation = (function() {
    * @return {Animation} Page animation definition.
    */
   function sectionSlideIn(section) {
-    var prefix = section.classList.contains('active') ? '': '.active ';
-    var main = section.querySelector(prefix + '.slide-up');
-    var mainDelayed = section.querySelector(prefix + '.slide-up-delay');
+    var main = section.querySelector('.slide-up');
+    var mainDelayed = section.querySelector('.slide-up-delay');
     var start = {
       transform: 'translate(0, ' + CONTENT_SLIDE_LENGTH + ')',
       opacity: 0
@@ -342,9 +340,7 @@ IOWA.PageAnimation = (function() {
   function play(animation, callback) {
     var player = document.timeline.play(animation);
     if (callback) {
-      player.onfinish = function(e) {
-        callback();
-      };
+      player.onfinish = callback;
     }
   }
 
@@ -354,13 +350,11 @@ IOWA.PageAnimation = (function() {
   function playPageSlideIn() {
     return new Promise(function(resolve, reject) {
       // Wait 1 rAF for DOM to settle.
-      IOWA.Elements.Template.async(function() {
+      // IOWA.Elements.Template.async(function() {
         // Hide the masthead ripple before proceeding with page transition.
         play(elementFadeOut(IOWA.Elements.Ripple, {duration: 0}));
-        play(pageSlideIn(), function() {
-          resolve();
-        });
-      });
+        play(pageSlideIn(), resolve);
+      // });
 
     });
   }
@@ -371,10 +365,9 @@ IOWA.PageAnimation = (function() {
   function playPageSlideOut() {
     return new Promise(function(resolve, reject) {
       // Wait 1rAF for smooth animation.
-      IOWA.Elements.Template.async(function() {
-        var animation = contentSlideOut();
-        play(animation, resolve);
-      });
+      // IOWA.Elements.Template.async(function() {
+        play(contentSlideOut(), resolve);
+      // });
     });
   }
 
@@ -384,9 +377,8 @@ IOWA.PageAnimation = (function() {
   function playSectionSlideOut(section) {
     return new Promise(function(resolve, reject) {
       play(new GroupEffect([
-      sectionSlideOut(section),
-      elementFadeOut(
-          IOWA.Elements.Footer, {duration: 400})
+        sectionSlideOut(section),
+        elementFadeOut(IOWA.Elements.Footer, {duration: 400})
       ]), resolve);
     });
   }
@@ -398,8 +390,7 @@ IOWA.PageAnimation = (function() {
     return new Promise(function(resolve, reject) {
       play(new GroupEffect([
         sectionSlideIn(section),
-        elementFadeIn(
-            IOWA.Elements.Footer, {duration: 400})
+        elementFadeIn(IOWA.Elements.Footer, {duration: 400})
       ]), resolve);
     });
   }
@@ -423,12 +414,7 @@ IOWA.PageAnimation = (function() {
       var rippleAnim = rippleEffect(
             IOWA.Elements.Ripple, x, y, duration,
             rippleColor, isFadeRipple);
-      var animGroup = [
-        rippleAnim,
-        contentSlideOut(),
-      ];
-
-      var animation = new GroupEffect(animGroup);
+      var animation = new GroupEffect([rippleAnim, contentSlideOut()]);
       play(animation, resolve);
     });
   }

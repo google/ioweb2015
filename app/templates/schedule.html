@@ -238,7 +238,7 @@
 </paper-dialog>
 
 <div class="subpage__container">
-  <section class$="subpage-agenda subpage__content {{_computeActiveClassForSubpage('schedule', 'agenda')}}">
+  <section class$="subpage-agenda subpage__content {{_computeActiveClassForSubpage(pages.schedule.selectedSubpage, 'schedule', 'agenda')}}">
     <section class="page__section page__section--top slide-up">
       <div class="card__container card__container--top">
         <div class="card js-experiment-visualizer">
@@ -344,11 +344,11 @@
     </div>
   </section>
 
-  <section id="subpage-day1" class$="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{_computeActiveClassForSubpage('schedule', 'agenda', true)}}">
+  <section id="subpage-day1" class$="subpage-day1 subpage-day2 subpage-myschedule subpage__content {{_computeActiveClassForSubpage(pages.schedule.selectedSubpage, 'schedule', 'agenda', true)}}">
     <section class="page__section page__section--top slide-up">
       <div id="signin-prompt"
           class$="card__container card__container--top {{_addClass('prompt-hidden', currentUser)}}"
-          hidden$="{{_isSelectedSubpage('schedule', 'myschedule')}}">
+          hidden$="{{_equal(pages.schedule.selectedSubpage, 'myschedule')}}">
         <div class="card js-experiment-visualizer">
           <div class="card-content">
             <h3 class="card__title">Create your custom I/O schedule</h3>
@@ -367,7 +367,7 @@
       </div>
 
       <div class="card__container card__container--top"
-           hidden$="{{!_isSelectedSubpage('schedule', 'myschedule')}}">
+           hidden$="{{!_equal(pages.schedule.selectedSubpage, 'myschedule')}}">
         <div class="card js-experiment-visualizer">
 
           <template is="dom-if" if="[[!currentUser]]">
