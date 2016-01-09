@@ -235,9 +235,11 @@
         history.replaceState({}, null, location.pathname); // Remove #photos hash from URL.
       };
 
-      IOWA.Elements.Template.togglePhotoGallery = function(e, detail, sender) {
-        if (sender && sender.hasAttribute('data-track-link')) {
-          IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+      IOWA.Elements.Template.togglePhotoGallery = function(e, detail) {
+        var target = Polymer.dom(e).rootTarget;
+
+        if (target && target.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent('link', 'click', target.getAttribute('data-track-link'));
         } else {
           IOWA.Analytics.trackEvent('link', 'click', 'about-photos-deeplink');
         }
