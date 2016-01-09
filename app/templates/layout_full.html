@@ -335,7 +335,6 @@ limitations under the License.
 
     <template is="dom-bind" id="t">
 
-<!-- TODO: update for polymer 1.0 port. Make sure user notifies -->
       <google-signin client-id="{% .ClientID %}"
                      scopes="https://www.googleapis.com/auth/drive.appfolder"
                      user="{{currentUser}}"></google-signin>
@@ -390,16 +389,15 @@ limitations under the License.
             <!-- /fakesignin is not a real endpoint, but we need it to trick router not
                  to return early from the document-level touchstart listener on mobile. -->
             <span class="anchor-like button-link" data-track-link="nav-signin"
-                  on-click="signIn" hidden$="{{currentUser}}">Sign in</span>
+                  on-click="signIn" hidden="{{currentUser}}">Sign in</span>
             <template is="dom-if" if="{{currentUser}}" restamp>
               <img src$="{{currentUser.picture}}" class="profilepic">
-              <paper-menu-button>
-                <paper-icon-button icon="io:more-vert" aria-label="Settings"></paper-icon-button>
+              <paper-menu-button horizontal-align="right" vertical-align="top">
+                <paper-icon-button icon="io:more-vert" class="dropdown-trigger"
+                                   aria-label="Settings"></paper-icon-button>
 <!-- TODO: update events polymer 1.0 -->
-                <paper-dropdown id="signin-settings-panel" class="dropdown"
-                                halign="right" valign="top"
-                                on-core-overlay-open="getNotificationState"
-                                duration="200">
+                <div id="signin-settings-panel"  class="dropdown-content"
+                                on-paper-dropdown-open="getNotificationState">
                   <div class="card-content" layout horizontal>
                     <div><img src$="{{currentUser.picture}}" class="profilepic"></div>
                     <div>
@@ -409,16 +407,14 @@ limitations under the License.
                   </div>
                   <div class="card-content notification__feature">
                     <h4>Notifications</h4>
-                    <paper-label horizontal layout>
-                      <paper-checkbox autoFocus for
-                                      checked$="{{currentUser.notify}}"
+                    <iron-label horizontal layout>
+                      <paper-checkbox checked$="{{currentUser.notify}}"
                                       disabled$="{{_disableNotify(currentUser.notify)}}"
                                       on-tap="updateNotifyUser"></paper-checkbox>
                       <h5>I want to receive notifications from the Google I/O 2015 web app.</h5>
-                    </paper-label>
+                    </iron-label>
                     <p>If this option is deselected, I understand I won't be notified when:</p>
                     <ul>
-                      <!-- <li>New Extended events register near me</li> -->
                       <li>I/O is about to start</li>
                       <li>Events added to My Schedule are about to start</li>
                       <li>Videos of sessions added to My Schedule are available</li>
@@ -426,40 +422,16 @@ limitations under the License.
                     <p class="settings-note"><b>Note</b>: Notifications are activated per device. To receive notifications on multiple devices, sign in on each device, enable notifications, and make sure you're online. All device notifications can be turned on/off at any time in the settings panel.</p>
                   </div>
                   <div class="card-content" layout horizontal justified>
-                    <a href="https://www.google.com/intl/en/policies/terms/" data-track-link="login-tos" target="_blank">Terms of Service</a>
-                    <span class="anchor-like" data-track-link="login-signout" on-tap="signOut">Sign out</span>
+                    <a href="https://www.google.com/intl/en/policies/terms/"
+                       data-track-link="login-tos" target="_blank">Terms of Service</a>
+                    <span class="anchor-like" data-track-link="login-signout"
+                          on-tap="signOut">Sign out</span>
                   </div>
-                </paper-dropdown>
+                </div>
               </paper-menu-button>
             </template>
           </span>
         </paper-toolbar>
-
-        <!-- backdrop shouldn't be applied on ios - github.com/Polymer/paper-dialog/issues/16 -->
-<!-- TODO: update for polymer 1.0 port -->
-
-        <paper-dialog class="card card__signin-intro"
-                      entry-animation="scale-up-animation" no-cancel-on-outside-click
-                      modal="{{!isIOS}}" layered="false">
-          <div class="card-content">
-            <h4 class="card__title">Sign in</h4>
-            <p>By signing in to the 2015 I/O web app, you can create a customized I/O schedule.</p>
-            <div class="notification__feature">
-              <p>Once signed-in, you can choose to receive notifications on this device when:</p>
-              <ul>
-                <!-- <li>New I/O Extended events register near your location</li> -->
-                <li>I/O is about to start</li>
-                <li>Events added to My Schedule are about to start</li>
-                <li>Videos of sessions added to My Schedule are available</li>
-              </ul>
-              <p class="settings-note"><b>Note</b>: Notifications are activated per device. To receive notifications on multiple devices, sign in on each device, enable notifications, and make sure you're online. All device notifications can be turned on/off at any time in the settings panel.</p>
-            </div>
-          </div>
-          <div class="card-content" layout horizontal justified>
-            <span class="anchor-like" role="link" tabindex="0" data-track-link="signin-intro-signin" on-click="signIn" iron-overlay-toggle>Sign in</span>
-            <a href="#" data-track-link="signin-intro-later" iron-overlay-toggle>Maybe later</a>
-          </div>
-        </paper-dialog>
 
         <div class="masthead-container" flex end$="{{!isPhoneSize}}"
              layout vertical$="{{isPhoneSize}}" horizontal$="{{!isPhoneSize}}">
@@ -468,9 +440,7 @@ limitations under the License.
             <div id="template-masthead-container">{% template "masthead" .%}</div>
           </div>
         </div>
-        <!-- <experiment-fab-container class="fab" mini$="{{isPhoneSize}}" mode="{{mode}}" playmode="{{playmode}}" recordmode="{{recordmode}}" direction="{{direction}}" hidden$="{{selectedPage !== 'home'}}"></experiment-fab-container> -->
-        <a href="schedule#myschedule" hidden$="{{_isPage('home', selectedPage)}}"
-           data-ajax-link data-track-link="fab-myschedule">
+        <a href="schedule#myschedule" data-ajax-link data-track-link="fab-myschedule">
           <paper-fab class="fab" icon="event" title="My Schedule"
                      mini$="{{isPhoneSize}}"></paper-fab>
         </a>

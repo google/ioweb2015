@@ -164,7 +164,7 @@ paper-drawer-panel {
       color: inherit;
     }
 
-    &.core-selected {
+    &.iron-selected {
       pointer-events: none;
     }
   }
@@ -174,13 +174,6 @@ paper-drawer-panel {
     color: inherit;
     margin-right: $mobileKeyline / 2;
   }
-}
-
-.card__signin-intro {
-  position: absolute !important;
-  top: initial !important;
-  right: $tabletKeyline;
-  margin: 0;
 }
 
 #signin-nav-elements {
@@ -198,14 +191,13 @@ paper-drawer-panel {
   }
 }
 
-#signin-settings-panel,
-.card__signin-intro {
+#signin-settings-panel {
   width: 344px;
   color: $color-text;
   font-size: 14px;
   line-height: 18px;
 
-  core-label {
+  iron-label {
     padding: $mobileKeyline 0;
   }
 
@@ -275,7 +267,7 @@ paper-drawer-panel {
     margin: 0;
     padding: 0;
     border: none;
-    core-menu {
+    paper-menu {
       margin: 0;
     }
     paper-item {
@@ -295,8 +287,8 @@ paper-drawer-panel {
   line-height: 20px;
 }
 
-experiment-fab-container, .fab {
-  bottom: -20px; // experiment-fab's height / 2
+.fab {
+  bottom: -20px; // fab's height / 2
   right: $mobileKeyline;
   width: 56px;
   height: 56px;
@@ -309,7 +301,7 @@ paper-fab {
 }
 
 @media (max-width: $phone-breakpoint-max) {
-  experiment-fab-container, .fab {
+  .fab {
     width: 40px;
     height: 40px;
   }
@@ -338,12 +330,6 @@ paper-fab {
       background: transparent;
     }
   }
-
-  .card__signin-intro {
-    right: 0;
-    left: 0;
-    width: 100%;
-  }
 }
 
 @media (min-width: $tablet-breakpoint-min) {
@@ -360,8 +346,8 @@ paper-fab {
     padding: 0 0 170px 0;
   }
 
-  experiment-fab-container, .fab {
-    bottom: -28px; // experiment-fab's height / 2
+  .fab {
+    bottom: -28px; // fab's height / 2
     right: $desktopKeyline;
   }
 
@@ -371,8 +357,7 @@ paper-fab {
       margin: 0;
     }
     paper-menu-button {
-      height: 40px;
-      margin: 0;
+      padding: 0;
     }
     [icon="menu"] {
       display: none;

@@ -19,34 +19,6 @@ IOWA.Elements = (function() {
 
   const ANALYTICS_LINK_ATTR = 'data-track-link';
 
-  function showSigninHelp() {
-    var signinIntroEl = document.querySelector('.card__signin-intro');
-    var showSigninIntro = !JSON.parse(localStorage.getItem('showSigninIntro'));
-    if (showSigninIntro) {
-
-// TODO: update for polymer 1.0 port
-      signinIntroEl.addEventListener('core-overlay-close-completed', function(e) {
-        e.stopPropagation();
-        localStorage.setItem('showSigninIntro', JSON.stringify(true));
-
-        // Allow taps on the toast/off the toast to dismiss it. Also re-establish
-        // the reload handler for the "Tap to refresh content" toast.
-        IOWA.Elements.Toast.autoCloseDisabled = false;
-        IOWA.Elements.Toast.tapHandler_ = function() {
-          window.location.reload();
-        };
-
-        signinIntroEl.parentElement.removeChild(signinIntroEl);
-        signinIntroEl = null;
-      });
-
-      signinIntroEl.opened = true;
-    } else {
-      signinIntroEl.parentElement.removeChild(signinIntroEl);
-      IOWA.Elements.Toast.autoCloseDisabled = false;
-    }
-  }
-
   function optionallyLaunchExperiment() {
     if (window.location.search.indexOf('experiment') > -1) {
       IOWA.Elements.FAB.onFabClick();
@@ -89,7 +61,6 @@ IOWA.Elements = (function() {
           }
           optionallyLaunchExperiment();
           IOWA.ServiceWorkerRegistration.register();
-          showSigninHelp(); // show signin help popup on page load.
         }
       );
     });
