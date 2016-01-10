@@ -278,6 +278,17 @@ limitations under the License.
         background-size: 15% !important;
       };
     }
+
+    paper-dialog {
+      --paper-font-title: {}; /* nuke paper-dialog's styling */
+    }
+
+    paper-dialog-scrollable {
+      --paper-dialog-scrollable: {
+        padding: 0;
+        position: relative;
+      };
+    }
   </style>
 </head>
 <body id="page-{% .Slug %}">

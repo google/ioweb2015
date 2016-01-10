@@ -1,5 +1,5 @@
 <!--
-Copyright 2015 Google Inc. All rights reserved.
+Copyright 2016 Google Inc. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -13,12 +13,10 @@ limitations under the License.
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
-<link rel="import" href="../bower_components/iron-label/iron-label.html">
+<!-- <link rel="import" href="../bower_components/iron-label/iron-label.html"> -->
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<!-- <link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html"> -->
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
-<!-- <link rel="import" href="io-checkbox.html"> -->
-<!-- <link rel="import" href="io-radio-button.html"> -->
 
 <link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
@@ -26,6 +24,13 @@ limitations under the License.
 
 <!--
 The `<io-schedule>` element renders a schedule for a given day(s).
+-->
+<!--
+Fired when session is selected.
+
+@event session-select
+@param {Object} detail
+@param {Object} detail.session The selected session.
 -->
 <dom-module id="io-schedule">
   <link rel="import" type="css" href="io-schedule.css">
@@ -132,12 +137,6 @@ The `<io-schedule>` element renders a schedule for a given day(s).
         </template>
 
         <template is="dom-if" if="{{!_dayIs(day, 'myschedule')}}">
-
-          <!-- <div class="card day-title">
-            <div class="card-content">
-              <h4>May {{day.value}}</h4>
-            </div>
-          </div> -->
 
           <template is="dom-repeat" items="[[_timeBlocks]]" as="timeBlock">
 
@@ -509,17 +508,16 @@ The `<io-schedule>` element renders a schedule for a given day(s).
           }
         },
 
-        onSessionSelect: function(e, detail, sender) {
+        onSessionSelect: function(e, detail) {
           e.preventDefault();
-// TODO: update polymer 1.0
-          this.selectSession(sender.templateInstance.model.session);
+          e.stopPropagation();
+          this.selectSession(e.model.session);
         },
 
-        onSessionKeyUp: function(e, detail, sender) {
+        onSessionKeyUp: function(e, detail) {
           // enter or ctrl+alt+space (voice over click)
           if (e.keyCode === 13 || e.altKey && e.ctrlKey && e.keyCode === 32) {
-// TODO: update polymer 1.0
-            this.selectSession(sender.templateInstance.model.session);
+            this.selectSession(e.model.session);
           }
         },
 

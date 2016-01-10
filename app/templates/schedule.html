@@ -51,190 +51,194 @@
               with-backdrop="[[!isIOS]]"
               on-iron-overlay-closed="onSessionDetailsClose"
               on-iron-overlay-open="onSessionDetailsOpen">
-  <paper-icon-button icon="arrow-back" iron-overlay-toggle
-                     aria-label="Close session"></paper-icon-button>
-  <div class="card__photo" relative>
+  <paper-dialog-scrollable>
+    <paper-icon-button icon="arrow-back" dialog-dismiss
+                       aria-label="Close session"></paper-icon-button>
+    <div class="card__photo" relative>
 
-    <template is="dom-if" if="{{sessionHasVideo(showScheduleVideo, selectedSession.isLivestream, selectedSession.youtubeUrl)}}" restamp>
-      <google-youtube video-id="[[toVideoIdFilter(selectedSession.youtubeUrl)]]"
-          height="100%" width="100%" fit
-          autohide="1" controls="2" modestbranding="1" showinfo="0"
-          iv_load_policy="3" rel="0" autoplay="1"
-          on-google-youtube-ready="onScheduleVideoReady"></google-youtube>
-    </template>
-    <div class="play__button__container" on-click="onVideoPlay"
-         data-track-link$="{{selectedSession.youtubeUrl}}"
-         hidden$="{{showSessionPlayButton(selectedSession)}}" layout vertical center-center fit>
-      <h4>Watch video</h4>
+      <template is="dom-if" if="{{sessionHasVideo(startScheduleVideo, selectedSession.isLivestream, selectedSession.youtubeUrl)}}" restamp>
+        <google-youtube video-id="[[toVideoIdFilter(selectedSession.youtubeUrl)]]"
+            height="100%" width="100%" fit
+            autohide="1" controls="2" modestbranding="1" showinfo="0"
+            iv_load_policy="3" rel="0" autoplay="1"
+            on-google-youtube-ready="onScheduleVideoReady"></google-youtube>
+      </template>
+      <div class="play__button__container" on-click="onVideoPlay"
+           data-track-link$="{{selectedSession.youtubeUrl}}"
+           hidden$="{{showSessionPlayButton(selectedSession)}}"
+           layout vertical center-center fit>
+        <h4>Watch video</h4>
+      </div>
+      <iron-image src="{{placeholderImage(selectedSession)}}"
+                  placeholder="images/io15-color.png"
+                  sizing="cover" preload fade fit></iron-image>
+      <paper-fab icon="{{_computeSessionSavedIcon(selectedSession.*)}}"
+                 mini="[[isPhoneSize]]"
+                 class$="[[_addClass('active', selectedSession.saved)]]"
+                 on-up="toggleSaveSession"
+                 disabled$="{{scheduleFetchingUserData}}"></paper-fab>
+      <paper-progress indeterminate
+          hidden$="{{_computeHideSessionDetailProgress(currentUser, savedSessions, scheduleFetchingUserData)}}"></paper-progress>
     </div>
-    <iron-image src="{{placeholderImage(selectedSession)}}"
-                placeholder="images/io15-color.png"
-                sizing="cover" preload fade fit></iron-image>
-    <paper-fab icon="{{selectedSession.saved ? 'check' : 'add'}}"
-               mini="[[isPhoneSize]]"
-               class$="[[_addClass('active', selectedSession.saved)]]"
-               on-up="toggleSaveSession"
-               disabled$="{{scheduleFetchingUserData}}"></paper-fab>
-    <paper-progress indeterminate
-        hidden$="{{!currentUser || (savedSessions && !scheduleFetchingUserData)}}"></paper-progress>
-  </div>
-  <div class="session__info__section">
-    <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
-    <h5 class="session__time">May <span>{{selectedSession.day}}</span> / <span>{{selectedSession.start}}</span><span hidden$="{{_equal('__keynote__', selectedSession.id)}}"> - {{selectedSession.end}}</span> / <span>{{selectedSession.room}}</span></h5>
-    <h5 class="session__categories">{{formatSessionTagsFilter(selectedSession.tags)}}</h5>
-    <div class="session__desc">{{selectedSession.description}}</div>
-    <div class="session__social" layout horizontal>
-      <a href="#" target="_blank" class="share-icon" data-share-type="gplus"
-         data-track-link="schedule-detail-share-gplus" on-click="openShareWindow">
-        <iron-icon icon="io:post-gplus"></iron-icon>
-      </a>
-      <a href="#" target="_blank" class="share-icon" data-share-type="twitter"
-         data-track-link="schedule-detail-share-twitter" on-click="openShareWindow">
-        <iron-icon icon="io:post-twitter"></iron-icon>
-      </a>
-      <a href="#" target="_blank" class="share-icon" data-share-type="fb"
-         data-track-link="schedule-detail-share-fb" on-click="openShareWindow">
-        <iron-icon icon="io:post-facebook"></iron-icon>
-      </a>
-      <span class="session__livestream" flex
-            hidden$="{{!selectedSession.isLivestream}}">Live streamed <iron-icon icon="io:videocam"></iron-icon>
-      </span>
+    <div class="session__info__section">
+      <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
+      <h5 class="session__time">May <span>{{selectedSession.day}}</span> / <span>{{selectedSession.start}}</span><span hidden$="{{_equal('__keynote__', selectedSession.id)}}"> - {{selectedSession.end}}</span> / <span>{{selectedSession.room}}</span></h5>
+      <h5 class="session__categories">{{formatSessionTagsFilter(selectedSession.tags)}}</h5>
+      <div class="session__desc">{{selectedSession.description}}</div>
+      <div class="session__social" layout horizontal>
+        <a href="#" target="_blank" class="share-icon" data-share-type="gplus"
+           data-track-link="schedule-detail-share-gplus" on-click="openShareWindow">
+          <iron-icon icon="io:post-gplus"></iron-icon>
+        </a>
+        <a href="#" target="_blank" class="share-icon" data-share-type="twitter"
+           data-track-link="schedule-detail-share-twitter" on-click="openShareWindow">
+          <iron-icon icon="io:post-twitter"></iron-icon>
+        </a>
+        <a href="#" target="_blank" class="share-icon" data-share-type="fb"
+           data-track-link="schedule-detail-share-fb" on-click="openShareWindow">
+          <iron-icon icon="io:post-facebook"></iron-icon>
+        </a>
+        <span class="session__livestream" flex
+              hidden$="{{!selectedSession.isLivestream}}">Live streamed <iron-icon icon="io:videocam"></iron-icon>
+        </span>
+      </div>
     </div>
-  </div>
-  <div class="session__info__section session__speakers"
-       hidden$="{{!selectedSession.speakers.length}}">
-    <h4>Speakers</h4>
-    <div layout horizontal wrap>
-      <template is="dom-repeat" items="{{selectedSession.speakers}}" as="speakerId">
-        <div class="speaker__card" layout horizontal>
-          <div><img src$="{{speakerProfilePic(scheduleData.speakers, speakerId)}}"
-                    class="profilepic"></div>
-          <div class="speaker__info" layout vertical flex>
-            <span class="speaker__name">{{_propOfArrayItem(scheduleData.speakers, speakerId, 'name')}}</span>
-            <span class="speaker__title">{{_propOfArrayItem(scheduleData.speakers, speakerId, 'company')}}</span>
-            <div class="speaker__desc">{{_propOfArrayItem(scheduleData.speakers, speakerId, 'bio')}}</div>
-            <div class="session__social" layout horizontal>
-              <a href$="{{_propOfArrayItem(scheduleData.speakers, speakerId, 'plusoneUrl')}}" target="_blank" class="share-icon" hidden$="{{!_propOfArrayItem(scheduleData.speakers, speakerId, 'plusoneUrl')}}"><iron-icon icon="io:post-gplus"></iron-icon></a>
-              <a href$="{{_propOfArrayItem(scheduleData.speakers, speakerId, 'twitterUrl')}}" target="_blank" class="share-icon" hidden$="{{!_propOfArrayItem(scheduleData.speakers, speakerId, 'twitterUrl')}}"><iron-icon icon="io:post-twitter"></iron-icon></a>
+    <div class="session__info__section session__speakers"
+         hidden$="{{!selectedSession.speakers.length}}">
+      <h4>Speakers</h4>
+      <div layout horizontal wrap>
+        <template is="dom-repeat" items="{{selectedSession.speakers}}" as="speakerId">
+          <div class="speaker__card" layout horizontal>
+            <div><img src$="{{speakerProfilePic(scheduleData.speakers, speakerId)}}"
+                      class="profilepic"></div>
+            <div class="speaker__info" layout vertical flex>
+              <span class="speaker__name">{{_propOfArrayItem(scheduleData.speakers, speakerId, 'name')}}</span>
+              <span class="speaker__title">{{_propOfArrayItem(scheduleData.speakers, speakerId, 'company')}}</span>
+              <div class="speaker__desc">{{_propOfArrayItem(scheduleData.speakers, speakerId, 'bio')}}</div>
+              <div class="session__social" layout horizontal>
+                <a href$="{{_propOfArrayItem(scheduleData.speakers, speakerId, 'plusoneUrl')}}" target="_blank" class="share-icon" hidden$="{{!_propOfArrayItem(scheduleData.speakers, speakerId, 'plusoneUrl')}}"><iron-icon icon="io:post-gplus"></iron-icon></a>
+                <a href$="{{_propOfArrayItem(scheduleData.speakers, speakerId, 'twitterUrl')}}" target="_blank" class="share-icon" hidden$="{{!_propOfArrayItem(scheduleData.speakers, speakerId, 'twitterUrl')}}"><iron-icon icon="io:post-twitter"></iron-icon></a>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
+        </template>
 
+      </div>
     </div>
-  </div>
 
-<!-- TODO: update for polymer 1.0 -->
-  <div class="session__info__section session__info__links card-content"
-      layout horizontal justified$="{{isPhoneSize}}"
-      hidden$="{{_computeHideSessionInfo(selectedSession)}}">
-    <span class="anchor-like" role="link"
-          on-click="onRelatedContent"
-          data-track-link="schedule-detail-related"
-          hidden$="{{!selectedSession.hasRelated}}"
-          iron-overlay-toggle>View related content</span>
-    <span class="anchor-like" role="link"
-        on-click="onRateSession"
-        data-track-link="schedule-rate-session"
-        hidden$="{{_computeHideSessionRating(selectedSession)}}">Rate session</span>
-    <span class="anchor-like-disabled" hidden$="{{!selectedSession.rated}}">Rating submitted</span>
-  </div>
+    <div class="session__info__section session__info__links card-content"
+        layout horizontal justified$="{{isPhoneSize}}"
+        hidden$="{{_computeHideSessionInfo(selectedSession)}}">
+      <span class="anchor-like" role="link"
+            on-click="onRelatedContent"
+            data-track-link="schedule-detail-related"
+            hidden$="{{!selectedSession.hasRelated}}"
+            dialog-dismiss>View related content</span>
+      <span class="anchor-like" role="link"
+          on-click="onRateSession"
+          data-track-link="schedule-rate-session"
+          hidden$="{{_computeHideSessionRating(selectedSession)}}">Rate session</span>
+      <span class="anchor-like-disabled" hidden$="{{!selectedSession.rated}}">Rating submitted</span>
+    </div>
+  </paper-dialog-scrollable>
 </paper-dialog>
 
 <paper-dialog class="session__rate"
               entry-animation="scale-up-animation"
               exit-animation="fade-out-animation"
               with-backdrop$="{{!isIOS}}">
-  <div class="session__info__section rate__header" layout horizontal center>
-    <paper-icon-button icon="arrow-back" iron-overlay-toggle aria-label="Close session"></paper-icon-button>
-    <span>Rate this session</span>
-  </div>
-  <div class="session__info__section">
-    <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
-    <h5 class="session__authors">{{speakerIdsToNameString(selectedSession.speakers)}}</h5>
-  </div>
-  <div class="session__info__section">
-    <p>Session rating:</p>
-    <div>
+  <paper-dialog-scrollable>
+    <div class="session__info__section rate__header" layout horizontal center>
+      <paper-icon-button icon="arrow-back" dialog-dismiss aria-label="Close session"></paper-icon-button>
+      <span>Rate this session</span>
+    </div>
+    <div class="session__info__section">
+      <h2 class="session__title" tabindex="-1">{{selectedSession.title}}</h2>
+      <h5 class="session__authors">{{speakerIdsToNameString(selectedSession.speakers)}}</h5>
+    </div>
+    <div class="session__info__section">
+      <p>Session rating:</p>
       <div>
-        <paper-menu selected="{{answers.overall}}"
-                    attr-for-selected="value" layout horizontal justified>
-          <paper-icon-button value="1" icon="star" class="rate__icon"></paper-icon-button>
-          <paper-icon-button value="2" icon="star" class="rate__icon"></paper-icon-button>
-          <paper-icon-button value="3" icon="star" class="rate__icon"></paper-icon-button>
-          <paper-icon-button value="4" icon="star" class="rate__icon"></paper-icon-button>
-          <paper-icon-button value="5" icon="star" class="rate__icon"></paper-icon-button>
-        </paper-menu>
-      </div>
-      <div class="rate__hint" layout horizontal justified>
-        <span>Not so awesome</span>
-        <span>Awesome</span>
+        <div>
+          <paper-menu selected="{{answers.overall}}"
+                      attr-for-selected="value" layout horizontal justified>
+            <paper-icon-button value="1" icon="star" class="rate__icon"></paper-icon-button>
+            <paper-icon-button value="2" icon="star" class="rate__icon"></paper-icon-button>
+            <paper-icon-button value="3" icon="star" class="rate__icon"></paper-icon-button>
+            <paper-icon-button value="4" icon="star" class="rate__icon"></paper-icon-button>
+            <paper-icon-button value="5" icon="star" class="rate__icon"></paper-icon-button>
+          </paper-menu>
+        </div>
+        <div class="rate__hint" layout horizontal justified>
+          <span>Not so awesome</span>
+          <span>Awesome</span>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="session__info__section">
-    <p>How relevant was this session to your projects?</p>
-    <div>
+    <div class="session__info__section">
+      <p>How relevant was this session to your projects?</p>
       <div>
-        <paper-menu selected="{{answers.relevance}}"
-                    attr-for-selected="value" layout horizontal justified>
-          <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
-          <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
-          <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
-          <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
-          <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
-        </paper-menu>
-      </div>
-      <div class="rate__hint" layout horizontal justified>
-        <span>Not at all</span>
-        <span>Extremely</span>
+        <div>
+          <paper-menu selected="{{answers.relevance}}"
+                      attr-for-selected="value" layout horizontal justified>
+            <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+            <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+            <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+            <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+            <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+          </paper-menu>
+        </div>
+        <div class="rate__hint" layout horizontal justified>
+          <span>Not at all</span>
+          <span>Extremely</span>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="session__info__section">
-    <p>Based on the description/my expectations, the content was:</p>
-    <div>
+    <div class="session__info__section">
+      <p>Based on the description/my expectations, the content was:</p>
       <div>
-        <paper-menu selected="{{answers.content}}"
-                    attr-for-selected="value" layout horizontal justified>
-          <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
-          <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
-          <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
-          <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
-          <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
-        </paper-menu>
-      </div>
-      <div class="rate__hint" layout horizontal justified>
-        <span>Too basic</span>
-        <span>Too advanced</span>
+        <div>
+          <paper-menu selected="{{answers.content}}"
+                      attr-for-selected="value" layout horizontal justified>
+            <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+            <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+            <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+            <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+            <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+          </paper-menu>
+        </div>
+        <div class="rate__hint" layout horizontal justified>
+          <span>Too basic</span>
+          <span>Too advanced</span>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="session__info__section">
-    <p>Speaker quality:</p>
-    <div>
+    <div class="session__info__section">
+      <p>Speaker quality:</p>
       <div>
-        <paper-menu selected="{{answers.speaker}}"
-                    attr-for-selected="value" layout horizontal justified>
-          <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
-          <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
-          <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
-          <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
-          <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
-        </paper-menu>
-      </div>
-      <div class="rate__hint" layout horizontal justified>
-        <span>Poor</span>
-        <span>Outstanding</span>
+        <div>
+          <paper-menu selected="{{answers.speaker}}"
+                      attr-for-selected="value" layout horizontal justified>
+            <paper-icon-button value="1" icon="star" class="rate__icon rate__icon-empty rate__icon-1"></paper-icon-button>
+            <paper-icon-button value="2" icon="star" class="rate__icon rate__icon-empty rate__icon-2"></paper-icon-button>
+            <paper-icon-button value="3" icon="star" class="rate__icon rate__icon-empty rate__icon-3"></paper-icon-button>
+            <paper-icon-button value="4" icon="star" class="rate__icon rate__icon-empty rate__icon-4"></paper-icon-button>
+            <paper-icon-button value="5" icon="star" class="rate__icon rate__icon-empty rate__icon-5"></paper-icon-button>
+          </paper-menu>
+        </div>
+        <div class="rate__hint" layout horizontal justified>
+          <span>Poor</span>
+          <span>Outstanding</span>
+        </div>
       </div>
     </div>
-  </div>
-<!-- TODO: update for polymer 1.0 -->
-  <div class="session__info__section session__info__links card-content">
-    <span class="anchor-like"
-        disabled$="{{ !answers.overall && !answers.relevance && !answers.content && !answers.speaker}}" on-click="onRateSessionSubmit" role="link"
-        data-track-link="schedule-rate-submit" iron-overlay-toggle$="{{ answers.overall || answers.relevance || answers.content || answers.speaker}}">Submit</span>
-  </div>
+  <!-- TODO: update for polymer 1.0 -->
+    <div class="session__info__section session__info__links card-content">
+      <span class="anchor-like"
+          disabled$="{{ !answers.overall && !answers.relevance && !answers.content && !answers.speaker}}" on-click="onRateSessionSubmit" role="link"
+          data-track-link="schedule-rate-submit" dialog-dismiss$="{{ answers.overall || answers.relevance || answers.content || answers.speaker}}">Submit</span>
+    </div>
+  </paper-dialog-scrollable>
 </paper-dialog>
 
 <div class="subpage__container">
@@ -562,7 +566,7 @@
 
         IOWA.Schedule.saveSession(this.selectedSession.id, saved).then(function() {
           this.scheduleFetchingUserData = false;
-          this.selectedSession.saved = saved;
+          this.set('selectedSession.saved', saved);
 
           IOWA.Schedule.bookmarkSessionNotification(saved);
 
@@ -579,7 +583,7 @@
         }
       };
 
-      IOWA.Elements.Template.onSessionDetailsClose = function(e, detail, sender) {
+      IOWA.Elements.Template.onSessionDetailsClose = function(e, detail) {
         // Remove session id hash from URL.
         var search = IOWA.Util.removeSearchParam(window.location.search, 'sid');
         var url = IOWA.Router.composeUrl(
@@ -589,21 +593,22 @@
         document.title = 'Schedule';
         pageIsDeepLinked_ = false;
 
+        var parent = Polymer.dom(e.target).node;
+
         // Reset video state.
-        var video = sender.querySelector('google-youtube')
+        var video = parent.querySelector('google-youtube');
         if (video) {
           video.pause();
         }
-// TODO: update polymer 1.0
-        sender.querySelector('iron-image').classList.remove('fadeout');
-        sender.querySelector('.play__button__container').classList.remove('fadeout');
+        parent.querySelector('iron-image').classList.remove('fadeout');
+        parent.querySelector('.play__button__container').classList.remove('fadeout');
         this.startScheduleVideo = false;
       };
 
-      IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail, sender) {
-        // sender.updateTargetDimensions();
-// TODO: update polymer 1.0
-        sender.querySelector('.session__title').focus();
+      IOWA.Elements.Template.onSessionDetailsOpen = function(e, detail) {
+        var el = Polymer.dom(e.target).node;
+
+        el.querySelector('.session__title').focus();
 
         document.title = this.selectedSession.title + ' - Google I/O Schedule';
 
@@ -622,10 +627,11 @@
         }
       };
 
-      IOWA.Elements.Template.selectFilter = function(e, detail, sender) {
+      IOWA.Elements.Template.selectFilter = function(e, detail) {
+        var menu = Polymer.dom(e.target).node;
+
         var oldFilters = ioScheduleEl.filters;
-// TODO: update polyer 1.0
-        ioScheduleEl.filters = sender.selectedIndex ? [sender.selected] : [];
+        ioScheduleEl.filters = menu.selectedIndex ? [menu.selected] : [];
         var newFilters = ioScheduleEl.filters;
         // This should not be necessary, since assigning filters above should trigger
         // the change watcher automatically. For unknown reason, on mobile only, Polymer
@@ -634,31 +640,35 @@
         ioScheduleEl.filtersChanged(oldFilters, newFilters);
       };
 
-      IOWA.Elements.Template.onRelatedContent = function(e, detail, sender) {
+      IOWA.Elements.Template.onRelatedContent = function(e, detail) {
         e.stopPropagation();
-// TODO: update polyer 1.0
-        if (sender && sender.hasAttribute('data-track-link')) {
-          IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+
+        var target = Polymer.dom(e).rootTarget;
+
+        if (target && target.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent('link', 'click', target.getAttribute('data-track-link'));
         }
         ioScheduleEl.filters = [this.selectedSession.id];
       };
 
-      IOWA.Elements.Template.onRateSession = function(e, detail, sender) {
-// TODO: update polyer 1.0
-        if (sender && sender.hasAttribute('data-track-link')) {
-          IOWA.Analytics.trackEvent('link', 'click', sender.getAttribute('data-track-link'));
+      IOWA.Elements.Template.onRateSession = function(e, detail) {
+        var target = Polymer.dom(e).rootTarget;
+
+        if (target && target.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent('link', 'click', target.getAttribute('data-track-link'));
         }
         this.answers = {}; // Reset answers.
         ratePanel.open();
       };
 
-      IOWA.Elements.Template.onRateSessionSubmit = function(e, detail, sender) {
-// TODO: update polyer 1.0
-        if (sender.hasAttribute('disabled')) {
+      IOWA.Elements.Template.onRateSessionSubmit = function(e, detail) {
+        var target = Polymer.dom(e).rootTarget;
+
+        if (target.hasAttribute('disabled')) {
           return;
         }
         IOWA.Schedule.saveSurvey(this.selectedSession.id, this.answers).then(function() {
-          this.selectedSession.rated = true;
+          this.set('selectedSession.rated', true);
         }.bind(this));
       };
 
@@ -684,20 +694,21 @@
         detailsPanel.querySelector('.play__button__container').classList.add('fadeout');
       };
 
-      IOWA.Elements.Template.onVideoPlay = function(e, detail, sender) {
+      IOWA.Elements.Template.onVideoPlay = function(e, detail) {
         e.stopPropagation();
         e.preventDefault();
 
         this.startScheduleVideo = true;
 
-        if (sender.hasAttribute('data-track-link')) {
-// TODO: update polymer 1.0
-          IOWA.Analytics.trackEvent('schedule', 'video play', sender.getAttribute('data-track-link'));
+        var target = Polymer.dom(e).rootTarget;
+        if (target.hasAttribute('data-track-link')) {
+          IOWA.Analytics.trackEvent(
+              'schedule', 'video play', target.getAttribute('data-track-link'));
         }
       };
 
-      IOWA.Elements.Template.sessionHasVideo = function(showVideo, isLivestream,  dyoutubeUrl) {
-        return showVideo && !isLivestream && youtubeUrl;
+      IOWA.Elements.Template.sessionHasVideo = function(startVideo, isLivestream, youtubeUrl) {
+        return startVideo && !isLivestream && youtubeUrl;
       };
 
       IOWA.Elements.Template.showSessionPlayButton = function(selectedSession) {
@@ -740,6 +751,10 @@
 
       IOWA.Elements.Template._computeDay = function(days) {
         return this.days[this.pages[this.selectedPage].selectedSubpage];
+      };
+
+      IOWA.Elements.Template._computeSessionSavedIcon = function(selectedSession) {
+        return selectedSession.value && selectedSession.value.saved ? 'check' : 'add';
       };
 
       page.load(); // Run load callback on page load.

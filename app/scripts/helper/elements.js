@@ -797,6 +797,10 @@ IOWA.Elements = (function() {
       return key === val;
     };
 
+    template._ternary = function(boolean, yes, no) {
+      return boolean ? yes : no;
+    };
+
     template._propOfArrayItem = function(array, index, prop) {
       return array[index][prop];
     };
@@ -852,6 +856,10 @@ IOWA.Elements = (function() {
         isSubpage = !isSubpage;
       }
       return this._addClass('active', isSubpage);
+    };
+
+    template._computeHideSessionDetailProgress = function(user, sessions, fetching) {
+      return !user || (sessions && !fetching);
     };
     // ---
 

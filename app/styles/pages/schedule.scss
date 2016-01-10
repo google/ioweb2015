@@ -229,13 +229,16 @@ iron-icon[icon="schedule"] {
   }
 }
 
+paper-dialog-scrollable {
+  margin: 0;
+}
+
 .session__detail {
   $lineHeight: 32px;
 
   color: $color-link-grey;
   font-size: 14px;
-
-  top: 0;
+  max-width: $tablet-breakpoint-min;
 
   paper-fab {
     background: #fff;
@@ -245,13 +248,13 @@ iron-icon[icon="schedule"] {
     bottom: calc(-40px/2);
 
     &.active {
-      color: white;
-      background-color: $color-cyan-400;
+      color: white !important;
+      background-color: $color-cyan-400 !important;
     }
 
     &[disabled] {
-      background-color: $color-light-grey-border;
-      color: $color-gray;
+      background-color: $color-light-grey-border !important;
+      color: $color-gray !important;
     }
   }
   paper-progress {
