@@ -229,8 +229,13 @@ iron-icon[icon="schedule"] {
   }
 }
 
-paper-dialog-scrollable {
-  margin: 0;
+.session__detail {
+  .scrollable {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    position: relative; // So back arrow scrolls away.
+  }
 }
 
 .session__detail {
@@ -239,6 +244,7 @@ paper-dialog-scrollable {
   color: $color-link-grey;
   font-size: 14px;
   max-width: $tablet-breakpoint-min;
+  position: fixed;
 
   paper-fab {
     background: #fff;

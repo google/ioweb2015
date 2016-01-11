@@ -537,11 +537,10 @@ Fired when session is selected.
           return moment(dateStr).tz(tzId);
         },
 
-        onToggleSaveSession: function(e, detail, sender) {
+        onToggleSaveSession: function(e, detail) {
           e.stopPropagation();
           this.fire('session-bookmark', {
-// TODO: update polymer 1.0
-            session: sender.templateInstance.model.session,
+            session: e.model.session,
             save: e.target.checked
           });
         },

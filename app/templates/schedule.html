@@ -9,7 +9,7 @@
   <h1>Schedule</h1>
   <div layout horizontal justified>
     <paper-tabs id="subpage-tabs" class="white" attr-for-selected="label"
-                selected="day1" scrollable="{{isPhoneSize}}">
+                selected="day1" scrollable$="{{isPhoneSize}}">
       <paper-tab label="agenda" role="">
         <a href="#agenda" data-track-link="schedule-agenda" data-ajax-link
                           layout horizontal center-center>Agenda</a>
@@ -50,8 +50,8 @@
               exit-animation="fade-out-animation"
               with-backdrop="[[!isIOS]]"
               on-iron-overlay-closed="onSessionDetailsClose"
-              on-iron-overlay-open="onSessionDetailsOpen">
-  <paper-dialog-scrollable>
+              on-iron-overlay-opened="onSessionDetailsOpen">
+  <div class="scrollable">
     <paper-icon-button icon="arrow-back" dialog-dismiss
                        aria-label="Close session"></paper-icon-button>
     <div class="card__photo" relative>
@@ -140,14 +140,14 @@
           hidden$="{{_computeHideSessionRating(selectedSession)}}">Rate session</span>
       <span class="anchor-like-disabled" hidden$="{{!selectedSession.rated}}">Rating submitted</span>
     </div>
-  </paper-dialog-scrollable>
+  </div>
 </paper-dialog>
 
 <paper-dialog class="session__rate"
               entry-animation="scale-up-animation"
               exit-animation="fade-out-animation"
               with-backdrop$="{{!isIOS}}">
-  <paper-dialog-scrollable>
+  <div class="scrollable">
     <div class="session__info__section rate__header" layout horizontal center>
       <paper-icon-button icon="arrow-back" dialog-dismiss aria-label="Close session"></paper-icon-button>
       <span>Rate this session</span>
@@ -232,13 +232,14 @@
         </div>
       </div>
     </div>
-  <!-- TODO: update for polymer 1.0 -->
     <div class="session__info__section session__info__links card-content">
-      <span class="anchor-like"
-          disabled$="{{ !answers.overall && !answers.relevance && !answers.content && !answers.speaker}}" on-click="onRateSessionSubmit" role="link"
-          data-track-link="schedule-rate-submit" dialog-dismiss$="{{ answers.overall || answers.relevance || answers.content || answers.speaker}}">Submit</span>
+      <span class="anchor-like" role="link"
+          disabled$="[[_computeDisableRateSession(answers.*)]]"
+          on-click="onRateSessionSubmit"
+          data-track-link="schedule-rate-submit"
+          dialog-dismiss$="[[!_computeDisableRateSession(answers.*)]]">Submit</span>
     </div>
-  </paper-dialog-scrollable>
+  </div>
 </paper-dialog>
 
 <div class="subpage__container">
@@ -532,6 +533,7 @@
           detailsPanel.querySelector('.play__button__container').classList.remove('fadeout');
           ratePanel = ratePanel || document.querySelector('.session__rate');
 
+          // TODO: check that this is still needed in paper-tabs.
           IOWA.A11y.addFocusStates(SUBTAB_SELECTOR);
         });
         window.addEventListener('popstate', sessionDetailsPopstateHandler);
@@ -755,6 +757,11 @@
 
       IOWA.Elements.Template._computeSessionSavedIcon = function(selectedSession) {
         return selectedSession.value && selectedSession.value.saved ? 'check' : 'add';
+      };
+
+      IOWA.Elements.Template._computeDisableRateSession = function(answersRecord) {
+        return !this.answers.overall && !this.answers.relevance &&
+               !this.answers.content && !this.answers.speaker;
       };
 
       page.load(); // Run load callback on page load.

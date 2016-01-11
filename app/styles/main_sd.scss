@@ -92,24 +92,24 @@
   }
 }
 
-#page-schedule {
-  // paper-dropdown-menu::shadow {
-  //   #arrow, #label {
-  //     color: inherit;
-  //   }
-  // }
-  .session__rate::shadow #scroller,
-  .session__detail::shadow #scroller {
-    width: 100%;
-    padding: 0;
-  }
-  @media (min-width: $tablet-breakpoint-min) {
-    .session__rate::shadow #scroller,
-    .session__detail::shadow #scroller {
-      width: 768px;
-    }
-  }
-}
+// #page-schedule {
+//   // paper-dropdown-menu::shadow {
+//   //   #arrow, #label {
+//   //     color: inherit;
+//   //   }
+//   // }
+//   .session__rate::shadow #scroller,
+//   .session__detail::shadow #scroller {
+//     width: 100%;
+//     padding: 0;
+//   }
+//   @media (min-width: $tablet-breakpoint-min) {
+//     .session__rate::shadow #scroller,
+//     .session__detail::shadow #scroller {
+//       width: 768px;
+//     }
+//   }
+// }
 
 #page-videos {
   .filter-rows {

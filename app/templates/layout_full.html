@@ -166,9 +166,8 @@ limitations under the License.
 
   <!-- Page styles -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-  <link rel="stylesheet" href="styles/main.css">
-<!-- TODO: update for Polymer 1.0 -->
-  <link rel="stylesheet" href="styles/main_sd.css" shim-shadowdom>
+  <link rel="stylesheet" href="styles/main.css">s
+  <!-- <link rel="stylesheet" href="styles/main_sd.css" shim-shadowdom> -->
 
   <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
   <link rel="import" href="elements/elements.html">
@@ -244,7 +243,6 @@ limitations under the License.
       };
     }
 
-
     footer paper-dropdown-menu {
       --paper-input-container-underline: {
         display: none;
@@ -283,11 +281,8 @@ limitations under the License.
       --paper-font-title: {}; /* nuke paper-dialog's styling */
     }
 
-    paper-dialog-scrollable {
-      --paper-dialog-scrollable: {
-        padding: 0;
-        position: relative;
-      };
+    .scrollable {
+      @apply(--layout-scroll);
     }
   </style>
 </head>
