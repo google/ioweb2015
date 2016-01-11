@@ -726,7 +726,7 @@
       };
 
       IOWA.Elements.Template.speakerProfilePic = function(speakers, id) {
-        if (speakers.length && speakers[id].thumbnailUrl) {
+        if (speakers && speakers[id].thumbnailUrl) {
           return speakers[id].thumbnailUrl;
         }
         return 'images/schedule/profile_placeholder.png';
