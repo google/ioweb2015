@@ -21,6 +21,13 @@ $name: 'page-offsite';
 @import '../base/_color';
 @import '../base/_breakpoints';
 
+.bg-globe {
+  background-image: url(../images/home/globe-1440.jpg);
+  background-repeat: no-repeat;
+  background-position: 50% 60px;
+  background-size: 150%;
+}
+
 ##{$name} {
 
 $icon-margin: 10px;

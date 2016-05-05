@@ -66,13 +66,13 @@
     "polymer": "Polymer/polymer#^0.5.6",
     "shed": "wibblymat/shed#^1.0.0",
     "es6-promise": "jakearchibald/es6-promise#^2.2.0",
-    "web-animations-js": "web-animations/web-animations-js#^1.0.7",
+    "web-animations-js": "web-animations/web-animations-js#^1.0.8",
     "moment": "~2.10.2",
     "moment-timezone": "~0.3.1",
     "elevator": "tholman/elevator.js#db3486b1d99c9ab284f5a8479d0025f279083713"
   },
   "resolutions": {
-    "web-animations-js": "1.0.7",
+    "web-animations-js": "1.0.8",
     "webcomponentsjs": "^0.6.1",
     "google-apis": "^0.4.4",
     "polymer": "^0.5.6"

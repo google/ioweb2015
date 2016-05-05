@@ -333,7 +333,7 @@ paper-progress {
   flex-shrink: 0;
 }
 
-&.bg-dark-grey {
+:host(.bg-dark-grey) {
   // color: $color-bluegrey-100;
   background-color: $color-bluegrey-700;
   // color: $color-section-dark-grey-text;
