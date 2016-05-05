@@ -125,6 +125,7 @@ core-drawer-panel {
     background-color: $color-body;
   }
   [main] {
+    height: 100%; // Fix Chrome 50 bug where page doesn't scroll.
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
   }
