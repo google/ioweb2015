@@ -67,7 +67,6 @@ func registerHandlers() {
 	handle("/api/v1/auth", handleAuth)
 	handle("/api/v1/schedule", serveSchedule)
 	handle("/api/v1/easter-egg", handleEasterEgg)
-	handle("/api/v1/photoproxy", servePhotosProxy)
 	handle("/api/v1/user/schedule", handleUserSchedule)
 	handle("/api/v1/user/schedule/", handleUserSchedule)
 	handle("/api/v1/user/notify", handleUserNotifySettings)
@@ -1135,36 +1134,6 @@ func serveEasterEgg(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("content-type", "application/json")
 	fmt.Fprintf(w, `{"link": %q}`, link)
-}
-
-// servePhotosProxy serves as a server proxy for Picasa's JSON feeds.
-func servePhotosProxy(w http.ResponseWriter, r *http.Request) {
-	c := newContext(r)
-	if r.Method != "GET" {
-		writeJSONError(c, w, http.StatusBadRequest, "invalid request method")
-		return
-	}
-	url := r.FormValue("url")
-	if !strings.HasPrefix(url, "https://picasaweb.google.com/data/feed/api") {
-		writeJSONError(c, w, http.StatusBadRequest, "url parameter is missing or is an invalid endpoint")
-		return
-	}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		writeJSONError(c, w, errStatus(err), err)
-		return
-	}
-
-	res, err := httpClient(c).Do(req)
-	if err != nil {
-		writeJSONError(c, w, errStatus(err), err)
-		return
-	}
-
-	defer res.Body.Close()
-	w.Header().Set("Content-Type", "application/json;charset=utf-8")
-	w.WriteHeader(res.StatusCode)
-	io.Copy(w, res.Body)
 }
 
 // handleAdmin renders admin home page on 'GET' requests,
