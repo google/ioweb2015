@@ -20,7 +20,6 @@ IOWA.Picasa = (function() {
 
   "use strict";
 
-  var API_ENDPOINT = 'api/v1/photoproxy';
   var GDEVELOPER_USER_ID = '111395306401981598462';
   var IO_ALBUM_ID = '6148448302499535601';
   var EXTENDED_ALBUM_ID = '6151106494033928993';
@@ -40,20 +39,12 @@ IOWA.Picasa = (function() {
     var startIndex = opt_startIndex || 1;
     var feedUrl = getFeedUrl(opt_albumId || IO_ALBUM_ID);
 
-    var url = API_ENDPOINT + '?url=' +
-              encodeURIComponent(feedUrl + '&start-index=' + startIndex);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.onload = function(e) {
-      if (this.status != 200) {
-        return;
-      }
-      var photos = JSON.parse(this.response).data.items;
-      callback(photos);
-    };
-
-    xhr.send();
+    var sharedLib = document.createElement('core-shared-lib');
+    sharedLib.url = feedUrl + '&start-index=' + startIndex +
+                    '&callback=%%callback%%';
+    sharedLib.addEventListener('core-shared-lib-load', function(e) {
+      callback(e.detail[1][0].data.items);
+    });
   }
 
   function fetchExtendedPhotos(callback) {

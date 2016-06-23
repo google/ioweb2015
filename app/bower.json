@@ -44,6 +44,7 @@
     "core-pages": "Polymer/core-pages#^0.5.6",
     "core-selector": "Polymer/core-selector#^0.5.6",
     "core-scroll-threshold": "Polymer/core-scroll-threshold#^0.5.6",
+    "core-shared-lib": "Polymer/core-shared-lib#^0.5.6",
     "core-toolbar": "Polymer/core-toolbar#^0.5.6",
     "core-tooltip": "Polymer/core-tooltip#^0.5.6",
     "google-apis": "GoogleWebComponents/google-apis#^0.4.4",
